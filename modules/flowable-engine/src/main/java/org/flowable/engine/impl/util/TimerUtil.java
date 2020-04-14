@@ -15,11 +15,13 @@ package org.flowable.engine.impl.util;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
@@ -58,7 +60,8 @@ public class TimerUtil {
      * 
      * Takes in an optional execution, if missing the {@link NoExecutionVariableScope} will be used (eg Timer start event)
      */
-    public static TimerJobEntity createTimerEntityForTimerEventDefinition(TimerEventDefinition timerEventDefinition, boolean isInterruptingTimer,
+    public static TimerJobEntity createTimerEntityForTimerEventDefinition(TimerEventDefinition timerEventDefinition, 
+            FlowElement currentFlowElement, boolean isInterruptingTimer,
             ExecutionEntity executionEntity, String jobHandlerType, String jobHandlerConfig) {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -132,6 +135,16 @@ public class TimerUtil {
 
         TimerJobEntity timer = null;
         if (duedate != null) {
+            
+            String jobCategoryElementText = null;
+            List<ExtensionElement> jobCategoryElements = currentFlowElement.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    jobCategoryElementText = jobCategoryElement.getElementText();
+                }
+            }
+            
             timer = CommandContextUtil.getTimerJobService().createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setRevision(1);
@@ -149,6 +162,17 @@ public class TimerUtil {
                 if (executionEntity.getTenantId() != null) {
                     timer.setTenantId(executionEntity.getTenantId());
                 }
+                
+                if (jobCategoryElementText != null) {
+                    Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElementText);
+                    Object categoryValue = categoryExpression.getValue(executionEntity);
+                    if (categoryValue != null) {
+                        timer.setCategory(categoryValue.toString());
+                    }
+                }
+            
+            } else if (jobCategoryElementText != null) {
+                timer.setCategory(jobCategoryElementText);
             }
             
         } else {
@@ -201,7 +225,8 @@ public class TimerUtil {
             }
 
             ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(timerJob.getExecutionId());
-            TimerJobEntity rescheduledTimerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, isInterruptingTimer, execution,
+            TimerJobEntity rescheduledTimerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, 
+                    eventElement, isInterruptingTimer, execution,
                     timerJob.getJobHandlerType(), timerJob.getJobHandlerConfiguration());
 
             timerJobService.deleteTimerJob(timerJob);

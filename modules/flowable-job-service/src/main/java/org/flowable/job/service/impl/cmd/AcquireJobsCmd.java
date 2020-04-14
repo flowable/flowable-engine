@@ -50,7 +50,8 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
     public AcquiredJobEntities execute(CommandContext commandContext) {
         int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
-        List<? extends JobInfoEntity> jobs = jobEntityManager.findJobsToExecute(new Page(0, maxResults)); 
+        List<String> enabledCategories = asyncExecutor.getJobServiceConfiguration().getEnabledJobCategories();
+        List<? extends JobInfoEntity> jobs = jobEntityManager.findJobsToExecute(enabledCategories, new Page(0, maxResults)); 
         AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
 
         for (JobInfoEntity job : jobs) {

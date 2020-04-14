@@ -1062,7 +1062,7 @@ public abstract class AbstractDynamicStateManager {
                             timerExecution.setCurrentFlowElement(startEvent);
                             timerExecution.setEventScope(true);
                             timerExecution.setActive(false);
-                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
                                 TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
                             if (timerJob != null) {
                                 timerJobService.scheduleTimerJob(timerJob);

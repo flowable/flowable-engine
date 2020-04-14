@@ -67,6 +67,51 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         // User task should be active after the timer has triggered
         assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1L);
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testTimerExpressionDurationWithCategory() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1L);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1L);
+
+        Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        assertThat(timerJob.getCategory()).isEqualTo("myCategory");
+
+        cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
+        cmmnManagementService.executeJob(timerJob.getId());
+
+        // User task should be active after the timer has triggered
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1L);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTimerExpressionDurationWithCategoryExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testTimerExpression")
+                .variable("categoryValue", "testValue")
+                .start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1L);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1L);
+
+        Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        assertThat(timerJob.getCategory()).isEqualTo("testValue");
+
+        cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
+        cmmnManagementService.executeJob(timerJob.getId());
+
+        // User task should be active after the timer has triggered
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1L);
+    }
 
     /**
      * Similar test as #testTimerExpressionDuration but with the real async executor,
@@ -74,7 +119,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
      */
     @Test
     @CmmnDeployment
-    public void testTimerExpressionDurationWithRealAsyncExeutor() {
+    public void testTimerExpressionDurationWithRealAsyncExecutor() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
 

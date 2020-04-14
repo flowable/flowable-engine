@@ -64,6 +64,7 @@ public class TimerJobEntity extends AbstractJobEntity {
 
     public TimerJobEntity(AbstractJobEntity te) {
         this.id = te.getId();
+        this.category = te.getCategory();
         this.jobType = te.getJobType();
         this.revision = te.getRevision();
         this.jobHandlerConfiguration = te.getJobHandlerConfiguration();

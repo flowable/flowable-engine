@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +116,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
     protected List<JobProcessor> jobProcessors;
+    
+    protected List<String> enabledJobCategories;
     
     protected AsyncExecutor asyncHistoryExecutor;
     protected int asyncHistoryExecutorNumberOfRetries;
@@ -523,6 +526,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (historyJobHandlers != null 
                 && historyJobHandler instanceof AsyncHistoryJobHandler
                 && !historyJobHandlers.containsKey(historyJobHandler.getType())) {
+            
             for (HistoryJobHandler existingHistoryJobHandler : historyJobHandlers.values()) {
                 if (existingHistoryJobHandler.getClass().equals(historyJobHandler.getClass())) {
                     copyHistoryJsonTransformers((AsyncHistoryJobHandler) historyJobHandler, (AsyncHistoryJobHandler) existingHistoryJobHandler);
@@ -599,6 +603,22 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return jobParentStateResolver;
     }
     
+    public List<String> getEnabledJobCategories() {
+        return enabledJobCategories;
+    }
+
+    public void setEnabledJobCategories(List<String> enabledJobCategories) {
+        this.enabledJobCategories = enabledJobCategories;
+    }
+
+    public void addEnabledJobCategory(String jobCategory) {
+        if (enabledJobCategories == null) {
+            enabledJobCategories = new ArrayList<>();
+        }
+        
+        enabledJobCategories.add(jobCategory);
+    }
+
     public String getJobTypeAsyncHistory() {
         return jobTypeAsyncHistory;
     }

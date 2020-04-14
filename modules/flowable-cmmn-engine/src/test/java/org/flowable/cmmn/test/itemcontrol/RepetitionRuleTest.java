@@ -203,6 +203,130 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
         assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        cmmnEngineConfiguration.resetClock();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithCategory() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingTimer").start();
+
+        // Task should not be created yet
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+
+        // Should have a timer job available
+        Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getCategory()).isEqualTo("myCategory");
+
+        // Moving the timer 1 hour ahead, should create a task instance. 
+        currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+        setClockTo(currentTime);
+        job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+        cmmnManagementService.executeJob(job.getId());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+
+        // A plan item in state 'waiting for repetition' should exist for the yask
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        // This can be repeated forever
+        for (int i = 0; i < 10; i++) {
+            currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+            setClockTo(currentTime);
+            job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(job.getCategory()).isEqualTo("myCategory");
+            job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+            cmmnManagementService.executeJob(job.getId());
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(i + 2);
+        }
+
+        // Completing all the tasks should still keep the case instance running
+        for (Task task : cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1L);
+        // There should also still be a plan item instance in the 'wait for repetition' state
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult()).isNotNull();
+
+        // Terminating the case instance should remove the timer
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        cmmnEngineConfiguration.resetClock();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithCategoryExpression() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepeatingTimer")
+                .variable("categoryValue", "testValue")
+                .start();
+
+        // Task should not be created yet
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+
+        // Should have a timer job available
+        Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getCategory()).isEqualTo("testValue");
+
+        // Moving the timer 1 hour ahead, should create a task instance. 
+        currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+        setClockTo(currentTime);
+        job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+        cmmnManagementService.executeJob(job.getId());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+
+        // A plan item in state 'waiting for repetition' should exist for the yask
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        // This can be repeated forever
+        for (int i = 0; i < 10; i++) {
+            currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+            setClockTo(currentTime);
+            job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(job.getCategory()).isEqualTo("testValue");
+            job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+            cmmnManagementService.executeJob(job.getId());
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(i + 2);
+        }
+
+        // Completing all the tasks should still keep the case instance running
+        for (Task task : cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1L);
+        // There should also still be a plan item instance in the 'wait for repetition' state
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult()).isNotNull();
+
+        // Terminating the case instance should remove the timer
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        cmmnEngineConfiguration.resetClock();
     }
 
     @Test

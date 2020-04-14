@@ -20,13 +20,13 @@ import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 
 public interface JobInfoDataManager<T extends JobInfoEntity> extends DataManager<T> {
 
-    List<T> findJobsToExecute(Page page);
+    List<T> findJobsToExecute(List<String> enabledCategories, Page page);
 
     List<T> findJobsByExecutionId(final String executionId);
 
     List<T> findJobsByProcessInstanceId(final String processInstanceId);
 
-    List<T> findExpiredJobs(Page page);
+    List<T> findExpiredJobs(List<String> enabledCategories, Page page);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 

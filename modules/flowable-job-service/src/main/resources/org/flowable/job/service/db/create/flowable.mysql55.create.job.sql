@@ -1,6 +1,7 @@
 create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp NULL,
     LOCK_OWNER_ varchar(255),
@@ -30,6 +31,7 @@ create table ACT_RU_JOB (
 create table ACT_RU_TIMER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp NULL,
     LOCK_OWNER_ varchar(255),
@@ -59,6 +61,7 @@ create table ACT_RU_TIMER_JOB (
 create table ACT_RU_SUSPENDED_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
@@ -86,6 +89,7 @@ create table ACT_RU_SUSPENDED_JOB (
 create table ACT_RU_DEADLETTER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),

@@ -399,8 +399,9 @@ public class ProcessInstanceHelper {
                 timerExecution.setEventScope(true);
                 timerExecution.setActive(false);
 
-                TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
-                    TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+                TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                        false, timerExecution, TriggerTimerEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
+                                timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
                 if (timerJob != null) {
                     CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);

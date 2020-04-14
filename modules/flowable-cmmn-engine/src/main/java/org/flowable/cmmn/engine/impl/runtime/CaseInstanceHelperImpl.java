@@ -40,9 +40,11 @@ import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceBeforeContext;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
@@ -150,7 +152,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     }
 
     protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition, CaseInstanceBuilder caseInstanceBuilder) {
-        CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, caseInstanceBuilder);
+        CmmnModel cmmnModel = getCmmnModel(commandContext, caseDefinition);
+        Case caseModel = getCaseModel(caseDefinition, cmmnModel);
+        CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, 
+                cmmnModel, caseModel, caseInstanceBuilder);
 
         // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
         CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
@@ -159,16 +164,21 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     }
 
     protected CaseInstanceEntity startCaseInstanceAsync(CommandContext commandContext, CaseDefinition caseDefinition, CaseInstanceBuilder caseInstanceBuilder) {
-        CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, caseInstanceBuilder);
+        CmmnModel cmmnModel = getCmmnModel(commandContext, caseDefinition);
+        Case caseModel = getCaseModel(caseDefinition, cmmnModel);
+        CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, 
+                cmmnModel, caseModel, caseInstanceBuilder);
 
         // create a job to execute InitPlanModelOperation, which will take care of initializing all the child plan items of that stage
         JobService jobService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
-        createAsyncInitJob(caseInstanceEntity, caseDefinition, jobService);
+        createAsyncInitJob(caseInstanceEntity, caseDefinition, caseModel, jobService, commandContext);
 
         return caseInstanceEntity;
     }
 
-    protected void createAsyncInitJob(CaseInstance caseInstance, CaseDefinition caseDefinition, JobService jobService) {
+    protected void createAsyncInitJob(CaseInstanceEntity caseInstance, CaseDefinition caseDefinition, 
+            Case caseModel, JobService jobService, CommandContext commandContext) {
+        
         JobEntity job = jobService.createJob();
         job.setJobHandlerType(AsyncInitializePlanModelJobHandler.TYPE);
         job.setScopeId(caseInstance.getId());
@@ -177,18 +187,39 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         job.setElementId(caseDefinition.getId());
         job.setElementName(caseDefinition.getName());
         job.setJobHandlerConfiguration(caseInstance.getId());
+        
+        List<ExtensionElement> jobCategoryElements = caseModel.getExtensionElements().get("jobCategory");
+        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                Object categoryValue = categoryExpression.getValue(caseInstance);
+                if (categoryValue != null) {
+                    job.setCategory(categoryValue.toString());
+                }
+            }
+        }
+        
         job.setTenantId(caseInstance.getTenantId());
         jobService.createAsyncJob(job, true);
         jobService.scheduleAsyncJob(job);
     }
-
-    protected CaseInstanceEntity initializeCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition, 
-                    CaseInstanceBuilder caseInstanceBuilder) {
-        
+    
+    protected CmmnModel getCmmnModel(CommandContext commandContext, CaseDefinition caseDefinition) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
-        CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
-        Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());
+        return deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
+    }
+    
+    protected Case getCaseModel(CaseDefinition caseDefinition, CmmnModel cmmnModel) {
+        return cmmnModel.getCaseById(caseDefinition.getKey());
+    }
+
+    protected CaseInstanceEntity initializeCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition, 
+            CmmnModel cmmnModel, Case caseModel, CaseInstanceBuilder caseInstanceBuilder) {
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         StartCaseInstanceBeforeContext instanceBeforeContext = new StartCaseInstanceBeforeContext(caseInstanceBuilder.getBusinessKey(), caseInstanceBuilder.getName(),
                         caseInstanceBuilder.getCallbackId(), caseInstanceBuilder.getCallbackType(),

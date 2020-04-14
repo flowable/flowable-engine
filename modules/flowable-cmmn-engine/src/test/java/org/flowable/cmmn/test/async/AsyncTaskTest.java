@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -50,6 +52,75 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task after service task");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testAsyncServiceTaskWithCategory() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAsyncServiceTask").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.getCategory()).isEqualTo("cmmnCategory");
+
+        waitForJobExecutorToProcessAllJobs();
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task after service task");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testAsyncServiceTaskWithCategoryExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAsyncServiceTask")
+                .variable("categoryValue", "testValue")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.getCategory()).isEqualTo("testValue");
+
+        waitForJobExecutorToProcessAllJobs();
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task after service task");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncTaskTest.testAsyncServiceTaskWithCategory.cmmn")
+    public void testAsyncServiceTaskWithCategoryEnabledConfigurationSet() {
+        try {
+            cmmnEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAsyncServiceTask").start();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+    
+            Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(job.getCategory()).isEqualTo("cmmnCategory");
+    
+            try {
+                CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 4000L, 200L, true);
+                fail("expected that job is still there");
+            } catch (Exception e) {
+                // expected
+            }
+            
+            cmmnEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("cmmnCategory");
+            
+            waitForJobExecutorToProcessAllJobs();
+    
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task.getName()).isEqualTo("Task after service task");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
+            
+        } finally {
+            cmmnEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
     }
 
     @Test

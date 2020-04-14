@@ -38,7 +38,7 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
     /**
      * Returns the {@link TimerJobEntity} instances that are eligible to execute, meaning the due date of the timer has been passed.
      */
-    List<TimerJobEntity> findTimerJobsToExecute(Page page);
+    List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page);
 
     /**
      * Returns the {@link TimerJobEntity} for a given process definition.
