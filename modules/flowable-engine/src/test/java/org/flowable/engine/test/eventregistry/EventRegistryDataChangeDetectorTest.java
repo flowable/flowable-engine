@@ -157,6 +157,23 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         
         assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
         assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+
+        eventRegistryEngine.getEventRepositoryService().deleteDeployment(engine2Deployment.getId());
+
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).isEmpty(); // removed on engine1
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).isEmpty(); // but not yet on engine2, timer job needs to pass first
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+
+        // Manually trigger the detect changes logic on engine2
+        getOtherProcessEngineEventRegistryManagementService().executeEventRegistryChangeDetection();
+
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
     }
 
     protected EventRegistry getEventRegistry() {

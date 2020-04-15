@@ -29,7 +29,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     "ACT_GE_PROPERTY",
     "ACT_ID_PROPERTY",
     "ACT_FO_DATABASECHANGELOGLOCK",
-    "ACT_FO_DATABASECHANGELOG"
+    "ACT_FO_DATABASECHANGELOG",
+    "FLW_EV_DATABASECHANGELOGLOCK",
+    "FLW_EV_DATABASECHANGELOG",
 })
 @ExtendWith(InternalFlowableSpringExtension.class)
 @ExtendWith(SpringExtension.class)
