@@ -12,6 +12,8 @@
  */
 package org.flowable.standalone.jpa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,22 +53,22 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
     @BeforeEach
     protected void setUp() {
         entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
-            .getEntityManagerFactory();
+                .getEntityManagerFactory();
     }
 
     public void setupJPAEntities() {
-            EntityManager manager = entityManagerFactory.createEntityManager();
-            manager.getTransaction().begin();
+        EntityManager manager = entityManagerFactory.createEntityManager();
+        manager.getTransaction().begin();
 
-            // Simple test data
-            simpleEntityFieldAccess = new FieldAccessJPAEntity();
-            simpleEntityFieldAccess.setId(1L);
-            simpleEntityFieldAccess.setValue("value1");
-            manager.persist(simpleEntityFieldAccess);
+        // Simple test data
+        simpleEntityFieldAccess = new FieldAccessJPAEntity();
+        simpleEntityFieldAccess.setId(1L);
+        simpleEntityFieldAccess.setValue("value1");
+        manager.persist(simpleEntityFieldAccess);
 
-            manager.flush();
-            manager.getTransaction().commit();
-            manager.close();
+        manager.flush();
+        manager.getTransaction().commit();
+        manager.close();
     }
 
     @Test
@@ -91,8 +93,8 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
                 .processInstanceId(processInstanceId).variableName("simpleEntityFieldAccess").singleResult();
 
         Object value = historicVariableInstance.getValue();
-        assertTrue(value instanceof FieldAccessJPAEntity);
-        assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+        assertThat(value instanceof FieldAccessJPAEntity).isTrue();
+        assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
     }
 
     @Test
@@ -121,8 +123,8 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
 
         for (HistoricData event : events) {
             Object value = ((HistoricVariableInstanceEntity) event).getValue();
-            assertTrue(value instanceof FieldAccessJPAEntity);
-            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+            assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+            assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
         }
     }
 
@@ -153,8 +155,8 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
 
         for (HistoricData event : events) {
             Object value = ((HistoricDetailVariableInstanceUpdateEntity) event).getValue();
-            assertTrue(value instanceof FieldAccessJPAEntity);
-            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+            assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+            assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
         }
     }
 }

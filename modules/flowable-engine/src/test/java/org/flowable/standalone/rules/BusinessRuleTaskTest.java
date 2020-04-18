@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.standalone.rules;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -26,17 +28,18 @@ public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testBusinessRuleTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");
-        assertEquals("test2", runtimeService.getVariable(processInstance.getId(), "test"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "test")).isEqualTo("test2");
 
-        assertEquals(1, CustomBusinessRuleTask.ruleInputVariables.size());
-        assertEquals("order", CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText());
+        assertThat(CustomBusinessRuleTask.ruleInputVariables);
+        assertThat(CustomBusinessRuleTask.ruleInputVariables).hasSize(1);
+        assertThat(CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText()).isEqualTo("order");
 
-        assertEquals(2, CustomBusinessRuleTask.ruleIds.size());
-        assertEquals("rule1", CustomBusinessRuleTask.ruleIds.get(0).getExpressionText());
-        assertEquals("rule2", CustomBusinessRuleTask.ruleIds.get(1).getExpressionText());
+        assertThat(CustomBusinessRuleTask.ruleIds).hasSize(2);
+        assertThat(CustomBusinessRuleTask.ruleIds.get(0).getExpressionText()).isEqualTo("rule1");
+        assertThat(CustomBusinessRuleTask.ruleIds.get(1).getExpressionText()).isEqualTo("rule2");
 
-        assertTrue(CustomBusinessRuleTask.exclude);
-        assertEquals("rulesOutput", CustomBusinessRuleTask.resultVariableName);
+        assertThat(CustomBusinessRuleTask.exclude).isTrue();
+        assertThat(CustomBusinessRuleTask.resultVariableName).isEqualTo("rulesOutput");
 
         runtimeService.trigger(runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())

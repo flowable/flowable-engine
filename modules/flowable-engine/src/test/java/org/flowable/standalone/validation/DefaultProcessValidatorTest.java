@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,6 @@ import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorSetNames;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -61,18 +60,18 @@ public class DefaultProcessValidatorTest {
         InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
-        Assert.assertNotNull(bpmnModel);
+        assertThat(bpmnModel).isNotNull();
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(71, allErrors.size());
+        assertThat(allErrors.size()).isEqualTo(71);
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
         // isExecutable should be true
         List<ValidationError> problems = findErrors(allErrors, setName, Problems.ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE, 1);
-        Assert.assertNotNull(problems.get(0).getValidatorSetName());
-        Assert.assertNotNull(problems.get(0).getProblem());
-        Assert.assertNotNull(problems.get(0).getDefaultDescription());
+        assertThat(problems.get(0).getValidatorSetName()).isNotNull();
+        assertThat(problems.get(0).getProblem()).isNotNull();
+        assertThat(problems.get(0).getDefaultDescription()).isNotNull();
 
         // Event listeners
         problems = findErrors(allErrors, setName, Problems.EVENT_LISTENER_IMPLEMENTATION_MISSING, 1);
@@ -255,35 +254,32 @@ public class DefaultProcessValidatorTest {
     public void testWarningError() throws UnsupportedEncodingException, XMLStreamException {
         String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"
-                + "  <process id='exclusiveGwDefaultSequenceFlow'> " + "    <startEvent id='theStart' /> " + "    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='exclusiveGw' /> " +
-
-                "    <exclusiveGateway id='exclusiveGw' name='Exclusive Gateway' /> "
-                + // no default = "flow3" !!
-                "    <sequenceFlow id='flow2' sourceRef='exclusiveGw' targetRef='theTask1'> " + "      <conditionExpression xsi:type='tFormalExpression'>${input == 1}</conditionExpression> "
-                + "    </sequenceFlow> " + "    <sequenceFlow id='flow3' sourceRef='exclusiveGw' targetRef='theTask2'/> " + // one
-                                                                                                                            // would
-                                                                                                                            // be
-                                                                                                                            // OK
-                "    <sequenceFlow id='flow4' sourceRef='exclusiveGw' targetRef='theTask2'/> " + // but
-                                                                                                 // two
-                                                                                                 // unconditional
-                                                                                                 // not!
-
-                "    <userTask id='theTask1' name='Input is one' /> " + "    <userTask id='theTask2' name='Default input' /> " + "  </process>" + "</definitions>";
+                + "  <process id='exclusiveGwDefaultSequenceFlow'> " + "    <startEvent id='theStart' /> "
+                + "    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='exclusiveGw' /> "
+                + "    <exclusiveGateway id='exclusiveGw' name='Exclusive Gateway' /> "
+                // no default = "flow3" !!
+                + "    <sequenceFlow id='flow2' sourceRef='exclusiveGw' targetRef='theTask1'> "
+                + "      <conditionExpression xsi:type='tFormalExpression'>${input == 1}</conditionExpression> "
+                + "    </sequenceFlow> " + "    <sequenceFlow id='flow3' sourceRef='exclusiveGw' targetRef='theTask2'/> "
+                // one would be OK
+                + "    <sequenceFlow id='flow4' sourceRef='exclusiveGw' targetRef='theTask2'/> "
+                // but two unconditional not!
+                + "    <userTask id='theTask1' name='Input is one' /> " + "    <userTask id='theTask2' name='Default input' /> " + "  </process>"
+                + "</definitions>";
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(flowWithoutConditionNoDefaultFlow.getBytes()), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
-        Assert.assertNotNull(bpmnModel);
+        assertThat(bpmnModel).isNotNull();
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(1, allErrors.size());
-        Assert.assertTrue(allErrors.get(0).isWarning());
+        assertThat(allErrors.size()).isEqualTo(1);
+        assertThat(allErrors.get(0).isWarning()).isTrue();
     }
 
     /*
      * Test for https://jira.codehaus.org/browse/ACT-2071:
-     * 
+     *
      * If all processes in a deployment are not executable, throw an exception as this doesn't make sense to do.
      */
     @Test
@@ -296,12 +292,12 @@ public class DefaultProcessValidatorTest {
         }
 
         List<ValidationError> errors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(1, errors.size());
+        assertThat(errors.size()).isEqualTo(1);
     }
 
     /*
      * Test for https://jira.codehaus.org/browse/ACT-2071:
-     * 
+     *
      * If there is at least one process definition which is executable, and the deployment contains other process definitions which are not executable, then add a warning for those non executable
      * process definitions
      */
@@ -322,12 +318,12 @@ public class DefaultProcessValidatorTest {
         bpmnModel.addProcess(process);
 
         List<ValidationError> errors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(3, errors.size());
+        assertThat(errors.size()).isEqualTo(3);
         for (ValidationError error : errors) {
-            Assert.assertTrue(error.isWarning());
-            Assert.assertNotNull(error.getValidatorSetName());
-            Assert.assertNotNull(error.getProblem());
-            Assert.assertNotNull(error.getDefaultDescription());
+            assertThat(error.isWarning()).isTrue();
+            assertThat(error.getValidatorSetName()).isNotNull();
+            assertThat(error.getProblem()).isNotNull();
+            assertThat(error.getDefaultDescription()).isNotNull();
         }
     }
 
@@ -340,40 +336,41 @@ public class DefaultProcessValidatorTest {
         assertThat(errors)
                 .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
                 .containsExactlyInAnyOrder(
-                        tuple(Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, "event sub process cannot have attached boundary events", "errorEndEventSubProcess", true)
+                        tuple(Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, "event sub process cannot have attached boundary events", "errorEndEventSubProcess",
+                                true)
                 );
     }
 
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);
 
-        Assert.assertNotNull(error.getActivityId());
-        Assert.assertNotNull(error.getActivityName());
+        assertThat(error.getActivityId()).isNotNull();
+        assertThat(error.getActivityName()).isNotNull();
 
-        Assert.assertTrue(error.getActivityId().length() > 0);
-        Assert.assertTrue(error.getActivityName().length() > 0);
+        assertThat(error.getActivityId().length() > 0).isTrue();
+        assertThat(error.getActivityName().length() > 0).isTrue();
     }
 
     protected void assertCommonErrorFields(ValidationError error) {
-        Assert.assertNotNull(error.getValidatorSetName());
-        Assert.assertNotNull(error.getProblem());
-        Assert.assertNotNull(error.getDefaultDescription());
-        Assert.assertTrue(error.getXmlLineNumber() > 0);
-        Assert.assertTrue(error.getXmlColumnNumber() > 0);
+        assertThat(error.getValidatorSetName()).isNotNull();
+        assertThat(error.getProblem()).isNotNull();
+        assertThat(error.getDefaultDescription()).isNotNull();
+        assertThat(error.getXmlLineNumber() > 0).isTrue();
+        assertThat(error.getXmlColumnNumber() > 0).isTrue();
     }
 
     protected void assertProcessElementError(ValidationError error) {
         assertCommonErrorFields(error);
-        Assert.assertEquals("invalidProcess", error.getProcessDefinitionId());
-        Assert.assertEquals("The invalid process", error.getProcessDefinitionName());
+        assertThat(error.getProcessDefinitionId()).isEqualTo("invalidProcess");
+        assertThat(error.getProcessDefinitionName()).isEqualTo("The invalid process");
     }
 
     protected List<ValidationError> findErrors(List<ValidationError> errors, String validatorSetName, String problemName, int expectedNrOfProblems) {
         List<ValidationError> results = findErrors(errors, validatorSetName, problemName);
-        Assert.assertEquals(expectedNrOfProblems, results.size());
+        assertThat(results.size()).isEqualTo(expectedNrOfProblems);
         for (ValidationError result : results) {
-            Assert.assertEquals(validatorSetName, result.getValidatorSetName());
-            Assert.assertEquals(problemName, result.getProblem());
+            assertThat(result.getValidatorSetName()).isEqualTo(validatorSetName);
+            assertThat(result.getProblem()).isEqualTo(problemName);
         }
         return results;
     }

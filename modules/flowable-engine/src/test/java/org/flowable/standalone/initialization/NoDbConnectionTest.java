@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.standalone.initialization;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
 
@@ -25,21 +27,8 @@ public class NoDbConnectionTest extends AbstractTestCase {
 
     @Test
     public void testNoDbConnection() {
-        try {
-            ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine();
-            fail("expected exception");
-        } catch (RuntimeException e) {
-            assertTrue(containsSqlException(e));
-        }
-    }
-
-    private boolean containsSqlException(Throwable e) {
-        if (e == null) {
-            return false;
-        }
-        if (e instanceof SQLException) {
-            return true;
-        }
-        return containsSqlException(e.getCause());
+        assertThatThrownBy(() -> ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine())
+                .hasCauseInstanceOf(SQLException.class);
     }
 }
