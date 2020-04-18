@@ -12,8 +12,7 @@
  */
 package org.flowable.standalone.event;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
@@ -37,7 +36,9 @@ public class GetProcessOnProcessDefinitionInitializesEventTest extends ResourceF
     public void testProcessAccessibleProcessDefinitionEntityInitializedEvent() throws Exception {
         // deploy any process
         this.deployOneTaskTestProcess();
-        assertThat("ProcessId must be accessible during processDefinition entity initialized event.", GetProcessOnDefinitionInitializedListener.processId, is("oneTaskProcess"));
+        assertThat(GetProcessOnDefinitionInitializedListener.processId)
+                .as("ProcessId must be accessible during processDefinition entity initialized event.")
+                .isEqualTo("oneTaskProcess");
     }
 
 }
