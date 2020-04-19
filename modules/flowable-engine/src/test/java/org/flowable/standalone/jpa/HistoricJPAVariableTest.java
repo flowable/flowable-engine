@@ -93,7 +93,7 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
                 .processInstanceId(processInstanceId).variableName("simpleEntityFieldAccess").singleResult();
 
         Object value = historicVariableInstance.getValue();
-        assertThat(value instanceof FieldAccessJPAEntity).isTrue();
+        assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
         assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
     }
 

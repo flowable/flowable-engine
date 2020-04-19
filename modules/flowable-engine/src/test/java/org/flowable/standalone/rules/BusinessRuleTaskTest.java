@@ -30,7 +30,6 @@ public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");
         assertThat(runtimeService.getVariable(processInstance.getId(), "test")).isEqualTo("test2");
 
-        assertThat(CustomBusinessRuleTask.ruleInputVariables);
         assertThat(CustomBusinessRuleTask.ruleInputVariables).hasSize(1);
         assertThat(CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText()).isEqualTo("order");
 

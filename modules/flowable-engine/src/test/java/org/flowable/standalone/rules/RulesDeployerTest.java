@@ -44,7 +44,7 @@ public class RulesDeployerTest extends ResourceFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rulesDeployment", variableMap);
         assertThat(processInstance).isNotNull();
-        assertThat(processInstance.getProcessDefinitionId().startsWith("rulesDeployment:1"));
+        assertThat(processInstance.getProcessDefinitionId().startsWith("rulesDeployment:1")).isTrue();
 
         runtimeService.getVariable(processInstance.getId(), "order");
         assertThat(order.isValid()).isTrue();

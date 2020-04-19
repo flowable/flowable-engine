@@ -12,13 +12,16 @@
  */
 package org.flowable.standalone.initialization;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableWrongDbException;
 import org.flowable.common.engine.impl.db.DbSqlSession;
@@ -76,13 +79,15 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
 
         // now we can see what happens if when a process engine is being
         // build with a version mismatch between library and db tables
+        Consumer<FlowableWrongDbException> flowableWrongDbExceptionRequirements = flowableWrongDbException -> {
+            assertThat(flowableWrongDbException.getDbVersion()).isEqualTo("25.7");
+            assertThat(flowableWrongDbException.getLibraryVersion()).isEqualTo(ProcessEngine.VERSION);
+        };
         assertThatThrownBy(() -> ProcessEngineConfiguration
                 .createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE).buildProcessEngine())
-                .isExactlyInstanceOf(FlowableWrongDbException.class)
-                .hasMessageContaining("version mismatch")
-                .hasMessageContaining("25.7")
-                .hasMessageContaining(ProcessEngine.VERSION);
+                .isInstanceOfSatisfying(FlowableWrongDbException.class, flowableWrongDbExceptionRequirements)
+                .hasMessageContaining("version mismatch");
 
         // closing the original process engine to drop the db tables
         processEngine.close();

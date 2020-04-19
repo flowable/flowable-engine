@@ -347,16 +347,16 @@ public class DefaultProcessValidatorTest {
         assertThat(error.getActivityId()).isNotNull();
         assertThat(error.getActivityName()).isNotNull();
 
-        assertThat(error.getActivityId().length() > 0).isTrue();
-        assertThat(error.getActivityName().length() > 0).isTrue();
+        assertThat(error.getActivityId()).isNotEmpty();
+        assertThat(error.getActivityName()).isNotEmpty();
     }
 
     protected void assertCommonErrorFields(ValidationError error) {
         assertThat(error.getValidatorSetName()).isNotNull();
         assertThat(error.getProblem()).isNotNull();
         assertThat(error.getDefaultDescription()).isNotNull();
-        assertThat(error.getXmlLineNumber() > 0).isTrue();
-        assertThat(error.getXmlColumnNumber() > 0).isTrue();
+        assertThat(error.getXmlLineNumber()).isPositive();
+        assertThat(error.getXmlColumnNumber()).isPositive();
     }
 
     protected void assertProcessElementError(ValidationError error) {
