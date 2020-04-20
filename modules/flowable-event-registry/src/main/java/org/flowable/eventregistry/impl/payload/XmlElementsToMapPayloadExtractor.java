@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.slf4j.Logger;
@@ -34,14 +32,6 @@ import org.w3c.dom.NodeList;
 public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtractor<Document> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
-
-    @Override
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, Document event) {
-        return eventDefinition.getCorrelationParameters().stream()
-            .filter(parameterDefinition -> getChildNode(event, parameterDefinition.getName()) != null)
-            .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
-            .collect(Collectors.toList());
-    }
 
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Document event) {

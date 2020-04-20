@@ -10,22 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.api.runtime;
+package org.flowable.eventregistry.impl.pipeline;
 
-import org.flowable.eventregistry.model.EventCorrelationParameter;
+import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
+import org.flowable.eventregistry.api.runtime.EventInstance;
 
 /**
- * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public interface EventCorrelationParameterInstance {
+public class InMemoryOutboundEventProcessingPipeline implements OutboundEventProcessingPipeline<EventInstance> {
 
-    EventCorrelationParameter getEventCorrelationParameterDefinition();
-
-    String getDefinitionName();
-
-    String getDefinitionType();
-
-    Object getValue();
-
+    @Override
+    public EventInstance run(EventInstance eventInstance) {
+        return eventInstance;
+    }
 }

@@ -18,7 +18,7 @@ import org.springframework.jms.core.JmsOperations;
 /**
  * @author Filip Hrisafov
  */
-public class JmsOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+public class JmsOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
     protected JmsOperations jmsOperations;
     protected String destination;

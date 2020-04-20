@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -137,13 +136,9 @@ public class EventInstanceBpmnUtil {
     
     protected static void addEventPayloadInstance(List<EventPayloadInstance> eventPayloadInstances, String source, String target, 
                     VariableScope variableScope, ExpressionManager expressionManager, EventModel eventDefinition) {
-        
-        Optional<EventPayload> matchingEventDefinition = eventDefinition.getPayload()
-            .stream()
-            .filter(e -> e.getName().equals(target))
-            .findFirst();
-        if (matchingEventDefinition.isPresent()) {
-            EventPayload eventPayloadDefinition = matchingEventDefinition.get();
+
+        EventPayload eventPayloadDefinition = eventDefinition.getPayload(target);
+        if (eventPayloadDefinition != null) {
 
             Expression sourceExpression = expressionManager.createExpression(source);
             Object value = sourceExpression.getValue(variableScope);

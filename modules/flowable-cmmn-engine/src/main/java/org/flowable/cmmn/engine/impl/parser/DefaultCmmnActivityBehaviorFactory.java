@@ -138,7 +138,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener) {
-        return new EventRegistryEventListenerActivityBehaviour(genericEventListener.getEventType());
+        return new EventRegistryEventListenerActivityBehaviour(createExpression(genericEventListener.getEventType()));
     }
 
     @Override

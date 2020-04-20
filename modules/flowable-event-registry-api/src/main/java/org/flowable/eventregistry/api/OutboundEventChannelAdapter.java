@@ -15,8 +15,8 @@ package org.flowable.eventregistry.api;
 /**
  * @author Joram Barrez
  */
-public interface OutboundEventChannelAdapter {
+public interface OutboundEventChannelAdapter<T> {
 
-    void sendEvent(String rawEvent);
+    void sendEvent(T rawEvent);
 
 }

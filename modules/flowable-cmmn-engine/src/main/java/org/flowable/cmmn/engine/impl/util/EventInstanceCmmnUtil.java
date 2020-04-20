@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -88,12 +87,8 @@ public class EventInstanceCmmnUtil {
                 String source = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
                 String target = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
 
-                Optional<EventPayload> matchingEventDefinition = eventDefinition.getPayload()
-                    .stream()
-                    .filter(e -> e.getName().equals(target))
-                    .findFirst();
-                if (matchingEventDefinition.isPresent()) {
-                    EventPayload eventPayloadDefinition = matchingEventDefinition.get();
+                EventPayload eventPayloadDefinition = eventDefinition.getPayload(target);
+                if (eventPayloadDefinition != null) {
 
                     Expression sourceExpression = expressionManager.createExpression(source);
                     Object value = sourceExpression.getValue(variableScope);

@@ -29,7 +29,6 @@ import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDe
 import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.model.ChannelModel;
-import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -125,11 +124,11 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals("myEvent", eventModel.getKey());
         
         assertEquals(1, eventModel.getCorrelationParameters().size());
-        EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
+        EventPayload correlationParameter = eventModel.getCorrelationParameters().iterator().next();
         assertEquals("customerId", correlationParameter.getName());
         assertEquals("string", correlationParameter.getType());
         
-        assertEquals(2, eventModel.getPayload().size());
+        assertEquals(3, eventModel.getPayload().size());
         Iterator<EventPayload> itPayload = eventModel.getPayload().iterator();
         EventPayload payloadDefinition = itPayload.next();
         assertEquals("payload1", payloadDefinition.getName());
@@ -138,6 +137,10 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         payloadDefinition = itPayload.next();
         assertEquals("payload2", payloadDefinition.getName());
         assertEquals("integer", payloadDefinition.getType());
+
+        payloadDefinition = itPayload.next();
+        assertEquals("customerId", payloadDefinition.getName());
+        assertEquals("string", payloadDefinition.getType());
 
         EventDeployment redeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleEvent2.event")
@@ -159,7 +162,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals("customerId2", correlationParameter.getName());
         assertEquals("string", correlationParameter.getType());
         
-        assertEquals(2, eventModel.getPayload().size());
+        assertEquals(3, eventModel.getPayload().size());
         itPayload = eventModel.getPayload().iterator();
         payloadDefinition = itPayload.next();
         assertEquals("payload3", payloadDefinition.getName());
@@ -168,6 +171,10 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         payloadDefinition = itPayload.next();
         assertEquals("payload4", payloadDefinition.getName());
         assertEquals("integer", payloadDefinition.getType());
+
+        payloadDefinition = itPayload.next();
+        assertEquals("customerId2", payloadDefinition.getName());
+        assertEquals("string", payloadDefinition.getType());
 
         repositoryService.deleteDeployment(redeployment.getId());
     }

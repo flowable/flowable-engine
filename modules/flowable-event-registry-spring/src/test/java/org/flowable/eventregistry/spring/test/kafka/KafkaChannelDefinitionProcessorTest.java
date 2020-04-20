@@ -45,9 +45,8 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
-import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
@@ -177,7 +176,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("name", "Kermit the Frog")
             );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -222,7 +221,7 @@ class KafkaChannelDefinitionProcessorTest {
                     tuple("name", "Kermit the Frog")
                 );
             assertThat(eventInstance.getCorrelationParameterInstances())
-                .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
                 .containsExactlyInAnyOrder(
                     tuple("customer", "kermit")
                 );
@@ -296,7 +295,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("name", "Kermit the Frog")
             );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -310,7 +309,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -372,7 +371,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("name", "Kermit the Frog")
             );
         assertThat(kermitEvent.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -387,7 +386,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("name", "Fozzie Bear")
             );
         assertThat(fozzieEvent.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "fozzie")
             );
@@ -416,21 +415,20 @@ class KafkaChannelDefinitionProcessorTest {
                 .jsonSerializer()
                 .deploy();
 
-            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
             ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
 
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
 
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
             consumer.commitSync();
             consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
 
-            eventRegistry.sendEventOutbound(kermitEvent);
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
             records = consumer.poll(Duration.ofSeconds(2));
 
@@ -462,20 +460,19 @@ class KafkaChannelDefinitionProcessorTest {
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
             consumer.subscribe(Collections.singleton("outbound-customer"));
 
-            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
             ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
 
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
             consumer.commitSync();
             consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
 
-            eventRegistry.sendEventOutbound(kermitEvent);
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
             records = consumer.poll(Duration.ofSeconds(2));
 

@@ -349,7 +349,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

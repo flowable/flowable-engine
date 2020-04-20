@@ -86,7 +86,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

@@ -118,7 +118,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
                 .isEqualTo("Hello tenantB"); // Note: a different json (different event definition for different tenant)
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

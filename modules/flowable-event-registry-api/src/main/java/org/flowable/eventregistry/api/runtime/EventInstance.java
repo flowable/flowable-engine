@@ -14,9 +14,6 @@ package org.flowable.eventregistry.api.runtime;
 
 import java.util.Collection;
 
-import org.flowable.eventregistry.api.ChannelDefinition;
-import org.flowable.eventregistry.api.EventDefinition;
-import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -33,17 +30,11 @@ import org.flowable.eventregistry.model.EventModel;
  */
 public interface EventInstance {
 
-    EventDefinition getEventDefinition();
-
-    EventModel getEventModel();
-
-    Collection<ChannelDefinition> getChannelDefinitions();
-
-    Collection<ChannelModel> getChannelModels();
+    String getEventKey();
 
     Collection<EventPayloadInstance> getPayloadInstances();
 
-    Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances();
+    Collection<EventPayloadInstance> getCorrelationParameterInstances();
 
     String getTenantId();
 

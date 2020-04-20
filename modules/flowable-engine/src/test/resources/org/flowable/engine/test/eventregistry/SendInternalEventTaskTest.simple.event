@@ -1,0 +1,32 @@
+{
+  "key": "simpleTest",
+  "name": "My event",
+  "correlationParameters": [
+    {
+      "name": "customer",
+      "type": "string"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    }
+  ],
+  "payload": [
+    {
+      "name": "customer",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    },
+    {
+      "name": "eventKey",
+      "type": "string"
+    }
+  ]
+}

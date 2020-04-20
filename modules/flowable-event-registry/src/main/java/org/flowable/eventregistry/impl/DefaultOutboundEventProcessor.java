@@ -37,20 +37,19 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
     }
     
     @Override
-    public void sendEvent(EventInstance eventInstance) {
-        Collection<ChannelModel> channelModels = eventInstance.getChannelModels();
+    public void sendEvent(EventInstance eventInstance, Collection<ChannelModel> channelModels) {
         if (channelModels == null || channelModels.isEmpty()) {
-            throw new FlowableException("No channel model set for outgoing event " + eventInstance.getEventModel().getKey());
+            throw new FlowableException("No channel model set for outgoing event " + eventInstance.getEventKey());
         }
 
         for (ChannelModel channelModel : channelModels) {
 
             OutboundChannelModel outboundChannelModel = (OutboundChannelModel) channelModel;
 
-            OutboundEventProcessingPipeline outboundEventProcessingPipeline = (OutboundEventProcessingPipeline) outboundChannelModel.getOutboundEventProcessingPipeline();
-            String rawEvent = outboundEventProcessingPipeline.run(eventInstance);
+            OutboundEventProcessingPipeline<?> outboundEventProcessingPipeline = (OutboundEventProcessingPipeline<?>) outboundChannelModel.getOutboundEventProcessingPipeline();
+            Object rawEvent = outboundEventProcessingPipeline.run(eventInstance);
 
-            OutboundEventChannelAdapter outboundEventChannelAdapter = (OutboundEventChannelAdapter) outboundChannelModel.getOutboundEventChannelAdapter();
+            OutboundEventChannelAdapter outboundEventChannelAdapter = (OutboundEventChannelAdapter<?>) outboundChannelModel.getOutboundEventChannelAdapter();
             if (outboundEventChannelAdapter == null) {
                 throw new FlowableException("Could not find an outbound channel adapter for channel " + channelModel.getKey());
             }

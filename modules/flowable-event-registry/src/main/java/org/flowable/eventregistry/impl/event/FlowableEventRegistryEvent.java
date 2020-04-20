@@ -24,7 +24,7 @@ public class FlowableEventRegistryEvent implements EventRegistryEvent {
     protected EventInstance eventInstance;
 
     public FlowableEventRegistryEvent(EventInstance eventInstance) {
-        this.type = eventInstance.getEventModel().getKey();
+        this.type = eventInstance.getEventKey();
         this.eventInstance = eventInstance;
     }
 
@@ -46,7 +46,7 @@ public class FlowableEventRegistryEvent implements EventRegistryEvent {
     }
     
     @Override
-    public Object getEventObject() {
+    public EventInstance getEventObject() {
         return eventInstance;
     }
 }

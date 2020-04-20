@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -96,9 +98,16 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
-        JsonNode eventNode = objectMapper.readTree(content);
-        assertEquals("myEvent", eventNode.get("key").asText());
-        assertEquals("customerId", eventNode.get("correlationParameters").get(0).get("name").asText());
+        assertThatJson(content)
+                .isEqualTo("{"
+                        + "  key: 'myEvent',"
+                        + "  name: 'My event',"
+                        + "  payload: ["
+                        + "    { name: 'payload1', type: 'string' },"
+                        + "    { name: 'payload2', type: 'integer' },"
+                        + "    { name: 'customerId', type: 'string', correlationParameter: true }"
+                        + "  ]"
+                        + "}");
     }
 
     /**

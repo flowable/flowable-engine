@@ -75,6 +75,8 @@ import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEvent
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.eventregistry.impl.pipeline.DelegateExpressionInboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.DelegateExpressionOutboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventChannelAdapter;
+import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
@@ -143,6 +145,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventRegistry eventRegistry;
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
+    protected OutboundEventProcessor systemOutboundEventProcessor;
 
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
@@ -237,6 +240,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initEventRegistry();
         initInboundEventProcessor();
         initOutboundEventProcessor();
+        initSystemOutboundEventProcessor();
         initChannelDefinitionProcessors();
         initDeployers();
         initClock();
@@ -501,6 +505,16 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
     }
 
+    public void initSystemOutboundEventProcessor() {
+        if (this.systemOutboundEventProcessor == null) {
+            this.systemOutboundEventProcessor = new SystemOutboundEventProcessor<>(
+                    new InMemoryOutboundEventChannelAdapter(eventRegistry),
+                    new InMemoryOutboundEventProcessingPipeline()
+            );
+        }
+        this.eventRegistry.setSystemOutboundEventProcessor(systemOutboundEventProcessor);
+    }
+
     public void initChannelDefinitionProcessors() {
         channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this));
         channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this));
@@ -613,6 +627,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor) {
         this.outboundEventProcessor = outboundEventProcessor;
+        return this;
+    }
+
+    public OutboundEventProcessor getSystemOutboundEventProcessor() {
+        return systemOutboundEventProcessor;
+    }
+
+    public EventRegistryEngineConfiguration setSystemOutboundEventProcessor(OutboundEventProcessor systemOutboundEventProcessor) {
+        this.systemOutboundEventProcessor = systemOutboundEventProcessor;
         return this;
     }
 

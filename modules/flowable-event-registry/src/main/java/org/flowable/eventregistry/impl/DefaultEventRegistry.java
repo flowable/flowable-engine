@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.CorrelationKeyGenerator;
@@ -22,6 +23,7 @@ import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
@@ -35,6 +37,7 @@ public class DefaultEventRegistry implements EventRegistry {
 
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
+    protected OutboundEventProcessor systemOutboundEventProcessor;
 
     public DefaultEventRegistry(EventRegistryEngineConfiguration engineConfiguration) {
         this.engineConfiguration = engineConfiguration;
@@ -52,6 +55,16 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
+    public OutboundEventProcessor getSystemOutboundEventProcessor() {
+        return systemOutboundEventProcessor;
+    }
+
+    @Override
+    public void setSystemOutboundEventProcessor(OutboundEventProcessor systemOutboundEventProcessor) {
+        this.systemOutboundEventProcessor = systemOutboundEventProcessor;
+    }
+
+    @Override
     public void eventReceived(InboundChannelModel channelModel, String event) {
         inboundEventProcessor.eventReceived(channelModel, event);
     }
@@ -65,8 +78,13 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void sendEventOutbound(EventInstance eventInstance) {
-        outboundEventProcessor.sendEvent(eventInstance);
+    public void sendSystemEventOutbound(EventInstance eventInstance) {
+        systemOutboundEventProcessor.sendEvent(eventInstance, Collections.emptyList());
+    }
+
+    @Override
+    public void sendEventOutbound(EventInstance eventInstance, Collection<ChannelModel> channelModels) {
+        outboundEventProcessor.sendEvent(eventInstance, channelModels);
     }
 
     @Override

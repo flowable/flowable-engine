@@ -18,7 +18,7 @@ import org.springframework.amqp.rabbit.core.RabbitOperations;
 /**
  * @author Filip Hrisafov
  */
-public class RabbitOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+public class RabbitOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
     protected RabbitOperations rabbitOperations;
     protected String exchange;
