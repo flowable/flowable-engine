@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="oneDecisionTaskCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="decisionTask" />
+
+            <decisionTask id="decisionTask" name="dmn" isBlocking="false" decisionRef="decisionTableInternal"/>
+
+
+        </casePlanModel>
+    </case>
+
+    <decision id="decisionTableInternal" name="Simple decision table" externalRef="DecisionTable"/>
+
+</definitions>

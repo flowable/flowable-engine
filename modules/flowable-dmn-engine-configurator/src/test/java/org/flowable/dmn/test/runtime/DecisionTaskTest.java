@@ -17,7 +17,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -503,6 +507,60 @@ public class DecisionTaskTest {
         } finally {
             deleteAllDmnDeployments();
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.outputOrder.dmn"})
+    public void withOutputOrder_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
+        CaseInstance caseInstance = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "second")
+                .start();
+        Map<String, Object> processVariables = caseInstance.getCaseVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isInstanceOf(ObjectNode.class);
+        assertThat(result.get(0).get("testOutput")).isInstanceOf(DoubleNode.class);
+        assertThat(result.get(0).get("testOutput").asDouble()).isEqualTo(2.0);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
+    public void withRuleOrder_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
+        CaseInstance caseInstance = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "second")
+                .start();
+        Map<String, Object> processVariables = caseInstance.getCaseVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isInstanceOf(ObjectNode.class);
+        assertThat(result.get(0).get("testOutput")).isInstanceOf(DoubleNode.class);
+        assertThat(result.get(0).get("testOutput").asDouble()).isEqualTo(2.0);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
+    public void withRuleOrder_ensureListOfItemIsReturnedEvenIfNoRowIsHit() {
+        CaseInstance caseInstance = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "fourth")
+                .start();
+        Map<String, Object> processVariables = caseInstance.getCaseVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(0);
     }
 
     // Helper methodes

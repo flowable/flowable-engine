@@ -144,7 +144,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
         } else {
             setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, 
-                            execution, processEngineConfiguration.getObjectMapper());
+                            execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
         }
 
         leave(execution);
@@ -180,14 +180,15 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         executeDecisionBuilder.parentDeploymentId(parentDeploymentId);
     }
 
-    protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-        if (executionResult == null || executionResult.isEmpty()) {
+    protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
             return;
         }
 
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
-        if (executionResult.size() > 1) {
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
             ArrayNode ruleResultNode = objectMapper.createArrayNode();
 
             for (Map<String, Object> ruleResult : executionResult) {
