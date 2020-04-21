@@ -682,6 +682,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected String asyncExecutorLockOwner;
 
     /**
+     * Whether to unlock jobs that are owned by this executor (have the same {@link #asyncExecutorLockOwner}) at startup or shutdown.o
+     */
+    protected boolean asyncExecutorUnlockOwnedJobs = true;
+
+    /**
      * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
      * Default value = 5 minutes;
@@ -2178,6 +2183,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (asyncExecutorLockOwner != null) {
                 defaultAsyncExecutor.setLockOwner(asyncExecutorLockOwner);
             }
+            defaultAsyncExecutor.setUnlockOwnedJobs(asyncExecutorUnlockOwnedJobs);
 
             // Reset expired
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
@@ -4613,6 +4619,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncExecutorLockOwner(String asyncExecutorLockOwner) {
         this.asyncExecutorLockOwner = asyncExecutorLockOwner;
+        return this;
+    }
+
+    public boolean isAsyncExecutorUnlockOwnedJobs() {
+        return asyncExecutorUnlockOwnedJobs;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorUnlockOwnedJobs(boolean asyncExecutorUnlockOwnedJobs) {
+        this.asyncExecutorUnlockOwnedJobs = asyncExecutorUnlockOwnedJobs;
         return this;
     }
 

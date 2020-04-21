@@ -659,6 +659,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String asyncExecutorLockOwner;
 
     /**
+     * Whether to unlock jobs that are owned by this executor (have the same {@link #asyncExecutorLockOwner}) at startup or shutdown.
+     */
+    protected boolean asyncExecutorUnlockOwnedJobs = true;
+
+    /**
      * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor.
      * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
@@ -1820,6 +1825,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             if (asyncExecutorLockOwner != null) {
                 defaultAsyncExecutor.setLockOwner(asyncExecutorLockOwner);
             }
+            defaultAsyncExecutor.setUnlockOwnedJobs(asyncExecutorUnlockOwnedJobs);
 
             // Reset expired
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
@@ -3100,6 +3106,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setAsyncExecutorLockOwner(String asyncExecutorLockOwner) {
         this.asyncExecutorLockOwner = asyncExecutorLockOwner;
         return this;
+    }
+
+    public boolean isAsyncExecutorUnlockOwnedJobs() {
+        return asyncExecutorUnlockOwnedJobs;
+    }
+
+    public void setAsyncExecutorUnlockOwnedJobs(boolean asyncExecutorUnlockOwnedJobs) {
+        this.asyncExecutorUnlockOwnedJobs = asyncExecutorUnlockOwnedJobs;
     }
 
     public int getAsyncExecutorTimerLockTimeInMillis() {

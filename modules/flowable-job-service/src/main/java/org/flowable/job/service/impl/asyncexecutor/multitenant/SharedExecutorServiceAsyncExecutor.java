@@ -51,6 +51,7 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
 
     public SharedExecutorServiceAsyncExecutor(TenantInfoHolder tenantInfoHolder) {
         this.tenantInfoHolder = tenantInfoHolder;
+        this.unlockOwnedJobs = false;
 
         setExecuteAsyncRunnableFactory(new ExecuteAsyncRunnableFactory() {
 

@@ -116,7 +116,7 @@ public class ClearCaseInstanceLocksTest extends FlowableCmmnTestCase {
             assertThat(((CaseInstanceEntity) caseInstance).getLockTime()).isNull();
             assertThat(((CaseInstanceEntity) caseInstance).getLockOwner()).isNull();
         }
-        JobEventsTest
+
     }
 
 }
