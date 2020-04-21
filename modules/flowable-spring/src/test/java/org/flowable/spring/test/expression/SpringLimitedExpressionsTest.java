@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,11 @@
  */
 
 package org.flowable.spring.test.expression;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.function.Consumer;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -23,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Test limiting the exposed beans in expressions.
- * 
+ *
  * @author Frederik Heremans
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/expressionLimitedBeans-context.xml")
@@ -36,19 +41,18 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("limitedExpressionProcess");
 
         String beanOutput = (String) runtimeService.getVariable(processInstance.getId(), "beanOutput");
-        assertNotNull(beanOutput);
-        assertEquals("Activiti BPMN 2.0 process engine", beanOutput);
+        assertThat(beanOutput).isNotNull();
+        assertThat(beanOutput).isEqualTo("Activiti BPMN 2.0 process engine");
 
         // Finish the task, should continue to serviceTask which uses a bean that is present
         // in application-context, but not exposed explicitly in "beans", should throw error!
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
-        try {
-            taskService.complete(task.getId());
-            fail("Exception should have been thrown");
-        } catch (FlowableException ae) {
-            assertTextPresent("Cannot resolve identifier 'bean2'", ae.getCause().getMessage());
-        }
+        Consumer<FlowableException> flowableExceptionRequirements = flowableException -> {
+            assertThat(flowableException.getCause().getMessage()).contains("Cannot resolve identifier 'bean2'");
+        };
+        assertThatThrownBy(() -> taskService.complete(task.getId()))
+                .isInstanceOfSatisfying(FlowableException.class, flowableExceptionRequirements);
     }
 }
