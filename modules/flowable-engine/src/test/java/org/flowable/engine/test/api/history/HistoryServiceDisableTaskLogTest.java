@@ -48,8 +48,8 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
     @Test
     public void createTaskEvent() {
         task = taskService.createTaskBuilder().
-            assignee("testAssignee").
-            create();
+                assignee("testAssignee").
+                create();
     }
 
     @Test
@@ -58,8 +58,8 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
         Authentication.setAuthenticatedUserId("testUser");
         try {
             task = taskService.createTaskBuilder().
-                assignee("testAssignee").
-                create();
+                    assignee("testAssignee").
+                    create();
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }

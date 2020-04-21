@@ -19,15 +19,18 @@ import java.util.List;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.batch.service.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 
-public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements BatchQuery, Serializable {
+public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements BatchQuery, CacheAwareQuery<BatchEntity>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String id;
     protected String batchType;
     protected String searchKey;
@@ -188,6 +191,7 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     
     // getters //////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

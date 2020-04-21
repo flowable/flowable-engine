@@ -39,6 +39,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
@@ -541,6 +542,11 @@ public interface RuntimeService {
      * Retrieves the {@link EntityLink}s associated with the given process instance.
      */
     List<EntityLink> getEntityLinkChildrenForProcessInstance(String instanceId);
+
+    /**
+     * Retrieves all the {@link EntityLink}s associated with the same root as the given process instance.
+     */
+    List<EntityLink> getEntityLinkChildrenWithSameRootAsProcessInstance(String instanceId);
 
     /**
      * Retrieves the {@link EntityLink}s associated with the given task.
@@ -1284,6 +1290,10 @@ public interface RuntimeService {
      *     when the given event is not suitable for dispatching.
      */
     void dispatchEvent(FlowableEvent event);
+    
+    void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
+    
+    void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
 
     /**
      * Sets the name for the process instance with the given id.

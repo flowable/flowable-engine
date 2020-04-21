@@ -16,11 +16,11 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;

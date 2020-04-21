@@ -49,7 +49,14 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         Authentication.setAuthenticatedUserId("getCaseUser");
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .businessKey("myBusinessKey")
+            .referenceId("testReferenceId")
+            .referenceType("testReferenceType")
+            .callbackId("testCallbackId")
+            .callbackType("testCallbackType")
+            .start();
 
         String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
         CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
@@ -60,6 +67,10 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertNotNull(responseNode);
         assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
         assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
+        assertEquals("testReferenceId", responseNode.get("referenceId").textValue());
+        assertEquals("testReferenceType", responseNode.get("referenceType").textValue());
+        assertEquals("testCallbackId", responseNode.get("callbackId").textValue());
+        assertEquals("testCallbackType", responseNode.get("callbackType").textValue());
         assertEquals("", responseNode.get("tenantId").textValue());
         assertThat(responseNode.get("startTime").textValue()).as("startTime").isNotNull();
         assertThat(responseNode.get("startUserId").textValue()).as("startUserId").isEqualTo("getCaseUser");
@@ -149,7 +160,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
-        assertStage(stageOverviewResponse.get(2), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
 
         // We're doing a wrong time ordering, to test that the display order has precedence over the end time
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
@@ -159,7 +170,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
-        assertStage(stageOverviewResponse.get(2), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
@@ -168,7 +179,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
-        assertStage(stageOverviewResponse.get(2), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
     }
 
     @CmmnDeployment
@@ -222,7 +233,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(9, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
@@ -232,8 +243,121 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(0), "Stage two", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
     }
+    
+    @CmmnDeployment
+    public void testStageAndMilestoneOverview() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageOverview")
+                .variable("includeInOverview", true)
+                .variable("includeInOverviewNegative", false)
+                .start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+    }
+
+    @CmmnDeployment
+    public void testStageOverviewWithRepetition() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverviewWithRepetition").start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(9, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testUpdateCaseInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .start();
+
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        // Triggering the evaluation twice will satisfy the entry criterion for B
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name one\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name one", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessKey\": \"test business key\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name one", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertEquals("test business key", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name two\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name two", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertEquals("test business key", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+    }
+
+
 
     protected ArrayNode getStageOverviewResponse(CaseInstance caseInstance) throws IOException {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
@@ -249,7 +373,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     protected void assertStage(JsonNode jsonNode, String name, boolean isEnded, boolean isCurrent) {
         assertEquals(name, jsonNode.get("name").asText());
         assertEquals("'ended' boolean is wrong", isEnded, jsonNode.get("ended").asBoolean());
-        assertEquals("current boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
+        assertEquals("'current' boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
     }
     
     public static class TestBean implements Serializable {

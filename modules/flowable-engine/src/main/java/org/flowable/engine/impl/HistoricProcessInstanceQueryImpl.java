@@ -16,24 +16,27 @@ package org.flowable.engine.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -42,13 +45,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Bernd Ruecker
  * @author Joram Barrez
  */
-public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
+public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> 
+        implements HistoricProcessInstanceQuery, CacheAwareQuery<HistoricProcessInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
     
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String businessKey;
+    protected String businessKeyLike;
     protected String deploymentId;
     protected List<String> deploymentIds;
     protected boolean finished;
@@ -70,7 +75,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
     protected String involvedUser;
+    protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
     protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
@@ -82,6 +89,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String nameLikeIgnoreCase;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String locale;
     protected boolean withLocalizationFallback;
     protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
@@ -192,6 +201,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.businessKey = businessKey;
         } else {
             this.businessKey = businessKey;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKeyLike = businessKeyLike;
+        } else {
+            this.businessKeyLike = businessKeyLike;
         }
         return this;
     }
@@ -347,6 +366,38 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
         return this;
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery involvedUser(String userId, String identityLinkType) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        } else {
+            this.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery involvedGroup(String groupId, String identityLinkType) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        } else {
+            this.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        }
+        return this;
+    }
 
     @Override
     public HistoricProcessInstanceQuery involvedGroups(Set<String> involvedGroups) {
@@ -468,6 +519,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceReferenceId(String referenceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceReferenceType(String referenceType) {
+        if (inOrStatement) {
+            currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
         }
         return this;
     }
@@ -705,13 +776,18 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         
         if (includeProcessVariables) {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
+
+            if (processInstanceId != null) {
+                addCachedVariableForQueryById(commandContext, results);
+            }
+
         } else {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
         }
 
-        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
             for (HistoricProcessInstance processInstance : results) {
-                localize(processInstance, commandContext);
+                processEngineConfiguration.getInternalProcessLocalizationManager().localize(processInstance, locale, withLocalizationFallback);
             }
         }
         
@@ -722,27 +798,39 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return results;
     }
 
-    protected void localize(HistoricProcessInstance processInstance, CommandContext commandContext) {
-        HistoricProcessInstanceEntity processInstanceEntity = (HistoricProcessInstanceEntity) processInstance;
-        processInstanceEntity.setLocalizedName(null);
-        processInstanceEntity.setLocalizedDescription(null);
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricProcessInstance> results) {
 
-        if (locale != null && processInstance.getProcessDefinitionId() != null) {
-            ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().findDeployedProcessDefinitionById(processInstanceEntity.getProcessDefinitionId());
-            ObjectNode languageNode = BpmnOverrideContext.getLocalizationElementProperties(locale, processDefinition.getKey(),
-                    processInstanceEntity.getProcessDefinitionId(), withLocalizationFallback);
+        // Unlike the ExecutionEntityImpl, variables are not stored on the HistoricExecutionEntityImpl.
+        // The solution for the non-historical entity is to use the variable cache on the entity, inspect the variables
+        // of the current transaction and add them if necessary.
+        // For the historical entity, we need to detect this use case specifically (i.e. byId is used) and check the entityCache.
 
-            if (languageNode != null) {
-                JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
-                if (languageNameNode != null && !languageNameNode.isNull()) {
-                    processInstanceEntity.setLocalizedName(languageNameNode.asText());
+        for (HistoricProcessInstance historicProcessInstance : results) {
+            if (Objects.equals(processInstanceId, historicProcessInstance.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<HistoricVariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(HistoricVariableInstanceEntity.class);
+                for (HistoricVariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (historicProcessInstance.getId().equals(cachedVariableEntity.getProcessInstanceId())) {
+
+                        // Variables from the cache have precedence
+                        ((HistoricProcessInstanceEntity) historicProcessInstance).getQueryVariables().add(cachedVariableEntity);
+
+                    }
+
                 }
 
-                JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
-                if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                    processInstanceEntity.setLocalizedDescription(languageDescriptionNode.asText());
-                }
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(HistoricProcessInstanceEntity processInstance) {
+        if (includeProcessVariables) {
+            processInstance.getQueryVariables()
+                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                            .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
         }
     }
 
@@ -764,8 +852,33 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
     }
 
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(this));
+        } else {
+            new DeleteHistoricProcessInstancesCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        if (commandExecutor != null) {
+            CommandConfig config = new CommandConfig().transactionRequiresNew();
+            commandExecutor.execute(config, new DeleteHistoricProcessInstancesCmd(this));
+            commandExecutor.execute(config, new DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd());
+            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd());
+        } else {
+            throw new FlowableException("deleting historic process instances with related data requires CommandExecutor");
+        }
+    }
+
     public String getBusinessKey() {
         return businessKey;
+    }
+
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
     }
 
     public boolean isOpen() {
@@ -801,6 +914,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+    
+    @Override
+    public String getId() {
         return processInstanceId;
     }
 
@@ -914,6 +1032,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public List<HistoricProcessInstanceQueryImpl> getOrQueryObjects() {

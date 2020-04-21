@@ -222,7 +222,7 @@ public abstract class ReflectUtil {
      * Returns the setter-method for the given field name or null if no setter exists.
      */
     public static Method getSetter(String fieldName, Class<?> clazz, Class<?> fieldType) {
-        String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) + fieldName.substring(1, fieldName.length());
+        String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) + fieldName.substring(1);
         try {
             // Using getMethods(), getMethod(...) expects exact parameter type
             // matching and ignores inheritance-tree.

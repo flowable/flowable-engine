@@ -228,6 +228,11 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
     public String getScopeId() {
         return null;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
 
     @Override
     public String getScopeType() {

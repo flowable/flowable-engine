@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**
@@ -39,6 +40,8 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceStartedBy(String userId);
     CaseInstanceQuery caseInstanceCallbackId(String callbackId);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
+    CaseInstanceQuery caseInstanceReferenceId(String referenceId);
+    CaseInstanceQuery caseInstanceReferenceType(String referenceType);
     CaseInstanceQuery caseInstanceIsCompleteable();
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);
@@ -48,6 +51,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * Select the case instances with which the user with the given id is involved.
      */
     CaseInstanceQuery involvedUser(String userId);
+    
+    /**
+     * Select the case instances with which the user with the given id and identity link type are involved.
+     */
+    CaseInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /**
+     * Select the case instances with which the group with the given id and identity link type are involved.
+     */
+    CaseInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
     /**
      * Select the case instances with which the groups with the given ids are involved.

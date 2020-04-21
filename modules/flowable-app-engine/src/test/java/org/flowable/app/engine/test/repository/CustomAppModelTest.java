@@ -12,9 +12,7 @@
  */
 package org.flowable.app.engine.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
@@ -37,22 +35,45 @@ public class CustomAppModelTest extends FlowableAppTestCase {
         try {
             deploymentId = appRepositoryService.createDeployment().addClasspathResource("org/flowable/app/engine/test/extraInfoApp.app").deploy().getId();
             AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
-            assertNotNull(appDeployment);
+            assertThat(appDeployment).isNotNull();
             
             AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey("extraInfoApp").singleResult();
             
             AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
-            assertNotNull(appModel);
-            assertTrue(appModel instanceof CustomAppModel);
+            assertThat(appModel)
+                .isNotNull()
+                .isInstanceOf(CustomAppModel.class);
             
             CustomAppModel customAppModel = (CustomAppModel) appModel;
-            assertEquals("extraInfoApp", customAppModel.getKey());
-            assertEquals("Extra info app", customAppModel.getName());
-            assertEquals("test", customAppModel.getExtraProperty());
+            assertThat(customAppModel.getKey()).isEqualTo("extraInfoApp");
+            assertThat(customAppModel.getName()).isEqualTo("Extra info app");
+            assertThat(customAppModel.getExtraProperty()).isEqualTo("test");
             
         } finally {
             appEngineConfiguration.setAppResourceConverter(defaultAppResourceConverter);
             appRepositoryService.deleteDeployment(deploymentId, true);
         }
     }
+
+    @Test
+    public void testAppDefinitionDeployedThroughDefaultConverter() {
+        String deploymentId = null;
+        try {
+            deploymentId = appRepositoryService.createDeployment().addClasspathResource("org/flowable/app/engine/test/extraInfoApp.app").deploy().getId();
+            AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
+            assertThat(appDeployment).isNotNull();
+
+            AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey("extraInfoApp").singleResult();
+            assertThat(appDefinition).isNotNull();
+
+            AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
+            assertThat(appModel).isNotNull();
+
+        } finally {
+            if (deploymentId != null) {
+                appRepositoryService.deleteDeployment(deploymentId, true);
+            }
+        }
+    }
+
 }

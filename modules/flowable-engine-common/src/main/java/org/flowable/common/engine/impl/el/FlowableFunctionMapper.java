@@ -14,7 +14,9 @@
 package org.flowable.common.engine.impl.el;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.javax.el.FunctionMapper;
@@ -26,24 +28,35 @@ import org.flowable.common.engine.impl.javax.el.FunctionMapper;
  */
 public class FlowableFunctionMapper extends FunctionMapper {
 
-    protected List<FlowableFunctionDelegate> functionDelegates;
+    protected Map<String, FlowableFunctionDelegate> functionDelegates;
 
     public FlowableFunctionMapper(List<FlowableFunctionDelegate> functionDelegates) {
-        this.functionDelegates = functionDelegates;
+        setFunctionDelegates(functionDelegates);
+
     }
 
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
-        this.functionDelegates = functionDelegates;
+        if (functionDelegates != null) {
+            this.functionDelegates = new LinkedHashMap<>();
+            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
+                for (String prefix : functionDelegate.prefixes()) {
+                    for (String localName : functionDelegate.localNames()) {
+                        this.functionDelegates.put(prefix + ":" + localName, functionDelegate);
+                    }
+
+                }
+
+            }
+        } else {
+            this.functionDelegates = null;
+        }
     }
 
     @Override
     public Method resolveFunction(String prefix, String localName) {
         if (functionDelegates != null) {
-            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
-                if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {
-                    return functionDelegate.functionMethod();
-                }
-            }
+            FlowableFunctionDelegate functionDelegate = functionDelegates.get(prefix + ":" + localName);
+            return functionDelegate != null ? functionDelegate.functionMethod() : null;
         }
 
         return null;

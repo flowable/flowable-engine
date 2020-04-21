@@ -14,19 +14,19 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * @author Joram Barrez
  */
 public class VariableGreaterThanExpressionFunction extends AbstractVariableComparatorExpressionFunction {
 
-    public VariableGreaterThanExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("greaterThan", "gt"), "greaterThan");
+    public VariableGreaterThanExpressionFunction() {
+        super(Arrays.asList("greaterThan", "gt"), "greaterThan");
     }
     
-    public static boolean greaterThan(VariableScope variableScope, String variableName, Object comparedValue) {
-        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.GT);
+    public static boolean greaterThan(VariableContainer variableContainer, String variableName, Object comparedValue) {
+        return compareVariableValue(variableContainer, variableName, comparedValue, OPERATOR.GT);
     }
 
 }

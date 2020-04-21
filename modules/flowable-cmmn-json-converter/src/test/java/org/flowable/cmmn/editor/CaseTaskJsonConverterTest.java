@@ -13,9 +13,7 @@
 package org.flowable.cmmn.editor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
@@ -29,6 +27,7 @@ import org.flowable.cmmn.model.Stage;
  * @author martin.grofcik
  */
 public class CaseTaskJsonConverterTest extends AbstractConverterTest {
+
     @Override
     protected String getResource() {
         return "test.caseTaskModel.json";
@@ -37,31 +36,28 @@ public class CaseTaskJsonConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("caseTaskModelId", caseModel.getId());
-        assertEquals("caseTaskModelName", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("caseTaskModelId");
+        assertThat(caseModel.getName()).isEqualTo("caseTaskModelName");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
-        assertEquals("casePlanModel", planModelStage.getId());
+        assertThat(planModelStage).isNotNull();
+        assertThat(planModelStage.getId()).isEqualTo("casePlanModel");
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("caseTaskName", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("caseTaskName");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof CaseTask);
+        assertThat(planItemDefinition).isNotNull();
+        assertThat(planItemDefinition).isInstanceOf(CaseTask.class);
         CaseTask caseTask = (CaseTask) planItemDefinition;
-        assertEquals("sid-E06221FA-0225-4EF8-A1E8-8DC177326B77", caseTask.getId());
-        assertEquals("caseTaskName", caseTask.getName());
-        assertTrue(caseTask.getFallbackToDefaultTenant());
+        assertThat(caseTask.getId()).isEqualTo("sid-E06221FA-0225-4EF8-A1E8-8DC177326B77");
+        assertThat(caseTask.getName()).isEqualTo("caseTaskName");
+        assertThat(caseTask.getFallbackToDefaultTenant()).isTrue();
+        assertThat(caseTask.isSameDeployment()).isTrue();
 
         assertThat(caseTask.getInParameters())
-                .isNotNull()
-                .hasSize(1);
-        IOParameter inParameter = caseTask.getInParameters().get(0);
-        assertThat(inParameter).isNotNull();
-        assertThat(inParameter.getSource()).isEqualTo("testSource");
-        assertThat(inParameter.getTarget()).isEqualTo("testTarget");
+                .extracting(IOParameter::getSource, IOParameter::getTarget)
+                .containsExactly(tuple("testSource", "testTarget"));
     }
 }

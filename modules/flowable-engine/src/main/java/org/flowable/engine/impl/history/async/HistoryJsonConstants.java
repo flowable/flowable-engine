@@ -194,6 +194,10 @@ public interface HistoryJsonConstants {
     
     String CALLBACK_TYPE = "callbackType";
 
+    String REFERENCE_ID = "referenceId";
+
+    String REFERENCE_TYPE = "referenceType";
+
     String CALLED_PROCESS_INSTANCE_ID = "calledProcessInstanceId";
 
     String SCOPE_ID = "scopeId";
@@ -209,6 +213,10 @@ public interface HistoryJsonConstants {
     String REF_SCOPE_TYPE = "referenceScopeType";
     
     String REF_SCOPE_DEFINITION_ID = "referenceScopeDefinitionId";
+
+    String ROOT_SCOPE_ID = "rootScopeId";
+
+    String ROOT_SCOPE_TYPE = "rootScopeType";
 
     String HIERARCHY_TYPE = "hierarchyType";
 

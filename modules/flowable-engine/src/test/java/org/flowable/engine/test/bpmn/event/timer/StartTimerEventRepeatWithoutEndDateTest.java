@@ -19,13 +19,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.runtime.Clock;

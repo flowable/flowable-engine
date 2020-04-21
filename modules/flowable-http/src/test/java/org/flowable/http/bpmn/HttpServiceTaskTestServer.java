@@ -292,6 +292,7 @@ public class HttpServiceTaskTestServer {
 
         private static final long serialVersionUID = 1L;
 
+        @Override
         protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             resp.setStatus(200);
         }

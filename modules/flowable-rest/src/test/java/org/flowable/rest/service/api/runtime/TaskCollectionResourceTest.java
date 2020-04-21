@@ -293,6 +293,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeyLike=" + encode("process%");
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            // Task definition keys filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeys=processTask,invalidTask";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
             // Duedate filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getISODateString(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());

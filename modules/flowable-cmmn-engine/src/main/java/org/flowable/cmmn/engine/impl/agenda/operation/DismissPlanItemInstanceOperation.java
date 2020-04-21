@@ -43,4 +43,9 @@ public class DismissPlanItemInstanceOperation extends AbstractChangePlanItemInst
         return PlanItemTransition.DISMISS;
     }
 
+    @Override
+    protected String getOperationName() {
+        return "[Dismiss plan item]";
+    }
+
 }

@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.query.Query;
  */
 public interface MilestoneInstanceQuery extends Query<MilestoneInstanceQuery, MilestoneInstance> {
     
+    MilestoneInstanceQuery milestoneInstanceId(String milestoneInstanceId);
     MilestoneInstanceQuery milestoneInstanceName(String name);
     MilestoneInstanceQuery milestoneInstanceCaseInstanceId(String caseInstanceId);
     MilestoneInstanceQuery milestoneInstanceCaseDefinitionId(String caseDefinitionId);

@@ -31,6 +31,8 @@ public interface HistoricCaseInstance {
     String getStartUserId();
     String getCallbackId();
     String getCallbackType();
+    String getReferenceId();
+    String getReferenceType();
     String getTenantId();
 
     Map<String, Object> getCaseVariables();

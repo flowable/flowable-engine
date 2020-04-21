@@ -41,6 +41,7 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
@@ -58,6 +59,7 @@ import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.ServiceTask;
@@ -117,7 +119,13 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                         processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                     }
                 } else {
-                    processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        processDiagramCanvas.drawEventRegistryStartEvent(graphicInfo, scaleFactor);
+                        
+                    } else {
+                        processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    }
                 }
             }
         });
@@ -280,6 +288,16 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 processDiagramCanvas.drawManualTask(flowNode.getName(), graphicInfo, scaleFactor);
             }
         });
+        
+        // send event service task
+        activityDrawInstructions.put(SendEventServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                processDiagramCanvas.drawSendEventServiceTask(flowNode.getName(), graphicInfo, scaleFactor);
+            }
+        });
 
         // businessRuleTask task
         activityDrawInstructions.put(BusinessRuleTask.class, new ActivityDrawInstruction() {
@@ -361,8 +379,13 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     } else if (eventDefinition instanceof CompensateEventDefinition) {
                         processDiagramCanvas.drawCatchingCompensateEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                     }
+                    
+                } else {
+                    List<ExtensionElement> eventTypeElements = boundaryEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        processDiagramCanvas.drawCatchingEventRegistryEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
+                    }
                 }
-
             }
         });
 

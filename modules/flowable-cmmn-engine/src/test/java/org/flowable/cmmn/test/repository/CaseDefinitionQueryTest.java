@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,56 +70,59 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryNoParams() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByDeploymentId() {
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).count()).isEqualTo(2);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentId() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByDeploymentIds() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3))).list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3)))
+                .list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3)))
+                .count()).isEqualTo(4);
 
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).count())
+                .isEqualTo(2);
 
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).list())
+                .hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).count())
+                .isEqualTo(2);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).count())
+                .isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentIds() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByEmptyDeploymentIds() {
-        try {
-            cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>()).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>()).list())
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -128,27 +131,27 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         List<String> caseDefinitionIdsDeployment2 = getCaseDefinitionIds(deploymentId2);
         List<String> caseDefinitionIdsDeployment3 = getCaseDefinitionIds(deploymentId3);
 
-        assertNotNull(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).singleResult());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(0)).count()).isEqualTo(1);
 
-        assertNotNull(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).singleResult());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment1.get(1)).count()).isEqualTo(1);
 
-        assertNotNull(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).singleResult());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment2.get(0)).count()).isEqualTo(1);
 
-        assertNotNull(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).singleResult());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseDefinitionIdsDeployment3.get(0)).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionId() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").count()).isEqualTo(0);
     }
 
     @Test
@@ -156,301 +159,310 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         List<String> caseDefinitionIdsDeployment1 = getCaseDefinitionIds(deploymentId1);
         List<String> caseDefinitionIdsDeployment2 = getCaseDefinitionIds(deploymentId2);
 
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment1)).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment1)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment1)).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment1)).count()).isEqualTo(2);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment2)).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment2)).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment2)).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(caseDefinitionIdsDeployment2)).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByEmptyCaseDefinitionIds() {
-        try {
-            cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>()).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>()).list())
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionIds() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count())
+                .isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionCategory() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionCategory() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionCategoryLike() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("http%").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("http%n").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("http%").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("http%n").count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionCategoryLike() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%n").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%n").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionCategoryNotEquals() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").count()).isEqualTo(4);
 
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionName() {
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 1").list().size());
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 1").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 1").list()).hasSize(3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 1").count()).isEqualTo(3);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").count()).isEqualTo(1);
 
-        assertEquals(deploymentId1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").singleResult().getDeploymentId());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 2").singleResult().getDeploymentId()).isEqualTo(deploymentId1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionName() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionNameLike() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("Ca%").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("Ca%").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("Ca%").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("Ca%").count()).isEqualTo(4);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").count()).isEqualTo(1);
 
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionKey() {
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").list().size());
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").list()).hasSize(3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").count()).isEqualTo(3);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase2").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase2").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase2").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase2").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionKey() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionKeyLike() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("my%").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("my%").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("my%").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("my%").count()).isEqualTo(4);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%2").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%2").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%2").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%2").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionKeyLike() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionVersion() {
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(1).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(1).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(1).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(1).count()).isEqualTo(2);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionVersionGreaterThan() {
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).count()).isEqualTo(1);
 
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionVersionGreaterThanOrEquals() {
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(2).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(2).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(2).count()).isEqualTo(2);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).count()).isEqualTo(1);
 
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionVersionLowerThan() {
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(2).list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(2).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(2).count()).isEqualTo(2);
 
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(3).list().size());
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(3).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(3).list()).hasSize(3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThan(3).count()).isEqualTo(3);
     }
 
     @Test
     public void testQueryByCaseDefinitionVersionLowerThanOrEquals() {
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(2).list().size());
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(2).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(2).list()).hasSize(3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(2).count()).isEqualTo(3);
 
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(3).list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(3).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(3).list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(3).count()).isEqualTo(4);
 
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(4).list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(4).count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(4).list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionLowerThanOrEquals(4).count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByLatestVersion() {
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().latestVersion().list().size());
-        assertEquals(2, cmmnRepositoryService.createCaseDefinitionQuery().latestVersion().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().latestVersion().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().latestVersion().count()).isEqualTo(2);
     }
 
     @Test
     public void testQueryByLatestVersionAndKey() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().singleResult();
-        assertNotNull(caseDefinition);
-        assertEquals(3, caseDefinition.getVersion());
-        assertEquals(deploymentId3, caseDefinition.getDeploymentId());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().count());
+        assertThat(caseDefinition).isNotNull();
+        assertThat(caseDefinition.getVersion()).isEqualTo(3);
+        assertThat(caseDefinition.getDeploymentId()).isEqualTo(deploymentId3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByCaseDefinitionResourceName() {
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").list().size());
-        assertEquals(3, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").list()
+        ).hasSize(3);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").count())
+                .isEqualTo(3);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case2.cmmn").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case2.cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case2.cmmn").list()
+        ).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case2.cmmn").count())
+                .isEqualTo(1);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").latestVersion().list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn").latestVersion().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn")
+                .latestVersion().list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("org/flowable/cmmn/test/repository/simple-case.cmmn")
+                .latestVersion().count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionResourceName() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryByCaseDefinitionResourceNameLike() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%.cmmn").list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%.cmmn").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%.cmmn").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%.cmmn").count()).isEqualTo(4);
 
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%2%").list().size());
-        assertEquals(1, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%2%").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%2%").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%2%").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidCaseDefinitionResourceNameLike() {
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").list().size());
-        assertEquals(0, cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").list()).hasSize(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").count()).isEqualTo(0);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionCategory() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().asc().count());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().asc().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionCategory().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionKey() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().count()).isEqualTo(4);
         List<CaseDefinition> caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list();
         for (int i = 0; i < caseDefinitions.size(); i++) {
             if (i <= 2) {
-                assertEquals("myCase", caseDefinitions.get(i).getKey());
+                assertThat(caseDefinitions.get(i).getKey()).isEqualTo("myCase");
             } else {
-                assertEquals("myCase2", caseDefinitions.get(i).getKey());
+                assertThat(caseDefinitions.get(i).getKey()).isEqualTo("myCase2");
             }
         }
 
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().desc().count()).isEqualTo(4);
         caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().desc().list();
         for (int i = 0; i < caseDefinitions.size(); i++) {
             if (i > 0) {
-                assertEquals("myCase", caseDefinitions.get(i).getKey());
+                assertThat(caseDefinitions.get(i).getKey()).isEqualTo("myCase");
             } else {
-                assertEquals("myCase2", caseDefinitions.get(i).getKey());
+                assertThat(caseDefinitions.get(i).getKey()).isEqualTo("myCase2");
             }
         }
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionId() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().asc().count());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().asc().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionId().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionName() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().count());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().asc().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionName().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionDeploymentId() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().asc().count());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().asc().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByDeploymentId().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionVersion() {
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().asc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().asc().count());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().desc().list().size());
-        assertEquals(4, cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().desc().count());
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().asc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().asc().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().desc().list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().desc().count()).isEqualTo(4);
 
         List<CaseDefinition> caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().orderByCaseDefinitionVersion().desc().list();
-        assertEquals(3, caseDefinitions.get(0).getVersion());
-        assertEquals(2, caseDefinitions.get(1).getVersion());
-        assertEquals(1, caseDefinitions.get(2).getVersion());
-        assertEquals(1, caseDefinitions.get(3).getVersion());
+        assertThat(caseDefinitions.get(0).getVersion()).isEqualTo(3);
+        assertThat(caseDefinitions.get(1).getVersion()).isEqualTo(2);
+        assertThat(caseDefinitions.get(2).getVersion()).isEqualTo(1);
+        assertThat(caseDefinitions.get(3).getVersion()).isEqualTo(1);
 
         caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().latestVersion().orderByCaseDefinitionVersion().asc().list();
-        assertEquals(1, caseDefinitions.get(0).getVersion());
-        assertEquals("myCase2", caseDefinitions.get(0).getKey());
-        assertEquals(3, caseDefinitions.get(1).getVersion());
-        assertEquals("myCase", caseDefinitions.get(1).getKey());
+        assertThat(caseDefinitions)
+                .extracting(CaseDefinition::getVersion, CaseDefinition::getKey)
+                .containsExactly(
+                        tuple(1, "myCase2"),
+                        tuple(3, "myCase"));
+        assertThat(caseDefinitions.get(0).getVersion()).isEqualTo(1);
+        assertThat(caseDefinitions.get(0).getKey()).isEqualTo("myCase2");
+        assertThat(caseDefinitions.get(1).getVersion()).isEqualTo(3);
+        assertThat(caseDefinitions.get(1).getKey()).isEqualTo("myCase");
     }
 
     private List<String> getCaseDefinitionIds(String deploymentId) {

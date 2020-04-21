@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableTaskAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.ui.task.conf",

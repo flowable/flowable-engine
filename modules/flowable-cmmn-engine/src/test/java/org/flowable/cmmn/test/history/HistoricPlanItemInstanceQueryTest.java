@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,13 +37,13 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     @Before
     public void deployCaseDefinition() {
         this.deploymentId = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
-            .deploy()
-            .getId();
+                .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
+                .deploy()
+                .getId();
         caseDefinitionId = cmmnRepositoryService.createCaseDefinitionQuery()
-            .deploymentId(deploymentId)
-            .singleResult()
-            .getId();
+                .deploymentId(deploymentId)
+                .singleResult()
+                .getId();
     }
 
     @After
@@ -55,14 +54,14 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testByCaseDefinitionId() {
         startInstances(5);
-        assertEquals(20, cmmnHistoryService.createHistoricPlanItemInstanceQuery().list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list()).hasSize(20);
     }
 
     @Test
     public void testByCaseInstanceId() {
         List<String> caseInstanceIds = startInstances(3);
         for (String caseInstanceId : caseInstanceIds) {
-            assertEquals(4, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).list().size());
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).list()).hasSize(4);
         }
     }
 
@@ -70,11 +69,11 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void testByStageInstanceId() {
         startInstances(1);
         HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
-            .planItemInstanceName("Stage one")
-            .singleResult();
-        assertNotNull(planItemInstance);
-        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceStageInstanceId(planItemInstance.getId()).count());
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
+                .planItemInstanceName("Stage one")
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceStageInstanceId(planItemInstance.getId()).count()).isEqualTo(2);
     }
 
     @Test
@@ -82,55 +81,104 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(1);
         List<HistoricPlanItemInstance> planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
         for (HistoricPlanItemInstance planItemInstance : planItemInstances) {
-            assertEquals(1L, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count());
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1L);
         }
     }
 
     @Test
     public void testByElementId() {
         startInstances(4);
-        assertEquals(4, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceElementId("planItem3").list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceElementId("planItem3").list()).hasSize(4);
     }
 
     @Test
     public void testByName() {
         startInstances(9);
-        assertEquals(9, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("B").list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("B").list()).hasSize(9);
     }
 
     @Test
     public void testByState() {
         startInstances(1);
-        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ACTIVE).list().size());
-        assertEquals(1, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.AVAILABLE).list().size());
-        assertEquals(1, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ACTIVE).list()).hasSize(2);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.AVAILABLE).list()).hasSize(1);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).list()).hasSize(1);
     }
 
     @Test
     public void testByPlanItemDefinitionType() {
         startInstances(3);
-        assertEquals(6, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK).list().size());
-        assertEquals(6, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE).list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK).list().size())
+                .isEqualTo(6);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE).list().size())
+                .isEqualTo(6);
     }
 
     @Test
     public void testByPlanItemDefinitionTypes() {
         startInstances(2);
-        assertEquals(8, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.HUMAN_TASK)).list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.HUMAN_TASK)).list()).hasSize(8);
     }
 
     @Test
     public void testByStateAndType() {
         startInstances(3);
-        assertEquals(3, cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-            .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
-            .list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list())
+                .hasSize(3);
 
-        assertEquals(3, cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-            .planItemInstanceState(PlanItemInstanceState.ENABLED)
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
-            .list().size());
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.ENABLED)
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list())
+                .hasSize(3);
+    }
+
+    @Test
+    public void testOrderBy() {
+        startInstances(4);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByName().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByName().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByCreateTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByCreateTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastAvailableTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastAvailableTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastEnabledTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastEnabledTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastDisabledTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastDisabledTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastStartedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastStartedTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastSuspendedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastSuspendedTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByCompletedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByCompletedTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByOccurredTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByOccurredTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByTerminatedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByTerminatedTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByExitTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByExitTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByEndedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByEndedTime().desc().list()).hasSize(16);
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastUpdatedTime().asc().list()).hasSize(16);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastUpdatedTime().desc().list()).hasSize(16);
     }
 
     private List<String> startInstances(int numberOfInstances) {

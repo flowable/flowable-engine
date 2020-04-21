@@ -16,6 +16,7 @@ package org.flowable.examples.bpmn.callactivity;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -89,5 +90,28 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         pi = runtimeService.startProcessInstanceByKey("mainProcessInheritBusinessKey", "123");
         subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
         assertEquals("123", subProcessInstance.getBusinessKey());
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/examples/bpmn/callactivity/processWithDynamicCallActivity.bpmn20.xml",
+            "org/flowable/examples/bpmn/callactivity/calledChildProcess.bpmn20.xml",
+            "org/flowable/examples/bpmn/callactivity/dynamicallyCalledChildProcess.bpmn20.xml"})
+    public void testCallActivityDynamicChange(){
+        // Call original CallActivity
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("processWithDynamicCallActivity");
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        assertEquals("Original Child Process User Task",
+                taskService.createTaskQuery().singleResult().getName());
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        // Dynamically change CallActivity
+        ProcessInstance dynamicallyChangedInstance = runtimeService.startProcessInstanceByKey("processWithDynamicCallActivity");
+        ObjectNode infoNode = dynamicBpmnService.changeCallActivityCalledElement("callActivity", "dynamicallyCalledChildProcess");
+        dynamicBpmnService.saveProcessDefinitionInfo(dynamicallyChangedInstance.getProcessDefinitionId(), infoNode);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(dynamicallyChangedInstance.getProcessInstanceId()).singleResult().getId());
+
+        assertEquals("Dynamically Changed Call Activity User Task",
+                taskService.createTaskQuery().singleResult().getName());
+
     }
 }

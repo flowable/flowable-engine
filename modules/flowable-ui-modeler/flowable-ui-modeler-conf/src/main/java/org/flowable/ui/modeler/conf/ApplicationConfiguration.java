@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableModelerAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.ui.modeler.conf",

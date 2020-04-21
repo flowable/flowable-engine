@@ -45,4 +45,14 @@ public class PlanItemLifeCycleEvent {
         this.transition = transition;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PlanItem lifecycle event for plan item [").append(planItem).append("]");
+        if (transition != null) {
+            stringBuilder.append(" and transition '").append(transition).append("'");
+        }
+        return stringBuilder.toString();
+    }
+
 }

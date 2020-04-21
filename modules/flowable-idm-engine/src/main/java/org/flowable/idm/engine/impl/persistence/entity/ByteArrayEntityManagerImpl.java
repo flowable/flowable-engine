@@ -15,7 +15,6 @@ package org.flowable.idm.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
@@ -23,36 +22,22 @@ import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
-public class ByteArrayEntityManagerImpl extends AbstractEntityManager<IdmByteArrayEntity> implements ByteArrayEntityManager {
-
-    protected ByteArrayDataManager byteArrayDataManager;
+public class ByteArrayEntityManagerImpl
+    extends AbstractIdmEngineEntityManager<IdmByteArrayEntity, ByteArrayDataManager>
+    implements ByteArrayEntityManager {
 
     public ByteArrayEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, ByteArrayDataManager byteArrayDataManager) {
-        super(idmEngineConfiguration);
-        this.byteArrayDataManager = byteArrayDataManager;
-    }
-
-    @Override
-    protected DataManager<IdmByteArrayEntity> getDataManager() {
-        return byteArrayDataManager;
+        super(idmEngineConfiguration, byteArrayDataManager);
     }
 
     @Override
     public List<IdmByteArrayEntity> findAll() {
-        return byteArrayDataManager.findAll();
+        return dataManager.findAll();
     }
 
     @Override
     public void deleteByteArrayById(String byteArrayEntityId) {
-        byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
-    }
-
-    public ByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
-    public void setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+        dataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
     }
 
 }

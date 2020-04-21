@@ -13,17 +13,26 @@
 
 package org.flowable.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
@@ -528,6 +537,129 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         // done!
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    @Deployment
+    public void testNonInterruptingSimpleActivities() {
+        runtimeService.startProcessInstanceByKey("testSimpleSignalEventSubProcess");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        // Signal the Event sub process
+        runtimeService.signalEventReceived("eventSignal");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "signalEventSubProcess"),
+                tuple("startEvent", "eventSubProcessSignalStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "signalEventSubProcess"),
+                tuple("startEvent", "eventSubProcessSignalStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1"),
+                tuple("sequenceFlow", "eventSubProcessFlow2"),
+                tuple("endEvent", "eventSubProcessEnd")
+            );
+
+        ActivityInstance eventSubProcessActivity = runtimeService.createActivityInstanceQuery()
+            .activityType("eventSubProcess")
+            .activityId("signalEventSubProcess")
+            .singleResult();
+        assertThat(eventSubProcessActivity).isNotNull();
+        assertThat(eventSubProcessActivity.getEndTime()).isNotNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "start"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "signalEventSubProcess"),
+                    tuple("startEvent", "eventSubProcessSignalStart"),
+                    tuple("sequenceFlow", "eventSubProcessFlow1"),
+                    tuple("userTask", "eventSubProcessTask1"),
+                    tuple("sequenceFlow", "eventSubProcessFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testInterruptingSimpleActivities() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSimpleSignalEventSubProcess");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        // Signal the Event sub process
+        runtimeService.signalEventReceived("eventSignal");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "signalEventSubProcess"),
+                tuple("startEvent", "eventSubProcessSignalStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "start"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "signalEventSubProcess"),
+                    tuple("startEvent", "eventSubProcessSignalStart"),
+                    tuple("sequenceFlow", "eventSubProcessFlow1"),
+                    tuple("userTask", "eventSubProcessTask1"),
+                    tuple("sequenceFlow", "eventSubProcessFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

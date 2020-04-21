@@ -18,10 +18,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 
 public class CaseExport implements CmmnXmlConstants {
     
-    public static void writeCase(Case caseModel, XMLStreamWriter xtw) throws Exception {
+    public static void writeCase(CmmnModel model, Case caseModel, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_CASE);
         xtw.writeAttribute(ATTRIBUTE_ID, caseModel.getId());
 
@@ -48,7 +50,17 @@ public class CaseExport implements CmmnXmlConstants {
             xtw.writeEndElement();
         }
         
-        boolean didWriteExtensionStartElement = FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER, caseModel.getLifecycleListeners(), false);
+        if (StringUtils.isNotEmpty(caseModel.getStartEventType()) && caseModel.getExtensionElements().get("eventType") == null) {
+            ExtensionElement extensionElement = new ExtensionElement();
+            extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+            extensionElement.setName("eventType");
+            extensionElement.setElementText(caseModel.getStartEventType());
+            caseModel.addExtensionElement(extensionElement);
+        }
+        
+        boolean didWriteExtensionStartElement = CmmnXmlUtil.writeExtensionElements(caseModel, false, model.getNamespaces(), xtw);
+        didWriteExtensionStartElement = FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER, caseModel.getLifecycleListeners(), didWriteExtensionStartElement);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }

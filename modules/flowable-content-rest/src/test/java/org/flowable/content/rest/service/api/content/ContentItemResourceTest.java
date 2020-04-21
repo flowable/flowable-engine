@@ -12,11 +12,12 @@
  */
 package org.flowable.content.rest.service.api.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -87,7 +88,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
             // Check response headers
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
             closeResponse(response);
 
         } finally {
@@ -149,23 +152,23 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
         ContentItem origContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
         assertNotNull(origContentItem);
 
-        InputStream binaryContent = null;
-        try {
-            binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+        try (InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes())) {
 
             // Get content item data
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
+                ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, null));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
             closeResponse(response);
 
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
+                ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
 
             // Check response headers
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
             closeResponse(response);
 
             ContentItem changedContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
@@ -173,9 +176,6 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
         } finally {
             contentService.deleteContentItem(contentItemId);
-            if (binaryContent != null) {
-                binaryContent.close();
-            }
         }
     }
 

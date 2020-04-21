@@ -25,7 +25,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  */
 public class TransientVariableInstance implements VariableInstance {
 
-    public static String TYPE_TRANSIENT = "transient";
+    public static final String TYPE_TRANSIENT = "transient";
 
     protected String variableName;
     protected Object variableValue;

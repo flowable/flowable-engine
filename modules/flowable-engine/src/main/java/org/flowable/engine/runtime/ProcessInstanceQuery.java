@@ -45,6 +45,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
 
     /**
+     * Select process instances with a business key like the given value.
+     */
+    ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
+
+    /**
      * Only select process instances that have the given tenant id.
      */
     ProcessInstanceQuery processInstanceTenantId(String tenantId);
@@ -127,6 +132,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances with which the user with the given id is involved.
      */
     ProcessInstanceQuery involvedUser(String userId);
+    
+    /**
+     * Select the process instances with which the user with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /**
+     * Select the process instances with which the group with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
     /**
      * Select the process instances with which the {@link org.flowable.idm.api.Group}s with the given ids are involved.
@@ -299,6 +314,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with the given callback type.
      */
     ProcessInstanceQuery processInstanceCallbackType(String callbackType);
+
+    /**
+     * Only select process instances with the given reference id.
+     */
+    ProcessInstanceQuery processInstanceReferenceId(String referenceId);
+
+    /**
+     * Only select process instances with the given callback type.
+     */
+    ProcessInstanceQuery processInstanceReferenceType(String referenceType);
 
     /**
      * Localize process name and description to specified locale.

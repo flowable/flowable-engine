@@ -49,6 +49,16 @@ public interface Job extends JobInfo {
     String getProcessDefinitionId();
     
     /**
+     * Get the category for this job.
+     */
+    String getCategory();
+    
+    /**
+     * Get the job type for this job.
+     */
+    String getJobType();
+    
+    /**
      * Reference to an element identifier or null if none is set.
      */
     String getElementId();
@@ -82,11 +92,6 @@ public interface Job extends JobInfo {
      * Is the job exclusive?
      */
     boolean isExclusive();
-
-    /**
-     * Get the job type for this job.
-     */
-    String getJobType();
     
     /**
      * Returns the create datetime of the job.

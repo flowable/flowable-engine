@@ -138,6 +138,16 @@ public class EventLogger extends AbstractFlowableEventListener {
                             @Override
                             public void closeFailure(CommandContext commandContext) {
                             }
+                            
+                            @Override
+                            public Integer order() {
+                                return 5;
+                            }
+                            
+                            @Override
+                            public boolean multipleAllowed() {
+                                return false;
+                            }
 
                         });
             }

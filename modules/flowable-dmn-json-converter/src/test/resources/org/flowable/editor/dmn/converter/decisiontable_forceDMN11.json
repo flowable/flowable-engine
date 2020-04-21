@@ -1,0 +1,65 @@
+{
+  "id": "75af3205-3089-11ea-9f9b-da8e6afe55af",
+  "modelVersion": "2",
+  "name": "ForceDMN11 Collect SUM",
+  "key": "ForceDMN11_Collect_SUM_1",
+  "forceDMN11": true,
+  "hitIndicator": "COLLECT",
+  "collectOperator": "SUM",
+  "inputExpressions": [
+    {
+      "id": "1",
+      "variableId": "input1",
+      "variableType": null,
+      "type": "number",
+      "label": "",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "2",
+      "variableId": "output1",
+      "variableType": null,
+      "type": "number",
+      "label": "",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    }
+  ],
+  "rules": [
+    {
+      "2": 10,
+      "1_operator": "<",
+      "1_expression": 10
+    },
+    {
+      "2": 20,
+      "1_operator": "<",
+      "1_expression": 20
+    },
+    {
+      "2": 30,
+      "1_operator": "<",
+      "1_expression": 30
+    },
+    {
+      "2": 40,
+      "1_operator": "<",
+      "1_expression": 40
+    },
+    {
+      "2": 50,
+      "1_operator": "<",
+      "1_expression": 50
+    },
+    {
+      "2": 50,
+      "1_operator": "<",
+      "1_expression": 60
+    }
+  ]
+}

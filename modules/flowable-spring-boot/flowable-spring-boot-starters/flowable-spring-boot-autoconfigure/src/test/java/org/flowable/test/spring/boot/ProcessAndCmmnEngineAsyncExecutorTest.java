@@ -226,12 +226,12 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
     }
 
     @Import({ CmmnTaskExecutorConfiguration.class, ProcessTaskExecutorConfiguration.class })
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class DedicatedTaskExecutorsConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CmmnTaskExecutorConfiguration {
 
         @Cmmn
@@ -242,7 +242,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class ProcessTaskExecutorConfiguration {
 
         @Process
@@ -253,7 +253,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class PrimaryTaskExecutorConfiguration {
 
         @Primary
@@ -265,12 +265,12 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
     }
 
     @Import({ CmmnRejectedHandlerConfiguration.class, ProcessRejectedHandlerConfiguration.class })
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class DedicatedRejectedHandlerConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CmmnRejectedHandlerConfiguration {
 
         @Cmmn
@@ -281,7 +281,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class ProcessRejectedHandlerConfiguration {
 
         @Process
@@ -292,7 +292,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class PrimaryRejectedHandlerConfiguration {
 
         @Primary

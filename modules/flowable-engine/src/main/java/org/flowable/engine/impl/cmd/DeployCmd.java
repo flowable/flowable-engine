@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -81,7 +82,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<Deployment> deploymentEntities = new DeploymentQueryImpl(processEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
-                        .orderByDeploymenTime().desc()
+                        .orderByDeploymentTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
@@ -89,7 +90,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
                 
             } else {
                 List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymenTime().desc().list();
+                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentTime().desc().list();
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
@@ -110,6 +111,13 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         // Save the data
         CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {

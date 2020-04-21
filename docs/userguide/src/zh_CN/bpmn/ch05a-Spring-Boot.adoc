@@ -38,7 +38,7 @@ Spring Boot提倡约定大于配置。要开始工作，只需在项目中添加
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -179,7 +179,7 @@ flowable.Application                     : Started Application in 18.235 seconds
 
 [source,java,linenums]
 ----
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {

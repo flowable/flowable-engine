@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -61,15 +60,15 @@ public interface ExpressionManager {
     void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates);
     
     /**
-     * Returns the {@link FlowableExpressionEnhancer} which potentially can alter the expression text 
-     * before being transformed into an {@link Expression} instance.
+     * Returns the {@link FlowableAstFunctionCreator} which potentially can alter the expression functions
+     * during the creation of an {@link Expression} instance.
      */
-    List<FlowableExpressionEnhancer> getExpressionEnhancers();
+    List<FlowableAstFunctionCreator> getAstFunctionCreators();
     
     /**
-     * Sets the {@link FlowableExpressionEnhancer} instances which can enhance expression texts 
-     * before being tranformed into an {@link Expression} instance.
+     * Sets the {@link FlowableAstFunctionCreator} instances which can alter the expression functions
+     * during the creation of an {@link Expression} instance.
      */
-    void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers);
+    void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators);
 
 }

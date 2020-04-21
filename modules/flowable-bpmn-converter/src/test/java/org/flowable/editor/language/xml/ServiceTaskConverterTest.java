@@ -72,7 +72,7 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
         exception = exceptions.get(1);
         assertEquals("java", exception.getErrorCode());
         assertEquals("MyClass", exception.getClassName());
-        assertEquals(true, exception.isAndChildren());
+        assertTrue(exception.isAndChildren());
 
         List<FlowableListener> listeners = serviceTask.getExecutionListeners();
         assertEquals(3, listeners.size());

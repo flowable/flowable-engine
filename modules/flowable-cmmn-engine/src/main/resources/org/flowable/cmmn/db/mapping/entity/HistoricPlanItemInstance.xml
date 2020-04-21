@@ -5,16 +5,17 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
 
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
+            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
             #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{stageInstanceId ,jdbcType=VARCHAR},
             #{isStage ,jdbcType=BOOLEAN},
@@ -39,15 +40,16 @@
             #{entryCriterionId, jdbcType=VARCHAR},
             #{exitCriterionId, jdbcType=VARCHAR},
             #{showInOverview, jdbcType=BOOLEAN},
+            #{extraValue, jdbcType=VARCHAR},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
         ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
+        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
             (
@@ -56,6 +58,7 @@
             #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
@@ -80,6 +83,7 @@
             #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.exitCriterionId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.showInOverview, jdbcType=BOOLEAN},
+            #{historicPlanItemInstance.extraValue, jdbcType=VARCHAR},
             #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -88,16 +92,17 @@
     <insert id="bulkInsertHistoricPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicPlanItemInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+            into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
+            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
                 1,
                 #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
@@ -122,6 +127,7 @@
                 #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.exitCriterionId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.showInOverview, jdbcType=BOOLEAN},
+                #{historicPlanItemInstance.extraValue, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -141,6 +147,9 @@
             </if>
             <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
                 CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.derivedCaseDefinitionId != derivedCaseDefinitionId">
+                DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.caseInstanceId != caseInstanceId">
                 CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
@@ -214,6 +223,9 @@
             <if test="originalPersistentState.showInOverview != showInOverview">
                 SHOW_IN_OVERVIEW_ = #{showInOverview, jdbcType=VARCHAR}
             </if>
+            <if test="originalPersistentState.extraValue != extraValue">
+                EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
@@ -235,6 +247,11 @@
         NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where PLANITEM.CASE_INST_ID_ = CASEINST.ID_)
     </delete>
   
+    <delete id="bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
+        delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where PLANITEM.CASE_INST_ID_ is not null and
+        NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where PLANITEM.CASE_INST_ID_ = CASEINST.ID_)
+    </delete>
+
     <delete id="bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
         delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_INST_ID_ is not null and CASE_INST_ID_ != '' and
         CASE_INST_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
@@ -246,6 +263,7 @@
         <result property="name" column="NAME_" jdbcType="VARCHAR"/>
         <result property="state" column="STATE_" jdbcType="VARCHAR"/>
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
+        <result property="derivedCaseDefinitionId" column="DERIVED_CASE_DEF_ID_" jdbcType="VARCHAR"/>
         <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
         <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR"/>
         <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN"/>
@@ -270,6 +288,7 @@
         <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
         <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
         <result property="showInOverview" column="SHOW_IN_OVERVIEW_" jdbcType="BOOLEAN" />
+        <result property="extraValue" column="EXTRA_VALUE_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -309,6 +328,9 @@
             </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="derivedCaseDefinitionId != null">
+                and RES.DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId}
             </if>
             <if test="caseInstanceId != null">
                 and RES.CASE_INST_ID_ = #{caseInstanceId}
@@ -415,8 +437,34 @@
             <if test="exitCriterionId != null">
                 and RES.EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR}
             </if>
+            <if test="formKey != null">
+                and RES.EXTRA_VALUE_ = #{formKey, jdbcType=VARCHAR}
+            </if>
+            <if test="extraValue != null">
+                and RES.EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR}
+            </if>
             <if test="onlyStages">
                 and RES.IS_STAGE_ = #{onlyStages, jdbcType=BOOLEAN}
+            </if>
+            <if test="involvedUser != null || involvedGroups != null">
+                and exists(select I.ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SUB_SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'planItem'
+                    and
+                    (
+                      <if test="involvedUser != null">
+                        I.USER_ID_ = #{involvedUser}
+                      </if>
+                      <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+                        or
+                      </if>
+                      <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+                        I.GROUP_ID_ IN
+                        <foreach item="involvedGroup" index="index" collection="involvedGroups"
+                                 open="(" separator="," close=")">
+                          #{involvedGroup}
+                        </foreach>
+                      </if>
+                    )
+                )
             </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}

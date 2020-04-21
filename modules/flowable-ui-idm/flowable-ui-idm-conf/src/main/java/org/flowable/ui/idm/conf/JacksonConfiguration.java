@@ -22,7 +22,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 /**
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JacksonConfiguration {
 
     @Bean

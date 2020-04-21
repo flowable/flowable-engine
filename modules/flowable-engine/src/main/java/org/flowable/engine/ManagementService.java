@@ -27,6 +27,7 @@ import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
@@ -378,6 +379,18 @@ public interface ManagementService {
      * @return the result of command execution
      */
     <T> T executeCommand(CommandConfig config, Command<T> command);
+
+    /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
 
     /**
      * Executes the sql contained in the {@link CustomSqlExecution} parameter.

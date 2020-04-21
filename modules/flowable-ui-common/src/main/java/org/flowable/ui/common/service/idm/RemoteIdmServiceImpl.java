@@ -14,7 +14,7 @@ package org.flowable.ui.common.service.idm;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -60,7 +60,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         adminUser = properties.getIdmAdmin().getUser();
         Assert.hasText(adminUser, "Admin user must not be empty");
         adminPassword = properties.getIdmAdmin().getPassword();
-        Assert.hasText(adminUser, "Admin user password should not be empty");
+        Assert.hasText(adminPassword, "Admin user password should not be empty");
     }
 
     @Override
@@ -133,7 +133,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.getEncoder().encode((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
+                Base64.getEncoder().encode((username + ":" + password).getBytes(StandardCharsets.UTF_8))));
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         SSLConnectionSocketFactory sslsf = null;

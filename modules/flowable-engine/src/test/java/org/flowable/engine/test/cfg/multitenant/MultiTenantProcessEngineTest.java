@@ -78,6 +78,7 @@ public class MultiTenantProcessEngineTest {
 
         config.setAsyncExecutorActivate(true);
         config.setDisableIdmEngine(true);
+        config.setDisableEventRegistry(true);
 
         if (sharedExecutor) {
             config.setAsyncExecutor(new SharedExecutorServiceAsyncExecutor(tenantInfoHolder));

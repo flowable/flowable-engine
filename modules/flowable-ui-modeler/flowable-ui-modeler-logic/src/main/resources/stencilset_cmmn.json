@@ -327,6 +327,13 @@
       "value" : "",
       "description" : "CMMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXT.DESCRIPTION",
       "popular" : true
+    }, {
+      "id" : "mailtasktextvar",
+      "type" : "Text",
+      "title" : "CMMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXTVAR.TITLE",
+      "value" : "",
+      "description" : "CMMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXTVAR.DESCRIPTION",
+      "popular" : true
     } ]
   }, {
     "name" : "mailtaskhtmlpackage",
@@ -336,6 +343,13 @@
       "title" : "CMMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTML.TITLE",
       "value" : "",
       "description" : "CMMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTML.DESCRIPTION",
+      "popular" : true
+    }, {
+      "id" : "mailtaskhtmlVar",
+      "type" : "Text",
+      "title" : "CMMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTMLVAR.TITLE",
+      "value" : "",
+      "description" : "CMMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTMLVAR.DESCRIPTION",
       "popular" : true
     } ]
   }, {
@@ -602,6 +616,138 @@
         "description" : "CMMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEASJSONPACKAGE.HTTPTASKSAVERESPONSEASJSON.DESCRIPTION",
         "popular" : true
       } ]
+    }, 
+    {
+      "name" : "eventregistryeventpackage",
+      "properties" : [ {
+        "id" : "eventkey",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTKEY.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTKEY.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistryeventnamepackage",
+      "properties" : [ {
+        "id" : "eventname",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTNAME.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTNAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistryinparameterspackage",
+      "properties" : [ {
+        "id" : "eventinparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTINPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTINPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistryoutparameterspackage",
+      "properties" : [ {
+        "id" : "eventoutparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTOUTPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTOUTPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrycorrelationpackage",
+      "properties" : [ {
+        "id" : "eventcorrelationparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTCORRELATIONPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.EVENTCORRELATIONPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrychannelkeypackage",
+      "properties" : [ {
+        "id" : "channelkey",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELKEY.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELKEY.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrychannelnamepackage",
+      "properties" : [ {
+        "id" : "channelname",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELNAME.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELNAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrychanneltypepackage",
+      "properties" : [ {
+        "id" : "channeltype",
+        "type" : "flowable-channeltype",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELTYPE.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELTYPE.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrychanneldestinationpackage",
+      "properties" : [ {
+        "id" : "channeldestination",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELDESTINATION.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.CHANNELDESTINATION.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrykeydetectionfixedvaluepackage",
+      "properties" : [ {
+        "id" : "keydetectionfixedvalue",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONFIXEDVALUE.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONFIXEDVALUE.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrykeydetectionjsonfieldpackage",
+      "properties" : [ {
+        "id" : "keydetectionjsonfield",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONFIELD.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONFIELD.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "eventregistrykeydetectionjsonpointerpackage",
+      "properties" : [ {
+        "id" : "keydetectionjsonpointer",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.DESCRIPTION",
+        "popular" : true
+      } ]
     },
     {
       "name" : "casetaskcasereferencepackage",
@@ -654,6 +800,36 @@
         "popular" : true
       } ]
     }, {
+      "name" : "casetaskinparameterspackage",
+      "properties" : [ {
+        "id" : "casetaskinparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.CASETASKINPARAMETERSPACKAGE.CASETASKINPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.CASETASKINPARAMETERSPACKAGE.CASETASKINPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "casetaskoutparameterspackage",
+      "properties" : [ {
+        "id" : "casetaskoutparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.CASETASKOUTPARAMETERSPACKAGE.CASETASKOUTPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.CASETASKOUTPARAMETERSPACKAGE.CASETASKOUTPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    },{
+      "name" : "idVariableNamepackage",
+      "properties" : [ {
+        "id" : "idVariableName",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.IDVARIABLENAMEPACKAGE.IDVARIABLENAME.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.IDVARIABLENAMEPACKAGE.IDVARIABLENAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    },{
       "name" : "timerexpressionpackage",
       "properties" : [ {
         "id" : "timerexpression",
@@ -843,6 +1019,16 @@
           "popular" : true
         }]
     },{
+      "name" : "milestonevariablepackage",
+      "properties" : [ {
+        "id" : "milestonevariable",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.MILESTONEVARIABLEPACKAGE.MILESTONEVARIABLE.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.MILESTONEVARIABLEPACKAGE.MILESTONEVARIABLE.DESCRIPTION",
+        "popular" : true
+      }]
+    },{
       "name" : "scriptformatpackage",
       "properties" : [ {
         "id" : "scriptformat",
@@ -863,6 +1049,17 @@
         "popular" : true
       }
       ]
+    },
+    {
+      "name" : "servicetaskstoreresultvariabletransientpackage",
+      "properties" : [ {
+        "id" : "servicetaskstoreresultvariabletransient",
+        "type" : "Boolean",
+        "title" : "CMMN.PROPERTYPACKAGES.SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE.SERVICETASKSTORERESULTVARIABLETRANSIENT.TITLE",
+        "value" : "false",
+        "description" : "CMMN.PROPERTYPACKAGES.SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE.SERVICETASKSTORERESULTVARIABLETRANSIENT.DESCRIPTION",
+        "popular" : true
+      } ]
     }, {
       "name" : "transitioneventpackage",
       "properties" : [ {
@@ -895,7 +1092,7 @@
     "groups" : [ "CMMN.STENCILS.GROUPS.DIAGRAM" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage"],
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
@@ -1008,6 +1205,7 @@
       "servicetaskdelegateexpressionpackage",
       "servicetaskfieldspackage",
       "servicetaskresultvariablepackage",
+      "servicetaskstoreresultvariabletransientpackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
@@ -1097,6 +1295,45 @@
       ]
     }, {
       "type" : "node",
+      "id" : "MailTask",
+      "title" : "CMMN.STENCILS.MAILTASK.TITLE",
+      "description" : "CMMN.STENCILS.MAILTASK.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg         xmlns=\"http://www.w3.org/2000/svg\"         xmlns:oryx=\"http://www.b3mn.org/oryx\"          width=\"102\"         height=\"82\"         version=\"1.0\">     <defs></defs>     <oryx:magnets>         <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\"/>         <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\"/>         <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\"/>          <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\"/>         <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\"/>         <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\"/>          <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\"/>         <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\"/>         <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\"/>          <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\"/>         <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\"/>         <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\"/>          <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\"/>     </oryx:magnets>     <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">         <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\"               fill=\"none\"/>         <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\"               fill=\"#f9f9f9\"/>         <text                 font-size=\"12\"                 id=\"text_name\"                 x=\"50\"                 y=\"40\"                 oryx:align=\"middle center\"                 oryx:fittoelem=\"text_frame\"                 stroke=\"#373e48\">         </text>          <g id=\"sendTask\" transform=\"translate(4,3)\">              <!-- path here -->             <path oryx:anchors=\"top left\"                   style=\"fill:#16964d;stroke:none;\"                   d=\"M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z \"/>         </g>         <g id=\"required\" display=\"inherit\" stroke=\"#000000\">             <g oryx:anchors=\"bottom\">                 <path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"></path>             </g>         </g>         <g id=\"repetition\" oryx:anchors=\"bottom\">             <path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/>         </g>         <g id=\"manualActivation\" display=\"inherit\" stroke=\"#000000\" oryx:anchors=\"bottom\">             <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"></path>         </g>     </g> </svg>",
+      "icon" : "activity/mailtask.png",
+      "groups" : [
+        "CMMN.STENCILS.GROUPS.ACTIVITIES"
+      ],
+      "propertyPackages" : [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
+        "completionneutralrulepackage",
+        "mailtaskheaderspackage",
+        "mailtasktopackage",
+        "mailtaskfrompackage",
+        "mailtasksubjectpackage",
+        "mailtaskccpackage",
+        "mailtaskbccpackage",
+        "mailtasktextpackage",
+        "mailtaskhtmlpackage",
+        "mailtaskcharsetpackage",
+        "planitemlifecyclelistenerspackage"
+      ],
+      "hiddenPropertyPackages" : [],
+      "roles" : [
+        "Activity",
+        "sequence_start",
+        "sequence_end",
+        "ActivitiesMorph",
+        "all"
+      ]
+    }, {
+      "type" : "node",
       "id" : "ScriptTask",
       "title" : "CMMN.STENCILS.SCRIPTTASK.TITLE",
       "description" : "CMMN.STENCILS.SCRIPTTASK.DESCRIPTION",
@@ -1122,6 +1359,35 @@
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
       "type" : "node",
+      "id" : "SendEventTask",
+      "title" : "CMMN.STENCILS.SENDEVENTTASK.TITLE",
+      "description" : "CMMN.STENCILS.SENDEVENTTASK.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"sendEventTask\" transform=\"translate(2,2)\">\n\t\t<path oryx:anchors=\"top left\"\n\t\t\td=\"M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z \"\n     \t\tstyle=\"fill:#72a7d0;stroke:none\"\n\t\t/>\n\t</g><g id=\"required\" display=\"inherit\" stroke=\"#000000\"><g oryx:anchors=\"bottom\"><path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"></path></g></g><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g><g id=\"manualActivation\" display=\"inherit\" stroke=\"#000000\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"></path></g></g></svg>",
+      "icon" : "activity/sendeventtask.png",
+      "groups" : [ "CMMN.STENCILS.GROUPS.ACTIVITIES" ],
+      "propertyPackages" : [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
+        "completionneutralrulepackage",
+        "eventregistryeventpackage", 
+        "eventregistryeventnamepackage", 
+        "eventregistryinparameterspackage", 
+        "eventregistrychannelkeypackage", 
+        "eventregistrychannelnamepackage", 
+        "eventregistrychanneltypepackage", 
+        "eventregistrychanneldestinationpackage", 
+        "planitemlifecyclelistenerspackage"
+      ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
+    }, {
+      "type" : "node",
       "id" : "Milestone",
       "title" : "CMMN.STENCILS.MILESTONE.TITLE",
       "description" : "CMMN.STENCILS.MILESTONE.DESCRIPTION",
@@ -1135,7 +1401,9 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "completionneutralrulepackage",
-        "planitemlifecyclelistenerspackage" ],
+        "planitemlifecyclelistenerspackage",
+        "milestonevariablepackage"
+      ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1152,7 +1420,10 @@
         "documentationpackage",
         "blockingpackage",
         "casetaskcasereferencepackage",
+        "casetaskinparameterspackage",
+        "casetaskoutparameterspackage",
         "fallbacktodefaulttenantpackage",
+        "idVariableNamepackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
@@ -1178,6 +1449,7 @@
         "fallbacktodefaulttenantpackage",
         "processtaskinparameterspackage",
         "processtaskoutparameterspackage",
+        "idVariableNamepackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
@@ -1202,7 +1474,18 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "planitemlifecyclelistenerspackage",
-        "availableconditionpackage"],
+        "availableconditionpackage",
+        "eventregistryeventpackage", 
+        "eventregistryeventnamepackage", 
+        "eventregistryoutparameterspackage", 
+        "eventregistrycorrelationpackage", 
+        "eventregistrychannelkeypackage", 
+        "eventregistrychannelnamepackage", 
+        "eventregistrychanneltypepackage", 
+        "eventregistrychanneldestinationpackage", 
+        "eventregistrykeydetectionfixedvaluepackage", 
+        "eventregistrykeydetectionjsonfieldpackage", 
+        "eventregistrykeydetectionjsonpointerpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
@@ -1275,7 +1558,7 @@
         "ifpartconditionpackage",
         "triggermodepackage"],
       "hiddenPropertyPackages" : [ ],
-      "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
+      "roles" : [ "association_start", "association_end", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
     }, {
       "type" : "edge",
       "id" : "Association",

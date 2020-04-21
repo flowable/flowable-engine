@@ -20,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -32,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,14 +116,41 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         }
         
         String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
+
+        if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {
+            Expression expression = expressionManager.createExpression(caseServiceTask.getCaseInstanceIdVariableName());
+            String idVariableName = (String) expression.getValue(execution);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                execution.setVariable(idVariableName, caseInstanceId);
+            }
+        }
         
         if (processEngineConfiguration.isEnableEntityLinks()) {
-            EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
-            EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
+            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
         }
 
-        caseInstanceService.startCaseInstanceByKey(caseServiceTask.getCaseDefinitionKey(), caseInstanceId,
-                        caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
+        String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);
+
+        String parentDeploymentId = null;
+        if (caseServiceTask.isSameDeployment()) {
+            parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+        }
+
+        caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
+                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(),
+                parentDeploymentId, inParameters);
+
+        // Bidirectional storing of reference to avoid queries later on
+        executionEntity.setReferenceId(caseInstanceId);
+        executionEntity.setReferenceType(ReferenceTypes.EXECUTION_CHILD_CASE);
+    }
+
+    protected String getCaseDefinitionKey(String caseDefinitionKeyExpression, VariableContainer variableContainer, ExpressionManager expressionManager) {
+        if (StringUtils.isNotEmpty(caseDefinitionKeyExpression)) {
+            return (String) expressionManager.createExpression(caseDefinitionKeyExpression).getValue(variableContainer);
+        } else {
+            return caseDefinitionKeyExpression;
+        }
     }
     
     @Override
@@ -135,6 +165,10 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
     
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
         execution.setVariables(variables);
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        // Set the reference id and type to null since the execution could be reused
+        executionEntity.setReferenceId(null);
+        executionEntity.setReferenceType(null);
         leave(execution);
     }
 }

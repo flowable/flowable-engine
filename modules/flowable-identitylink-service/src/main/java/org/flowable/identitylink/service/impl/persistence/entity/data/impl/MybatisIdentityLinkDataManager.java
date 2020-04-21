@@ -27,6 +27,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceUserGroupAndTypeMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByScopeIdAndTypeMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByScopeIdScopeTypeUserGroupAndTypeMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksBySubScopeIdAndTypeMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByTaskIdMatcher;
 
 /**
@@ -37,6 +38,7 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByTaskIdMatcher = new IdentityLinksByTaskIdMatcher();
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByScopeIdAndTypeMatcher = new IdentityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinksBySubScopeIdAndTypeMatcher = new IdentityLinksBySubScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByProcessInstanceUserGroupAndTypeMatcher = new IdentityLinksByProcessInstanceUserGroupAndTypeMatcher();
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByScopeIdScopeTypeUserGroupAndTypeMatcher = new IdentityLinksByScopeIdScopeTypeUserGroupAndTypeMatcher();
 
@@ -79,6 +81,14 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         return getList("selectIdentityLinksByScopeIdAndType", parameters, identityLinksByScopeIdAndTypeMatcher, true);
+    }
+    
+    @Override
+    public List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("subScopeId", subScopeId);
+        parameters.put("scopeType", scopeType);
+        return getList("selectIdentityLinksBySubScopeIdAndType", parameters, identityLinksBySubScopeIdAndTypeMatcher, true);
     }
 
     @Override

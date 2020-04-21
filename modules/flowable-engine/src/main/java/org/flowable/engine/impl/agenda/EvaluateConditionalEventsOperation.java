@@ -111,6 +111,8 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                                 ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
                                 eventSubProcessExecution.setScope(true);
                                 eventSubProcessExecution.setCurrentFlowElement(eventSubProcess);
+
+                                CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(eventSubProcessExecution);
                                 
                                 ExecutionEntity startEventSubProcessExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
                                 startEventSubProcessExecution.setCurrentFlowElement(startEvent);

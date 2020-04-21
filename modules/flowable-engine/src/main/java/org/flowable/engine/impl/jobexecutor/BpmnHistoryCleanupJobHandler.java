@@ -12,14 +12,8 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
-import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
-import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -36,14 +30,9 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        CommandConfig config = new CommandConfig().transactionRequiresNew();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        
-        HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = processEngineConfiguration.getHistoryCleaningManager().createHistoricProcessInstanceCleaningQuery();
-        commandExecutor.execute(config, new DeleteHistoricProcessInstancesCmd(historicProcessInstanceQuery));
-        commandExecutor.execute(config, new DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd());
-        commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd());
+
+        processEngineConfiguration.getHistoryCleaningManager().createHistoricProcessInstanceCleaningQuery().deleteWithRelatedData();
     }
     
 }

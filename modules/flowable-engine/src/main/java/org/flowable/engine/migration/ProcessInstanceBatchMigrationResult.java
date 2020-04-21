@@ -18,12 +18,12 @@ import java.util.List;
 
 public class ProcessInstanceBatchMigrationResult {
     
-    public static String STATUS_IN_PROGRESS = "inProgress";
-    public static String STATUS_WAITING = "waiting";
-    public static String STATUS_COMPLETED = "completed";
+    public static final String STATUS_IN_PROGRESS = "inProgress";
+    public static final String STATUS_WAITING = "waiting";
+    public static final String STATUS_COMPLETED = "completed";
     
-    public static String RESULT_SUCCESS = "success";
-    public static String RESULT_FAIL = "fail";
+    public static final String RESULT_SUCCESS = "success";
+    public static final String RESULT_FAIL = "fail";
 
     protected String batchId;
     protected String status;

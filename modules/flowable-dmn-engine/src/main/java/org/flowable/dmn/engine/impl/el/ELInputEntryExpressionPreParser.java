@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ELInputEntryExpressionPreParser {
 
-    protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
+    protected static final String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
 
     public static String parse(String expression, String inputVariable, String inputVariableType) {
         

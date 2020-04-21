@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test">
+    <process id="terminateByEndEvent" name="Terminate by End Event" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false"/>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="parallelGateway1"/>
+        <parallelGateway id="parallelGateway1"/>
+        <userTask id="formTask1" name="User Task" flowable:assignee="${initiator}"
+                  flowable:formFieldValidation="false"/>
+        <sequenceFlow id="sequenceFlow2" sourceRef="parallelGateway1" targetRef="formTask1"/>
+        <sequenceFlow id="sequenceFlow3" sourceRef="formTask1" targetRef="endTerminateEvent1"/>
+        <endEvent id="endTerminateEvent1">
+            <terminateEventDefinition/>
+        </endEvent>
+        <serviceTask id="caseTask1" name="Case task" flowable:type="case" flowable:caseDefinitionKey="myCase"
+                     flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true"/>
+        <sequenceFlow id="sequenceFlow4" sourceRef="parallelGateway1" targetRef="caseTask1"/>
+        <endEvent id="endNoneEvent2"/>
+        <sequenceFlow id="sequenceFlow5" sourceRef="caseTask1" targetRef="endNoneEvent2"/>
+    </process>
+</definitions>

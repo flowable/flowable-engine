@@ -16,8 +16,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.form.api.FormDefinition;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
@@ -27,18 +26,12 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataM
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormDeploymentEntity> implements FormDeploymentEntityManager {
-
-    protected FormDeploymentDataManager deploymentDataManager;
+public class FormDeploymentEntityManagerImpl
+    extends AbstractEngineEntityManager<FormEngineConfiguration, FormDeploymentEntity, FormDeploymentDataManager>
+    implements FormDeploymentEntityManager {
 
     public FormDeploymentEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormDeploymentDataManager deploymentDataManager) {
-        super(formEngineConfiguration);
-        this.deploymentDataManager = deploymentDataManager;
-    }
-
-    @Override
-    protected DataManager<FormDeploymentEntity> getDataManager() {
-        return deploymentDataManager;
+        super(formEngineConfiguration, deploymentDataManager);
     }
 
     @Override
@@ -67,47 +60,37 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
         getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
     }
 
-    protected FormDefinitionEntity findLatestFormDefinition(FormDefinition formDefinition) {
-        FormDefinitionEntity latestForm = null;
-        if (formDefinition.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {
-            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKeyAndTenantId(formDefinition.getKey(), formDefinition.getTenantId());
-        } else {
-            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKey(formDefinition.getKey());
-        }
-        return latestForm;
-    }
-
     @Override
     public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-        return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
+        return dataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
     }
 
     @Override
     public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery);
+        return dataManager.findDeploymentsByQueryCriteria(deploymentQuery);
     }
 
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+        return dataManager.getDeploymentResourceNames(deploymentId);
     }
 
     @Override
     public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
-        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap);
+        return dataManager.findDeploymentsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-        return deploymentDataManager.findDeploymentCountByNativeQuery(parameterMap);
+        return dataManager.findDeploymentCountByNativeQuery(parameterMap);
     }
 
-    public FormDeploymentDataManager getDeploymentDataManager() {
-        return deploymentDataManager;
+    protected FormResourceEntityManager getResourceEntityManager() {
+        return engineConfiguration.getResourceEntityManager();
     }
 
-    public void setDeploymentDataManager(FormDeploymentDataManager deploymentDataManager) {
-        this.deploymentDataManager = deploymentDataManager;
+    protected FormDefinitionEntityManager getFormDefinitionEntityManager() {
+        return engineConfiguration.getFormDefinitionEntityManager();
     }
 
 }

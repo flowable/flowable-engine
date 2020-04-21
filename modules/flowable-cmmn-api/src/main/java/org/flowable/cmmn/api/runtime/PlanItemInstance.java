@@ -23,6 +23,7 @@ public interface PlanItemInstance {
     String getName();
     String getState();
     String getCaseDefinitionId();
+    String getDerivedCaseDefinitionId();
     String getCaseInstanceId();
     String getStageInstanceId();
     boolean isStage();
@@ -45,9 +46,11 @@ public interface PlanItemInstance {
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
-    boolean isCompleteable();
+    boolean isCompletable();
     String getEntryCriterionId();
     String getExitCriterionId();
+    String getFormKey();
+    String getExtraValue();
     String getTenantId();
     
 }

@@ -12,11 +12,9 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +43,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
@@ -175,10 +176,11 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             }
 
             BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
-            Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+            Map<String, StartEvent> noneStartEventMap = new HashMap<>();
+            postProcessFlowElements(new ArrayList<>(), noneStartEventMap, bpmnModel);
 
             for (Process process : bpmnModel.getProcesses()) {
-                processUserTasks(process.getFlowElements(), process, startEventMap);
+                processUserTasks(process.getFlowElements(), process, noneStartEventMap);
             }
 
             byte[] modelXML = modelService.getBpmnXML(bpmnModel);
@@ -197,10 +199,11 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         for (Model model : modelDefinitions.values()) {
 
             BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
-            Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+            Map<String, StartEvent> noneStartEventMap = new HashMap<>();
+            postProcessFlowElements(new ArrayList<>(), noneStartEventMap, bpmnModel);
 
             for (Process process : bpmnModel.getProcesses()) {
-                processUserTasks(process.getFlowElements(), process, startEventMap);
+                processUserTasks(process.getFlowElements(), process, noneStartEventMap);
             }
 
             byte[] modelXML = modelService.getBpmnXML(bpmnModel);

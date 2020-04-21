@@ -1307,7 +1307,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }
@@ -1325,7 +1325,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }
@@ -1342,7 +1342,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }
@@ -1541,21 +1541,6 @@ GET runtime/process-instances/{processInstanceId}/diagram
 |404|Indicates the requested process instance was not found.
 
 |===============
-
-
-*Success response body:*
-
-[source,json,linenums]
-----
-{
-   "id":"7",
-   "url":"http://localhost:8182/runtime/process-instances/7",
-   "businessKey":"myBusinessKey",
-   "suspended":false,
-   "processDefinitionUrl":"http://localhost:8182/repository/process-definitions/processOne%3A1%3A4",
-   "activityId":"processTask"
-}
-----
 
 
 ==== Get involved people for process instance
@@ -6303,7 +6288,7 @@ POST management/deadletter-jobs/{jobId}
 [source,json,linenums]
 ----
 {
-  "action" : "execute"
+  "action" : "move"
 }
 ----
 

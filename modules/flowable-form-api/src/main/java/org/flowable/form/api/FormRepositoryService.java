@@ -35,7 +35,7 @@ public interface FormRepositoryService {
      * 
      * @param deploymentId
      *              The id of the deployment of which the category will be changed.
-     * @param newTenantId
+     * @param category
      *              The new category.
      */
     void setDeploymentCategory(String deploymentId, String category);

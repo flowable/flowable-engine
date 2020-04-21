@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JacksonConfiguration {
 
     @Bean()

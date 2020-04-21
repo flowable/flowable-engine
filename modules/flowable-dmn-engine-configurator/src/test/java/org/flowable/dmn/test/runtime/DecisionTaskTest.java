@@ -12,9 +12,13 @@
  */
 package org.flowable.dmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
+
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -26,6 +30,8 @@ import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.task.api.Task;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +39,7 @@ import org.junit.rules.ExpectedException;
 
 /**
  * @author martin.grofcik
+ * @author Filip Hrisafov
  */
 public class DecisionTaskTest {
 
@@ -251,6 +258,26 @@ public class DecisionTaskTest {
 
     @Test
     @CmmnDeployment(
+        resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testUseDmnOutputInEntryCriteria.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testUseDmnOutputInEntryCriteria.dmn"
+        }
+    )
+    public void testUseDmnOutputInEntryCriteria() {
+        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+            .caseDefinitionKey("testRules")
+            .variable("first", "11")
+            .variable("second", "11")
+            .start();
+
+        // The entry sentry on the first stage uses the output of the DMN table
+        List<Task> tasks = cmmnRule.getCmmnTaskService().createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals("Human task", tasks.get(0).getName());
+        assertEquals("Task One", tasks.get(1).getName());
+    }
+
+    @Test
+    @CmmnDeployment(
         resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenant.cmmn"},
         tenantId = "flowable"
     )
@@ -290,6 +317,195 @@ public class DecisionTaskTest {
 
         deployDmnTableWithGlobalTenantFallback("otherTenant");
     }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskSameDeployment.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeployment() {
+        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
+        CaseInstance caseInstance = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                .isEqualTo("executed");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskV2.dmn")
+                    .deploy();
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .start();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                    .isEqualTo("executed");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskSameDeployment.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
+    }, tenantId = "flowable")
+    public void testDecisionTaskExecutionWithSameDeploymentInTenant() {
+        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .tenantId("flowable")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                .isEqualTo("executed");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskV2.dmn")
+                    .tenantId("flowable")
+                    .deploy();
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .tenantId("flowable")
+                    .start();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                    .isEqualTo("executed");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeploymentGlobal() {
+        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                .isEqualTo("executed");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskV2.dmn")
+                    .deploy();
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .start();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                    .isEqualTo("executed");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskSameDeploymentFalse.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeploymentFalse() {
+        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                .isEqualTo("executed");
+
+        try {
+            // Latest decision should be used
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskV2.dmn")
+                    .deploy();
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .start();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                    .isEqualTo("executedV2");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskSameDeploymentFalse.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
+    }, tenantId = "flowable")
+    public void testDecisionTaskExecutionWithSameDeploymentFalseInTenant() {
+        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("testVar", "test2")
+                .tenantId("flowable")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                .isEqualTo("executed");
+
+        try {
+            // Latest decision should be used
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskV2.dmn")
+                    .tenantId("flowable")
+                    .deploy();
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .tenantId("flowable")
+                    .start();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVar"))
+                    .isEqualTo("executedV2");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    // Helper methodes
 
     protected void deployDmnTableAssertCaseStarted() {
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRule.getCmmnRepositoryService().createDeployment().
@@ -396,6 +612,17 @@ public class DecisionTaskTest {
         // Triggering the task should end the case instance
         cmmnRule.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
         Assert.assertEquals(0, cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count());
+    }
+
+    protected void deleteAllDmnDeployments() {
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) cmmnRule.getCmmnEngine()
+                .getCmmnEngineConfiguration()
+                .getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list().stream()
+                .forEach(
+                        deployment -> dmnEngineConfiguration.getDmnRepositoryService().deleteDeployment(deployment.getId())
+                );
     }
 
 }

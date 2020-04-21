@@ -69,7 +69,7 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        return getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
     }
 
     @Override
@@ -89,7 +89,8 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
         }
         historicProcessInstanceQuery.setFirstResult(0);
 
-        List<HistoricProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery);
+        List<HistoricProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {

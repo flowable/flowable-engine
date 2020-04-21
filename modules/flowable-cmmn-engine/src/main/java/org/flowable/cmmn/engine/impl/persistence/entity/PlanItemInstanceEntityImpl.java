@@ -20,15 +20,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -36,6 +40,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements PlanItemInstanceEntity, CountingPlanItemInstanceEntity {
     
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected boolean isStage;
@@ -58,9 +63,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Counts
@@ -73,11 +79,15 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
-    
+
+    protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
+    protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
+        persistentState.put("derivedCaseDefinitionId", derivedCaseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("stageInstanceId", stageInstanceId);
         persistentState.put("isStage", isStage);
@@ -100,9 +110,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
         persistentState.put("countEnabled", countEnabled);
         persistentState.put("variableCount", variableCount);
         persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
@@ -113,7 +124,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public PlanItem getPlanItem() {
         if (planItem == null) {
-            Case caze = CaseDefinitionUtil.getCase(caseDefinitionId);
+            Case caze;
+
+            // check, if the plan item is a derived one
+            if (derivedCaseDefinitionId != null) {
+                caze = CaseDefinitionUtil.getCase(derivedCaseDefinitionId);
+            } else {
+                caze = CaseDefinitionUtil.getCase(caseDefinitionId);
+            }
             planItem = (PlanItem) caze.getAllCaseElements().get(elementId);
         }
         return planItem;
@@ -126,6 +144,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+    @Override
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
+    }
+    @Override
+    public void setDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
     }
     @Override
     public String getCaseInstanceId() {
@@ -321,12 +347,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.referenceType = referenceType;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getEntryCriterionId() {
@@ -343,6 +369,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
+    }
+    @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
     }
     @Override
     public String getTenantId() {
@@ -370,6 +412,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
+        if (childPlanItemInstances == null && id != null) {
+            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findByStagePlanItemInstanceId(id);
+        }
         return childPlanItemInstances;
     }
     
@@ -418,6 +463,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         variableInstance.setScopeId(caseInstanceId);
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override
@@ -470,5 +520,36 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
     }
-    
+
+    @Override
+    public FlowableListener getCurrentFlowableListener() {
+        return currentFlowableListener;
+    }
+
+    @Override
+    public PlanItemInstanceLifecycleListener getCurrentLifecycleListener() {
+        return currentLifecycleListener;
+    }
+
+    @Override
+    public void setCurrentLifecycleListener(PlanItemInstanceLifecycleListener lifecycleListener, FlowableListener flowableListener) {
+        this.currentLifecycleListener = lifecycleListener;
+        this.currentFlowableListener = flowableListener;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PlanItemInstance with id: ")
+            .append(id);
+
+        if (getName() != null) {
+            stringBuilder.append(", name: ").append(name);
+        }
+        stringBuilder.append(", definitionId: ")
+            .append(planItemDefinitionId)
+            .append(", state: ")
+            .append(state);
+        return stringBuilder.toString();
+    }
 }

@@ -35,6 +35,7 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.ServiceTaskExport());
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.HttpServiceTaskExport());
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.ScriptServiceTaskExport());
+        addPlanItemDefinitionExport(new CasePageTaskExport());
         addPlanItemDefinitionExport(new MilestoneExport());
         addPlanItemDefinitionExport(new GenericEventListenerExport());
         addPlanItemDefinitionExport(new SignalEventListenerExport());
@@ -47,12 +48,25 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
     }
 
     public static void writePlanItemDefinition(CmmnModel model, PlanItemDefinition planItemDefinition, XMLStreamWriter xtw) throws Exception {
-
-        String exporterType = planItemDefinition.getClass().getCanonicalName();
-        AbstractPlanItemDefinitionExport exporter = planItemDefinitionExporters.get(exporterType);
+        AbstractPlanItemDefinitionExport exporter = determineExporter(planItemDefinition);
         if (exporter == null) {
-            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '" + exporterType + "'");
+            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '" + planItemDefinition.getClass().getCanonicalName() + "'");
         }
         exporter.writePlanItemDefinition(model, planItemDefinition, xtw);
+    }
+
+    protected static AbstractPlanItemDefinitionExport determineExporter(PlanItemDefinition planItemDefinition) {
+
+        AbstractPlanItemDefinitionExport exporter = null;
+        Class currentPlanItemDefinitionClass = planItemDefinition.getClass();
+
+        while (exporter == null && !currentPlanItemDefinitionClass.equals(PlanItemDefinition.class)) {
+            String exporterType = currentPlanItemDefinitionClass.getCanonicalName();
+            exporter = planItemDefinitionExporters.get(exporterType);
+
+            currentPlanItemDefinitionClass = currentPlanItemDefinitionClass.getSuperclass(); // loop will stop once PlanItemDefinition is reached, so only child hierarchies will be checked
+        }
+
+        return exporter;
     }
 }

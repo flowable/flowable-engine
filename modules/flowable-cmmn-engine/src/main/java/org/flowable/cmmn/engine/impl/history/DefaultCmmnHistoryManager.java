@@ -27,11 +27,11 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
@@ -70,6 +70,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
             historicCaseInstanceEntity.setCallbackId(caseInstanceEntity.getCallbackId());
             historicCaseInstanceEntity.setCallbackType(caseInstanceEntity.getCallbackType());
+            historicCaseInstanceEntity.setReferenceId(caseInstanceEntity.getReferenceId());
+            historicCaseInstanceEntity.setReferenceType(caseInstanceEntity.getReferenceType());
             historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
         }
     }
@@ -127,7 +129,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, caseInstanceId);
         }
@@ -142,9 +144,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicIdentityLinkEntity.setGroupId(identityLink.getGroupId());
             historicIdentityLinkEntity.setScopeDefinitionId(identityLink.getScopeDefinitionId());
             historicIdentityLinkEntity.setScopeId(identityLink.getScopeId());
-            if (identityLink.getScopeId() != null) {
-                historicIdentityLinkEntity.setScopeType(ScopeTypes.CMMN);
-            }
+            historicIdentityLinkEntity.setSubScopeId(identityLink.getSubScopeId());
+            historicIdentityLinkEntity.setScopeType(identityLink.getScopeType());
             historicIdentityLinkEntity.setTaskId(identityLink.getTaskId());
             historicIdentityLinkEntity.setType(identityLink.getType());
             historicIdentityLinkEntity.setUserId(identityLink.getUserId());
@@ -173,6 +174,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
             historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
             historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
+            historicEntityLinkEntity.setRootScopeId(entityLink.getRootScopeId());
+            historicEntityLinkEntity.setRootScopeType(entityLink.getRootScopeType());
             historicEntityLinkEntity.setHierarchyType(entityLink.getHierarchyType());
             historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
         }
@@ -236,6 +239,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setName(planItemInstanceEntity.getName());
             historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
             historicPlanItemInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+            historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(planItemInstanceEntity.getDerivedCaseDefinitionId());
             historicPlanItemInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             historicPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getStageInstanceId());
             historicPlanItemInstanceEntity.setStage(planItemInstanceEntity.isStage());
@@ -249,9 +253,21 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
             historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
             historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
+            historicPlanItemInstanceEntity.setExtraValue(planItemInstanceEntity.getExtraValue());
             historicPlanItemInstanceEntity.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
             
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
+        }
+    }
+    
+    @Override
+    public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+            HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
+            if (historicPlanItemInstanceEntity != null) {
+                historicPlanItemInstanceEntity.setFormKey(planItemInstanceEntity.getFormKey());
+            }
         }
     }
 
@@ -317,6 +333,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             h -> {
                 h.setEndedTime(occurredTime);
                 h.setOccurredTime(occurredTime);
+                h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
         });
     }
 
@@ -359,24 +376,33 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     
     protected boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
         boolean showInOverview = false;
+        
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        String includeInStageOverviewValue = null;
         if (planItemInstanceEntity.isStage()) {
-            PlanItemDefinition stagePlanItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-            if (stagePlanItemDefinition != null && stagePlanItemDefinition instanceof Stage) {
-                Stage stage = (Stage) stagePlanItemDefinition;
-                
-                if ("true".equalsIgnoreCase(stage.getIncludeInStageOverview())) {
-                    showInOverview = true;
-                
-                } else if (StringUtils.isNotEmpty(stage.getIncludeInStageOverview()) && !"false".equalsIgnoreCase(stage.getIncludeInStageOverview())) {
-                    Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(stage.getIncludeInStageOverview());
-                    Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
-                    if (!(stageValueObject instanceof Boolean)) {
-                        throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
-                                        stage.getIncludeInStageOverview() + ": " + stageValueObject);
-                    }
-                    
-                    showInOverview = (Boolean) stageValueObject;
+            if (planItemDefinition != null && planItemDefinition instanceof Stage) {
+                Stage stage = (Stage) planItemDefinition;
+                includeInStageOverviewValue = stage.getIncludeInStageOverview();
+            }
+            
+        } else if (planItemDefinition != null && planItemDefinition instanceof Milestone) {
+            Milestone milestone = (Milestone) planItemDefinition;
+            includeInStageOverviewValue = milestone.getIncludeInStageOverview();
+        }
+        
+        if (StringUtils.isNotEmpty(includeInStageOverviewValue)) {
+            if ("true".equalsIgnoreCase(includeInStageOverviewValue)) {
+                showInOverview = true;
+            
+            } else if (!"false".equalsIgnoreCase(includeInStageOverviewValue)) {
+                Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(includeInStageOverviewValue);
+                Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
+                if (!(stageValueObject instanceof Boolean)) {
+                    throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
+                                    includeInStageOverviewValue + ": " + stageValueObject);
                 }
+                
+                showInOverview = (Boolean) stageValueObject;
             }
         }
         

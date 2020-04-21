@@ -12,16 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.job;
 
-import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
-import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
-import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
-import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -37,14 +30,9 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        CommandConfig config = new CommandConfig().transactionRequiresNew();
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
-        
-        HistoricCaseInstanceQuery historicCaseInstanceQuery = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createHistoricCaseInstanceCleaningQuery();
-        commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd((HistoricCaseInstanceQueryImpl) historicCaseInstanceQuery));
-        commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd());
-        commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd());
+
+        cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createHistoricCaseInstanceCleaningQuery().deleteWithRelatedData();
     }
     
 }

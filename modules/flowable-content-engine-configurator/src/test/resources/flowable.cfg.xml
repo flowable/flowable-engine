@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
+    <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="jdbcUsername" value="${jdbc.username:sa}" />
+        <property name="jdbcPassword" value="${jdbc.password:}" />
+        <property name="databaseSchemaUpdate" value="true" />
+
+        <property name="mailServerHost" value="localhost" />
+        <property name="mailServerPort" value="5025" />
+        
+        <property name="asyncExecutorActivate" value="false" />
+
+        <property name="configurators">
+            <list>
+                <bean class="org.flowable.content.engine.configurator.ContentEngineConfigurator"/>
+            </list>
+        </property>
+
+        <property name="beans">
+            <map>
+                <entry key="testAttachmentBean" value-ref="testAttachmentBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="testAttachmentBean" class="org.flowable.content.engine.configurator.test.TestAttachmentBean" />
+    
+</beans>

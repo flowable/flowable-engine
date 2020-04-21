@@ -56,8 +56,8 @@ public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implem
         fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes) : null);
     }
 
-    public static String MESSAGE_PARTS_MARKER = "_|_";
-    public static Pattern MESSAGE_PARTS_MARKER_REGEX = Pattern.compile("_\\|_");
+    public static final String MESSAGE_PARTS_MARKER = "_|_";
+    public static final Pattern MESSAGE_PARTS_MARKER_REGEX = Pattern.compile("_\\|_");
 
     @Override
     public void setMessage(String[] messageParts) {
@@ -65,11 +65,10 @@ public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implem
         for (String part : messageParts) {
             if (part != null) {
                 stringBuilder.append(part.replace(MESSAGE_PARTS_MARKER, " | "));
-                stringBuilder.append(MESSAGE_PARTS_MARKER);
             } else {
                 stringBuilder.append("null");
-                stringBuilder.append(MESSAGE_PARTS_MARKER);
             }
+            stringBuilder.append(MESSAGE_PARTS_MARKER);
         }
         for (int i = 0; i < MESSAGE_PARTS_MARKER.length(); i++) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);

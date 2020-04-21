@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,6 +34,7 @@ public class ProcessEngineRestConfiguration {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @ConditionalOnMissingBean //If we don't include this annotation, we cannot override the RestResponseFactory bean
     @Bean
     public RestResponseFactory restResponseFactory() {
         return new RestResponseFactory(objectMapper);

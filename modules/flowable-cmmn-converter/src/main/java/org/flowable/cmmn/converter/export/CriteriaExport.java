@@ -12,14 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
-
-import java.util.List;
 
 public class CriteriaExport implements CmmnXmlConstants {
 
@@ -34,6 +34,7 @@ public class CriteriaExport implements CmmnXmlConstants {
 
     public static void writeExitCriteriaElements(List<Criterion> criterionList, XMLStreamWriter xtw) throws Exception {
         writeCriteriaElements(ELEMENT_EXIT_CRITERION, criterionList, xtw);
+
     }
 
     public static void writeCriteriaElements(String criteriaElementLabel, List<Criterion> criterionList, XMLStreamWriter xtw) throws Exception {
@@ -48,6 +49,14 @@ public class CriteriaExport implements CmmnXmlConstants {
 
             if (StringUtils.isNotEmpty(criterion.getSentryRef())) {
                 xtw.writeAttribute(ATTRIBUTE_SENTRY_REF, criterion.getSentryRef());
+            }
+
+            if (StringUtils.isNotEmpty(criterion.getExitType())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_EXIT_TYPE, criterion.getExitType());
+            }
+
+            if (StringUtils.isNotEmpty(criterion.getExitEventType())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_EXIT_EVENT_TYPE, criterion.getExitEventType());
             }
 
             // end entry criterion element

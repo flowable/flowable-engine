@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,7 +90,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
             }
         }
 
-        assertEquals(15, eventLogEntries.size());
+        assertThat(eventLogEntries).hasSize(15);
 
         long lastLogNr = -1;
         for (int i = 0; i < eventLogEntries.size(); i++) {
@@ -97,194 +99,231 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
             if (i == 0) {
 
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.VARIABLE_CREATED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.PROCESS_INSTANCE_ID));
-                assertNotNull(data.get(Fields.VALUE_STRING));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.VALUE_STRING,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             // process instance start
             if (i == 1) {
 
-                assertNotNull(entry.getType());
-                assertEquals("PROCESSINSTANCE_START", entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo("PROCESSINSTANCE_START");
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.TENANT_ID));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-                assertEquals(1, variableMap.size());
-                assertEquals("helloWorld", variableMap.get("testVar"));
+                assertThat(variableMap).hasSize(1);
+                assertThat(variableMap.get("testVar")).isEqualTo("helloWorld");
 
-                assertFalse(data.containsKey(Fields.NAME));
-                assertFalse(data.containsKey(Fields.BUSINESS_KEY));
+                assertThat(data).doesNotContainKey(Fields.NAME);
+                assertThat(data).doesNotContainKey(Fields.BUSINESS_KEY);
             }
 
             // Activity started
             if (i == 2 || i == 5 || i == 8 || i == 12) {
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.ACTIVITY_STARTED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ACTIVITY_ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.PROCESS_INSTANCE_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.ACTIVITY_TYPE));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             // Leaving start
             if (i == 3) {
 
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
-                });
-                assertNotNull(data.get(Fields.ACTIVITY_ID));
-                assertEquals("startEvent1", data.get(Fields.ACTIVITY_ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.PROCESS_INSTANCE_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.ACTIVITY_TYPE));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
 
+                });
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data.get(Fields.ACTIVITY_ID)).isEqualTo("startEvent1");
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             // Sequence flow taken
             if (i == 4 || i == 7 || i == 11) {
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_ID));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_NAME));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_TYPE));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.SOURCE_ACTIVITY_ID,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             // Leaving parallel gateway
             if (i == 6) {
 
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
-                });
-                assertNotNull(data.get(Fields.ACTIVITY_ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.PROCESS_INSTANCE_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.ACTIVITY_TYPE));
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
 
+                });
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
             }
 
             // Tasks
             if (i == 10 || i == 14) {
 
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.TASK_CREATED.name(), entry.getType());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getExecutionId());
-                assertNotNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED.name());
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNotNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.NAME));
-                assertNotNull(data.get(Fields.ASSIGNEE));
-                assertNotNull(data.get(Fields.CREATE_TIME));
-                assertNotNull(data.get(Fields.PRIORITY));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY,
+                                Fields.USER_ID
+                        );
 
-                assertFalse(data.containsKey(Fields.DESCRIPTION));
-                assertFalse(data.containsKey(Fields.CATEGORY));
-                assertFalse(data.containsKey(Fields.OWNER));
-                assertFalse(data.containsKey(Fields.DUE_DATE));
-                assertFalse(data.containsKey(Fields.FORM_KEY));
-                assertFalse(data.containsKey(Fields.USER_ID));
-
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
             }
 
             if (i == 9 || i == 13) {
 
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.TASK_ASSIGNED.name(), entry.getType());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getExecutionId());
-                assertNotNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.TASK_ASSIGNED.name());
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNotNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.NAME));
-                assertNotNull(data.get(Fields.ASSIGNEE));
-                assertNotNull(data.get(Fields.CREATE_TIME));
-                assertNotNull(data.get(Fields.PRIORITY));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY,
+                                Fields.USER_ID
+                        );
 
-                assertFalse(data.containsKey(Fields.DESCRIPTION));
-                assertFalse(data.containsKey(Fields.CATEGORY));
-                assertFalse(data.containsKey(Fields.OWNER));
-                assertFalse(data.containsKey(Fields.DUE_DATE));
-                assertFalse(data.containsKey(Fields.FORM_KEY));
-                assertFalse(data.containsKey(Fields.USER_ID));
-
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
-
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             lastLogNr = entry.getLogNumber();
@@ -301,7 +340,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
         // Verify events
         eventLogEntries = managementService.getEventLogEntries(lastLogNr, 100L);
-        assertEquals(17, eventLogEntries.size());
+        assertThat(eventLogEntries).hasSize(17);
 
         for (int i = 0; i < eventLogEntries.size(); i++) {
 
@@ -309,124 +348,146 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
             // org.flowable.task.service.Task completion
             if (i == 1 || i == 6) {
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.TASK_COMPLETED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getExecutionId());
-                assertNotNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNotNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.NAME));
-                assertNotNull(data.get(Fields.ASSIGNEE));
-                assertNotNull(data.get(Fields.CREATE_TIME));
-                assertNotNull(data.get(Fields.PRIORITY));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.TENANT_ID));
-                assertNotNull(data.get(Fields.USER_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID,
+                                Fields.USER_ID
+                        );
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-                assertEquals(1, variableMap.size());
-                assertEquals("test", variableMap.get("test"));
+                assertThat(variableMap).hasSize(1);
+                assertThat(variableMap.get("test")).isEqualTo("test");
 
-                assertFalse(data.containsKey(Fields.DESCRIPTION));
-                assertFalse(data.containsKey(Fields.CATEGORY));
-                assertFalse(data.containsKey(Fields.OWNER));
-                assertFalse(data.containsKey(Fields.DUE_DATE));
-                assertFalse(data.containsKey(Fields.FORM_KEY));
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY
+                        );
 
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
             }
 
             // Activity Completed
             if (i == 2 || i == 7 || i == 10 || i == 13) {
-                assertNotNull(entry.getType());
-                assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED.name(), entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED.name());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
-                });
-                assertNotNull(data.get(Fields.ACTIVITY_ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.PROCESS_INSTANCE_ID));
-                assertNotNull(data.get(Fields.EXECUTION_ID));
-                assertNotNull(data.get(Fields.ACTIVITY_TYPE));
-                assertNotNull(data.get(Fields.BEHAVIOR_CLASS));
 
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                });
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID,
+                                Fields.BEHAVIOR_CLASS
+                        );
+
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
                 if (i == 2) {
-                    assertEquals("userTask", data.get(Fields.ACTIVITY_TYPE));
+                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("userTask");
                 } else if (i == 7) {
-                    assertEquals("userTask", data.get(Fields.ACTIVITY_TYPE));
+                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("userTask");
                 } else if (i == 10) {
-                    assertEquals("parallelGateway", data.get(Fields.ACTIVITY_TYPE));
+                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("parallelGateway");
                 } else if (i == 13) {
-                    assertEquals("endEvent", data.get(Fields.ACTIVITY_TYPE));
+                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("endEvent");
                 }
 
             }
 
             // Sequence flow taken
             if (i == 3 || i == 8 || i == 11) {
-                assertNotNull(entry.getType());
-                assertEquals(entry.getType(), FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name()).isEqualTo(entry.getType());
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
-                });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_ID));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_TYPE));
-                assertNotNull(data.get(Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS));
-                assertNotNull(data.get(Fields.TARGET_ACTIVITY_ID));
-                assertNotNull(data.get(Fields.TARGET_ACTIVITY_TYPE));
-                assertNotNull(data.get(Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS));
 
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                });
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.SOURCE_ACTIVITY_ID,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS,
+                                Fields.TARGET_ACTIVITY_ID,
+                                Fields.TARGET_ACTIVITY_TYPE,
+                                Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS
+                        );
+
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
             if (i == 14 || i == 15) {
-                assertNotNull(entry.getType());
-                assertEquals("VARIABLE_DELETED", entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNotNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo("VARIABLE_DELETED");
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNotNull();
+                assertThat(entry.getTaskId()).isNull();
             }
 
             if (i == 16) {
-                assertNotNull(entry.getType());
-                assertEquals("PROCESSINSTANCE_END", entry.getType());
-                assertNotNull(entry.getProcessDefinitionId());
-                assertNotNull(entry.getProcessInstanceId());
-                assertNotNull(entry.getTimeStamp());
-                assertNull(entry.getExecutionId());
-                assertNull(entry.getTaskId());
+                assertThat(entry.getType()).isNotNull();
+                assertThat(entry.getType()).isEqualTo("PROCESSINSTANCE_END");
+                assertThat(entry.getProcessDefinitionId()).isNotNull();
+                assertThat(entry.getProcessInstanceId()).isNotNull();
+                assertThat(entry.getTimeStamp()).isNotNull();
+                assertThat(entry.getExecutionId()).isNull();
+                assertThat(entry.getTaskId()).isNull();
 
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNotNull(data.get(Fields.ID));
-                assertNotNull(data.get(Fields.PROCESS_DEFINITION_ID));
-                assertNotNull(data.get(Fields.TENANT_ID));
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.NAME,
+                                Fields.BUSINESS_KEY
+                        );
 
-                assertFalse(data.containsKey(Fields.NAME));
-                assertFalse(data.containsKey(Fields.BUSINESS_KEY));
-
-                assertEquals(testTenant, data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
         }
 
@@ -442,10 +503,12 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
     @Test
     public void testDatabaseEventsNoTenant() throws IOException {
 
-        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml").deploy().getId();
+        String deploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml").deploy().getId();
 
         // Run process to gather data
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("DatabaseEventLoggerProcess", CollectionUtil.singletonMap("testVar", "helloWorld"));
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("DatabaseEventLoggerProcess", CollectionUtil.singletonMap("testVar", "helloWorld"));
 
         // Verify event log entries
         List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(null, null);
@@ -459,72 +522,80 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
             }
         }
 
-        assertEquals(15, eventLogEntries.size());
+        assertThat(eventLogEntries).hasSize(15);
 
         for (int i = 0; i < eventLogEntries.size(); i++) {
 
             EventLogEntry entry = eventLogEntries.get(i);
 
             if (i == 0) {
-                assertEquals(entry.getType(), FlowableEngineEventType.VARIABLE_CREATED.name());
+                assertThat(FlowableEngineEventType.VARIABLE_CREATED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // process instance start
             if (i == 1) {
-                assertEquals("PROCESSINSTANCE_START", entry.getType());
+                assertThat(entry.getType()).isEqualTo("PROCESSINSTANCE_START");
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // Activity started
             if (i == 2 || i == 5 || i == 8 || i == 12) {
-                assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_STARTED.name());
+                assertThat(FlowableEngineEventType.ACTIVITY_STARTED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // Leaving start
             if (i == 3) {
-                assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
+                assertThat(FlowableEngineEventType.ACTIVITY_COMPLETED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // Sequence flow taken
             if (i == 4 || i == 7 || i == 11) {
-                assertEquals(entry.getType(), FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name());
+                assertThat(FlowableEngineEventType.SEQUENCEFLOW_TAKEN.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // Leaving parallel gateway
             if (i == 6) {
-                assertEquals(entry.getType(), FlowableEngineEventType.ACTIVITY_COMPLETED.name());
+                assertThat(FlowableEngineEventType.ACTIVITY_COMPLETED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             // Tasks
             if (i == 10 || i == 14) {
-                assertEquals(entry.getType(), FlowableEngineEventType.TASK_CREATED.name());
+                assertThat(FlowableEngineEventType.TASK_CREATED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
             if (i == 9 || i == 13) {
-                assertEquals(entry.getType(), FlowableEngineEventType.TASK_ASSIGNED.name());
+                assertThat(FlowableEngineEventType.TASK_ASSIGNED.name()).isEqualTo(entry.getType());
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
+
                 });
-                assertNull(data.get(Fields.TENANT_ID));
+                assertThat(data.get(Fields.TENANT_ID)).isNull();
             }
 
         }
@@ -547,14 +618,15 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         List<EventLogEntry> events = managementService.getEventLogEntries(null, null);
-        assertEquals(2, events.size());
-        assertEquals("TASK_ASSIGNED", events.get(0).getType());
-        assertEquals("TASK_CREATED", events.get(1).getType());
+        assertThat(events).hasSize(2);
+        assertThat(events.get(0).getType()).isEqualTo("TASK_ASSIGNED");
+        assertThat(events.get(1).getType()).isEqualTo("TASK_CREATED");
 
         for (EventLogEntry eventLogEntry : events) {
             Map<String, Object> data = objectMapper.readValue(eventLogEntry.getData(), new TypeReference<HashMap<String, Object>>() {
+
             });
-            assertEquals("myTenant", data.get(Fields.TENANT_ID));
+            assertThat(data.get(Fields.TENANT_ID)).isEqualTo("myTenant");
         }
 
         // Cleanup

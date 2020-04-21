@@ -13,9 +13,7 @@
 
 package org.flowable.app.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -44,20 +42,20 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     public void before() throws Exception {
         super.before();
         classUnderTest = new DefaultAutoDeploymentStrategy();
-        assertNotNull(classUnderTest);
+        assertThat(classUnderTest).isNotNull();
     }
 
     @Test
     public void testHandlesMode() {
-        assertTrue(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE));
-        assertFalse(classUnderTest.handlesMode("other-mode"));
-        assertFalse(classUnderTest.handlesMode(null));
+        assertThat(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE)).isTrue();
+        assertThat(classUnderTest.handlesMode("other-mode")).isFalse();
+        assertThat(classUnderTest.handlesMode(null)).isFalse();
     }
 
     @Test
     public void testDeployResources() {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
-        classUnderTest.deployResources(resources, repositoryServiceMock);
+        classUnderTest.deployResources(null, resources, appEngineMock);
 
         verify(repositoryServiceMock, times(3)).createDeployment();
         verify(deploymentBuilderMock, times(1)).name(resourceName1);
@@ -71,7 +69,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(resources, repositoryServiceMock);
+        classUnderTest.deployResources(null, resources, appEngineMock);
 
         verify(repositoryServiceMock, never()).createDeployment();
         verify(deploymentBuilderMock, never()).addInputStream(isA(String.class), isA(InputStream.class));

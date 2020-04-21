@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Josh Long
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(Endpoint.class)
 @ConditionalOnProcessEngine
 public class EndpointAutoConfiguration {

@@ -55,19 +55,19 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return plan item instances which have the given element id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return plan item instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return plan item instances which have the given reference type.", paramType = "query"),
-            @ApiImplicitParam(name = "startedBefore", dataType = "date", value = "Only return plan item instances which are started before the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "startedAfter", dataType = "date", value = "Only return plan item instances which are started after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdBefore", dataType = "date", value = "Only return plan item instances which are created before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdAfter", dataType = "date", value = "Only return plan item instances which are created after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "startUserId", dataType = "string", value = "Only return plan item instances which are started by the given user id.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenantId.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "processInstanceId,processDefinitionId,processDefinitionKey ,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return plan item instances with the given tenantId.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns plan item instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name, createTime, startTime", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @GetMapping(value = "/cmmn-runtime/plan-item-instances", produces = "application/json")
-    public DataResponse<PlanItemInstanceResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<PlanItemInstanceResponse> getPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         PlanItemInstanceQueryRequest queryRequest = new PlanItemInstanceQueryRequest();
 

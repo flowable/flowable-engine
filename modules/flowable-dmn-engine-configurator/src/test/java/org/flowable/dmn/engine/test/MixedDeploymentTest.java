@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -39,6 +41,7 @@ import org.junit.rules.ExpectedException;
 
 /**
  * @author Yvo Swillens
+ * @author Filip Hrisafov
  */
 public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
 
@@ -124,10 +127,10 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskNoHitsErrorProcess.bpmn20.xml"})
     public void testDecisionNotFound() {
         try {
-            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2)))
+                    .isInstanceOf(FlowableException.class)
+                    .hasMessageContaining("No decision found for key: decision1")
+                    .hasMessageNotContaining("tenant");
         } finally {
             deleteAllDmnDeployments();
         }
@@ -165,7 +168,8 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFalse() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
+        this.expectedException.expectMessage("No decision found for key: decision1");
+        this.expectedException.expectMessage("and tenant id: flowable");
 
         deployDecisionAndAssertProcessExecuted();
     }
@@ -176,7 +180,8 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackFalseWithoutDeployment() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
+        this.expectedException.expectMessage("No decision found for key: decision1");
+        this.expectedException.expectMessage("and tenant id: flowable");
 
         deleteAllDmnDeployments();
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
@@ -211,6 +216,222 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         }
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessSameDeployment.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeployment() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .start();
+
+        assertThat(historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("outputVariable1")
+                .singleResult())
+                .extracting(HistoricVariableInstance::getValue)
+                .isEqualTo("result1");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simpleV2.dmn")
+                    .deploy();
+
+            processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 1)
+                    .start();
+
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("outputVariable1")
+                    .singleResult())
+                    .extracting(HistoricVariableInstance::getValue)
+                    .isEqualTo("result1");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessSameDeployment.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn"
+    }, tenantId = "flowable")
+    public void testDecisionTaskExecutionWithSameDeploymentInTenant() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .tenantId("flowable")
+                .start();
+
+        assertThat(historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("outputVariable1")
+                .singleResult())
+                .extracting(HistoricVariableInstance::getValue)
+                .isEqualTo("result1");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simpleV2.dmn")
+                    .tenantId("flowable")
+                    .deploy();
+
+            processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 1)
+                    .tenantId("flowable")
+                    .start();
+
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("outputVariable1")
+                    .singleResult())
+                    .extracting(HistoricVariableInstance::getValue)
+                    .isEqualTo("result1");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeploymentGlobal() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .start();
+
+        assertThat(historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("outputVariable1")
+                .singleResult())
+                .extracting(HistoricVariableInstance::getValue)
+                .isEqualTo("result1");
+
+        try {
+            // Same deployment decision should be used from parent deployment
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simpleV2.dmn")
+                    .deploy();
+
+            processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 1)
+                    .start();
+
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("outputVariable1")
+                    .singleResult())
+                    .extracting(HistoricVariableInstance::getValue)
+                    .isEqualTo("result1");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessSameDeploymentFalse.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn"
+    })
+    public void testDecisionTaskExecutionWithSameDeploymentFalse() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .start();
+
+        assertThat(historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("outputVariable1")
+                .singleResult())
+                .extracting(HistoricVariableInstance::getValue)
+                .isEqualTo("result1");
+
+        try {
+            // Latest decision should be used
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simpleV2.dmn")
+                    .deploy();
+
+            processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 1)
+                    .start();
+
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("outputVariable1")
+                    .singleResult())
+                    .extracting(HistoricVariableInstance::getValue)
+                    .isEqualTo("result1V2");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcessSameDeploymentFalse.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn"
+    }, tenantId = "flowable")
+    public void testDecisionTaskExecutionWithSameDeploymentFalseInTenant() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .tenantId("flowable")
+                .start();
+
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("outputVariable1")
+                .singleResult())
+                .extracting(HistoricVariableInstance::getValue)
+                .isEqualTo("result1");
+
+        try {
+            // Latest decision should be used
+            DmnEngines.getDefaultDmnEngine()
+                    .getDmnRepositoryService()
+                    .createDeployment()
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simpleV2.dmn")
+                    .tenantId("flowable")
+                    .deploy();
+
+            processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 1)
+                    .tenantId("flowable")
+                    .start();
+
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("outputVariable1")
+                    .singleResult())
+                    .extracting(HistoricVariableInstance::getValue)
+                    .isEqualTo("result1V2");
+
+        } finally {
+            deleteAllDmnDeployments();
+        }
+    }
 
     protected void deployDecisionAndAssertProcessExecuted() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().

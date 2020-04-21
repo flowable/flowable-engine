@@ -110,7 +110,8 @@ angular.module('flowableModeler')
                 key: $rootScope.currentDecisionTableModel.key,
                 description: description,
                 newVersion: false,
-                comment: ''
+                comment: '',
+                forceDMN11: $rootScope.currentDecisionTable.forceDMN11
             };
 
             $scope.keyFieldPattern = /^[a-zA-Z_]\w*$/;
@@ -153,7 +154,8 @@ angular.module('flowableModeler')
                 var data = {
                     reusable: $scope.saveDialog.reusable,
                     newVersion: $scope.saveDialog.newVersion,
-                    comment: $scope.saveDialog.comment
+                    comment: $scope.saveDialog.comment,
+                    forceDMN11: $scope.saveDialog.forceDMN11
                 };
 
                 $rootScope.currentDecisionTableRules = $scope.model.rulesData;
@@ -164,7 +166,8 @@ angular.module('flowableModeler')
                     $rootScope.currentDecisionTableModel.name = $scope.saveDialog.name;
                     $rootScope.currentDecisionTableModel.key = $scope.saveDialog.key;
                     $rootScope.currentDecisionTableModel.description = $scope.saveDialog.description;
-                    
+                    $rootScope.currentDecisionTable.forceDMN11 = $scope.saveDialog.forceDMN11;
+
                     $rootScope.addAlertPromise($translate('DECISION-TABLE-EDITOR.ALERT.SAVE-CONFIRM', {name: $scope.saveDialog.name}), 'info');
                     
                     if (additionalSaveCallback) {

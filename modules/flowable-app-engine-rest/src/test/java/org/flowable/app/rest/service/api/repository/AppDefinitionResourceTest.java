@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -74,7 +76,7 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
         assertTrue(content.contains("oneApp"));

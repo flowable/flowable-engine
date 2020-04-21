@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -84,8 +85,9 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
             EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
+            String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, execution);
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
+                if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageName)) {
 
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
                     CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
@@ -97,6 +99,8 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
         newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
+
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newSubProcessExecution);
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);

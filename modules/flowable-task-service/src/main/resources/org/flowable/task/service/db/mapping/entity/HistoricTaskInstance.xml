@@ -32,6 +32,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -60,6 +61,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{propagatedStageInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -92,6 +94,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -121,6 +124,7 @@
            #{historicTask.subScopeId, jdbcType=VARCHAR},
            #{historicTask.scopeType, jdbcType=VARCHAR},
            #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+           #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
            #{historicTask.name ,jdbcType=VARCHAR},
            #{historicTask.parentTaskId ,jdbcType=VARCHAR},
            #{historicTask.description ,jdbcType=VARCHAR},
@@ -155,6 +159,7 @@
             SUB_SCOPE_ID_,
             SCOPE_TYPE_,
             SCOPE_DEFINITION_ID_,
+            PROPAGATED_STAGE_INST_ID_,
             NAME_,
             PARENT_TASK_ID_,
             DESCRIPTION_,
@@ -183,6 +188,7 @@
              #{historicTask.subScopeId, jdbcType=VARCHAR},
              #{historicTask.scopeType, jdbcType=VARCHAR},
              #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+             #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
              #{historicTask.name ,jdbcType=VARCHAR},
              #{historicTask.parentTaskId ,jdbcType=VARCHAR},
              #{historicTask.description ,jdbcType=VARCHAR},
@@ -220,16 +226,19 @@
 	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
 	      </if>
           <if test="originalPersistentState.scopeId != scopeId">
-            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.subScopeId != subScopeId">
-            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeType != scopeType">
-            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
+            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
           </if>
 	      <if test="originalPersistentState.name != name">
 	      	NAME_ = #{name, jdbcType=VARCHAR},
@@ -274,7 +283,7 @@
 	      	CATEGORY_ = #{category, jdbcType=VARCHAR},
 	  	  </if>
 	  	  <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
-	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP}
+	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP},
 	      </if>
   	  </set>
     where ID_ = #{id}
@@ -299,6 +308,11 @@
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TASK.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
+  <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TASK.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_TASKINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
@@ -309,6 +323,11 @@
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
   </delete>
   
+  <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_TASKINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
     SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
@@ -327,6 +346,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -357,6 +377,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -981,6 +1002,12 @@
       <if test="taskDefinitionKeyLike != null">
         and ${queryTablePrefix}TASK_DEF_KEY_ like #{taskDefinitionKeyLike}${wildcardEscapeClause}
       </if>
+      <if test="taskDefinitionKeys != null and !taskDefinitionKeys.isEmpty()">
+        and ${queryTablePrefix}TASK_DEF_KEY_ in
+        <foreach item="item" index="index" collection="taskDefinitionKeys" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="executionId != null">
         and ${queryTablePrefix}EXECUTION_ID_ = #{executionId}
       </if>
@@ -995,6 +1022,9 @@
       </if>
       <if test="scopeDefinitionId != null">
         and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="propagatedStageInstanceId != null">
+        and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
       </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
@@ -1204,6 +1234,12 @@
       <if test="orQueryObject.taskDefinitionKeyLike != null">
         or ${queryTablePrefix}TASK_DEF_KEY_ like #{orQueryObject.taskDefinitionKeyLike}${wildcardEscapeClause}
       </if>
+      <if test="orQueryObject.taskDefinitionKeys != null and !orQueryObject.taskDefinitionKeys.isEmpty()">
+        or ${queryTablePrefix}TASK_DEF_KEY_ in
+        <foreach item="item" index="index" collection="orQueryObject.taskDefinitionKeys" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="orQueryObject.executionId != null">
         or ${queryTablePrefix}EXECUTION_ID_ = #{orQueryObject.executionId}
       </if>
@@ -1218,6 +1254,9 @@
       </if>
       <if test="orQueryObject.scopeDefinitionId != null">
         or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+      </if>
+      <if test="orQueryObject.propagatedStageInstanceId != null">
+        or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}
       </if>
       <if test="orQueryObject.processInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and

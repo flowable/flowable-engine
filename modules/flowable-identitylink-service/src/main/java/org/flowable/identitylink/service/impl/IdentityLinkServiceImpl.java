@@ -51,6 +51,11 @@ public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServi
     }
     
     @Override
+    public List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType) {
+        return getIdentityLinkEntityManager().findIdentityLinksBySubScopeIdAndType(subScopeId, scopeType);
+    }
+    
+    @Override
     public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId) {
         return getIdentityLinkEntityManager().findIdentityLinksByProcessDefinitionId(processDefinitionId);
     }
@@ -88,6 +93,13 @@ public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServi
     @Override
     public IdentityLinkEntity createScopeIdentityLink(String scopeDefinitionId, String scopeId, String scopeType, String userId, String groupId, String type) {
         return getIdentityLinkEntityManager().addScopeIdentityLink(scopeDefinitionId, scopeId, scopeType, userId, groupId, type);
+    }
+    
+    @Override
+    public IdentityLinkEntity createSubScopeIdentityLink(String scopeDefinitionId, String scopeId, String subScopeId, String scopeType, 
+                    String userId, String groupId, String type) {
+        
+        return getIdentityLinkEntityManager().addSubScopeIdentityLink(scopeDefinitionId, scopeId, subScopeId, scopeType, userId, groupId, type);
     }
     
     @Override
@@ -158,6 +170,11 @@ public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServi
     @Override
     public void deleteIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
     
     @Override

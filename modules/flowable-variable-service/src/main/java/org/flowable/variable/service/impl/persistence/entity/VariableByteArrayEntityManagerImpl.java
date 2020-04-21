@@ -15,7 +15,7 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableByteArrayDataManager;
 
@@ -23,36 +23,22 @@ import org.flowable.variable.service.impl.persistence.entity.data.VariableByteAr
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
-public class VariableByteArrayEntityManagerImpl extends AbstractEntityManager<VariableByteArrayEntity> implements VariableByteArrayEntityManager {
-
-    protected VariableByteArrayDataManager byteArrayDataManager;
+public class VariableByteArrayEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<VariableServiceConfiguration, VariableByteArrayEntity, VariableByteArrayDataManager>
+    implements VariableByteArrayEntityManager {
 
     public VariableByteArrayEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, VariableByteArrayDataManager byteArrayDataManager) {
-        super(variableServiceConfiguration);
-        this.byteArrayDataManager = byteArrayDataManager;
-    }
-
-    @Override
-    protected DataManager<VariableByteArrayEntity> getDataManager() {
-        return byteArrayDataManager;
+        super(variableServiceConfiguration, byteArrayDataManager);
     }
 
     @Override
     public List<VariableByteArrayEntity> findAll() {
-        return byteArrayDataManager.findAll();
+        return dataManager.findAll();
     }
 
     @Override
     public void deleteByteArrayById(String byteArrayEntityId) {
-        byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
-    }
-
-    public VariableByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
-    public void setByteArrayDataManager(VariableByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+        dataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
     }
 
 }

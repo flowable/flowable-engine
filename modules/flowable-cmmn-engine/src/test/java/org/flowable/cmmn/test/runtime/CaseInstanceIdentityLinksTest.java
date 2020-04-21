@@ -18,11 +18,13 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -127,6 +129,20 @@ public class CaseInstanceIdentityLinksTest extends FlowableCmmnTestCase {
             .containsExactly(
                 tuple("custom", null, "muppets", caseInstanceId, ScopeTypes.CMMN)
             );
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCandidateGroupFromModel() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCandidateGroup")
+            .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        List<IdentityLink> identityLinks = cmmnTaskService.getIdentityLinksForTask(task.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getGroupId)
+            .containsExactly("admins");
     }
 
 }

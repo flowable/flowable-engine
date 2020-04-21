@@ -15,17 +15,19 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeQuery;
+import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  */
-public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege> implements PrivilegeQuery {
+public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege> implements PrivilegeQuery, CacheAwareQuery<PrivilegeEntity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -76,6 +78,7 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
         return this;
     }
 
+    @Override
     public String getId() {
         return id;
     }

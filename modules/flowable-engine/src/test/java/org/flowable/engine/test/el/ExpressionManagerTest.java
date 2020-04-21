@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.el;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -80,6 +81,20 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
             expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
 
         assertThat(value, Is.is(-1.5d));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testNullJsonVariableSerialization() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().putNull("nullVar"));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.nullVar}");
+        Object value = managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
+
+        assertThat(value, Is.is(nullValue()));
     }
 
     @Test

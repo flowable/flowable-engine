@@ -20,6 +20,9 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeReference;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 
 /**
@@ -45,19 +48,36 @@ public class VariableByteArrayRefTypeHandler extends TypeReference<VariableByteA
     @Override
     public VariableByteArrayRef getResult(ResultSet rs, String columnName) throws SQLException {
         String id = rs.getString(columnName);
-        return new VariableByteArrayRef(id);
+        return createVariableByteArrayRef(id);
     }
 
     @Override
     public VariableByteArrayRef getResult(ResultSet rs, int columnIndex) throws SQLException {
         String id = rs.getString(columnIndex);
-        return new VariableByteArrayRef(id);
+        return createVariableByteArrayRef(id);
     }
 
     @Override
     public VariableByteArrayRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String id = cs.getString(columnIndex);
-        return new VariableByteArrayRef(id);
+        return createVariableByteArrayRef(id);
     }
 
+    protected VariableByteArrayRef createVariableByteArrayRef(String id) {
+        if (id == null) {
+            return null;
+        }
+        return new VariableByteArrayRef(id, getCommandExecutor());
+    }
+
+
+    protected CommandExecutor getCommandExecutor() {
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null && commandContext.getCurrentEngineConfiguration() != null) {
+            // There is always a command context and engine here
+            // However, just to be extra safe do a null check
+            return commandContext.getCurrentEngineConfiguration().getCommandExecutor();
+        }
+        return null;
+    }
 }

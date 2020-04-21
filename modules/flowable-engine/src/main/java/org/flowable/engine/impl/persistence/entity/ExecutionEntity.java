@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersistentObject;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -30,6 +31,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -140,7 +142,18 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setCallbackType(String callbackType);
     
     void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
+
+    void setReferenceId(String referenceId);
+
+    void setReferenceType(String referenceType);
+
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 
+    FlowElement getOriginatingCurrentFlowElement();
+    
+    void setOriginatingCurrentFlowElement(FlowElement flowElement);
+
+    List<VariableInstanceEntity> getQueryVariables();
 }

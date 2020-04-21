@@ -17,12 +17,12 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.task.service.delegate.TaskListener;
 
 /**
  * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate the behaviour classes for {@link TaskListener} and {@link ExecutionListener} usages.

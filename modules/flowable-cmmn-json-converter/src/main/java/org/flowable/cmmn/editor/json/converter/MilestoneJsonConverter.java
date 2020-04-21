@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
@@ -54,6 +55,12 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         Milestone milestone = new Milestone();
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, milestone);
+
+        String milestoneVariable = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_MILESTONE_VARIABLE, elementNode);
+        if (StringUtils.isNotEmpty(milestoneVariable)) {
+            milestone.setMilestoneVariable(milestoneVariable);
+        }
+
         return milestone;
     }
 
@@ -62,6 +69,8 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
         PlanItem planItem = (PlanItem) baseElement;
         Milestone milestone = (Milestone) planItem.getPlanItemDefinition();
        
-        // nothing to do yet
+        if (StringUtils.isNotEmpty(milestone.getMilestoneVariable())) {
+            propertiesNode.put(PROPERTY_MILESTONE_VARIABLE, milestone.getMilestoneVariable());
+        }
     }
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testRepeatingTimer" name="testRepeatingTimer" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" definitionRef="listener"></planItem>
+      <planItem id="planItem2" name="Task after timer" definitionRef="task">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter">
+            <condition><![CDATA[${true}]]></condition>
+          </repetitionRule>
+        </itemControl>
+        <entryCriterion id="sid-A5BD6737-2F53-4934-A78B-B4600DE95DBB" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="listener">
+      	<extensionElements>
+      		<flowable:jobCategory>${categoryValue}</flowable:jobCategory>
+      	</extensionElements>
+        <timerExpression><![CDATA[R/PT1H]]></timerExpression>
+      </timerEventListener>
+      <humanTask id="task" name="Task after timer"></humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

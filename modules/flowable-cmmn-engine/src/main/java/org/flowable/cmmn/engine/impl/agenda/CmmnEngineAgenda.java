@@ -37,7 +37,9 @@ public interface CmmnEngineAgenda extends Agenda {
     void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
-    
+
+    void planEvaluateToActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables);
@@ -52,9 +54,9 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId);
+    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType);
 
-    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType);
 
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
@@ -64,7 +66,7 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId);
 
-    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId);
+    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId, String exitType, String exitEventType);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId);
     

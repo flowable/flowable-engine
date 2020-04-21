@@ -1,22 +1,22 @@
 ---
 swagger: "2.0"
 info:
-  description: "# flowable / flow??b(??)l /\n\n- a compact and highly efficient workflow\
-    \ and Business Process Management (BPM) platform for developers, system admins\
-    \ and business users.\n- a lightning fast, tried and tested BPMN 2 process engine\
-    \ written in Java. It is Apache 2.0 licensed open source, with a committed community.\n\
-    - can run embedded in a Java application, or as a service on a server, a cluster,\
-    \ and in the cloud. It integrates perfectly with Spring. With a rich Java and\
-    \ REST API, it is the ideal engine for orchestrating human or system activities."
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
   version: "v1"
-  title: "Flowable Form REST API"
+  title: "Flowable FORM REST API"
   contact:
     name: "Flowable"
     url: "http://www.flowable.org/"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:8080"
 basePath: "/flowable-rest/form-api"
 tags:
 - name: "Engine"
@@ -74,7 +74,19 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return form deployments which don?t have the given category."
+        description: "Only return form deployments which do not have the given category."
+        required: false
+        type: "string"
+      - name: "parentDeploymentId"
+        in: "query"
+        description: "Only return form deployments with the given parent deployment\
+          \ id."
+        required: false
+        type: "string"
+      - name: "parentDeploymentIdLike"
+        in: "query"
+        description: "Only return form deployments with a parent deployment id like\
+          \ the given value."
         required: false
         type: "string"
       - name: "tenantId"
@@ -108,7 +120,7 @@ paths:
         200:
           description: "Indicates the request was successful."
           schema:
-            $ref: "#/definitions/DataResponseFormDeployment"
+            $ref: "#/definitions/DataResponseFormDeploymentResponse"
       security:
       - basicAuth: []
     post:
@@ -137,7 +149,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/FormDeployment"
+            $ref: "#/definitions/FormDeploymentResponse"
         201:
           description: "Indicates the form deployment was created."
         400:
@@ -164,7 +176,7 @@ paths:
         200:
           description: "Indicates the form deployment was found and returned."
           schema:
-            $ref: "#/definitions/FormDeployment"
+            $ref: "#/definitions/FormDeploymentResponse"
         404:
           description: "Indicates the requested form deployment was not found."
       security:
@@ -402,7 +414,7 @@ paths:
         200:
           description: "Indicates the form definition Form model was found returned."
           schema:
-            $ref: "#/definitions/FormModel"
+            $ref: "#/definitions/FormModelResponse"
         404:
           description: "Indicates the form definition Form model was not found."
       security:
@@ -542,6 +554,22 @@ paths:
           \ the given value."
         required: false
         type: "string"
+      - name: "scopeId"
+        in: "query"
+        description: "Only return form instances with the given scope id."
+        required: false
+        type: "string"
+      - name: "scopeType"
+        in: "query"
+        description: "Only return form instances with a scope type like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "scopeDefinitionId"
+        in: "query"
+        description: "Only return form instances with the given scope definition id."
+        required: false
+        type: "string"
       - name: "submittedBy"
         in: "query"
         description: "Only return form instances submitted by the given value."
@@ -641,7 +669,7 @@ paths:
       - "Query"
       summary: "Query form instances"
       description: "The request body can contain all possible filters that can be\
-        \ used in the List form instances URL query. On top of these, it?s possible\
+        \ used in the List form instances URL query. On top of these, it’s possible\
         \ to provide an array of variables to include in the query, with their format\
         \ described here.\n\nThe general paging and sorting query-parameters can be\
         \ used for this URL."
@@ -709,13 +737,13 @@ definitions:
       size:
         type: "integer"
         format: "int32"
-  DataResponseFormDeployment:
+  DataResponseFormDeploymentResponse:
     type: "object"
     properties:
       data:
         type: "array"
         items:
-          $ref: "#/definitions/FormDeployment"
+          $ref: "#/definitions/FormDeploymentResponse"
       total:
         type: "integer"
         format: "int64"
@@ -798,13 +826,10 @@ definitions:
       deploymentId:
         type: "string"
         example: "818e4703-f1d2-11e6-8549-acde48001121"
-      parentDeploymentId:
-        type: "string"
-        example: "2"
       tenantId:
         type: "string"
         example: "null"
-  FormDeployment:
+  FormDeploymentResponse:
     type: "object"
     properties:
       id:
@@ -884,16 +909,6 @@ definitions:
       version:
         type: "integer"
         format: "int32"
-      fields:
-        type: "array"
-        items:
-          $ref: "#/definitions/FormField"
-      outcomes:
-        type: "array"
-        items:
-          $ref: "#/definitions/FormOutcome"
-      outcomeVariableName:
-        type: "string"
       formInstanceId:
         type: "string"
       submittedBy:
@@ -912,6 +927,16 @@ definitions:
       tenantId:
         type: "string"
       url:
+        type: "string"
+      fields:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormField"
+      outcomes:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormOutcome"
+      outcomeVariableName:
         type: "string"
   FormInstanceQueryRequest:
     type: "object"
@@ -944,6 +969,12 @@ definitions:
         type: "string"
       processDefinitionIdLike:
         type: "string"
+      scopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      scopeDefinitionId:
+        type: "string"
       submittedBy:
         type: "string"
       submittedByLike:
@@ -972,6 +1003,15 @@ definitions:
       processDefinitionId:
         type: "string"
         example: "oneTaskProcess:1:158"
+      scopeId:
+        type: "string"
+        example: "243"
+      scopeType:
+        type: "string"
+        example: "cmmn"
+      scopeDefinitionId:
+        type: "string"
+        example: "caseDef:1:244"
       submittedDate:
         type: "string"
         format: "date-time"
@@ -990,28 +1030,6 @@ definitions:
         example: "http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122"
   FormModel:
     type: "object"
-    properties:
-      id:
-        type: "string"
-      name:
-        type: "string"
-      description:
-        type: "string"
-      key:
-        type: "string"
-      version:
-        type: "integer"
-        format: "int32"
-      fields:
-        type: "array"
-        items:
-          $ref: "#/definitions/FormField"
-      outcomes:
-        type: "array"
-        items:
-          $ref: "#/definitions/FormOutcome"
-      outcomeVariableName:
-        type: "string"
   FormModelResponse:
     type: "object"
     properties:
@@ -1026,6 +1044,10 @@ definitions:
       version:
         type: "integer"
         format: "int32"
+      formModel:
+        $ref: "#/definitions/FormModel"
+      url:
+        type: "string"
       fields:
         type: "array"
         items:
@@ -1035,8 +1057,6 @@ definitions:
         items:
           $ref: "#/definitions/FormOutcome"
       outcomeVariableName:
-        type: "string"
-      url:
         type: "string"
   FormOutcome:
     type: "object"
@@ -1074,6 +1094,8 @@ definitions:
         type: "object"
         additionalProperties:
           type: "object"
+      fallbackToDefaultTenant:
+        type: "boolean"
   LayoutDefinition:
     type: "object"
     properties:
@@ -1100,3 +1122,5 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/Option"
+        optionsExpression:
+          type: "string"

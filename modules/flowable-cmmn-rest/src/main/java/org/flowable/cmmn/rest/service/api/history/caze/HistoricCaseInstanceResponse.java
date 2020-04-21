@@ -45,6 +45,11 @@ public class HistoricCaseInstanceResponse {
     protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
+    protected String state;
+    protected String callbackId;
+    protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -173,5 +178,50 @@ public class HistoricCaseInstanceResponse {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    @ApiModelProperty(example = "active")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn-1.1-to-cmmn-1.1-child-case")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-cmmn-1.1-case")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 }

@@ -9,7 +9,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>6.5.1-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -100,6 +100,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-job-spring-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-spring-configurator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -349,26 +353,6 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485 -->
                             </excludes>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

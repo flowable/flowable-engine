@@ -55,9 +55,7 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             if (startTime != null && endTime != null) {
                 historicProcessInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
             }
-    
-            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-        
+
         } else {
             historicProcessInstance = historicProcessInstanceEntityManager.create();
             historicProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
@@ -75,6 +73,8 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             historicProcessInstance.setSuperProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.SUPER_PROCESS_INSTANCE_ID));
             historicProcessInstance.setCallbackId(getStringFromJson(historicalData, HistoryJsonConstants.CALLBACK_ID));
             historicProcessInstance.setCallbackType(getStringFromJson(historicalData, HistoryJsonConstants.CALLBACK_TYPE));
+            historicProcessInstance.setReferenceId(getStringFromJson(historicalData, HistoryJsonConstants.REFERENCE_ID));
+            historicProcessInstance.setReferenceType(getStringFromJson(historicalData, HistoryJsonConstants.REFERENCE_TYPE));
             historicProcessInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
     
             historicProcessInstanceEntityManager.insert(historicProcessInstance, false);
@@ -93,9 +93,9 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             }
             
             historicProcessInstanceEntityManager.update(historicProcessInstance, false);
-    
-            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+
         }
+        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
     }
     
 }

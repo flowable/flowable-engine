@@ -13,59 +13,14 @@
 
 package org.flowable.entitylink.api.history;
 
-import java.util.Date;
-
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkInfo;
 
 /**
  * Historic counterpart of {@link EntityLink} that represents the current state if any runtime link.
  * 
  * @author Tijs Rademakers
  */
-public interface HistoricEntityLink {
-    
-    /**
-     * Returns the type of link. See for the native supported types.
-     */
-    String getLinkType();
+public interface HistoricEntityLink extends EntityLinkInfo {
 
-    /**
-     * Returns the scope id of the originating entity
-     */
-    String getScopeId();
-    
-    /**
-     * The scope type associated with the originating entity
-     */
-    String getScopeType();
-
-    /**
-     * A scope definition id for the originating entity
-     */
-    String getScopeDefinitionId();
-    
-    /**
-     * Returns the scope id of the referenced entity
-     */
-    String getReferenceScopeId();
-    
-    /**
-     * The scope type associated with the referenced entity
-     */
-    String getReferenceScopeType();
-    
-    /**
-     * A scope definition id for the referenced entity
-     */
-    String getReferenceScopeDefinitionId();
-
-    /**
-     * Returns the hierarchy type for the entity link e.g. root, parent or empty
-     */
-    String getHierarchyType();
-
-    /**
-     * The create time for the entity link
-     */
-    Date getCreateTime();
 }

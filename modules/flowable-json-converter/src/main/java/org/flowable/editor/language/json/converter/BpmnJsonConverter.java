@@ -109,6 +109,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         HttpTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         SendTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+        SendEventTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
 
         // gateways
         ExclusiveGatewayJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -147,6 +148,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_START_NONE);
         DI_CIRCLES.add(STENCIL_EVENT_START_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_START_SIGNAL);
+        DI_CIRCLES.add(STENCIL_EVENT_START_EVENT_REGISTRY);
 
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CONDITIONAL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_ERROR);
@@ -154,6 +156,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_MESSAGE);
+        DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CANCEL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_COMPENSATION);
 
@@ -165,6 +168,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_THROW_NONE);
         DI_CIRCLES.add(STENCIL_EVENT_THROW_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_THROW_ESCALATION);
+        DI_CIRCLES.add(STENCIL_EVENT_THROW_COMPENSATION);
 
         DI_CIRCLES.add(STENCIL_EVENT_END_NONE);
         DI_CIRCLES.add(STENCIL_EVENT_END_ERROR);
@@ -189,6 +193,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_TASK_MULE);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
+        DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
         DI_RECTANGLES.add(STENCIL_TASK_SHELL);
         DI_RECTANGLES.add(STENCIL_TEXT_ANNOTATION);
 
@@ -398,12 +403,10 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 }
             }
 
-            processMessageFlows(model, shapesArrayNode);
-
         } else {
             processFlowElements(model.getMainProcess(), model, shapesArrayNode, formKeyMap, decisionTableKeyMap, 0.0, 0.0);
-            processMessageFlows(model, shapesArrayNode);
         }
+        processMessageFlows(model, shapesArrayNode);
 
         modelNode.set(EDITOR_CHILD_SHAPES, shapesArrayNode);
         return modelNode;
@@ -520,6 +523,25 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     List<ValuedDataObject> dataObjects = BpmnJsonConverterUtil.convertJsonToDataProperties(processDataPropertiesNode, process);
                     process.setDataObjects(dataObjects);
                     process.getFlowElements().addAll(dataObjects);
+                }
+
+                String userStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERUSER, modelNode);
+                String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
+
+                if (StringUtils.isNotEmpty(userStarterValue)) {
+                    String userStartArray[] = userStarterValue.split(",");
+
+                    List<String> userStarters = new ArrayList<>(Arrays.asList(userStartArray));
+
+                    process.setCandidateStarterUsers(userStarters);
+                }
+
+                if (StringUtils.isNotEmpty(groupStarterValue)) {
+                    String groupStarterArray[] = groupStarterValue.split(",");
+
+                    List<String> groupStarters = new ArrayList<>(Arrays.asList(groupStarterArray));
+
+                    process.setCandidateStarterGroups(groupStarters);
                 }
 
                 bpmnModel.addProcess(process);
@@ -892,7 +914,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             for (JsonNode jsonChildNode : objectNode.get(EDITOR_CHILD_SHAPES)) {
 
                 String stencilId = BpmnJsonConverterUtil.getStencilId(jsonChildNode);
-                if (!STENCIL_SEQUENCE_FLOW.equals(stencilId)) {
+                if (!STENCIL_SEQUENCE_FLOW.equals(stencilId) && !STENCIL_ASSOCIATION.equals(stencilId)) {
 
                     GraphicInfo graphicInfo = new GraphicInfo();
 

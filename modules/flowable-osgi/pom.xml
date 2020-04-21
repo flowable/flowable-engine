@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>6.5.1-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -68,6 +68,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -167,6 +171,11 @@
             <version>1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -180,28 +189,5 @@
             org.flowable.osgi
         </flowable.artifact>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

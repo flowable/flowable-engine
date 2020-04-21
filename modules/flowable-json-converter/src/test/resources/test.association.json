@@ -1,0 +1,274 @@
+{
+  "bounds": {
+    "upperLeft": {
+      "x": 279,
+      "y": 138
+    },
+    "lowerRight": {
+      "x": 610,
+      "y": 466
+    }
+  },
+  "properties": {
+    "process_id": "5e2c3b6dbfedeb296e85812f",
+    "name": "Process With Compensation Boundary Event",
+    "executionlisteners": {
+      "executionListeners": []
+    },
+    "eventlisteners": {
+      "eventListeners": []
+    },
+    "signaldefinitions": "[]"
+  },
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "childShapes": [
+    {
+      "bounds": {
+        "upperLeft": {
+          "x": 580,
+          "y": 161
+        },
+        "lowerRight": {
+          "x": 610,
+          "y": 191
+        }
+      },
+      "resourceId": "ubi_id-3b842bc9-f8b9-4848-93ad-5fd09dc270e1",
+      "childShapes": [],
+      "stencil": {
+        "id": "EndNoneEvent"
+      },
+      "outgoing": [],
+      "properties": {
+        "overrideid": "ubi_id-3b842bc9-f8b9-4848-93ad-5fd09dc270e1",
+        "name": "ubi_id-3b842bc9-f8b9-4848-93ad-5fd09dc270e1"
+      }
+    },
+    {
+      "bounds": {
+        "upperLeft": {
+          "x": 412,
+          "y": 392
+        },
+        "lowerRight": {
+          "x": 516,
+          "y": 466
+        }
+      },
+      "resourceId": "ubi_id-b507df96-608f-4af0-9027-b430dcaed430",
+      "childShapes": [],
+      "stencil": {
+        "id": "UserTask"
+      },
+      "outgoing": [],
+      "properties": {
+        "overrideid": "ubi_id-b507df96-608f-4af0-9027-b430dcaed430",
+        "name": "Task",
+        "usertaskassignment": {
+          "assignment": {
+            "assignee": "${__startingUser}",
+            "candidateGroups": [],
+            "candidateUsers": []
+          }
+        },
+        "duedatedefinition": "",
+        "localization": {
+          "name": {
+            "en": "User Task"
+          }
+        },
+        "isforcompensation": false,
+        "multiinstance_type": "None",
+        "multiinstance_condition": ""
+      }
+    },
+    {
+      "bounds": {
+        "upperLeft": {
+          "x": 279,
+          "y": 162
+        },
+        "lowerRight": {
+          "x": 309,
+          "y": 192
+        }
+      },
+      "resourceId": "ubi_id-115936a2-91d9-408d-91b3-1bd41c38c55f",
+      "childShapes": [],
+      "stencil": {
+        "id": "StartNoneEvent"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-95b3e899-c855-4010-8c33-a5ed984c9d79"
+        }
+      ],
+      "properties": {
+        "overrideid": "ubi_id-115936a2-91d9-408d-91b3-1bd41c38c55f",
+        "name": "ubi_id-115936a2-91d9-408d-91b3-1bd41c38c55f",
+        "isInterrupting": true
+      }
+    },
+    {
+      "bounds": {
+        "upperLeft": {
+          "x": 394,
+          "y": 138
+        },
+        "lowerRight": {
+          "x": 498,
+          "y": 212
+        }
+      },
+      "resourceId": "ubi_id-70c578a4-ec14-4c60-b540-6aaeca11560b",
+      "childShapes": [],
+      "stencil": {
+        "id": "UserTask"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-4e7a7374-61d6-43fb-be1f-e9bc5f6d96e8"
+        },
+        {
+          "resourceId": "userTask1"
+        }
+      ],
+      "properties": {
+        "overrideid": "ubi_id-70c578a4-ec14-4c60-b540-6aaeca11560b",
+        "name": "Task 2",
+        "usertaskassignment": {
+          "assignment": {
+            "assignee": "${__startingUser}",
+            "candidateGroups": [],
+            "candidateUsers": []
+          }
+        },
+        "duedatedefinition": "",
+        "localization": {
+          "name": {
+            "en": "User Task 2"
+          }
+        },
+        "isforcompensation": false,
+        "multiinstance_type": "None",
+        "multiinstance_condition": ""
+      }
+    },
+    {
+      "bounds": {
+        "upperLeft": {
+          "x": 430,
+          "y": 197
+        },
+        "lowerRight": {
+          "x": 460,
+          "y": 227
+        }
+      },
+      "resourceId": "userTask1",
+      "childShapes": [],
+      "stencil": {
+        "id": "BoundaryCompensationEvent"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-3673aeba-8427-47ac-85b1-4cbfac5c1bda"
+        }
+      ],
+      "properties": {
+        "overrideid": "userTask1",
+        "name": "userTask1",
+        "cancelactivity": true
+      }
+    },
+    {
+      "resourceId": "ubi_id-4e7a7374-61d6-43fb-be1f-e9bc5f6d96e8",
+      "childShapes": [],
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-3b842bc9-f8b9-4848-93ad-5fd09dc270e1"
+        }
+      ],
+      "properties": {
+        "overrideid": "ubi_id-4e7a7374-61d6-43fb-be1f-e9bc5f6d96e8",
+        "name": "ubi_id-4e7a7374-61d6-43fb-be1f-e9bc5f6d96e8"
+      },
+      "target": {
+        "resourceId": "ubi_id-3b842bc9-f8b9-4848-93ad-5fd09dc270e1"
+      },
+      "dockers": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "resourceId": "ubi_id-3673aeba-8427-47ac-85b1-4cbfac5c1bda",
+      "childShapes": [],
+      "stencil": {
+        "id": "Association"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-b507df96-608f-4af0-9027-b430dcaed430"
+        }
+      ],
+      "properties": {
+        "overrideid": "ubi_id-3673aeba-8427-47ac-85b1-4cbfac5c1bda",
+        "name": "ubi_id-3673aeba-8427-47ac-85b1-4cbfac5c1bda"
+      },
+      "target": {
+        "resourceId": "ubi_id-b507df96-608f-4af0-9027-b430dcaed430"
+      },
+      "dockers": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "resourceId": "ubi_id-95b3e899-c855-4010-8c33-a5ed984c9d79",
+      "childShapes": [],
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "outgoing": [
+        {
+          "resourceId": "ubi_id-70c578a4-ec14-4c60-b540-6aaeca11560b"
+        }
+      ],
+      "properties": {
+        "overrideid": "ubi_id-95b3e899-c855-4010-8c33-a5ed984c9d79",
+        "name": "ubi_id-95b3e899-c855-4010-8c33-a5ed984c9d79"
+      },
+      "target": {
+        "resourceId": "ubi_id-70c578a4-ec14-4c60-b540-6aaeca11560b"
+      },
+      "dockers": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ]
+    }
+  ]
+}

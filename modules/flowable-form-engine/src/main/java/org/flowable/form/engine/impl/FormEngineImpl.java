@@ -12,6 +12,7 @@
  */
 package org.flowable.form.engine.impl;
 
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -52,12 +53,24 @@ public class FormEngineImpl implements FormEngine {
         }
 
         FormEngines.registerFormEngine(this);
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
 
     @Override
     public void close() {
         FormEngines.unregister(this);
         engineConfiguration.close();
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
 
     // getters and setters

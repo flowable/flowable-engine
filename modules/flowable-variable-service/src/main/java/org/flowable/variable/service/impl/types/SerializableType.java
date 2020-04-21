@@ -21,19 +21,23 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  */
-public class SerializableType extends ByteArrayType {
+public class SerializableType extends ByteArrayType implements MutableVariableType<Object, byte[]> {
 
     public static final String TYPE_NAME = "serializable";
 
@@ -65,10 +69,7 @@ public class SerializableType extends ByteArrayType {
             Object deserializedObject = deserialize(bytes, valueFields);
             valueFields.setCachedValue(deserializedObject);
 
-            if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
-                Context.getCommandContext().addCloseListener(new VerifyDeserializedObjectCommandContextCloseListener(
-                        new DeserializedObject(this, valueFields.getCachedValue(), bytes, (VariableInstanceEntity) valueFields)));
-            }
+            traceValue(valueFields.getCachedValue(), bytes, valueFields);
 
             return deserializedObject;
         }
@@ -82,11 +83,45 @@ public class SerializableType extends ByteArrayType {
 
         super.setValue(bytes, valueFields);
 
-        if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
-            Context.getCommandContext().addCloseListener(new VerifyDeserializedObjectCommandContextCloseListener(
-                    new DeserializedObject(this, valueFields.getCachedValue(), bytes, (VariableInstanceEntity) valueFields)));
-        }
+        traceValue(valueFields.getCachedValue(), bytes, valueFields);
+    }
 
+    protected void traceValue(Object value, byte[] valueBytes, ValueFields valueFields) {
+        if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
+                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
+                                    commandContext.getCurrentEngineConfiguration();
+                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
+                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                        new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                    ));
+                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public boolean updateValueIfChanged(Object tracedObject, byte[] originalBytes,
+        VariableInstanceEntity variableInstanceEntity) {
+        byte[] bytes = serialize(tracedObject, variableInstanceEntity);
+        boolean valueChanged = false;
+        // this first check verifies if the variable value was not overwritten with another object
+        if (!Arrays.equals(originalBytes, bytes)) {
+
+            // Add an additional check to prevent byte differences due to JDK changes etc
+            Object originalObject = deserialize(originalBytes, variableInstanceEntity);
+            byte[] refreshedOriginalBytes = serialize(originalObject, variableInstanceEntity);
+
+            if (!Arrays.equals(refreshedOriginalBytes, bytes)) {
+                variableInstanceEntity.setBytes(bytes);
+                valueChanged = true;
+            }
+        }
+        return valueChanged;
     }
 
     public byte[] serialize(Object value, ValueFields valueFields) {

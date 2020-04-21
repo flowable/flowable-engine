@@ -22,8 +22,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -53,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * An executor behavior for HTTP requests.
@@ -71,7 +70,6 @@ public class HttpActivityExecutor {
     public static final String HTTP_TASK_REQUEST_HEADERS_INVALID = "requestHeaders are invalid";
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
-    protected final Timer timer = new Timer(true);
     protected final HttpClientBuilder clientBuilder;
     protected final ErrorPropagator errorPropagator;
     protected ObjectMapper objectMapper;
@@ -116,6 +114,9 @@ public class HttpActivityExecutor {
                 if (!response.isBodyResponseHandled()) {
                     String varName = StringUtils.isNotEmpty(responseVariableName) ? responseVariableName : request.getPrefix() + "ResponseBody";
                     Object varValue = request.isSaveResponseAsJson() && response.getBody() != null ? objectMapper.readTree(response.getBody()) : response.getBody();
+                    if (varValue instanceof MissingNode) {
+                        varValue = null;
+                    }
                     if (request.isSaveResponseTransient()) {
                         variableContainer.setTransientVariable(varName, varValue);
                     } else {
@@ -257,10 +258,6 @@ public class HttpActivityExecutor {
                     connectTimeout,
                     connectionRequestTimeout);
 
-            if (requestInfo.getTimeout() > 0) {
-                timer.schedule(new TimeoutTask(request), requestInfo.getTimeout());
-            }
-
             response = client.execute(request);
 
             HttpResponse responseInfo = new HttpResponse();
@@ -375,21 +372,6 @@ public class HttpActivityExecutor {
             return URLDecoder.decode(string, "UTF-8");
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
             throw new IllegalStateException("JVM does not support UTF-8 encoding.", unsupportedEncodingException);
-        }
-    }
-
-    protected static class TimeoutTask extends TimerTask {
-        private HttpRequestBase request;
-
-        public TimeoutTask(HttpRequestBase request) {
-            this.request = request;
-        }
-
-        @Override
-        public void run() {
-            if (request != null) {
-                request.abort();
-            }
         }
     }
 

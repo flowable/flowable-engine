@@ -12,22 +12,21 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class UserTaskConverterTest extends AbstractConverterTest {
 
@@ -51,72 +50,70 @@ public class UserTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("usertask", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getId()).isEqualTo("usertask");
         UserTask userTask = (UserTask) flowElement;
-        assertEquals("usertask", userTask.getId());
-        assertEquals("User task", userTask.getName());
-        assertEquals("testKey", userTask.getFormKey());
-        assertEquals("formFieldValidationValue", userTask.getValidateFormFields());
-        assertEquals("40", userTask.getPriority());
-        assertEquals("2012-11-01", userTask.getDueDate());
-        assertEquals("defaultCategory", userTask.getCategory());
-        assertEquals("${skipExpression}", userTask.getSkipExpression());
+        assertThat(userTask.getId()).isEqualTo("usertask");
+        assertThat(userTask.getName()).isEqualTo("User task");
+        assertThat(userTask.getFormKey()).isEqualTo("testKey");
+        assertThat(userTask.getValidateFormFields()).isEqualTo("formFieldValidationValue");
+        assertThat(userTask.getPriority()).isEqualTo("40");
+        assertThat(userTask.getDueDate()).isEqualTo("2012-11-01");
+        assertThat(userTask.getBusinessCalendarName()).isEqualTo("myCalendarName");
+        assertThat(userTask.getCategory()).isEqualTo("defaultCategory");
+        assertThat(userTask.getSkipExpression()).isEqualTo("${skipExpression}");
 
-        assertEquals("kermit", userTask.getAssignee());
-        assertEquals(2, userTask.getCandidateUsers().size());
-        assertTrue(userTask.getCandidateUsers().contains("kermit"));
-        assertTrue(userTask.getCandidateUsers().contains("fozzie"));
-        assertEquals(2, userTask.getCandidateGroups().size());
-        assertTrue(userTask.getCandidateGroups().contains("management"));
-        assertTrue(userTask.getCandidateGroups().contains("sales"));
+        assertThat(userTask.getAssignee()).isEqualTo("kermit");
+
+        assertThat(userTask.getCandidateUsers())
+                .containsOnly("kermit", "fozzie");
+        ;
+        assertThat(userTask.getCandidateGroups())
+                .containsOnly("management", "sales");
 
         List<FormProperty> formProperties = userTask.getFormProperties();
-        assertEquals(2, formProperties.size());
+        assertThat(formProperties)
+                .extracting(FormProperty::getId, FormProperty::getName, FormProperty::getType)
+                .containsExactly(
+                        tuple("formId", "formName", "string"),
+                        tuple("formId2", "anotherName", "long")
+                );
         FormProperty formProperty = formProperties.get(0);
-        assertEquals("formId", formProperty.getId());
-        assertEquals("formName", formProperty.getName());
-        assertEquals("string", formProperty.getType());
-        assertEquals("variable", formProperty.getVariable());
-        assertEquals("${expression}", formProperty.getExpression());
+        assertThat(formProperty.getVariable()).isEqualTo("variable");
+        assertThat(formProperty.getExpression()).isEqualTo("${expression}");
         formProperty = formProperties.get(1);
-        assertEquals("formId2", formProperty.getId());
-        assertEquals("anotherName", formProperty.getName());
-        assertEquals("long", formProperty.getType());
-        assertTrue(StringUtils.isEmpty(formProperty.getVariable()));
-        assertTrue(StringUtils.isEmpty(formProperty.getExpression()));
+        assertThat(formProperty.getVariable()).isBlank();   // one time null, next time ""
+        assertThat(formProperty.getExpression()).isBlank();
 
         List<FlowableListener> listeners = userTask.getTaskListeners();
-        assertEquals(3, listeners.size());
+        assertThat(listeners)
+                .extracting(FlowableListener::getImplementationType, FlowableListener::getImplementation, FlowableListener::getEvent)
+                .containsExactly(
+                        tuple(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.test.TestClass", "create"),
+                        tuple(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${someExpression}", "assignment"),
+                        tuple(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${someDelegateExpression}", "complete")
+                );
         FlowableListener listener = listeners.get(0);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-        assertEquals("org.test.TestClass", listener.getImplementation());
-        assertEquals("create", listener.getEvent());
-        assertEquals(2, listener.getFieldExtensions().size());
-        assertEquals("testField", listener.getFieldExtensions().get(0).getFieldName());
-        assertEquals("test", listener.getFieldExtensions().get(0).getStringValue());
-        listener = listeners.get(1);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
-        assertEquals("${someExpression}", listener.getImplementation());
-        assertEquals("assignment", listener.getEvent());
-        listener = listeners.get(2);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
-        assertEquals("${someDelegateExpression}", listener.getImplementation());
-        assertEquals("complete", listener.getEvent());
+        assertThat(listener.getFieldExtensions())
+                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+                .containsExactly(
+                        tuple("testField", "test"),
+                        tuple("testField2", null)
+                );
 
         flowElement = model.getMainProcess().getFlowElement("start", true);
-        assertTrue(flowElement instanceof StartEvent);
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
 
         StartEvent startEvent = (StartEvent) flowElement;
-        assertEquals(1, startEvent.getOutgoingFlows().size());
+        assertThat(startEvent.getOutgoingFlows()).hasSize(1);
 
         flowElement = model.getMainProcess().getFlowElement("flow1", true);
-        assertTrue(flowElement instanceof SequenceFlow);
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
 
         SequenceFlow flow = (SequenceFlow) flowElement;
-        assertEquals("flow1", flow.getId());
-        assertNotNull(flow.getSourceRef());
-        assertNotNull(flow.getTargetRef());
+        assertThat(flow.getId()).isEqualTo("flow1");
+        assertThat(flow.getSourceRef()).isNotNull();
+        assertThat(flow.getTargetRef()).isNotNull();
     }
 }

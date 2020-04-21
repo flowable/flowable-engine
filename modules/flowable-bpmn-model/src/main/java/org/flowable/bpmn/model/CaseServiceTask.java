@@ -26,6 +26,7 @@ public class CaseServiceTask extends ServiceTask {
     protected String businessKey;
     protected boolean inheritBusinessKey;
     protected boolean fallbackToDefaultTenant;
+    protected String caseInstanceIdVariableName;
     
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
@@ -94,6 +95,14 @@ public class CaseServiceTask extends ServiceTask {
         this.outParameters = outParameters;
     }
 
+    public String getCaseInstanceIdVariableName() {
+        return caseInstanceIdVariableName;
+    }
+
+    public void setCaseInstanceIdVariableName(String caseInstanceIdVariableName) {
+        this.caseInstanceIdVariableName = caseInstanceIdVariableName;
+    }
+
     @Override
     public CaseServiceTask clone() {
         CaseServiceTask clone = new CaseServiceTask();
@@ -103,14 +112,14 @@ public class CaseServiceTask extends ServiceTask {
 
     public void setValues(CaseServiceTask otherElement) {
         super.setValues(otherElement);
-        
-        super.setValues(otherElement);
+
         setCaseDefinitionKey(otherElement.getCaseDefinitionKey());
         setCaseInstanceName(otherElement.getCaseInstanceName());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
         setSameDeployment(otherElement.isSameDeployment());
         setFallbackToDefaultTenant(otherElement.isFallbackToDefaultTenant());
+        setCaseInstanceIdVariableName(otherElement.getCaseInstanceIdVariableName());
 
         inParameters = new ArrayList<>();
         if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {

@@ -206,6 +206,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
 
     protected void initialiseCommonProperties(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         initEngineConfigurations(engineConfiguration, targetEngineConfiguration);
+        initEventRegistryEventConsumers(engineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(engineConfiguration, targetEngineConfiguration);
         initIdGenerator(engineConfiguration, targetEngineConfiguration);
 
@@ -232,6 +233,10 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
                 targetEngineConfiguration.addServiceConfiguration(serviceConfigurationKey, engineConfiguration.getServiceConfigurations().get(serviceConfigurationKey));
             }
         }
+    }
+    
+    protected void initEventRegistryEventConsumers(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setEventRegistryEventConsumers(engineConfiguration.getEventRegistryEventConsumers());
     }
 
     protected void initCommandContextFactory(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {

@@ -24,19 +24,20 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Filip Hrisafov
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableJobConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(8);
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("flowable-task-Executor-");
         executor.setAwaitTerminationSeconds(30);
         executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAllowCoreThreadTimeOut(true);
         executor.initialize();
         return executor;
     }

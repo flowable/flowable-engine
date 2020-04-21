@@ -36,7 +36,7 @@
         <dc:Bounds x="268" y="216" width="20" height="28" />
         <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
-      <cmmndi:CMMNEdge id="CMMNEdge_onPart1" cmmnElementRef="onPart1" targetCMMNElementRef="criterion1">
+      <cmmndi:CMMNEdge id="CMMNEdge_onPart1" cmmnElementRef="planItem1" targetCMMNElementRef="criterion1">
         <di:waypoint x="170" y="95" />
         <di:waypoint x="220" y="95" />
         <di:waypoint x="220" y="130" />

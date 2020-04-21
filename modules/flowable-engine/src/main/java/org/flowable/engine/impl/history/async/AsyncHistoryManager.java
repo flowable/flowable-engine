@@ -86,7 +86,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId) {
+    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
         if (isHistoryEnabled(processDefinitionId)) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstanceId);

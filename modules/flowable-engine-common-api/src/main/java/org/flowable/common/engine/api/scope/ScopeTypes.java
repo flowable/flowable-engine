@@ -14,7 +14,6 @@ package org.flowable.common.engine.api.scope;
 
 /**
  * @author Joram Barrez
- * @author Valentin Zickner
  */
 public interface ScopeTypes {
 
@@ -22,6 +21,8 @@ public interface ScopeTypes {
     String BPMN = "bpmn";
     String CMMN = "cmmn";
     String DMN = "dmn";
+    String EVENT_REGISTRY = "eventRegistry";
     String FORM = "form";
+    String PLAN_ITEM = "planItem";
     String TASK = "task";
 }

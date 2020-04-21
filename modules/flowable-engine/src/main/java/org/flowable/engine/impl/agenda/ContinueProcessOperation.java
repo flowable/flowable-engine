@@ -16,25 +16,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.logging.LogMDC;
@@ -96,6 +102,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (flowNode.getIncomingFlows() != null
                 && flowNode.getIncomingFlows().size() == 0
                 && flowNode.getSubProcess() == null) {
+            
             executeProcessStartExecutionListeners();
         }
 
@@ -166,6 +173,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         JobService jobService = CommandContextUtil.getJobService(commandContext);
         
         JobEntity job = jobService.createJob();
@@ -175,6 +183,18 @@ public class ContinueProcessOperation extends AbstractOperation {
         job.setElementId(flowNode.getId());
         job.setElementName(flowNode.getName());
         job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
+        
+        List<ExtensionElement> jobCategoryElements = flowNode.getExtensionElements().get("jobCategory");
+        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                Object categoryValue = categoryExpression.getValue(execution);
+                if (categoryValue != null) {
+                    job.setCategory(categoryValue.toString());
+                }
+            }
+        }
 
         // Inherit tenant id (if applicable)
         if (execution.getTenantId() != null) {
@@ -185,6 +205,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         
         jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
+        
+        if (processEngineConfiguration.isLoggingSessionEnabled()) {
+            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Created async job for " + flowNode.getId() + ", with job id " + job.getId(),
+                            LoggingSessionConstants.TYPE_SERVICE_TASK_ASYNC_JOB, job, flowNode, execution);
+        }
     }
 
     protected void executeMultiInstanceSynchronous(FlowNode flowNode) {
@@ -270,6 +295,11 @@ public class ContinueProcessOperation extends AbstractOperation {
                                 execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
             }
         }
+        
+        if (processEngineConfiguration.isLoggingSessionEnabled()) {
+            BpmnLoggingSessionUtil.addExecuteActivityBehaviorLoggingData(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, 
+                            activityBehavior, flowNode, execution);
+        }
 
         try {
             activityBehavior.execute(execution);
@@ -337,9 +367,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                    || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
-                continue;
+            if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
+                if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                        || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                    continue;
+                }
             }
 
             // A Child execution of the current execution is created to represent the boundary event being active
@@ -348,6 +380,13 @@ public class ContinueProcessOperation extends AbstractOperation {
             childExecutionEntity.setCurrentFlowElement(boundaryEvent);
             childExecutionEntity.setScope(false);
             boundaryEventExecutions.add(childExecutionEntity);
+            
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(BpmnLoggingSessionUtil.getBoundaryCreateEventType(boundaryEvent), 
+                                "Creating boundary event (" + BpmnLoggingSessionUtil.getBoundaryEventType(boundaryEvent) + 
+                                ") for execution id " + childExecutionEntity.getId(), childExecutionEntity);
+            }
         }
 
         return boundaryEventExecutions;

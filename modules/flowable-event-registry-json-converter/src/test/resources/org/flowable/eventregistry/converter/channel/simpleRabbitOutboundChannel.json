@@ -1,0 +1,13 @@
+{
+  "key": "rabbitChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Rabbit channel",
+  "channelType": "outbound",
+  "type": "rabbit",
+
+  "routingKey": "customer",
+  "exchange": "flowable",
+
+  "serializerType": "json"
+}

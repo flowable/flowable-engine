@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
@@ -39,7 +40,6 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
             verifyResultVariableName(process, serviceTask, errors);
             verifyWebservice(bpmnModel, process, serviceTask, errors);
         }
-
     }
 
     protected void verifyImplementation(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
@@ -47,7 +47,6 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 && !ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) 
-                && !ServiceTask.CASE_TASK.equalsIgnoreCase(serviceTask.getType()) 
                 && StringUtils.isEmpty(serviceTask.getType())) {
             
             addError(errors, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
@@ -58,23 +57,26 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
     protected void verifyType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
-            if (!serviceTask.getType().equalsIgnoreCase("mail") && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
-                    && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn") 
-                    && !serviceTask.getType().equalsIgnoreCase("http") && !serviceTask.getType().equalsIgnoreCase("case")) {
+            if (!serviceTask.getType().equalsIgnoreCase(ServiceTask.MAIL_TASK) && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
+                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.SHELL_TASK) && !serviceTask.getType().equalsIgnoreCase(ServiceTask.DMN_TASK) 
+                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.HTTP_TASK) && !serviceTask.getType().equalsIgnoreCase(ServiceTask.CASE_TASK)
+                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.SEND_EVENT_TASK)) {
 
                 addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
 
-            if (serviceTask.getType().equalsIgnoreCase("mail")) {
+            if (serviceTask.getType().equalsIgnoreCase(ServiceTask.MAIL_TASK)) {
                 validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.SHELL_TASK)) {
                 validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.DMN_TASK)) {
                 validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("http")) {
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.HTTP_TASK)) {
                 validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("case")) {
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.CASE_TASK)) {
                 validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.SEND_EVENT_TASK)) {
+                validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
             }
 
         }
@@ -103,6 +105,7 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                         for (Operation operation : bpmnInterface.getOperations()) {
                             if (operation.getId() != null && operation.getId().equals(serviceTask.getOperationRef())) {
                                 operationFound = true;
+                                break;
                             }
                         }
                     }

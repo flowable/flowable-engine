@@ -27,6 +27,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
+    protected String caseDefinitionParentDeploymentId;
     protected String predefinedCaseInstanceId;
     protected String name;
     protected String businessKey;
@@ -38,6 +39,8 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> startFormVariables;
     protected String callbackType;
     protected String callbackId;
+    protected String referenceId;
+    protected String referenceType;
     protected String parentId;
     protected boolean fallbackToDefaultTenant;
     protected boolean startWithForm;
@@ -59,6 +62,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public CaseInstanceBuilder caseDefinitionKey(String caseDefinitionKey) {
         this.caseDefinitionKey = caseDefinitionKey;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceBuilder caseDefinitionParentDeploymentId(String parentDeploymentId) {
+        this.caseDefinitionParentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -146,14 +155,26 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public CaseInstanceBuilder callbackId(String callbackId) {
+        this.callbackId = callbackId;
+        return this;
+    }
+
+    @Override
     public CaseInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
         return this;
     }
 
     @Override
-    public CaseInstanceBuilder callbackId(String callbackId) {
-        this.callbackId = callbackId;
+    public CaseInstanceBuilder referenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceBuilder referenceType(String referenceType) {
+        this.referenceType = referenceType;
         return this;
     }
 
@@ -195,6 +216,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         return caseDefinitionKey;
     }
     
+    @Override
+    public String getCaseDefinitionParentDeploymentId() {
+        return caseDefinitionParentDeploymentId;
+    }
+
     @Override
     public String getPredefinedCaseInstanceId() {
         return predefinedCaseInstanceId;
@@ -241,13 +267,23 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public String getCallbackId() {
+        return this.callbackId;
+    }
+
+    @Override
     public String getCallbackType() {
         return this.callbackType;
     }
 
     @Override
-    public String getCallbackId() {
-        return this.callbackId;
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return referenceType;
     }
 
     @Override

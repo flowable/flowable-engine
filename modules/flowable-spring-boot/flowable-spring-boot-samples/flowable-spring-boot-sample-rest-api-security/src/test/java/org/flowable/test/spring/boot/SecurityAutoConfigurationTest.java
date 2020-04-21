@@ -12,16 +12,17 @@
  */
 package org.flowable.test.spring.boot;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Josh Long
  */
 public class SecurityAutoConfigurationTest {
+
     private AnnotationConfigApplicationContext applicationContext;
 
     @After
@@ -52,12 +54,12 @@ public class SecurityAutoConfigurationTest {
         this.applicationContext.register(SecurityConfiguration.class);
         this.applicationContext.refresh();
         UserDetailsService userDetailsService = this.applicationContext.getBean(UserDetailsService.class);
-        Assert.assertNotNull("the userDetailsService should not be null", userDetailsService);
-        Assert.assertEquals("there should only be 1 authority", 1, userDetailsService.loadUserByUsername("jlong2").getAuthorities().size());
-        Assert.assertEquals("there should be 2 authorities", 2, userDetailsService.loadUserByUsername("jbarrez2").getAuthorities().size());
+        assertThat(userDetailsService).as("the userDetailsService should not be null").isNotNull();
+        assertThat(userDetailsService.loadUserByUsername("jlong2").getAuthorities().size()).as("there should only be 1 authority").isEqualTo(1);
+        assertThat(userDetailsService.loadUserByUsername("jbarrez2").getAuthorities().size()).as("there should be 2 authorities").isEqualTo(2);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @Import({ DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,
@@ -94,8 +96,9 @@ public class SecurityAutoConfigurationTest {
 
         @Bean
         InitializingBean init(
-            final IdmIdentityService identityService) {
+                final IdmIdentityService identityService) {
             return new InitializingBean() {
+
                 @Override
                 public void afterPropertiesSet() throws Exception {
                     // We have to use different names than from the CommandLineRunner. The reason is that during

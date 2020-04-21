@@ -83,34 +83,34 @@ public class DefaultProcessDiagramCanvas {
     protected static final int LINE_HEIGHT = FONT_SIZE + FONT_SPACING;
 
     // Colors
-    protected static Color TASK_BOX_COLOR = new Color(249, 249, 249);
-    protected static Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
-    protected static Color EVENT_COLOR = new Color(255, 255, 255);
-    protected static Color CONNECTION_COLOR = new Color(88, 88, 88);
-    protected static Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
-    protected static Color HIGHLIGHT_COLOR = Color.RED;
-    protected static Color LABEL_COLOR = new Color(112, 146, 190);
-    protected static Color TASK_BORDER_COLOR = new Color(187, 187, 187);
-    protected static Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
-    protected static Color SUBPROCESS_BORDER_COLOR = new Color(0, 0, 0);
+    protected static final Color TASK_BOX_COLOR = new Color(249, 249, 249);
+    protected static final Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
+    protected static final Color EVENT_COLOR = new Color(255, 255, 255);
+    protected static final Color CONNECTION_COLOR = new Color(88, 88, 88);
+    protected static final Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
+    protected static final Color HIGHLIGHT_COLOR = Color.RED;
+    protected static final Color LABEL_COLOR = new Color(112, 146, 190);
+    protected static final Color TASK_BORDER_COLOR = new Color(187, 187, 187);
+    protected static final Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
+    protected static final Color SUBPROCESS_BORDER_COLOR = new Color(0, 0, 0);
 
     // Fonts
     protected static Font LABEL_FONT;
     protected static Font ANNOTATION_FONT;
 
     // Strokes
-    protected static Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
-    protected static Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
-    protected static Stroke END_EVENT_STROKE = new BasicStroke(3.0f);
-    protected static Stroke MULTI_INSTANCE_STROKE = new BasicStroke(1.3f);
-    protected static Stroke EVENT_SUBPROCESS_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.0f }, 0.0f);
-    protected static Stroke NON_INTERRUPTING_EVENT_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 4.0f, 3.0f }, 0.0f);
-    protected static Stroke HIGHLIGHT_FLOW_STROKE = new BasicStroke(1.3f);
-    protected static Stroke ANNOTATION_STROKE = new BasicStroke(2.0f);
-    protected static Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
+    protected static final Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke END_EVENT_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke MULTI_INSTANCE_STROKE = new BasicStroke(1.3f);
+    protected static final Stroke EVENT_SUBPROCESS_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.0f }, 0.0f);
+    protected static final Stroke NON_INTERRUPTING_EVENT_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 4.0f, 3.0f }, 0.0f);
+    protected static final Stroke HIGHLIGHT_FLOW_STROKE = new BasicStroke(1.3f);
+    protected static final Stroke ANNOTATION_STROKE = new BasicStroke(2.0f);
+    protected static final Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
 
     // icons
-    protected static int ICON_PADDING = 5;
+    protected static final int ICON_PADDING = 5;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SCRIPTTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
@@ -263,22 +263,12 @@ public class DefaultProcessDiagramCanvas {
             throw new FlowableImageException("ProcessDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(processDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating process image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
@@ -320,6 +310,10 @@ public class DefaultProcessDiagramCanvas {
     }
 
     public void drawMessageStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
+    }
+    
+    public void drawEventRegistryStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
     }
 
@@ -513,8 +507,17 @@ public class DefaultProcessDiagramCanvas {
     public void drawCatchingMessageEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
     }
+    
+    public void drawCatchingEventRegistryEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+    }
 
     public void drawCatchingMessageEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+        drawLabel(name, graphicInfo);
+    }
+    
+    public void drawCatchingEventRegistryEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
         drawLabel(name, graphicInfo);
     }
@@ -581,10 +584,10 @@ public class DefaultProcessDiagramCanvas {
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -907,6 +910,10 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawManualTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(MANUALTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawBusinessRuleTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

@@ -14,6 +14,7 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -54,6 +55,11 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
                                 "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
                     }
                 }
+            }
+
+            List<BoundaryEvent> boundaryEvents = eventSubprocess.getBoundaryEvents();
+            if (boundaryEvents != null && !boundaryEvents.isEmpty()) {
+                addWarning(errors, Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, process, eventSubprocess, "event sub process cannot have attached boundary events");
             }
 
         }

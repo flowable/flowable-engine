@@ -15,17 +15,18 @@ package org.flowable.engine.test.bpmn.event.timer;
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -33,7 +34,9 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.cmd.CancelJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,77 +47,183 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testDurationStartTimerEvent() throws Exception {
-
-        // Set the clock fixed
-        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
-        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(373));
-
-        // After process start, there should be timer created
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        // After setting the clock to time '50 minutes and 5 seconds', the second timer should fire
-        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 200L);
-
-        List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
-        assertEquals(1, pi.size());
-
-        assertEquals(0, jobQuery.count());
-
+        try {
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            Date startTime = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+            processEngineConfiguration.getClock().setCurrentTime(startTime);
+            waitForJobExecutorToProcessAllJobs(5000L, 200L);
+    
+            List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+            assertEquals(1, pi.size());
+    
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testDurationStartTimerEventWithCategory() throws Exception {
+        try {
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+            assertEquals("myCategory", jobQuery.singleResult().getCategory());
+    
+            Date startTime = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+            processEngineConfiguration.getClock().setCurrentTime(startTime);
+            waitForJobExecutorToProcessAllJobs(5000L, 200L);
+    
+            List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+            assertEquals(1, pi.size());
+    
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testDurationStartTimerEventWithCategory.bpmn20.xml")
+    public void testDurationStartTimerEventWithCategoryAndEnabledConfigurationSet() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("testValue");
+            
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+            assertEquals("myCategory", jobQuery.singleResult().getCategory());
+    
+            Date startTime = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+            processEngineConfiguration.getClock().setCurrentTime(startTime);
+            
+            assertEquals(0, getTimerJobsCount());
+            
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            
+            assertEquals(1, getTimerJobsCount());
+            
+            waitForJobExecutorToProcessAllJobs(5000L, 200L);
+    
+            assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").count());
+            
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
     }
 
     @Test
     @Deployment
     public void testFixedDateStartTimerEvent() throws Exception {
-        // After process start, there should be timer created
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        processEngineConfiguration.getClock().setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
-        waitForJobExecutorToProcessAllJobs(7000L, 200L);
-
-        List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
-        assertEquals(1, pi.size());
-
-        assertEquals(0, jobQuery.count());
+        try {
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            processEngineConfiguration.getClock().setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
+            waitForJobExecutorToProcessAllJobs(7000L, 200L);
+    
+            List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+            assertEquals(1, pi.size());
+    
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
-    // FIXME: This test likes to run in an endless loop when invoking the
-    // waitForJobExecutorOnCondition method
     @Test
     @Deployment
     public void testCycleDateStartTimerEvent() throws Exception {
-        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
-        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(730)));
-
-        // After process start, there should be timer created
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
-
-        moveByMinutes(5);
-        waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return 1 == piq.count();
-            }
-        });
-
-        assertEquals(1, jobQuery.count());
-
-        moveByMinutes(5);
-        waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return 2 == piq.count();
-            }
-        });
-
-        assertEquals(1, jobQuery.count());
-        // have to manually delete pending timer
-        cleanDB();
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)));
+    
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    
+            moveByMinutes(6);
+            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return 1 == piq.count();
+                }
+            });
+    
+            assertEquals(1, jobQuery.count());
+    
+            moveByMinutes(6);
+            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return 2 == piq.count();
+                }
+            });
+    
+            assertEquals(1, jobQuery.count());
+            // have to manually delete pending timer
+            cleanDB();
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testCycleDateStartTimerEventWithCategory() throws Exception {
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)));
+    
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+            assertEquals("myCategory", jobQuery.singleResult().getCategory());
+    
+            final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    
+            moveByMinutes(6);
+            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return 1 == piq.count();
+                }
+            });
+    
+            assertEquals(1, jobQuery.count());
+            assertEquals("myCategory", jobQuery.singleResult().getCategory());
+    
+            moveByMinutes(6);
+            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return 2 == piq.count();
+                }
+            });
+    
+            assertEquals(1, jobQuery.count());
+            assertEquals("myCategory", jobQuery.singleResult().getCategory());
+            
+            // have to manually delete pending timer
+            cleanDB();
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
     private void moveByMinutes(int minutes) throws Exception {
@@ -124,84 +233,99 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCycleWithLimitStartTimerEvent() throws Exception {
-        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
-        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(620)));
-
-        // After process start, there should be timer created
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        moveByMinutes(6);
-        String jobId = managementService.createTimerJobQuery().executable().singleResult().getId();
-        managementService.moveTimerToExecutableJob(jobId);
-        managementService.executeJob(jobId);
-        assertEquals(1, jobQuery.count());
-
-        moveByMinutes(6);
-        jobId = managementService.createTimerJobQuery().executable().singleResult().getId();
-        managementService.moveTimerToExecutableJob(jobId);
-        managementService.executeJob(jobId);
-        assertEquals(0, jobQuery.count());
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(620)));
+    
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            moveByMinutes(6);
+            String jobId = managementService.createTimerJobQuery().executable().singleResult().getId();
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+            assertEquals(1, jobQuery.count());
+    
+            moveByMinutes(6);
+            jobId = managementService.createTimerJobQuery().executable().singleResult().getId();
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
     @Test
     @Deployment
     public void testExpressionStartTimerEvent() throws Exception {
-        // ACT-1415: fixed start-date is an expression
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        processEngineConfiguration.getClock().setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
-        waitForJobExecutorToProcessAllJobs(7000L, 200L);
-
-        List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
-        assertEquals(1, pi.size());
-
-        assertEquals(0, jobQuery.count());
+        try {
+            // ACT-1415: fixed start-date is an expression
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            processEngineConfiguration.getClock().setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
+            waitForJobExecutorToProcessAllJobs(7000L, 200L);
+    
+            List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+            assertEquals(1, pi.size());
+    
+            assertEquals(0, jobQuery.count());
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
     @Test
     @Deployment
     public void testVersionUpgradeShouldCancelJobs() throws Exception {
-        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
-        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(293)));
-
-        // After process start, there should be timer created
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
-
-        // we deploy new process version, with some small change
-        String process = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml"), "")).replaceAll("beforeChange", "changed");
-        String id = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", new ByteArrayInputStream(process.getBytes())).deploy().getId();
-
-        assertEquals(1, jobQuery.count());
-
-        moveByMinutes(5);
-        waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                // we check that correct version was started
-                ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();
-                if (processInstance != null) {
-                    String pi = processInstance.getId();
-                    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi).list();
-                    Execution activityExecution = null;
-                    for (Execution execution : executions) {
-                        if (!execution.getProcessInstanceId().equals(execution.getId())) {
-                            activityExecution = execution;
-                            break;
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(293)));
+    
+            // After process start, there should be timer created
+            TimerJobQuery jobQuery = managementService.createTimerJobQuery();
+            assertEquals(1, jobQuery.count());
+    
+            // we deploy new process version, with some small change
+            String process = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml"), "")).replaceAll("beforeChange", "changed");
+            String id = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", new ByteArrayInputStream(process.getBytes())).deploy().getId();
+    
+            assertEquals(1, jobQuery.count());
+    
+            moveByMinutes(5);
+            waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    // we check that correct version was started
+                    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();
+                    if (processInstance != null) {
+                        String pi = processInstance.getId();
+                        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi).list();
+                        Execution activityExecution = null;
+                        for (Execution execution : executions) {
+                            if (!execution.getProcessInstanceId().equals(execution.getId())) {
+                                activityExecution = execution;
+                                break;
+                            }
                         }
+                        return activityExecution != null && "changed".equals(activityExecution.getActivityId());
+                    } else {
+                        return false;
                     }
-                    return activityExecution != null && "changed".equals(activityExecution.getActivityId());
-                } else {
-                    return false;
                 }
-            }
-        });
-        assertEquals(1, jobQuery.count());
-
-        cleanDB();
-        repositoryService.deleteDeployment(id, true);
+            });
+            assertEquals(1, jobQuery.count());
+    
+            cleanDB();
+            repositoryService.deleteDeployment(id, true);
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
     @Test
@@ -435,111 +559,131 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     // Can't use @Deployment, we need to control the clock very strict to have a good test
     @Test
     public void testMultipleStartEvents() {
-
-        // Human time (GMT): Tue, 10 May 2016 18:50:01 GMT
-        Date startTime = new Date(1462906201000L);
-        processEngineConfiguration.getClock().setCurrentTime(startTime);
-
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testMultipleStartEvents.bpmn20.xml")
-                .deploy().getId();
-
-        // After deployment, should have 4 jobs for the 4 timer events
-        assertEquals(4, managementService.createTimerJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().count());
-
-        // Path A : triggered at start + 10 seconds (18:50:11) (R2)
-        // Path B: triggered at start + 5 seconds (18:50:06) (R3)
-        // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-        // path D: triggered at 18:50:20 (Cron)
-
-        // Moving 7 seconds (18:50:08) should trigger one timer (the second start timer in the process diagram)
-        Date newDate = new Date(startTime.getTime() + (7 * 1000));
-        processEngineConfiguration.getClock().setCurrentTime(newDate);
-        List<Job> executableTimers = managementService.createTimerJobQuery().executable().list();
-        assertEquals(1, executableTimers.size());
-
-        executeJobs(executableTimers);
-        validateTaskCounts(0, 1, 0, 0);
-        assertEquals(4, managementService.createTimerJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().count());
-
-        // New situation:
-        // Path A : triggered at start + 10 seconds (18:50:11) (R2)
-        // Path B: triggered at start + 2*5 seconds (18:50:11) (R2 - was R3) [CHANGED]
-        // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-        // path D: triggered at 18:50:20 (Cron)
-
-        // Moving 4 seconds (18:50:12) should trigger both path A and B
-        newDate = new Date(newDate.getTime() + (4 * 1000));
-        processEngineConfiguration.getClock().setCurrentTime(newDate);
-
-        executableTimers = managementService.createTimerJobQuery().executable().list();
-        assertEquals(2, executableTimers.size());
-        executeJobs(executableTimers);
-        validateTaskCounts(1, 2, 0, 0);
-        assertEquals(4, managementService.createTimerJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().count());
-
-        // New situation:
-        // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
-        // Path B: triggered at start + 3*5 seconds (18:50:16) (R1 - was R2) [CHANGED]
-        // Path C: triggered at start + 15 seconds (18:50:16) (R1)
-        // path D: triggered at 18:50:20 (Cron)
-
-        // Moving 6 seconds (18:50:18) should trigger B and C
-        newDate = new Date(newDate.getTime() + (6 * 1000));
-        processEngineConfiguration.getClock().setCurrentTime(newDate);
-
-        executableTimers = managementService.createTimerJobQuery().executable().list();
-        assertEquals(2, executableTimers.size());
-        executeJobs(executableTimers);
-        validateTaskCounts(1, 3, 1, 0);
-        assertEquals(2, managementService.createTimerJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().count());
-
-        // New situation:
-        // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
-        // Path B: all repeats used up
-        // Path C: all repeats used up
-        // path D: triggered at 18:50:20 (Cron)
-
-        // Moving 10 seconds (18:50:28) should trigger A and D
-        newDate = new Date(newDate.getTime() + (6 * 1000));
-        processEngineConfiguration.getClock().setCurrentTime(newDate);
-
-        executableTimers = managementService.createTimerJobQuery().executable().list();
-        assertEquals(2, executableTimers.size());
-        executeJobs(executableTimers);
-        validateTaskCounts(2, 3, 1, 1);
-        assertEquals(1, managementService.createTimerJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().count());
-
-        // New situation:
-        // Path A : all repeats used up
-        // Path B: all repeats used up
-        // Path C: all repeats used up
-        // path D: triggered at 18:50:40 (Cron)
-
-        // Clean up
-        repositoryService.deleteDeployment(deploymentId, true);
+        try {
+            // Human time (GMT): Tue, 10 May 2016 18:50:01 GMT
+            Date startTime = new Date(1462906201000L);
+            processEngineConfiguration.getClock().setCurrentTime(startTime);
+    
+            String deploymentId = repositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testMultipleStartEvents.bpmn20.xml")
+                    .deploy().getId();
+    
+            // After deployment, should have 4 jobs for the 4 timer events
+            assertEquals(4, managementService.createTimerJobQuery().count());
+            assertEquals(0, managementService.createTimerJobQuery().executable().count());
+    
+            // Path A : triggered at start + 10 seconds (18:50:11) (R2)
+            // Path B: triggered at start + 5 seconds (18:50:06) (R3)
+            // Path C: triggered at start + 15 seconds (18:50:16) (R1)
+            // path D: triggered at 18:50:20 (Cron)
+    
+            // Moving 7 seconds (18:50:08) should trigger one timer (the second start timer in the process diagram)
+            Date newDate = new Date(startTime.getTime() + (7 * 1000));
+            processEngineConfiguration.getClock().setCurrentTime(newDate);
+            List<Job> executableTimers = managementService.createTimerJobQuery().executable().list();
+            assertEquals(1, executableTimers.size());
+    
+            executeJobs(executableTimers);
+            validateTaskCounts(0, 1, 0, 0);
+            assertEquals(4, managementService.createTimerJobQuery().count());
+            assertEquals(0, managementService.createTimerJobQuery().executable().count());
+    
+            // New situation:
+            // Path A : triggered at start + 10 seconds (18:50:11) (R2)
+            // Path B: triggered at start + 2*5 seconds (18:50:11) (R2 - was R3) [CHANGED]
+            // Path C: triggered at start + 15 seconds (18:50:16) (R1)
+            // path D: triggered at 18:50:20 (Cron)
+    
+            // Moving 4 seconds (18:50:12) should trigger both path A and B
+            newDate = new Date(newDate.getTime() + (4 * 1000));
+            processEngineConfiguration.getClock().setCurrentTime(newDate);
+    
+            executableTimers = managementService.createTimerJobQuery().executable().list();
+            assertEquals(2, executableTimers.size());
+            executeJobs(executableTimers);
+            validateTaskCounts(1, 2, 0, 0);
+            assertEquals(4, managementService.createTimerJobQuery().count());
+            assertEquals(0, managementService.createTimerJobQuery().executable().count());
+    
+            // New situation:
+            // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
+            // Path B: triggered at start + 3*5 seconds (18:50:16) (R1 - was R2) [CHANGED]
+            // Path C: triggered at start + 15 seconds (18:50:16) (R1)
+            // path D: triggered at 18:50:20 (Cron)
+    
+            // Moving 6 seconds (18:50:18) should trigger B and C
+            newDate = new Date(newDate.getTime() + (6 * 1000));
+            processEngineConfiguration.getClock().setCurrentTime(newDate);
+    
+            executableTimers = managementService.createTimerJobQuery().executable().list();
+            assertEquals(2, executableTimers.size());
+            executeJobs(executableTimers);
+            validateTaskCounts(1, 3, 1, 0);
+            assertEquals(2, managementService.createTimerJobQuery().count());
+            assertEquals(0, managementService.createTimerJobQuery().executable().count());
+    
+            // New situation:
+            // Path A : triggered at start + 2*10 seconds (18:50:21) (R1 - was R2) [CHANGED]
+            // Path B: all repeats used up
+            // Path C: all repeats used up
+            // path D: triggered at 18:50:20 (Cron)
+    
+            // Moving 10 seconds (18:50:28) should trigger A and D
+            newDate = new Date(newDate.getTime() + (6 * 1000));
+            processEngineConfiguration.getClock().setCurrentTime(newDate);
+    
+            executableTimers = managementService.createTimerJobQuery().executable().list();
+            assertEquals(2, executableTimers.size());
+            executeJobs(executableTimers);
+            validateTaskCounts(2, 3, 1, 1);
+            assertEquals(1, managementService.createTimerJobQuery().count());
+            assertEquals(0, managementService.createTimerJobQuery().executable().count());
+    
+            // New situation:
+            // Path A : all repeats used up
+            // Path B: all repeats used up
+            // Path C: all repeats used up
+            // path D: triggered at 18:50:40 (Cron)
+    
+            // Clean up
+            repositoryService.deleteDeployment(deploymentId, true);
+            
+        } finally {
+            processEngineConfiguration.resetClock();
+        }
     }
 
-    private void validateTaskCounts(long taskACount, long taskBCount, long taskCCount, long taskDCount) {
+    protected void validateTaskCounts(long taskACount, long taskBCount, long taskCCount, long taskDCount) {
         assertEquals("task A counts are incorrect", taskACount, taskService.createTaskQuery().taskName("Task A").count());
         assertEquals("task B counts are incorrect", taskBCount, taskService.createTaskQuery().taskName("Task B").count());
         assertEquals("task C counts are incorrect", taskCCount, taskService.createTaskQuery().taskName("Task C").count());
         assertEquals("task D counts are incorrect", taskDCount, taskService.createTaskQuery().taskName("Task D").count());
     }
 
-    private void executeJobs(List<Job> jobs) {
+    protected void executeJobs(List<Job> jobs) {
         for (Job job : jobs) {
             managementService.moveTimerToExecutableJob(job.getId());
             managementService.executeJob(job.getId());
         }
     }
+    
+    protected int getTimerJobsCount() {
+        int timerJobsCount = processEngineConfiguration.getCommandExecutor().execute(new Command<Integer>() {
 
-    private void cleanDB() {
+            @Override
+            public Integer execute(CommandContext commandContext) {
+                List<String> enabledCategories = CommandContextUtil.getJobServiceConfiguration().getEnabledJobCategories();
+                AsyncExecutor asyncExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncExecutor();
+                List<TimerJobEntity> timerJobs = CommandContextUtil.getJobServiceConfiguration().getTimerJobEntityManager()
+                        .findTimerJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+                return timerJobs.size();
+            }
+        });
+        
+        return timerJobsCount;
+    }
+
+    protected void cleanDB() {
         String jobId = managementService.createTimerJobQuery().singleResult().getId();
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new CancelJobsCmd(jobId));

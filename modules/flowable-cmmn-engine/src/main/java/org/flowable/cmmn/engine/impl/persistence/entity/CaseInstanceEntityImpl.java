@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -28,6 +29,8 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -43,7 +46,9 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected boolean completeable;
+    protected String referenceId;
+    protected String referenceType;
+    protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     protected Date lockTime;
@@ -66,7 +71,9 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
+        persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
         return persistentState;
@@ -129,12 +136,24 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         this.startUserId = startUserId;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public boolean isCompleteable() {
+        return completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public void setCompleteable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getCallbackId() {
@@ -151,6 +170,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
     @Override
     public String getTenantId() {
@@ -220,6 +255,11 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
     }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
+    }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
@@ -239,6 +279,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public Map<String, Object> getCaseVariables() {
         Map<String, Object> caseVariables = new HashMap<>();
+
         if (this.queryVariables != null) {
             for (VariableInstanceEntity queryVariable : queryVariables) {
                 if (queryVariable.getId() != null && queryVariable.getTaskId() == null) {
@@ -246,9 +287,18 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
                 }
             }
         }
+
+        // The variables from the cache have precedence
+        if (variableInstances != null) {
+            for (String variableName : variableInstances.keySet()) {
+                caseVariables.put(variableName, variableInstances.get(variableName).getValue());
+            }
+        }
+
         return caseVariables;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();

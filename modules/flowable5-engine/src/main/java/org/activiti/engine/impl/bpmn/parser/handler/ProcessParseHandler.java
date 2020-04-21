@@ -26,7 +26,6 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.event.FlowableEventSupport;
-import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,10 +98,6 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
 
         bpmnParse.removeCurrentScope();
 
-        if (process.getIoSpecification() != null) {
-            IOSpecification ioSpecification = createIOSpecification(bpmnParse, process.getIoSpecification());
-            currentProcessDefinition.setIoSpecification(ioSpecification);
-        }
         return currentProcessDefinition;
     }
 

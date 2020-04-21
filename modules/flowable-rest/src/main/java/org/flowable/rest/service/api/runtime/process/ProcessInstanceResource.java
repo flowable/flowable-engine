@@ -97,25 +97,52 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
-    @ApiOperation(value = "Activate or suspend a process instance", tags = { "Process Instances" })
+    @ApiOperation(value = "Update process instance properties or execute an action on a process instance (body needs to contain an 'action' property for the latter).", tags = { "Process Instances" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the process instance was found and action was executed."),
-            @ApiResponse(code = 400, message = "\t\n" + "Indicates an invalid action was supplied."),
-            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and the update/action was executed."),
+            @ApiResponse(code = 400, message = "Indicates a invalid parameters are supplied."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance change cannot be executed since the process-instance is in a wrong status which doesn't accept the change"),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
     @PutMapping(value = "/runtime/process-instances/{processInstanceId}", produces = "application/json")
-    public ProcessInstanceResponse performProcessInstanceAction(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody ProcessInstanceActionRequest actionRequest, HttpServletRequest request) {
+    public ProcessInstanceResponse updateProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+        @RequestBody ProcessInstanceUpdateRequest updateRequest, HttpServletResponse response) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
-        if (ProcessInstanceActionRequest.ACTION_ACTIVATE.equals(actionRequest.getAction())) {
-            return activateProcessInstance(processInstance);
-
-        } else if (ProcessInstanceActionRequest.ACTION_SUSPEND.equals(actionRequest.getAction())) {
-            return suspendProcessInstance(processInstance);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.updateProcessInstance(processInstance, updateRequest);
         }
-        throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
+
+        if (StringUtils.isNotEmpty(updateRequest.getAction())) {
+
+            if (ProcessInstanceUpdateRequest.ACTION_ACTIVATE.equals(updateRequest.getAction())) {
+                return activateProcessInstance(processInstance);
+
+            } else if (ProcessInstanceUpdateRequest.ACTION_SUSPEND.equals(updateRequest.getAction())) {
+                return suspendProcessInstance(processInstance);
+            }
+            throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
+
+        } else { // update
+
+            if (StringUtils.isNotEmpty(updateRequest.getName())) {
+                runtimeService.setProcessInstanceName(processInstanceId, updateRequest.getName());
+            }
+            if (StringUtils.isNotEmpty(updateRequest.getBusinessKey())) {
+                runtimeService.updateBusinessKey(processInstanceId, updateRequest.getBusinessKey());
+            }
+
+            processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            if (processInstance == null) {
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+                return null;
+            } else {
+                return restResponseFactory.createProcessInstanceResponse(processInstance);
+            }
+
+        }
+
     }
 
     @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" }, notes = "")

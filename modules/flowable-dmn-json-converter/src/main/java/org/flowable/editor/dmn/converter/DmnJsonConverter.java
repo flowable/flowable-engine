@@ -26,6 +26,7 @@ import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
@@ -47,6 +48,7 @@ public class DmnJsonConverter {
 
     public static final String MODEL_NAMESPACE = "http://flowable.org/dmn";
     public static final String URI_JSON = "http://www.ecma-international.org/ecma-404/";
+    public static final String MODEL_VERSION = "3";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -68,6 +70,10 @@ public class DmnJsonConverter {
         decision.setId(DmnJsonConverterUtil.getValueAsString("key", modelNode));
         decision.setName(DmnJsonConverterUtil.getValueAsString("name", modelNode));
         decision.setDescription(DmnJsonConverterUtil.getValueAsString("description", modelNode));
+
+        if (modelNode.has("forceDMN11") && "true".equals(DmnJsonConverterUtil.getValueAsString("forceDMN11", modelNode))) {
+            decision.setForceDMN11(true);
+        }
 
         definition.addDecision(decision);
 
@@ -107,11 +113,16 @@ public class DmnJsonConverter {
         modelNode.put("id", definition.getId());
         modelNode.put("key", firstDecision.getId());
         modelNode.put("name", definition.getName());
+        modelNode.put("version", MODEL_VERSION);
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
 
         if (decisionTable.getAggregation() != null) {
             modelNode.put("collectOperator", decisionTable.getAggregation().name());
+        }
+
+        if (firstDecision.isForceDMN11()) {
+            modelNode.put("forceDMN11", true);
         }
 
         // input expressions
@@ -492,5 +503,15 @@ public class DmnJsonConverter {
         extensionElement.setElementText(value);
 
         element.addExtensionElement(extensionElement);
+    }
+
+    protected void addExtensionAttribute(String name, String value, DmnElement element) {
+        DmnExtensionAttribute extensionAttribute = new DmnExtensionAttribute();
+        extensionAttribute.setNamespace(MODEL_NAMESPACE);
+        extensionAttribute.setNamespacePrefix("flowable");
+        extensionAttribute.setName(name);
+        extensionAttribute.setValue(value);
+
+        element.addAttribute(extensionAttribute);
     }
 }

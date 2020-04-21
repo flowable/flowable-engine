@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- This bean is needed in context xml in order for the jdbc properties to work -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+        <property name="username" value="${jdbc.username:sa}" />
+        <property name="password" value="${jdbc.password:}" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="eventEngineConfiguration" class="org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="databaseSchemaUpdate" value="true"/>
+    </bean>
+
+    <bean id="eventRegistryEngine" class="org.flowable.eventregistry.spring.EventRegistryFactoryBean">
+        <property name="eventEngineConfiguration" ref="eventEngineConfiguration"/>
+    </bean>
+
+    <bean id="eventRepositoryService" factory-bean="eventRegistryEngine" factory-method="getEventRepositoryService"/>
+
+</beans>

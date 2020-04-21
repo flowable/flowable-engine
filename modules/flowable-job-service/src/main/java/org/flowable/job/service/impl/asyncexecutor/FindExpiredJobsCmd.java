@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -35,7 +36,8 @@ public class FindExpiredJobsCmd implements Command<List<? extends JobInfoEntity>
 
     @Override
     public List<? extends JobInfoEntity> execute(CommandContext commandContext) {
-        return jobEntityManager.findExpiredJobs(new Page(0, pageSize));
+        List<String> enabledCategories = CommandContextUtil.getJobServiceConfiguration(commandContext).getEnabledJobCategories();
+        return jobEntityManager.findExpiredJobs(enabledCategories, new Page(0, pageSize));
     }
 
 }

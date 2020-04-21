@@ -17,17 +17,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> implements DmnHistoricDecisionExecutionQuery {
+public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> 
+        implements DmnHistoricDecisionExecutionQuery, CacheAwareQuery<HistoricDecisionExecutionEntity> {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -208,6 +211,7 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
 
     // getters ////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

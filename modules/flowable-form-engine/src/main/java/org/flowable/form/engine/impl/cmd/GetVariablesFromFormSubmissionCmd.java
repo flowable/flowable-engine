@@ -13,7 +13,6 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;

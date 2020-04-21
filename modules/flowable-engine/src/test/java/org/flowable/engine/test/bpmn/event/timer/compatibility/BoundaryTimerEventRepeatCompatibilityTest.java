@@ -14,7 +14,6 @@ package org.flowable.engine.test.bpmn.event.timer.compatibility;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
 
         // boundary events
 
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobs(7000, 100);
 
         // a new job must be prepared because there are 10 repeats 2 seconds interval
         jobs = managementService.createTimerJobQuery().list();
@@ -78,7 +77,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         for (int i = 0; i < 9; i++) {
             nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
             processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
-            waitForJobExecutorToProcessAllJobs(2000, 100);
+            waitForJobExecutorToProcessAllJobs(7000, 100);
             // a new job must be prepared because there are 10 repeats 2 seconds interval
 
             jobs = managementService.createTimerJobQuery().list();
@@ -89,7 +88,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
         try {
-            waitForJobExecutorToProcessAllJobs(2000, 100);
+            waitForJobExecutorToProcessAllJobs(7000, 100);
         } catch (Exception ex) {
             fail("Should not have any other jobs because the endDate is reached");
         }
@@ -101,7 +100,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         taskService.complete(task.getId());
 
         try {
-            waitForJobExecutorToProcessAllJobs(2000, 500);
+            waitForJobExecutorToProcessAllJobs(7000, 500);
         } catch (Exception e) {
             fail("No jobs should be active here.");
         }

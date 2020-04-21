@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.api.repository.BaseAppModel;
+import org.flowable.app.engine.impl.deployer.BaseAppModel;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.dmn.api.DmnDeployment;
@@ -131,7 +131,7 @@ public class FlowableAppDefinitionService {
     
     public String migrateAppDefinitions() {
         List<Deployment> deployments = new ArrayList<>();
-        List<Deployment> processDeployments = repositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list();
+        List<Deployment> processDeployments = repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list();
         for (Deployment deployment : processDeployments) {
             if (deployment.getKey() != null && deployment.getParentDeploymentId() == null) {
                 deployments.add(deployment);

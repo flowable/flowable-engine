@@ -45,7 +45,7 @@ public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity>
     @SuppressWarnings("unchecked")
     @Override
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query) {
-        return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectGroupByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override

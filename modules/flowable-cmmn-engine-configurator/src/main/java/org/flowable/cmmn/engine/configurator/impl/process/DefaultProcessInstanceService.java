@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.configurator.impl.process;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,21 +55,26 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId,
-        String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
         
-        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
+        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant,
+                parentDeploymentId, inParametersMap, businessKey);
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId,
-                    String planItemInstanceId, String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
         
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
         if (tenantId != null) {
             processInstanceBuilder.tenantId(tenantId);
             processInstanceBuilder.overrideProcessDefinitionTenantId(tenantId);
+        }
+
+        if (parentDeploymentId != null) {
+            processInstanceBuilder.processDefinitionParentDeploymentId(parentDeploymentId);
         }
         
         processInstanceBuilder.predefineProcessInstanceId(predefinedProcessInstanceId);
@@ -90,6 +96,10 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
             processInstanceBuilder.businessKey(businessKey);
         }
 
+        if (stageInstanceId != null) {
+            processInstanceBuilder.stageInstanceId(stageInstanceId);
+        }
+
         ProcessInstance processInstance = processInstanceBuilder.start();
         return processInstance.getId();
     }
@@ -109,7 +119,9 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
         
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (!(flowElement instanceof CaseServiceTask)) {
-            throw new FlowableException("No execution could be found with a case service task for id " + executionId);
+            // The execution already processed this stage, there is no need to copy parameters anymore.
+            // One possible reason for this is that the case task was terminated by a boundary event.
+            return Collections.emptyList();
         }
         
         List<IOParameter> cmmnParameters = new ArrayList<>();

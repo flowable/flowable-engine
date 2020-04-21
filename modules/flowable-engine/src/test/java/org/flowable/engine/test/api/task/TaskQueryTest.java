@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +36,7 @@ import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -2024,6 +2028,53 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+    public void testTaskDefinitionKeys() throws Exception {
+
+        // Start process instance, 2 tasks will be available
+        runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list();
+        assertThat(tasks)
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).count()).isEqualTo(2L);
+
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).list()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+    public void testTaskDefinitionKeysOr() throws Exception {
+
+        // Start process instance, 2 tasks will be available
+        runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().or().taskId("invalid")
+            .taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list();
+        assertThat(tasks)
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).endOr().count())
+            .isEqualTo(2L);
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().count())
+            .isEqualTo(0L);
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().list())
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
     public void testTaskDefinitionKeyLike() throws Exception {
 
         // Start process instance, 2 tasks will be available
@@ -3088,6 +3139,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, taskService.createTaskQuery().orderByExecutionId().asc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().asc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskDueDate().asc().list().size());
+        assertEquals(12, taskService.createTaskQuery().orderByCategory().asc().list().size());
 
         assertEquals(12, taskService.createTaskQuery().orderByTaskId().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskName().desc().list().size());
@@ -3098,6 +3150,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, taskService.createTaskQuery().orderByExecutionId().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskDueDate().desc().list().size());
+        assertEquals(12, taskService.createTaskQuery().orderByCategory().desc().list().size());
 
         assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc().list().size());
         assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc().list().size());

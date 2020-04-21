@@ -6,9 +6,9 @@
     <process id="changeStateForEventSubProcess">
 
         <startEvent id="theStart"/>
-        <sequenceFlow sourceRef="theStart" targetRef="processTask"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="processTask"/>
         <userTask id="processTask"/>
-        <sequenceFlow sourceRef="processTask" targetRef="theEnd"/>
+        <sequenceFlow id="flow2" sourceRef="processTask" targetRef="theEnd"/>
         <endEvent id="theEnd"/>
 
         <subProcess id="eventSubProcess" triggeredByEvent="true">
@@ -17,9 +17,9 @@
                     <timeCycle>R/PT15M</timeCycle>
                 </timerEventDefinition>
             </startEvent>
-            <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+            <sequenceFlow id="eventSubProcessFlow1" sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
             <userTask id="eventSubProcessTask"/>
-            <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <sequenceFlow id="eventSubProcessFlow2" sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
             <endEvent id="eventSubProcessEnd" />
         </subProcess>
     </process>

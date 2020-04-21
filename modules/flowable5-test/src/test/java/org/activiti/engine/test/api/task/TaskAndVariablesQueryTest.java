@@ -96,7 +96,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
         assertEquals(3, task.getProcessVariables().size());
-        assertEquals(0, task.getTaskLocalVariables().size());
         assertEquals(true, task.getProcessVariables().get("processVar"));
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
         assertEquals("This is a binary process variable", new String((byte[]) task.getProcessVariables().get("binaryVariable")));
@@ -119,7 +118,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("kermit").taskVariableValueEquals("localVar", "test").singleResult();
         assertEquals(3, task.getProcessVariables().size());
-        assertEquals(0, task.getTaskLocalVariables().size());
         assertEquals(true, task.getProcessVariables().get("processVar"));
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 

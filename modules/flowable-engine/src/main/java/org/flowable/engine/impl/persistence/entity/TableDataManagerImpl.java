@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.ibatis.session.RowBounds;
@@ -29,6 +30,7 @@ import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
@@ -171,51 +173,73 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     @Override
     public List<String> getTablesPresentInDatabase() {
         List<String> tableNames = new ArrayList<>();
-        Connection connection = null;
         try {
-            connection = getDbSqlSession().getSqlSession().getConnection();
+            Connection connection = getDbSqlSession().getSqlSession().getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
-            ResultSet tables = null;
-            try {
-                LOGGER.debug("retrieving flowable tables from jdbc metadata");
-                String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-                String tableNameFilter = databaseTablePrefix + "ACT_%";
-                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
-                        || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "act_%";
-                }
-                if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "ACT" + databaseMetaData.getSearchStringEscape() + "_%";
-                }
+            LOGGER.debug("retrieving flowable tables from jdbc metadata");
+            String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+            String actTableNameFilter = getTableNameFilter(databaseMetaData, databaseTablePrefix, "ACT");
+            String flwTableNameFilter = getTableNameFilter(databaseMetaData, databaseTablePrefix, "FLW");
 
-                String catalog = null;
-                if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
-                    catalog = getProcessEngineConfiguration().getDatabaseCatalog();
-                }
+            String catalog = getDatabaseCatalog();
 
-                String schema = null;
-                if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
-                    if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                        schema = getProcessEngineConfiguration().getDatabaseSchema().toUpperCase();
-                    } else {
-                        schema = getProcessEngineConfiguration().getDatabaseSchema();
-                    }
-                }
+            String schema = getDatabaseSchema();
 
-                tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
-                while (tables.next()) {
-                    String tableName = tables.getString("TABLE_NAME");
-                    tableName = tableName.toUpperCase();
-                    tableNames.add(tableName);
-                    LOGGER.debug("  retrieved flowable table name {}", tableName);
-                }
-            } finally {
-                tables.close();
-            }
+            tableNames.addAll(getTableNames(databaseMetaData, catalog, schema, actTableNameFilter));
+            tableNames.addAll(getTableNames(databaseMetaData, catalog, schema, flwTableNameFilter));
         } catch (Exception e) {
             throw new FlowableException("couldn't get flowable table names using metadata: " + e.getMessage(), e);
         }
         return tableNames;
+    }
+
+    protected String getTableNameFilter(DatabaseMetaData databaseMetaData, String databaseTablePrefix, String flowableTablePrefix) throws SQLException {
+        String tableNameFilter = databaseTablePrefix + flowableTablePrefix + "_%";
+        if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            tableNameFilter = databaseTablePrefix + flowableTablePrefix.toLowerCase(Locale.ROOT) + "_%";
+        }
+        if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            tableNameFilter = databaseTablePrefix + flowableTablePrefix + databaseMetaData.getSearchStringEscape() + "_%";
+        }
+
+        return tableNameFilter;
+    }
+
+    protected List<String> getTableNames(DatabaseMetaData databaseMetaData, String catalog, String schema, String tableNameFilter) throws SQLException {
+        List<String> tableNames = new ArrayList<>();
+        try (ResultSet tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES)) {
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                tableName = tableName.toUpperCase(Locale.ROOT);
+                tableNames.add(tableName);
+                LOGGER.debug("retrieved flowable table name {}", tableName);
+            }
+        }
+
+        return tableNames;
+    }
+
+    protected String getDatabaseCatalog() {
+        String catalog = null;
+        if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
+            catalog = getProcessEngineConfiguration().getDatabaseCatalog();
+        }
+
+        return catalog;
+    }
+
+    protected String getDatabaseSchema() {
+        String schema = null;
+        if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
+            if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                schema = getProcessEngineConfiguration().getDatabaseSchema().toUpperCase(Locale.ROOT);
+            } else {
+                schema = getProcessEngineConfiguration().getDatabaseSchema();
+            }
+        }
+
+        return schema;
     }
 
     protected long getTableCount(String tableName) {
@@ -267,22 +291,12 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
             if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
                     || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                tableName = tableName.toLowerCase();
+                tableName = tableName.toLowerCase(Locale.ROOT);
             }
 
-            String catalog = null;
-            if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
-                catalog = getProcessEngineConfiguration().getDatabaseCatalog();
-            }
+            String catalog = getDatabaseCatalog();
 
-            String schema = null;
-            if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
-                if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    schema = getProcessEngineConfiguration().getDatabaseSchema().toUpperCase();
-                } else {
-                    schema = getProcessEngineConfiguration().getDatabaseSchema();
-                }
-            }
+            String schema = getDatabaseSchema();
 
             ResultSet resultSet = metaData.getColumns(catalog, schema, tableName, null);
             while (resultSet.next()) {
@@ -300,8 +314,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                 }
 
                 if (!wrongSchema) {
-                    String name = resultSet.getString("COLUMN_NAME").toUpperCase();
-                    String type = resultSet.getString("TYPE_NAME").toUpperCase();
+                    String name = resultSet.getString("COLUMN_NAME").toUpperCase(Locale.ROOT);
+                    String type = resultSet.getString("TYPE_NAME").toUpperCase(Locale.ROOT);
                     result.addColumnMetaData(name, type);
                 }
             }

@@ -8,7 +8,7 @@
   <artifactId>flowable-dbclean</artifactId>
 
   <packaging>pom</packaging>
-  <version>6.5.0-SNAPSHOT</version>
+  <version>6.5.1-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc7</artifactId>
+      <artifactId>${oracle.jdbc.artifact}</artifactId>
       <version>12.1.0.1</version>
     </dependency>
     <dependency>
@@ -49,11 +49,6 @@
   </dependencies>
 
   <pluginRepositories>
-    <pluginRepository>
-      <id>maven2.java.net</id>
-      <name>Java.net Repository for Maven 2</name>
-      <url>http://download.java.net/maven/2/</url>
-    </pluginRepository>
     <pluginRepository>
       <id>sonatype-snapshot-repo</id>
       <snapshots>

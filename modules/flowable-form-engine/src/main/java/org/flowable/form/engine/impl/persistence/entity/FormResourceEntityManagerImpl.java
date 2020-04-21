@@ -15,7 +15,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.data.FormResourceDataManager;
 
@@ -23,41 +23,27 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormResourceDataMan
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class FormResourceEntityManagerImpl extends AbstractEntityManager<FormResourceEntity> implements FormResourceEntityManager {
-
-    protected FormResourceDataManager resourceDataManager;
+public class FormResourceEntityManagerImpl
+    extends AbstractEngineEntityManager<FormEngineConfiguration, FormResourceEntity, FormResourceDataManager>
+    implements FormResourceEntityManager {
 
     public FormResourceEntityManagerImpl(FormEngineConfiguration dmnEngineConfiguration, FormResourceDataManager resourceDataManager) {
-        super(dmnEngineConfiguration);
-        this.resourceDataManager = resourceDataManager;
-    }
-
-    @Override
-    protected DataManager<FormResourceEntity> getDataManager() {
-        return resourceDataManager;
+        super(dmnEngineConfiguration, resourceDataManager);
     }
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        resourceDataManager.deleteResourcesByDeploymentId(deploymentId);
+        dataManager.deleteResourcesByDeploymentId(deploymentId);
     }
 
     @Override
     public FormResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
-        return resourceDataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+        return dataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
     }
 
     @Override
     public List<FormResourceEntity> findResourcesByDeploymentId(String deploymentId) {
-        return resourceDataManager.findResourcesByDeploymentId(deploymentId);
-    }
-
-    public FormResourceDataManager getResourceDataManager() {
-        return resourceDataManager;
-    }
-
-    public void setResourceDataManager(FormResourceDataManager resourceDataManager) {
-        this.resourceDataManager = resourceDataManager;
+        return dataManager.findResourcesByDeploymentId(deploymentId);
     }
 
 }

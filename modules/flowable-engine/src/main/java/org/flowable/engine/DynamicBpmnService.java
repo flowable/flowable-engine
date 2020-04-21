@@ -184,6 +184,10 @@ public interface DynamicBpmnService {
 
     void changeSequenceFlowCondition(String id, String condition, ObjectNode infoNode);
 
+    ObjectNode changeCallActivityCalledElement(String id, String calledElement);
+
+    void changeCallActivityCalledElement(String id, String calledElement, ObjectNode infoNode);
+
     ObjectNode getBpmnElementProperties(String id, ObjectNode infoNode);
 
     ObjectNode changeLocalizationName(String language, String id, String value);

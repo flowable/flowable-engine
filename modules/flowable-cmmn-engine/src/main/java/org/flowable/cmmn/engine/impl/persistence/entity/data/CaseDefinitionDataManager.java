@@ -34,6 +34,10 @@ public interface CaseDefinitionDataManager extends DataManager<CaseDefinitionEnt
 
     CaseDefinitionEntity findCaseDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String caseDefinitionKey, String tenantId);
 
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey);
+
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId);
+
     CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion);
 
     CaseDefinitionEntity findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId);

@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.runtime.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return tasks in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "Only return tasks with the given task definition id.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKeyLike", dataType = "string", value = "Only return tasks with a given task definition id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "taskDefinitionKeys", dataType = "string", value = "Only return tasks with the given task definition ids.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return tasks which are part of the process instance with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the process instance and its children with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKey", dataType = "string", value = "Only return tasks which are part of the process instance with the given business key.", paramType = "query"),
@@ -241,6 +243,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("taskDefinitionKeyLike")) {
             request.setTaskDefinitionKeyLike(requestParams.get("taskDefinitionKeyLike"));
+        }
+
+        if (requestParams.containsKey("taskDefinitionKeys")) {
+            request.setTaskDefinitionKeys(Arrays.asList(requestParams.get("taskDefinitionKeys").split(",")));
         }
 
         if (requestParams.containsKey("dueDate")) {

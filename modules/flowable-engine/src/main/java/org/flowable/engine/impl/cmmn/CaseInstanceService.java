@@ -28,11 +28,13 @@ public interface CaseInstanceService {
      */
     String generateNewCaseInstanceId();
 
-    String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey, 
-                    String executionId, String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
+    String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
+            String executionId, String tenantId, boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap);
     
     void handleSignalEvent(EventSubscriptionEntity eventSubscription);
 
     void deleteCaseInstance(String caseInstanceId);
+
+    void deleteCaseInstancesForExecutionId(String executionId);
 
 }

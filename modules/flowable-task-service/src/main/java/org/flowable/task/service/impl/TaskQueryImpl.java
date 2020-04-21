@@ -13,16 +13,19 @@
 package org.flowable.task.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
@@ -30,10 +33,12 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -41,7 +46,7 @@ import org.flowable.variable.service.impl.QueryVariableValue;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery {
+public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, CacheAwareQuery<TaskEntity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,8 +54,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
-    protected List<String> nameList;
-    protected List<String> nameListIgnoreCase;
+    protected Collection<String> nameList;
+    protected Collection<String> nameListIgnoreCase;
     protected String description;
     protected String descriptionLike;
     protected String descriptionLikeIgnoreCase;
@@ -60,9 +65,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String assignee;
     protected String assigneeLike;
     protected String assigneeLikeIgnoreCase;
-    protected List<String> assigneeIds;
+    protected Collection<String> assigneeIds;
     protected String involvedUser;
-    protected Set<String> involvedGroups;
+    protected Collection<String> involvedGroups;
     protected String owner;
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
@@ -71,19 +76,20 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected DelegationState delegationState;
     protected String candidateUser;
     protected String candidateGroup;
-    protected List<String> candidateGroups;
+    protected Collection<String> candidateGroups;
     protected boolean ignoreAssigneeValue;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected boolean withoutDeleteReason;
     protected String processInstanceId;
-    protected List<String> processInstanceIds;
+    protected Collection<String> processInstanceIds;
     protected String executionId;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String propagatedStageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
     protected Date createTime;
@@ -95,19 +101,20 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
+    protected Collection<String> keys;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
     protected String processDefinitionKeyLikeIgnoreCase;
-    protected List<String> processDefinitionKeys;
+    protected Collection<String> processDefinitionKeys;
     protected String processDefinitionId;
     protected String processDefinitionName;
     protected String processDefinitionNameLike;
-    protected List<String> processCategoryInList;
-    protected List<String> processCategoryNotInList;
+    protected Collection<String> processCategoryInList;
+    protected Collection<String> processCategoryNotInList;
     protected String deploymentId;
-    protected List<String> deploymentIds;
+    protected Collection<String> deploymentIds;
     protected String cmmnDeploymentId;
-    protected List<String> cmmnDeploymentIds;
+    protected Collection<String> cmmnDeploymentIds;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -129,7 +136,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
 
-    private List<String> cachedCandidateGroups;
+    private Collection<String> cachedCandidateGroups;
 
     public TaskQueryImpl() {
     }
@@ -176,7 +183,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery taskNameIn(List<String> nameList) {
+    public TaskQuery taskNameIn(Collection<String> nameList) {
         if (nameList == null) {
             throw new FlowableIllegalArgumentException("Task name list is null");
         }
@@ -208,7 +215,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery taskNameInIgnoreCase(List<String> nameList) {
+    public TaskQuery taskNameInIgnoreCase(Collection<String> nameList) {
         if (nameList == null) {
             throw new FlowableIllegalArgumentException("Task name list is null");
         }
@@ -232,7 +239,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         final int nameListSize = nameList.size();
-        final List<String> caseIgnoredNameList = new ArrayList<>(nameListSize);
+        final Collection<String> caseIgnoredNameList = new ArrayList<>(nameListSize);
         for (String name : nameList) {
             caseIgnoredNameList.add(name.toLowerCase());
         }
@@ -392,7 +399,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery taskAssigneeIds(List<String> assigneeIds) {
+    public TaskQuery taskAssigneeIds(Collection<String> assigneeIds) {
         if (assigneeIds == null) {
             throw new FlowableIllegalArgumentException("Task assignee list is null");
         }
@@ -519,7 +526,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQueryImpl taskInvolvedGroups(Set<String> involvedGroups) {
+    public TaskQueryImpl taskInvolvedGroups(Collection<String> involvedGroups) {
         if (involvedGroups == null) {
             throw new FlowableIllegalArgumentException("Involved groups are null");
         }
@@ -573,7 +580,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery taskCandidateGroupIn(List<String> candidateGroups) {
+    public TaskQuery taskCandidateGroupIn(Collection<String> candidateGroups) {
         if (candidateGroups == null) {
             throw new FlowableIllegalArgumentException("Candidate group list is null");
         }
@@ -661,7 +668,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery processInstanceIdIn(List<String> processInstanceIds) {
+    public TaskQuery processInstanceIdIn(Collection<String> processInstanceIds) {
         if (processInstanceIds == null) {
             throw new FlowableIllegalArgumentException("Process instance id list is null");
         }
@@ -819,6 +826,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery propagatedStageInstanceId(String propagatedStageInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.propagatedStageInstanceId = propagatedStageInstanceId;
+        } else {
+            this.propagatedStageInstanceId = propagatedStageInstanceId;
+        }
+        return this;
+    }
+
+    @Override
     public TaskQueryImpl taskCreatedOn(Date createTime) {
         if (orActive) {
             currentOrQueryObject.createTime = createTime;
@@ -907,6 +924,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.keyLike = keyLike;
         } else {
             this.keyLike = keyLike;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskDefinitionKeys(Collection<String> keys) {
+        if (orActive) {
+            currentOrQueryObject.keys = keys;
+        } else {
+            this.keys = keys;
         }
         return this;
     }
@@ -1203,7 +1230,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery processDefinitionKeyIn(List<String> processDefinitionKeys) {
+    public TaskQuery processDefinitionKeyIn(Collection<String> processDefinitionKeys) {
         if (orActive) {
             this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
         } else {
@@ -1243,7 +1270,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery processCategoryIn(List<String> processCategoryInList) {
+    public TaskQuery processCategoryIn(Collection<String> processCategoryInList) {
         if (processCategoryInList == null) {
             throw new FlowableIllegalArgumentException("Process category list is null");
         }
@@ -1265,7 +1292,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery processCategoryNotIn(List<String> processCategoryNotInList) {
+    public TaskQuery processCategoryNotIn(Collection<String> processCategoryNotInList) {
         if (processCategoryNotInList == null) {
             throw new FlowableIllegalArgumentException("Process category list is null");
         }
@@ -1297,7 +1324,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery deploymentIdIn(List<String> deploymentIds) {
+    public TaskQuery deploymentIdIn(Collection<String> deploymentIds) {
         if (orActive) {
             currentOrQueryObject.deploymentIds = deploymentIds;
         } else {
@@ -1317,7 +1344,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
+    public TaskQuery cmmnDeploymentIdIn(Collection<String> cmmnDeploymentIds) {
         if (orActive) {
             currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
         } else {
@@ -1457,9 +1484,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return taskVariablesLimit;
     }
 
-    public List<String> getCandidateGroups() {
+    public Collection<String> getCandidateGroups() {
         if (candidateGroup != null) {
-            List<String> candidateGroupList = new ArrayList<>(1);
+            Collection<String> candidateGroupList = new ArrayList<>(1);
             candidateGroupList.add(candidateGroup);
             return candidateGroupList;
 
@@ -1481,8 +1508,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return null;
     }
 
-    protected List<String> getGroupsForCandidateUser(String candidateUser) {
-        List<String> groupIds = new ArrayList<>();
+    protected Collection<String> getGroupsForCandidateUser(String candidateUser) {
+        Collection<String> groupIds = new ArrayList<>();
         IdmEngineConfigurationApi idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
         if (idmEngineConfiguration != null) {
             IdmIdentityService idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
@@ -1611,6 +1638,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery orderByCategory() {
+        return orderBy(TaskQueryProperty.CATEGORY);
+    }
+
+    @Override
     public TaskQuery orderByTenantId() {
         return orderBy(TaskQueryProperty.TENANT_ID);
     }
@@ -1636,6 +1668,15 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
+
+            if (taskId != null) {
+                if (includeProcessVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, false);
+                } else if (includeTaskLocalVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, true);
+                }
+            }
+
         } else {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
         }
@@ -1651,6 +1692,40 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         return tasks;
+    }
+
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<Task> results, boolean local) {
+        for (Task task : results) {
+            if (Objects.equals(taskId, task.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<VariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(VariableInstanceEntity.class);
+                for (VariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (local) {
+                        if (task.getId().equals(cachedVariableEntity.getTaskId())) {
+                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    } else {
+                        if (task.getProcessInstanceId().equals(cachedVariableEntity.getProcessInstanceId())) {
+                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(TaskEntity task) {
+        if (includeProcessVariables) {
+            task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService()
+                    .findVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
+        } else if (includeTaskLocalVariables) {
+            task.getQueryVariables()
+                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskId(task.getId()));
+        }
     }
 
     @Override
@@ -1675,11 +1750,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return nameLike;
     }
 
-    public List<String> getNameList() {
+    public Collection<String> getNameList() {
         return nameList;
     }
 
-    public List<String> getNameListIgnoreCase() {
+    public Collection<String> getNameListIgnoreCase() {
         return nameListIgnoreCase;
     }
 
@@ -1719,7 +1794,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return processInstanceId;
     }
 
-    public List<String> getProcessInstanceIds() {
+    public Collection<String> getProcessInstanceIds() {
         return processInstanceIds;
     }
 
@@ -1743,7 +1818,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return scopeDefinitionId;
     }
 
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
     public String getTaskId() {
+        return taskId;
+    }
+    
+    @Override
+    public String getId() {
         return taskId;
     }
 
@@ -1781,6 +1865,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getKeyLike() {
         return keyLike;
+    }
+
+    public Collection<String> getKeys() {
+        return keys;
     }
 
     public String getProcessDefinitionKey() {
@@ -1847,7 +1935,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return assigneeLike;
     }
 
-    public List<String> getAssigneeIds() {
+    public Collection<String> getAssigneeIds() {
         return assigneeIds;
     }
 
@@ -1855,7 +1943,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return involvedUser;
     }
 
-    public Set<String> getInvolvedGroups() {
+    public Collection<String> getInvolvedGroups() {
         return involvedGroups;
     }
 
@@ -1883,7 +1971,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return processDefinitionKeyLike;
     }
 
-    public List<String> getProcessDefinitionKeys() {
+    public Collection<String> getProcessDefinitionKeys() {
         return processDefinitionKeys;
     }
 
@@ -1891,11 +1979,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return processDefinitionNameLike;
     }
 
-    public List<String> getProcessCategoryInList() {
+    public Collection<String> getProcessCategoryInList() {
         return processCategoryInList;
     }
 
-    public List<String> getProcessCategoryNotInList() {
+    public Collection<String> getProcessCategoryNotInList() {
         return processCategoryNotInList;
     }
 
@@ -1903,7 +1991,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return deploymentId;
     }
 
-    public List<String> getDeploymentIds() {
+    public Collection<String> getDeploymentIds() {
         return deploymentIds;
     }
 
@@ -1911,7 +1999,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return cmmnDeploymentId;
     }
 
-    public List<String> getCmmnDeploymentIds() {
+    public Collection<String> getCmmnDeploymentIds() {
         return cmmnDeploymentIds;
     }
 

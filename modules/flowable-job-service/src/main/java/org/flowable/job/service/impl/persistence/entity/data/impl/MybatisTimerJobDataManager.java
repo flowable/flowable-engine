@@ -71,7 +71,7 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
+    public List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>(2);
         String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
         params.put("jobExecutionScope", jobExecutionScope);
@@ -79,7 +79,12 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
         
-        return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
+        if (enabledCategories != null && enabledCategories.size() > 0) {
+            params.put("enabledCategories", enabledCategories);
+            return getDbSqlSession().selectList("selectTimerJobsToExecuteWithEnabledCategories", params, page);
+        } else {
+            return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
+        }
     }
 
     @Override

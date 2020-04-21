@@ -1,4 +1,4 @@
-= Flowable DOCS (v 6.5.0-SNAPSHOT)
+= Flowable DOCS (v 6.5.0.event-SNAPSHOT)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header

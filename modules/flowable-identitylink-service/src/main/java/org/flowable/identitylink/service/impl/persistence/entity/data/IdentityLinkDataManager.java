@@ -30,6 +30,8 @@ public interface IdentityLinkDataManager extends DataManager<IdentityLinkEntity>
     
     List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
     
+    List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType);
+    
     List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
     List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId, String userId, String groupId, String type);

@@ -56,6 +56,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchType;
     }
 
+    @Override
     public void setBatchType(String batchType) {
         this.batchType = batchType;
     }
@@ -83,6 +84,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchSearchKey;
     }
 
+    @Override
     public void setBatchSearchKey(String batchSearchKey) {
         this.batchSearchKey = batchSearchKey;
     }
@@ -92,6 +94,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchSearchKey2;
     }
 
+    @Override
     public void setBatchSearchKey2(String batchSearchKey2) {
         this.batchSearchKey2 = batchSearchKey2;
     }
@@ -101,10 +104,12 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
+    @Override
     public BatchByteArrayRef getBatchDocRefId() {
         return batchDocRefId;
     }
@@ -129,10 +134,12 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         this.batchDocRefId = setByteArrayRef(this.batchDocRefId, BATCH_DOCUMENT_JSON_LABEL, batchDocumentJson);
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

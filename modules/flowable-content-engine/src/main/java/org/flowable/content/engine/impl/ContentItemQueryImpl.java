@@ -19,18 +19,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
+import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, ContentItem> implements ContentItemQuery, Serializable {
+public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, ContentItem> implements ContentItemQuery, CacheAwareQuery<ContentItemEntity>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -333,6 +335,7 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

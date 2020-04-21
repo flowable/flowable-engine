@@ -63,6 +63,9 @@ create table ACT_RU_EXECUTION (
     ID_LINK_COUNT_ INTEGER,
     CALLBACK_ID_ NVARCHAR2(255),
     CALLBACK_TYPE_ NVARCHAR2(255),
+    REFERENCE_ID_ NVARCHAR2(255),
+    REFERENCE_TYPE_ NVARCHAR2(255),
+    PROPAGATED_STAGE_INST_ID_ NVARCHAR2(255),
     primary key (ID_)
 );
 
@@ -339,7 +342,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.0.2', 1);
+values ('schema.version', '6.5.1.2', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.0.2)', 1);
+values ('schema.history', 'create(6.5.1.2)', 1);

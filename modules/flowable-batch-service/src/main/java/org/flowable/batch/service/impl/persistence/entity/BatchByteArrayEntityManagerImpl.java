@@ -17,42 +17,28 @@ import java.util.List;
 
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchByteArrayDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 
 /**
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
-public class BatchByteArrayEntityManagerImpl extends AbstractEntityManager<BatchByteArrayEntity> implements BatchByteArrayEntityManager {
-
-    protected BatchByteArrayDataManager byteArrayDataManager;
+public class BatchByteArrayEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchByteArrayEntity, BatchByteArrayDataManager>
+    implements BatchByteArrayEntityManager {
 
     public BatchByteArrayEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchByteArrayDataManager byteArrayDataManager) {
-        super(batchServiceConfiguration);
-        this.byteArrayDataManager = byteArrayDataManager;
-    }
-
-    @Override
-    protected DataManager<BatchByteArrayEntity> getDataManager() {
-        return byteArrayDataManager;
+        super(batchServiceConfiguration, byteArrayDataManager);
     }
 
     @Override
     public List<BatchByteArrayEntity> findAll() {
-        return byteArrayDataManager.findAll();
+        return dataManager.findAll();
     }
 
     @Override
     public void deleteByteArrayById(String byteArrayEntityId) {
-        byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
-    }
-
-    public BatchByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
-    public void setByteArrayDataManager(BatchByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+        dataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
     }
 
 }

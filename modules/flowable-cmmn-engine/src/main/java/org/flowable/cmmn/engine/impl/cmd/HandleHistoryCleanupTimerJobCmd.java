@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -48,7 +49,8 @@ public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Seriali
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
             timerJob.setRevision(1);
             timerJob.setJobHandlerType(CmmnHistoryCleanupJobHandler.TYPE);
-            
+            timerJob.setScopeType(ScopeTypes.CMMN);
+
             BusinessCalendar businessCalendar = cmmnEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig()));
             timerJob.setRepeat(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig());

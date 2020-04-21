@@ -13,6 +13,7 @@
 
 package org.flowable.engine.repository;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -124,6 +125,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
     ProcessDefinitionQuery startableByUser(String userId);
 
     /**
+     * Only selects process definition which the given userId or groups are authorized to start.
+     */
+    ProcessDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups);
+
+    /**
      * Only selects process definitions which are suspended
      */
     ProcessDefinitionQuery suspended();
@@ -159,6 +165,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Selects the single process definition which has a start message event with the messageName.
      */
     ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
+
+    /**
+     * Localize process definition name and description to specified locale.
+     */
+    ProcessDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    ProcessDefinitionQuery withLocalizationFallback();
 
     // ordering ////////////////////////////////////////////////////////////
 

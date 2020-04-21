@@ -99,7 +99,9 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
             decisionTableDefinition.key = key;
             decisionTableDefinition.rules = angular.copy($rootScope.currentDecisionTableRules);
 
-			html2canvas(jQuery('#decision-table-editor'), {
+            decisionTableDefinition.forceDMN11 = data.forceDMN11;
+
+            html2canvas(jQuery('#decision-table-editor'), {
                 onrendered: function (canvas) {
                     var scale = canvas.width / 300.0;
 

@@ -17,6 +17,7 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -27,6 +28,11 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Milestone;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -59,6 +65,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_TIME, caseInstanceEntity.getStartTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID, caseInstanceEntity.getCallbackId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE, caseInstanceEntity.getCallbackType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, caseInstanceEntity.getReferenceId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, caseInstanceEntity.getReferenceType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, caseInstanceEntity.getTenantId());
 
         if (caseInstanceEntity.getCaseDefinitionId() != null) {
@@ -80,6 +88,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, historicCaseInstanceEntity.getTenantId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID, historicCaseInstanceEntity.getCallbackId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE, historicCaseInstanceEntity.getCallbackType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, historicCaseInstanceEntity.getReferenceId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, historicCaseInstanceEntity.getReferenceType());
 
         if (historicCaseInstanceEntity.getCaseDefinitionId() != null) {
             addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(historicCaseInstanceEntity.getCaseDefinitionId()));
@@ -103,6 +113,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_GROUP_ID, identityLink.getGroupId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID, identityLink.getScopeDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, identityLink.getScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID, identityLink.getSubScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, identityLink.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, identityLink.getScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, identityLink.getScopeDefinitionId());
@@ -122,6 +133,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_ID, entityLink.getReferenceScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_ID, entityLink.getRootScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_TYPE, entityLink.getRootScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_HIERARCHY_TYPE, entityLink.getHierarchyType());
     }
 
@@ -174,6 +187,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, planItemInstanceEntity.getReferenceType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTRY_CRITERION_ID, planItemInstanceEntity.getEntryCriterionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXIT_CRITERION_ID, planItemInstanceEntity.getExitCriterionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXTRA_VALUE, planItemInstanceEntity.getExtraValue());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
 
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME, planItemInstanceEntity.getLastAvailableTime());
@@ -266,7 +280,52 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
             if (task != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
                 caseDefinitionId = task.getScopeDefinitionId();
             }
+        
+        } else if (ScopeTypes.PLAN_ITEM.equals(identityLink.getScopeType()) && identityLink.getSubScopeId() != null) {
+            PlanItemInstanceEntity planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(identityLink.getSubScopeId());
+            if (planItemInstance != null) {
+                caseDefinitionId = planItemInstance.getCaseDefinitionId();
+            }
         }
+        
         return CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
+    }
+    
+    protected Boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
+        Boolean showInOverview = null;
+        
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        String includeInStageOverviewValue = null;
+        if (planItemInstanceEntity.isStage()) {
+            if (planItemDefinition != null && planItemDefinition instanceof Stage) {
+                Stage stage = (Stage) planItemDefinition;
+                includeInStageOverviewValue = stage.getIncludeInStageOverview();
+            }
+            
+        } else if (planItemDefinition != null && planItemDefinition instanceof Milestone) {
+            Milestone milestone = (Milestone) planItemDefinition;
+            includeInStageOverviewValue = milestone.getIncludeInStageOverview();
+        }
+        
+        if (StringUtils.isNotEmpty(includeInStageOverviewValue)) {
+            if ("true".equalsIgnoreCase(includeInStageOverviewValue)) {
+                showInOverview = true;
+                
+            } else if ("false".equalsIgnoreCase(includeInStageOverviewValue)) {
+                showInOverview = false;
+            
+            } else {
+                Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(includeInStageOverviewValue);
+                Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
+                if (!(stageValueObject instanceof Boolean)) {
+                    throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
+                                    includeInStageOverviewValue + ": " + stageValueObject);
+                }
+                
+                showInOverview = (Boolean) stageValueObject;
+            }
+        }
+        
+        return showInOverview;
     }
 }

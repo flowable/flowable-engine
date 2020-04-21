@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +12,18 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StartEventConverterTest extends AbstractConverterTest {
 
@@ -48,40 +48,31 @@ public class StartEventConverterTest extends AbstractConverterTest {
     private void validateModel(BpmnModel model) {
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("start", true);
-        assertTrue(flowElement instanceof StartEvent);
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
 
         StartEvent startEvent = (StartEvent) flowElement;
-        assertEquals("start", startEvent.getId());
-        assertEquals("startName", startEvent.getName());
-        assertEquals("startFormKey", startEvent.getFormKey());
-        assertEquals("formFieldValidationValue", startEvent.getValidateFormFields());
-        assertEquals("startInitiator", startEvent.getInitiator());
-        assertEquals("startDoc", startEvent.getDocumentation());
+        assertThat(startEvent.getId()).isEqualTo("start");
+        assertThat(startEvent.getName()).isEqualTo("startName");
+        assertThat(startEvent.getFormKey()).isEqualTo("startFormKey");
+        assertThat(startEvent.isSameDeployment()).isTrue();
+        assertThat(startEvent.getValidateFormFields()).isEqualTo("formFieldValidationValue");
+        assertThat(startEvent.getInitiator()).isEqualTo("startInitiator");
+        assertThat(startEvent.getDocumentation()).isEqualTo("startDoc");
 
-        assertEquals(2, startEvent.getExecutionListeners().size());
-        FlowableListener executionListener = startEvent.getExecutionListeners().get(0);
-        assertEquals("start", executionListener.getEvent());
-        assertEquals("org.test.TestClass", executionListener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, executionListener.getImplementationType());
-
-        executionListener = startEvent.getExecutionListeners().get(1);
-        assertEquals("end", executionListener.getEvent());
-        assertEquals("${someExpression}", executionListener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, executionListener.getImplementationType());
+        assertThat(startEvent.getExecutionListeners())
+                .extracting(FlowableListener::getEvent, FlowableListener::getImplementation, FlowableListener::getImplementationType)
+                .containsExactly(
+                        tuple("start", "org.test.TestClass", ImplementationType.IMPLEMENTATION_TYPE_CLASS),
+                        tuple("end", "${someExpression}", ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION)
+                );
 
         List<FormProperty> formProperties = startEvent.getFormProperties();
-        assertEquals(2, formProperties.size());
-
-        FormProperty formProperty = formProperties.get(0);
-        assertEquals("startFormProp1", formProperty.getId());
-        assertEquals("startFormProp1", formProperty.getName());
-        assertEquals("string", formProperty.getType());
-
-        formProperty = formProperties.get(1);
-        assertEquals("startFormProp2", formProperty.getId());
-        assertEquals("startFormProp2", formProperty.getName());
-        assertEquals("boolean", formProperty.getType());
-
+        assertThat(formProperties)
+                .extracting(FormProperty::getId, FormProperty::getName, FormProperty::getType)
+                .containsExactly(
+                        tuple("startFormProp1", "startFormProp1", "string"),
+                        tuple("startFormProp2", "startFormProp2", "boolean")
+                );
     }
 
 }

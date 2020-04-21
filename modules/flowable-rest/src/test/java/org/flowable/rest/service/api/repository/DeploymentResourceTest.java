@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -116,7 +117,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
             // Add text-resource
             zipStream.putNextEntry(new ZipEntry("test.txt"));
-            IOUtils.write("Testing REST-deployment with tenant", zipStream);
+            IOUtils.write("Testing REST-deployment with tenant", zipStream, StandardCharsets.UTF_8);
             zipStream.closeEntry();
             zipStream.close();
 
@@ -181,7 +182,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
             // Add text-resource
             zipStream.putNextEntry(new ZipEntry("test.txt"));
-            IOUtils.write("Testing REST-deployment", zipStream);
+            IOUtils.write("Testing REST-deployment", zipStream, StandardCharsets.UTF_8);
             zipStream.closeEntry();
             zipStream.close();
 

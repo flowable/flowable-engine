@@ -111,6 +111,16 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
     ExecutionQuery executionWithoutTenantId();
 
     /**
+     * Only select executions with the given reference id.
+     */
+    ExecutionQuery executionReferenceId(String referenceId);
+
+    /**
+     * Only select executions with the given reference type.
+     */
+    ExecutionQuery executionReferenceType(String referenceType);
+
+    /**
      * Only select executions which have a local variable with the given value. The type of variable is determined based on the value, using types configured in
      * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      * 

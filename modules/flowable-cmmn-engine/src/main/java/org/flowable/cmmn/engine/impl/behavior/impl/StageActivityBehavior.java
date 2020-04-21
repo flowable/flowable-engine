@@ -38,7 +38,7 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity.getPlanItem().getName() != null) {
+        if (planItemInstanceEntity.getName() == null && planItemInstanceEntity.getPlanItem().getName() != null) {
             Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
             planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
         }
@@ -71,11 +71,13 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
         List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                if (StateTransition.isPossible(planItemInstance, transition)) {
+                if (StateTransition.isPossible(childPlanItemInstance, transition)) {
+                    // we don't propagate the exit and exit event type to the child plan items as regardless of the parent termination type, children always
+                    // get treated the same way
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance, null, null);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null);
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null, null, null);
                     }
                 }
             }

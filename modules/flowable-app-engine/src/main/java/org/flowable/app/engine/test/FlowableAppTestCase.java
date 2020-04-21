@@ -37,7 +37,7 @@ public abstract class FlowableAppTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableAppTestCase.class);
 
-    public static String FLOWABLE_APP_CFG_XML = "flowable.app.cfg.xml";
+    public static final String FLOWABLE_APP_CFG_XML = "flowable.app.cfg.xml";
 
     protected AppEngineConfiguration appEngineConfiguration;
     protected AppManagementService appManagementService;

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,8 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,131 +74,123 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
 
     @Test
     public void testCreateDuplicatePrivilege() {
-        try {
-            idmIdentityService.createPrivilege("access admin application");
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createPrivilege("access admin application"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetUsers() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").singleResult().getId();
         List<User> users = idmIdentityService.getUsersWithPrivilege(privilegeId);
-        assertEquals(1, users.size());
-        assertEquals("mispiggy", users.get(0).getId());
+        assertThat(users)
+                .extracting(User::getId)
+                .containsExactly("mispiggy");
 
-        assertEquals(0, idmIdentityService.getUsersWithPrivilege("does not exist").size());
+        assertThat(idmIdentityService.getUsersWithPrivilege("does not exist")).isEmpty();
 
-        try {
-            idmIdentityService.getUsersWithPrivilege(null);
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.getUsersWithPrivilege(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetGroups() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult().getId();
         List<Group> groups = idmIdentityService.getGroupsWithPrivilege(privilegeId);
-        assertEquals(2, groups.size());
-        assertEquals("admins", groups.get(0).getId());
-        assertEquals("engineering", groups.get(1).getId());
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admins", "engineering");
 
-        assertEquals(0, idmIdentityService.getGroupsWithPrivilege("does not exist").size());
+        assertThat(idmIdentityService.getGroupsWithPrivilege("does not exist")).isEmpty();
 
-        try {
-            idmIdentityService.getGroupsWithPrivilege(null);
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.getGroupsWithPrivilege(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryAll() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
-        assertEquals(3, privileges.size());
-        assertEquals(3L, idmIdentityService.createPrivilegeQuery().count());
+        assertThat(privileges).hasSize(3);
+        assertThat(idmIdentityService.createPrivilegeQuery().count()).isEqualTo(3L);
     }
 
     @Test
     public void testQueryByName() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").list();
-        assertEquals(1, privileges.size());
+        assertThat(privileges).hasSize(1);
 
-        assertEquals(1, idmIdentityService.getUsersWithPrivilege(privileges.get(0).getId()).size());
-        assertEquals(1, idmIdentityService.getGroupsWithPrivilege(privileges.get(0).getId()).size());
+        assertThat(idmIdentityService.getUsersWithPrivilege(privileges.get(0).getId())).hasSize(1);
+        assertThat(idmIdentityService.getGroupsWithPrivilege(privileges.get(0).getId())).hasSize(1);
     }
 
     @Test
     public void testQueryByInvalidName() {
-        assertEquals(0, idmIdentityService.createPrivilegeQuery().privilegeName("does not exist").list().size());
+        assertThat(idmIdentityService.createPrivilegeQuery().privilegeName("does not exist").list()).isEmpty();
     }
 
     @Test
     public void testQueryByUserId() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().userId("kermit").list();
-        assertEquals(1, privileges.size());
+        assertThat(privileges).hasSize(1);
 
         Privilege privilege = privileges.get(0);
-        assertEquals("access modeler application", privilege.getName());
+        assertThat(privilege.getName()).isEqualTo("access modeler application");
     }
 
     @Test
     public void testQueryByInvalidUserId() {
-        assertEquals(0, idmIdentityService.createPrivilegeQuery().userId("does not exist").list().size());
+        assertThat(idmIdentityService.createPrivilegeQuery().userId("does not exist").list()).isEmpty();
     }
 
     @Test
     public void testQueryByGroupId() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().groupId("admins").list();
-        assertEquals(2, privileges.size());
+        assertThat(privileges).hasSize(2);
     }
 
     @Test
     public void testQueryByInvalidGroupId() {
-        assertEquals(0, idmIdentityService.createPrivilegeQuery().groupId("does not exist").list().size());
+        assertThat(idmIdentityService.createPrivilegeQuery().groupId("does not exist").list()).isEmpty();
     }
-    
+
     @Test
     public void testQueryByGroupIds() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins")).list();
-        assertEquals(2, privileges.size());
-        
+        assertThat(privileges).hasSize(2);
+
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins", "engineering")).list();
-        assertEquals(2, privileges.size());
-        
+        assertThat(privileges).hasSize(2);
+
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("engineering")).list();
-        assertEquals(1, privileges.size());
-        
+        assertThat(privileges).hasSize(1);
+
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins", "engineering")).listPage(0, 1);
-        assertEquals(1, privileges.size());
-        
+        assertThat(privileges).hasSize(1);
+
         privileges = idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("admins", "engineering")).listPage(1, 1);
-        assertEquals(1, privileges.size());
+        assertThat(privileges).hasSize(1);
     }
-    
+
     @Test
     public void testQueryByInvalidGroupIds() {
-        assertEquals(0, idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("does not exist")).list().size());
+        assertThat(idmIdentityService.createPrivilegeQuery().groupIds(Arrays.asList("does not exist")).list()).isEmpty();
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_ID_PRIV", idmManagementService.getTableName(Privilege.class));
-        assertEquals("ACT_ID_PRIV", idmManagementService.getTableName(PrivilegeEntity.class));
+        assertThat(idmManagementService.getTableName(Privilege.class)).isEqualTo("ACT_ID_PRIV");
+        assertThat(idmManagementService.getTableName(PrivilegeEntity.class)).isEqualTo("ACT_ID_PRIV");
 
         String tableName = idmManagementService.getTableName(PrivilegeEntity.class);
         String baseQuerySql = "SELECT * FROM " + tableName + " where NAME_ = #{name}";
 
-        assertEquals(1, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", "access admin application").list().size());
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", "access admin application").list()).hasSize(1);
     }
 
     @Test
     public void testGetPrivilegeMappings() {
         Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult();
         List<PrivilegeMapping> privilegeMappings = idmIdentityService.getPrivilegeMappingsByPrivilegeId(modelerPrivilege.getId());
-        assertEquals(3, privilegeMappings.size());
+        assertThat(privilegeMappings).hasSize(3);
         List<String> users = new ArrayList<>();
         List<String> groups = new ArrayList<>();
 
@@ -212,23 +203,19 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
             }
         }
 
-        assertTrue(users.contains("kermit"));
-        assertTrue(groups.contains("admins"));
-        assertTrue(groups.contains("engineering"));
+        assertThat(users.contains("kermit")).isTrue();
+        assertThat(groups.contains("admins")).isTrue();
+        assertThat(groups.contains("engineering")).isTrue();
     }
 
     @Test
     public void testPrivilegeUniqueName() {
         Privilege privilege = idmIdentityService.createPrivilege("test");
-        
-        try {
-            idmIdentityService.createPrivilege("test");
-            fail();
-        } catch (Exception e) { 
-            e.printStackTrace();
-        }
-        
+
+        assertThatThrownBy(() -> idmIdentityService.createPrivilege("test"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
         idmIdentityService.deletePrivilege(privilege.getId());
     }
-    
+
 }

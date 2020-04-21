@@ -28,6 +28,7 @@ public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
 
     void setCompleteTime(Date completeTime);
 
+    @Override
     boolean isCompleted();
 
     void setBatchSearchKey(String searchKey);

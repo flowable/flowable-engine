@@ -26,7 +26,9 @@ import org.junit.jupiter.api.Tag;
     "ACT_GE_PROPERTY",
     "ACT_ID_PROPERTY",
     "ACT_CMMN_DATABASECHANGELOG",
-    "ACT_CMMN_DATABASECHANGELOGLOCK"
+    "ACT_CMMN_DATABASECHANGELOGLOCK",
+    "FLW_EV_DATABASECHANGELOG",
+    "FLW_EV_DATABASECHANGELOGLOCK"
 })
 @Tag("http")
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {

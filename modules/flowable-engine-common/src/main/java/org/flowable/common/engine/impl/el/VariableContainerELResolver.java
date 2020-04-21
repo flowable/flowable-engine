@@ -16,6 +16,7 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 
@@ -23,6 +24,9 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
  * @author Joram Barrez
  */
 public class VariableContainerELResolver extends ELResolver {
+
+    public static final String VARIABLE_CONTAINER_KEY = "variableContainer";
+    public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
 
     protected VariableContainer variableContainer;
 
@@ -34,9 +38,16 @@ public class VariableContainerELResolver extends ELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             String variable = (String) property; // according to javadoc, can only be a String
-            if (variableContainer.hasVariable(variable)) {
+            if (LOGGED_IN_USER_KEY.equals(property)) {
+                context.setPropertyResolved(true);
+                return Authentication.getAuthenticatedUserId();
+
+            } else if (variableContainer.hasVariable(variable)) {
                 context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
                 return variableContainer.getVariable(variable);
+            } else if (VARIABLE_CONTAINER_KEY.equals(property)) {
+                context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
+                return variableContainer;
             }
         }
         return null;

@@ -35,6 +35,10 @@ public class EventSubscriptionResponse {
     protected String processInstanceUrl;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String scopeId;
+    protected String scopeType;
+    protected String subScopeId;
+    protected String scopeDefinitionId;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date created;
     protected String configuration;
@@ -126,6 +130,38 @@ public class EventSubscriptionResponse {
 
     public void setExecutionUrl(String executionUrl) {
         this.executionUrl = executionUrl;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     public Date getCreated() {

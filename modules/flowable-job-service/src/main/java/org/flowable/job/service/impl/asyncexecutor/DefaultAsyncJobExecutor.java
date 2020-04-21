@@ -20,8 +20,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.util.CommandContextUtil;
@@ -70,13 +71,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
      * The minimal number of threads that are kept alive in the threadpool for
      * job execution
      */
-    protected int corePoolSize = 2;
+    protected int corePoolSize = 8;
 
     /**
      * The maximum number of threads that are kept alive in the threadpool for
      * job execution
      */
-    protected int maxPoolSize = 10;
+    protected int maxPoolSize = 8;
 
     /**
      * The time (in milliseconds) a thread used for job execution must be kept
@@ -88,6 +89,9 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** The size of the queue on which jobs to be executed are placed */
     protected int queueSize = 100;
+
+    /** Whether or not core threads can time out (which is needed to scale down the threads) */
+    protected boolean allowCoreThreadTimeout = true;
 
     /**
      * Whether to unlock jobs that are owned by this executor (have the same
@@ -114,6 +118,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         try {
             executorService.execute(runnable);
             return true;
+
         } catch (RejectedExecutionException e) {
             unacquireJobAfterRejection(job);
 
@@ -123,30 +128,21 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     }
 
     protected void unacquireJobAfterRejection(final JobInfo job) {
+
         // When a RejectedExecutionException is caught, this means that the
         // queue for holding the jobs that are to be executed is full and can't store more.
         // The job is now 'unlocked', meaning that the lock owner/time is set to null,
         // so other executors can pick the job up (or this async executor, the next time the
         // acquire query is executed.
 
-        // This can happen while already in a command context (for example in a transaction listener
-        // after the async executor has been hinted that a new async job is created)
-        // or not (when executed in the acquire thread runnable)
-
-        CommandContext commandContext = Context.getCommandContext();
-        if (commandContext != null) {
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
-
-        } else {
-            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
-                    return null;
-                }
-            });
-        }
+        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+        jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                CommandContextUtil.getJobManager(commandContext).unacquire(job);
+                return null;
+            }
+        });
     }
 
     @Override
@@ -189,7 +185,10 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
 
             BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern(threadPoolNamingPattern).build();
-            executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
+            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
+                TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
+            threadPoolExecutor.allowCoreThreadTimeOut(allowCoreThreadTimeout);
+            executorService = threadPoolExecutor;
         }
     }
 
@@ -328,6 +327,14 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     public int getQueueSize() {
         return queueSize;
+    }
+
+    public boolean isAllowCoreThreadTimeout() {
+        return allowCoreThreadTimeout;
+    }
+
+    public void setAllowCoreThreadTimeout(boolean allowCoreThreadTimeout) {
+        this.allowCoreThreadTimeout = allowCoreThreadTimeout;
     }
 
     @Override

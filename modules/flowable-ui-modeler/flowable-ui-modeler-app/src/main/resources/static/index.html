@@ -103,7 +103,7 @@
     </script>
     <![endif]-->
     <div class="alert-wrapper" ng-cloak>
-        <div class="alert fadein {{alerts.current.type}}" ng-show="alerts.current" ng-click="dismissAlert()">
+        <div class="alert fadein {{alerts.current.type}}" ng-if="alerts.current" ng-click="dismissAlert()">
             <i class="glyphicon"
                ng-class="{'glyphicon-ok': alerts.current.type == 'info', 'glyphicon-remove': alerts.current.type == 'error'}"></i>
             <span>{{alerts.current.message}}</span>
@@ -252,6 +252,10 @@
 <script src="editor-app/configuration/properties-planitem-dropdown-controller.js" type="text/javascript"></script>
 <script src="editor-app/configuration/properties-plan-item-lifecycle-listeners-controller.js" type="text/javascript"></script>
 <script src="editor-app/configuration/properties-httprequest-controller.js" type="text/javascript"></script>
+<script src="editor-app/configuration/properties-event-in-parameters-controller.js" type="text/javascript"></script>
+<script src="editor-app/configuration/properties-event-out-parameters-controller.js" type="text/javascript"></script>
+<script src="editor-app/configuration/properties-event-correlation-parameters-controller.js" type="text/javascript"></script>
+<script src="editor-app/configuration/properties-event-channel-type-controller.js" type="text/javascript"></script>
 
 <script src="editor-app/editor-config.js" type="text/javascript"></script>
 

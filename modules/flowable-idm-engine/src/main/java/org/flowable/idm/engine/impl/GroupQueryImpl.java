@@ -16,18 +16,20 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
+import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  */
-public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
+public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery, CacheAwareQuery<GroupEntity> {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -153,6 +155,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

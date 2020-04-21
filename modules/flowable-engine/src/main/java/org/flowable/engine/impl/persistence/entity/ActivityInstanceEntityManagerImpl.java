@@ -24,10 +24,10 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -36,58 +36,52 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 /**
  * @author martin.grofcik
  */
-public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<ActivityInstanceEntity> implements ActivityInstanceEntityManager {
+public class ActivityInstanceEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<ActivityInstanceEntity, ActivityInstanceDataManager>
+    implements ActivityInstanceEntityManager {
 
     protected static final String NO_ACTIVITY_ID_PREFIX = "_flow_";
     protected static final String NO_ACTIVITY_ID_SEPARATOR = "__";
 
-    protected ActivityInstanceDataManager activityInstanceDataManager;
-
     protected final boolean usePrefixId;
 
     public ActivityInstanceEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ActivityInstanceDataManager activityInstanceDataManager) {
-        super(processEngineConfiguration);
-        this.activityInstanceDataManager = activityInstanceDataManager;
+        super(processEngineConfiguration, activityInstanceDataManager);
         this.usePrefixId = processEngineConfiguration.isUsePrefixId();
     }
 
-    @Override
-    protected DataManager<ActivityInstanceEntity> getDataManager() {
-        return activityInstanceDataManager;
-    }
-
     protected List<ActivityInstanceEntity> findUnfinishedActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
-        return activityInstanceDataManager.findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
+        return dataManager.findUnfinishedActivityInstancesByExecutionAndActivityId(executionId, activityId);
     }
     
     @Override
     public List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
-        return activityInstanceDataManager.findActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
+        return dataManager.findActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
     }
 
     @Override
     public void deleteActivityInstancesByProcessInstanceId(String processInstanceId) {
-        activityInstanceDataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
+        dataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl historicActivityInstanceQuery) {
-        return activityInstanceDataManager.findActivityInstanceCountByQueryCriteria(historicActivityInstanceQuery);
+        return dataManager.findActivityInstanceCountByQueryCriteria(historicActivityInstanceQuery);
     }
 
     @Override
     public List<ActivityInstance> findActivityInstancesByQueryCriteria(ActivityInstanceQueryImpl historicActivityInstanceQuery) {
-        return activityInstanceDataManager.findActivityInstancesByQueryCriteria(historicActivityInstanceQuery);
+        return dataManager.findActivityInstancesByQueryCriteria(historicActivityInstanceQuery);
     }
 
     @Override
     public List<ActivityInstance> findActivityInstancesByNativeQuery(Map<String, Object> parameterMap) {
-        return activityInstanceDataManager.findActivityInstancesByNativeQuery(parameterMap);
+        return dataManager.findActivityInstancesByNativeQuery(parameterMap);
     }
 
     @Override
     public long findActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-        return activityInstanceDataManager.findActivityInstanceCountByNativeQuery(parameterMap);
+        return dataManager.findActivityInstanceCountByNativeQuery(parameterMap);
     }
 
     @Override
@@ -159,12 +153,12 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     public void updateActivityInstancesProcessDefinitionId(String newProcessDefinitionId, String processInstanceId) {
         ActivityInstanceQueryImpl activityQuery = new ActivityInstanceQueryImpl();
         activityQuery.processInstanceId(processInstanceId);
-        List<ActivityInstance> activities = getActivityInstanceEntityManager().findActivityInstancesByQueryCriteria(activityQuery);
+        List<ActivityInstance> activities = findActivityInstancesByQueryCriteria(activityQuery);
         if (activities != null) {
             for (ActivityInstance activityInstance : activities) {
                 ActivityInstanceEntity activityEntity = (ActivityInstanceEntity) activityInstance;
                 activityEntity.setProcessDefinitionId(newProcessDefinitionId);
-                getActivityInstanceEntityManager().update(activityEntity);
+                update(activityEntity);
             }
         }
     }
@@ -256,14 +250,6 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
         return activityInstance;
     }
 
-    public ActivityInstanceDataManager getActivityInstanceDataManager() {
-        return activityInstanceDataManager;
-    }
-
-    public void setActivityInstanceDataManager(ActivityInstanceDataManager activityInstanceDataManager) {
-        this.activityInstanceDataManager = activityInstanceDataManager;
-    }
-
     @Override
     public ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution) {
         String activityId = getActivityIdForExecution(execution);
@@ -300,7 +286,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
     }
 
     protected ActivityInstanceEntity createActivityInstanceEntity(ExecutionEntity execution) {
-        IdGenerator idGenerator = getProcessEngineConfiguration().getIdGenerator();
+        IdGenerator idGenerator = engineConfiguration.getIdGenerator();
 
         String processDefinitionId = execution.getProcessDefinitionId();
         String processInstanceId = execution.getProcessInstanceId();
@@ -336,7 +322,7 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
             activityInstanceEntity.setTenantId(execution.getTenantId());
         }
 
-        getActivityInstanceEntityManager().insert(activityInstanceEntity);
+        insert(activityInstanceEntity);
         return activityInstanceEntity;
     }
 
@@ -397,6 +383,14 @@ public class ActivityInstanceEntityManagerImpl extends AbstractEntityManager<Act
 
     protected String getArtificialSequenceFlowId(SequenceFlow sequenceFlow) {
         return NO_ACTIVITY_ID_PREFIX + sequenceFlow.getSourceRef() + NO_ACTIVITY_ID_SEPARATOR + sequenceFlow.getTargetRef();
+    }
+
+    protected HistoryManager getHistoryManager() {
+        return engineConfiguration.getHistoryManager();
+    }
+
+    protected ExecutionEntityManager getExecutionEntityManager() {
+        return engineConfiguration.getExecutionEntityManager();
     }
 
 }

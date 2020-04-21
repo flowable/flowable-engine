@@ -1,6 +1,7 @@
 CREATE TABLE ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp,
     LOCK_OWNER_ varchar(255),
@@ -30,6 +31,7 @@ CREATE TABLE ACT_RU_JOB (
 CREATE TABLE ACT_RU_TIMER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp,
     LOCK_OWNER_ varchar(255),
@@ -59,6 +61,7 @@ CREATE TABLE ACT_RU_TIMER_JOB (
 CREATE TABLE ACT_RU_SUSPENDED_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
@@ -86,6 +89,7 @@ CREATE TABLE ACT_RU_SUSPENDED_JOB (
 CREATE TABLE ACT_RU_DEADLETTER_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
+    CATEGORY_ varchar(255),
     TYPE_ varchar(255) NOT NULL,
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
@@ -198,6 +202,6 @@ alter table ACT_RU_DEADLETTER_JOB
     references ACT_GE_BYTEARRAY (ID_);
 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.2', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.1.2', 1);
 
 -- force-commit

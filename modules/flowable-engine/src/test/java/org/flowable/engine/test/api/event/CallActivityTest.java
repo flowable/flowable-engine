@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +38,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,180 +90,180 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // no task should be active in parent process
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
         // only active task should be the one defined in the external subprocess
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("User Task2 in External", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task2 in External");
 
         ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
                 .rootProcessInstanceId(processInstance.getId())
                 .onlySubProcessExecutions()
                 .singleResult();
-        assertNotNull(subprocessInstance);
+        assertThat(subprocessInstance).isNotNull();
 
-        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
-        assertEquals("Default name", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Default name");
+        assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Default name");
 
         // set the variable in the subprocess to validate that the new value is returned from callActivity
         runtimeService.setVariable(subprocessInstance.getId(), "FullName", "Mary Smith");
-        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
-        assertEquals("Mary Smith", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Default name");
+        assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Mary Smith");
 
         // complete user task so that external subprocess will flow to terminate end
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        assertEquals("User Task1", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task1");
 
         // validate that the variable was copied back when Call Activity finished
-        assertEquals("Mary Smith", runtimeService.getVariable(processInstance.getId(), "Name"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Mary Smith");
 
         // complete user task so that parent process will terminate normally
         taskService.complete(task.getId());
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         ExecutionEntity executionEntity = (ExecutionEntity) entityEvent.getEntity();
 
         // this is the root process so parent null
-        assertNull(executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNull();
         String processExecutionId = executionEntity.getId();
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNotNull(executionEntity.getParentId());
-        assertEquals(processExecutionId, executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNotNull();
+        assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(5);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("callActivity1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("callActivity1");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(6);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNull(executionEntity.getParentId());
-        assertEquals(executionEntity.getId(), executionEntity.getProcessInstanceId());
+        assertThat(executionEntity.getParentId()).isNull();
+        assertThat(executionEntity.getProcessInstanceId()).isEqualTo(executionEntity.getId());
 
         // user task within the external subprocess
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(7);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertEquals("calledtask1", executionEntity.getActivityId());
+        assertThat(executionEntity.getActivityId()).isEqualTo("calledtask1");
 
         // external subprocess
         flowableEvent = mylistener.getEventsReceived().get(8);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(9);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(10);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         // user task within external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(11);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("calledtask1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("calledtask1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(12);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2 in External", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2 in External");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(13);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2 in External", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2 in External");
 
         // user task within external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(14);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("calledtask1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("calledtask1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         // None event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(15);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("noneevent2", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent2");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(16);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("noneevent2", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent2");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         // the external subprocess
-        entityEvent = (FlowableEntityEvent)mylistener.getEventsReceived().get(17);
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED, entityEvent.getType());
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(17);
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED);
 
         // callActivity
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(18);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("callActivity", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("callActivity");
 
         // user task within parent process
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(19);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(20);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(21);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(22);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(23);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("noneevent1", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(24);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("noneevent1", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         // the parent process
-        entityEvent = (FlowableEntityEvent)mylistener.getEventsReceived().get(25);
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED, entityEvent.getType());
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(25);
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED);
 
-        assertEquals(26, mylistener.getEventsReceived().size());
+        assertThat(mylistener.getEventsReceived()).hasSize(26);
     }
-    
+
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
@@ -271,367 +274,367 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // no task should be active in parent process
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
         // only active task should be the one defined in the external subprocess
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("User Task2 in External", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task2 in External");
 
         ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
                 .rootProcessInstanceId(processInstance.getId())
                 .onlySubProcessExecutions()
                 .singleResult();
-        assertNotNull(subprocessInstance);
+        assertThat(subprocessInstance).isNotNull();
 
-        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
-        assertEquals("Default name", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
-        
-        runtimeService.deleteProcessInstance(processInstance.getId(), null);  
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Default name");
+        assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Default name");
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         ExecutionEntity executionEntity = (ExecutionEntity) entityEvent.getEntity();
 
         // this is the root process so parent null
-        assertNull(executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNull();
         String processExecutionId = executionEntity.getId();
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNotNull(executionEntity.getParentId());
-        assertEquals(processExecutionId, executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNotNull();
+        assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(5);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("callActivity1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("callActivity1");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(6);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNull(executionEntity.getParentId());
-        assertEquals(executionEntity.getId(), executionEntity.getProcessInstanceId());
+        assertThat(executionEntity.getParentId()).isNull();
+        assertThat(executionEntity.getProcessInstanceId()).isEqualTo(executionEntity.getId());
 
         // user task within the external subprocess
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(7);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertEquals("calledtask1", executionEntity.getActivityId());
+        assertThat(executionEntity.getActivityId()).isEqualTo("calledtask1");
 
         // external subprocess
         flowableEvent = mylistener.getEventsReceived().get(8);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(9);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(10);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         // user task within external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(11);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("calledtask1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("calledtask1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(12);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2 in External", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2 in External");
 
         // user task within external subprocess cancelled
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(13);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
-        assertEquals("User Task2 in External", activityCancelledEvent.getActivityName());
-        assertEquals("userTask", activityCancelledEvent.getActivityType());
-   
+        assertThat(activityCancelledEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityCancelledEvent.getActivityName()).isEqualTo("User Task2 in External");
+        assertThat(activityCancelledEvent.getActivityType()).isEqualTo("userTask");
+
         // external subprocess cancelled
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(14);
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
-        assertEquals(subprocessInstance.getId(), processCancelledEvent.getProcessInstanceId());
-        
+        assertThat(processCancelledEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
+        assertThat(processCancelledEvent.getProcessInstanceId()).isEqualTo(subprocessInstance.getId());
+
         // expecting cancelled event for Call Activity
         activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(15);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
-        assertEquals("callActivity", activityCancelledEvent.getActivityType());
-        
+        assertThat(activityCancelledEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityCancelledEvent.getActivityType()).isEqualTo("callActivity");
+
         // parent process cancelled
         processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(16);
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
-        assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
+        assertThat(processCancelledEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
+        assertThat(processCancelledEvent.getProcessInstanceId()).isEqualTo(processInstance.getId());
 
-        assertEquals(17, mylistener.getEventsReceived().size());
+        assertThat(mylistener.getEventsReceived()).hasSize(17);
     }
 
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityTerminateEnd.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivityTerminateEnd.bpmn20.xml" })
-    public void  testCallActivityCalledHasTerminateEndEvent() throws Exception {
+    public void testCallActivityCalledHasTerminateEndEvent() throws Exception {
 
         CallActivityEventListener mylistener = new CallActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivityTerminateEnd");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // no task should be active in parent process
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
         // only active task should be the one defined in the external subprocess
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("User Task2 in External with Terminate End Event", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task2 in External with Terminate End Event");
 
         ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
                 .rootProcessInstanceId(processInstance.getId())
                 .onlySubProcessExecutions()
                 .singleResult();
-        assertNotNull(subprocessInstance);
+        assertThat(subprocessInstance).isNotNull();
 
-        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
-        assertEquals("Default name", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Default name");
+        assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Default name");
 
         // set the variable in the subprocess to validate that the new value is returned from callActivity
         runtimeService.setVariable(subprocessInstance.getId(), "FullName", "Mary Smith");
-        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
-        assertEquals("Mary Smith", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Default name");
+        assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Mary Smith");
 
         // complete user task so that external subprocess will flow to terminate end
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        assertEquals("User Task1 in Parent", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task1 in Parent");
 
         // validate that the variable was copied back when Call Activity finished
-        assertEquals("Mary Smith", runtimeService.getVariable(processInstance.getId(), "Name"));
+        assertThat("Mary Smith").isEqualTo(runtimeService.getVariable(processInstance.getId(), "Name"));
 
         // complete user task so that parent process will terminate normally
         taskService.complete(task.getId());
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         ExecutionEntity executionEntity = (ExecutionEntity) entityEvent.getEntity();
 
         // this is the root process so parent null
-        assertNull(executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNull();
         String processExecutionId = executionEntity.getId();
 
-        int idx=1;
+        int idx = 1;
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNotNull(executionEntity.getParentId());
-        assertEquals(processExecutionId, executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isNotNull();
+        assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("callActivityId1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("callActivityId1");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertNull(executionEntity.getParentId());
-        assertEquals(executionEntity.getId(), executionEntity.getProcessInstanceId());
+        assertThat(executionEntity.getParentId()).isNull();
+        assertThat(executionEntity.getProcessInstanceId()).isEqualTo(executionEntity.getId());
 
         // user task within the external subprocess
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertEquals("calledtask1", executionEntity.getActivityId());
+        assertThat(executionEntity.getActivityId()).isEqualTo("calledtask1");
 
         // external subprocess
         flowableEvent = mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         executionEntity = (ExecutionEntity) ((FlowableProcessStartedEvent) flowableEvent).getEntity();
-        assertEquals(subprocessInstance.getId(), executionEntity.getParentId());
+        assertThat(executionEntity.getParentId()).isEqualTo(subprocessInstance.getId());
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
-        assertEquals("startevent2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("startevent2");
 
         // user task within external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("calledtask1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("calledtask1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2 in External with Terminate End Event", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2 in External with Terminate End Event");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2 in External with Terminate End Event", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2 in External with Terminate End Event");
 
         // user task within external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("calledtask1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("calledtask1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         // None event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("terminateEnd2", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("terminateEnd2");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         // PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT instead of PROCESS_COMPLETED
         // because external subprocess defined with terminate end event
-        entityEvent = (FlowableEntityEvent)mylistener.getEventsReceived().get(idx++);
-        assertEquals(subprocessInstance.getId(), ((FlowableEngineEntityEvent)entityEvent).getExecutionId());
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
+        assertThat(((FlowableEngineEntityEvent) entityEvent).getExecutionId()).isEqualTo(subprocessInstance.getId());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
 
         //the external subprocess (callActivity)
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("callActivity", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("callActivity");
 
         // user task within parent process
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1 in Parent", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1 in Parent");
 
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1 in Parent", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1 in Parent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals("userTask", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("userTask");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("noneevent1", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("noneevent1", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("noneevent1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
 
         // the parent process
-        entityEvent = (FlowableEntityEvent)mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED, entityEvent.getType());
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED);
 
-        assertEquals(idx, mylistener.getEventsReceived().size());
+        assertThat(mylistener.getEventsReceived()).hasSize(idx);
     }
-    
+
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
     public void testDeleteParentProcessWithCallActivity() throws Exception {
-        
+
         CallActivityEventListener mylistener = new CallActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // no task should be active in parent process
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
         // only active task should be the one defined in the external subprocess
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("User Task2 in External", task.getName());
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("User Task2 in External");
 
         ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
                 .rootProcessInstanceId(processInstance.getId())
                 .onlySubProcessExecutions()
                 .singleResult();
-        assertNotNull(subprocessInstance);
-        
+        assertThat(subprocessInstance).isNotNull();
+
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
-        
+
         List<FlowableEvent> entityEvents = mylistener.getEventsReceived();
         int lastIndex = entityEvents.size() - 1;
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, entityEvents.get(lastIndex - 3).getType());
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, entityEvents.get(lastIndex - 2).getType());
+        assertThat(entityEvents.get(lastIndex - 3).getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(entityEvents.get(lastIndex - 2).getType()).isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
         FlowableCancelledEvent subProcessCancelledEvent = (FlowableCancelledEvent) entityEvents.get(lastIndex - 2);
-        assertEquals(subprocessInstance.getId(), subProcessCancelledEvent.getProcessInstanceId());
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, entityEvents.get(lastIndex - 1).getType());
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, entityEvents.get(lastIndex).getType());
+        assertThat(subProcessCancelledEvent.getProcessInstanceId()).isEqualTo(subprocessInstance.getId());
+        assertThat(entityEvents.get(lastIndex - 1).getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(entityEvents.get(lastIndex).getType()).isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) entityEvents.get(lastIndex);
-        assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
-        
-        System.out.println("the end");
+        assertThat(processCancelledEvent.getProcessInstanceId()).isEqualTo(processInstance.getId());
     }
-    
+
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityProcessInstanceName.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml"
     })
     public void testCallActivityProcessInstanceName() {
-        runtimeService.startProcessInstanceByKey("testCallActivityProcessInstanceName", 
+        runtimeService.startProcessInstanceByKey("testCallActivityProcessInstanceName",
                 CollectionUtil.singletonMap("theCollection", Arrays.asList("A", "B", "C", "D")));
-        
+
         List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery().list().stream()
-            .filter(processInstance -> (processInstance.getSuperExecutionId() != null))
-            .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
-            .collect(Collectors.toList());
-        
-        assertEquals(4, childProcessInstances.size());
-        assertEquals("Process instance A", childProcessInstances.get(0).getName());
-        assertEquals("Process instance B", childProcessInstances.get(1).getName());
-        assertEquals("Process instance C", childProcessInstances.get(2).getName());
-        assertEquals("Process instance D", childProcessInstances.get(3).getName());
+                .filter(processInstance -> (processInstance.getSuperExecutionId() != null))
+                .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
+                .collect(Collectors.toList());
+
+        assertThat(childProcessInstances)
+                .extracting(ProcessInstance::getName)
+                .containsExactly(
+                        "Process instance A",
+                        "Process instance B",
+                        "Process instance C",
+                        "Process instance D")
+        ;
     }
-    
 
     @Test
     @Deployment(resources = {
@@ -640,55 +643,59 @@ public class CallActivityTest extends PluggableFlowableTestCase {
     })
     public void testCallActivityAsyncComplete() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
-        
+
         // 1 async service task
         List<Job> jobs = managementService.createJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        
+
         // 5 async multi instance call activities after start
         jobs = managementService.createJobQuery().list();
-        assertEquals(5, jobs.size());
+        assertThat(jobs).hasSize(5);
         for (Job job : jobs) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
-            assertEquals("testAsyncComplete", processDefinition.getKey());
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId())
+                    .singleResult();
+            assertThat(processDefinition.getKey()).isEqualTo("testAsyncComplete");
         }
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        
+
         // 1 job for each step1 in subprocess, so 5 in total
         jobs = managementService.createJobQuery().list();
-        assertEquals(5, jobs.size());
+        assertThat(jobs).hasSize(5);
         for (Job job : jobs) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
-            assertEquals("subProcess", processDefinition.getKey());
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId())
+                    .singleResult();
+            assertThat(processDefinition.getKey()).isEqualTo("subProcess");
         }
         jobs.forEach(job -> managementService.executeJob(job.getId()));
 
         // Step 2
         jobs = managementService.createJobQuery().list();
-        assertEquals(5, jobs.size());
+        assertThat(jobs).hasSize(5);
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        
+
         // Step 3 will trigger the async complete
         jobs = managementService.createJobQuery().list();
-        assertEquals(5, jobs.size());
+        assertThat(jobs).hasSize(5);
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        
+
         // Async complete
         jobs = managementService.createJobQuery().list();
-        assertEquals(5, jobs.size());
+        assertThat(jobs).hasSize(5);
         for (Job job : jobs) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
-            assertEquals("subProcess", processDefinition.getKey()); // context is the subprocess, as the EndExecution will be scheduled for that process definition
-            
-            assertEquals(AsyncCompleteCallActivityJobHandler.TYPE, job.getJobHandlerType());
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId())
+                    .singleResult();
+            assertThat(processDefinition.getKey())
+                    .isEqualTo("subProcess"); // context is the subprocess, as the EndExecution will be scheduled for that process definition
+
+            assertThat(job.getJobHandlerType()).isEqualTo(AsyncCompleteCallActivityJobHandler.TYPE);
         }
-        
+
         // Completing ends the process instance
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
     }
-    
+
     // Same as testCallActivityAsyncComplete, but now using the real job executor instead of fetching and executing jobs manually
     @Test
     @Deployment(resources = {
@@ -699,7 +706,49 @@ public class CallActivityTest extends PluggableFlowableTestCase {
     public void testCallActivityAsyncCompleteRealExecutor() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessParent.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocess.bpmn20.xml"
+    })
+    public void testCallActivityWithEventSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testWithEventSubprocessParent");
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task.getName()).isEqualTo("One");
+
+        // Completing the task should trigger the event subprocess
+        taskService.complete(task.getId());
+        Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
+        assertThat(subOneTask).isNotNull();
+        taskService.complete(subOneTask.getId());
+
+        // Complete the last task
+        task = taskService.createTaskQuery().singleResult();
+        assertThat(task.getName()).isEqualTo("Two");
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessParent.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessInterrupting.bpmn20.xml"
+    })
+    public void testCallActivityWithEventSubprocessInterrupting() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testWithEventSubprocessParent");
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task.getName()).isEqualTo("One");
+
+        // Completing the task should trigger the event subprocess. This interupts the main flow.
+        taskService.complete(task.getId());
+        Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
+        assertThat(subOneTask).isNotNull();
+        taskService.complete(subOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
 
     class CallActivityEventListener extends AbstractFlowableEngineEventListener {
@@ -708,7 +757,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         public CallActivityEventListener() {
             eventsReceived = new ArrayList<>();
-
         }
 
         public List<FlowableEvent> getEventsReceived() {
@@ -723,25 +771,25 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         public void onEvent(FlowableEvent event) {
             FlowableEngineEventType engineEventType = (FlowableEngineEventType) event.getType();
             switch (engineEventType) {
-            case ENTITY_CREATED:
-                FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
-                if (entityEvent.getEntity() instanceof ExecutionEntity) {
+                case ENTITY_CREATED:
+                    FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+                    if (entityEvent.getEntity() instanceof ExecutionEntity) {
+                        eventsReceived.add(event);
+                    }
+                    break;
+                case ACTIVITY_STARTED:
+                case ACTIVITY_COMPLETED:
+                case ACTIVITY_CANCELLED:
+                case TASK_CREATED:
+                case TASK_COMPLETED:
+                case PROCESS_STARTED:
+                case PROCESS_COMPLETED:
+                case PROCESS_CANCELLED:
+                case PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT:
                     eventsReceived.add(event);
-                }
-                break;
-            case ACTIVITY_STARTED:
-            case ACTIVITY_COMPLETED:
-            case ACTIVITY_CANCELLED:
-            case TASK_CREATED:
-            case TASK_COMPLETED:
-            case PROCESS_STARTED:
-            case PROCESS_COMPLETED:
-            case PROCESS_CANCELLED:
-            case PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT:
-                eventsReceived.add(event);
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
 
             }
         }

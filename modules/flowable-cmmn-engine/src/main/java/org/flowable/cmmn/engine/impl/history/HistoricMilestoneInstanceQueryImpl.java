@@ -17,17 +17,20 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryProperty;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 
 /**
  * @author Joram Barrez
  */
-public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMilestoneInstanceQuery, HistoricMilestoneInstance> implements HistoricMilestoneInstanceQuery {
+public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMilestoneInstanceQuery, HistoricMilestoneInstance> 
+        implements HistoricMilestoneInstanceQuery, CacheAwareQuery<HistoricMilestoneInstanceEntity> {
 
     protected String id;
     protected String name;
@@ -127,6 +130,7 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
         return CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext).findHistoricMilestoneInstancesByQueryCriteria(this);
     }
 
+    @Override
     public String getId() {
         return id;
     }

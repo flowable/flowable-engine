@@ -151,7 +151,7 @@ public class ValidationError {
         }
         strb.append("]");
         if (xmlLineNumber > 0 && xmlColumnNumber > 0) {
-            strb.append(" ( line: ").append(Integer.toString(xmlLineNumber)).append(", column: ").append(Integer.toString(xmlColumnNumber)).append(")");
+            strb.append(" ( line: ").append(xmlLineNumber).append(", column: ").append(xmlColumnNumber).append(")");
         }
         return strb.toString();
     }

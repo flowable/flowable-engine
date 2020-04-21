@@ -1,0 +1,1041 @@
+---
+swagger: "2.0"
+info:
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
+  version: "v1"
+  title: "Flowable Event Registry REST API"
+  contact:
+    name: "Flowable"
+    url: "http://www.flowable.org/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/flowable-rest/event-registry-api"
+tags:
+- name: "Case Definitions"
+- name: "Channel Definitions"
+- name: "Cmmn Engine"
+- name: "Deployment"
+- name: "Event Definitions"
+- name: "Event Deployment"
+- name: "Event Instances"
+- name: "Event Registry Deployment"
+- name: "Event Registry Engine"
+schemes:
+- "http"
+- "https"
+paths:
+  /event-registry-management/engine:
+    get:
+      tags:
+      - "Cmmn Engine"
+      summary: "Get engine info"
+      description: ""
+      operationId: "getEngineInfo"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Indicates the engine info is returned."
+          schema:
+            $ref: "#/definitions/EventRegistryEngineInfoResponse"
+      security:
+      - basicAuth: []
+  /event-registry-repository/channel-definitions:
+    get:
+      tags:
+      - "Channel Definitions"
+      summary: "List of channel definitions"
+      description: ""
+      operationId: "listChannelDefinitions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "version"
+        in: "query"
+        description: "Only return channel definitions with the given version."
+        required: false
+        type: "integer"
+      - name: "name"
+        in: "query"
+        description: "Only return channel definitions with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return channel definitions with a name like the given name."
+        required: false
+        type: "string"
+      - name: "key"
+        in: "query"
+        description: "Only return channel definitions with the given key."
+        required: false
+        type: "string"
+      - name: "keyLike"
+        in: "query"
+        description: "Only return channel definitions with a name like the given key."
+        required: false
+        type: "string"
+      - name: "createTime"
+        in: "query"
+        description: "Only return channel definitions with the given create time."
+        required: false
+        type: "date-time"
+      - name: "createTimeAfter"
+        in: "query"
+        description: "Only return channel definitions with a create time after the\
+          \ given date."
+        required: false
+        type: "date-time"
+      - name: "createTimeBefore"
+        in: "query"
+        description: "Only return channel definitions with a create time before the\
+          \ given date."
+        required: false
+        type: "date-time"
+      - name: "resourceName"
+        in: "query"
+        description: "Only return channel definitions with the given resource name."
+        required: false
+        type: "string"
+      - name: "resourceNameLike"
+        in: "query"
+        description: "Only return channel definitions with a name like the given resource\
+          \ name."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Only return channel definitions with the given category."
+        required: false
+        type: "string"
+      - name: "categoryLike"
+        in: "query"
+        description: "Only return channel definitions with a category like the given\
+          \ name."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return channel definitions which do not have the given\
+          \ category."
+        required: false
+        type: "string"
+      - name: "deploymentId"
+        in: "query"
+        description: "Only return channel definitions with the given category."
+        required: false
+        type: "string"
+      - name: "latest"
+        in: "query"
+        description: "Only return the latest channel definition versions. Can only\
+          \ be used together with key and keyLike parameters, using any other parameter\
+          \ will result in a 400-response."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "name"
+        - "id"
+        - "key"
+        - "category"
+        - "deploymentId"
+        - "version"
+      responses:
+        200:
+          description: "Indicates request was successful and the channel definitions\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseChannelDefinitionResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ latest is used with other parameters other than key and keyLike. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/channel-definitions/{channelDefinitionId}:
+    get:
+      tags:
+      - "Case Definitions"
+      summary: "Get a channel definition"
+      description: ""
+      operationId: "getChannelDefinition"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "channelDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the channel definitions\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/ChannelDefinitionResponse"
+        404:
+          description: "Indicates the requested event definition was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/channel-definitions/{channelDefinitionId}/model:
+    get:
+      tags:
+      - "Channel Definitions"
+      summary: "Get a channel definition JSON model"
+      description: ""
+      operationId: "getChannelModelResource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "channelDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the event definition was found and the model is\
+            \ returned. The response contains the full event definition model."
+          schema:
+            $ref: "#/definitions/ChannelModel"
+        404:
+          description: "Indicates the requested event definition was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/channel-definitions/{channelDefinitionId}/resourcedata:
+    get:
+      tags:
+      - "Case Definitions"
+      summary: "Get a channel definition resource content"
+      description: ""
+      operationId: "getChannelDefinitionResource"
+      parameters:
+      - name: "channelDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both channel definition and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested channel definition was not found or\
+            \ there is no resource with the given id present in the case definition.\
+            \ The status-description contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/deployments:
+    get:
+      tags:
+      - "Deployment"
+      summary: "List Deployments"
+      description: ""
+      operationId: "listDeployments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "query"
+        description: "Only return deployments with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return deployments with a name like the given name."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Only return deployments with the given category."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return deployments which do not have the given category."
+        required: false
+        type: "string"
+      - name: "parentDeploymentId"
+        in: "query"
+        description: "Only return deployments with the given parent deployment id."
+        required: false
+        type: "string"
+      - name: "parentDeploymentIdLike"
+        in: "query"
+        description: "Only return deployments with a parent deployment id like the\
+          \ given value."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return deployments with a tenantId like the given value."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return deployments with the given tenantId."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns deployments without a tenantId set. If\
+          \ false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "id"
+        - "name"
+        - "deployTime"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates the request was successful."
+          schema:
+            $ref: "#/definitions/DataResponseEventDeploymentResponse"
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - "Deployment"
+      summary: "Create a new deployment"
+      description: "The request body should contain data of type multipart/form-data.\
+        \ There should be exactly one file in the request, any additional files will\
+        \ be ignored. The deployment name is the name of the file-field passed in.\
+        \ If multiple resources need to be deployed in a single deployment, compress\
+        \ the resources in a zip and make sure the file-name ends with .bar or .zip.\n\
+        \nAn additional parameter (form-field) can be passed in the request body with\
+        \ name tenantId. The value of this field will be used as the id of the tenant\
+        \ this deployment is done in."
+      operationId: "uploadDeployment"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "deploymentName"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        required: true
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/EventDeploymentResponse"
+        201:
+          description: "Indicates the deployment was created."
+        400:
+          description: "Indicates there was no content present in the request body\
+            \ or the content mime-type is not supported for deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/deployments/{deploymentId}:
+    get:
+      tags:
+      - "Deployment"
+      summary: "Get a deployment"
+      description: ""
+      operationId: "getDeployment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        description: "The id of the deployment to get."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the deployment was found and returned."
+          schema:
+            $ref: "#/definitions/EventDeploymentResponse"
+        404:
+          description: "Indicates the requested deployment was not found."
+      security:
+      - basicAuth: []
+    delete:
+      tags:
+      - "Deployment"
+      summary: "Delete a deployment"
+      description: ""
+      operationId: "deleteDeployment"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the deployment was found and has been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested deployment was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/deployments/{deploymentId}/resourcedata/{resourceName}:
+    get:
+      tags:
+      - "Deployment"
+      summary: "Get a deployment resource content"
+      description: "The response body will contain the binary resource-content for\
+        \ the requested resource. The response content-type will be the same as the\
+        \ type returned in the resources mimeType property. Also, a content-disposition\
+        \ header is set, allowing browsers to download the file instead of displaying\
+        \ it."
+      operationId: "getDeploymentResourceData"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "resourceName"
+        in: "path"
+        description: "The name of the resource to get."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both deployment and resource have been found and\
+            \ the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested deployment was not found or there\
+            \ is no resource with the given id present in the deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/deployments/{deploymentId}/resources:
+    get:
+      tags:
+      - "Deployment"
+      summary: "List resources in a deployment"
+      description: "The dataUrl property in the resulting JSON for a single resource\
+        \ contains the actual URL to use for retrieving the binary resource."
+      operationId: "listDeploymentResources"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the deployment was found and the resource list has\
+            \ been returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/DeploymentResourceResponse"
+        404:
+          description: "Indicates the requested deployment was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/deployments/{deploymentId}/resources/**:
+    get:
+      tags:
+      - "Deployment"
+      summary: "Get a deployment resource"
+      description: "Replace ** by ResourceId"
+      operationId: "getDeploymentResource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both deployment and resource have been found and\
+            \ the resource has been returned."
+          schema:
+            $ref: "#/definitions/DeploymentResourceResponse"
+        404:
+          description: "Indicates the requested deployment was not found or there\
+            \ is no resource with the given id present in the deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/event-definitions:
+    get:
+      tags:
+      - "Event Definitions"
+      summary: "List of event definitions"
+      description: ""
+      operationId: "listEventDefinitions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "version"
+        in: "query"
+        description: "Only return event definitions with the given version."
+        required: false
+        type: "integer"
+      - name: "name"
+        in: "query"
+        description: "Only return event definitions with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return event definitions with a name like the given name."
+        required: false
+        type: "string"
+      - name: "key"
+        in: "query"
+        description: "Only return event definitions with the given key."
+        required: false
+        type: "string"
+      - name: "keyLike"
+        in: "query"
+        description: "Only return event definitions with a name like the given key."
+        required: false
+        type: "string"
+      - name: "resourceName"
+        in: "query"
+        description: "Only return event definitions with the given resource name."
+        required: false
+        type: "string"
+      - name: "resourceNameLike"
+        in: "query"
+        description: "Only return event definitions with a name like the given resource\
+          \ name."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Only return event definitions with the given category."
+        required: false
+        type: "string"
+      - name: "categoryLike"
+        in: "query"
+        description: "Only return event definitions with a category like the given\
+          \ name."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return event definitions which do not have the given category."
+        required: false
+        type: "string"
+      - name: "deploymentId"
+        in: "query"
+        description: "Only return event definitions with the given category."
+        required: false
+        type: "string"
+      - name: "latest"
+        in: "query"
+        description: "Only return the latest event definition versions. Can only be\
+          \ used together with key and keyLike parameters, using any other parameter\
+          \ will result in a 400-response."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "name"
+        - "id"
+        - "key"
+        - "category"
+        - "deploymentId"
+        - "version"
+      responses:
+        200:
+          description: "Indicates request was successful and the event definitions\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseEventDefinitionResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ latest is used with other parameters other than key and keyLike. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-repository/event-definitions/{eventDefinitionId}:
+    get:
+      tags:
+      - "Case Definitions"
+      summary: "Get an event definition"
+      description: ""
+      operationId: "getEventDefinition"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "eventDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the event definitions\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/EventDefinitionResponse"
+        404:
+          description: "Indicates the requested event definition was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/event-definitions/{eventDefinitionId}/model:
+    get:
+      tags:
+      - "Event Definitions"
+      summary: "Get an event definition JSON model"
+      description: ""
+      operationId: "getEventModelResource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "eventDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the event definition was found and the model is\
+            \ returned. The response contains the full event definition model."
+          schema:
+            $ref: "#/definitions/EventModel"
+        404:
+          description: "Indicates the requested event definition was not found."
+      security:
+      - basicAuth: []
+  /event-registry-repository/event-definitions/{eventDefinitionId}/resourcedata:
+    get:
+      tags:
+      - "Case Definitions"
+      summary: "Get an event definition resource content"
+      description: ""
+      operationId: "getEventDefinitionResource"
+      parameters:
+      - name: "eventDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both event definition and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested event definition was not found or\
+            \ there is no resource with the given id present in the case definition.\
+            \ The status-description contains additional information."
+      security:
+      - basicAuth: []
+  /event-registry-runtime/event-instances:
+    post:
+      tags:
+      - "Event Instances"
+      summary: "Send an event instance"
+      description: "Only one of *eventDefinitionId* or *eventDefinitionKey* an be\
+        \ used in the request body. \n\n"
+      operationId: "createEventInstance"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/EventInstanceCreateRequest"
+      responses:
+        201:
+          description: "Indicates the event instance was created."
+        400:
+          description: "Indicates either the event definition was not found (based\
+            \ on id or key), no event was send. Status description contains additional\
+            \ information about the error."
+      security:
+      - basicAuth: []
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+definitions:
+  ChannelDefinitionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "oneChannel:1:4"
+      url:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/channel-definitions/oneChannel%3A1%3A4"
+      key:
+        type: "string"
+        example: "oneChannel"
+      version:
+        type: "integer"
+        format: "int32"
+        example: 1
+      name:
+        type: "string"
+        example: "The One Channel"
+      createTime:
+        type: "string"
+        format: "date-time"
+        example: "2010-10-13T14:54:26.750+02:00"
+      description:
+        type: "string"
+        example: "This is a channel definition for testing purposes"
+      tenantId:
+        type: "string"
+        example: "null"
+      deploymentId:
+        type: "string"
+        example: "2"
+      deploymentUrl:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/deployments/2"
+      resourceName:
+        type: "string"
+        example: "oneChannel.channel"
+      resource:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/deployments/2/resources/oneChannel.channel"
+        description: "Contains the actual deployed channel definition JSON."
+      category:
+        type: "string"
+        example: "Examples"
+  ChannelModel:
+    type: "object"
+    properties:
+      key:
+        type: "string"
+      category:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      channelType:
+        type: "string"
+      type:
+        type: "string"
+  DataResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseChannelDefinitionResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/ChannelDefinitionResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseEventDefinitionResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventDefinitionResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseEventDeploymentResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventDeploymentResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DeploymentResourceResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "diagrams/my-process.bpmn20.xml"
+      url:
+        type: "string"
+        example: "http://localhost:8081/flowable-rest/service/cmmn-repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml"
+        description: "For a single resource contains the actual URL to use for retrieving\
+          \ the binary resource"
+      contentUrl:
+        type: "string"
+        example: "http://localhost:8081/flowable-rest/service/cmmn-repository/deployments/10/resourcedata/diagrams%2Fmy-process.bpmn20.xml"
+      mediaType:
+        type: "string"
+        example: "text/xml"
+        description: "Contains the media-type the resource has. This is resolved using\
+          \ a (pluggable) MediaTypeResolver and contains, by default, a limited number\
+          \ of mime-type mappings."
+      type:
+        type: "string"
+        example: "processDefinition"
+        description: "Type of resource"
+        enum:
+        - "resource"
+        - "processDefinition"
+        - "processImage"
+  EventCorrelationParameter:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+  EventDefinitionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "oneEvent:1:4"
+      url:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/event-definitions/oneEvent%3A1%3A4"
+      key:
+        type: "string"
+        example: "oneEvent"
+      version:
+        type: "integer"
+        format: "int32"
+        example: 1
+      name:
+        type: "string"
+        example: "The One Event"
+      description:
+        type: "string"
+        example: "This is an event definition for testing purposes"
+      tenantId:
+        type: "string"
+        example: "null"
+      deploymentId:
+        type: "string"
+        example: "2"
+      deploymentUrl:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/deployments/2"
+      resourceName:
+        type: "string"
+        example: "oneEvent.event"
+      resource:
+        type: "string"
+        example: "http://localhost:8182/event-registry-repository/deployments/2/resources/oneEvent.event"
+        description: "Contains the actual deployed event definition JSON."
+      category:
+        type: "string"
+        example: "Examples"
+  EventDeploymentResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "10"
+      name:
+        type: "string"
+        example: "flowable-examples.bar"
+      deploymentTime:
+        type: "string"
+        format: "date-time"
+        example: "2010-10-13T14:54:26.750+02:00"
+      category:
+        type: "string"
+        example: "examples"
+      parentDeploymentId:
+        type: "string"
+        example: "12"
+      url:
+        type: "string"
+        example: "http://localhost:8081/flowable-rest/service/event-registry-repository/deployments/10"
+      tenantId:
+        type: "string"
+  EventInstanceCreateRequest:
+    type: "object"
+    properties:
+      eventDefinitionId:
+        type: "string"
+        example: "oneEvent:1:158"
+      eventDefinitionKey:
+        type: "string"
+        example: "oneEvent"
+      channelDefinitionId:
+        type: "string"
+        example: "myChannel:1:123"
+      channelDefinitionKey:
+        type: "string"
+        example: "myChannel"
+      eventPayload:
+        $ref: "#/definitions/ObjectNode"
+      tenantId:
+        type: "string"
+        example: "tenant1"
+    description: "Data for creating an event instance. Only one of eventDefinitionId\
+      \ or eventDefinitionKey can be used in the request body. Same applies to channelDefinitionId/Key"
+  EventModel:
+    type: "object"
+    properties:
+      key:
+        type: "string"
+      name:
+        type: "string"
+      correlationParameters:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventCorrelationParameter"
+      payload:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventPayload"
+  EventPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+  EventRegistryEngineInfoResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      version:
+        type: "string"
+  ObjectNode:
+    type: "object"
+    properties:
+      nodeType:
+        type: "string"
+        enum:
+        - "ARRAY"
+        - "BINARY"
+        - "BOOLEAN"
+        - "MISSING"
+        - "NULL"
+        - "NUMBER"
+        - "OBJECT"
+        - "POJO"
+        - "STRING"
+      array:
+        type: "boolean"
+      null:
+        type: "boolean"
+      float:
+        type: "boolean"
+      number:
+        type: "boolean"
+      integralNumber:
+        type: "boolean"
+      floatingPointNumber:
+        type: "boolean"
+      int:
+        type: "boolean"
+      long:
+        type: "boolean"
+      double:
+        type: "boolean"
+      bigDecimal:
+        type: "boolean"
+      bigInteger:
+        type: "boolean"
+      textual:
+        type: "boolean"
+      boolean:
+        type: "boolean"
+      valueNode:
+        type: "boolean"
+      containerNode:
+        type: "boolean"
+      missingNode:
+        type: "boolean"
+      object:
+        type: "boolean"
+      binary:
+        type: "boolean"
+      pojo:
+        type: "boolean"
+      short:
+        type: "boolean"

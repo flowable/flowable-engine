@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Building dependencies"
 cd ..
-mvn clean install -DskipTests -Pcheck
+mvn clean install -DskipTests -Pcheck $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -11,7 +11,7 @@ then
 fi
 
 cd modules/flowable5-engine/
-mvn clean install -DskipTests
+mvn clean install -DskipTests $MAVEN_CONFIG
 STATUS=$?
 if [ $STATUS -ne 0 ]
 then
@@ -22,7 +22,7 @@ fi
 cd ../..
 
 cd modules/flowable5-compatibility/
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -34,7 +34,7 @@ fi
 cd ../..
 
 cd modules/flowable5-test
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -48,7 +48,7 @@ fi
 cd ../..
 
 cd modules/flowable5-spring
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -60,7 +60,7 @@ fi
 cd ../..
 
 cd modules/flowable5-spring-compatibility/
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -72,7 +72,7 @@ fi
 cd ../..
 
 cd modules/flowable5-spring-test/
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -84,7 +84,7 @@ fi
 cd ../..
 
 cd modules/flowable-cxf/
-mvn clean install -DskipTests
+mvn clean install -DskipTests $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -96,7 +96,7 @@ fi
 cd ../..
 
 cd modules/flowable5-cxf-test/
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -108,7 +108,7 @@ fi
 cd ../..
 
 cd modules/flowable-camel/
-mvn clean install -DskipTests
+mvn clean install -DskipTests $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]
@@ -120,7 +120,7 @@ fi
 cd ../..
 
 cd modules/flowable5-camel-test/
-mvn clean install
+mvn clean install $MAVEN_CONFIG
 
 STATUS=$?
 if [ $STATUS -ne 0 ]

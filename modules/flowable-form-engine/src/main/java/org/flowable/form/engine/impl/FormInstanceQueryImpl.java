@@ -19,18 +19,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
+import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, FormInstance> implements FormInstanceQuery, Serializable {
+public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, FormInstance> implements FormInstanceQuery, CacheAwareQuery<FormInstanceEntity>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -231,6 +233,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

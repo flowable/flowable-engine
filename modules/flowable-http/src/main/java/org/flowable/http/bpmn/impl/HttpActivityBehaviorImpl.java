@@ -47,7 +47,6 @@ import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.HttpActivityExecutor;
@@ -110,6 +109,10 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected HttpActivityExecutor httpActivityExecutor;
 
     public HttpActivityBehaviorImpl() {
+        this.httpActivityExecutor = createHttpActivityExecutor();
+    }
+
+    protected HttpActivityExecutor createHttpActivityExecutor() {
         HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
@@ -143,7 +146,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             httpClientBuilder.useSystemProperties();
         }
 
-        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(),
+        return new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(),
                 CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
     }
 

@@ -319,7 +319,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // Start process instance
             assertDatabaseSelects("StartProcessInstanceCmd", 
                             "selectLatestProcessDefinitionByKey", 1L,
-                            "selectEntityLinksByReferenceScopeIdAndType", 2L);
+                            "selectEntityLinksByReferenceScopeIdAndType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "ExecutionEntityImpl-bulk-with-2", 1L,
                     "TaskEntityImpl", 1L,
@@ -390,7 +390,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // Start process instance
             assertDatabaseSelects("StartProcessInstanceCmd", 
                             "selectLatestProcessDefinitionByKey", 1L,
-                            "selectEntityLinksByReferenceScopeIdAndType", 2L);
+                            "selectEntityLinksByReferenceScopeIdAndType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "ExecutionEntityImpl-bulk-with-3", 1L,
                     "TaskEntityImpl", 1L,

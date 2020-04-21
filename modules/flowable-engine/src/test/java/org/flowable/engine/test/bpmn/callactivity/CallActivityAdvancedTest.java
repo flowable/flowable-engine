@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.callactivity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -313,12 +315,288 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertTrue(taskIds.contains(taskBeforeSubProcess.getId()));
                 assertTrue(taskIds.contains(taskInSubProcess.getId()));
                 assertTrue(taskIds.contains(taskAfterSubProcess.getId()));
-                
+
                 HistoricTaskInstance childHistoricTask = historyService.createHistoricTaskInstanceQuery()
                                 .processInstanceIdWithChildren(execution.getProcessInstanceId())
                                 .singleResult();
                 assertEquals(taskInSubProcess.getId(), childHistoricTask.getId());
             }
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testThreeLevelSubProcess.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+    public void testThreeLevelSubProcess() {
+        // The threeLevelSubProcess has the following structure
+        // threeLevelSubProcess
+        // - taskBeforeSubProcess (UserTask)
+        // - callSubProcess (CallActivity)
+        //     - taskBeforeSubProcess (UserTask)
+        //     - callSubProcess (CallActivity)
+        //         - task (UserTask)
+        //     - taskAfterSubProcess (UserTask)
+        // - taskAfterSubProcess (UserTask)
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("threeLevelSubProcess");
+
+        // one task in the subprocess should be active after starting the process instance
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
+
+        String rootInstanceId = processInstance.getId();
+        Task childTask = taskService.createTaskQuery().processInstanceIdWithChildren(rootInstanceId).singleResult();
+        assertThat(childTask.getId()).isEqualTo(taskBeforeSubProcess.getId());
+
+        // Completing the task continues the process which leads to calling the subprocess
+        taskService.complete(taskBeforeSubProcess.getId());
+        Task taskBeforeSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskBeforeSubProcessInSubProcess.getName()).isEqualTo("Task before subprocess");
+        assertThat(taskBeforeSubProcessInSubProcess.getId()).isNotEqualTo(taskBeforeSubProcess.getId());
+
+        // Completing the task continues the process which leads to calling the last subprocess
+        taskService.complete(taskBeforeSubProcessInSubProcess.getId());
+        Task taskInLastSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskInLastSubProcess.getName()).isEqualTo("Task in subprocess");
+
+        ProcessInstance firstSubProcess = runtimeService.createProcessInstanceQuery().superProcessInstanceId(rootInstanceId).singleResult();
+        String firstProcessId = firstSubProcess.getId();
+        assertThat(taskBeforeSubProcessInSubProcess.getProcessInstanceId()).isEqualTo(firstProcessId);
+
+        ProcessInstance secondSubProcess = runtimeService.createProcessInstanceQuery().superProcessInstanceId(firstProcessId).singleResult();
+        assertThat(taskInLastSubProcess.getProcessInstanceId()).isEqualTo(secondSubProcess.getId());
+
+        List<EntityLink> entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(rootInstanceId);
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, firstProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, secondSubProcess.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        // The sub process tasks even though completed keep their entity links until the process instance is completed
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
+        entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(firstSubProcess.getProcessInstanceId());
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, secondSubProcess.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD),
+                        tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        // The sub process tasks even though completed keep their entity links until the sub process is not completed
+                        tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
+        entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(secondSubProcess.getProcessInstanceId());
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
+        List<EntityLink> taskEntityLinks = runtimeService.getEntityLinkParentsForTask(taskInLastSubProcess.getId());
+        assertThat(taskEntityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(taskEntityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
+        childTask = taskService.createTaskQuery().processInstanceIdWithChildren(rootInstanceId).singleResult();
+        assertThat(childTask.getId()).isEqualTo(taskInLastSubProcess.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceIdWithChildren(rootInstanceId)
+                    .list();
+            assertThat(childHistoricTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsOnly(taskBeforeSubProcess.getId(), taskBeforeSubProcessInSubProcess.getId(), taskInLastSubProcess.getId());
+        }
+
+        // Completing the task in the second subprocess, finishes the second subprocess
+        taskService.complete(taskInLastSubProcess.getId());
+        Task taskAfterSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskAfterSubProcessInSubProcess.getName()).isEqualTo("Task after subprocess");
+
+        // Completing this task finishes the first subproces
+        taskService.complete(taskAfterSubProcessInSubProcess.getId());
+        Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
+
+        entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(rootInstanceId);
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, firstProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, secondSubProcess.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                        tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
+        // Completing this task end the process instance
+        taskService.complete(taskAfterSubProcess.getId());
+        assertProcessEnded(rootInstanceId);
+
+        // Validate subprocess history entity links
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+
+            List<HistoricEntityLink> historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(rootInstanceId);
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, firstProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, secondSubProcess.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
+            historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(firstProcessId);
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, secondSubProcess.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
+            historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(secondSubProcess.getId());
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
+            List<HistoricEntityLink> taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskInLastSubProcess.getId());
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
+            taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskAfterSubProcessInSubProcess.getId());
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
+            taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskAfterSubProcess.getId());
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
         }
     }
 
@@ -988,6 +1266,45 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testIdVariableName.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testIdVariableName() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testIdVariableName")
+            .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", task.getName());
+
+        assertEquals(1, runtimeService.getVariables(processInstance.getId()).size());
+        assertEquals(0, runtimeService.getVariables(task.getProcessInstanceId()).size());
+
+        assertEquals(task.getProcessInstanceId(), runtimeService.getVariable(processInstance.getId(), "myVariable"));
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testIdVariableNameExpression.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testIdVariableNameExpression() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testIdVariableName")
+            .variable("counter", 123)
+            .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", task.getName());
+
+        assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());
+        assertEquals(0, runtimeService.getVariables(task.getProcessInstanceId()).size());
+
+        assertEquals(task.getProcessInstanceId(), runtimeService.getVariable(processInstance.getId(), "myVariable-123"));
     }
 
     protected void assertCallActivityToFallback() {

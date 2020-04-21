@@ -1,6 +1,7 @@
 create table ACT_RU_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
+    CATEGORY_ varchar(255),
     TYPE_ nvarchar(255) NOT NULL,
     LOCK_EXP_TIME_ datetime,
     LOCK_OWNER_ nvarchar(255),
@@ -30,6 +31,7 @@ create table ACT_RU_JOB (
 create table ACT_RU_TIMER_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
+    CATEGORY_ varchar(255),
     TYPE_ nvarchar(255) NOT NULL,
     LOCK_EXP_TIME_ datetime,
     LOCK_OWNER_ nvarchar(255),
@@ -59,6 +61,7 @@ create table ACT_RU_TIMER_JOB (
 create table ACT_RU_SUSPENDED_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
+    CATEGORY_ varchar(255),
     TYPE_ nvarchar(255) NOT NULL,
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
@@ -86,6 +89,7 @@ create table ACT_RU_SUSPENDED_JOB (
 create table ACT_RU_DEADLETTER_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
+    CATEGORY_ varchar(255),
     TYPE_ nvarchar(255) NOT NULL,
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
@@ -195,4 +199,4 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.2', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.1.2', 1);

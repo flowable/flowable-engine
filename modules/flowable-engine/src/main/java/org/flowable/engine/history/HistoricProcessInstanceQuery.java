@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
@@ -30,7 +31,7 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
  * @author Tijs Rademakers
  * @author Falko Menge
  */
-public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInstanceQuery, HistoricProcessInstance> {
+public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInstanceQuery, HistoricProcessInstance>, DeleteQuery<HistoricProcessInstanceQuery, HistoricProcessInstance> {
 
     /**
      * Only select historic process instances with the given process instance. {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
@@ -75,6 +76,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
     /**
+     * Only select historic process instances with a business key like the given value.
+     */
+    HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
+
+    /**
      * Only select historic process instances that are defined by a process definition with the given deployment identifier.
      */
     HistoricProcessInstanceQuery deploymentId(String deploymentId);
@@ -96,14 +102,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     /** Only select historic process instance that are not deleted. */
     HistoricProcessInstanceQuery notDeleted();
 
-    /**
-     * Only select the historic process instances with which the user with the given id is involved.
-     */
+    /** Only select the historic process instances with which the user with the given id is involved. */
     HistoricProcessInstanceQuery involvedUser(String userId);
+    
+    /** Only select the historic process instances with which the user with the given id and link type is involved. */
+    HistoricProcessInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /** Only select the historic process instances with which the group with the given id and link type is involved. */
+    HistoricProcessInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
-    /**
-     * Only select the historic process instances with which the group with the given ids are involved.
-     */
+    /** Only select the historic process instances with which the group with the given ids are involved. */
     HistoricProcessInstanceQuery involvedGroups(Set<String> groups);
 
     /**
@@ -352,6 +360,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select process instances with the given callback type. 
      */
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
+
+    /**
+     * Only select process instances with the given reference identifier.
+     */
+    HistoricProcessInstanceQuery processInstanceReferenceId(String referenceId);
+
+    /**
+     * Only select process instances with the given reference type.
+     */
+    HistoricProcessInstanceQuery processInstanceReferenceType(String referenceType);
 
     /**
      * Localize historic process name and description to specified locale.

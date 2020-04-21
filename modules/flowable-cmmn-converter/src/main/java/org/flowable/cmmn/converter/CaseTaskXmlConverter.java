@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnElement;
 
@@ -46,6 +47,16 @@ public class CaseTaskXmlConverter extends TaskXmlConverter {
         String fallbackToDefaultTenantValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallbackToDefaultTenantValue != null) {
             caseTask.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenantValue));
+        }
+
+        String sameDeployment = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if (sameDeployment != null) {
+            caseTask.setSameDeployment(Boolean.parseBoolean(sameDeployment));
+        }
+
+        String idVariableName = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ID_VARIABLE_NAME);
+        if (StringUtils.isNotEmpty(idVariableName)) {
+            caseTask.setCaseInstanceIdVariableName(idVariableName);
         }
         
         return caseTask;

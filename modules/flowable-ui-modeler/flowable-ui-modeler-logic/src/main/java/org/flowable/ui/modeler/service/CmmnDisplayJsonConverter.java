@@ -143,7 +143,9 @@ public class CmmnDisplayJsonConverter {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
                 if (HttpServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "http");
-                } 
+                } else if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
+                    elementNode.put("taskType", "mail");
+                }
             }
 
             elementArray.add(elementNode);

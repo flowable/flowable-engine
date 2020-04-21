@@ -11,6 +11,25 @@ spring:
     multipart:
       max-file-size: 104MB
       max-request-size: 104MB
+  cloud:
+    gateway:
+        routes:
+          - id: flowable-admin
+            uri: http://localhost:9988/flowable-admin/
+            predicates:
+              - Path=/flowable-admin/**
+          - id: flowable-idm
+            uri: http://localhost:8080/flowable-idm/
+            predicates:
+              - Path=/flowable-idm/**
+          - id: flowable-modeler
+            uri: http://localhost:8888/flowable-modeler/
+            predicates:
+              - Path=/flowable-modeler/**
+          - id: flowable-task
+            uri: http://localhost:9988/flowable-task/
+            predicates:
+              - Path=/flowable-task/**
 
 management:
   endpoints:
@@ -25,26 +44,6 @@ management:
       show-details: when_authorized
       # Only users with role access-admin can access full health details
       roles: access-admin
-
-zuul:
-  routes:
-    flowable_admin:
-      path: /flowable-admin/**
-      url: http://localhost:9988/flowable-admin/
-    flowable_idm:
-      path: /flowable-idm/**
-      url: http://localhost:8080/flowable-idm/
-    flowable_modeler:
-      path: /flowable-modeler/**
-      url: http://localhost:8888/flowable-modeler/
-    flowable_task:
-      path: /flowable-task/**
-      url: http://localhost:9999/flowable-task/
-  sensitive-headers:
-  host:
-    max-per-route-connections: 100
-    connect-timeout-millis: 10000
-    max-total-connections: 500
 
 ribbon:
   eureka:

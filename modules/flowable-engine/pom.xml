@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>6.5.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -45,6 +45,14 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-entitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry</artifactId>
+        </dependency>
+       <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-configurator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -161,9 +169,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-          <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -237,6 +250,11 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -399,26 +417,6 @@
             <properties>
                 <skipTests>true</skipTests>
             </properties>
-        </profile>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>cleanDb</id>
@@ -586,12 +584,28 @@
                                         <echo
                                             message="updating flowable configuration to db ${databasemssql}" />
                                         <copy
-                                            file="${basedir}/../../qa/db/mssql/flowable.cfg.xml"
-                                            todir="target/test-classes"
+                                            file="${basedir}/../../qa/db/flowable.mssql.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
                                             overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
                                         </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasemssql}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -1381,7 +1395,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1398,7 +1412,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1415,7 +1429,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

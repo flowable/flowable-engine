@@ -99,7 +99,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @SuppressWarnings("unchecked")
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
         final String query = "selectTaskByQueryCriteria";
-        return getDbSqlSession().selectList(query, taskQuery);
+        return getDbSqlSession().selectList(query, taskQuery, getManagedEntityClass());
     }
 
     @Override
@@ -120,7 +120,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         }
         taskQuery.setFirstResult(0);
 
-        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck(query, taskQuery);
+        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(query, taskQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {

@@ -13,9 +13,7 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -44,20 +42,20 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     public void before() throws Exception {
         super.before();
         classUnderTest = new DefaultAutoDeploymentStrategy();
-        assertNotNull(classUnderTest);
+        assertThat(classUnderTest).isNotNull();
     }
 
     @Test
     public void testHandlesMode() {
-        assertTrue(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE));
-        assertFalse(classUnderTest.handlesMode("other-mode"));
-        assertFalse(classUnderTest.handlesMode(null));
+        assertThat(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE)).isTrue();
+        assertThat(classUnderTest.handlesMode("other-mode")).isFalse();
+        assertThat(classUnderTest.handlesMode(null)).isFalse();
     }
 
     @Test
     public void testDeployResources() {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, formEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
@@ -70,7 +68,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, formEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();

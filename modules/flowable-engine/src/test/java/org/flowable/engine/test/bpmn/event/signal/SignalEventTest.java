@@ -13,12 +13,15 @@
 
 package org.flowable.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -27,7 +30,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.validation.validator.Problems;
@@ -838,6 +843,37 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived("mySignal");
         
         assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstanceId).count());
+    }
+
+    @Test
+    @Deployment
+    public void testSignalExpression() {
+        assertSignalEventSubscriptions("startSignal");
+
+        runtimeService.signalEventReceived("startSignal", CollectionUtil.singletonMap("catchSignal", "actualCatchSignalValue"));
+        assertSignalEventSubscriptions("actualCatchSignalValue", "eventSubprocessSignal", "startSignal");
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwSignal", "eventSubprocessSignal");
+        vars.put("boundarySignal", "actualBoundarySignalValue");
+        runtimeService.signalEventReceived("actualCatchSignalValue", vars);
+
+        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("T1", "T3");
+
+        assertSignalEventSubscriptions("actualBoundarySignalValue", "eventSubprocessSignal", "startSignal");
+        runtimeService.signalEventReceived("actualBoundarySignalValue");
+    }
+
+    protected void assertSignalEventSubscriptions(String ... names) {
+        Tuple[] tuples = new Tuple[names.length];
+        for (int i = 0; i < names.length; i++) {
+            tuples[i] = Tuple.tuple(SignalEventSubscriptionEntity.EVENT_TYPE, names[i]);
+        }
+
+        assertThat(runtimeService.createEventSubscriptionQuery().orderByEventName().asc().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getEventName)
+            .containsOnly(tuples);
     }
 
     private void validateTaskCounts(long taskACount, long taskBCount, long taskCCount) {

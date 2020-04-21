@@ -1,12 +1,17 @@
 name: Flowable SQL Server Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 jobs:
   test_mssql:
     name: SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:
@@ -25,7 +30,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -45,16 +50,18 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -PcleanDb,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
   test_mssql_dmn:
     name: DMN SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:
@@ -73,7 +80,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -93,17 +100,19 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pdmn,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
   test_mssql_content:
     name: Content SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:
@@ -122,7 +131,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -142,10 +151,11 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcontent,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-content-engine -am

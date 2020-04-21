@@ -230,8 +230,17 @@ public class ErrorPropagation {
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
-            eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess() != null ? event.getSubProcess() : event);
-            CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
+            if (event.getSubProcess() != null) {
+                eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess());
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(eventSubProcessExecution);
+                ExecutionEntity subProcessStartEventExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
+                subProcessStartEventExecution.setCurrentFlowElement(event);
+                CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessStartEventExecution);
+                
+            } else {
+                eventSubProcessExecution.setCurrentFlowElement(event);
+                CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
+            }
 
         } else {
             ExecutionEntity boundaryExecution = null;
@@ -276,7 +285,8 @@ public class ErrorPropagation {
 
         List<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
-            if (boundaryEvent.getAttachedToRefId() != null && CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) && boundaryEvent.getEventDefinitions().get(0) instanceof ErrorEventDefinition) {
+            if (boundaryEvent.getAttachedToRefId() != null && CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) && boundaryEvent
+                    .getEventDefinitions().get(0) instanceof ErrorEventDefinition && !(boundaryEvent.getAttachedToRef() instanceof EventSubProcess)) {
 
                 ErrorEventDefinition errorEventDef = (ErrorEventDefinition) boundaryEvent.getEventDefinitions().get(0);
                 String eventErrorCode = retrieveErrorCode(bpmnModel, errorEventDef.getErrorCode());

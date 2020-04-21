@@ -81,6 +81,7 @@ public interface DelegateTask extends VariableScope {
     boolean isSuspended();
 
     /** The tenant identifier of this task */
+    @Override
     String getTenantId();
 
     /** The form key for the user task */

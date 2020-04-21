@@ -99,7 +99,7 @@
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
-            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef and  originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="(originalPersistentState.typeName == null and type != null) or (originalPersistentState.typeName != null and type == null) or (originalPersistentState.typeName != type.typeName)">
@@ -163,6 +163,11 @@
 
     <select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectVariablesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+        select * from ${prefix}ACT_RU_VARIABLE
+        where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
     <select id="selectVariablesByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">

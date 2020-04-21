@@ -18,6 +18,7 @@ CmmnRepositoryService repositoryService = cmmnEngine.getCmmnRepositoryService();
 CmmnTaskService taskService = cmmnEngine.getCmmnTaskService();
 CmmnManagementService managementService = cmmnEngine.getCmmnManagementService();
 CmmnHistoryService historyService = cmmnEngine.getCmmnHistoryService();
+DynamicCmmnService dynamicCmmnService = cmmnEngine.getDynamicCmmnService();
 ----
 
 +CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration()+ will initialize and build a CMMN engine and afterwards always return the CMMN engine.
@@ -48,6 +49,8 @@ Tasks that need to be performed by human users of the system are core to a CMMN 
 The *CmmnHistoryService* exposes all historical data gathered by the Flowable CMMN engine. When executing cases, a lot of data can be kept by the engine (this is configurable), such as case instance start times, who did which tasks, how long it took to complete the tasks, which path was followed in each case instance, and so on. This service exposes mainly query  capabilities to access this data.
 
 The *CmmnManagementService* gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.
+
+The *DynamicCmmnService* supports various features to dynamically modify a running CMMN case or its plan items. As an example, you can dynamically inject a plan item into an existing, running case instance or into a running stage to dynamically change the runtime execution of the case.
 
 For more detailed information on the service operations and the engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[the javadocs].
 
@@ -160,12 +163,12 @@ CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().transient
 
 Flowable uses UEL for expression-resolving. UEL stands for _Unified Expression Language_ and is part of the EE6 specification (see link:$$http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html$$[ the EE6 specification] for detailed information).
 
-Expressions can be used in, for example, Java Service tasks, and plan item transitions. Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an +expression+ is expected.
+Expressions can be used in, for example, Java Service tasks, sentry conditions and plan item listeners. Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an +expression+ is expected.
 
-* *Value expression*: resolves to a value. By default, all case variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. Some examples:
+* *Value expression*: resolves to a value. By default, all case variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. In non-Spring environments the beans available to expressions can be set through the ++setBeans++ method of the ++CmmnEngineConfiguration++. Some examples:
 
 ----
-${myVar}
+${myVariable}
 ${myBean.myProperty}
 ----
 
@@ -178,12 +181,114 @@ ${myBean.addNewOrder('orderName')}
 ${myBean.doSomething(myVar, planItemInstance)}
 ----
 
-Note that these expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.
+These expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.
 
-On top of all process variables, there are a few default objects available that can be used in expressions:
+On top of all case instance variables, there are default objects available that can be used in expressions:
 
-* ++caseInstance++: The +DelegateCaseInstance+ holds additional information about the ongoing case instance.
-* ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item.
+* ++caseInstance++: Holds additional information about the ongoing case instance. The ++caseInstance++ keyword is available in all expressions.
+* ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item instance. The ++planItemInstance++ keyword is available in all plan item related expressions (e.g. sentry conditions, plan item lifecycle listeners, service task expression, etc.).
+* ++planItemInstances++: Exposes information about all current plan item instance. See the examples below on how to use it.
+* ++variableContainer++: The +VariableContainer+ for which the expression is being resolved for. A variable container is an abstraction on top of case instances, plan item instances, process instances and executions. The ++variableContainer+ keyword allows to write expressions that are not bound to a specific implementation.
+* ++authenticatedUserId++: The id of the user that is currently authenticated. If no user is authenticated, the variable is not available.
+
+For example:
+
+----
+${caseInstance.id}
+${caseInstance.getVariable('myVariable') == 'test'}
+${caseInstance.setVariable('myVariable', 'test')}
+
+${planItemInstance.getPlanItem().getPlanItemDefinition().getName()}
+${planItemInstance.getVariable('myVariable') == 123}
+${planItemInstance.setVariable('myVariable', 123)}
+
+${variableContainer.getVariable('myVariable')}
+${variableContainer.setVariable('myVariable', 'true')}
+----
+
+The keyword *planItemInstances* deserves some more explanation. Using this keyword it is possible to retrieve all the current plan item instances, but it also acts like a sort of API to retrieve more information about the current plan item instance.
+
+For example, the following expression
+
+----
+${planItemInstances.active().count()}
+----
+
+Will return a count of all plan item instances that are currently in the 'active' state. If we're only interested in a certain plan item, it can be filtered down:
+
+----
+${planItemInstances.definitionId('a').active().count()}
+----
+
+As the example shows, the ++planItemInstances++ keyword allows to chain together various filter methods. Such chaining will use AND semantics. The following methods are supported.
+
+Methods that filter on plan item instance state:
+
+* active()
+* available()
+* enabled()
+* disabled()
+* completed()
+* terminated()
+
+The following state filters are also supported, but do note these reflect non-spec compliant internal states:
+
+* unavailable()
+* waitingForRepetition()
+* asyncActive()
+
+To get all plan item instances that are in a terminal (i.e. terminated or completed) or non-terminal state:
+
+* onlyTerminal()
+* onlyNonTerminal()
+
+To filter based on the identifier that is set in the CMMN model:
+
+* definitionId('id1')
+* definitionIds('id1', 'id2')
+
+To filter based on the name:
+
+* name('name1')
+* names('name1', 'name2', 'name3')
+
+For some use cases, the plan item instances that should be filtered should only be part of the current stage. The 'current stage' is either the parent stage of a plan item or the case instance when there's no parent stage.
+
+* currentStage()
+
+Lastly, there is a set of methods that cannot be chained, as they return a result.
+
+* count(): returns a count of plan item instances, after applying all filters.
+* getDefinitionIds(): returns a list of strings with all the ids as defined in the CMMN model of the matching plan item instances.
+* getDefinitionNames(): returns a list of names with all the names as defined in the CMMN model of the matching plan item instances.
+* getList(): returns the 'raw' list of _org.flowable.cmmn.api.runtime.PlanItemInstance_ instances.
+
+Let's look at some examples where the above methods are used in expressions:
+
+To count all active plan item instances in a case instance:
+
+----
+${planItemInstances.active().count()}
+----
+
+To do a count of all active plan item instances with an id 'a' or 'b':
+
+----
+${planItemInstances.active().definitionIds('a', 'b').count()}
+----
+
+To get all the ids of the plan item instances which are in a terminal state in the current stage:
+
+----
+${planItemInstances.currentStage().onlyTerminal().getDefinitionIds()()}
+----
+
+To store the result of the above expression in a transient variable
+
+----
+${caseInstance.setTransientVariable('myVar', planItemInstances.currentStage().onlyTerminal().getDefinitionIds()}}
+----
+
 
 [[cmmnExpressionsFunctions]]
 
@@ -211,6 +316,7 @@ To make working with case variables easier, a set of out-of-the-box functions is
 ** For +ArrayNode+ variables: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type.
 ** When the variable value is null, false is returned in all cases. When the variable value is not null, and the instance type is not one of the types above, false will be returned.
 * *variables:containsAny(varName, value1, value2, ...)* : similar to the _contains_ function, but _true_ will be returned if *any* (and not all) the passed values is contained in the variable.
+* *variables:base64(varName): converts a Binary or String Variable in Base64 String
 * Comparator functions:
 ** *variables:lowerThan(varName, value)* (alias _:lessThan_ or _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_.
 ** *variables:lowerThanOrEquals(varName, value)* (alias _:lessThanOrEquals_ or _:lte_) : similar, but now for _< =_.
@@ -246,6 +352,142 @@ ${var:get(someVariable) == someValue}
 The function implementations take into account the nullability of the variable (and not throw an exception in case the variable is null) and will handle the equality correctly.
 
 Additionally, it's possible to register custom functions that can be used in expressions. See the +org.flowable.common.engine.api.delegate.FlowableFunctionDelegate+ interface for more information.
+
+=== History Cleaning
+
+By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size.
+
+==== Automatic History Cleaning Configuration
+
+Automatic cleanup of HistoricCaseInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricCaseInstances and associated data that have ended 365 days prior or older.
+
+[source,java,linenums]
+----
+CmmnEngine cmmnEngine = CmmnEngineConfiguration.
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setEnableHistoryCleaning(true)
+    .setHistoryCleaningTimeCycleConfig("0 0 1 * * ?")
+    .setCleanInstancesEndedAfterNumberOfDays(365)
+    .buildCmmnEngine();
+----
+
+Spring properties set in an application.properties or externalized configuration are also available:
+
+[source]
+----
+ flowable.enable-history-cleaning=true
+ flowable.history-cleaning-after-days=365
+ flowable.history-cleaning-cycle=0 0 1 * * ?
+----
+
+==== Manually Deleting History
+
+Manually cleaning history can accomplished by executing methods on the CmmnHistoryService query builders.
+
+Delete all HistoricCaseInstances and their related data that are older than one year.
+
+[source,java,linenums]
+----
+     Calendar cal = new GregorianCalendar();
+     cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+     cmmnHistoryService.createHistoricCaseInstanceQuery()
+       .finishedBefore(cal.getTime())
+       .deleteWithRelatedData();
+----
+
+Delete just HistoricCaseInstances older than one year.
+
+[source,java,linenums]
+----
+    Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    cmmnHistoryService.createHistoricCaseInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+----
+
+Delete just HistoricTaskInstances older than one year.
+
+[source,java,linenums]
+----
+Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    cmmnHistoryService.createHistoricTaskInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+----
+
+[[apiDynamicCmmnService]]
+
+
+=== Dynamic CMMN Service
+
+With the *DynamicCmmnService* you can dynamically modify running case- and plan item instances at runtime. One option is to inject a new plan item into a running case instance or even a stage.
+
+A new plan item to be injected can be referenced from the same definition as the running case or even from another, referenced (delegated) case definition, which then acts like a template.
+
+Regardless where the new plan item is coming from, it will be injected into a running case or stage and will become part of the case agenda which means, that it is evaluated for activation right after injection and if it does not have any entry sentries, is immediately activated. If it has entry-sentries, they will evaluated in the very same way as any others and as soon as satisfied, the injected plan item will become active. It is also considered for parent completion evaluation.
+
+You can also use any of the query APIs to search for such injected plan items, they will be available the very same way as regular, non-injected plan items.
+
+
+Examples:
+
+* Inject a new human task into a running stage or case instance
+* Inject a full stage into a running case or as a child stage into an existing stage
+
+
+==== Inject a new plan item into a running stage
+
+Here is an example on how to inject a human task from a "template" case definition into a running stage:
+
+[source,java,linenums]
+----
+// load the case definition where we want to inject a plan item from
+CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+    .caseDefinitionKey("templateCaseDefinition")
+    .latestVersion()
+    .singleResult();
+
+// get the plan item we want to inject as a case element
+CaseElement templateTask = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("templateTask");
+
+// query for the running stage in an active case
+PlanItemInstance runningStage = cmmnRuntimeService.createPlanItemInstanceQuery()
+    .caseInstanceId(runningCaseId)
+    .planItemInstanceElementId("myStage")
+    .singleResult();
+
+// inject new plan item (human task) into the running stage
+PlanItemInstance injectedTask = dynamicCmmnService
+    .createInjectedPlanItemInstanceBuilder()
+    .name("Injected Task")
+    .caseDefinitionId(dynamicPlanItemCase.getId())
+    .elementId(templateTask.getId())
+    .createInStage(runningStage.getId());
+----
+
+The second example creates and injects a full blown stage (including child plan items) into a running case instance:
+
+[source,java,linenums]
+----
+// load the case definition where we want to inject a stage from
+CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+    .caseDefinitionKey("dynamicPlanItemCase")
+    .latestVersion()
+    .singleResult();
+
+CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("stageElement");
+
+// inject new stage into existing, running case
+PlanItemInstance injectedStage = dynamicCmmnService
+    .createInjectedPlanItemInstanceBuilder()
+    .name("Injected Stage")
+    .caseDefinitionId(dynamicPlanItemCase.getId())
+    .elementId(templateStage.getId())
+    .createInCase(runningCaseId);
+----
+
 
 
 [[apiUnitTesting]]

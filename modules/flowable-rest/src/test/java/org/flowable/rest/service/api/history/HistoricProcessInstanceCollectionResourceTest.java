@@ -62,13 +62,14 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey", processVariables);
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         startTime.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
-        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey2");
 
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES);
 
@@ -81,7 +82,13 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId() + "&finished=true", processInstance.getId());
 
         assertResultsPresentInDataResponse(url + "?processDefinitionKey=oneTaskProcess", processInstance.getId(), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?businessKey=businessKey", processInstance.getId());
+        assertResultsPresentInDataResponse(url + "?businessKey=businessKey2", processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?businessKeyLike=" + encode("business%"), processInstance.getId(), processInstance2.getId());
 
+        
         // includeProcessVariables
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=false&processInstanceId=" + processInstance.getId(), processInstance.getId(), new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=true&processInstanceId=" + processInstance.getId(), processInstance.getId(), processVariables);

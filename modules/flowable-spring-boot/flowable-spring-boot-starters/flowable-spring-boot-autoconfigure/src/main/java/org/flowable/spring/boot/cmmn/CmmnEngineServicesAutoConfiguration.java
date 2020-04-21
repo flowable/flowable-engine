@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
@@ -40,7 +41,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnCmmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -57,7 +58,7 @@ public class CmmnEngineServicesAutoConfiguration {
      * If a process engine is present and no app engine that means that the CmmnEngine was created as part of the process engine.
      * Therefore extract it from the CmmnEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.cmmn.engine.CmmnEngine",
         "org.flowable.app.engine.AppEngine"
@@ -81,7 +82,7 @@ public class CmmnEngineServicesAutoConfiguration {
      * If an app engine is present that means that the CmmnEngine was created as part of the app engine.
      * Therefore extract it from the CmmnEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.cmmn.engine.CmmnEngine"
     })
@@ -103,7 +104,7 @@ public class CmmnEngineServicesAutoConfiguration {
     /**
      * If there is no process engine configuration, then trigger a creation of the cmmn engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.cmmn.engine.CmmnEngine",
         "org.flowable.engine.ProcessEngine",
@@ -125,6 +126,11 @@ public class CmmnEngineServicesAutoConfiguration {
     @Bean
     public CmmnRuntimeService cmmnRuntimeService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnRuntimeService();
+    }
+
+    @Bean
+    public DynamicCmmnService dynamicCmmnService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getDynamicCmmnService();
     }
 
     @Bean

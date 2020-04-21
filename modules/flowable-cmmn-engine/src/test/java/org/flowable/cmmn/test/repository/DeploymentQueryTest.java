@@ -12,10 +12,7 @@
  */
 package org.flowable.cmmn.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -29,24 +26,24 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class DeploymentQueryTest extends FlowableCmmnTestCase {
-    
+
     private String deploymentId1;
     private String deploymentId2;
-    
+
     @Before
     public void deployTestDeployments() {
         this.deploymentId1 = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
-            .deploy()
-            .getId();
+                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
+                .deploy()
+                .getId();
         this.deploymentId2 = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/repository/simple-case2.cmmn")
-            .name("testName")
-            .category("testCategory")
-            .deploy()
-            .getId();
+                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case2.cmmn")
+                .name("testName")
+                .category("testCategory")
+                .deploy()
+                .getId();
     }
-    
+
     @After
     public void deleteTestDeployments() {
         List<CmmnDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().list();
@@ -54,118 +51,111 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
             cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true);
         }
     }
-    
+
     @Test
     public void testQueryNoParams() {
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().count());
-        
-        boolean deployment1Found = false;
-        boolean deployment2Found = false;
-        for (CmmnDeployment cmmnDeployment : cmmnRepositoryService.createDeploymentQuery().list()) {
-            if (deploymentId1.equals(cmmnDeployment.getId())) {
-                deployment1Found = true;
-            } else if (deploymentId2.equals(cmmnDeployment.getId())) {
-                deployment2Found = true;
-            }
-        }
-        assertTrue(deployment1Found);
-        assertTrue(deployment2Found);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(2);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().list())
+                .extracting(CmmnDeployment::getId)
+                .contains(deploymentId1, deploymentId2);
     }
-    
+
     @Test
     public void testQueryByDeploymentId() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult());
-        assertEquals(deploymentId1, cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).count());
-        
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).singleResult());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult().getId()).isEqualTo(deploymentId1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testQueryByInvalidDeploymentId() {
-        assertNull(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isEqualTo(0);
     }
-    
+
     @Test
     public void testQueryByDeploymentName() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").singleResult());
-        assertEquals(deploymentId2, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").singleResult().getId()).isEqualTo(deploymentId2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testQueryByInvalidDeploymentName() {
-        assertNull(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").singleResult());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").singleResult()).isNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").count()).isEqualTo(0);
     }
-    
+
     @Test
     public void testQueryByDeploymentNameLike() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult());
-        assertEquals(deploymentId2, cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").count());
-        
-        assertNull(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").singleResult());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").list().size());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult().getId()).isEqualTo(deploymentId2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("test%").count()).isEqualTo(1);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").singleResult()).isNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").count()).isEqualTo(0);
     }
-    
+
     @Test
     public void testQueryByDeploymentCategory() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").singleResult());
-        assertEquals(deploymentId2, cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").singleResult().getId()).isEqualTo(deploymentId2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("testCategory").count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testQueryByInvalidDeploymentCategory() {
-        assertNull(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").singleResult());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").list().size());
-        assertEquals(0, cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").singleResult()).isNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").count()).isEqualTo(0);
     }
-    
+
     @Test
     public void testQueryByDeploymentCategoryNotEquals() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").singleResult());
-        assertEquals(deploymentId1, cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").singleResult().getId()).isEqualTo(deploymentId1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategory").count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testQueryByDeploymentNameAndCategory() {
-        assertNotNull(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").singleResult());
-        assertEquals(deploymentId2, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").singleResult().getId());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").list().size());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").singleResult()).isNotNull();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").singleResult().getId())
+                .isEqualTo(deploymentId2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("testName").deploymentCategory("testCategory").count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testOrdering() {
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().asc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().asc().count());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().count());
-        
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().count());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().count());
-        
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().count());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().list().size());
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().asc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().asc().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().count()).isEqualTo(2);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().count()).isEqualTo(2);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().count()).isEqualTo(2);
     }
 
 }

@@ -4,7 +4,7 @@
 
 === Spring Boot
 
-Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that can you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
+Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
 
 For more information on Spring Boot, see link:$$http://projects.spring.io/spring-boot/$$[http://projects.spring.io/spring-boot/]
 
@@ -44,7 +44,7 @@ You can now run your Spring Boot application:
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -178,7 +178,7 @@ Also, add following code lines to test if the deployment actually worked. The _C
 
 [source,java,linenums]
 ----
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -371,7 +371,7 @@ To add JPA support for Flowable in Spring Boot, add following dependency:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
-    <version>${spring-boot.version</version>
+    <version>${spring-boot.version}</version>
 </dependency>
 ----
 
@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.5.0-SNAPSHOT"
+    "version": "6.5.0.event-SNAPSHOT"
   }
 }
 ----

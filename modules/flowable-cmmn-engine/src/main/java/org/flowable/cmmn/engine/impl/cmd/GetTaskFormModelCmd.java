@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -86,13 +86,15 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
         String parentDeploymentId = null;
         if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
-            CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
-            CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
-            CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
-            if (cmmnDeployment.getParentDeploymentId() != null) {
-                parentDeploymentId = cmmnDeployment.getParentDeploymentId();
-            } else {
-                parentDeploymentId = cmmnDeployment.getId();
+            PlanItemDefinition itemDefinition = CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).findPlanItemDefinition(task.getTaskDefinitionKey());
+            boolean sameDeployment = true;
+            if (itemDefinition instanceof HumanTask) {
+                sameDeployment = ((HumanTask) itemDefinition).isSameDeployment();
+            }
+
+            if (sameDeployment) {
+                // If it is not same deployment then there is no need to search for parent deployment
+                parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(task.getScopeDefinitionId(), cmmnEngineConfiguration);
             }
         }
 

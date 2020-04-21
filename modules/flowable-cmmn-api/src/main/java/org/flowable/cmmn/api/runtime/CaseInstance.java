@@ -30,7 +30,9 @@ public interface CaseInstance {
     String getStartUserId();
     String getCallbackId();
     String getCallbackType();
-    boolean isCompleteable();
+    String getReferenceId();
+    String getReferenceType();
+    boolean isCompletable();
     String getTenantId();
 
     /**

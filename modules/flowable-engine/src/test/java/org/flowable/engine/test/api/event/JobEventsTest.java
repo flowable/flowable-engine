@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,6 +22,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
@@ -36,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to jobs.
- * 
+ *
  * @author Frederik Heremans
  */
 public class JobEventsTest extends PluggableFlowableTestCase {
@@ -52,31 +56,31 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     public void testJobEntityEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJobEvents");
         Job theJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(theJob);
+        assertThat(theJob).isNotNull();
 
         // Check if create-event has been dispatched
-        assertEquals(3, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(3);
         FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_SCHEDULED);
         checkEventContext(event, theJob);
 
         listener.clearEventsReceived();
 
         // Update the job-entity. Check if update event is dispatched with update job entity
         managementService.setTimerJobRetries(theJob.getId(), 5);
-        assertEquals(1, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(1);
         event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         Job updatedJob = (Job) ((FlowableEntityEvent) event).getEntity();
-        assertEquals(5, updatedJob.getRetries());
+        assertThat(updatedJob.getRetries()).isEqualTo(5);
         checkEventContext(event, theJob);
 
         checkEventCount(0, FlowableEngineEventType.TIMER_SCHEDULED);
@@ -91,29 +95,29 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         managementService.executeJob(jobId);
 
         // Check delete-event has been dispatched
-        assertEquals(6, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(6);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, theJob);
 
         // First, a timer fired event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(event, theJob);
 
         // Next, a delete event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         checkEventContext(event, theJob);
 
         // Finally, a complete event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
-        assertEquals(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_EXECUTION_SUCCESS);
         checkEventContext(event, theJob);
 
         checkEventCount(0, FlowableEngineEventType.TIMER_SCHEDULED);
@@ -127,20 +131,20 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     public void testJobEntityEventsForRescheduleTimer() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJobEventsForReschedule");
         Job originalTimerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(originalTimerJob);
+        assertThat(originalTimerJob).isNotNull();
 
         // Check if create-event has been dispatched
-        assertEquals(3, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(3);
         FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, originalTimerJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, originalTimerJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_SCHEDULED);
         checkEventContext(event, originalTimerJob);
 
         listener.clearEventsReceived();
@@ -149,12 +153,12 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         managementService.rescheduleTimeDurationJob(originalTimerJob.getId(), "PT2H");
 
         Job rescheduledJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(rescheduledJob);
-        assertNotSame(originalTimerJob.getId(), rescheduledJob.getId());
+        assertThat(rescheduledJob).isNotNull();
+        assertThat(rescheduledJob.getId()).isNotSameAs(originalTimerJob.getId());
 
-        assertEquals(5, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(5);
         event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         checkEventContext(event, originalTimerJob);
 
         Job deletedJob = (Job) ((FlowableEntityEvent) event).getEntity();
@@ -162,25 +166,25 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
         Job newJob = (Job) ((FlowableEntityEvent) event).getEntity();
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, newJob);
         checkEventContext(event, rescheduledJob);
-        assertEquals(newJob.getId(), rescheduledJob.getId());
+        assertThat(rescheduledJob.getId()).isEqualTo(newJob.getId());
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         newJob = (Job) ((FlowableEntityEvent) event).getEntity();
         checkEventContext(event, newJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.JOB_RESCHEDULED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_RESCHEDULED);
         Job newTimerJob = (Job) ((FlowableEntityEvent) event).getEntity();
         checkEventContext(event, rescheduledJob);
-        assertEquals(rescheduledJob.getId(), newTimerJob.getId());
-        assertEquals(simpleDateFormat.format(rescheduledJob.getDuedate()), simpleDateFormat.format(newTimerJob.getDuedate()));
+        assertThat(newTimerJob.getId()).isEqualTo(rescheduledJob.getId());
+        assertThat(simpleDateFormat.format(newTimerJob.getDuedate())).isEqualTo(simpleDateFormat.format(rescheduledJob.getDuedate()));
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_SCHEDULED);
         newJob = (Job) ((FlowableEntityEvent) event).getEntity();
         checkEventContext(event, newJob);
 
@@ -194,29 +198,29 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         managementService.executeJob(rescheduledJob.getId());
 
         // Check delete-event has been dispatched
-        assertEquals(6, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(6);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, rescheduledJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, rescheduledJob);
 
         // First, a timer fired event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(event, rescheduledJob);
 
         // Next, a delete event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         checkEventContext(event, rescheduledJob);
 
         // Finally, a complete event has been dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
-        assertEquals(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_EXECUTION_SUCCESS);
         checkEventContext(event, rescheduledJob);
 
         checkEventCount(0, FlowableEngineEventType.TIMER_SCHEDULED);
@@ -241,28 +245,28 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testRepetitionJobEvents");
         Job theJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(theJob);
+        assertThat(theJob).isNotNull();
 
         // Check if create-event has been dispatched
-        assertEquals(3, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(3);
         FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_SCHEDULED);
         checkEventContext(event, theJob);
 
         listener.clearEventsReceived();
 
         // no timer jobs will be fired
         waitForJobExecutorToProcessAllJobs(2000, 200);
-        assertEquals(0, listener.getEventsReceived().size());
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(listener.getEventsReceived()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         Job firstTimerInstance = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
         nowCalendar.add(Calendar.HOUR, 1);
@@ -273,9 +277,9 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(2000, 200);
 
         // a new timer should be created with the repeat
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         Job secondTimerInstance = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotSame(firstTimerInstance.getId(), secondTimerInstance.getId());
+        assertThat(secondTimerInstance.getId()).isNotSameAs(firstTimerInstance.getId());
 
         checkEventCount(1, FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(filterEvents(FlowableEngineEventType.TIMER_FIRED).get(0), firstTimerInstance);
@@ -290,14 +294,14 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         // the second timer job will be fired and no jobs should be remaining
         waitForJobExecutorToProcessAllJobs(2000, 200);
-        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
 
         nowCalendar.add(Calendar.HOUR, 1);
         nowCalendar.add(Calendar.MINUTE, 5);
         testClock.setCurrentTime(nowCalendar.getTime());
         waitForJobExecutorToProcessAllJobs(2000, 200);
 
-        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
 
         checkEventCount(1, FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(filterEvents(FlowableEngineEventType.TIMER_FIRED).get(0), secondTimerInstance);
@@ -345,12 +349,14 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     @Test
     public void testJobCanceledAndTimerStartEventOnProcessRedeploy() throws Exception {
         // GIVEN deploy process definition
-        String deployment1 = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml").deploy().getId();
+        String deployment1 = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml").deploy().getId();
         checkEventCount(1, FlowableEngineEventType.TIMER_SCHEDULED);
         listener.clearEventsReceived();
 
         // WHEN
-        String deployment2 = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml").deploy().getId();
+        String deployment2 = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/api/event/JobEventsTest.testTimerFiredForTimerStart.bpmn20.xml").deploy().getId();
 
         // THEN
         checkEventCount(1, FlowableEngineEventType.JOB_CANCELED);
@@ -379,7 +385,8 @@ public class JobEventsTest extends PluggableFlowableTestCase {
                 timerCancelledCount++;
             }
         }
-        assertEquals(eventType.name() + " event was expected " + expectedCount + " times.", expectedCount, timerCancelledCount);
+        assertThat(expectedCount).as(eventType.name() + " event was expected " + expectedCount + " times.")
+                .isEqualTo(timerCancelledCount);
     }
 
     private List<FlowableEngineEvent> filterEvents(FlowableEngineEventType eventType) {
@@ -408,18 +415,18 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(2000, 100);
 
         // Check Timer fired event has been dispatched
-        assertEquals(6, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(6);
 
         // timer entity created first
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, listener.getEventsReceived().get(0).getType());
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         // timer entity initialized
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, listener.getEventsReceived().get(1).getType());
+        assertThat(listener.getEventsReceived().get(1).getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         // timer entity deleted
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(2).getType());
+        assertThat(listener.getEventsReceived().get(2).getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         // job fired
-        assertEquals(FlowableEngineEventType.TIMER_FIRED, listener.getEventsReceived().get(3).getType());
+        assertThat(listener.getEventsReceived().get(3).getType()).isEqualTo(FlowableEngineEventType.TIMER_FIRED);
         // job executed successfully
-        assertEquals(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, listener.getEventsReceived().get(5).getType());
+        assertThat(listener.getEventsReceived().get(5).getType()).isEqualTo(FlowableEngineEventType.JOB_EXECUTION_SUCCESS);
 
         checkEventCount(0, FlowableEngineEventType.JOB_CANCELED);
     }
@@ -451,7 +458,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     public void testJobEntityEventsException() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJobEvents");
         Job theJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(theJob);
+        assertThat(theJob).isNotNull();
 
         // Set retries to 1, to prevent multiple chains of events being thrown
         managementService.setTimerJobRetries(theJob.getId(), 1);
@@ -465,58 +472,54 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         listener.clearEventsReceived();
 
-        try {
-            managementService.executeJob(executableJob.getId());
-            fail("Expected exception");
-        } catch (Exception e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> managementService.executeJob(executableJob.getId()))
+                .isInstanceOf(FlowableException.class);
 
         theJob = managementService.createDeadLetterJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(theJob);
-        assertEquals("timer", theJob.getElementId());
-        assertEquals("Timer", theJob.getElementName());
+        assertThat(theJob).isNotNull();
+        assertThat(theJob.getElementId()).isEqualTo("timer");
+        assertThat(theJob.getElementName()).isEqualTo("Timer");
 
         // Check delete-event has been dispatched
-        assertEquals(8, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(8);
 
         // First, the timer was fired
         FlowableEngineEvent event = (FlowableEngineEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.TIMER_FIRED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(event, theJob);
 
         // Second, the job-entity was deleted, as the job was executed
         event = (FlowableEngineEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         checkEventContext(event, theJob);
 
         // Next, a job failed event is dispatched
         event = (FlowableEngineEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.JOB_EXECUTION_FAILURE, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_EXECUTION_FAILURE);
         checkEventContext(event, theJob);
 
         // Finally, an timer create event is received and the job count is decremented
         event = (FlowableEngineEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         checkEventContext(event, theJob);
 
         // original job is deleted
         event = (FlowableEngineEvent) listener.getEventsReceived().get(5);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         checkEventContext(event, theJob);
 
         // timer job updated
         event = (FlowableEngineEvent) listener.getEventsReceived().get(6);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         checkEventContext(event, theJob);
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(7);
-        assertEquals(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, event.getType());
-        assertEquals(0, ((Job) ((FlowableEntityEvent) event).getEntity()).getRetries());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_RETRIES_DECREMENTED);
+        assertThat(((Job) ((FlowableEntityEvent) event).getEntity()).getRetries()).isEqualTo(0);
         checkEventContext(event, theJob);
     }
 
@@ -536,7 +539,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("Inside Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Inside Task");
 
         // Force timer to trigger so that subprocess will flow to terminate end event
         Calendar later = Calendar.getInstance();
@@ -564,7 +567,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         }
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("Outside Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Outside Task");
 
         taskService.complete(task.getId());
 
@@ -574,14 +577,14 @@ public class JobEventsTest extends PluggableFlowableTestCase {
     }
 
     protected void checkEventContext(FlowableEngineEvent event, Job entity) {
-        assertEquals(entity.getProcessInstanceId(), event.getProcessInstanceId());
-        assertEquals(entity.getProcessDefinitionId(), event.getProcessDefinitionId());
-        assertNotNull(event.getExecutionId());
+        assertThat(event.getProcessInstanceId()).isEqualTo(entity.getProcessInstanceId());
+        assertThat(event.getProcessDefinitionId()).isEqualTo(entity.getProcessDefinitionId());
+        assertThat(event.getExecutionId()).isNotNull();
 
-        assertTrue(event instanceof FlowableEntityEvent);
+        assertThat(event).isInstanceOf(FlowableEntityEvent.class);
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
-        assertTrue(entityEvent.getEntity() instanceof Job);
-        assertEquals(entity.getId(), ((Job) entityEvent.getEntity()).getId());
+        assertThat(entityEvent.getEntity()).isInstanceOf(Job.class);
+        assertThat(((Job) entityEvent.getEntity()).getId()).isEqualTo(entity.getId());
     }
 
     @BeforeEach

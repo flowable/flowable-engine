@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -27,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -285,6 +287,19 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByBusinessKeyLike() {
+        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, "1A").getId());
+        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, "A1").getId());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%0").count());
+        assertEquals(3, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("1%").count());
+        assertEquals(3, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%1").count());
+        assertEquals(4, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%1%").count());
+        assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%A%").count());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%B%").count());
+    }
+    
+
+    @Test
     public void testQueryByInvalidBusinessKey() {
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("invalid").count());
 
@@ -391,11 +406,16 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().deploymentIdIn(deploymentIds).list();
         assertEquals(PROCESS_DEPLOY_COUNT, instances.size());
 
-        ProcessInstance processInstance = instances.get(0);
-        assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
-        assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
-        assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
+        assertThat(instances)
+            .extracting(ProcessInstance::getBusinessKey, ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionName, ProcessInstance::getProcessDefinitionVersion, ProcessInstance::getDeploymentId)
+            .as("businessKey, processDefinitionKey, processDefinitionName, processDefinitionVersion, deploymentId")
+            .containsExactlyInAnyOrder(
+                tuple("0", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, deployment.getId()),
+                tuple("1", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, deployment.getId()),
+                tuple("2", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, deployment.getId()),
+                tuple("3", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, deployment.getId()),
+                tuple("1", PROCESS_DEFINITION_KEY_2, "oneTaskProcess2Name", 1, deployment.getId())
+            );
 
         assertEquals(PROCESS_DEPLOY_COUNT, runtimeService.createProcessInstanceQuery().deploymentIdIn(deploymentIds).count());
     }
@@ -515,6 +535,62 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertNotNull(subProcessInstance);
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/superProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    public void testQueryByInvolvedUser() {
+        ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
+        runtimeService.addUserIdentityLink(superProcessInstance.getId(), "kermit", "specialLink");
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superProcessInstance.getId());
+        ProcessInstance subProcessInstance = query.singleResult();
+        assertNotNull(subProcessInstance);
+        runtimeService.addUserIdentityLink(subProcessInstance.getId(), "kermit", "anotherLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "anotherLink").count());
+        assertEquals(subProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedUser("kermit", "anotherLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "undefined").processDefinitionKey("undefined").endOr().count());
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/superProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    public void testQueryByInvolvedGroup() {
+        ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
+        runtimeService.addGroupIdentityLink(superProcessInstance.getId(), "sales", "specialLink");
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superProcessInstance.getId());
+        ProcessInstance subProcessInstance = query.singleResult();
+        assertNotNull(subProcessInstance);
+        runtimeService.addGroupIdentityLink(subProcessInstance.getId(), "sales", "anotherLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "anotherLink").count());
+        assertEquals(subProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroup("sales", "anotherLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "undefined").processDefinitionKey("undefined").endOr().count());
     }
 
     @Test
@@ -2050,12 +2126,12 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(Date.from(now.plus(1, ChronoUnit.HOURS)));
         String nowPlus1InstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
 
-        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().asc().list())
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().asc().list())
             .extracting(ProcessInstance::getId)
             .as("ascending order by startTime")
             .containsExactly(nowMinus1InstanceId, nowInstanceId, nowPlus1InstanceId);
 
-        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().desc().list())
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("now").orderByStartTime().desc().list())
             .extracting(ProcessInstance::getId)
             .as("descending order by startTime")
             .containsExactly(nowPlus1InstanceId, nowInstanceId, nowMinus1InstanceId);
@@ -2065,13 +2141,74 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidCallbackId() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
-        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").list()).isNullOrEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").list()).isNullOrEmpty();
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidCallbackType() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
-        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceId() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceId("testReferenceId")
+            .start()
+            .getId();
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceId("testReferenceId").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidReferenceId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceId("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceType() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceType("testReferenceType")
+            .start()
+            .getId();
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceType("testReferenceType").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidReferenceType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceType("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceIdAndType() {
+        String[] processInstanceIds = new String[6];
+        for (int i = 0; i < processInstanceIds.length; i++) {
+            String processInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start()
+                .getId();
+            processInstanceIds[i] = processInstanceId;
+        }
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceId("testReferenceId").processInstanceReferenceType("testReferenceType").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceIds);
     }
 }

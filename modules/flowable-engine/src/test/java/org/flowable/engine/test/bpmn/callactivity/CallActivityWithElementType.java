@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.test.bpmn.callactivity;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

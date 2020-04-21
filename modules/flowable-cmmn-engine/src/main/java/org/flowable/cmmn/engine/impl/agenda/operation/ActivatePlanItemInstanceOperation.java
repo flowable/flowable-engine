@@ -85,18 +85,10 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Activate PlanItem] ");
-
-        if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append(" (");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(") ");
-        } else {
-            stringBuilder.append(planItem.getId());
-        }
+       stringBuilder.append(planItem);
 
         if (entryCriterionId != null) {
-            stringBuilder.append("via entry criterion ").append(entryCriterionId);
+            stringBuilder.append(" via entry criterion ").append(entryCriterionId);
         }
 
         return stringBuilder.toString();

@@ -40,6 +40,12 @@ public interface JobQuery extends Query<JobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     JobQuery processDefinitionId(String processDefinitionId);
     
+    /** Only select jobs which exist for the given category */
+    JobQuery category(String category);
+    
+    /** Only select jobs like for the given category value */
+    JobQuery categoryLike(String categoryLike);
+    
     /** Only select jobs which exist for the given element id */
     JobQuery elementId(String elementId);
     

@@ -14,6 +14,8 @@ COPY assets/flowable-modeler.war.original /opt/tomcat/webapps/flowable-modeler.w
 COPY assets/flowable-task.war.original /opt/tomcat/webapps/flowable-task.war
 COPY assets/flowable-admin.war.original /opt/tomcat/webapps/flowable-admin.war
 
+COPY application.properties /opt/tomcat/lib/application.properties
+
 RUN cd /opt/tomcat && chgrp -R tomcat /opt/tomcat && chmod -R g+r conf && chmod g+x conf && chown -R tomcat webapps/ work/ temp/ logs/ \
     && chown tomcat /wait-for-something.sh && chmod +x /wait-for-something.sh
 

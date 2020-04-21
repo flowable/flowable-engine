@@ -56,7 +56,9 @@ public class HistoricTaskInstanceResponse {
     protected List<RestVariable> variables = new ArrayList<>();
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
     protected String category;
 
@@ -264,12 +266,28 @@ public class HistoricTaskInstanceResponse {
         this.scopeId = scopeId;
     }
 
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
     public String getScopeType() {
         return scopeType;
     }
 
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     public void setTenantId(String tenantId) {

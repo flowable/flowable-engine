@@ -19,7 +19,7 @@
             #{scopeDefinitionId, jdbcType=VARCHAR},
             #{submittedDate, jdbcType=TIMESTAMP},
             #{submittedBy, jdbcType=VARCHAR},
-            #{resourceRef, typeHandler=ResourceRefTypeHandler},
+            #{resourceRef, typeHandler=FormResourceRefTypeHandler},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
   
@@ -39,7 +39,7 @@
          #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
          #{formInstance.submittedDate, jdbcType=TIMESTAMP},
          #{formInstance.submittedBy, jdbcType=VARCHAR},
-         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.resourceRef, typeHandler=FormResourceRefTypeHandler},
          #{formInstance.tenantId, jdbcType=VARCHAR})
     </foreach>
   </insert>
@@ -59,7 +59,7 @@
          #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
          #{formInstance.submittedDate, jdbcType=TIMESTAMP},
          #{formInstance.submittedBy, jdbcType=VARCHAR},
-         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.resourceRef, typeHandler=FormResourceRefTypeHandler},
          #{formInstance.tenantId, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual
@@ -106,7 +106,7 @@
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="submittedDate" column="SUBMITTED_DATE_" jdbcType="TIMESTAMP"/>
     <result property="submittedBy" column="SUBMITTED_BY_" jdbcType="VARCHAR"/>
-    <result property="resourceRef" column="FORM_VALUES_ID_" typeHandler="ResourceRefTypeHandler" />
+    <result property="resourceRef" column="FORM_VALUES_ID_" typeHandler="FormResourceRefTypeHandler" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 

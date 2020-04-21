@@ -97,7 +97,10 @@ public class BatchByteArrayRef implements Serializable {
     private void ensureInitialized() {
         if (id != null && entity == null) {
             entity = CommandContextUtil.getBatchByteArrayEntityManager().findById(id);
-            name = entity.getName();
+
+            if (entity != null) {
+                name = entity.getName();
+            }
         }
     }
 

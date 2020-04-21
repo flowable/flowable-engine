@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.event;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
@@ -23,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to deployments.
- * 
+ *
  * @author Frederik Heremans
  */
 public class DeploymentEventsTest extends PluggableFlowableTestCase {
@@ -39,42 +41,42 @@ public class DeploymentEventsTest extends PluggableFlowableTestCase {
         try {
             listener.clearEventsReceived();
             deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml").deploy();
-            assertNotNull(deployment);
+            assertThat(deployment).isNotNull();
 
             // Check create-event
-            assertEquals(2, listener.getEventsReceived().size());
-            assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+            assertThat(listener.getEventsReceived()).hasSize(2);
+            assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEntityEvent.class);
 
             FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+            assertThat(((Deployment) event.getEntity()).getId()).isEqualTo(deployment.getId());
 
-            assertTrue(listener.getEventsReceived().get(1) instanceof FlowableEntityEvent);
+            assertThat(listener.getEventsReceived().get(1)).isInstanceOf(FlowableEntityEvent.class);
             event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-            assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
+            assertThat(((Deployment) event.getEntity()).getId()).isEqualTo(deployment.getId());
 
             listener.clearEventsReceived();
 
             // Check update event when category is updated
             repositoryService.setDeploymentCategory(deployment.getId(), "test");
-            assertEquals(1, listener.getEventsReceived().size());
-            assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+            assertThat(listener.getEventsReceived()).hasSize(1);
+            assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEntityEvent.class);
 
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
-            assertEquals("test", ((Deployment) event.getEntity()).getCategory());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+            assertThat(((Deployment) event.getEntity()).getId()).isEqualTo(deployment.getId());
+            assertThat(((Deployment) event.getEntity()).getCategory()).isEqualTo("test");
             listener.clearEventsReceived();
 
             // Check delete event when category is updated
             repositoryService.deleteDeployment(deployment.getId(), true);
-            assertEquals(1, listener.getEventsReceived().size());
-            assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEntityEvent);
+            assertThat(listener.getEventsReceived()).hasSize(1);
+            assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEntityEvent.class);
 
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-            assertEquals(deployment.getId(), ((Deployment) event.getEntity()).getId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+            assertThat(((Deployment) event.getEntity()).getId()).isEqualTo(deployment.getId());
             listener.clearEventsReceived();
 
         } finally {

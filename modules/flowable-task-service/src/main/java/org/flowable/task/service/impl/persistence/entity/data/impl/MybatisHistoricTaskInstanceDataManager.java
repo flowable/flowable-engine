@@ -65,7 +65,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
     }
 
     @Override
@@ -85,7 +85,8 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         }
         historicTaskInstanceQuery.setFirstResult(0);
 
-        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery);
+        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {

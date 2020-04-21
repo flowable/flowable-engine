@@ -97,26 +97,32 @@ public class BatchBuilderImpl implements BatchBuilder {
         }
     }
 
+    @Override
     public String getBatchType() {
         return batchType;
     }
 
+    @Override
     public String getSearchKey() {
         return searchKey;
     }
 
+    @Override
     public String getSearchKey2() {
         return searchKey2;
     }
 
+    @Override
     public String getStatus() {
         return status;
     }
 
+    @Override
     public String getBatchDocumentJson() {
         return batchDocumentJson;
     }
     
+    @Override
     public String getTenantId() {
         return tenantId;
     }

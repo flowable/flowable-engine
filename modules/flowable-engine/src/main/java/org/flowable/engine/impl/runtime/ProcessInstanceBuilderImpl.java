@@ -29,11 +29,15 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     protected String processDefinitionId;
     protected String processDefinitionKey;
+    protected String processDefinitionParentDeploymentId;
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String stageInstanceId;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
@@ -50,6 +54,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId) {
+        this.processDefinitionParentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -86,6 +96,24 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceType(String referenceType) {
+        this.referenceType = referenceType;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder stageInstanceId(String stageInstanceId) {
+        this.stageInstanceId = stageInstanceId;
         return this;
     }
 
@@ -197,6 +225,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return processDefinitionKey;
     }
 
+    public String getProcessDefinitionParentDeploymentId() {
+        return processDefinitionParentDeploymentId;
+    }
+
     public String getMessageName() {
         return messageName;
     }
@@ -215,6 +247,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public String getStageInstanceId() {
+        return stageInstanceId;
     }
 
     public String getTenantId() {
