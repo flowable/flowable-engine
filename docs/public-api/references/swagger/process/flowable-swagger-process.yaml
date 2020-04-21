@@ -5203,7 +5203,7 @@ paths:
         type: "string"
       - name: "businessKeyLike"
         in: "query"
-        description: "Only return process instancess with the businessKey like the\
+        description: "Only return process instances with the businessKey like the\
           \ given key."
         required: false
         type: "string"

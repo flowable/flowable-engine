@@ -2410,7 +2410,7 @@ paths:
         400:
           description: "Indicates the body does not contain the correct information."
         404:
-          description: "Indicates the requested ccase definition was not found."
+          description: "Indicates the requested case definition was not found."
       security:
       - basicAuth: []
   /cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks/{family}/{identityId}:
