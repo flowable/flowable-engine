@@ -207,11 +207,12 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     }
 
     @Override
-    public void updateLockTime(String caseInstanceId, Date lockDate, Date expirationTime) {
+    public void updateLockTime(String caseInstanceId, Date lockDate, String lockOwner, Date expirationTime) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", caseInstanceId);
         params.put("lockTime", lockDate);
         params.put("expirationTime", expirationTime);
+        params.put("lockOwner", lockOwner);
 
         int result = getDbSqlSession().update("updateCaseInstanceLockTime", params);
         if (result == 0) {
@@ -224,6 +225,13 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", caseInstanceId);
         getDbSqlSession().update("clearCaseInstanceLockTime", params);
+    }
+
+    @Override
+    public void clearAllLockTimes(String lockOwner) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("lockOwner", lockOwner);
+        getDbSqlSession().update("clearAllCaseInstanceLockTimes", params);
     }
 
 }

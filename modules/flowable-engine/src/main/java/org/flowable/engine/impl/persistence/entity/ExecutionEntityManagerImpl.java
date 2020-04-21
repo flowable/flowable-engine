@@ -970,14 +970,15 @@ public class ExecutionEntityManagerImpl
     @Override
     public void updateProcessInstanceLockTime(String processInstanceId) {
         Date expirationTime = getClock().getCurrentTime();
-        int lockMillis = getAsyncExecutor().getAsyncJobLockTimeInMillis();
+        AsyncExecutor asyncExecutor = getAsyncExecutor();
+        int lockMillis = asyncExecutor.getAsyncJobLockTimeInMillis();
 
         GregorianCalendar lockCal = new GregorianCalendar();
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
         Date lockDate = lockCal.getTime();
 
-        dataManager.updateProcessInstanceLockTime(processInstanceId, lockDate, expirationTime);
+        dataManager.updateProcessInstanceLockTime(processInstanceId, lockDate, asyncExecutor.getLockOwner(), expirationTime);
     }
 
     @Override
@@ -985,6 +986,12 @@ public class ExecutionEntityManagerImpl
         dataManager.clearProcessInstanceLockTime(processInstanceId);
     }
 
+    @Override
+    public void clearAllProcessInstanceLockTimes() {
+        if (engineConfiguration.getAsyncExecutor() != null) {
+            dataManager.clearAllProcessInstanceLockTimes(engineConfiguration.getAsyncExecutor().getLockOwner());
+        }
+    }
     @Override
     public String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey) {
         if (executionEntity.isProcessInstanceType() && businessKey != null) {

@@ -95,9 +95,9 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /**
      * Whether to unlock jobs that are owned by this executor (have the same
-     * lockOwner) at startup
+     * lockOwner) at startup or shutdown.
      */
-    protected boolean unlockOwnedJobs;
+    protected boolean unlockOwnedJobs = true;
 
     /** The queue used for job execution work */
     protected BlockingQueue<Runnable> threadPoolQueue;

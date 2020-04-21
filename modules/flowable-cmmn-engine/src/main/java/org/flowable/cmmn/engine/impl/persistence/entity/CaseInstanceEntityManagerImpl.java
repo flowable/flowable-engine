@@ -38,6 +38,7 @@ import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
@@ -184,19 +185,27 @@ public class CaseInstanceEntityManagerImpl
     @Override
     public void updateLockTime(String caseInstanceId) {
         Date expirationTime = getClock().getCurrentTime();
-        int lockMillis = engineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
+        AsyncExecutor asyncExecutor = engineConfiguration.getAsyncExecutor();
+        int lockMillis = asyncExecutor.getAsyncJobLockTimeInMillis();
 
         GregorianCalendar lockCal = new GregorianCalendar();
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
         Date lockDate = lockCal.getTime();
 
-        dataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
+        dataManager.updateLockTime(caseInstanceId, lockDate, asyncExecutor.getLockOwner(), expirationTime);
     }
 
     @Override
     public void clearLockTime(String caseInstanceId) {
         dataManager.clearLockTime(caseInstanceId);
+    }
+
+    @Override
+    public void clearAllLockTimes() {
+        if (engineConfiguration.getAsyncExecutor() != null) {
+            dataManager.clearAllLockTimes(engineConfiguration.getAsyncExecutor().getLockOwner());
+        }
     }
 
     @Override

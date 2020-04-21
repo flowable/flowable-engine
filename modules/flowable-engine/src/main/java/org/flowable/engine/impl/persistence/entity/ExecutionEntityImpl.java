@@ -89,6 +89,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String localizedDescription;
 
     protected Date lockTime;
+    protected String lockOwner;
 
     // state/type of execution //////////////////////////////////////////////////
 
@@ -262,6 +263,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("parentId", parentId);
         persistentState.put("name", name);
         persistentState.put("lockTime", lockTime);
+        persistentState.put("lockOwner", lockOwner);
         persistentState.put("superExecution", this.superExecutionId);
         persistentState.put("rootProcessInstanceId", this.rootProcessInstanceId);
         persistentState.put("isMultiInstanceRoot", this.isMultiInstanceRoot);
@@ -1104,6 +1106,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setLockTime(Date lockTime) {
         this.lockTime = lockTime;
+    }
+
+    @Override
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    @Override
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
     }
 
     @Override

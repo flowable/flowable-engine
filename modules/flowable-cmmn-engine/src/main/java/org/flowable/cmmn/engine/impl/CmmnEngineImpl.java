@@ -21,7 +21,10 @@ import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
+import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
@@ -108,6 +111,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
+            cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd());
         }
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
             asyncHistoryExecutor.shutdown();

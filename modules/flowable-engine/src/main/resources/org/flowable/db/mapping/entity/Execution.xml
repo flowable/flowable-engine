@@ -272,7 +272,8 @@
   <update id="updateProcessInstanceLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION
     set
-      LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+      LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+      LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
     where ID_ = #{id}
       and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
   </update>
@@ -280,8 +281,17 @@
   <update id="clearProcessInstanceLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION
     set
-      LOCK_TIME_ = null
+      LOCK_TIME_ = null,
+      LOCK_OWNER_ = null
     where ID_ = #{id}
+  </update>
+
+  <update id="clearAllProcessInstanceLockTimes" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_EXECUTION
+    set
+      LOCK_TIME_ = null,
+      LOCK_OWNER_ = null
+    where LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
   </update>
 
   <update id="updateExecutionRelatedEntityCountEnabled" parameterType="boolean">
@@ -367,6 +377,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
@@ -460,6 +471,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />

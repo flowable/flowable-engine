@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     START_TIME_ timestamp,
     START_USER_ID_ varchar(255),
     LOCK_TIME_ timestamp,
+    LOCK_OWNER_ varchar(255),
     IS_COUNT_ENABLED_ bit,
     EVT_SUBSCR_COUNT_ integer, 
     TASK_COUNT_ integer, 
@@ -311,7 +312,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.1.2', 1);
+values ('schema.version', '6.5.1.3', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.1.2)', 1);
+values ('schema.history', 'create(6.5.1.3)', 1);
