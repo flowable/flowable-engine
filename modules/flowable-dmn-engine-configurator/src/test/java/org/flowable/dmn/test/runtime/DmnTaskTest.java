@@ -36,9 +36,11 @@ import org.junit.jupiter.api.Test;
 public class DmnTaskTest {
 
     protected RuntimeService runtimeService;
+    protected ProcessEngineConfiguration processEngineConfiguration;
 
     @BeforeEach
     void setUp(ProcessEngineConfiguration processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
         runtimeService = processEngineConfiguration.getRuntimeService();
     }
 
@@ -91,6 +93,24 @@ public class DmnTaskTest {
         assertThat(result.get(0)).isInstanceOf(ObjectNode.class);
         assertThat(result.get(0).get("testOutput")).isInstanceOf(DoubleNode.class);
         assertThat(result.get(0).get("testOutput").asDouble()).isEqualTo(2.0);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
+    void withRuleOrderAndBackwardsCompatibilityFlag_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
+        processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(false);
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("testInput", "second")
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isNull();
+        assertThat(processVariables.get("testOutput")).isEqualTo(2.0);
+
+        processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(true);
     }
 
     @Test

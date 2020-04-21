@@ -139,8 +139,9 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                             externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             
         } else {
-            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef, 
-                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
+            boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
+            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef,
+                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
         }
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);

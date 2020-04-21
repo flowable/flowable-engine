@@ -518,8 +518,8 @@ public class DecisionTaskTest {
                 .caseDefinitionKey("oneDecisionTaskCase")
                 .variable("testInput", "second")
                 .start();
-        Map<String, Object> processVariables = caseInstance.getCaseVariables();
-        Object resultObject = processVariables.get("DecisionTable");
+        Map<String, Object> caseVariables = caseInstance.getCaseVariables();
+        Object resultObject = caseVariables.get("DecisionTable");
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
         assertThat(result).hasSize(1);
@@ -537,8 +537,8 @@ public class DecisionTaskTest {
                 .caseDefinitionKey("oneDecisionTaskCase")
                 .variable("testInput", "second")
                 .start();
-        Map<String, Object> processVariables = caseInstance.getCaseVariables();
-        Object resultObject = processVariables.get("DecisionTable");
+        Map<String, Object> caseVariables = caseInstance.getCaseVariables();
+        Object resultObject = caseVariables.get("DecisionTable");
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
         assertThat(result).hasSize(1);
@@ -551,13 +551,30 @@ public class DecisionTaskTest {
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
             "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
+    public void withRuleOrderAndBackwardCompatibilityFlag_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
+        this.cmmnRule.getCmmnEngineConfiguration().setAlwaysUseArraysForDmnMultiHitPolicies(false);
+        CaseInstance caseInstance = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "second")
+                .start();
+        Map<String, Object> caseVariables = caseInstance.getCaseVariables();
+        Object resultObject = caseVariables.get("DecisionTable");
+        assertThat(resultObject).isNull();
+        assertThat(caseVariables.get("testOutput")).isEqualTo(2.0);
+        this.cmmnRule.getCmmnEngineConfiguration().setAlwaysUseArraysForDmnMultiHitPolicies(true);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
     public void withRuleOrder_ensureListOfItemIsReturnedEvenIfNoRowIsHit() {
         CaseInstance caseInstance = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("oneDecisionTaskCase")
                 .variable("testInput", "fourth")
                 .start();
-        Map<String, Object> processVariables = caseInstance.getCaseVariables();
-        Object resultObject = processVariables.get("DecisionTable");
+        Map<String, Object> caseVariables = caseInstance.getCaseVariables();
+        Object resultObject = caseVariables.get("DecisionTable");
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
         assertThat(result).hasSize(0);
