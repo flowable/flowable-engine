@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <process id="externalWorkerProcess" name="test no topic" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="externalWorkerServiceTask"/>
+        <serviceTask id="externalWorkerServiceTask" flowable:type="external-worker"/>
+        <sequenceFlow id="flow2" sourceRef="externalWorkerServiceTask" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>
