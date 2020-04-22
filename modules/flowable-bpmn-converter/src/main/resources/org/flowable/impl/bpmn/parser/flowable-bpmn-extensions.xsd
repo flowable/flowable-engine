@@ -247,6 +247,8 @@
         <enumeration value="shell"/>
         <enumeration value="dmn"/>
         <enumeration value="case"/>
+        <enumeration value="send-event"/>
+        <enumeration value="external-worker"/>
       </restriction>
     </simpleType>
   </attribute>
@@ -265,6 +267,14 @@
     <annotation>
       <documentation>
         Allows to specify an expression that is evaluated at runtime.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="skipExpression" type="string">
+    <annotation>
+      <documentation>
+        Allows to specify an expression used for skipping a service task that is evaluated at runtime.
       </documentation>
     </annotation>
   </attribute>
@@ -324,6 +334,14 @@
       <documentation>
         Can be used to store the result variable of an expression transiently.
         Transient variables will not be persisted at the end of the database transaction.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="topic" type="string">
+    <annotation>
+      <documentation>
+        The topic that should be used for external worker tasks.
       </documentation>
     </annotation>
   </attribute>

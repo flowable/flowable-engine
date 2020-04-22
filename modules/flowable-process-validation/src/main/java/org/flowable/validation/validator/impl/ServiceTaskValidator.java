@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
@@ -57,26 +58,34 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
     protected void verifyType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
-            if (!serviceTask.getType().equalsIgnoreCase(ServiceTask.MAIL_TASK) && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
-                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.SHELL_TASK) && !serviceTask.getType().equalsIgnoreCase(ServiceTask.DMN_TASK) 
-                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.HTTP_TASK) && !serviceTask.getType().equalsIgnoreCase(ServiceTask.CASE_TASK)
-                    && !serviceTask.getType().equalsIgnoreCase(ServiceTask.SEND_EVENT_TASK)) {
-
-                addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
-            }
-
-            if (serviceTask.getType().equalsIgnoreCase(ServiceTask.MAIL_TASK)) {
-                validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.SHELL_TASK)) {
-                validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.DMN_TASK)) {
-                validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.HTTP_TASK)) {
-                validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.CASE_TASK)) {
-                validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
-            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.SEND_EVENT_TASK)) {
-                validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
+            switch (serviceTask.getType()) {
+                case ServiceTask.MAIL_TASK:
+                    validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.SHELL_TASK:
+                    validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.DMN_TASK:
+                    validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.HTTP_TASK:
+                    validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.CASE_TASK:
+                    validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+                    return;
+                case ServiceTask.SEND_EVENT_TASK:
+                    validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
+                    return;
+                case ServiceTask.EXTERNAL_WORKER_TASK:
+                    validateExternalWorkerTask(process, (ExternalWorkerServiceTask) serviceTask, errors);
+                    return;
+                case "mule":
+                case "camel":
+                    // Mule or camel have no special validation
+                    return;
+                default:
+                    addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
 
         }

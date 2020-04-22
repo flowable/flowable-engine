@@ -151,6 +151,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         addConverter(new HttpServiceTaskXMLConverter());
         addConverter(new CaseServiceTaskXMLConverter());
         addConverter(new SendEventServiceTaskXMLConverter());
+        addConverter(new ExternalWorkerServiceTaskXMLConverter());
         addConverter(new SendTaskXMLConverter());
         addConverter(new UserTaskXMLConverter());
         addConverter(new TaskXMLConverter());

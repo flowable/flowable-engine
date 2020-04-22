@@ -341,6 +341,19 @@ public class DefaultProcessValidatorTest {
                 );
     }
 
+    @Test
+    void testExternalWorkerTaskWithoutTopic() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/processWithInvalidExternalWorkerTask.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactlyInAnyOrder(
+                        tuple(Problems.EXTERNAL_WORKER_TASK_NO_TOPIC, "No topic is defined on the external worker task", "externalWorkerServiceTask", false)
+                );
+    }
+
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);
 

@@ -26,6 +26,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
     public static final String SHELL_TASK = "shell";
     public static final String CASE_TASK = "case";
     public static final String SEND_EVENT_TASK = "send-event";
+    public static final String EXTERNAL_WORKER_TASK = "external-worker";
 
     protected String implementation;
     protected String implementationType;
