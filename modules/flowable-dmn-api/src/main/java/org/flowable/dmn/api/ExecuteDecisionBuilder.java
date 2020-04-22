@@ -96,9 +96,13 @@ public interface ExecuteDecisionBuilder {
 
     DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail();
 
+    Map<String, Object> executeDecisionServiceWithSingleResult();
+
     Map<String, List<Map<String, Object>>> evaluateDecision();
 
     DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail();
+
+    Map<String, Object> evaluateDecisionWithSingleResult();
 
     ExecuteDecisionContext buildExecuteDecisionContext();
 }

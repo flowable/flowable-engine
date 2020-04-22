@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.util.Maps;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
@@ -250,13 +251,11 @@ public class DecisionServiceTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
-        assertThatThrownBy(() -> {
-            dmnRuleService.createExecuteDecisionBuilder()
-                .decisionKey("decision")
-                .variable("inputVariable1", 10D)
-                .variable("inputVariable2", "test2")
-                .executeDecisionService();
-        })
+        assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variable("inputVariable1", 10D)
+            .variable("inputVariable2", "test2")
+            .executeDecisionService())
             .isInstanceOf(FlowableIllegalArgumentException.class)
             .hasMessageContaining("no decision service with id: 'decision' found in definition");
     }
@@ -267,13 +266,88 @@ public class DecisionServiceTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
-        assertThatThrownBy(() -> {
-            dmnRuleService.createExecuteDecisionBuilder()
-                .decisionKey("expandedDecisionService")
-                .execute();
-        })
+        assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .execute())
             .isInstanceOf(FlowableIllegalArgumentException.class)
             .hasMessageContaining("no decision with id: 'expandedDecisionService' found in definition");
+    }
 
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
+    public void evaluateDecisionWithSingleResult() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .variable("input1", "test1")
+            .variable("input2", "test2")
+            .variable("input3", "test3")
+            .variable("input4", "test4")
+            .evaluateDecisionWithSingleResult();
+
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put("output1", "NOT EMPTY");
+        expectedResult.put("output2", "NOT EMPTY");
+
+        assertThat(result)
+            .containsAllEntriesOf(expectedResult);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
+    public void evaluateDecisionWithSingleResultMultipleResults() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .variable("input1", "test1")
+            .variable("input2", "test2")
+            .variable("input3", "test3")
+            .variable("input4", "test4")
+            .evaluateDecisionWithSingleResult())
+            .isInstanceOf(FlowableException.class)
+            .hasMessageContaining("more than one result in decision: decision1");
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
+    public void executeDecisionServiceWithSingleResult() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .variable("input1", "test1")
+            .variable("input2", "test2")
+            .variable("input3", "test3")
+            .variable("input4", "test4")
+            .executeDecisionServiceWithSingleResult();
+
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put("output1", "NOT EMPTY");
+        expectedResult.put("output2", "NOT EMPTY");
+
+        assertThat(result)
+            .containsAllEntriesOf(expectedResult);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
+    public void executeDecisionServiceWithSingleResultMultipleResults() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .variable("input1", "test1")
+            .variable("input2", "test2")
+            .variable("input3", "test3")
+            .variable("input4", "test4")
+            .executeDecisionServiceWithSingleResult())
+            .isInstanceOf(FlowableException.class)
+            .hasMessageContaining("more than one result in decision: decision1");
     }
 }

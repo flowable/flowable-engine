@@ -139,6 +139,11 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     }
 
     @Override
+    public Map<String, Object> executeDecisionServiceWithSingleResult() {
+        return decisionService.executeDecisionServiceWithSingleResult(this);
+    }
+
+    @Override
     public Map<String, List<Map<String, Object>>> evaluateDecision() {
         return decisionService.evaluateDecision(this);
     }
@@ -146,6 +151,11 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     @Override
     public DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail() {
         return decisionService.evaluateDecisionWithAuditTrail(this);
+    }
+
+    @Override
+    public Map<String, Object> evaluateDecisionWithSingleResult() {
+        return decisionService.evaluateDecisionWithSingleResult(this);
     }
 
     public String getDecisionKey() {

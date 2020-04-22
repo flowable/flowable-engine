@@ -37,7 +37,7 @@ public interface DmnDecisionService {
      *
      * @return a Map with decision result(s) per decision
      */
-    Map<String, List<Map<String, Object>>> evaluateDecision(ExecuteDecisionBuilder executeDecisionBuilder);
+    Map<String, List<Map<String, Object>>> evaluateDecision(ExecuteDecisionBuilder builder);
 
     /**
      * Execute a single decision or a decision service depending on the provided decision key
@@ -45,7 +45,16 @@ public interface DmnDecisionService {
      * @return the {@link DecisionExecutionAuditContainer} when a decision was executed
      * or a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
      */
-    DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail(ExecuteDecisionBuilder executeDecisionBuilder);
+    DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail(ExecuteDecisionBuilder builder);
+
+    /**
+     * Execute a single decision or a decision service depending on the provided decision key
+     *
+     * @return a Map with the decision(s) result(s). When multiple output decisions use the same
+     * variable IDs the last occurrence will be present in the Map.
+     * An {@link FlowableException} will be thrown when multiple rules were hit.
+     */
+    Map<String, Object> evaluateDecisionWithSingleResult(ExecuteDecisionBuilder builder);
 
     /**
      * Execute a single decision
@@ -74,12 +83,20 @@ public interface DmnDecisionService {
      *
      * @return a Map with decision result(s) per output decision
      */
-    Map<String, List<Map<String, Object>>> executeDecisionService(ExecuteDecisionBuilder executeDecisionBuilder);
+    Map<String, List<Map<String, Object>>> executeDecisionService(ExecuteDecisionBuilder builder);
 
     /**
      * Execute a decision service
      *
      * @return a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
      */
-    DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail(ExecuteDecisionBuilder executeDecisionBuilder);
+    DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail(ExecuteDecisionBuilder builder);
+
+    /**
+     * Execute a decision service
+     *
+     * @return a Map with the decision service result.
+     * An {@link FlowableException} will be thrown when multiple rules were hit.
+     */
+    Map<String, Object> executeDecisionServiceWithSingleResult(ExecuteDecisionBuilder builder);
 }
