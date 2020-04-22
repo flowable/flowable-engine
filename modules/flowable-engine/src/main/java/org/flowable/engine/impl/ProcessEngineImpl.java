@@ -32,7 +32,6 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,9 +119,6 @@ public class ProcessEngineImpl implements ProcessEngine {
         ProcessEngines.unregister(this);
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
-
-            // Async executor will have cleared the jobs lock owner/times, but not yet the process instances
-            processEngineConfiguration.getCommandExecutor().execute(new ClearProcessInstanceLockTimesCmd());
         }
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
             asyncHistoryExecutor.shutdown();

@@ -190,6 +190,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.TaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
+import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
 import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
@@ -2630,12 +2631,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public Runnable getProcessEngineCloseRunnable() {
-        return new Runnable() {
+        return () -> {
 
-            @Override
-            public void run() {
-                commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
-            }
+            // Async executor will have cleared the jobs lock owner/times, but not yet the process instance lock time/owner
+            commandExecutor.execute(new ClearProcessInstanceLockTimesCmd());
+
+            commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
         };
     }
 

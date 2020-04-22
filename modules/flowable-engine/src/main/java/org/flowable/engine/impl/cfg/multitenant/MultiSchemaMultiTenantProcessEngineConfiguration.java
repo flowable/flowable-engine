@@ -26,6 +26,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -171,6 +172,9 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
             public void run() {
                 for (String tenantId : tenantInfoHolder.getAllTenants()) {
                     tenantInfoHolder.setCurrentTenantId(tenantId);
+
+                    commandExecutor.execute(new ClearProcessInstanceLockTimesCmd());
+
                     commandExecutor.execute(getProcessEngineCloseCommand());
                     tenantInfoHolder.clearCurrentTenantId();
                 }
