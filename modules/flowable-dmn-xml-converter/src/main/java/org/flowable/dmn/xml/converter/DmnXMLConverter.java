@@ -232,11 +232,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
         Decision currentDecision = null;
         DecisionTable currentDecisionTable = null;
 
-        // reset element counters
-        convertersToDmnMap.get(ELEMENT_RULE).initializeElementCounter();
-        convertersToDmnMap.get(ELEMENT_INPUT_CLAUSE).initializeElementCounter();
-        convertersToDmnMap.get(ELEMENT_OUTPUT_CLAUSE).initializeElementCounter();
-
         try {
             while (xtr.hasNext()) {
                 try {
@@ -256,6 +251,12 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     model.setNamespace(MODEL_NAMESPACE);
                     parentElement = model;
                 } else if (ELEMENT_DECISION.equals(xtr.getLocalName())) {
+
+                    // reset element counters
+                    convertersToDmnMap.get(ELEMENT_RULE).initializeElementCounter();
+                    convertersToDmnMap.get(ELEMENT_INPUT_CLAUSE).initializeElementCounter();
+                    convertersToDmnMap.get(ELEMENT_OUTPUT_CLAUSE).initializeElementCounter();
+
                     currentDecision = new Decision();
                     currentDecision.setDmnDefinition(model);
                     model.addDecision(currentDecision);
@@ -284,10 +285,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     parentElement = currentDecisionTable;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
                     // limit description to 255 characters
-                    String description = xtr.getElementText();
-                    if (description != null) {
-                        parentElement.setDescription(description.substring(0, 255));
-                    }
+                    parentElement.setDescription(StringUtils.abbreviate(xtr.getElementText(), 255));
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     while (xtr.hasNext()) {
                         xtr.next();
@@ -300,16 +298,13 @@ public class DmnXMLConverter implements DmnXMLConstants {
                             }
                         }
                     }
-
                 } else if (convertersToDmnMap.containsKey(xtr.getLocalName())) {
                     BaseDmnXMLConverter converter = convertersToDmnMap.get(xtr.getLocalName());
                     converter.convertToDmnModel(xtr, model, currentDecision);
                 }
             }
-
         } catch (DmnXMLException e) {
             throw e;
-
         } catch (Exception e) {
             LOGGER.error("Error processing DMN document", e);
             throw new DmnXMLException("Error processing DMN document", e);
@@ -566,9 +561,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeEndElement();
                     }
                     xtw.writeEndElement();
-
-                    xtw.writeEndElement();
                 }
+                xtw.writeEndElement();
             }
 
             for (DecisionService decisionService : model.getDecisionServices()) {
