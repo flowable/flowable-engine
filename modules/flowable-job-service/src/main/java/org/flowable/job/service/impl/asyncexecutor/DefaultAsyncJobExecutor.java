@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -173,6 +174,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             unlockOwnedJobs();
         }
 
+    }
+
+    @Override
+    protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
+        return new ResetExpiredJobsRunnable(resetRunnableName, this,
+                jobServiceConfiguration.getJobEntityManager()
+        );
     }
 
     protected void initAsyncJobExecutionThreadPool() {
