@@ -264,18 +264,28 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
         $scope.loadDecisionTables = function() {
             var modelMetaData = editorManager.getBaseModelData();
             $http.get(FLOWABLE.APP_URL.getDecisionTableModelsUrl())
-                .success(
-                    function(response) {
-                        $scope.state.loadingDecisionTables = false;
-                        $scope.state.decisionTableError = false;
-                        $scope.decisionTables = response.data;
-                        $scope.resetCurrent();
-                    })
-                .error(
-                    function(data, status, headers, config) {
-                        $scope.state.loadingDecisionTables = false;
-                        $scope.state.decisionTableError = true;
-                    });
+                .success(function(responseDecisionTables) {
+
+                    var params = {
+                        modelType: 6
+                    };
+
+                    $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params})
+                        .success(function (responseDecisionServices) {
+                            $scope.state.loadingDecisionTables = false;
+                            $scope.state.decisionTableError = false;
+                            $scope.decisionTables = [].concat(responseDecisionTables.data, responseDecisionServices.data);
+                            $scope.resetCurrent();
+                        }).error(function (data, status, headers, config) {
+                            $scope.state.loadingDecisionTables = false;
+                            $scope.state.decisionTableError = true;
+                        });
+
+                })
+                .error(function(data, status, headers, config) {
+                    $scope.state.loadingDecisionTables = false;
+                    $scope.state.decisionTableError = true;
+                });
         };
 
         if ($scope.property && $scope.property.value && $scope.property.value.id) {

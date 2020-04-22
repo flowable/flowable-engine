@@ -94,7 +94,8 @@ angular.module('flowableModeler')
                 // Check if the root group is the 'diagram' group. If so, this item should not be shown.
                 var currentGroupName = data.stencils[stencilIndex].groups[0];
                 if (currentGroupName === 'Diagram' || currentGroupName === 'BPMN.STENCILS.GROUPS.DIAGRAM' || 
-                        currentGroupName === 'CMMN.STENCILS.GROUPS.DIAGRAM') {
+                        currentGroupName === 'CMMN.STENCILS.GROUPS.DIAGRAM' ||
+                        currentGroupName === 'DMN.STENCILS.GROUPS.DIAGRAM') {
                         
                     continue;  // go to next item
                 }
@@ -1107,7 +1108,11 @@ angular.module('flowableModeler')
                         }
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-                        if (parentItem.roles.indexOf('Activity') > -1) {
+                        if (parentCandidate.getStencil().id().endsWith("DecisionServiceSection")) {
+                            if (item.id === 'Decision') {
+                                _canContain = true;
+                            }
+                        } else if (parentItem.roles.indexOf('Activity') > -1) {
                             if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1 
                                 || item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
                                 || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
