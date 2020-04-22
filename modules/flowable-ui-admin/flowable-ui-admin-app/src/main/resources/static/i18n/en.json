@@ -39,7 +39,7 @@
             "EVENT-SUBSCRIPTIONS": "Event subscriptions",
             "CONFIGURATION": "Configuration",
             "CONFIGURATION-ENGINE": "Engine",
-            "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLES": "Decisions",
             "DECISION-TABLE-EXECUTIONS": "Executions",
             "CONTENT-ITEMS": "Content items"
         },
@@ -68,14 +68,14 @@
         "PROCESS-INSTANCES-EMPTY": "Definition has no process instances running",
         "JOBS-SIZE": "Definition has {{total}} jobs running",
         "JOBS-EMPTY": "Definition has no jobs running",
-        "DECISION-TABLES-SIZE": "Definition has {{total}} decision tables.",
-        "DECISION-TABLES-EMPTY": "Definition has no decision tables.",
+        "DECISION-TABLES-SIZE": "Definition has {{total}} decision.",
+        "DECISION-TABLES-EMPTY": "Definition has no decisions.",
         "FORM-DEFINITIONS-SIZE": "Definition has {{total}} form definitions.",
         "FORM-DEFINITIONS-EMPTY": "Definition has no form definitions.",
         "TITLE": {
             "PROCESS-INSTANCES": "Process instances",
             "JOBS": "Jobs",
-            "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLES": "Decisions",
             "FORMS": "Form definitions"
         },
         "ACTION": {
@@ -167,8 +167,8 @@
         "JOBS-EMPTY": "This process instance has no jobs.",
         "SUBPROCESSES-SIZE": "This process instance has {{total}} subprocesses.",
         "SUBPROCESSES-EMPTY": "This process instance has no subprocesses.",
-        "DECISION-TABLES-SIZE": "This process instance has {{total}} decision tables.",
-        "DECISION-TABLES-EMPTY": "This process instance has no decision tables.",
+        "DECISION-TABLES-SIZE": "This process instance has {{total}} decisions.",
+        "DECISION-TABLES-EMPTY": "This process instance has no decisions.",
         "FORM-INSTANCES-SIZE": "This process instance has {{total}} form instances.",
         "FORM-INSTANCES-EMPTY": "This process instance has no form instances.",
         "TITLE": {
@@ -176,7 +176,7 @@
             "VARIABLES": "Variables",
             "JOBS": "Jobs",
             "SUBPROCESSES": "Subprocesses",
-            "DECISION-TABLES": "Decision Tables",
+            "DECISION-TABLES": "Decisions",
             "FORM-INSTANCES": "Form instances"
         },
         "ACTION": {
@@ -983,14 +983,14 @@
         "CASE-INSTANCES-EMPTY": "Definition has no case instances running",
         "JOBS-SIZE": "Definition has {{total}} jobs running",
         "JOBS-EMPTY": "Definition has no jobs running",
-        "DECISION-TABLES-SIZE": "Definition has {{total}} decision tables.",
-        "DECISION-TABLES-EMPTY": "Definition has no decision tables.",
+        "DECISION-TABLES-SIZE": "Definition has {{total}} decisions.",
+        "DECISION-TABLES-EMPTY": "Definition has no decisions.",
         "FORM-DEFINITIONS-SIZE": "Definition has {{total}} form definitions.",
         "FORM-DEFINITIONS-EMPTY": "Definition has no form definitions.",
         "TITLE": {
             "CASE-INSTANCES": "Case instances",
             "JOBS": "Jobs",
-            "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLES": "Decisions",
             "FORMS": "Form definitions"
         },
         "ACTION": {
@@ -1068,15 +1068,15 @@
         "VARIABLES-EMPTY": "This case instance has no variables.",
         "JOBS-SIZE": "This case instance has {{total}} jobs.",
         "JOBS-EMPTY": "This case instance has no jobs.",
-        "DECISION-TABLES-SIZE": "This case instance has {{total}} decision tables.",
-        "DECISION-TABLES-EMPTY": "This case instance has no decision tables.",
+        "DECISION-TABLES-SIZE": "This case instance has {{total}} decisions.",
+        "DECISION-TABLES-EMPTY": "This case instance has no decisions.",
         "FORM-INSTANCES-SIZE": "This case instance has {{total}} form instances.",
         "FORM-INSTANCES-EMPTY": "This case instance has no form instances.",
         "TITLE": {
             "TASKS": "Tasks",
             "VARIABLES": "Variables",
             "JOBS": "Jobs",
-            "DECISION-TABLES": "Decision Tables",
+            "DECISION-TABLES": "Decisions",
             "FORM-INSTANCES": "Form instances"
         },
         "ACTION": {
@@ -1219,14 +1219,14 @@
         "PROCESS-DEFINITIONS-EMPTY": "App has no process definitions",
         "CASE-DEFINITIONS-SIZE": "App has {{total}} case definitions",
         "CASE-DEFINITIONS-EMPTY": "App has no case definitions",
-        "DECISION-TABLES-SIZE": "App has {{total}} decision tables.",
-        "DECISION-TABLES-EMPTY": "App has no decision tables.",
+        "DECISION-TABLES-SIZE": "App has {{total}} decisions.",
+        "DECISION-TABLES-EMPTY": "App has no decisions.",
         "FORM-DEFINITIONS-SIZE": "App has {{total}} form definitions.",
         "FORM-DEFINITIONS-EMPTY": "App has no form definitions.",
         "TITLE": {
             "PROCESS-DEFINITIONS": "Process definitions",
             "CASE-DEFINITIONS": "Case definitions",
-            "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLES": "Decisions",
             "FORM-DEFINITIONS": "Form definitions"
         },
         "ACTION": {
@@ -1275,21 +1275,21 @@
         "TIME": "Deployment time:",
         "CATEGORY": "Category:",
         "TENANTID": "Tenant identifier:",
-        "DECISION-TABLES-MESSAGE": "This deployment has {{total}} decision tables, showing {{size}}.",
-        "DECISION-TABLES-MESSAGE-EMPTY": "This deployment has no decision tables.",
+        "DECISION-TABLES-MESSAGE": "This deployment has {{total}} decisions, showing {{size}}.",
+        "DECISION-TABLES-MESSAGE-EMPTY": "This deployment has no decisions.",
         "PARENT-DEPLOYMENT-ID": "Parent deployment ID",
         "TITLE": {
-            "DECISION-TABLES": "Decision Tables",
+            "DECISION-TABLES": "Decisions",
             "RESOURCES": "Resources"
         },
         "ACTION": {
-            "SHOW-ALL-DEFINITIONS": "Show all decision tables"
+            "SHOW-ALL-DEFINITIONS": "Show all decisions"
         }
     },
     "DECISION-TABLES": {
-        "TITLE": "Decision tables",
-        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision tables.",
-        "LIST-MESSAGE-EMPTY": "No matching decision tables.",
+        "TITLE": "Decisions",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decisions.",
+        "LIST-MESSAGE-EMPTY": "No matching decisions.",
         "FILTER": {
             "NAME": "Name",
             "KEY": "Key",
@@ -1322,14 +1322,14 @@
         "TITLE": {
             "DECISION-AUDITS": "Decision audits"
         },
-        "DECISION-EXECUTION-MESSAGE": "This decision table has {{total}} executions, showing {{size}}.",
-        "DECISION-EXECUTION-MESSAGE-EMPTY": "This decision table has no executions",
+        "DECISION-EXECUTION-MESSAGE": "This decision has {{total}} executions, showing {{size}}.",
+        "DECISION-EXECUTION-MESSAGE-EMPTY": "This decision has no executions",
         "ACTION": {
             "EDIT-CATEGORY": "Edit category",
             "SHOW-ALL-JOBS": "Show all jobs",
             "SHOW-ALL-PROCESSES": "Show all processes",
             "SHOW-DIAGRAM": "Show process diagram",
-            "SHOW-DECISION-TABLE": "Show decision table",
+            "SHOW-DECISION-TABLE": "Show decision",
             "SHOW-ALL-EXECUTIONS": "Show all executions"
         },
         "POPUP": {
@@ -1343,9 +1343,9 @@
         }
     },
     "DECISION-TABLE-EXECUTIONS": {
-        "TITLE": "Decision table executions",
-        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision table executions.",
-        "LIST-MESSAGE-EMPTY": "No matching decision table executions.",
+        "TITLE": "Decision executions",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision executions.",
+        "LIST-MESSAGE-EMPTY": "No matching decision executions.",
         "FILTER": {
             "DEFINITION-ID": "Definition ID",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
@@ -1368,8 +1368,8 @@
     },
     "DECISION-TABLE-EXECUTION": {
         "TITLE": "Decision table execution",
-        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision tables.",
-        "LIST-MESSAGE-EMPTY": "No matching decision tables.",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decisions.",
+        "LIST-MESSAGE-EMPTY": "No matching decisions.",
         "DEFINITION-ID": "Decision Definition ID",
         "DEPLOYMENT-ID": "Deployment ID",
         "DEFINITION-KEY": "Decision Key",
