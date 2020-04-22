@@ -15,9 +15,11 @@ package org.flowable.ui.modeler.service;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -38,6 +40,7 @@ import org.flowable.ui.modeler.domain.AppDefinition;
 import org.flowable.ui.modeler.domain.AppModelDefinition;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.model.AppDefinitionRepresentation;
+import org.flowable.ui.modeler.repository.ModelSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -112,13 +115,21 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             for (Model formModel : formMap.values()) {
                 createZipEntries(formModel, "form-models", zipOutputStream);
             }
+            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
+            if (!decisionTableMap.isEmpty()) {
+                List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
+                decisionTableEditorJSONs = decisionTableModels.stream()
+                    .collect(Collectors.toMap(
+                        AbstractModel::getKey,
+                        AbstractModel::getModelEditorJson
+                    ));
+            }
 
             for (Model decisionTableModel : decisionTableMap.values()) {
                 createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
                 try {
                     JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
-                    DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(),
-                            decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
+                    DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(), decisionTableEditorJSONs);
                     byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
                     createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
                 } catch (Exception e) {
@@ -170,7 +181,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                 if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                     formMap.put(childModel.getId(), childModel);
 
-                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType() || Model.MODEL_TYPE_DRD == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
                 }
             }

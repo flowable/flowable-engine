@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -58,6 +59,7 @@ import org.flowable.ui.modeler.domain.AppDefinition;
 import org.flowable.ui.modeler.domain.AppModelDefinition;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.repository.ModelRepository;
+import org.flowable.ui.modeler.repository.ModelSort;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.flowable.ui.modeler.util.BpmnEventModelUtil;
 import org.flowable.ui.modeler.util.CmmnEventModelUtil;
@@ -226,12 +228,18 @@ public class BaseAppDefinitionService {
             }
 
             if (decisionTableMap.size() > 0) {
+                List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
+                Map<String, String> decisionTableEditorJSONs = decisionTableModels.stream()
+                    .collect(Collectors.toMap(
+                        AbstractModel::getKey,
+                        AbstractModel::getModelEditorJson
+                    ));
+
                 for (String decisionTableId : decisionTableMap.keySet()) {
                     Model decisionTableInfo = decisionTableMap.get(decisionTableId);
                     try {
                         JsonNode decisionTableNode = objectMapper.readTree(decisionTableInfo.getModelEditorJson());
-                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(),
-                                decisionTableInfo.getVersion(), decisionTableInfo.getLastUpdated());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(), decisionTableEditorJSONs);
                         byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
                         deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {
@@ -281,7 +289,7 @@ public class BaseAppDefinitionService {
             if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                 formMap.put(childModel.getId(), childModel);
 
-            } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+            } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType() || Model.MODEL_TYPE_DRD == childModel.getModelType()) {
                 decisionTableMap.put(childModel.getId(), childModel);
             
             } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
