@@ -5,7 +5,7 @@
             "PROCESSES": "Processes",
             "CASEMODELS": "Case models",
             "FORMS": "Forms",
-            "DECISION-TABLES": "Decision Tables",
+            "DECISIONS": "Decisions",
             "APPS": "Apps"
         },
         "TITLE": {
@@ -1935,7 +1935,7 @@
     },
 
     "DECISION-TABLES-LIST": {
-        "TITLE": "Decision Tables",
+        "TITLE": "Decisions",
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION": {
             "CREATE-DECISION-SERVICE": "Create Decision Service",

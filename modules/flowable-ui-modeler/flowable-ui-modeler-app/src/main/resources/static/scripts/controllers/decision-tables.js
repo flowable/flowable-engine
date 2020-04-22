@@ -178,7 +178,7 @@ angular.module('flowableModeler')
                 if (decision.modelType === 4) {
                     $location.url("/decision-tables/" + encodeURIComponent(decision.id));
                 } else if (decision.modelType === 6) {
-                    $location.url("/decision-tables/" + encodeURIComponent(decision.id));
+                    $location.url("/decision-services/" + encodeURIComponent(decision.id));
                 }
             }
         };

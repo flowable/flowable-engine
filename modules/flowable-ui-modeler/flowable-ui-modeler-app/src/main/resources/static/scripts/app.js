@@ -132,6 +132,10 @@ flowableModeler
             templateUrl: appResourceRoot + 'editor-app/editor.html',
             controller: 'EditorController'
         })
+        .when('/decision-services/:modelId', {
+            templateUrl: appResourceRoot + 'views/decision-service.html',
+            controller: 'DecisionServiceDetailsCtrl'
+        });
 
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {
@@ -219,7 +223,7 @@ flowableModeler
                 },
                 {
                     'id': 'decision-tables',
-                    'title': 'GENERAL.NAVIGATION.DECISION-TABLES',
+                    'title': 'GENERAL.NAVIGATION.DECISIONS',
                     'path': '/decision-tables'
                 },
                 {
