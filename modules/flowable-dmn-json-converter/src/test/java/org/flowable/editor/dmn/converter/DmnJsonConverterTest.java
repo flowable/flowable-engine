@@ -12,9 +12,11 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,16 +27,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
@@ -74,12 +82,12 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_19 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_compare.json";
     private static final String JSON_RESOURCE_20 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
     private static final String JSON_RESOURCE_21 = "org/flowable/editor/dmn/converter/decisiontable_forceDMN11.json";
+    private static final String JSON_RESOURCE_22 = "org/flowable/editor/dmn/converter/decisionservice_1.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Test
     public void testConvertJsonToDmnOK() {
-
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_1);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -98,7 +106,6 @@ public class DmnJsonConverterTest {
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
         assertNotNull(decisionTable);
-        assertEquals("decisionTable_11", decisionTable.getId());
         assertEquals(HitPolicy.ANY, decisionTable.getHitPolicy());
         assertEquals(DecisionTableOrientation.RULE_AS_ROW, decisionTable.getPreferredOrientation());
 
@@ -117,7 +124,6 @@ public class DmnJsonConverterTest {
         LiteralExpression inputExpression11 = condition1.getInputExpression();
         assertNotNull(inputExpression11);
         assertEquals("Order Size", inputExpression11.getLabel());
-        assertEquals("inputExpression_input1", inputExpression11.getId());
         assertEquals("number", inputExpression11.getTypeRef());
 
         // Condition 2
@@ -127,7 +133,6 @@ public class DmnJsonConverterTest {
         LiteralExpression inputExpression21 = condition2.getInputExpression();
         assertNotNull(inputExpression21);
         assertEquals("Registered On", inputExpression21.getLabel());
-        assertEquals("inputExpression_input2", inputExpression21.getId());
         assertEquals("date", inputExpression21.getTypeRef());
 
         // Conclusion 1
@@ -135,7 +140,6 @@ public class DmnJsonConverterTest {
         assertNotNull(conclusion1);
 
         assertEquals("Has discount", conclusion1.getLabel());
-        assertEquals("outputExpression_output1", conclusion1.getId());
         assertEquals("boolean", conclusion1.getTypeRef());
         assertEquals("newVariable1", conclusion1.getName());
 
@@ -217,7 +221,6 @@ public class DmnJsonConverterTest {
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
         assertNotNull(decisionTable);
 
-        assertEquals("decisionTable_11", decisionTable.getId());
         assertEquals(HitPolicy.ANY, decisionTable.getHitPolicy());
         assertEquals(DecisionTableOrientation.RULE_AS_ROW, decisionTable.getPreferredOrientation());
 
@@ -228,14 +231,12 @@ public class DmnJsonConverterTest {
         LiteralExpression inputExpression11 = inputClauses.get(0).getInputExpression();
         assertNotNull(inputExpression11);
         assertEquals("Order Size", inputExpression11.getLabel());
-        assertEquals("inputExpression_1", inputExpression11.getId());
         assertEquals("number", inputExpression11.getTypeRef());
         assertEquals("ordersize", inputExpression11.getText());
 
         LiteralExpression inputExpression12 = inputClauses.get(1).getInputExpression();
         assertNotNull(inputExpression12);
         assertEquals("Registered On", inputExpression12.getLabel());
-        assertEquals("inputExpression_2", inputExpression12.getId());
         assertEquals("date", inputExpression12.getTypeRef());
         assertEquals("registered", inputExpression12.getText());
 
@@ -247,7 +248,6 @@ public class DmnJsonConverterTest {
         OutputClause outputClause1 = outputClauses.get(0);
         assertNotNull(outputClause1);
         assertEquals("Has discount", outputClause1.getLabel());
-        assertEquals("outputExpression_3", outputClause1.getId());
         assertEquals("newVariable1", outputClause1.getName());
         assertEquals("boolean", outputClause1.getTypeRef());
 
@@ -303,9 +303,9 @@ public class DmnJsonConverterTest {
         assertEquals(1, rules.size());
         assertNotNull(rules.get(0).getOutputEntries());
         assertEquals(3, rules.get(0).getOutputEntries().size());
-        assertEquals("outputExpression_14", rules.get(0).getOutputEntries().get(0).getOutputClause().getId());
-        assertEquals("outputExpression_13", rules.get(0).getOutputEntries().get(1).getOutputClause().getId());
-        assertEquals("outputExpression_15", rules.get(0).getOutputEntries().get(2).getOutputClause().getId());
+        assertEquals("boolvarfield", rules.get(0).getOutputEntries().get(0).getOutputClause().getName());
+        assertEquals("datevarfield", rules.get(0).getOutputEntries().get(1).getOutputClause().getName());
+        assertEquals("stringvarfield", rules.get(0).getOutputEntries().get(2).getOutputClause().getName());
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
@@ -558,12 +558,13 @@ public class DmnJsonConverterTest {
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
-        assertEquals("NONE OF", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
-        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
-        assertEquals("ALL OF", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
-        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
-        assertEquals("ALL OF", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
-        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
+        String inputExpression1 = modelerJson.get("inputExpressions").get(0).get("id").asText();
+        assertEquals("NONE OF", modelerJson.get("rules").get(0).get(inputExpression1 + "_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get(inputExpression1 + "_expression").asText());
+        assertEquals("ALL OF", modelerJson.get("rules").get(1).get(inputExpression1 + "_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get(inputExpression1 + "_expression").asText());
+        assertEquals("ALL OF", modelerJson.get("rules").get(2).get(inputExpression1 + "_operator").asText());
+        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get(inputExpression1 + "_expression").asText());
     }
 
     @Test
@@ -591,12 +592,14 @@ public class DmnJsonConverterTest {
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
-        assertEquals("IS NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
-        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
-        assertEquals("IS IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
-        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
-        assertEquals("IS IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
-        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
+
+        String inputExpression1 = modelerJson.get("inputExpressions").get(0).get("id").asText();
+        assertEquals("IS NOT IN", modelerJson.get("rules").get(0).get(inputExpression1 + "_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get(inputExpression1 + "_expression").asText());
+        assertEquals("IS IN", modelerJson.get("rules").get(1).get(inputExpression1 + "_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get(inputExpression1 + "_expression").asText());
+        assertEquals("IS IN", modelerJson.get("rules").get(2).get(inputExpression1 + "_operator").asText());
+        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get(inputExpression1 + "_expression").asText());
     }
 
     @Test
@@ -615,6 +618,60 @@ public class DmnJsonConverterTest {
         Decision decision = dmnDefinition.getDecisions().get(0);
 
         assertFalse(decision.isForceDMN11());
+    }
+
+    @Test
+    public void testConvertDecisionServiceJsonToDMN() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+        String testDecJsonResource1 = readJsonToString(JSON_RESOURCE_1);
+        String testDecJsonResource2 = readJsonToString(JSON_RESOURCE_5);
+        String testDecJsonResource3 = readJsonToString(JSON_RESOURCE_7);
+        String testDecJsonResource4 = readJsonToString(JSON_RESOURCE_9);
+        String testDecJsonResource5 = readJsonToString(JSON_RESOURCE_10);
+
+        Map<String, String> decisionTableMap = new HashMap<>();
+        decisionTableMap.put("decTable1", testDecJsonResource1);
+        decisionTableMap.put("decTable2", testDecJsonResource2);
+        decisionTableMap.put("decTable3", testDecJsonResource3);
+        decisionTableMap.put("ComplexExpression", testDecJsonResource4);
+        decisionTableMap.put("decTable4", testDecJsonResource5);
+
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", decisionTableMap);
+
+        assertEquals(1,  dmnDefinition.getDecisionServices().size());
+
+        DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
+
+        assertEquals(2, decisionService.getOutputDecisions().size());
+        assertEquals(2, decisionService.getEncapsulatedDecisions().size());
+
+        assertEquals(4, dmnDefinition.getDecisions().size());
+
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertNotNull(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())));
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertNotNull(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())));
+
+        dmnDefinition.getDecisions().forEach(decision -> assertNotNull(decision.getExpression()));
+    }
+
+    @Test
+    public void testConvertDecisionServiceJsonToDMNNoDecisionTableMap() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc");
+
+        assertEquals(1,  dmnDefinition.getDecisionServices().size());
+
+        DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
+
+        assertEquals(2, decisionService.getOutputDecisions().size());
+        assertEquals(2, decisionService.getEncapsulatedDecisions().size());
+
+        assertEquals(4, dmnDefinition.getDecisions().size());
+
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertNotNull(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())));
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertNotNull(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())));
+
+        dmnDefinition.getDecisions().forEach(decision -> assertNull(decision.getExpression()));
     }
 
     /* Helper methods */

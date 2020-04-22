@@ -12,6 +12,12 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import static org.flowable.editor.constants.DmnJsonConstants.EDITOR_SHAPE_ID;
+import static org.flowable.editor.constants.DmnJsonConstants.EDITOR_SHAPE_PROPERTIES;
+import static org.flowable.editor.constants.DmnJsonConstants.EDITOR_STENCIL;
+import static org.flowable.editor.constants.DmnJsonConstants.EDITOR_STENCIL_ID;
+import static org.flowable.editor.constants.DmnStencilConstants.PROPERTY_OVERRIDE_ID;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -23,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -254,40 +261,6 @@ public class DmnJsonConverterUtil {
         return decisionTableNode;
     }
 
-    protected static String transformCollectionOperation(String operatorValue, String inputType) {
-        if (StringUtils.isEmpty(operatorValue) || StringUtils.isEmpty(inputType)) {
-            throw new IllegalArgumentException("operator value and input type must be present");
-        }
-
-        if ("collection".equalsIgnoreCase(inputType)) {
-            switch (operatorValue) {
-                case "IN":
-                    return "ALL OF";
-                case "NOT IN":
-                    return "NONE OF";
-                case "ANY":
-                    return "ANY OF";
-                case "NOT ANY":
-                    return "NOT ALL OF";
-                default:
-                    return operatorValue;
-            }
-        } else {
-            switch (operatorValue) {
-                case "IN":
-                    return "IS IN";
-                case "NOT IN":
-                    return "IS NOT IN";
-                case "ANY":
-                    return "IS IN";
-                case "NOT ANY":
-                    return "IS NOT IN";
-                default:
-                    return operatorValue;
-            }
-        }
-    }
-
     public static String determineExpressionType(String expressionValue) {
         String expressionType = null;
         if (!"-".equals(expressionValue)) {
@@ -336,6 +309,19 @@ public class DmnJsonConverterUtil {
         return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator) ||
             "IS IN".equals(operator) || "IS NOT IN".equals(operator) ||
             "NONE OF".equals(operator) || "NOT ALL OF".equals(operator) || "ALL OF".equals(operator);
+    }
+
+    public static boolean isDRD(JsonNode definitionNode) {
+        return definitionNode.has("childShapes");
+    }
+
+    public static String getStencilId(JsonNode objectNode) {
+        String stencilId = null;
+        JsonNode stencilNode = objectNode.get(EDITOR_STENCIL);
+        if (stencilNode != null && stencilNode.get(EDITOR_STENCIL_ID) != null) {
+            stencilId = stencilNode.get(EDITOR_STENCIL_ID).asText();
+        }
+        return stencilId;
     }
 
     protected static String getDMNContainsExpressionMethod(String containsOperator) {
@@ -408,5 +394,81 @@ public class DmnJsonConverterUtil {
         return Stream.of(str.split(regex))
             .map(elem -> elem.trim())
             .collect(Collectors.toList());
+    }
+
+    protected static String transformCollectionOperation(String operatorValue, String inputType) {
+        if (StringUtils.isEmpty(operatorValue) || StringUtils.isEmpty(inputType)) {
+            throw new IllegalArgumentException("operator value and input type must be present");
+        }
+
+        if ("collection".equalsIgnoreCase(inputType)) {
+            switch (operatorValue) {
+                case "IN":
+                    return "ALL OF";
+                case "NOT IN":
+                    return "NONE OF";
+                case "ANY":
+                    return "ANY OF";
+                case "NOT ANY":
+                    return "NOT ALL OF";
+                default:
+                    return operatorValue;
+            }
+        } else {
+            switch (operatorValue) {
+                case "IN":
+                    return "IS IN";
+                case "NOT IN":
+                    return "IS NOT IN";
+                case "ANY":
+                    return "IS IN";
+                case "NOT ANY":
+                    return "IS NOT IN";
+                default:
+                    return operatorValue;
+            }
+        }
+    }
+
+    public static String getElementId(JsonNode objectNode) {
+        String elementId = null;
+        if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_OVERRIDE_ID, objectNode))) {
+            elementId = getPropertyValueAsString(PROPERTY_OVERRIDE_ID, objectNode).trim();
+        } else {
+            elementId = objectNode.get(EDITOR_SHAPE_ID).asText();
+        }
+
+        return elementId;
+    }
+
+    public static String getUniqueElementId() {
+       return getUniqueElementId(null);
+    }
+
+    public static String getUniqueElementId(String prefix) {
+        UUID uuid = UUID.randomUUID();
+        if (StringUtils.isEmpty(prefix)) {
+            return uuid.toString();
+        } else {
+            return String.format("%s_%s", prefix, uuid.toString());
+        }
+    }
+
+    public static String getPropertyValueAsString(String name, JsonNode objectNode) {
+        String propertyValue = null;
+        JsonNode propertyNode = getProperty(name, objectNode);
+        if (propertyNode != null && !propertyNode.isNull()) {
+            propertyValue = propertyNode.asText();
+        }
+        return propertyValue;
+    }
+
+    public static JsonNode getProperty(String name, JsonNode objectNode) {
+        JsonNode propertyNode = null;
+        if (objectNode.get(EDITOR_SHAPE_PROPERTIES) != null) {
+            JsonNode propertiesNode = objectNode.get(EDITOR_SHAPE_PROPERTIES);
+            propertyNode = propertiesNode.get(name);
+        }
+        return propertyNode;
     }
 }
