@@ -138,7 +138,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         if (resetExpiredJobsRunnable == null) {
             String resetRunnableName = resetExpiredRunnableName != null ?
                     resetExpiredRunnableName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-reset-expired-jobs";
-            resetExpiredJobsRunnable = new ResetExpiredJobsRunnable(resetRunnableName, this, jobEntityManagerToUse);
+            resetExpiredJobsRunnable = createResetExpiredJobsRunnable(resetRunnableName);
         }
 
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
@@ -147,6 +147,8 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
         }
     }
+
+    protected abstract ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName);
 
     protected abstract void startAdditionalComponents();
 

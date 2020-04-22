@@ -12,6 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -39,17 +42,20 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
     protected final String name;
     protected final AsyncExecutor asyncExecutor;
-    protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+    protected final Collection<JobInfoEntityManager<? extends JobInfoEntity>> jobInfoEntityManagers;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
     public ResetExpiredJobsRunnable(String name, AsyncExecutor asyncExecutor,
-            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+            JobInfoEntityManager<? extends JobInfoEntity>... jobEntityManagers) {
         this.name = name;
         this.asyncExecutor = asyncExecutor;
-        this.jobEntityManager = jobEntityManager;
+        if (jobEntityManagers.length < 1) {
+            throw new IllegalArgumentException("there must be at least one job entity manager");
+        }
+        this.jobInfoEntityManagers = Arrays.asList(jobEntityManagers);
     }
 
     @Override
@@ -88,19 +94,24 @@ public class ResetExpiredJobsRunnable implements Runnable {
      * Resets jobs that were expired. Will continue to reset jobs until no more jobs are returned.
      */
     public void resetJobs() {
+        for (JobInfoEntityManager<? extends JobInfoEntity> jobInfoEntityManager : jobInfoEntityManagers) {
+            resetJobs(jobInfoEntityManager);
+        }
+    }
+
+    protected void resetJobs(JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
 
         boolean hasExpiredJobs = true;
         while (hasExpiredJobs) {
 
             try {
-
                 List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
-                    .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
+                        .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
                 List<String> expiredJobIds = expiredJobs.stream().map(JobInfoEntity::getId).collect(Collectors.toList());
                 if (!expiredJobIds.isEmpty()) {
                     asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
-                        new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
+                            new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
 
                 } else {
                     hasExpiredJobs = false;
