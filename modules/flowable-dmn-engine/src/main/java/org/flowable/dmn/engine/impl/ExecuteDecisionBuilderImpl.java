@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.dmn.api.ExecuteDecisionContext;
@@ -125,6 +126,26 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     @Override
     public DecisionExecutionAuditContainer executeWithAuditTrail() {
         return decisionService.executeDecisionWithAuditTrail(this);
+    }
+
+    @Override
+    public Map<String, List<Map<String, Object>>> executeDecisionService() {
+        return decisionService.executeDecisionService(this);
+    }
+
+    @Override
+    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail() {
+        return decisionService.executeDecisionServiceWithAuditTrail(this);
+    }
+
+    @Override
+    public Map<String, List<Map<String, Object>>> evaluateDecision() {
+        return decisionService.evaluateDecision(this);
+    }
+
+    @Override
+    public DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail() {
+        return decisionService.evaluateDecisionWithAuditTrail(this);
     }
 
     public String getDecisionKey() {

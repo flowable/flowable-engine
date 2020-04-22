@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.impl.audit;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
@@ -28,18 +29,18 @@ public class DecisionExecutionAuditUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionExecutionAuditUtil.class);
 
-    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
+    public static DecisionServiceExecutionAuditContainer initializeDecisionServiceExecutionAudit(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
 
         if (decisionService == null || decisionService.getId() == null) {
             LOGGER.error("decision service does not contain key");
             throw new IllegalArgumentException("decision does not contain decision key");
         }
 
-        return new DecisionExecutionAuditContainer(decisionService.getId(), decisionService.getName(), executeDecisionInfo.getDecisionVersion(),
+        return new DecisionServiceExecutionAuditContainer(decisionService.getId(), decisionService.getName(), executeDecisionInfo.getDecisionVersion(),
            CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
     }
 
-    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
+    public static DecisionExecutionAuditContainer initializeDecisionExecutionAudit(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
 
         if (decision == null || decision.getId() == null) {
             LOGGER.error("decision does not contain key");
@@ -56,5 +57,4 @@ public class DecisionExecutionAuditUtil {
         return new DecisionExecutionAuditContainer(decision.getId(), decision.getName(), executeDecisionInfo.getDecisionVersion(), 
                         decisionTable.getHitPolicy(), CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
     }
-
 }

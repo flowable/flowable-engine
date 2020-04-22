@@ -85,7 +85,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
-                .execute();
+                .executeWithAuditTrail();
         
         DmnHistoricDecisionExecution decisionExecution = historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").singleResult();
         assertNotNull(decisionExecution.getDecisionDefinitionId());

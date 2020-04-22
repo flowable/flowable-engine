@@ -43,7 +43,7 @@ public class ELExecutionContextBuilder {
         executionContext.setScopeType(executeDecisionInfo.getScopeType());
         executionContext.setTenantId(executeDecisionInfo.getTenantId());
 
-        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionInfo));
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionServiceExecutionAudit(decisionService, executeDecisionInfo));
 
         return executionContext;
     }
@@ -56,7 +56,7 @@ public class ELExecutionContextBuilder {
         executionContext.setForceDMN11(decision.isForceDMN11());
 
         // initialize audit trail
-        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionInfo));
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionExecutionAudit(decision, executeDecisionInfo));
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 

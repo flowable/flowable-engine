@@ -187,19 +187,13 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
     }
 
     protected void execute(CommandContext commandContext, DmnDefinition definition) {
-        DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
-        DecisionExecutionAuditContainer auditContainer;
+        Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
 
-        // executing a DecisionService is the default but will fallback to Decision
-        if (decisionService != null) {
-            executeDecisionContext.setDmnElement(decisionService);
-
-            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionServiceOperation(executeDecisionContext, decisionService);
-        } else {
-            Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
-            executeDecisionContext.setDmnElement(decision);
-
-            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision);
+        if (decision == null) {
+            throw new FlowableIllegalArgumentException("no decision with id: '" + executeDecisionContext.getDecisionKey() + "' found in definition");
         }
+
+        executeDecisionContext.setDmnElement(decision);
+        CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision);
     }
 }

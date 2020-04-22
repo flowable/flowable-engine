@@ -257,9 +257,18 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
         assertNotNull(deployment);
 
-        List<DmnDecision> decisions = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
-        assertEquals(13, decisions.size());
+        List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
+        assertEquals(2, decisionServices.size());
+    }
 
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
+    public void testExportedDecisionServicesDeployment() {
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
+        assertNotNull(deployment);
+
+        List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
+        assertEquals(1, decisionServices.size());
     }
     
     @Test

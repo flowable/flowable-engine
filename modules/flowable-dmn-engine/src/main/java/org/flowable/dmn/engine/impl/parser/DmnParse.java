@@ -85,15 +85,6 @@ public class DmnParse implements DmnXMLConstants {
             }
 
             if (dmnDefinition != null && dmnDefinition.getDecisions() != null) {
-                for (Decision decision : dmnDefinition.getDecisions()) {
-                    DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
-                    decisionEntity.setKey(decision.getId());
-                    decisionEntity.setName(decision.getName());
-                    decisionEntity.setResourceName(name);
-                    decisionEntity.setDeploymentId(deployment.getId());
-                    decisionEntity.setDescription(decision.getDescription());
-                    decisions.add(decisionEntity);
-                }
                 for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
                     DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
                     decisionEntity.setKey(decisionService.getId());
@@ -102,6 +93,17 @@ public class DmnParse implements DmnXMLConstants {
                     decisionEntity.setDeploymentId(deployment.getId());
                     decisionEntity.setDescription(decisionService.getDescription());
                     decisions.add(decisionEntity);
+                }
+                if (dmnDefinition.getDecisionServices().isEmpty()) {
+                    for (Decision decision : dmnDefinition.getDecisions()) {
+                        DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
+                        decisionEntity.setKey(decision.getId());
+                        decisionEntity.setName(decision.getName());
+                        decisionEntity.setResourceName(name);
+                        decisionEntity.setDeploymentId(deployment.getId());
+                        decisionEntity.setDescription(decision.getDescription());
+                        decisions.add(decisionEntity);
+                    }
                 }
             }
         } catch (Exception e) {

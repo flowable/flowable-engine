@@ -101,34 +101,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         } finally {
             // end audit trail
             executionContext.getAuditContainer().stopAudit();
-
-            DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-            if (dmnEngineConfiguration.isHistoryEnabled()) {
-                HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager = dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
-                HistoricDecisionExecutionEntity decisionExecutionEntity = historicDecisionExecutionEntityManager.create();
-                decisionExecutionEntity.setDecisionDefinitionId(executeDecisionInfo.getDecisionId());
-                decisionExecutionEntity.setDeploymentId(executeDecisionInfo.getDeploymentId());
-                decisionExecutionEntity.setStartTime(executionContext.getAuditContainer().getStartTime());
-                decisionExecutionEntity.setEndTime(executionContext.getAuditContainer().getEndTime());
-                decisionExecutionEntity.setInstanceId(executeDecisionInfo.getInstanceId());
-                decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
-                decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
-                decisionExecutionEntity.setScopeType(executeDecisionInfo.getScopeType());
-                decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
-
-                Boolean failed = executionContext.getAuditContainer().isFailed();
-                if (BooleanUtils.isTrue(failed)) {
-                    decisionExecutionEntity.setFailed(failed.booleanValue());
-                }
-
-                try {
-                    decisionExecutionEntity.setExecutionJson(objectMapper.writeValueAsString(executionContext.getAuditContainer()));
-                } catch (Exception e) {
-                    throw new FlowableException("Error writing execution json", e);
-                }
-
-                historicDecisionExecutionEntityManager.insert(decisionExecutionEntity);
-            }
         }
 
         return executionContext.getAuditContainer();

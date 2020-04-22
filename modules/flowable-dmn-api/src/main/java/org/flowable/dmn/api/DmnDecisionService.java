@@ -15,8 +15,10 @@ package org.flowable.dmn.api;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+
 /**
- * Service for executing DMN decisions (decision tables)
+ * Service for executing DMN decisions
  *
  * @author Tijs Rademakers
  * @author Yvo Swillens
@@ -24,15 +26,60 @@ import java.util.Map;
 public interface DmnDecisionService {
 
     /**
-     * Create a builder to execute a decision.
+     * Create a builder to execute a decision or decision service.
      *
      * @return the {@link ExecuteDecisionBuilder} build
      */
     ExecuteDecisionBuilder createExecuteDecisionBuilder();
 
+    /**
+     * Execute a single decision or a decision service depending on the provided decision key
+     *
+     * @return a Map with decision result(s) per decision
+     */
+    Map<String, List<Map<String, Object>>> evaluateDecision(ExecuteDecisionBuilder executeDecisionBuilder);
+
+    /**
+     * Execute a single decision or a decision service depending on the provided decision key
+     *
+     * @return the {@link DecisionExecutionAuditContainer} when a decision was executed
+     * or a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
+     */
+    DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail(ExecuteDecisionBuilder executeDecisionBuilder);
+
+    /**
+     * Execute a single decision
+     *
+     * @return a List with decision result(s)
+     */
     List<Map<String, Object>> executeDecision(ExecuteDecisionBuilder builder);
 
+    /**
+     * Execute a single decision
+     *
+     * @return a Map with the decision result.
+     * An {@link FlowableException} will be thrown when multiple rules were hit.
+     */
     Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilder builder);
 
+    /**
+     * Execute a single decision
+     *
+     * @return a List with decision result(s)
+     */
     DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilder builder);
+
+    /**
+     * Execute a decision service
+     *
+     * @return a Map with decision result(s) per output decision
+     */
+    Map<String, List<Map<String, Object>>> executeDecisionService(ExecuteDecisionBuilder executeDecisionBuilder);
+
+    /**
+     * Execute a decision service
+     *
+     * @return a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
+     */
+    DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail(ExecuteDecisionBuilder executeDecisionBuilder);
 }
