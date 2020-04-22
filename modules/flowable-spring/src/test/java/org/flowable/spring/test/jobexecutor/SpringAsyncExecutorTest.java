@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.test.CleanTest;
@@ -52,14 +54,14 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testHappyJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("process1");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
         waitForTasksToExpire(instance, 0);
 
         List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
-        assertTrue(activeTasks.isEmpty());
+        assertThat(activeTasks).isEmpty();
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }
@@ -67,7 +69,7 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testAsyncJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncProcess");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
@@ -76,7 +78,7 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(instance.getId())
                 .singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }
@@ -84,14 +86,14 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testRollbackJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("errorProcess1");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
         waitForTasksToExpire(instance, 1);
 
         List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
-        assertEquals(1, activeTasks.size());
+        assertThat(activeTasks).hasSize(1);
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }

@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.test.CleanTest;
@@ -44,7 +46,7 @@ public class SpringAsyncHistoryExecutorTest extends SpringFlowableTestCase {
 
     @Autowired
     protected TaskService taskService;
-    
+
     @Autowired
     protected HistoryService historyService;
 
@@ -59,17 +61,15 @@ public class SpringAsyncHistoryExecutorTest extends SpringFlowableTestCase {
             taskService.complete(tasks.get(0).getId());
             tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
-        
+
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000L, 200L, false);
-        
+
         List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        
-        String[] expectedTaskNames = new String[] { "Task a", "Task b1", "Task b2", "Task c" };
-        assertEquals(expectedTaskNames.length, historicTasks.size());
-        for (int i = 0; i < historicTasks.size(); i++) {
-            assertEquals(expectedTaskNames[i], historicTasks.get(i).getName());
-        }
+
+        assertThat(historicTasks)
+                .extracting(HistoricTaskInstance::getName)
+                .containsExactly("Task a", "Task b1", "Task b2", "Task c");
     }
-        
+
 }

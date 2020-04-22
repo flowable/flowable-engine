@@ -12,6 +12,9 @@
  */
 package org.flowable.spring.test.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.DataSource;
@@ -61,14 +64,10 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
     @Test
     @Deployment
     public void testExceptionDoesRollback() {
-        try {
-            runtimeService.createProcessInstanceBuilder().processDefinitionKey("testProcess").start();
-            fail();
-        } catch (Exception e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder().processDefinitionKey("testProcess").start())
+                .isInstanceOf(Exception.class);
 
-        assertEquals(taskService.createTaskQuery().count(), 0);
+        assertThat(taskService.createTaskQuery().count()).isZero();
     }
 
     @Test
@@ -78,15 +77,15 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
 
         // The task should be created, as the exception is try-catched
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         String variable = (String) runtimeService.getVariable(processInstance.getId(), "theVariable");
-        assertEquals("test", variable);
+        assertThat(variable).isEqualTo("test");
     }
 
     /**
      * This test starts a process instance, that has a service task which is a Spring bean that throws an exception from within a command.
-     *
+     * <p>
      * Bug that was fixed: due to the transaction mgmt in Spring, this marks the whole transaction for rollback, even if it was try-catched,
      * because the transaction interceptor is used for every command, event the nested ones.
      * (See the implementation of TransactionTemplate#execute)
@@ -99,10 +98,10 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
         // The task should be created, as the service task with an exception is try-catched in the delegate.
         // However, due to a bug that's now fixed this wasn't the case and the whole process instance was rolled back.
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         String variable = (String) runtimeService.getVariable(processInstance.getId(), "theVariable");
-        assertEquals("test", variable);
+        assertThat(variable).isEqualTo("test");
     }
 
     @Autowired
@@ -113,14 +112,11 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
     public void testExceptionInTransactionRollsbackFlowable() {
         // This will start a process instance, but throw an exception after the call,
         // which should rollback the whole transaction
-        try {
-            exceptionThrowingAfterFlowableLogicBean.execute();
-            fail();
-        } catch (Exception e) {
-        }
+        assertThatThrownBy(() -> exceptionThrowingAfterFlowableLogicBean.execute())
+                .isInstanceOf(Exception.class);
 
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(taskService.createTaskQuery().count()).isZero();
     }
 
     static class TestExecuteAsyncRunnableFactory implements ExecuteAsyncRunnableFactory {
@@ -132,7 +128,7 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
             counter.incrementAndGet();
 
             throw new RuntimeException("This line should never be reached, because the hint should happen in the post-commit, "
-                + "and the whole transaction should rollback (no post commit should have happened)");
+                    + "and the whole transaction should rollback (no post commit should have happened)");
         }
     }
 
@@ -144,28 +140,27 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
         // This test specifically tests if the hinting of the async executor (which is done in the post-commit) works properly,
         // hence why the async executor needs to be started specifically in this test
         try {
-            ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncExecutor()).setExecuteAsyncRunnableFactory(new TestExecuteAsyncRunnableFactory());
+            assertThatThrownBy(() -> {
+                ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncExecutor()).setExecuteAsyncRunnableFactory(new TestExecuteAsyncRunnableFactory());
 
-            processEngineConfiguration.getAsyncExecutor().start();
-            exceptionThrowingAfterFlowableLogicBean.execute();
-            fail();
-        } catch (Exception e) {
-
+                processEngineConfiguration.getAsyncExecutor().start();
+                exceptionThrowingAfterFlowableLogicBean.execute();
+            })
+                    .isInstanceOf(Exception.class);
         } finally {
             processEngineConfiguration.getAsyncExecutor().shutdown();
 
             ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncExecutor()).setExecuteAsyncRunnableFactory(null);
         }
 
-        assertEquals(0, TestExecuteAsyncRunnableFactory.counter.get());
+        assertThat(TestExecuteAsyncRunnableFactory.counter.get()).isZero();
 
-        assertEquals(0, managementService.createJobQuery().count());
-        assertEquals(0, managementService.createDeadLetterJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createDeadLetterJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(taskService.createTaskQuery().count()).isZero();
     }
-
 
     @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
@@ -242,7 +237,7 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
             private ManagementService managementService;
 
             public TestServiceTaskBean(ManagementService managementService,
-                ExceptionThrowingBean exceptionThrowingBean) {
+                    ExceptionThrowingBean exceptionThrowingBean) {
                 this.managementService = managementService;
             }
 
@@ -313,6 +308,5 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
         }
 
     }
-
 
 }
