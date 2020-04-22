@@ -70,7 +70,7 @@
       "title": "Decision",
       "description": "A decision",
       "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
-      "icon" : "activity/list/type.decision.png",
+      "icon": "activity/list/type.decision.png",
       "groups": [
         "Elements"
       ],
@@ -132,12 +132,58 @@
       "id": "ExpandedDecisionService",
       "title": "Expanded Decision service",
       "description": "A decision service",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"200\"\n   height=\"160\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"50\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"80\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"110\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"50\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"80\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"110\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"80\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"120 100\" oryx:maximumSize=\"\" >\n    <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"190\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"200\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#ffffff\" />\n    <path id=\"seperator\" oryx:resize=\"vertical horizontal\" d=\"M2.5,80 L197.5,80\" stroke=\"black\" stroke-width=\"1\" fill=\"none\"></path>\n    <rect id=\"border\" oryx:anchors=\"top bottom left right\" oryx:resize=\"vertical horizontal\" x=\"2.5\" y=\"2.5\" width=\"195\" height=\"155\" rx=\"8\" ry=\"8\" stroke=\"black\" stroke-width=\"1\" fill=\"none\" />\n\t<text \n\t\tfont-size=\"12\" \n\t\tid=\"text_name\" \n\t\tx=\"8\" \n\t\ty=\"10\" \n\t\toryx:align=\"top left\"\n\t\toryx:fittoelem=\"text_frame\"\n\t\toryx:anchors=\"left top\" \n\t\tstroke=\"#373e48\">\n\t</text>\n  </g>\n</svg>",
-      "icon" : "activity/expanded.subprocess.png",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"0\" oryx:cy=\"124\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"249\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"599\" oryx:cy=\"124\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"0\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"124\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"none\" >\n    <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"100%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t</radialGradient>\n\t</defs>\n\t  \t\n  \t<rect\n  \t\tid=\"border\"\n  \t\tclass=\"stripable-element-force\"\n  \t\toryx:resize=\"vertical horizontal\"\n  \t\tx=\"0\"\n  \t\ty=\"0\"\n  \t\twidth=\"600\"\n  \t\theight=\"250\"\n  \t\tfill=\"none\"\n  \t\tstroke-width=\"9\"\n  \t\tstroke=\"none\"\n  \t\tvisibility=\"visible\"\n  \t\tpointer-events=\"stroke\"\n        rx=\"10\"\n        ry=\"10\"\n  \t/>\n    <rect\n    \tid=\"c\"\n    \toryx:resize=\"vertical horizontal\"\n    \tx=\"0\"\n    \ty=\"0\"\n    \twidth=\"600\" \n    \theight=\"250\" \n    \tstroke=\"black\" \n    \tfill=\"url(#background) white\"\n    \tfill-opacity=\"0.3\"\n        rx=\"10\"\n        ry=\"10\" \n    />\n\t\n    <text x=\"13\" y=\"125\" font-size=\"12\" id=\"text_name\" oryx:fittoelem=\"border\" oryx:align=\"top top\" oryx:anchors=\"left\" fill=\"black\" stroke=\"black\"></text>\n    \n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
       "groups": [
-        "Elements"
+        "DMN.STENCILS.GROUPS.DIAGRAM"
       ],
-      "hide": true,
+      "mayBeRoot" : true,
+      "hide" : true,
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ],
+      "layout": [
+        {
+          "type": "layout.dmn1_2.decision_service"
+        }
+      ]
+    },
+    {
+      "type": "node",
+      "id": "OutputDecisionsDecisionServiceSection",
+      "title": "Output Decisions",
+      "description": "Output decisions ",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"none\" >\n  \n     <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n\t\t</radialGradient>\n\t</defs>\n\t\n  \t<rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" d=\"M0,0 h580 q10,0 10,10 v230 h-600 v-230 q0,-10 10,-10 z\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/>\t\t\n\t<!-- <rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\" /> -->\n\n    <path\n        id=\"border\"\n        d=\"M0,0 h580 q10,0 10,10 v230 h-600 v-230 q0,-10 10,-10 z\"\n        oryx:resize=\"vertical horizontal\"\n        stroke=\"black\" stroke-width=\"1\"\n        fill=\"url(#background) white\" \n        pointer-events=\"all\"\n    />\n\t\n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "DMN.STENCILS.GROUPS.DIAGRAM"
+      ],
+      "mayBeRoot" : true,
+      "hide" : true,
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ]
+    },
+    {
+      "type": "node",
+      "id": "EncapsulatedDecisionsDecisionServiceSection",
+      "title": "Encapsulated Decisions",
+      "description": "Encapsulated decisions ",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"none\" >\n  \n     <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n\t\t</radialGradient>\n\t</defs>\n\t\n  \t<rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" d=\"M0,0 h600 v230 q0,10 -10,10 h-580 q-10,0 -10,-10 z\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/>\t\t\n\t<!-- <rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\" /> -->\n\n    <path\n        id=\"border\"\n        d=\"M0,0 h600 v230 q0,10 -10,10 h-580 q-10,0 -10,-10 z\"\n        oryx:resize=\"vertical horizontal\"\n        stroke=\"black\" stroke-width=\"1\"\n        fill=\"url(#background) white\" \n        pointer-events=\"all\"\n    />\n\t\n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "DMN.STENCILS.GROUPS.DIAGRAM"
+      ],
+      "mayBeRoot" : true,
+      "hide" : true,
       "propertyPackages": [
         "overrideidpackage",
         "namepackage"
@@ -173,8 +219,8 @@
       "id": "KnowledgeRequirement",
       "title": "Knowledge requirement",
       "description": "The invocation of a business knownledge model",
-      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n\txmlns=\"http://www.w3.org/2000/svg\"\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\n\tversion=\"1.0\"\n\toryx:edge=\"edge\" >\n    <defs>\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\n\t  \t</marker>\n\t</defs>\n\t<g id=\"edge\">\n\t    <path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"3, 4\" marker-end=\"url(#end)\" />\n\t\t<text id=\"name\" x=\"0\" y=\"0\" oryx:edgePosition=\"midTop\" oryx:offsetTop=\"6\" style=\"font-size:9px;\"/>\n\t</g>\n</svg>",
-      "icon" : "connector/association.undirected.png",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n\txmlns=\"http://www.w3.org/2000/svg\"\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\n\tversion=\"1.0\"\n\toryx:edge=\"edge\" >\n    <defs>\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\n\t  \t</marker>\n\t</defs>\n\t<g id=\"edge\">\n\t    <path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"3, 4\" marker-end=\"url(#end)\" />\n\t\t<text id=\"name\" x=\"0\" y=\"0\" oryx:edgePosition=\"midTop\" oryx:offsetTop=\"6\" style=\"font-size:9px;\"/>\n\t</g>\n</svg>",
+      "icon": "connector/association.undirected.png",
       "groups": [
         "Requirements"
       ],
@@ -348,6 +394,23 @@
       },
       {
         "role": "ExpandedDecisionService",
+        "contains": [
+          "OutputDecisionsDecisionServiceSection",
+          "EncapsulatedDecisionsDecisionServiceSection"
+        ]
+      },
+      {
+        "role": "OutputDecisionsDecisionServiceSection",
+        "contains": [
+          "information_requirement_start",
+          "information_requirement_end",
+          "knowledge_requirement_start",
+          "knowledge_requirement_end",
+          "DecisionTable"
+        ]
+      },
+      {
+        "role": "EncapsulatedDecisionsDecisionServiceSection",
         "contains": [
           "information_requirement_start",
           "information_requirement_end",
