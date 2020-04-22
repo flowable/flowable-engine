@@ -279,14 +279,16 @@ public class ModelServiceImpl implements ModelService {
             childNode.set("bounds", boundsNode);
             ObjectNode lowerRightNode = objectMapper.createObjectNode();
             boundsNode.set("lowerRight", lowerRightNode);
-            lowerRightNode.put("x", 758);
+            lowerRightNode.put("x", 750);
             lowerRightNode.put("y", 554);
             ObjectNode upperLeftNode = objectMapper.createObjectNode();
             boundsNode.set("upperLeft", upperLeftNode);
-            upperLeftNode.put("x", 40);
-            upperLeftNode.put("y", 40);
+            upperLeftNode.put("x", 150);
+            upperLeftNode.put("y", 74);
 
-            childNode.set("childShapes", objectMapper.createArrayNode());
+            ArrayNode childShapes = objectMapper.createArrayNode();
+
+            childNode.set("childShapes", childShapes);
             childNode.set("dockers", objectMapper.createArrayNode());
             childNode.set("outgoing", objectMapper.createArrayNode());
             childNode.put("resourceId", "expandedDecisionService");
@@ -294,6 +296,52 @@ public class ModelServiceImpl implements ModelService {
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "ExpandedDecisionService");
+
+            ObjectNode outgoingDecisionsShape = objectMapper.createObjectNode();
+            childShapes.add(outgoingDecisionsShape);
+
+            ObjectNode outgoingDecisionsStencilNode = objectMapper.createObjectNode();
+            outgoingDecisionsShape.set("stencil", outgoingDecisionsStencilNode);
+            outgoingDecisionsStencilNode.put("id", "OutputDecisionsDecisionServiceSection");
+
+            outgoingDecisionsShape.set("childShapes", objectMapper.createArrayNode());
+            outgoingDecisionsShape.set("dockers", objectMapper.createArrayNode());
+            outgoingDecisionsShape.set("outgoing", objectMapper.createArrayNode());
+            outgoingDecisionsShape.put("resourceId", "outputDecisions");
+
+            ObjectNode outgoingDecisionsBoundsNode = objectMapper.createObjectNode();
+            outgoingDecisionsShape.set("bounds", outgoingDecisionsBoundsNode);
+            ObjectNode outgoingDecisionsLowerRightNode = objectMapper.createObjectNode();
+            outgoingDecisionsBoundsNode.set("lowerRight", outgoingDecisionsLowerRightNode);
+            outgoingDecisionsLowerRightNode.put("x", 600);
+            outgoingDecisionsLowerRightNode.put("y", 240);
+            ObjectNode outgoingDecisionsUpperLeftNode = objectMapper.createObjectNode();
+            outgoingDecisionsBoundsNode.set("upperLeft", outgoingDecisionsUpperLeftNode);
+            outgoingDecisionsUpperLeftNode.put("x", 0);
+            outgoingDecisionsUpperLeftNode.put("y", 0);
+
+            ObjectNode encapsulatedDecisionsShape = objectMapper.createObjectNode();
+            childShapes.add(encapsulatedDecisionsShape);
+
+            ObjectNode encapsulatedDecisionsStencilNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsShape.set("stencil", encapsulatedDecisionsStencilNode);
+            encapsulatedDecisionsStencilNode.put("id", "EncapsulatedDecisionsDecisionServiceSection");
+
+            encapsulatedDecisionsShape.set("childShapes", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.set("dockers", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.set("outgoing", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.put("resourceId", "encapsulatedDecisions");
+
+            ObjectNode encapsulatedDecisionsBoundsNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsShape.set("bounds", encapsulatedDecisionsBoundsNode);
+            ObjectNode encapsulatedDecisionsLowerRightNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsBoundsNode.set("lowerRight", encapsulatedDecisionsLowerRightNode);
+            encapsulatedDecisionsLowerRightNode.put("x", 600);
+            encapsulatedDecisionsLowerRightNode.put("y", 480);
+            ObjectNode encapsulatedDecisionsUpperLeftNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsBoundsNode.set("upperLeft", encapsulatedDecisionsUpperLeftNode);
+            encapsulatedDecisionsUpperLeftNode.put("x", 0);
+            encapsulatedDecisionsUpperLeftNode.put("y", 240);
 
             json = editorNode.toString();
 
