@@ -31,6 +31,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
@@ -298,6 +299,16 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 processDiagramCanvas.drawSendEventServiceTask(flowNode.getName(), graphicInfo, scaleFactor);
             }
         });
+        
+        // case service task
+        activityDrawInstructions.put(CaseServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                processDiagramCanvas.drawCaseServiceTask(flowNode.getName(), graphicInfo, scaleFactor);
+            }
+        });
 
         // businessRuleTask task
         activityDrawInstructions.put(BusinessRuleTask.class, new ActivityDrawInstruction() {
@@ -402,6 +413,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 }
             }
         });
+        
         // transaction
         activityDrawInstructions.put(Transaction.class, new ActivityDrawInstruction() {
 
@@ -750,6 +762,12 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 drawHighLight(processDiagramCanvas, bpmnModel.getGraphicInfo(flowNode.getId()));
             }
 
+        } else if (flowNode instanceof Task) {
+            activityDrawInstructions.get(Task.class).draw(processDiagramCanvas, bpmnModel, flowNode);
+            
+            if (highLightedActivities.contains(flowNode.getId())) {
+                drawHighLight(processDiagramCanvas, bpmnModel.getGraphicInfo(flowNode.getId()));
+            }
         }
 
         // Outgoing transitions of activity
