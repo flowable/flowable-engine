@@ -351,6 +351,9 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         ActivityDrawInstruction drawInstruction = activityDrawInstructions.get(planItem.getPlanItemDefinition().getClass());
         if (drawInstruction != null) {
             drawInstruction.draw(caseDiagramCanvas, cmmnModel, planItem);
+        
+        } else if (planItem.getPlanItemDefinition() instanceof Task) {
+            activityDrawInstructions.get(Task.class).draw(caseDiagramCanvas, cmmnModel, planItem);
         }
 
         // Nested elements
