@@ -288,7 +288,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithFallbackFalse() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision table found without parent deployment id.");
+        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision found without parent deployment id.");
 
         deployDmnTableAssertCaseStarted();
     }
@@ -309,7 +309,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithGlobalTenantFallbackNoDefinition() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("There was also no fall back decision table found for default tenant defaultFlowable");
+        this.expectedException.expectMessage("There was also no fall back decision found for default tenant defaultFlowable");
 
         deployDmnTableWithGlobalTenantFallback("otherTenant");
     }
