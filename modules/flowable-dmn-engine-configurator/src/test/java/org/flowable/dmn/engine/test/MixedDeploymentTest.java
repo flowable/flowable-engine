@@ -127,7 +127,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
             fail("Expected Exception");
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Decision table for key [decision1] was not found"));
+            assertTrue(e.getMessage().contains("Decision for key [decision1] was not found"));
         } finally {
             deleteAllDmnDeployments();
         }
@@ -165,7 +165,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFalse() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
+        this.expectedException.expectMessage("Decision for key [decision1] and tenantId [flowable] was not found");
 
         deployDecisionAndAssertProcessExecuted();
     }
@@ -176,7 +176,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackFalseWithoutDeployment() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Decision table for key [decision1] and tenantId [flowable] was not found");
+        this.expectedException.expectMessage("Decision for key [decision1] and tenantId [flowable] was not found");
 
         deleteAllDmnDeployments();
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
@@ -197,7 +197,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackTrueWithoutDeployment() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
+        this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision found without tenant.");
 
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
