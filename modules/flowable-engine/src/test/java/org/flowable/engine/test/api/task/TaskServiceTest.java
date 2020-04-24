@@ -867,7 +867,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         String taskId = task.getId();
-        taskService.complete(taskId, null);
+        taskService.complete(taskId, (Map) null);
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
