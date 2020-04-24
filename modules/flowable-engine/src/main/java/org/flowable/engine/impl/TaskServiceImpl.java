@@ -81,6 +81,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -208,7 +209,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public void complete(String taskId) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, null));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, (Map<String, Object>) null));
     }
 
     @Override
@@ -237,7 +238,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
-
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
@@ -592,4 +592,10 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
         
         return idmIdentityService;
     }
+
+    @Override
+    public TaskCompletionBuilder createTaskCompletionBuilder() {
+        return new TaskCompletionBuilderImpl(commandExecutor);
+    }
+
 }

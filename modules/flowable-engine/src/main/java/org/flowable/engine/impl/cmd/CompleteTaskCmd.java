@@ -14,6 +14,8 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
+import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -26,13 +28,19 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
-    protected Map<String, Object> variables;
-    protected Map<String, Object> transientVariables;
+    protected VariableCollectionsContainer variableCollectionsContainer;
     protected boolean localScope;
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
         super(taskId);
-        this.variables = variables;
+
+        if (this.variableCollectionsContainer == null) {
+            this.variableCollectionsContainer = new VariableCollectionsContainerImpl();
+        }
+
+        if (variables != null) {
+            variableCollectionsContainer.setVariables(variables);
+        }
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
@@ -42,7 +50,14 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         this(taskId, variables);
-        this.transientVariables = transientVariables;
+        this.variableCollectionsContainer = new VariableCollectionsContainerImpl();
+        this.variableCollectionsContainer.setTransientVariables(transientVariables);
+    }
+
+    public CompleteTaskCmd(String taskId, VariableCollectionsContainer variableCollectionsContainer) {
+        super(taskId);
+        this.variableCollectionsContainer = variableCollectionsContainer;
+        this.localScope = variableCollectionsContainer.hasLocalVariables();
     }
 
     @Override
@@ -52,16 +67,16 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
 
-                if (transientVariables == null) {
-                    compatibilityHandler.completeTask(task, variables, localScope);
+                if (variableCollectionsContainer.hasAnyTransientVariables()) {
+                    compatibilityHandler.completeTask(task, variableCollectionsContainer.getAllVariables(), localScope);
                 } else {
-                    compatibilityHandler.completeTask(task, variables, transientVariables);
+                    compatibilityHandler.completeTask(task, variableCollectionsContainer.getAllVariables(), variableCollectionsContainer.getAllTransientVariables());
                 }
                 return null;
             }
         }
 
-        TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+        TaskHelper.completeTask(task, this.variableCollectionsContainer, commandContext);
         return null;
     }
 
@@ -69,5 +84,4 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     protected String getSuspendedTaskException() {
         return "Cannot complete a suspended task";
     }
-
 }
