@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
@@ -70,6 +71,10 @@ public class CommandContextUtil {
     
     public static JobEntityManager getJobEntityManager(CommandContext commandContext) {
         return getJobServiceConfiguration(commandContext).getJobEntityManager();
+    }
+
+    public static ExternalWorkerJobEntityManager getExternalWorkerJobEntityManager(CommandContext commandContext) {
+        return getJobServiceConfiguration(commandContext).getExternalWorkerJobEntityManager();
     }
     
     public static DeadLetterJobEntityManager getDeadLetterJobEntityManager() {

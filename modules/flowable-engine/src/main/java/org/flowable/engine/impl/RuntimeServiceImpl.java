@@ -75,12 +75,14 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
+import org.flowable.engine.impl.externalworker.ExternalWorkerCompletionBuilderImpl;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -94,6 +96,8 @@ import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.service.impl.ExternalWorkerJobProviderImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -755,4 +759,13 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
 
+    @Override
+    public ExternalWorkerJobProvider createExternalWorkerProvider() {
+        return new ExternalWorkerJobProviderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId);
+    }
 }

@@ -49,6 +49,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
@@ -103,6 +104,7 @@ public class EntityDependencyOrder {
          * FK to ByteArray
          */
         DELETE_ORDER.add(JobEntityImpl.class);
+        DELETE_ORDER.add(ExternalWorkerJobEntityImpl.class);
         DELETE_ORDER.add(TimerJobEntityImpl.class);
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);

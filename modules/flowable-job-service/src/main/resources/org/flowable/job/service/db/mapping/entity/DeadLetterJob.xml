@@ -277,6 +277,9 @@
             <if test="onlyMessages">
                 and RES.TYPE_ = 'message'
             </if>
+            <if test="onlyExternalWorkers">
+                and RES.TYPE_ = 'externalWorker'
+            </if>
             <if test="duedateHigherThan != null">
                 and RES.DUEDATE_ &gt; #{duedateHigherThan}
             </if>
