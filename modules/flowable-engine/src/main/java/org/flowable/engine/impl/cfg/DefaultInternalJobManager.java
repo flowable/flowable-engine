@@ -41,6 +41,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -101,6 +102,8 @@ public class DefaultInternalJobManager implements InternalJobManager {
                             countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
                         } else if (job instanceof DeadLetterJobEntity) {
                             countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
+                        } else if (job instanceof ExternalWorkerJobEntity) {
+                            countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() + 1);
                         }
                     }
                 }
@@ -135,6 +138,8 @@ public class DefaultInternalJobManager implements InternalJobManager {
                 
                 } else if (job instanceof DeadLetterJobEntity) {
                     countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() - 1);
+                } else if (job instanceof ExternalWorkerJobEntity) {
+                    countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() - 1);
                 }
             }
         }

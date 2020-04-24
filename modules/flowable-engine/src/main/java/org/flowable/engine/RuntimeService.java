@@ -31,6 +31,7 @@ import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.engine.runtime.NativeActivityInstanceQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
@@ -44,6 +45,7 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.job.api.ExternalWorkerJobProvider;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -1377,5 +1379,14 @@ public interface RuntimeService {
      * The all events related to the given Process Instance.
      */
     List<Event> getProcessInstanceEvents(String processInstanceId);
+
+    // External Worker
+
+    ExternalWorkerJobProvider createExternalWorkerProvider();
+
+    /**
+     * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
+     */
+    ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
 
 }

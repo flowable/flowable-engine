@@ -12,12 +12,15 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -73,6 +76,13 @@ public interface JobManager {
     JobEntity moveTimerJobToExecutableJob(TimerJobEntity timerJob);
 
     /**
+     * Moves an {@link ExternalWorkerJobEntity} to become an async {@link JobEntity}.
+     *
+     * This happens when the external worker has completed the work and the external work job then becomes a 'regular' async job that can be picked up by the {@link AsyncExecutor}.
+     */
+    JobEntity moveExternalWorkerJobToExecutableJob(ExternalWorkerJobEntity externalWorkerJob);
+
+    /**
      * Moves an {@link AbstractRuntimeJobEntity} to become a {@link TimerJobEntity}.
      * 
      * This happens for example when an async job is executed and fails. It then becomes a timer, as it needs to be retried later.
@@ -95,10 +105,10 @@ public interface JobManager {
     DeadLetterJobEntity moveJobToDeadLetterJob(AbstractRuntimeJobEntity job);
 
     /**
-     * Transforms a {@link DeadLetterJobEntity} to a {@link JobEntity}, thus making it executable again. Note that a 'retries' parameter needs to be passed, as the job got into the deadletter table
+     * Transforms a {@link DeadLetterJobEntity} to a {@link Job}, thus making it executable again. Note that a 'retries' parameter needs to be passed, as the job got into the deadletter table
      * because of it failed and retries became 0.
      */
-    JobEntity moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
+    Job moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
     
     /**
      * schedules a {@link HistoryJobEntity}, meaning it will be scheduled (inserted in the database/put on a queue/...) to be executed at a later point in time.
@@ -129,6 +139,11 @@ public interface JobManager {
      * Create a dead letter job from another job
      */
     DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
+
+    /**
+     * Create an external worker job from another job
+     */
+    ExternalWorkerJobEntity createExternalWorkerJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
 
     /**
      * Copy job info from one job to the other

@@ -935,6 +935,10 @@ public class ExecutionEntityManagerImpl
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
             jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
+
+        if (!enableExecutionRelationshipCounts || ((CountingExecutionEntity) executionEntity).getExternalWorkerJobCount() > 0) {
+            jobService.deleteExternalWorkerJobsByExecutionId(executionEntity.getId());
+        }
     }
 
     protected void deleteEventSubScriptions(ExecutionEntity executionEntity, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {

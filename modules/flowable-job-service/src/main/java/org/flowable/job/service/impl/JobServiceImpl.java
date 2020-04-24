@@ -29,6 +29,8 @@ import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -155,6 +157,16 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
 
     @Override
+    public ExternalWorkerJobEntity createExternalWorkerJob() {
+        return getExternalWorkerJobEntityManager().create();
+    }
+
+    @Override
+    public void insertExternalWorkerJob(ExternalWorkerJobEntity job) {
+        getExternalWorkerJobEntityManager().insert(job);
+    }
+
+    @Override
     public DeadLetterJobEntity createDeadLetterJob() {
         return getDeadLetterJobEntityManager().create();
     }
@@ -215,4 +227,16 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         }
     }
     
+    @Override
+    public void deleteExternalWorkerJobsByExecutionId(String executionId) {
+        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = getExternalWorkerJobEntityManager();
+        Collection<ExternalWorkerJobEntity> externalWorkerJobsForExecution = externalWorkerJobEntityManager.findJobsByExecutionId(executionId);
+
+        for (ExternalWorkerJobEntity job : externalWorkerJobsForExecution) {
+            externalWorkerJobEntityManager.delete(job);
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            }
+        }
+    }
 }

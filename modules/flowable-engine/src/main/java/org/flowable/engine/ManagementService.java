@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -79,6 +80,11 @@ public interface ManagementService {
      * Returns a new JobQuery implementation, that can be used to dynamically query the jobs.
      */
     JobQuery createJobQuery();
+
+    /**
+     * Returns a new ExternalWorkerJobQuery implementation, that can be used to dynamically query the external worker jobs.
+     */
+    ExternalWorkerJobQuery createExternalWorkerJobQuery();
 
     /**
      * Returns a new TimerJobQuery implementation, that can be used to dynamically query the timer jobs.
@@ -327,6 +333,14 @@ public interface ManagementService {
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
     
+    /**
+     * Returns the full error details that were passed to the {@link ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
+     *
+     * @param jobId id of the job, cannot be null.
+     * @throws FlowableObjectNotFoundException when no job exists with the given id.
+     */
+    String getExternalWorkerJobErrorDetails(String jobId);
+
     void handleHistoryCleanupTimerJob();
     
     List<Batch> getAllBatches();
