@@ -12,10 +12,7 @@
  */
 package org.flowable.engine.impl.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -123,6 +120,94 @@ public class TaskHelper {
             if (execution != null) {
                 BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE, 
                                 "User task '" + taskLabel + "' completed", taskEntity, execution);
+            }
+        }
+
+        deleteTask(taskEntity, null, false, true, true);
+
+        // Continue process (if not a standalone task)
+        if (taskEntity.getExecutionId() != null) {
+            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
+        }
+    }
+
+    public static void completeTaskWithScopedVariables(TaskEntity taskEntity, ScopedVariableContainerHelper scopedVariableContainerHelper,
+                                                       CommandContext commandContext) {
+        // Task complete logic
+
+        Map<String, Object> variables = null;
+
+        if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
+            throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
+        }
+
+        if (scopedVariableContainerHelper.hasAnyVariables()){
+            variables = scopedVariableContainerHelper.getAllVariables();
+        }
+
+        if (scopedVariableContainerHelper.hasAnyVariables()) {
+            if (scopedVariableContainerHelper.hasVariablesLocal()) {
+                taskEntity.setVariablesLocal(scopedVariableContainerHelper.getVariablesLocal());
+
+                if (scopedVariableContainerHelper.hasVariables()){
+                    taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+                }
+            } else if (taskEntity.getExecutionId() != null) {
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                if (execution != null) {
+                    execution.setVariables(scopedVariableContainerHelper.getVariables());
+                }
+
+            } else {
+                taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+            }
+        }
+
+        if (scopedVariableContainerHelper.hasAnyTransientVariables()) {
+            if (scopedVariableContainerHelper.hasTransientVariablesLocal()) {
+                taskEntity.setTransientVariablesLocal(scopedVariableContainerHelper.getTransientVariablesLocal());
+
+                if (scopedVariableContainerHelper.hasTransientVariables()){
+                    taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariablesLocal());
+                }
+            } else {
+                taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariablesLocal());
+            }
+        }
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+
+        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            processEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
+        }
+
+        logUserTaskCompleted(taskEntity);
+
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            if (scopedVariableContainerHelper.hasAnyVariables()) {
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
+                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, scopedVariableContainerHelper.hasVariablesLocal()));
+            } else {
+                eventDispatcher.dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
+            }
+        }
+
+        if (processEngineConfiguration.isLoggingSessionEnabled() && taskEntity.getExecutionId() != null) {
+            String taskLabel = null;
+            if (StringUtils.isNotEmpty(taskEntity.getName())) {
+                taskLabel = taskEntity.getName();
+            } else {
+                taskLabel = taskEntity.getId();
+            }
+
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+            if (execution != null) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE,
+                        "User task '" + taskLabel + "' completed", taskEntity, execution);
             }
         }
 
