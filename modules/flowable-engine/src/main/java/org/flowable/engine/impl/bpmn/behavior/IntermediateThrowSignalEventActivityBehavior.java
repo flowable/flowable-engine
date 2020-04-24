@@ -13,14 +13,20 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.ThrowEvent;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -35,6 +41,8 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
@@ -42,7 +50,10 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
 public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntermediateThrowSignalEventActivityBehavior.class);
 
+    protected ThrowEvent throwEvent;
     protected SignalEventDefinition signalEventDefinition;
     protected boolean processInstanceScope;
 
@@ -53,6 +64,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             }
         }
 
+        this.throwEvent = throwEvent;
         this.signalEventDefinition = signalEventDefinition;
     }
 
@@ -62,27 +74,26 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         CommandContext commandContext = Context.getCommandContext();
 
         String eventSubscriptionName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
-            ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
-
+                ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;
         if (processInstanceScope) {
             subscriptionEntities = eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
-                            execution.getProcessInstanceId(), eventSubscriptionName);
+                    execution.getProcessInstanceId(), eventSubscriptionName);
             
             if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isEnableEntityLinks()) {
                 List<EntityLink> entityLinks = CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
-                                execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+                        execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
                 if (entityLinks != null) {
                     for (EntityLink entityLink : entityLinks) {
                         if (ScopeTypes.BPMN.equals(entityLink.getScopeType())) {
                             subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
-                                            entityLink.getScopeId(), eventSubscriptionName));
+                                    entityLink.getScopeId(), eventSubscriptionName));
                             
                         } else if (ScopeTypes.CMMN.equals(entityLink.getScopeType())) {
                             subscriptionEntities.addAll(eventSubscriptionService.findSignalEventSubscriptionsByScopeAndEventName(
-                                            entityLink.getScopeId(), ScopeTypes.CMMN, eventSubscriptionName));
+                                    entityLink.getScopeId(), ScopeTypes.CMMN, eventSubscriptionName));
                         }
                     }
                 }
@@ -91,6 +102,39 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         } else {
             subscriptionEntities = eventSubscriptionService
                     .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
+        }
+        
+        Map<String, Object> payload = new HashMap<>();
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+        for (IOParameter outParameter : throwEvent.getOutParameters()) {
+
+            Object value = null;
+            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
+                Expression expression = expressionManager.createExpression(outParameter.getSourceExpression().trim());
+                value = expression.getValue(execution);
+
+            } else {
+                value = execution.getVariable(outParameter.getSource());
+            }
+
+            String variableName = null;
+            if (StringUtils.isNotEmpty(outParameter.getTarget()))  {
+                variableName = outParameter.getTarget();
+
+            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
+                Expression expression = expressionManager.createExpression(outParameter.getTargetExpression());
+
+                Object variableNameValue = expression.getValue(execution);
+                if (variableNameValue != null) {
+                    variableName = variableNameValue.toString();
+                } else {
+                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                        outParameter.getTargetExpression());
+                }
+
+            }
+            
+            payload.put(variableName, value);
         }
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
@@ -104,7 +148,8 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
                 compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
                 
             } else {
-                EventSubscriptionUtil.eventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
+                
+                EventSubscriptionUtil.eventReceived(signalEventSubscriptionEntity, payload, signalEventDefinition.isAsync());
             }
         }
 

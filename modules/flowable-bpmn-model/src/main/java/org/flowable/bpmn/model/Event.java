@@ -21,6 +21,8 @@ import java.util.List;
 public abstract class Event extends FlowNode {
 
     protected List<EventDefinition> eventDefinitions = new ArrayList<>();
+    protected List<IOParameter> inParameters = new ArrayList<>();
+    protected List<IOParameter> outParameters = new ArrayList<>();
 
     public List<EventDefinition> getEventDefinitions() {
         return eventDefinitions;
@@ -33,6 +35,22 @@ public abstract class Event extends FlowNode {
     public void addEventDefinition(EventDefinition eventDefinition) {
         eventDefinitions.add(eventDefinition);
     }
+    
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
+    public List<IOParameter> getOutParameters() {
+        return outParameters;
+    }
+
+    public void setOutParameters(List<IOParameter> outParameters) {
+        this.outParameters = outParameters;
+    }
 
     public void setValues(Event otherEvent) {
         super.setValues(otherEvent);
@@ -41,6 +59,20 @@ public abstract class Event extends FlowNode {
         if (otherEvent.getEventDefinitions() != null && !otherEvent.getEventDefinitions().isEmpty()) {
             for (EventDefinition eventDef : otherEvent.getEventDefinitions()) {
                 eventDefinitions.add(eventDef.clone());
+            }
+        }
+        
+        inParameters = new ArrayList<>();
+        if (otherEvent.getInParameters() != null && !otherEvent.getInParameters().isEmpty()) {
+            for (IOParameter parameter : otherEvent.getInParameters()) {
+                inParameters.add(parameter.clone());
+            }
+        }
+
+        outParameters = new ArrayList<>();
+        if (otherEvent.getOutParameters() != null && !otherEvent.getOutParameters().isEmpty()) {
+            for (IOParameter parameter : otherEvent.getOutParameters()) {
+                outParameters.add(parameter.clone());
             }
         }
     }
