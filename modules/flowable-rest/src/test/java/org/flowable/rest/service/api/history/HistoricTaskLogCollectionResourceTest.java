@@ -14,10 +14,7 @@
 package org.flowable.rest.service.api.history;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -63,15 +60,15 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
 
         JsonNode list = queryTaskLogEntries("?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc");
         expectSequence(list,
-            asList(task1.getId(), task1.getId(), task1.getId()),
-            asList("USER_TASK_CREATED", "USER_TASK_OWNER_CHANGED", "USER_TASK_DUEDATE_CHANGED"));
+                asList(task1.getId(), task1.getId(), task1.getId()),
+                asList("USER_TASK_CREATED", "USER_TASK_OWNER_CHANGED", "USER_TASK_DUEDATE_CHANGED"));
     }
 
     @Test
     @Deployment(resources = { "org/flowable/rest/api/history/HistoricTaskLogCollectionResourceTest.bpmn20.xml" })
     public void whenTaskIdDoesNotExistItReturnsEmptyList() throws Exception {
         JsonNode list = queryTaskLogEntries("?taskId=FOOBAR_4242");
-        assertEquals(0, list.size());
+        assertThat(list).isEmpty();
     }
 
     @Test
@@ -114,31 +111,33 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
 
         processEngineConfiguration.getClock().reset();
 
-        JsonNode listAfter = queryTaskLogEntries("?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + dateFormat.format(startTime.getTime()));
+        JsonNode listAfter = queryTaskLogEntries(
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + dateFormat.format(startTime.getTime()));
         expectSequence(listAfter,
-            asList(task1.getId()),
-            asList("USER_TASK_OWNER_CHANGED"));
+                asList(task1.getId()),
+                asList("USER_TASK_OWNER_CHANGED"));
 
         startTime.add(Calendar.DAY_OF_YEAR, -1);
-        JsonNode listBefore = queryTaskLogEntries("?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + dateFormat.format(startTime.getTime()));
+        JsonNode listBefore = queryTaskLogEntries(
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + dateFormat.format(startTime.getTime()));
         expectSequence(listBefore,
-            asList(task1.getId(), task1.getId()),
-            asList("USER_TASK_CREATED", "USER_TASK_DUEDATE_CHANGED"));
+                asList(task1.getId(), task1.getId()),
+                asList("USER_TASK_CREATED", "USER_TASK_DUEDATE_CHANGED"));
     }
 
     protected JsonNode queryTaskLogEntries(String queryString) throws IOException {
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_LOG_ENTRIES) + queryString;
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
-        assertTrue(rootNode.has("data"));
+        assertThat(rootNode.has("data")).isTrue();
         return rootNode.get("data");
     }
 
     protected void expectSequence(JsonNode list, List<String> ids, List<String> types) {
-        assertEquals(ids.size(), list.size());
+        assertThat(list).hasSize(ids.size());
         List<String> resultingIds = list.findValuesAsText("taskId");
-        assertThat(resultingIds, is(ids));
+        assertThat(resultingIds).isEqualTo(ids);
         List<String> resultingTypes = list.findValuesAsText("type");
-        assertThat(resultingTypes, is(types));
+        assertThat(resultingTypes).isEqualTo(types);
     }
 }
