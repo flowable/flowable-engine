@@ -12,7 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -24,9 +25,13 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to listing the resources that are part of a deployment.
- * 
+ *
  * @author Frederik Heremans
  */
 public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
@@ -37,15 +42,17 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     public void testGetDeploymentResources() throws Exception {
 
         try {
-            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
                     .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
+            HttpGet httpGet = new HttpGet(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertTrue(responseNode.isArray());
-            assertEquals(2, responseNode.size());
+            assertThat(responseNode.isArray()).isTrue();
+            assertThat(responseNode).hasSize(2);
 
             // Since resources can be returned in any arbitrary order, find the
             // right one to check
@@ -58,11 +65,17 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             }
 
             // Check URL's for the resource
-            assertNotNull(txtNode);
-            assertTrue(txtNode.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt")));
-            assertTrue(txtNode.get("contentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt")));
-            assertTrue(txtNode.get("mediaType").isNull());
-            assertEquals("resource", txtNode.get("type").textValue());
+            assertThat(txtNode).isNotNull();
+            assertThatJson(txtNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
+                            + " 'contentUrl': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
+                            + " 'mediaType': null,"
+                            + " 'type': 'resource'"
+                            + "}");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
