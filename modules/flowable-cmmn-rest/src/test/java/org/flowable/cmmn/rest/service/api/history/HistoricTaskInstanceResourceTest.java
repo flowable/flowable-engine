@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 
 package org.flowable.cmmn.rest.service.api.history;
+
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -36,9 +39,11 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a single Task resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
@@ -51,35 +56,39 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             Calendar now = Calendar.getInstance();
             cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
-    
+
             CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
             Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             taskService.setDueDate(task.getId(), now.getTime());
             taskService.setOwner(task.getId(), "owner");
             task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertNotNull(task);
-    
+            assertThat(task).isNotNull();
+
             String url = buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, task.getId());
             CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
-    
+
             // Check resulting task
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(task.getId(), responseNode.get("id").asText());
-            assertEquals(task.getAssignee(), responseNode.get("assignee").asText());
-            assertEquals(task.getOwner(), responseNode.get("owner").asText());
-            assertEquals(task.getFormKey(), responseNode.get("formKey").asText());
-            assertEquals(task.getDescription(), responseNode.get("description").asText());
-            assertEquals(task.getName(), responseNode.get("name").asText());
-            assertEquals(task.getDueDate(), getDateFromISOString(responseNode.get("dueDate").asText()));
-            assertEquals(task.getCreateTime(), getDateFromISOString(responseNode.get("startTime").asText()));
-            assertEquals(task.getPriority(), responseNode.get("priority").asInt());
-            assertTrue(responseNode.get("parentTaskId").isNull());
-            assertEquals("", responseNode.get("tenantId").textValue());
-    
-            assertEquals(responseNode.get("caseInstanceUrl").asText(), buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, task.getScopeId()));
-            assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()));
-            assertEquals(responseNode.get("url").asText(), url);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " 'id': '" + task.getId() + "',"
+                            + " 'assignee': '" + task.getAssignee() + "',"
+                            + " 'owner': '" + task.getOwner() + "',"
+                            + " 'formKey': '" + task.getFormKey() + "',"
+                            + " 'description': '" + task.getDescription() + "',"
+                            + " 'name': '" + task.getName() + "',"
+                            + " 'priority': " + task.getPriority() + ","
+                            + " 'parentTaskId': null,"
+                            + " 'tenantId': \"\","
+                            + " 'caseInstanceUrl': '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, task.getScopeId()) + "',"
+                            + " 'caseDefinitionUrl': '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()) + "',"
+                            + " 'url': '" + url + "'"
+                            + "}");
+
+            assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
+            assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
         }
     }
 
@@ -89,13 +98,13 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     public void testGetTaskAdhoc() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
-    
+
                 Calendar now = Calendar.getInstance();
                 cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
-    
+
                 Task parentTask = taskService.newTask();
                 taskService.saveTask(parentTask);
-    
+
                 Task task = taskService.newTask();
                 task.setParentTaskId(parentTask.getId());
                 task.setName("Task name");
@@ -107,29 +116,33 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 task.setOwner("owner");
                 task.setPriority(20);
                 taskService.saveTask(task);
-    
+
                 String url = buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, task.getId());
                 CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
-    
+
                 // Check resulting task
                 JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
                 closeResponse(response);
-                assertEquals(task.getId(), responseNode.get("id").asText());
-                assertEquals(task.getAssignee(), responseNode.get("assignee").asText());
-                assertEquals(task.getOwner(), responseNode.get("owner").asText());
-                assertEquals(task.getDescription(), responseNode.get("description").asText());
-                assertEquals(task.getName(), responseNode.get("name").asText());
-                assertEquals(task.getDueDate(), getDateFromISOString(responseNode.get("dueDate").asText()));
-                assertEquals(task.getCreateTime(), getDateFromISOString(responseNode.get("startTime").asText()));
-                assertEquals(task.getPriority(), responseNode.get("priority").asInt());
-                assertTrue(responseNode.get("caseInstanceId").isNull());
-                assertTrue(responseNode.get("caseDefinitionId").isNull());
-                assertEquals("", responseNode.get("tenantId").textValue());
-    
-                assertEquals(responseNode.get("url").asText(), url);
-    
+                assertThatJson(responseNode)
+                        .when(Option.IGNORING_EXTRA_FIELDS)
+                        .isEqualTo("{"
+                                + " 'id': '" + task.getId() + "',"
+                                + " 'assignee': '" + task.getAssignee() + "',"
+                                + " 'owner': '" + task.getOwner() + "',"
+                                + " 'description': '" + task.getDescription() + "',"
+                                + " 'name': '" + task.getName() + "',"
+                                + " 'priority': " + task.getPriority() + ","
+                                + " 'caseInstanceId': null,"
+                                + " 'caseDefinitionId': null,"
+                                + " 'tenantId': \"\","
+                                + " 'url': '" + url + "'"
+                                + "}");
+
+                assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
+                assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
+
             } finally {
-    
+
                 // Clean adhoc-tasks even if test fails
                 List<Task> tasks = taskService.createTaskQuery().list();
                 for (Task task : tasks) {
@@ -145,25 +158,26 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     public void testDeleteTask() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
-    
+
                 // 1. Simple delete
                 Task task = taskService.newTask();
                 taskService.saveTask(task);
                 String taskId = task.getId();
-    
+
                 // Execute the request
-                HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, taskId));
+                HttpDelete httpDelete = new HttpDelete(
+                        SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, taskId));
                 closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
-    
-                assertNull(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult());
-    
+
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult()).isNull();
+
             } finally {
                 // Clean adhoc-tasks even if test fails
                 List<Task> tasks = taskService.createTaskQuery().list();
                 for (Task task : tasks) {
                     taskService.deleteTask(task.getId(), true);
                 }
-    
+
                 // Clean historic tasks with no runtime-counterpart
                 List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
                 for (HistoricTaskInstance task : historicTasks) {
@@ -174,53 +188,63 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn",
-                    "org/flowable/cmmn/rest/service/api/runtime/simple.form"})
+            "org/flowable/cmmn/rest/service/api/runtime/simple.form" })
     public void testCompletedTaskForm() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
             try {
                 FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-                assertNotNull(formDefinition);
-                
+                assertThat(formDefinition).isNotNull();
+
                 CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
                 Task task = taskService.createTaskQuery().scopeId(caseInstance.getId()).singleResult();
                 String taskId = task.getId();
-                
+
                 String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
                 CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
                 JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
                 closeResponse(response);
-                assertEquals(formDefinition.getId(), responseNode.get("id").asText());
-                assertEquals(formDefinition.getKey(), responseNode.get("key").asText());
-                assertEquals(formDefinition.getName(), responseNode.get("name").asText());
-                assertEquals(2, responseNode.get("fields").size());
-                
+                assertThatJson(responseNode)
+                        .when(Option.IGNORING_EXTRA_FIELDS)
+                        .isEqualTo("{"
+                                + " 'id': '" + formDefinition.getId() + "',"
+                                + " 'key': '" + formDefinition.getKey() + "',"
+                                + " 'name': '" + formDefinition.getName() + "'"
+                                + "}");
+
+                assertThat(responseNode.get("fields")).hasSize(2);
+
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("user", "First value");
                 variables.put("number", 789);
                 taskService.completeTaskWithForm(taskId, formDefinition.getId(), null, variables);
-                
-                assertNull(taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult());
-    
+
+                assertThat(taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNull();
+
                 response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
                 responseNode = objectMapper.readTree(response.getEntity().getContent());
                 closeResponse(response);
-                assertEquals(formDefinition.getId(), responseNode.get("id").asText());
-                assertEquals(formDefinition.getKey(), responseNode.get("key").asText());
-                assertEquals(formDefinition.getName(), responseNode.get("name").asText());
-                assertEquals(2, responseNode.get("fields").size());
-                
+                assertThatJson(responseNode)
+                        .when(Option.IGNORING_EXTRA_FIELDS)
+                        .isEqualTo("{"
+                                + " 'id': '" + formDefinition.getId() + "',"
+                                + " 'key': '" + formDefinition.getKey() + "',"
+                                + " 'name': '" + formDefinition.getName() + "'"
+                                + "}");
+
+                assertThat(responseNode.get("fields")).hasSize(2);
+
                 JsonNode fieldNode = responseNode.get("fields").get(0);
-                assertEquals("user", fieldNode.get("id").asText());
-                assertEquals("First value", fieldNode.get("value").asText());
-                
+                assertThat(fieldNode.get("id").asText()).isEqualTo("user");
+                assertThat(fieldNode.get("value").asText()).isEqualTo("First value");
+
                 fieldNode = responseNode.get("fields").get(1);
-                assertEquals("number", fieldNode.get("id").asText());
-                assertEquals(789, fieldNode.get("value").asInt());
-    
+                assertThat(fieldNode.get("id").asText()).isEqualTo("number");
+                assertThat(fieldNode.get("value").asInt()).isEqualTo(789);
+
             } finally {
                 formEngineFormService.deleteFormInstancesByScopeDefinition(caseDefinition.getId());
-                
+
                 List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
                 for (FormDeployment formDeployment : formDeployments) {
                     formRepositoryService.deleteDeployment(formDeployment.getId());

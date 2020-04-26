@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.HttpStatus;
@@ -47,14 +49,14 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
 
         PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent").singleResult();
-        assertNotNull(activateMilestoneEvent);
+        assertThat(activateMilestoneEvent).isNotNull();
         runtimeService.triggerPlanItemInstance(activateMilestoneEvent.getId());
 
         HistoricMilestoneInstance runtimeMilestone = historyService.createHistoricMilestoneInstanceQuery().singleResult();
-        assertNotNull(runtimeMilestone);
+        assertThat(runtimeMilestone).isNotNull();
         HttpGet milestoneHttpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, runtimeMilestone.getId()));
         CloseableHttpResponse response = executeRequest(milestoneHttpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -75,11 +77,11 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         //At first the history is empty until the a milestone is reach
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl);
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(0, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).isEmpty();
 
         //Case setup... two milestones, each waiting for a user event
         Calendar calendar = Calendar.getInstance();
@@ -109,30 +111,30 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         //There should be two milestones completed by case instance
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance1.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance1.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance2.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance2.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in general
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl);
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(4, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(4);
 
         //sorted by timestamp
         List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().asc().list();
@@ -151,12 +153,12 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
                 + "&reachedAfter=" + getISODateString(reachAfter)
         );
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals("milestonePlanItem2", n.get("elementId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
@@ -172,11 +174,11 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         ObjectNode requestNode = objectMapper.createObjectNode();
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(0, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).isEmpty();
 
         //Case setup... two milestones, each waiting for a user event
         Calendar calendar = Calendar.getInstance();
@@ -209,35 +211,35 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         requestNode.put("caseInstanceId", caseInstance1.getId());
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance1.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance2.getId());
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance2.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in the history
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(4, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(4);
 
         //sorted by timestamp
         List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().asc().list();
@@ -256,12 +258,12 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         requestNode.put("reachedAfter", getISODateString(reachAfter));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals("milestonePlanItem2", n.get("elementId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
@@ -277,35 +279,35 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
     }
 
     private void assertHistoricMilestoneValues(HistoricMilestoneInstance expected, JsonNode actual) {
-        assertNotNull(actual);
-        assertEquals(expected.getId(), actual.get("id").textValue());
-        assertEquals(expected.getName(), actual.get("name").textValue());
-        assertEquals(expected.getElementId(), actual.get("elementId").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getTimeStamp()), actual.get("timestamp").asText());
-        assertEquals(expected.getCaseInstanceId(), actual.get("caseInstanceId").textValue());
-        assertEquals(expected.getCaseDefinitionId(), actual.get("caseDefinitionId").textValue());
+        assertThat(actual).isNotNull();
+        assertThat(actual.get("id").textValue()).isEqualTo(expected.getId());
+        assertThat(actual.get("name").textValue()).isEqualTo(expected.getName());
+        assertThat(actual.get("elementId").textValue()).isEqualTo(expected.getElementId());
+        assertThat(actual.get("timestamp").asText()).isEqualTo(getISODateStringWithTZ(expected.getTimeStamp()));
+        assertThat(actual.get("caseInstanceId").textValue()).isEqualTo(expected.getCaseInstanceId());
+        assertThat(actual.get("caseDefinitionId").textValue()).isEqualTo(expected.getCaseDefinitionId());
 
         try {
-            assertNotNull(actual.get("url").textValue());
+            assertThat(actual.get("url").textValue()).isNotNull();
             String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, expected.getId())).toURL().toString();
-            assertEquals(url, actual.get("url").textValue());
+            assertThat(actual.get("url").textValue()).isEqualTo(url);
         } catch (MalformedURLException e) {
             throw new AssertionError("Cannot create url", e);
         }
 
         try {
-            assertNotNull(actual.get("historicCaseInstanceUrl").textValue());
+            assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         } catch (URISyntaxException e) {
             fail("Invalid historicCaseInstanceUrl: " + e.getMessage());
         }
 
         try {
-            assertNotNull(actual.get("caseDefinitionUrl").textValue());
+            assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         } catch (URISyntaxException e) {
             fail("Invalid caseDefinitionUrl: " + e.getMessage());
