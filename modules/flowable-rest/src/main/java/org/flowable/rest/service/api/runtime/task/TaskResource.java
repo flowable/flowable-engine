@@ -206,10 +206,10 @@ public class TaskResource extends TaskBaseResource {
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                if (var.getVariableScope().equals(RestVariable.RestVariableScope.LOCAL)){
-                    scopedVariableContainerHelper.setVariableLocal(var.getName(),actualVariableValue);
-                }else{
-                    scopedVariableContainerHelper.setVariable(var.getName(),actualVariableValue);
+                if (var.getVariableScope().equals(RestVariable.RestVariableScope.LOCAL)) {
+                    scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
+                } else {
+                    scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
                 }
             }
         }

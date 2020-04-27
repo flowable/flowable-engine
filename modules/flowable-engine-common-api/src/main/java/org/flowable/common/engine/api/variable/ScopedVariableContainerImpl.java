@@ -24,38 +24,22 @@ public class ScopedVariableContainerImpl implements ScopedVariableContainer {
 
     @Override
     public Object getVariable(String variableName, boolean isVariableLocal) {
-        if (isVariableLocal) {
-            return this.variablesLocal.get(variableName);
-        } else {
-            return this.variables.get(variableName);
-        }
+        return isVariableLocal ? this.variablesLocal.get(variableName) : this.variables.get(variableName);
     }
 
     @Override
     public Map<String, Object> getVariables(boolean isVariablesLocal) {
-        if (isVariablesLocal) {
-            return this.variablesLocal;
-        } else {
-            return this.variables;
-        }
+        return isVariablesLocal ? this.variablesLocal : this.variables;
     }
 
     @Override
     public boolean hasVariable(String variableName, boolean isVariableLocal) {
-        if (isVariableLocal) {
-            return this.variablesLocal.containsValue(variableName);
-        } else {
-            return this.variables.containsValue(variableName);
-        }
+        return isVariableLocal ? this.variablesLocal.containsValue(variableName) : this.variables.containsValue(variableName);
     }
 
     @Override
     public boolean hasVariables(boolean isVariablesLocal) {
-        if (isVariablesLocal) {
-            return this.variablesLocal.isEmpty();
-        } else {
-            return this.variables.isEmpty();
-        }
+        return isVariablesLocal ? this.variablesLocal.isEmpty() : this.variables.isEmpty();
     }
 
     @Override

@@ -19,19 +19,19 @@ public class ScopedVariableContainerHelper {
     }
 
     public void setVariables(Map<String, Object> variables) {
-        this.variables.setVariables(variables, false);
+        this.variables.setVariables(new HashMap<>(variables), false);
     }
 
     public void setVariablesLocal(Map<String, Object> variablesLocal) {
-        this.variables.setVariables(variablesLocal, true);
+        this.variables.setVariables(new HashMap<>(variablesLocal), true);
     }
 
     public void setTransientVariables(Map<String, Object> transientVariables) {
-        this.transientVariables.setVariables(transientVariables, false);
+        this.transientVariables.setVariables(new HashMap<>(transientVariables), false);
     }
 
     public void setTransientVariablesLocal(Map<String, Object> transientVariablesLocal) {
-        this.transientVariables.setVariables(transientVariablesLocal, true);
+        this.transientVariables.setVariables(new HashMap<>(transientVariablesLocal), true);
     }
 
     public void setVariable(String variableName, Object variableValue) {
