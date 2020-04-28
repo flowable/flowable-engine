@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.cmmn.rest.service.api.history;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 
@@ -31,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic case instance query resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
@@ -49,7 +51,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
-        
+
         caseVariables.put("oneVar", "test");
 
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
@@ -123,7 +125,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("value", "Azerty");
         variableNode.put("operation", "equals");
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId(), caseInstance2.getId());
-        
+
         variableNode.removeAll();
         variableNode.put("name", "oneVar");
         variableNode.put("value", "test");
@@ -175,12 +177,12 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(2, dataNode.size());
+        assertThat(dataNode).hasSize(2);
         JsonNode valueNode = dataNode.get(0);
-        assertEquals(caseInstance.getId(), valueNode.get("id").asText());
-        assertEquals(caseInstance2.getId(), dataNode.get(1).get("id").asText());
-        
-        assertEquals("One Human Task Case", valueNode.get("caseDefinitionName").asText());
-        assertEquals("A human task case", valueNode.get("caseDefinitionDescription").asText());
+        assertThat(valueNode.get("id").asText()).isEqualTo(caseInstance.getId());
+        assertThat(dataNode.get(1).get("id").asText()).isEqualTo(caseInstance2.getId());
+
+        assertThat(valueNode.get("caseDefinitionName").asText()).isEqualTo("One Human Task Case");
+        assertThat(valueNode.get("caseDefinitionDescription").asText()).isEqualTo("A human task case");
     }
 }
