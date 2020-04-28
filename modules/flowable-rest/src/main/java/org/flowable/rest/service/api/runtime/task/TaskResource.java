@@ -49,6 +49,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Frederik Heremans
  */
@@ -114,6 +117,9 @@ public class TaskResource extends TaskBaseResource {
         if (actionRequest == null) {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
+
+        // Scoped variables feature
+        actionRequest.setWithScopedVariables(true);
 
         Task task = getTaskFromRequest(taskId);
 
@@ -219,7 +225,6 @@ public class TaskResource extends TaskBaseResource {
         }
 
         if (actionRequest.getTransientVariables() != null) {
-
             for (RestVariable var : actionRequest.getTransientVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");
@@ -236,13 +241,23 @@ public class TaskResource extends TaskBaseResource {
                     scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
                 }
             }
+
         }
 
         if (actionRequest.getFormDefinitionId() != null) {
-            taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
-                    scopedVariableContainerHelper);
+            if (actionRequest.isWithScopedVariables()) {
+                taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
+                        scopedVariableContainerHelper);
+            } else {
+                taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
+                        scopedVariableContainerHelper.getAllVariables(), scopedVariableContainerHelper.getAllTransientVariables());
+            }
         } else {
-            taskService.complete(task.getId(), scopedVariableContainerHelper);
+            if (actionRequest.isWithScopedVariables()) {
+                taskService.complete(task.getId(), scopedVariableContainerHelper);
+            } else {
+                taskService.complete(task.getId(), scopedVariableContainerHelper.getAllVariables(), scopedVariableContainerHelper.getAllTransientVariables());
+            }
         }
     }
 

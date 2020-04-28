@@ -39,7 +39,7 @@ public class ScopedVariableContainerImpl implements ScopedVariableContainer {
 
     @Override
     public boolean hasVariables(boolean isVariablesLocal) {
-        return isVariablesLocal ? this.variablesLocal.isEmpty() : this.variables.isEmpty();
+        return isVariablesLocal ? !this.variablesLocal.isEmpty() : !this.variables.isEmpty();
     }
 
     @Override

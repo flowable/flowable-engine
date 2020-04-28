@@ -34,6 +34,7 @@ public class TaskActionRequest extends RestActionRequest {
     public static final String ACTION_RESOLVE = "resolve";
 
     protected String assignee;
+    protected boolean withScopedVariables;
     protected String formDefinitionId;
     protected String outcome;
     protected List<RestVariable> variables;
@@ -41,6 +42,14 @@ public class TaskActionRequest extends RestActionRequest {
 
     public void setAssignee(String assignee) {
         this.assignee = assignee;
+    }
+
+    public void setWithScopedVariables(boolean withScopedVariables){
+        this.withScopedVariables = withScopedVariables;
+    }
+
+    public boolean isWithScopedVariables() {
+        return this.withScopedVariables;
     }
 
     @ApiModelProperty(value = "If action is claim or delegate, you can use this parameter to set the assignee associated ", example = "userWhoClaims/userToDelegateTo")
