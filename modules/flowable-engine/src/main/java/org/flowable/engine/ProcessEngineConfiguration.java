@@ -130,6 +130,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     protected boolean isCreateDiagramOnDeploy = true;
+
+    protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
     
     /**
      *  include the sequence flow name in case there's no Label DI, 
@@ -788,6 +790,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
         this.historyCleaningManager = historyCleaningManager;
+        return this;
+    }
+
+    public boolean isAlwaysUseArraysForDmnMultiHitPolicies() {
+        return alwaysUseArraysForDmnMultiHitPolicies;
+    }
+
+    public ProcessEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
+        this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
         return this;
     }
 }

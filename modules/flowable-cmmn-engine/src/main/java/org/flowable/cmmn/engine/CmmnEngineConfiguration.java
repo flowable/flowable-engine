@@ -782,6 +782,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected boolean handleCmmnEngineExecutorsAfterEngineCreate = true;
 
+    protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -3756,5 +3758,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public boolean isAlwaysUseArraysForDmnMultiHitPolicies() {
+        return alwaysUseArraysForDmnMultiHitPolicies;
+    }
 
+    public CmmnEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
+        this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
+        return this;
+    }
 }
