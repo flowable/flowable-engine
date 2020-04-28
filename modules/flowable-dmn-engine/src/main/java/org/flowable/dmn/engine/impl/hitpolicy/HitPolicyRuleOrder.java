@@ -19,6 +19,10 @@ import org.flowable.dmn.model.HitPolicy;
  */
 public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
 
+    public HitPolicyRuleOrder() {
+        super(true);
+    }
+
     @Override
     public String getHitPolicyName() {
         return HitPolicy.RULE_ORDER.getValue();

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 
 /**
@@ -24,6 +25,15 @@ import org.flowable.dmn.engine.impl.el.ELExecutionContext;
  * (Abstact) base class for all Hit Policy behaviors
  */
 public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, ComposeRuleResultBehavior, ComposeDecisionResultBehavior {
+
+    protected boolean multipleResults = false;
+
+    public AbstractHitPolicy() {
+    }
+
+    public AbstractHitPolicy(boolean multipleResults) {
+        this.multipleResults = multipleResults;
+    }
 
     /**
      * Returns the name for the specific Hit Policy behavior
@@ -53,6 +63,8 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
     @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
-        executionContext.getAuditContainer().setDecisionResult(decisionResults);
+        DecisionExecutionAuditContainer auditContainer = executionContext.getAuditContainer();
+        auditContainer.setDecisionResult(decisionResults);
+        auditContainer.setMultipleResults(multipleResults);
     }
 }
