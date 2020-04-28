@@ -167,13 +167,18 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         processVariablesInput.put("input1", 11D);
 
-        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+        List<Map<String, Object>> result = ruleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
             .variables(processVariablesInput)
-            .executeWithSingleResult();
+            .execute();
 
-        Assert.assertEquals(1, result.keySet().size());
-        Assert.assertEquals(11d, result.get("output2"));
+        Assert.assertEquals(3, result.size());
+        Assert.assertEquals(1, result.get(0).size());
+        Assert.assertEquals(11d, result.get(0).get("output1"));
+        Assert.assertEquals(1, result.get(1).size());
+        Assert.assertEquals(11d, result.get(1).get("output2"));
+        Assert.assertEquals(1, result.get(2).size());
+        Assert.assertEquals(11d, result.get(2).get("output3"));
     }
 
     @Test
