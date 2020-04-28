@@ -81,6 +81,11 @@ public interface InternalVariableInstanceQuery {
     InternalVariableInstanceQuery scopeType(String scopeType);
 
     /**
+     * Query variables with the given scope types
+     */
+    InternalVariableInstanceQuery scopeTypes(Collection<String> scopeTypes);
+
+    /**
      * Query variables with the given name
      */
     InternalVariableInstanceQuery name(String name);

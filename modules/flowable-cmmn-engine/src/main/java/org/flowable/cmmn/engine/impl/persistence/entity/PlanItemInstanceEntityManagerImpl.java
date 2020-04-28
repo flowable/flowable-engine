@@ -416,7 +416,10 @@ public class PlanItemInstanceEntityManagerImpl
             VariableService variableService
                 = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableService();
             List<VariableInstanceEntity> variableInstanceEntities = variableService
-                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN);
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(planItemInstanceEntity.getId())
+                    .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                    .list();
             for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
                 variableService.deleteVariableInstance(variableInstanceEntity);
             }

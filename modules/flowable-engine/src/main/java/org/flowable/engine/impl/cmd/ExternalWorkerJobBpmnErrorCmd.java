@@ -14,11 +14,17 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
@@ -31,6 +37,7 @@ public class ExternalWorkerJobBpmnErrorCmd extends AbstractExternalWorkerJobCmd 
     public ExternalWorkerJobBpmnErrorCmd(String externalJobId, String workerId, Map<String, Object> variables, String errorCode) {
         super(externalJobId, workerId);
         this.errorCode = errorCode;
+        this.variables = variables;
     }
 
     @Override
@@ -44,7 +51,25 @@ public class ExternalWorkerJobBpmnErrorCmd extends AbstractExternalWorkerJobCmd 
             errorHandlerConfiguration = "error:";
         }
         externalWorkerJob.setJobHandlerConfiguration(errorHandlerConfiguration);
-        //TODO handle variables
+
+        if (variables != null && !variables.isEmpty()) {
+            VariableService variableService = CommandContextUtil.getVariableService(commandContext);
+            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableTypes();
+            for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
+                String varName = variableEntry.getKey();
+                Object varValue = variableEntry.getValue();
+
+                VariableType variableType = variableTypes.findVariableType(varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, varValue);
+                variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
+                variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
+                variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);
+
+                variableService.insertVariableInstance(variableInstance);
+
+                CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
+            }
+        }
 
         jobServiceConfiguration.getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
     }

@@ -47,6 +47,7 @@ public class InternalVariableInstanceQueryImpl
     protected String subScopeId;
     protected boolean withoutSubScopeId;
     protected String scopeType;
+    protected Collection<String> scopeTypes;
     protected String name;
     protected Collection<String> names;
 
@@ -164,6 +165,12 @@ public class InternalVariableInstanceQueryImpl
     }
 
     @Override
+    public InternalVariableInstanceQuery scopeTypes(Collection<String> scopeTypes) {
+        this.scopeTypes = scopeTypes;
+        return this;
+    }
+
+    @Override
     public InternalVariableInstanceQuery name(String name) {
         if (StringUtils.isEmpty(name)) {
             throw new FlowableIllegalArgumentException("name is empty");
@@ -232,6 +239,10 @@ public class InternalVariableInstanceQueryImpl
         return scopeType;
     }
 
+    public Collection<String> getScopeTypes() {
+        return scopeTypes;
+    }
+
     public String getName() {
         return name;
     }
@@ -288,6 +299,10 @@ public class InternalVariableInstanceQueryImpl
         }
 
         if (param.scopeType != null && !param.scopeType.equals(entity.getScopeType())) {
+            return false;
+        }
+
+        if (param.scopeTypes != null && !param.scopeTypes.isEmpty() && !param.scopeTypes.contains(entity.getScopeType())) {
             return false;
         }
 
