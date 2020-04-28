@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -31,8 +33,8 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
         CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage").singleResult();
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
                         CmmnRestUrls.URL_CASE_DEFINITION_IMAGE, repeatingStageCase.getId())), HttpStatus.SC_OK);
-        assertNotNull(response.getEntity().getContent());
-        assertEquals("image/png", response.getEntity().getContentType().getValue());
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
         closeResponse(response);
     }
 

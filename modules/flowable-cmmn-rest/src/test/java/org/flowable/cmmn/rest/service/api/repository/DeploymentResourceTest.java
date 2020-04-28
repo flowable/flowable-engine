@@ -12,7 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -27,9 +28,13 @@ import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a single Deployment resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class DeploymentResourceTest extends BaseSpringRestTestCase {
@@ -56,26 +61,26 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             String url = responseNode.get("url").textValue();
             String tenantId = responseNode.get("tenantId").textValue();
 
-            assertEquals("", tenantId);
+            assertThat(tenantId).isEqualTo("");
 
-            assertNotNull(deploymentId);
-            assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
+            assertThat(deploymentId).isNotNull();
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
-            assertNotNull(name);
-            assertEquals("oneHumanTaskCase", name);
+            assertThat(name).isNotNull();
+            assertThat(name).isEqualTo("oneHumanTaskCase");
 
-            assertNotNull(url);
-            assertTrue(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertThat(url).isNotNull();
+            assertThat(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId))).isTrue();
 
             // No deployment-category should have been set
-            assertNull(category);
-            assertNotNull(deployTime);
+            assertThat(category).isNull();
+            assertThat(deployTime).isNotNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
-            assertEquals(1L, resources.size());
-            assertEquals("oneHumanTaskCase.cmmn", resources.get(0));
-            assertEquals(1L, repositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).count());
+            assertThat(resources).hasSize(1);
+            assertThat(resources.get(0)).isEqualTo("oneHumanTaskCase.cmmn");
+            assertThat(repositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -108,29 +113,21 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        
+
         closeResponse(response);
 
-        String deploymentId = responseNode.get("id").textValue();
-        String name = responseNode.get("name").textValue();
-        String category = responseNode.get("category").textValue();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " 'id': '" + existingDeployment.getId() + "',"
+                        + " 'name': '" + existingDeployment.getName() + "',"
+                        + " 'category': null,"
+                        + " 'tenantId': \"\","
+                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                        + "}");
+
         String deployTime = responseNode.get("deploymentTime").textValue();
-        String url = responseNode.get("url").textValue();
-        String tenantId = responseNode.get("tenantId").textValue();
-
-        assertEquals("", tenantId);
-        assertNotNull(deploymentId);
-        assertEquals(existingDeployment.getId(), deploymentId);
-
-        assertNotNull(name);
-        assertEquals(existingDeployment.getName(), name);
-
-        assertEquals(existingDeployment.getCategory(), category);
-
-        assertNotNull(deployTime);
-
-        assertNotNull(url);
-        assertTrue(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId)));
+        assertThat(deployTime).isNotNull();
     }
 
     /**
@@ -148,15 +145,16 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(existingDeployment);
+        assertThat(existingDeployment).isNotNull();
 
         // Delete the deployment
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
+        HttpDelete httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
         existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNull(existingDeployment);
+        assertThat(existingDeployment).isNull();
     }
 
     /**
