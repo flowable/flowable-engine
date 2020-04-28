@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -75,6 +76,8 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.service.impl.ExternalWorkerJobProviderImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -356,5 +359,15 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     public void changePlanItemState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
         commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
+    }
+
+    @Override
+    public ExternalWorkerJobProvider createExternalWorkerProvider() {
+        return new ExternalWorkerJobProviderImpl(commandExecutor);
+    }
+
+    @Override
+    public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
+        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
 }

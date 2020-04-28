@@ -32,6 +32,11 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
     boolean insertExternalWorkerJobEntity(ExternalWorkerJobEntity externalWorkerJobEntity);
 
     /**
+     * Returns all {@link ExternalWorkerJobEntity} for the given scope and subscope.
+     */
+    List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
+
+    /**
      * Executes a {@link ExternalWorkerJobQueryImpl} and returns the matching {@link ExternalWorkerJobEntity} instances.
      * @return
      */

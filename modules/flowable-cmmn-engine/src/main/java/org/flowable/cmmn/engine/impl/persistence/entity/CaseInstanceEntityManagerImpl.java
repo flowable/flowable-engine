@@ -33,13 +33,16 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityMa
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
@@ -158,6 +161,12 @@ public class CaseInstanceEntityManagerImpl
         List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(new DeadLetterJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job deadLetterJob : deadLetterJobs) {
             deadLetterJobEntityManager.delete(deadLetterJob.getId());
+        }
+
+        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+        List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(new ExternalWorkerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        for (ExternalWorkerJob externalWorkerJob : externalWorkerJobs) {
+            externalWorkerJobEntityManager.delete(externalWorkerJob.getId());
         }
 
         // Actual case instance

@@ -29,6 +29,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.ExternalWorkerJobsByExecutionIdMatcher;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.ExternalWorkerJobsByScopeIdAndSubScopeIdMatcher;
 
 /**
  * @author Filip Hrisafov
@@ -38,6 +39,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     protected JobServiceConfiguration jobServiceConfiguration;
 
     protected CachedEntityMatcher<ExternalWorkerJobEntity> jobsByExecutionIdMatcher = new ExternalWorkerJobsByExecutionIdMatcher();
+    protected CachedEntityMatcher<ExternalWorkerJobEntity> externalWorkerJobsByScopeIdAndSubScopeIdMatcher = new ExternalWorkerJobsByScopeIdAndSubScopeIdMatcher();
 
     public MybatisExternalWorkerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
@@ -134,5 +136,13 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
         params.put("topic", topic);
 
         return getDbSqlSession().selectList("selectExternalWorkerJobsToExecute", params, new Page(0, maxResults));
+    }
+
+    @Override
+    public List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId) {
+        Map<String, String> paramMap = new HashMap<>();
+        paramMap.put("scopeId", scopeId);
+        paramMap.put("subScopeId", subScopeId);
+        return getList(getDbSqlSession(), "selectExternalWorkerJobsByScopeIdAndSubScopeId", paramMap, externalWorkerJobsByScopeIdAndSubScopeIdMatcher, true);
     }
 }

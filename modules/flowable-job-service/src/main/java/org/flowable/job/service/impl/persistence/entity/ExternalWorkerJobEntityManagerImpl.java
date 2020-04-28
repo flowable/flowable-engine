@@ -58,6 +58,11 @@ public class ExternalWorkerJobEntityManagerImpl
     }
 
     @Override
+    public List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId) {
+        return dataManager.findJobsByScopeIdAndSubScopeId(scopeId, subScopeId);
+    }
+
+    @Override
     public List<ExternalWorkerJob> findJobsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {
         return dataManager.findJobsByQueryCriteria(jobQuery);
     }
