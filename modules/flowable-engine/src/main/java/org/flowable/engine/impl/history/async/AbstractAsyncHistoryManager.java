@@ -18,6 +18,7 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -190,5 +191,17 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.SUB_SCOPE_ID, taskLogEntryBuilder.getSubScopeId());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_TYPE, taskLogEntryBuilder.getScopeType());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_DEFINITION_ID, taskLogEntryBuilder.getScopeDefinitionId());
+    }
+
+    protected void addCommonCommentFields(CommentEntity commentEntity, ObjectNode data) {
+        putIfNotNull(data, HistoryJsonConstants.ID, commentEntity.getId());
+        putIfNotNull(data, HistoryJsonConstants.TYPE, commentEntity.getType());
+        putIfNotNull(data, HistoryJsonConstants.TIME, commentEntity.getTime());
+        putIfNotNull(data, HistoryJsonConstants.USER_ID, commentEntity.getUserId());
+        putIfNotNull(data, HistoryJsonConstants.TASK_ID, commentEntity.getTaskId());
+        putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, commentEntity.getProcessInstanceId());
+        putIfNotNull(data, HistoryJsonConstants.ACTION, commentEntity.getAction());
+        putIfNotNull(data, HistoryJsonConstants.MESSAGE, commentEntity.getMessage());
+        putIfNotNull(data, HistoryJsonConstants.FULL_MESSAGE, commentEntity.getFullMessage());
     }
 }

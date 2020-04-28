@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -71,7 +70,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
                 }
             }
 
-            commentManager.delete((CommentEntity) comment);
+            CommandContextUtil.getHistoryManager().deleteComment(commentId);
 
         } else {
             // Delete all comments on a task of process
@@ -100,7 +99,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
             }
 
             for (Comment comment : comments) {
-                commentManager.delete((CommentEntity) comment);
+                CommandContextUtil.getHistoryManager().deleteComment(comment.getId());
             }
         }
         return null;

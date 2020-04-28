@@ -76,7 +76,9 @@ public interface HistoryJsonConstants {
     String TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE = "activity-update";
     String TYPE_HISTORIC_TASK_LOG_RECORD = "historic-user-task-log-record";
     String TYPE_HISTORIC_TASK_LOG_DELETE = "historic-user-task-log-delete";
-
+    String TYPE_COMMENT_CREATED = "comment-created";
+    String TYPE_COMMENT_UPDATED = "comment-updated";
+    String TYPE_COMMENT_DELETED = "comment-deleted";
 
     String DATA = "data";
 
@@ -229,4 +231,12 @@ public interface HistoryJsonConstants {
     String LOG_ENTRY_DATA = "logEntryData";
 
     String LOG_ENTRY_LOGNUMBER = "logNumber";
+
+    String TIME = "time";
+
+    String ACTION = "action";
+
+    String MESSAGE = "message";
+
+    String FULL_MESSAGE = "fullMessage";
 }

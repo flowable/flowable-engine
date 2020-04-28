@@ -252,6 +252,9 @@ import org.flowable.engine.impl.history.async.json.transformer.UpdateProcessDefi
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.CommentCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.CommentUpdatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.CommentDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
@@ -2128,6 +2131,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
         historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+
+        historyJsonTransformers.add(new CommentCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new CommentUpdatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new CommentDeletedHistoryJsonTransformer());
+
         return historyJsonTransformers;
     }
 

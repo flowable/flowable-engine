@@ -15,10 +15,15 @@ package org.flowable.engine.test.history;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.anyString;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Comment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
@@ -29,7 +34,7 @@ import org.mockito.Mockito;
  */
 public class HistoryManagerInvocationsTest extends CustomConfigurationFlowableTestCase {
 
-    private HistoryManager mockHistoryManager;
+    private HistoryManager spiedHistoryManager;
 
     public HistoryManagerInvocationsTest() {
         super(HistoryManagerInvocationsTest.class.getName());
@@ -37,8 +42,9 @@ public class HistoryManagerInvocationsTest extends CustomConfigurationFlowableTe
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.mockHistoryManager = Mockito.mock(HistoryManager.class);
-        processEngineConfiguration.setHistoryManager(mockHistoryManager);
+        HistoryManager historyManager = new DefaultHistoryManager(processEngineConfiguration, HistoryLevel.ACTIVITY, false);
+        spiedHistoryManager = Mockito.spy(historyManager);
+        processEngineConfiguration.setHistoryManager(spiedHistoryManager);
     }
 
     @Test
@@ -47,12 +53,45 @@ public class HistoryManagerInvocationsTest extends CustomConfigurationFlowableTe
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        verify(mockHistoryManager, times(1)).recordTaskCreated(any(), any());
-        verify(mockHistoryManager, times(1)).recordTaskEnd(any(), any(), any(), any());
+        verify(spiedHistoryManager, times(1)).recordTaskCreated(any(), any());
+        verify(spiedHistoryManager, times(1)).recordTaskEnd(any(), any(), any(), any());
 
-        verify(mockHistoryManager, times(1)).recordProcessInstanceStart(any());
-        verify(mockHistoryManager, times(1)).recordProcessInstanceEnd(any(), any(), any(), any());
+        verify(spiedHistoryManager, times(1)).recordProcessInstanceStart(any());
+        verify(spiedHistoryManager, times(1)).recordProcessInstanceEnd(any(), any(), any(), any());
 
     }
 
+    @Test
+    public void testCreateComment() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionId(deployOneTaskTestProcess()).start();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.addComment(task.getId(), processInstance.getProcessInstanceId(), "message");
+
+        verify(spiedHistoryManager, times(1)).createComment(any(CommentEntity.class));
+    }
+
+    @Test
+    public void testUpdateComment() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionId(deployOneTaskTestProcess()).start();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Comment comment = taskService.addComment(task.getId(), processInstance.getProcessInstanceId(), "message");
+
+        taskService.saveComment(comment);
+
+        verify(spiedHistoryManager, times(1)).updateComment(any(CommentEntity.class));
+    }
+
+    @Test
+    public void testDeleteComment() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionId(deployOneTaskTestProcess()).start();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Comment comment = taskService.addComment(task.getId(), processInstance.getProcessInstanceId(), "message");
+
+        taskService.deleteComment(comment.getId());
+
+        verify(spiedHistoryManager, times(1)).deleteComment(anyString());
+    }
 }

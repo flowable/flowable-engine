@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -248,4 +249,22 @@ public interface HistoryManager {
      * @param logNumber log identifier
      */
     void deleteHistoryUserTaskLog(long logNumber);
+
+    /**
+     * Create new comment
+     * @param commentEntity comment to be created
+     */
+    void createComment(CommentEntity commentEntity);
+
+    /**
+     * Update comment
+     * @param commentEntity comment to be updated
+     */
+    void updateComment(CommentEntity commentEntity);
+
+    /**
+     * Delete comment
+     * @param commentId comment to be deleted
+     */
+    void deleteComment(String commentId);
 }

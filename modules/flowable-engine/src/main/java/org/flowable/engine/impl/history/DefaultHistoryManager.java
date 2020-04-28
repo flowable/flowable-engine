@@ -33,6 +33,7 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -518,6 +519,22 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
             createNewHistoricActivityInstance(activityInstance);
         }
+    }
+
+    // Related to comments
+    @Override
+    public void createComment(CommentEntity commentEntity) {
+        CommandContextUtil.getCommentEntityManager().insert(commentEntity);
+    }
+
+    @Override
+    public void updateComment(CommentEntity commentEntity) {
+        CommandContextUtil.getCommentEntityManager().update(commentEntity);
+    }
+
+    @Override
+    public void deleteComment(String commentId) {
+        CommandContextUtil.getCommentEntityManager().delete(commentId);
     }
 
     protected HistoricActivityInstanceEntity createNewHistoricActivityInstance(ActivityInstance activityInstance) {
