@@ -898,7 +898,35 @@ public class ExecutionEntityManagerImpl
                 
                 CommandContextUtil.getVariableService(commandContext).deleteVariablesByExecutionId(executionEntity.getId());
             }
+
+            List<VariableInstanceEntity> variableInstances = CommandContextUtil.getVariableService(commandContext)
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(executionEntity.getId())
+                    .scopeTypes(ScopeTypes.BPMN_DEPENDENT)
+                    .list();
+            boolean deleteVariableInstances = !variableInstances.isEmpty();
+
+            for (VariableInstanceEntity variableInstance : variableInstances) {
+                if (eventDispatcherEnabled) {
+                    FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+                    if (eventDispatcher != null) {
+                        eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
+                        eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
+                    }
+                }
+
+                if (variableInstance.getByteArrayRef() != null && variableInstance.getByteArrayRef().getId() != null) {
+                    variableInstance.getByteArrayRef().delete();
+                }
+            }
+
+            if (deleteVariableInstances) {
+                CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager()
+                        .deleteBySubScopeIdAndScopeTypes(executionEntity.getId(), ScopeTypes.BPMN_DEPENDENT);
+            }
+
         }
+
     }
 
     protected void deleteUserTasks(ExecutionEntity executionEntity, String deleteReason, CommandContext commandContext, 

@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByExecutionIdMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeMatcher;
-import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypesMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypesMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByTaskIdMatcher;
 
 /**
@@ -42,8 +44,11 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeMatcher 
         = new VariableInstanceByScopeIdAndScopeTypeMatcher();
 
-    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypeMatcher 
-        = new VariableInstanceBySubScopeIdAndScopeTypeMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypesMatcher
+        = new VariableInstanceByScopeIdAndScopeTypesMatcher();
+
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypesMatcher
+        = new VariableInstanceBySubScopeIdAndScopeTypesMatcher();
 
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
@@ -95,4 +100,25 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         bulkDelete("deleteVariablesByScopeIdAndScopeType", variableInstanceByScopeIdAndScopeTypeMatcher, params);
     }
 
+    @Override
+    public void deleteByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        if (scopeTypes.size() == 1) {
+            deleteByScopeIdAndScopeType(scopeId, scopeTypes.iterator().next());
+            return;
+        }
+
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("scopeId", scopeId);
+        params.put("scopeTypes", scopeTypes);
+        bulkDelete("deleteVariablesByScopeIdAndScopeTypes", variableInstanceByScopeIdAndScopeTypesMatcher, params);
+
+    }
+
+    @Override
+    public void deleteBySubScopeIdAndScopeTypes(String subScopeId, Collection<String> scopeTypes) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeTypes", scopeTypes);
+        bulkDelete("deleteVariablesBySubScopeIdAndScopeTypes", variableInstanceBySubScopeIdAndScopeTypesMatcher, params);
+    }
 }

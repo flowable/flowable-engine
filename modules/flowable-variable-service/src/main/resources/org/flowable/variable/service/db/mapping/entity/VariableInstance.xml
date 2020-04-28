@@ -140,6 +140,23 @@
         delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
     </delete>
 
+    <delete id="deleteVariablesByScopeIdAndScopeTypes" parameterType="java.util.Map">
+        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+         and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+            #{scopeType}
+        </foreach>
+    </delete>
+
+    <delete id="deleteVariablesBySubScopeIdAndScopeTypes" parameterType="java.util.Map">
+        delete from ${prefix}ACT_RU_VARIABLE
+        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+         and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+            #{scopeType}
+        </foreach>
+    </delete>
+
     <!-- VARIABLE INSTANCE RESULTMAP -->
     <resultMap id="variableInstanceResultMap" type="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -207,6 +224,12 @@
             </if>
             <if test="parameter.scopeType != null">
                 AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.isEmpty()">
+                AND SCOPE_TYPE_ in
+                <foreach collection="parameter.scopeTypes" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
             </if>
             <if test="parameter.name != null">
                 AND NAME_ = #{parameter.name, jdbcType=VARCHAR}

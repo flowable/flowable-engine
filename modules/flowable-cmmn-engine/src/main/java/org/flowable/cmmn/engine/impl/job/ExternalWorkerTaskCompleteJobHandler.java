@@ -12,12 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.job;
 
+import java.util.List;
+
+import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
@@ -34,7 +40,21 @@ public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
-        //TODO set variables
+
+        VariableService variableService = CommandContextUtil.getVariableService(commandContext);
+        List<VariableInstanceEntity> jobVariables = variableService.findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN_EXTERNAL_WORKER);
+
+        if (!jobVariables.isEmpty()) {
+            for (VariableInstanceEntity jobVariable : jobVariables) {
+                planItemInstanceEntity.setVariable(jobVariable.getName(), jobVariable.getValue());
+                variableService.deleteVariableInstance(jobVariable);
+            }
+
+            if (planItemInstanceEntity instanceof CountingPlanItemInstanceEntity) {
+                ((CountingPlanItemInstanceEntity) planItemInstanceEntity)
+                        .setVariableCount(((CountingPlanItemInstanceEntity) planItemInstanceEntity).getVariableCount() - jobVariables.size());
+            }
+        }
 
         if (configuration != null && configuration.startsWith("terminate:")) {
             //TODO maybe pass exitType and exitEventType

@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
@@ -32,5 +33,9 @@ public interface VariableInstanceDataManager extends DataManager<VariableInstanc
     void deleteVariablesByExecutionId(String executionId);
     
     void deleteByScopeIdAndScopeType(String scopeId, String scopeType);
-    
+
+    void deleteByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
+
+    void deleteBySubScopeIdAndScopeTypes(String subScopeId, Collection<String> scopeTypes);
+
 }

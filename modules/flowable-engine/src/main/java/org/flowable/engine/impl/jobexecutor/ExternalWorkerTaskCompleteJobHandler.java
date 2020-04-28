@@ -12,13 +12,19 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import java.util.List;
+
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
@@ -35,7 +41,14 @@ public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
-        //TODO set variables
+
+        VariableService variableService = CommandContextUtil.getVariableService(commandContext);
+        List<VariableInstanceEntity> jobVariables = variableService.findVariableInstanceBySubScopeIdAndScopeType(executionEntity.getId(), ScopeTypes.BPMN_EXTERNAL_WORKER);
+        for (VariableInstanceEntity jobVariable : jobVariables) {
+            executionEntity.setVariable(jobVariable.getName(), jobVariable.getValue());
+            CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
+            variableService.deleteVariableInstance(jobVariable);
+        }
 
         if (configuration != null && configuration.startsWith("error:")) {
             String errorCode;

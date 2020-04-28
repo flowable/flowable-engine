@@ -91,7 +91,7 @@ public class CaseInstanceEntityManagerImpl
         CaseInstanceEntity caseInstanceEntity = dataManager.findById(caseInstanceId);
 
         // Variables
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
         
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
