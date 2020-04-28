@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import java.util.HashMap;
 
@@ -30,6 +30,8 @@ import org.flowable.task.api.Task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic case instance query resource.
@@ -177,12 +179,17 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertThat(dataNode).hasSize(2);
-        JsonNode valueNode = dataNode.get(0);
-        assertThat(valueNode.get("id").asText()).isEqualTo(caseInstance.getId());
-        assertThat(dataNode.get(1).get("id").asText()).isEqualTo(caseInstance2.getId());
-
-        assertThat(valueNode.get("caseDefinitionName").asText()).isEqualTo("One Human Task Case");
-        assertThat(valueNode.get("caseDefinitionDescription").asText()).isEqualTo("A human task case");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "  {"
+                        + "    id: '" + caseInstance.getId() + "',"
+                        + "    caseDefinitionName: 'One Human Task Case',"
+                        + "    caseDefinitionDescription: 'A human task case'"
+                        + "  },"
+                        + "  {"
+                        + "    id: '" + caseInstance2.getId() + "'"
+                        + "  }"
+                        + "]");
     }
 }

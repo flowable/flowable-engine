@@ -61,35 +61,25 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();
-        assertThat(responseNode).hasSize(2);
 
-        boolean groupCandidateFound = false;
-        boolean userCandidateFound = false;
-
-        for (int i = 0; i < responseNode.size(); i++) {
-            ObjectNode link = (ObjectNode) responseNode.get(i);
-            assertThat(link).isNotNull();
-            if (!link.get("user").isNull()) {
-                assertThat(link.get("user").textValue()).isEqualTo("kermit");
-                assertThat(link.get("type").textValue()).isEqualTo("candidate");
-                assertThat(link.get("group").isNull()).isTrue();
-                assertThat(link.get("url").asText().endsWith(
-                        CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "users", "kermit")))
-                        .isTrue();
-                userCandidateFound = true;
-
-            } else if (!link.get("group").isNull()) {
-                assertThat(link.get("group").textValue()).isEqualTo("admin");
-                assertThat(link.get("type").textValue()).isEqualTo("candidate");
-                assertThat(link.get("user").isNull()).isTrue();
-                assertThat(link.get("url").asText().endsWith(
-                        CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "groups", "admin")))
-                        .isTrue();
-                groupCandidateFound = true;
-            }
-        }
-        assertThat(groupCandidateFound).isTrue();
-        assertThat(userCandidateFound).isTrue();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + "  {"
+                        + "    user: 'kermit',"
+                        + "    type: 'candidate',"
+                        + "    group: null,"
+                        + "    url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "users", "kermit") + "'"
+                        + "  },"
+                        + "  {"
+                        + "    group: 'admin',"
+                        + "    type: 'candidate',"
+                        + "    user: null,"
+                        + "    url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "groups", "admin") + "'"
+                        + "  }"
+                        + "]");
     }
 
     @Test
@@ -119,10 +109,10 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'user': 'kermit',"
-                        + " 'type': 'candidate',"
-                        + " 'group': null,"
-                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " user: 'kermit',"
+                        + " type: 'candidate',"
+                        + " group: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "users", "kermit") + "'"
                         + "}");
 
@@ -144,10 +134,10 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'group': 'admin',"
-                        + " 'type': 'candidate',"
-                        + " 'user': null,"
-                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " group: 'admin',"
+                        + " type: 'candidate',"
+                        + " user: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "groups", "admin") + "'"
                         + "}");
 
@@ -186,10 +176,10 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'user': 'kermit',"
-                        + " 'type': 'candidate',"
-                        + " 'group': null,"
-                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " user: 'kermit',"
+                        + " type: 'candidate',"
+                        + " group: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "users", "kermit") + "'"
                         + "}");
 
@@ -203,10 +193,10 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'group': 'admin',"
-                        + " 'type': 'candidate',"
-                        + " 'user': null,"
-                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " group: 'admin',"
+                        + " type: 'candidate',"
+                        + " user: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinition.getId(), "groups", "admin") + "'"
                         + "}");
     }
