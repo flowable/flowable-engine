@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,13 +53,13 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = {"Tasks"}, description = "Manage Tasks", authorizations = {@Authorization(value = "basicAuth")})
 public class TaskResource extends TaskBaseResource {
-    
-    @Autowired(required=false)
+
+    @Autowired(required = false)
     protected FormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
 
-    @ApiOperation(value = "Get a task", tags = { "Tasks" })
+    @ApiOperation(value = "Get a task", tags = {"Tasks"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -70,7 +70,7 @@ public class TaskResource extends TaskBaseResource {
     }
 
     @ApiOperation(value = "Update a task", tags = {
-            "Tasks" }, notes = "All request values are optional. For example, you can only include the assignee attribute in the request body JSON-object, only updating the assignee of the task, leaving all other fields unaffected. When an attribute is explicitly included and is set to null, the task-value will be updated to null. Example: {\"dueDate\" : null} will clear the duedate of the task).")
+            "Tasks"}, notes = "All request values are optional. For example, you can only include the assignee attribute in the request body JSON-object, only updating the assignee of the task, leaving all other fields unaffected. When an attribute is explicitly included and is set to null, the task-value will be updated to null. Example: {\"dueDate\" : null} will clear the duedate of the task).")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was updated."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
@@ -101,7 +101,7 @@ public class TaskResource extends TaskBaseResource {
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" }, notes = "")
+    @ApiOperation(value = "Tasks actions", tags = {"Tasks"}, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),
@@ -116,7 +116,7 @@ public class TaskResource extends TaskBaseResource {
         }
 
         Task task = getTaskFromRequest(taskId);
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.executeTaskAction(task, actionRequest);
         }
@@ -138,7 +138,7 @@ public class TaskResource extends TaskBaseResource {
         }
     }
 
-    @ApiOperation(value = "Delete a task", tags = { "Tasks" })
+    @ApiOperation(value = "Delete a task", tags = {"Tasks"})
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cascadeHistory", dataType = "string", value = "Whether or not to delete the HistoricTask instance when deleting the task (if applicable). If not provided, this value defaults to false.", paramType = "query"),
             @ApiImplicitParam(name = "deleteReason", dataType = "string", value = "Reason why the task is deleted. This value is ignored when cascadeHistory is true.", paramType = "query")
@@ -150,7 +150,7 @@ public class TaskResource extends TaskBaseResource {
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}")
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
-            @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+                           @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
         Task taskToDelete = getTaskFromRequest(taskId);
         if (taskToDelete.getExecutionId() != null) {
@@ -174,8 +174,8 @@ public class TaskResource extends TaskBaseResource {
         }
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-    
-    @ApiOperation(value = "Get a task form", tags = { "Tasks" })
+
+    @ApiOperation(value = "Get a task form", tags = {"Tasks"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -186,7 +186,7 @@ public class TaskResource extends TaskBaseResource {
         if (StringUtils.isEmpty(task.getFormKey())) {
             throw new FlowableIllegalArgumentException("Task has no form defined");
         }
-        
+
         FormInfo formInfo = taskService.getTaskFormModel(task.getId());
         if (formHandlerRestApiInterceptor != null) {
             return formHandlerRestApiInterceptor.convertTaskFormInfo(formInfo, task);
@@ -206,8 +206,12 @@ public class TaskResource extends TaskBaseResource {
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                if (var.getVariableScope().equals(RestVariable.RestVariableScope.LOCAL)) {
-                    scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
+                if (var.getVariableScope() != null) {
+                    if (RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                        scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
+                    } else {
+                        scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
+                    }
                 } else {
                     scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
                 }
@@ -222,10 +226,14 @@ public class TaskResource extends TaskBaseResource {
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                if (var.getVariableScope().equals(RestVariable.RestVariableScope.LOCAL)){
-                    scopedVariableContainerHelper.setTransientVariableLocal(var.getName(),actualVariableValue);
-                }else{
-                    scopedVariableContainerHelper.setTransientVariable(var.getName(),actualVariableValue);
+                if (var.getVariableScope() != null) {
+                    if (RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                        scopedVariableContainerHelper.setTransientVariableLocal(var.getName(), actualVariableValue);
+                    } else {
+                        scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
+                    }
+                } else {
+                    scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
                 }
             }
         }
