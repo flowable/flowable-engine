@@ -101,6 +101,12 @@
         where J.PROCESS_INSTANCE_ID_ = #{parameter}
     </select>
 
+    <select id="selectExternalWorkerJobsByScopeIdAndSubScopeId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
+        select *
+        from ${prefix}ACT_RU_EXTERNAL_JOB
+        where SCOPE_ID_ = #{parameter.scopeId} and SUB_SCOPE_ID_ = #{parameter.subScopeId}
+    </select>
+
     <select id="selectExternalWorkerJobByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultMap="externalWorkerJobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>

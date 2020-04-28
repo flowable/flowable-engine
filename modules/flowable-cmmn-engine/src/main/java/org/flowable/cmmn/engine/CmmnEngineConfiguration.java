@@ -107,6 +107,7 @@ import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkIntercep
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
+import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
@@ -121,6 +122,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.CasePageTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.ExternalWorkerServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.GenericEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HttpTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
@@ -1274,6 +1276,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ScriptTaskParseHandler());
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
         cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
+        cmmnParseHandlers.add(new ExternalWorkerServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new CasePageTaskParseHandler());
@@ -1606,6 +1609,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
+        jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {

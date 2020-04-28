@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
@@ -37,6 +38,7 @@ import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HumanTask;
@@ -183,6 +185,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public SendEventActivityBehavior createSendEventActivityBehavior(PlanItem planItem, SendEventServiceTask sendEventServiceTask) {
         return new SendEventActivityBehavior(sendEventServiceTask);
+    }
+
+    @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerActivityBehaviour(PlanItem planItem, ExternalWorkerServiceTask externalWorkerServiceTask) {
+        return new ExternalWorkerTaskActivityBehavior(externalWorkerServiceTask);
     }
 
     @Override

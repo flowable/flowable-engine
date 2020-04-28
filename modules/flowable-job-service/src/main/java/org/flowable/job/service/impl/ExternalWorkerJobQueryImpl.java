@@ -135,7 +135,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
-    public ExternalWorkerJobQuery scopeId(String scopeId) {
+    public ExternalWorkerJobQueryImpl scopeId(String scopeId) {
         if (scopeId == null) {
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
@@ -153,7 +153,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
-    public ExternalWorkerJobQuery scopeType(String scopeType) {
+    public ExternalWorkerJobQueryImpl scopeType(String scopeType) {
         if (scopeType == null) {
             throw new FlowableIllegalArgumentException("Provided scope type is null");
         }

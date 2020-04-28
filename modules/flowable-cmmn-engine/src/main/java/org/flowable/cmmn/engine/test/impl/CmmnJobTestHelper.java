@@ -49,6 +49,10 @@ public class CmmnJobTestHelper {
 
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
+
+    public static void waitForJobExecutorOnCondition(CmmnEngineConfiguration cmmnEngineConfiguration, long maxMillisToWait, long intervalMillis, Callable<Boolean> predicate) {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), () -> !predicate.call(), maxMillisToWait, intervalMillis, true);
+    }
     
     public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {

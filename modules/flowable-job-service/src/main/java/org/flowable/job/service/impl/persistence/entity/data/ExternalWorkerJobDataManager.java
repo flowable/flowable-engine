@@ -31,4 +31,6 @@ public interface ExternalWorkerJobDataManager extends DataManager<ExternalWorker
     void deleteJobsByExecutionId(String executionId);
 
     List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults);
+
+    List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
 }

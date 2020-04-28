@@ -44,6 +44,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.variable.service.VariableService;
@@ -443,6 +445,17 @@ public class PlanItemInstanceEntityManagerImpl
                 .findIdentityLinksBySubScopeIdAndType(planItemInstanceEntity.getId(), ScopeTypes.PLAN_ITEM);
             for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
                 identityLinkEntityManager.delete(identityLinkEntity);
+            }
+        }
+
+        if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.EXTERNAL_WORKER_TASK)) {
+            ExternalWorkerJobEntityManager externalWorkerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                    .getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+            List<ExternalWorkerJobEntity> externalWorkerJobEntities = externalWorkerJobEntityManager
+                    .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+
+            for (ExternalWorkerJobEntity externalWorkerJobEntity : externalWorkerJobEntities) {
+                externalWorkerJobEntityManager.delete(externalWorkerJobEntity);
             }
         }
         

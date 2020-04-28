@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -30,6 +31,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.job.api.ExternalWorkerJobProvider;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -323,4 +325,13 @@ public interface CmmnRuntimeService {
      *     new businessKey value
      */
     void updateBusinessKey(String caseInstanceId, String businessKey);
+
+    // External Worker
+
+    ExternalWorkerJobProvider createExternalWorkerProvider();
+
+    /**
+     * Create an {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
+     */
+    CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 }
