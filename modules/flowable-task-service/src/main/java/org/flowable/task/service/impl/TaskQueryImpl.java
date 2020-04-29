@@ -1721,7 +1721,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public void enhanceCachedValue(TaskEntity task) {
         if (includeProcessVariables) {
             task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService()
-                    .findVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
+                    .findVariableInstancesByExecutionId(task.getProcessInstanceId()));
         } else if (includeTaskLocalVariables) {
             task.getQueryVariables()
                     .addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskId(task.getId()));
