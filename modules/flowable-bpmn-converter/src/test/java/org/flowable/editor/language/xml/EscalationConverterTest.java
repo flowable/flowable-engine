@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
@@ -37,11 +37,11 @@ public class EscalationConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Collection<Escalation> escalations = model.getEscalations();
-        assertEquals(2, escalations.size());
-        assertEquals("firstEscalation", model.getEscalation("escalation1").getEscalationCode());
-        assertEquals("Escalation 1", model.getEscalation("escalation1").getName());
-        assertEquals("secondEscalation", model.getEscalation("escalation2").getEscalationCode());
-        assertEquals("Escalation 2", model.getEscalation("escalation2").getName());
+        assertThat(escalations).hasSize(2);
+        assertThat(model.getEscalation("escalation1").getEscalationCode()).isEqualTo("firstEscalation");
+        assertThat(model.getEscalation("escalation1").getName()).isEqualTo("Escalation 1");
+        assertThat(model.getEscalation("escalation2").getEscalationCode()).isEqualTo("secondEscalation");
+        assertThat(model.getEscalation("escalation2").getName()).isEqualTo("Escalation 2");
     }
 
     @Override
