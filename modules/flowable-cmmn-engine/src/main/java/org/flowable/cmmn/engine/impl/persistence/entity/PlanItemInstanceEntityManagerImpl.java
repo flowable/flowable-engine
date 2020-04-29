@@ -46,6 +46,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
@@ -409,12 +410,13 @@ public class PlanItemInstanceEntityManagerImpl
         
         // Variables
         if (countingPlanItemInstanceEntity.getVariableCount() > 0) {
-            VariableInstanceEntityManager variableInstanceEntityManager 
-                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-            List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
+
+            VariableService variableService
+                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableService();
+            List<VariableInstanceEntity> variableInstanceEntities = variableService
                     .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN);
             for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-                variableInstanceEntityManager.delete(variableInstanceEntity);
+                variableService.deleteVariableInstance(variableInstanceEntity);
             }
         }
         

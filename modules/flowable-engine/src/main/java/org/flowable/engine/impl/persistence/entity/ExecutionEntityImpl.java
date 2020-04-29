@@ -822,9 +822,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableService().findVariableInstanceByExecutionAndName(id, variableName);
 
-        return variableInstance;
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .executionId(id)
+                .withoutTaskId()
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
@@ -833,7 +837,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableService().findVariableInstancesByExecutionAndNames(id, variableNames);
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .executionId(id)
+                .withoutTaskId()
+                .names(variableNames)
+                .list();
     }
 
     // event subscription support //////////////////////////////////////////////

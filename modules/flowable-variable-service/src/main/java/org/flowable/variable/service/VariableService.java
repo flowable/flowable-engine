@@ -12,9 +12,7 @@
  */
 package org.flowable.variable.service;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -27,37 +25,19 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface VariableService {
 
-    VariableInstanceEntity getVariableInstance(String id);
+    InternalVariableInstanceQuery createInternalVariableInstanceQuery();
 
-    List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
+    default List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
+        return createInternalVariableInstanceQuery().executionId(executionId).withoutTaskId().list();
+    }
 
-    List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
+    default List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return createInternalVariableInstanceQuery().scopeId(scopeId).withoutSubScopeId().scopeType(scopeType).list();
+    }
 
-    List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
-
-    VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String taskName);
-
-    List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> taskNames);
-
-    VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String taskName);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> taskNames);
-
-    List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType);
-
-    VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
-
-    List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType);
-
-    VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames);
+    default List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return createInternalVariableInstanceQuery().subScopeId(subScopeId).scopeType(scopeType).list();
+    }
 
     VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
 

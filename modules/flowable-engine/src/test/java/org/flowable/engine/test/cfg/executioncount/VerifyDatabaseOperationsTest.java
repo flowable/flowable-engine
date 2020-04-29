@@ -349,7 +349,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L,
                     "selectExecutionsWithSameRootProcessInstanceId", 1L,
                     "selectTasksByExecutionId", 2L,
-                    "selectVariablesByExecutionId", 1L,
+                    "selectVariablesByQuery", 1L,
                     "selectIdentityLinksByProcessInstance", 1L,
                     "selectEntityLinksByScopeIdAndType", 1L,
                     "selectEventSubscriptionsByExecution", 1L,

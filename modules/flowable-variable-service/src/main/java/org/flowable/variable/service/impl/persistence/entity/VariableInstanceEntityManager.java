@@ -12,12 +12,9 @@
  */
 package org.flowable.variable.service.impl.persistence.entity;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.InternalVariableInstanceQuery;
 
 /**
  * @author Joram Barrez
@@ -37,35 +34,7 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
      */
     VariableInstanceEntity create(String name, VariableType type);
 
-    List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
-
-    List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
-
-    List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
-
-    VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
-
-    VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
-    
-    List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType);
-    
-    VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName);
-    
-    List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
-    
-    List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType);
-    
-    VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName);
-    
-    List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames);
+    InternalVariableInstanceQuery createInternalVariableInstanceQuery();
 
     void deleteVariablesByTaskId(String taskId);
 
