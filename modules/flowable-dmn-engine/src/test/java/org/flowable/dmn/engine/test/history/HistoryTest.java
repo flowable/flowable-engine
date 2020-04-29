@@ -15,11 +15,13 @@ package org.flowable.dmn.engine.test.history;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
 import org.flowable.dmn.engine.test.DmnDeployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tijs Rademakers
@@ -78,6 +80,9 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertFalse(ruleExecutions.get("1").get("valid").asBoolean());
         assertTrue(ruleExecutions.has("2"));
         assertTrue(ruleExecutions.get("2").get("valid").asBoolean());
+
+        assertFalse(executionNode.has("childDecisionExecutions"));
+        assertFalse(executionNode.has("decisionServiceResult"));
     }
     
     @DmnDeployment
@@ -283,5 +288,45 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         historicExecutions = historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").orderByStartTime().desc().listPage(0, 10);
         assertEquals(secondDecisionExcecutionId, historicExecutions.get(0).getId());
         assertEquals(firstDecisionExecutionId, historicExecutions.get(1).getId());
+    }
+
+    @DmnDeployment
+    public void testHistoricDecisionService() throws Exception {
+        ruleService.createExecuteDecisionBuilder()
+            .decisionKey("expandedDecisionService")
+            .variable("input1", "test1")
+            .variable("input2", "test2")
+            .variable("input3", "test3")
+            .variable("input4", "test4")
+            .evaluateDecisionWithAuditTrail();
+
+        DmnHistoricDecisionExecution decisionExecution = historyService.createHistoricDecisionExecutionQuery().decisionKey("expandedDecisionService").singleResult();
+        assertNotNull(decisionExecution.getDecisionDefinitionId());
+        assertNotNull(decisionExecution.getDeploymentId());
+        assertFalse(decisionExecution.isFailed());
+        assertNotNull(decisionExecution.getStartTime());
+        assertNotNull(decisionExecution.getEndTime());
+        assertNotNull(decisionExecution.getExecutionJson());
+
+        JsonNode executionNode = dmnEngineConfiguration.getObjectMapper().readTree(decisionExecution.getExecutionJson());
+        assertEquals("expandedDecisionService", executionNode.get("decisionKey").asText());
+
+        JsonNode decisionServiceResult =  executionNode.get("decisionServiceResult");
+        assertTrue(decisionServiceResult.get("decision1").isArray());
+        assertTrue(decisionServiceResult.get("decision2").isArray());
+
+        assertEquals(3, decisionServiceResult.get("decision1").size());
+        assertEquals(3, decisionServiceResult.get("decision2").size());
+
+        JsonNode decisionResultArray = executionNode.get("decisionResult");
+        assertTrue(decisionResultArray.isArray());
+        assertEquals(0, decisionResultArray.size());
+
+        JsonNode ruleExecutions = executionNode.get("childDecisionExecutions");
+        assertTrue(ruleExecutions.isObject());
+        assertTrue(ruleExecutions.has("decision4"));
+        assertTrue(ruleExecutions.has("decision3"));
+        assertTrue(ruleExecutions.has("decision1"));
+        assertTrue(ruleExecutions.has("decision2"));
     }
 }

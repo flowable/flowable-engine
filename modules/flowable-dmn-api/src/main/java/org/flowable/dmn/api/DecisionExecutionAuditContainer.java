@@ -50,7 +50,6 @@ public class DecisionExecutionAuditContainer {
     protected String exceptionMessage;
     protected String validationMessage;
     protected Boolean strictMode;
-    protected Map<String, DecisionExecutionAuditContainer> childDecisionExecutions = new LinkedHashMap<>();
 
     public DecisionExecutionAuditContainer() {
     }
@@ -240,19 +239,6 @@ public class DecisionExecutionAuditContainer {
 
     public void addDecisionResultType(String decisionResultId, String decisionResultType) {
         this.decisionResultTypes.put(decisionResultId, decisionResultType);
-    }
-
-    public DecisionExecutionAuditContainer getChildDecisionExecution(String decisionKey) {
-        return childDecisionExecutions.get(decisionKey);
-    }
-    public void addChildDecisionExecution(String decisionKey, DecisionExecutionAuditContainer decisionResult) {
-        childDecisionExecutions.put(decisionKey, decisionResult);
-    }
-    public Map<String, DecisionExecutionAuditContainer> getChildDecisionExecutions() {
-        return childDecisionExecutions;
-    }
-    public void setChildDecisionExecutions(Map<String, DecisionExecutionAuditContainer> childDecisionExecutions) {
-        this.childDecisionExecutions = childDecisionExecutions;
     }
 
     protected static boolean isBoolean(Object obj) {

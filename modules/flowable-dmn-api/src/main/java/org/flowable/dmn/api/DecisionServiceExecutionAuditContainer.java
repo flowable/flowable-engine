@@ -13,12 +13,14 @@
 package org.flowable.dmn.api;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DecisionServiceExecutionAuditContainer extends DecisionExecutionAuditContainer {
 
     protected Map<String, List<Map<String, Object>>> decisionServiceResult = new HashMap<>();
+    protected Map<String, DecisionExecutionAuditContainer> childDecisionExecutions = new LinkedHashMap<>();
 
     public DecisionServiceExecutionAuditContainer() {
     }
@@ -39,4 +41,18 @@ public class DecisionServiceExecutionAuditContainer extends DecisionExecutionAud
     public List<Map<String, Object>> getDecisionServiceResultForDecision(String decisionKey) {
         return decisionServiceResult.get(decisionKey);
     }
+
+    public DecisionExecutionAuditContainer getChildDecisionExecution(String decisionKey) {
+        return childDecisionExecutions.get(decisionKey);
+    }
+    public void addChildDecisionExecution(String decisionKey, DecisionExecutionAuditContainer decisionResult) {
+        childDecisionExecutions.put(decisionKey, decisionResult);
+    }
+    public Map<String, DecisionExecutionAuditContainer> getChildDecisionExecutions() {
+        return childDecisionExecutions;
+    }
+    public void setChildDecisionExecutions(Map<String, DecisionExecutionAuditContainer> childDecisionExecutions) {
+        this.childDecisionExecutions = childDecisionExecutions;
+    }
+
 }

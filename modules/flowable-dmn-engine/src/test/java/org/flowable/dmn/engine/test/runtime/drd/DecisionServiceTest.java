@@ -49,7 +49,7 @@ public class DecisionServiceTest {
         inputVariables.put("inputVar2", "val2");
         inputVariables.put("inputVar3", "val3");
 
-        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+        DecisionServiceExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decisionService1")
             .variables(inputVariables)
             .executeDecisionServiceWithAuditTrail();
@@ -73,7 +73,7 @@ public class DecisionServiceTest {
         inputVariables.put("inputVar2", "val2");
         inputVariables.put("inputVar3", "val3");
 
-        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+        DecisionServiceExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decisionService1")
             .variables(inputVariables)
             .executeDecisionServiceWithAuditTrail();

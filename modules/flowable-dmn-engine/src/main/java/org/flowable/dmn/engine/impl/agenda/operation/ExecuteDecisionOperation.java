@@ -14,6 +14,7 @@ package org.flowable.dmn.engine.impl.agenda.operation;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -42,7 +43,8 @@ public class ExecuteDecisionOperation extends DmnOperation {
             .execute(decision, executeDecisionContext);
 
         if (!executeDecisionContext.getDmnElement().equals(decision)) {
-            executeDecisionContext.getDecisionExecution().addChildDecisionExecution(decision.getId(), auditContainer);
+            // is part of a decision service execution
+            ((DecisionServiceExecutionAuditContainer) executeDecisionContext.getDecisionExecution()).addChildDecisionExecution(decision.getId(), auditContainer);
         } else {
             executeDecisionContext.setDecisionExecution(auditContainer);
         }
