@@ -511,6 +511,108 @@ A service task is visualized as a rounded rectangle with a cog icon in the top l
 
 ![cmmn.servicetask](assets/cmmn/cmmn.servicetask.png)
 
+### External Worker Task
+
+#### Description
+
+The External Worker Task allows you to create jobs that should be acquired and executed by External Workers.
+An External Worker can acquire jobs over the Java API or REST API.
+This is similar to an async Service Task.
+The difference is that instead of Flowable executing the logic,
+an External Worker, which can be implemented in any language, queries Flowable for jobs, executes them and sends the result to Flowable.
+Note that the External Worker task is **not** an 'official' task of CMMN spec (and doesn’t have a dedicated icon as a consequence).
+
+#### Defining an External Worker Task
+
+The External Worker task is implemented as a dedicated [Task](cmmn/ch06-cmmn.md#task) and is defined by setting *'external-worker'* for the *type* of the task.
+
+```xml
+<task id="externalWorkerOrder" flowable:type="external-worker">
+```
+
+The External Worker task is configured by se setting the `topic` (can be an EL expression) which the External Worker uses to query for jobs to execute.
+
+#### Example usage
+
+The following XML snippet shows an example of using the External Worker Task.
+The External Worker is a wait state.
+When the execution reaches the task it will create an External Worker Job, which can be acquired by an External Worker.
+Once the External Worker is done with the job and notifies Flowable of the completion the execution of the case will continue.
+
+
+```xml
+<task id="externalWorkerOrder" flowable:type="external-worker" flowable:topic="orderService" />
+```
+
+#### Acquiring External Worker Job
+
+External Worker Jobs are acquired via the `CmmnRuntimeService#createExternalWorkerProvider` by using a `ExternalWorkerJobProvider`
+
+```java
+List<AcquiredExternalWorkerJob> acquiredJobs = cmmnRuntimeService.createExternalWorkerProvider()
+                .topic("orderService", Duration.ofMinutes(30))
+                .acquireAndLock(5, "orderWorker-1");
+```
+
+By using the above Java snippet External Worker jobs can be acquired.
+With the snippet we did the following:
+
+* Query for External Worker Jobs with the topic *orderService*.
+* Acquire and lock the jobs for 30 minutes waiting for the completion signal from the External Worker.
+* Acquire maximum of 5 jobs
+* The owner of the jobs is the worker with id *orderWorker-1*
+
+An `AcquiredExternalWorkerJob` also has access to the Case variables.
+When the External Worker Task is exclusive, acquiring the job will lock the Case Instance.
+
+#### Completing an External Worker Job
+
+External Worker Jobs are completed via the `CmmnRuntimeService#createCmmnExternalWorkerTransitionBuilder(String, String)` by using a `CmmnExternalWorkerTransitionBuilder`
+
+```java
+cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "orderWorker-1")
+                .variable("orderStatus", "COMPLETED")
+                .complete();
+```
+
+A Job can be completed only by the worker that acquired it. Otherwise a `FlowableIllegalArgumentException` will be thrown.
+
+Using the snippet above the task is completed and the case execution will continue.
+The continuation of the execution is done asynchronously in a new transaction.
+This means that completing an external worker task will only create an asynchronous (new) job to execute the completion (and the current thread returns after doing that).
+Any steps in the model that follow after the external worker task will be executed in that transaction, similar to a regular async service task.
+
+It is also possible to use `CmmnExternalWorkerTransitionBuilder#terminate()` to transition the external worker job.
+
+#### Error handling for an External Worker Job
+
+The `CmmnExternalWorkerTransitionBuilder` is also used to fail a job (schedule it for a new execution in the future)
+
+In order to fail a job the following can be used:
+
+
+```java
+cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "orderWorker-1")
+                .errorMessage("Failed to run job. Database not accessible")
+                .errorDetails("Some complex and long error details")
+                .failure(4, Duration.ofHours(1));
+```
+
+With this snippet the following will be done:
+
+* The error message and error details will be set on the job
+* The retry count for the job will be set to 4
+* The job will be available for acquiring after 1 hour
+
+The Job can only be failed by the worker that acquired it.
+Flowable will not automatically decrease the number of retries for a job.
+This has to be done explicitly by the External Worker.
+When the number of retries is 0 the job will be moved to the DeadLetter table job and will no longer be available for acquiring.
+
+#### Querying External Worker Jobs
+
+External Worker Jobs are queried by using the `ExternalWorkerJobQuery` by creating it via `CmmnManagementService#createExternalWorkerJobQuery`.
+
 ### Decision task
 
 A *Decision task* calls out to a DMN decision table and stores the resulting variable in the case instance.
