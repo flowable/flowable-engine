@@ -867,6 +867,12 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer expression"
           }
         },
+        "EXTERNALWORKERJOBPACKAGE": {
+          "TOPIC": {
+            "TITLE": "Job topic",
+            "DESCRIPTION": "The job topic that the external worker will query jobs on"
+          }
+        },
         "ISTRANSACTIONPACKAGE" : {
           "ISTRANSACTION" : {
             "TITLE" : "Is a transaction sub process",
@@ -1031,6 +1037,10 @@
         "SENDEVENTTASK" : {
           "TITLE" : "Send event task",
           "DESCRIPTION" : "An task that sends an event to the event registry"
+        },
+        "EXTERNALWORKERTASK" : {
+          "TITLE" : "External Worker task",
+          "DESCRIPTION" : "An task that creates a job which can be executed by an external worker"
         },
         "SHELLTASK" : {
           "TITLE" : "Shell task",
@@ -1573,6 +1583,12 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer value"
           }
         },
+        "EXTERNALWORKERJOBPACKAGE": {
+          "TOPIC": {
+            "TITLE": "Job topic",
+            "DESCRIPTION": "The job topic that the external worker will query jobs on"
+          }
+        },
         "CASETASKCASEREFERENCEPACKAGE": {
           "CASETASKCASEREFERENCE": {
             "TITLE": "Case reference",
@@ -1816,6 +1832,10 @@
         "SENDEVENTTASK" : {
           "TITLE" : "Send event task",
           "DESCRIPTION" : "A send event task"
+        },
+        "EXTERNALWORKERTASK" : {
+          "TITLE" : "External Worker task",
+          "DESCRIPTION" : "An task that creates a job which can be executed by an external worker"
         },
         "MILESTONE" : {
           "TITLE" : "Milestone",

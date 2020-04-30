@@ -55,6 +55,7 @@ public interface StencilConstants {
     final String STENCIL_TASK_MULE = "MuleTask";
     final String STENCIL_TASK_HTTP = "HttpTask";
     final String STENCIL_TASK_SEND_EVENT = "SendEventTask";
+    final String STENCIL_TASK_EXTERNAL_WORKER = "ExternalWorkerTask";
     final String STENCIL_TASK_SHELL = "ShellTask";
     final String STENCIL_TASK_DECISION = "DecisionTask";
 
@@ -336,6 +337,8 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
     
+    final String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
+
     final String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
     final String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
     final String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
