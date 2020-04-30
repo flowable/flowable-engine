@@ -204,6 +204,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         writeQualifiedAttribute(ATTRIBUTE_TYPE, ServiceTask.EXTERNAL_WORKER_TASK, xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, externalWorkerTask.getTopic(), xtw);
 
+        if (!externalWorkerTask.isAsynchronous() && externalWorkerTask.isNotExclusive()) {
+            // Write the not exclusive only if not async (otherwise it is added in the base)
+            writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
+        }
+
         if (StringUtils.isNotEmpty(externalWorkerTask.getSkipExpression())) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, externalWorkerTask.getSkipExpression(), xtw);
         }

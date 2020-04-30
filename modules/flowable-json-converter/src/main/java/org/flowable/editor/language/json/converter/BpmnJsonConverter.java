@@ -110,6 +110,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         SendTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         SendEventTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+        ExternalWorkerServiceTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
 
         // gateways
         ExclusiveGatewayJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -194,6 +195,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
         DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
+        DI_RECTANGLES.add(STENCIL_TASK_EXTERNAL_WORKER);
         DI_RECTANGLES.add(STENCIL_TASK_SHELL);
         DI_RECTANGLES.add(STENCIL_TEXT_ANNOTATION);
 

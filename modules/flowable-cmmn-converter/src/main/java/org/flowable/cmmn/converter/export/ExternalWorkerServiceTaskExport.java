@@ -31,6 +31,11 @@ public class ExternalWorkerServiceTaskExport extends AbstractPlanItemDefinitionE
 
         xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, ExternalWorkerServiceTask.TYPE);
 
+        if (!externalWorkerServiceTask.isAsync() && !externalWorkerServiceTask.isExclusive()) {
+            // Write the not exclusive only if not async (otherwise it is added in the TaskExport)
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, "false");
+        }
+
         if (StringUtils.isNotEmpty(externalWorkerServiceTask.getTopic())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_EXTERNAL_WORKER_TOPIC,
                     externalWorkerServiceTask.getTopic());
