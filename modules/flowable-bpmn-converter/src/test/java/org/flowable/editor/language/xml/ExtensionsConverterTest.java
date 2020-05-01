@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -40,15 +40,15 @@ public class ExtensionsConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("theTask");
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get("test");
-        assertEquals(1, extensionElements.size());
+        assertThat(extensionElements).hasSize(1);
         
         // Reconvert to xml and back to bpmn model
         BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
         byte[] xmlBytes = bpmnXMLConverter.convertToXML(bpmnModel);
         bpmnModel = readXMLFile(new ByteArrayInputStream(xmlBytes));
-        
+
         extensionElements = bpmnModel.getMainProcess().getFlowElement("theTask").getExtensionElements().get("test");
-        assertEquals(1, extensionElements.size());
+        assertThat(extensionElements).hasSize(1);
     }
 
 }

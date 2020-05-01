@@ -12,8 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.junit.Test;
@@ -39,8 +38,8 @@ public class NotExecutableConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(BpmnModel model) {
-        assertEquals("simpleProcess", model.getMainProcess().getId());
-        assertEquals("Simple process", model.getMainProcess().getName());
-        assertFalse(model.getMainProcess().isExecutable());
+        assertThat(model.getMainProcess().getId()).isEqualTo("simpleProcess");
+        assertThat(model.getMainProcess().getName()).isEqualTo("Simple process");
+        assertThat(model.getMainProcess().isExecutable()).isFalse();
     }
 }

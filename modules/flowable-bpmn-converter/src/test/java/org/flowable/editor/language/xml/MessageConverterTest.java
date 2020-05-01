@@ -12,8 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Message;
@@ -36,16 +35,16 @@ public class MessageConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Message message = model.getMessage("writeReport");
-        assertNotNull(message);
-        assertEquals("Examples:writeReportItem", message.getItemRef());
-        assertEquals("newWriteReport", message.getName());
-        assertEquals("writeReport", message.getId());
+        assertThat(message).isNotNull();
+        assertThat(message)
+                .extracting(Message::getItemRef, Message::getName, Message::getId)
+                .containsExactly("Examples:writeReportItem", "newWriteReport", "writeReport");
 
         Message message2 = model.getMessage("writeReport2");
-        assertNotNull(message2);
-        assertEquals("http://foo.bar.com/Examples:writeReportItem2", message2.getItemRef());
-        assertEquals("newWriteReport2", message2.getName());
-        assertEquals("writeReport2", message2.getId());
+        assertThat(message2).isNotNull();
+        assertThat(message2)
+                .extracting(Message::getItemRef, Message::getName, Message::getId)
+                .containsExactly("http://foo.bar.com/Examples:writeReportItem2", "newWriteReport2", "writeReport2");
     }
 
     @Override

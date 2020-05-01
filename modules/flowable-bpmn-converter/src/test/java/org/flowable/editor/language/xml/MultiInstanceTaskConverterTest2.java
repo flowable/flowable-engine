@@ -12,11 +12,10 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
@@ -67,45 +66,51 @@ public class MultiInstanceTaskConverterTest2 extends AbstractConverterTest {
 
         // verify start
         FlowElement flowElement = main.getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
 
         // verify user task
         flowElement = main.getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertEquals("User task 1", flowElement.getName());
-        assertTrue(flowElement instanceof UserTask);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, task -> {
+                    assertThat(task.getName()).isEqualTo("User task 1");
+                });
 
         UserTask task = (UserTask) flowElement;
         MultiInstanceLoopCharacteristics loopCharacteristics = task.getLoopCharacteristics();
-        assertEquals("participant", loopCharacteristics.getElementVariable());
-        assertEquals(PARTICIPANT_VALUE, loopCharacteristics.getCollectionString().trim());
-        assertEquals("delegateExpression", loopCharacteristics.getHandler().getImplementationType());
-        assertEquals("${collectionHandler}", loopCharacteristics.getHandler().getImplementation());
+        assertThat(loopCharacteristics.getElementVariable()).isEqualTo("participant");
+        assertThat(loopCharacteristics.getCollectionString().trim()).isEqualTo(PARTICIPANT_VALUE);
+        assertThat(loopCharacteristics.getHandler())
+                .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
+                .containsExactly("delegateExpression", "${collectionHandler}");
 
         // verify subprocess
         flowElement = main.getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertEquals("subProcess", flowElement.getName());
-        assertTrue(flowElement instanceof SubProcess);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getName()).isEqualTo("subProcess");
+                });
 
         SubProcess subProcess = (SubProcess) flowElement;
         loopCharacteristics = subProcess.getLoopCharacteristics();
-        assertTrue(loopCharacteristics.isSequential());
-        assertEquals("10", loopCharacteristics.getLoopCardinality());
-        assertEquals(5, subProcess.getFlowElements().size());
+        assertThat(loopCharacteristics.isSequential()).isTrue();
+        assertThat(loopCharacteristics.getLoopCardinality()).isEqualTo("10");
+        assertThat(subProcess.getFlowElements()).hasSize(5);
 
         // verify user task in subprocess
         flowElement = subProcess.getFlowElement("subUserTask1");
-        assertNotNull(flowElement);
-        assertEquals("User task 2", flowElement.getName());
-        assertTrue(flowElement instanceof UserTask);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getName()).isEqualTo("User task 2");
+                });
 
         task = (UserTask) flowElement;
         loopCharacteristics = task.getLoopCharacteristics();
-        assertEquals("participant", loopCharacteristics.getElementVariable());
-        assertEquals("${potentialOwnerList}", loopCharacteristics.getInputDataItem());
-        assertEquals("delegateExpression", loopCharacteristics.getHandler().getImplementationType());
-        assertEquals("${collectionHandler}", loopCharacteristics.getHandler().getImplementation());
+        assertThat(loopCharacteristics)
+                .extracting(MultiInstanceLoopCharacteristics::getElementVariable, MultiInstanceLoopCharacteristics::getInputDataItem)
+                .containsExactly("participant", "${potentialOwnerList}");
+        assertThat(loopCharacteristics.getHandler())
+                .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
+                .containsExactly("delegateExpression", "${collectionHandler}");
     }
 }
