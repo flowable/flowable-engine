@@ -40,7 +40,7 @@ import net.javacrumbs.jsonunit.core.Option;
 public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
     /**
-     * Test deploying singe cmmn file. POST cmmn-repository/deployments
+     * Test deploying single cmmn file. POST cmmn-repository/deployments
      */
     public void testPostNewDeploymentCmmnFile() throws Exception {
         try {
@@ -55,26 +55,20 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             String deploymentId = responseNode.get("id").textValue();
-            String name = responseNode.get("name").textValue();
-            String category = responseNode.get("category").textValue();
-            String deployTime = responseNode.get("deploymentTime").textValue();
-            String url = responseNode.get("url").textValue();
-            String tenantId = responseNode.get("tenantId").textValue();
 
-            assertThat(tenantId).isEqualTo("");
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: '${json-unit.any-string}',"
+                            + " name: 'oneHumanTaskCase',"
+                            + " category: null,"
+                            + " deploymentTime: '${json-unit.any-string}',"
+                            + " tenantId: \"\","
+                            + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                            + "}");
 
-            assertThat(deploymentId).isNotNull();
             assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
-
-            assertThat(name).isNotNull();
-            assertThat(name).isEqualTo("oneHumanTaskCase");
-
-            assertThat(url).isNotNull();
-            assertThat(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId))).isTrue();
-
-            // No deployment-category should have been set
-            assertThat(category).isNull();
-            assertThat(deployTime).isNotNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
@@ -119,11 +113,11 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'id': '" + existingDeployment.getId() + "',"
-                        + " 'name': '" + existingDeployment.getName() + "',"
-                        + " 'category': null,"
-                        + " 'tenantId': \"\","
-                        + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                        + " id: '" + existingDeployment.getId() + "',"
+                        + " name: '" + existingDeployment.getName() + "',"
+                        + " category: null,"
+                        + " tenantId: \"\","
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
                         + "}");
 
         String deployTime = responseNode.get("deploymentTime").textValue();

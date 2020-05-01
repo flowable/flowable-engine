@@ -14,9 +14,14 @@
 package org.flowable.cmmn.rest.service.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,13 +34,8 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.StreamSupport;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to get historic milestone
@@ -44,17 +44,19 @@ import java.util.stream.StreamSupport;
  */
 public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCase {
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn" })
     public void testHistoricMilestoneInstanceResource() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
 
-        PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent").singleResult();
+        PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent")
+                .singleResult();
         assertThat(activateMilestoneEvent).isNotNull();
         runtimeService.triggerPlanItemInstance(activateMilestoneEvent.getId());
 
         HistoricMilestoneInstance runtimeMilestone = historyService.createHistoricMilestoneInstanceQuery().singleResult();
         assertThat(runtimeMilestone).isNotNull();
-        HttpGet milestoneHttpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, runtimeMilestone.getId()));
+        HttpGet milestoneHttpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, runtimeMilestone.getId()));
         CloseableHttpResponse response = executeRequest(milestoneHttpGet, HttpStatus.SC_OK);
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
@@ -63,11 +65,12 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertHistoricMilestoneValues(runtimeMilestone, responseNode);
 
         //Finish the case
-        runtimeService.triggerPlanItemInstance(runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("finishCaseEvent").singleResult().getId());
+        runtimeService
+                .triggerPlanItemInstance(runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("finishCaseEvent").singleResult().getId());
         assertCaseEnded(caseInstance.getId());
     }
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceCollectionResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
@@ -90,22 +93,26 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
 
         //Trigger the events at different times, interleaved by case
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        PlanItemInstance event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceElementId("activateMilestone1").singleResult();
+        PlanItemInstance event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId())
+                .planItemInstanceElementId("activateMilestone1").singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         calendar.set(Calendar.HOUR, 2);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone2").singleResult();
+        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone2")
+                .singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         calendar.set(Calendar.HOUR, 3);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        PlanItemInstance activateMilestone2 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceElementId("activateMilestone2").singleResult();
+        PlanItemInstance activateMilestone2 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId())
+                .planItemInstanceElementId("activateMilestone2").singleResult();
         runtimeService.triggerPlanItemInstance(activateMilestone2.getId());
 
         calendar.set(Calendar.HOUR, 4);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone1").singleResult();
+        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone1")
+                .singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         //There should be two milestones completed by case instance
@@ -116,7 +123,8 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance2.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
@@ -125,7 +133,8 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in general
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl);
@@ -147,7 +156,6 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         calendar.set(Calendar.HOUR, 3);
         Date reachBefore = calendar.getTime();
 
-
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl
                 + "?reachedBefore=" + getISODateString(reachBefore)
                 + "&reachedAfter=" + getISODateString(reachAfter)
@@ -158,13 +166,14 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
     }
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceQueryResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
@@ -187,22 +196,26 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
 
         //Trigger the events at different times, interleaved by case
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        PlanItemInstance event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceElementId("activateMilestone1").singleResult();
+        PlanItemInstance event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId())
+                .planItemInstanceElementId("activateMilestone1").singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         calendar.set(Calendar.HOUR, 2);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone2").singleResult();
+        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone2")
+                .singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         calendar.set(Calendar.HOUR, 3);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        PlanItemInstance activateMilestone2 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceElementId("activateMilestone2").singleResult();
+        PlanItemInstance activateMilestone2 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId())
+                .planItemInstanceElementId("activateMilestone2").singleResult();
         runtimeService.triggerPlanItemInstance(activateMilestone2.getId());
 
         calendar.set(Calendar.HOUR, 4);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone1").singleResult();
+        event = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemInstanceElementId("activateMilestone1")
+                .singleResult();
         runtimeService.triggerPlanItemInstance(event.getId());
 
         //There should be two milestones completed by case instance
@@ -216,7 +229,8 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
@@ -228,7 +242,8 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in the history
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
@@ -263,7 +278,8 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
@@ -287,30 +303,25 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(actual.get("caseInstanceId").textValue()).isEqualTo(expected.getCaseInstanceId());
         assertThat(actual.get("caseDefinitionId").textValue()).isEqualTo(expected.getCaseDefinitionId());
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("url").textValue()).isNotNull();
-            String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, expected.getId())).toURL().toString();
+            String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, expected.getId()))
+                    .toURL().toString();
             assertThat(actual.get("url").textValue()).isEqualTo(url);
-        } catch (MalformedURLException e) {
-            throw new AssertionError("Cannot create url", e);
-        }
+        }).doesNotThrowAnyException();
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid historicCaseInstanceUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid caseDefinitionUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
     }
 }

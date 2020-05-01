@@ -234,13 +234,19 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
 
                 assertThat(responseNode.get("fields")).hasSize(2);
 
-                JsonNode fieldNode = responseNode.get("fields").get(0);
-                assertThat(fieldNode.get("id").asText()).isEqualTo("user");
-                assertThat(fieldNode.get("value").asText()).isEqualTo("First value");
-
-                fieldNode = responseNode.get("fields").get(1);
-                assertThat(fieldNode.get("id").asText()).isEqualTo("number");
-                assertThat(fieldNode.get("value").asInt()).isEqualTo(789);
+                JsonNode fields = responseNode.get("fields");
+                assertThatJson(fields)
+                        .when(Option.IGNORING_EXTRA_FIELDS)
+                        .isEqualTo("["
+                                + "  {"
+                                + "    id: 'user',"
+                                + "    value: 'First value'"
+                                + "  },"
+                                + "  {"
+                                + "    id: 'number',"
+                                + "    value: 789"
+                                + "  }"
+                                + "]");
 
             } finally {
                 formEngineFormService.deleteFormInstancesByScopeDefinition(caseDefinition.getId());

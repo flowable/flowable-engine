@@ -15,11 +15,10 @@ package org.flowable.cmmn.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -620,56 +619,53 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     private void assertHistoricPlanItemValues(HistoricPlanItemInstance expected, JsonNode actual) {
         assertThat(actual).isNotNull();
 
-        assertThat(actual.get("id").textValue()).isEqualTo(expected.getId());
-        assertThat(actual.get("name").textValue()).isEqualTo(expected.getName());
-        assertThat(actual.get("state").textValue()).isEqualTo(expected.getState());
-        assertThat(actual.get("caseDefinitionId").textValue()).isEqualTo(expected.getCaseDefinitionId());
-        assertThat(actual.get("caseInstanceId").textValue()).isEqualTo(expected.getCaseInstanceId());
-        assertThat(actual.get("stageInstanceId").textValue()).isEqualTo(expected.getStageInstanceId());
-        assertThat(actual.get("elementId").textValue()).isEqualTo(expected.getElementId());
-        assertThat(actual.get("planItemDefinitionId").textValue()).isEqualTo(expected.getPlanItemDefinitionId());
-        assertThat(actual.get("planItemDefinitionType").textValue()).isEqualTo(expected.getPlanItemDefinitionType());
-        assertThat(actual.get("createTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getCreateTime()));
-        assertThat(actual.get("lastAvailableTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getLastAvailableTime()));
-        assertThat(actual.get("lastEnabledTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getLastEnabledTime()));
-        assertThat(actual.get("lastDisabledTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getLastDisabledTime()));
-        assertThat(actual.get("lastStartedTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getLastStartedTime()));
-        assertThat(actual.get("lastSuspendedTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getLastSuspendedTime()));
-        assertThat(actual.get("completedTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getCompletedTime()));
-        assertThat(actual.get("occurredTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getOccurredTime()));
-        assertThat(actual.get("terminatedTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getTerminatedTime()));
-        assertThat(actual.get("exitTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getExitTime()));
-        assertThat(actual.get("endedTime").textValue()).isEqualTo(getISODateStringWithTZ(expected.getEndedTime()));
-        assertThat(actual.get("startUserId").textValue()).isEqualTo(expected.getStartUserId());
-        assertThat(actual.get("referenceId").textValue()).isEqualTo(expected.getReferenceId());
-        assertThat(actual.get("referenceType").textValue()).isEqualTo(expected.getReferenceType());
-        assertThat(actual.get("tenantId").textValue()).isEqualTo(expected.getTenantId());
+        assertThatJson(actual)
+                .isEqualTo("{"
+                        + "  id: '" + expected.getId() + "',"
+                        + "  name: '" + expected.getName() + "',"
+                        + "  state: '" + expected.getState() + "',"
+                        + "  caseDefinitionId: '" + expected.getCaseDefinitionId() + "',"
+                        + "  caseInstanceId: '" + expected.getCaseInstanceId() + "',"
+                        + "  stageInstanceId: '" + expected.getStageInstanceId() + "',"
+                        + "  elementId: '" + expected.getElementId() + "',"
+                        + "  planItemDefinitionId: '" + expected.getPlanItemDefinitionId() + "',"
+                        + "  planItemDefinitionType: '" + expected.getPlanItemDefinitionType() + "',"
+                        + "  startUserId: '" + expected.getStartUserId() + "',"
+                        + "  referenceId: '" + expected.getReferenceId() + "',"
+                        + "  referenceType: '" + expected.getReferenceType() + "',"
+                        + "  tenantId: '" + expected.getTenantId() + "',"
+                        + "  createTime: '" + getISODateStringWithTZ(expected.getCreateTime()) + "',"
+                        + "  lastAvailableTime: '" + getISODateStringWithTZ(expected.getLastAvailableTime()) + "',"
+                        + "  lastEnabledTime: '" + getISODateStringWithTZ(expected.getLastEnabledTime()) + "',"
+                        + "  lastDisabledTime: '" + getISODateStringWithTZ(expected.getLastDisabledTime()) + "',"
+                        + "  lastStartedTime: '" + getISODateStringWithTZ(expected.getLastStartedTime()) + "',"
+                        + "  lastSuspendedTime: '" + getISODateStringWithTZ(expected.getLastSuspendedTime()) + "',"
+                        + "  completedTime: '" + getISODateStringWithTZ(expected.getCompletedTime()) + "',"
+                        + "  occurredTime: '" + getISODateStringWithTZ(expected.getOccurredTime()) + "',"
+                        + "  terminatedTime: '" + getISODateStringWithTZ(expected.getTerminatedTime()) + "',"
+                        + "  exitTime: '" + getISODateStringWithTZ(expected.getExitTime()) + "',"
+                        + "  endedTime: '" + getISODateStringWithTZ(expected.getEndedTime()) + "'"
+                        + "}");
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("url").textValue()).isNotNull();
             String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, expected.getId()))
                     .toURL().toString();
             assertThat(actual.get("url").textValue()).isEqualTo(url);
-        } catch (MalformedURLException e) {
-            throw new AssertionError("Cannot create url", e);
-        }
+        }).doesNotThrowAnyException();
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid historicCaseInstanceUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
 
-        try {
+        assertThatCode(() -> {
             assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid caseDefinitionUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
     }
 }

@@ -96,9 +96,16 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
                     HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertThat(dataNode).hasSize(2);
-            assertThat(dataNode.get(0).get("id").textValue()).isEqualTo(firstDeployment.getId());
-            assertThat(dataNode.get(1).get("id").textValue()).isEqualTo(secondDeployment.getId());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: '" + firstDeployment.getId() + "'"
+                            + "  },"
+                            + "  {"
+                            + "    id: '" + secondDeployment.getId() + "'"
+                            + "  }"
+                            + "]");
 
             // Check ordering by deploy time
             response = executeRequest(new HttpGet(
@@ -106,9 +113,16 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
                     HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertThat(dataNode).hasSize(2);
-            assertThat(dataNode.get(0).get("id").textValue()).isEqualTo(firstDeployment.getId());
-            assertThat(dataNode.get(1).get("id").textValue()).isEqualTo(secondDeployment.getId());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: '" + firstDeployment.getId() + "'"
+                            + "  },"
+                            + "  {"
+                            + "    id: '" + secondDeployment.getId() + "'"
+                            + "  }"
+                            + "]");
 
             // Check ordering by tenantId
             response = executeRequest(new HttpGet(
@@ -116,9 +130,16 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
                     HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertThat(dataNode).hasSize(2);
-            assertThat(dataNode.get(0).get("id").textValue()).isEqualTo(secondDeployment.getId());
-            assertThat(dataNode.get(1).get("id").textValue()).isEqualTo(firstDeployment.getId());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: '" + secondDeployment.getId() + "'"
+                            + "  },"
+                            + "  {"
+                            + "    id: '" + firstDeployment.getId() + "'"
+                            + "  }"
+                            + "]");
 
             // Check paging
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION)
@@ -131,9 +152,9 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " 'total': 2,"
-                            + " 'start': 1,"
-                            + " 'size': 1"
+                            + " total: 2,"
+                            + " start: 1,"
+                            + " size: 1"
                             + "}");
 
         } finally {
