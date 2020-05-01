@@ -27,14 +27,11 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-/**
- * 
- * @author Daniel Meyer
- */
 public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     public static boolean INVOCATION;
@@ -266,6 +263,50 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             
         } finally {
             processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategory.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithCategoryConfigurationSetAndRunningAsyncExecutor() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            
+            processEngineConfiguration.getAsyncExecutor().start();
+            processEngineConfiguration.setAsyncExecutorActivate(true);
+            
+            // start process
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
+            
+            JobEntity job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNull(job.getLockOwner());
+            assertNull(job.getLockExpirationTime());
+            
+            Thread.sleep(4000);
+            
+            // job is not executed because of different job category value
+            assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+            
+            job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNull(job.getLockOwner());
+            assertNull(job.getLockExpirationTime());
+            
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+            
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
+    
+            processEngineConfiguration.getAsyncExecutor().start();
+            Thread.sleep(4000);
+            
+            // the job is done
+            assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+            
+            assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+            processEngineConfiguration.setAsyncExecutorActivate(false);
+            processEngineConfiguration.getAsyncExecutor().shutdown();
         }
     }
     

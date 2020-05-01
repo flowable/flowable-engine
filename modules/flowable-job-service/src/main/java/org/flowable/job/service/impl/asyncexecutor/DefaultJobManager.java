@@ -542,6 +542,15 @@ public class DefaultJobManager implements JobManager {
 
     protected void internalCreateLockedAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
+        
+        if (StringUtils.isNotEmpty(jobEntity.getCategory())) {
+            if (jobServiceConfiguration.getEnabledJobCategories() != null && 
+                    !jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                
+                return;
+            }
+        }
+        
         setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
     }
 
