@@ -570,10 +570,16 @@
       <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
       </if>
+      <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0)">
+            left outer join ${prefix}ACT_CMMN_CASEDEF CD_OR${orIndex} on RES.SCOPE_DEFINITION_ID_ = CD_OR${orIndex}.ID_
+      </if>
     </foreach>
 
     <if test="processDefinitionKey != null || processDefinitionKeyLike != null ||  processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; processCategoryInList.size() &gt; 0) || (processCategoryNotInList != null &amp;&amp; processCategoryNotInList.size() &gt; 0) || (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.size() &gt; 0)">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+    </if>
+    <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0)">
+          inner join ${prefix}ACT_CMMN_CASEDEF CD on RES.SCOPE_DEFINITION_ID_ = CD.ID_
     </if>
     <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null  || processInstanceBusinessKeyLikeIgnoreCase != null">
       inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
@@ -770,6 +776,21 @@
         <foreach item="processCategory" index="index" collection="processCategoryNotInList"
                  open="(" separator="," close=")">
           #{processCategory}
+        </foreach>
+      </if>
+      <if test="caseDefinitionKey != null">
+        and CD.KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionKeyLike != null">
+        and CD.KEY_ like #{caseDefinitionKeyLike}${wildcardEscapeClause}
+      </if>
+      <if test="caseDefinitionKeyLikeIgnoreCase != null">
+        and lower(CD.KEY_) like #{caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0">
+        and CD.KEY_ in
+        <foreach item="item" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+            #{item}
         </foreach>
       </if>
       <if test="deploymentId != null &amp;&amp; cmmnDeploymentId == null">
@@ -1210,6 +1231,21 @@
                        open="(" separator="," close=")">
                 #{processCategory}
               </foreach>
+            </if>
+            <if test="orQueryObject.caseDefinitionKey != null">
+                or CD_OR${orIndex}.KEY_ = #{orQueryObject.caseDefinitionKey}
+            </if>
+            <if test="orQueryObject.caseDefinitionKeyLike != null">
+                or CD_OR${orIndex}.KEY_ like #{orQueryObject.caseDefinitionKeyLike}${wildcardEscapeClause}
+            </if>
+            <if test="orQueryObject.caseDefinitionKeyLikeIgnoreCase != null">
+                or lower(CD_OR${orIndex}.KEY_) like #{orQueryObject.caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+            </if>
+            <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0">
+                or CD_OR${orIndex}.KEY_ in
+                <foreach item="item" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="orQueryObject.deploymentId != null">
               or DEPLOY_P_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}

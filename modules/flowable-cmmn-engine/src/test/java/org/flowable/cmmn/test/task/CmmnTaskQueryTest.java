@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -82,6 +83,34 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void testQueryByCaseDefinitionKey() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey(caseDefinition.getKey()).list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    @Test
+    public void testQueryByCaseDefinitionKeyLike() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    public void testQueryByCaseDefinitionKeyLikeIgnoreCase() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    @Test
+    public void testQueryByCaseDefinitionKeyIn() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(),"dummyKey")).list())
+                .hasSize(NR_CASE_INSTANCES);
+    }
+
+    @Test
     public void testQueryByCmmnDeploymentId() {
         CmmnDeployment deployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
         assertThat(deployment).isNotNull();
@@ -141,4 +170,31 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    public void testHistoricTaskQueryByCaseDefinitionKey(){
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey(caseDefinition.getKey()).list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    @Test
+    public void testHistoricTaskQueryByCaseDefinitionKeyLike() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKeyLike("oneTask%").list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    public void testHistoricTaskQueryByCaseDefinitionKeyLikeIgnoreCase() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(NR_CASE_INSTANCES);
+    }
+
+    @Test
+    public void testHistoricTaskQueryByCaseDefinitionKeyIn() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertThat(caseDefinition).isNotNull();
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(),"dummyKey")).list())
+                .hasSize(NR_CASE_INSTANCES);
+    }
 }
