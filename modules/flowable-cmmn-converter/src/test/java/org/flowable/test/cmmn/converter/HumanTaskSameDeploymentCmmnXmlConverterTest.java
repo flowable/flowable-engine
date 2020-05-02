@@ -48,8 +48,8 @@ public class HumanTaskSameDeploymentCmmnXmlConverterTest extends AbstractConvert
                 .isInstanceOfSatisfying(HumanTask.class, task -> {
                     assertThat(task.getFormKey()).isEqualTo("taskForm");
                     assertThat(task.isSameDeployment()).isTrue();
+                    assertThat(task.getAttributes()).isEmpty();
                 });
-        assertThat(itemDefinition.getAttributes()).isEmpty();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("humanTaskSameDeploymentFalse");
 
@@ -57,8 +57,8 @@ public class HumanTaskSameDeploymentCmmnXmlConverterTest extends AbstractConvert
                 .isInstanceOfSatisfying(HumanTask.class, task -> {
                     assertThat(task.getFormKey()).isEqualTo("taskForm2");
                     assertThat(task.isSameDeployment()).isFalse();
+                    assertThat(task.getAttributes()).isEmpty();
                 });
-        assertThat(itemDefinition.getAttributes()).isEmpty();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("humanTaskSameDeploymentGlobal");
 
@@ -66,8 +66,8 @@ public class HumanTaskSameDeploymentCmmnXmlConverterTest extends AbstractConvert
                 .isInstanceOfSatisfying(HumanTask.class, task -> {
                     assertThat(task.getFormKey()).isEqualTo("taskForm3");
                     assertThat(task.isSameDeployment()).isTrue();
+                    assertThat(task.getAttributes()).isEmpty();
                 });
-        assertThat(itemDefinition.getAttributes()).isEmpty();
     }
 
 }
