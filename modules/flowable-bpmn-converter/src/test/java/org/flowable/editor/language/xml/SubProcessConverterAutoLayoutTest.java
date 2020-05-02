@@ -12,11 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.BpmnModel;
@@ -54,32 +51,31 @@ public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
-        assertEquals("start1", flowElement.getId());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("userTask1", flowElement.getId());
-        UserTask userTask = (UserTask) flowElement;
-        assertEquals(1, userTask.getCandidateUsers().size());
-        assertEquals(1, userTask.getCandidateGroups().size());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("userTask1");
+                    assertThat(userTask.getCandidateUsers()).hasSize(1);
+                    assertThat(userTask.getCandidateGroups()).hasSize(1);
+                });
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess1", flowElement.getId());
-        SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(6, subProcess.getFlowElements().size());
-
-        List<ValuedDataObject> dataObjects = ((SubProcess) flowElement).getDataObjects();
-        assertEquals(1, dataObjects.size());
-
-        ValuedDataObject dataObj = dataObjects.get(0);
-        assertEquals("SubTest", dataObj.getName());
-        assertEquals("xsd:string", dataObj.getItemSubjectRef().getStructureRef());
-        assertTrue(dataObj.getValue() instanceof String);
-        assertEquals("Testing", dataObj.getValue());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getFlowElements()).hasSize(6);
+                    assertThat(subProcess.getDataObjects())
+                            .extracting(ValuedDataObject::getName, ValuedDataObject::getValue)
+                            .containsExactly(tuple("SubTest", "Testing"));
+                    assertThat(subProcess.getDataObjects().get(0).getItemSubjectRef().getStructureRef())
+                            .isInstanceOfSatisfying(String.class, structRef -> {
+                                assertThat(structRef).isEqualTo("xsd:string");
+                            });
+                });
     }
 }
