@@ -43,7 +43,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance> 
+public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance>
         implements HistoricTaskInstanceQuery, CacheAwareQuery<HistoricTaskInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
@@ -74,6 +74,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String propagatedStageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
+    protected String caseDefinitionKey;
+    protected String caseDefinitionKeyLike;
+    protected String caseDefinitionKeyLikeIgnoreCase;
+    protected Collection<String> caseDefinitionKeys;
     protected String taskId;
     protected String taskName;
     protected String taskNameLike;
@@ -325,6 +329,46 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         } else {
             this.scopeDefinitionId(caseDefinitionId);
             this.scopeType(ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionKey(String caseDefinitionKey) {
+        if (inOrStatement) {
+            currentOrQueryObject.caseDefinitionKey = caseDefinitionKey;
+        } else {
+            this.caseDefinitionKey = caseDefinitionKey;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        if (inOrStatement) {
+            currentOrQueryObject.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        } else {
+            this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        if (inOrStatement) {
+            currentOrQueryObject.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        } else {
+            this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionKeyIn(Collection<String> caseDefinitionKeys) {
+        if (inOrStatement) {
+            currentOrQueryObject.caseDefinitionKeys = caseDefinitionKeys;
+        } else {
+            this.caseDefinitionKeys = caseDefinitionKeys;
         }
         return this;
     }
@@ -1994,7 +2038,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public String getTaskId() {
         return taskId;
     }
-    
+
     @Override
     public String getId() {
         return taskId;
