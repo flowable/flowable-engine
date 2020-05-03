@@ -66,51 +66,47 @@ public class MultiInstanceTaskConverterTest2 extends AbstractConverterTest {
 
         // verify start
         FlowElement flowElement = main.getFlowElement("start1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(StartEvent.class);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         // verify user task
         flowElement = main.getFlowElement("userTask1");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(UserTask.class, task -> {
                     assertThat(task.getName()).isEqualTo("User task 1");
+                    MultiInstanceLoopCharacteristics loopCharacteristics = task.getLoopCharacteristics();
+                    assertThat(loopCharacteristics.getElementVariable()).isEqualTo("participant");
+                    assertThat(loopCharacteristics.getCollectionString().trim()).isEqualTo(PARTICIPANT_VALUE);
+                    assertThat(loopCharacteristics.getHandler())
+                            .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
+                            .containsExactly("delegateExpression", "${collectionHandler}");
                 });
-
-        UserTask task = (UserTask) flowElement;
-        MultiInstanceLoopCharacteristics loopCharacteristics = task.getLoopCharacteristics();
-        assertThat(loopCharacteristics.getElementVariable()).isEqualTo("participant");
-        assertThat(loopCharacteristics.getCollectionString().trim()).isEqualTo(PARTICIPANT_VALUE);
-        assertThat(loopCharacteristics.getHandler())
-                .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
-                .containsExactly("delegateExpression", "${collectionHandler}");
 
         // verify subprocess
         flowElement = main.getFlowElement("subprocess1");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
                     assertThat(subProcess.getName()).isEqualTo("subProcess");
+                    MultiInstanceLoopCharacteristics loopCharacteristics = subProcess.getLoopCharacteristics();
+                    assertThat(loopCharacteristics.isSequential()).isTrue();
+                    assertThat(loopCharacteristics.getLoopCardinality()).isEqualTo("10");
+                    assertThat(subProcess.getFlowElements()).hasSize(5);
+
+                    // verify user task in subprocess
+                    FlowElement task = subProcess.getFlowElement("subUserTask1");
+                    assertThat(task)
+                            .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                                assertThat(userTask.getName()).isEqualTo("User task 2");
+                                MultiInstanceLoopCharacteristics loopCharacteristics2 = userTask.getLoopCharacteristics();
+                                assertThat(loopCharacteristics2)
+                                        .extracting(MultiInstanceLoopCharacteristics::getElementVariable, MultiInstanceLoopCharacteristics::getInputDataItem)
+                                        .containsExactly("participant", "${potentialOwnerList}");
+                                assertThat(loopCharacteristics2.getHandler())
+                                        .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
+                                        .containsExactly("delegateExpression", "${collectionHandler}");
+                            });
                 });
-
-        SubProcess subProcess = (SubProcess) flowElement;
-        loopCharacteristics = subProcess.getLoopCharacteristics();
-        assertThat(loopCharacteristics.isSequential()).isTrue();
-        assertThat(loopCharacteristics.getLoopCardinality()).isEqualTo("10");
-        assertThat(subProcess.getFlowElements()).hasSize(5);
-
-        // verify user task in subprocess
-        flowElement = subProcess.getFlowElement("subUserTask1");
-        assertThat(flowElement)
-                .isInstanceOfSatisfying(UserTask.class, userTask -> {
-                    assertThat(userTask.getName()).isEqualTo("User task 2");
-                });
-
-        task = (UserTask) flowElement;
-        loopCharacteristics = task.getLoopCharacteristics();
-        assertThat(loopCharacteristics)
-                .extracting(MultiInstanceLoopCharacteristics::getElementVariable, MultiInstanceLoopCharacteristics::getInputDataItem)
-                .containsExactly("participant", "${potentialOwnerList}");
-        assertThat(loopCharacteristics.getHandler())
-                .extracting(CollectionHandler::getImplementationType, CollectionHandler::getImplementation)
-                .containsExactly("delegateExpression", "${collectionHandler}");
     }
 }

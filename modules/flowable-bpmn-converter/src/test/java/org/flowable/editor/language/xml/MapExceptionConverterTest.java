@@ -55,9 +55,9 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
         assertThat(flowElement)
                 .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
                     assertThat(serviceTask.getId()).isEqualTo("servicetaskWithAndTrueAndChildren");
-                    assertThat(serviceTask.getMapExceptions()).isNotNull();
-                    assertThat(serviceTask.getMapExceptions()).hasSize(1);
-                    assertThat(serviceTask.getMapExceptions().get(0).getClassName()).isEmpty();
+                    assertThat(serviceTask.getMapExceptions())
+                            .extracting(MapExceptionEntry::getClassName)
+                            .containsExactly("");
                 });
     }
 
