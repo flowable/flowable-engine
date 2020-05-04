@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.runtime;
 
-import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -24,13 +23,7 @@ public interface ExternalWorkerCompletionBuilder {
 
     ExternalWorkerCompletionBuilder variable(String name, Object value);
 
-    ExternalWorkerCompletionBuilder errorMessage(String errorMessage);
-
-    ExternalWorkerCompletionBuilder errorDetails(String errorDetails);
-
     void complete();
-
-    void failure(int retries, Duration retryTimeout);
 
     void bpmnError(String errorCode);
 }

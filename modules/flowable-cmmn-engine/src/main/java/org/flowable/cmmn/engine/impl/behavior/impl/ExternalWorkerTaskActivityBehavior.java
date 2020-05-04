@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
@@ -48,7 +49,8 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             throw new FlowableException("no topic expression configured");
         }
 
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+        JobService jobService = jobServiceConfiguration.getJobService();
 
         ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
         job.setSubScopeId(planItemInstanceEntity.getId());
@@ -74,7 +76,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
         }
 
         job.setJobType(JobEntity.JOB_TYPE_EXTERNAL_WORKER);
-        job.setRetries(1);
+        job.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
 
         // Inherit tenant id (if applicable)
         if (planItemInstanceEntity.getTenantId() != null) {

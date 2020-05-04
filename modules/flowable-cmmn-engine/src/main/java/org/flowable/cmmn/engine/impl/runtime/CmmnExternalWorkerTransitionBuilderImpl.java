@@ -12,13 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.impl.cmd.ExternalWorkerJobCompleteCmd;
-import org.flowable.cmmn.engine.impl.cmd.ExternalWorkerJobFailCmd;
 import org.flowable.cmmn.engine.impl.cmd.ExternalWorkerJobTerminateCmd;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
@@ -32,8 +30,6 @@ public class CmmnExternalWorkerTransitionBuilderImpl implements CmmnExternalWork
     protected final String workerId;
 
     protected Map<String, Object> variables;
-    protected String errorMessage;
-    protected String errorDetails;
 
     public CmmnExternalWorkerTransitionBuilderImpl(CommandExecutor commandExecutor, String externalJobId, String workerId) {
         this.commandExecutor = commandExecutor;
@@ -60,25 +56,8 @@ public class CmmnExternalWorkerTransitionBuilderImpl implements CmmnExternalWork
     }
 
     @Override
-    public CmmnExternalWorkerTransitionBuilder errorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-        return this;
-    }
-
-    @Override
-    public CmmnExternalWorkerTransitionBuilder errorDetails(String errorDetails) {
-        this.errorDetails = errorDetails;
-        return this;
-    }
-
-    @Override
     public void complete() {
         commandExecutor.execute(new ExternalWorkerJobCompleteCmd(externalJobId, workerId, variables));
-    }
-
-    @Override
-    public void failure(int retries, Duration retryTimeout) {
-        commandExecutor.execute(new ExternalWorkerJobFailCmd(externalJobId, workerId, retries, retryTimeout, errorMessage, errorDetails));
     }
 
     @Override

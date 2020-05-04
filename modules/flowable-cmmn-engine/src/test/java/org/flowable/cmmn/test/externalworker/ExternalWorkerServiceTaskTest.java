@@ -87,7 +87,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(externalWorkerJob.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(externalWorkerJob.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
         assertThat(externalWorkerJob.getScopeId()).isEqualTo(caseInstance.getId());
@@ -104,7 +104,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(externalWorkerJob.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(externalWorkerJob.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNotNull();
         assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -120,7 +120,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(acquiredJob.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(acquiredJob.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -224,7 +224,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(acquiredJob.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(acquiredJob.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -319,8 +319,10 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        assertThatThrownBy(() -> cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(externalWorkerJob.getId(), "otherWorker")
-                .failure(3, Duration.of(10, ChronoUnit.MINUTES)))
+        assertThatThrownBy(() -> cmmnRuntimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "otherWorker")
+                .retries(3)
+                .retryTimeout(Duration.ofMinutes(10))
+                .fail())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("otherWorker does not hold a lock on the requested job");
 
@@ -379,7 +381,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
 
         assertThat(externalWorkerJob).isNotNull();
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
 
@@ -390,7 +392,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
 
         assertThat(externalWorkerJob).isNotNull();
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isEqualTo(Date.from(startTime.plus(30, ChronoUnit.MINUTES)));
         assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -402,16 +404,18 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                         entry("name", "kermit")
                 );
 
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isEqualTo(Date.from(startTime.plus(30, ChronoUnit.MINUTES)));
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
         Instant executionTime = startTime.plus(20, ChronoUnit.MINUTES);
         setTime(executionTime);
-        cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(externalWorkerJob.getId(), "testWorker")
+        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(4, Duration.ofHours(1));
+                .retries(4)
+                .retryTimeout(Duration.ofHours(1))
+                .fail();
 
         externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
 
@@ -502,10 +506,11 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                         entry("name", "kermit")
                 );
 
-        cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(externalWorkerJob.getId(), "testWorker")
+        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(0, null);
+                .retries(0)
+                .fail();
 
         externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
 
@@ -520,6 +525,47 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(deadLetterJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
         assertThat(deadLetterJob.getExceptionMessage()).isEqualTo("Failed to run job");
         assertThat(cmmnManagementService.getDeadLetterJobExceptionStacktrace(deadLetterJob.getId()))
+                .isEqualTo("Some complex error details");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testSimpleFailureWithNoRetries() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnRuntimeService.createExternalWorkerProvider()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+                .errorMessage("Failed to run job")
+                .errorDetails("Some complex error details")
+                .fail();
+
+        externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries() - 1);
+        assertThat(externalWorkerJob.getExceptionMessage()).isEqualTo("Failed to run job");
+        assertThat(cmmnManagementService.getExternalWorkerJobErrorDetails(externalWorkerJob.getId()))
                 .isEqualTo("Some complex error details");
     }
 
@@ -540,10 +586,11 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .topic("simple", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(externalWorkerJob.getId(), "testWorker")
+        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(0, null);
+                .retries(0)
+                .fail();
 
         externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
 

@@ -24,13 +24,7 @@ public interface CmmnExternalWorkerTransitionBuilder {
 
     CmmnExternalWorkerTransitionBuilder variable(String name, Object value);
 
-    CmmnExternalWorkerTransitionBuilder errorMessage(String errorMessage);
-
-    CmmnExternalWorkerTransitionBuilder errorDetails(String errorDetails);
-
     void complete();
-
-    void failure(int retries, Duration retryTimeout);
 
     void terminate();
 

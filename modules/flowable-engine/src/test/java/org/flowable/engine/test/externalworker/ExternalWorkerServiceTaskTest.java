@@ -86,7 +86,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
         assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
 
@@ -100,7 +100,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
         assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNotNull();
         assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -115,7 +115,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getElementId()).isEqualTo("externalWorkerTask");
         assertThat(acquiredJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -262,7 +262,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getElementId()).isEqualTo("externalWorkerTask");
         assertThat(acquiredJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -354,8 +354,10 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "otherWorker")
-                .failure(3, Duration.of(10, ChronoUnit.MINUTES)))
+        assertThatThrownBy(() -> runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "otherWorker")
+                .retries(3)
+                .retryTimeout(Duration.ofMinutes(10))
+                .fail())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("otherWorker does not hold a lock on the requested job");
 
@@ -414,7 +416,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 
         assertThat(externalWorkerJob).isNotNull();
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
 
@@ -425,7 +427,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 
         assertThat(externalWorkerJob).isNotNull();
-        assertThat(externalWorkerJob.getRetries()).isEqualTo(1);
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(externalWorkerJob.getLockExpirationTime()).isEqualTo(Date.from(startTime.plus(30, ChronoUnit.MINUTES)));
         assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
 
@@ -437,16 +439,18 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                         entry("name", "kermit")
                 );
 
-        assertThat(acquiredJob.getRetries()).isEqualTo(1);
+        assertThat(acquiredJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(acquiredJob.getLockExpirationTime()).isEqualTo(Date.from(startTime.plus(30, ChronoUnit.MINUTES)));
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
         Instant executionTime = startTime.plus(20, ChronoUnit.MINUTES);
         setTime(executionTime);
-        runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
+        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(4, Duration.ofHours(1));
+                .retries(4)
+                .retryTimeout(Duration.ofHours(1))
+                .fail();
 
         externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 
@@ -534,10 +538,11 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                         entry("name", "kermit")
                 );
 
-        runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
+        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(0, null);
+                .retries(0)
+                .fail();
 
         externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 
@@ -557,6 +562,49 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testSimpleFailureWithNoRetries() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerProvider()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+                .errorMessage("Failed to run job")
+                .errorDetails("Some complex error details")
+                .fail();
+
+        externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries() - 1);
+        assertThat(externalWorkerJob.getExceptionMessage()).isEqualTo("Failed to run job");
+        assertThat(managementService.getExternalWorkerJobErrorDetails(externalWorkerJob.getId()))
+                .isEqualTo("Some complex error details");
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
     void testSimpleFailureMoveFromDeadLetter() {
         runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("simpleExternalWorker")
@@ -572,10 +620,11 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .topic("simple", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
+        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
-                .failure(0, null);
+                .retries(0)
+                .fail();
 
         externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 

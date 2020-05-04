@@ -31,6 +31,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobProvider;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -328,10 +329,21 @@ public interface CmmnRuntimeService {
 
     // External Worker
 
+    /**
+     * Create an {@link ExternalWorkerJobProvider} that can be used to acquire jobs for an external worker.
+     */
     ExternalWorkerJobProvider createExternalWorkerProvider();
 
     /**
-     * Create an {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create a {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
      */
     CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 }

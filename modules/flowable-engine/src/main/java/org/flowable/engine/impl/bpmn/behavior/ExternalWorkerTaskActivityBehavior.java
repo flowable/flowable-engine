@@ -27,6 +27,7 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
@@ -59,7 +60,8 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
         String elementId = currentFlowElement.getId();
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, elementId, execution, commandContext);
         if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, elementId, execution, commandContext)) {
-            JobService jobService = CommandContextUtil.getJobService(commandContext);
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+            JobService jobService = jobServiceConfiguration.getJobService();
 
             ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
             job.setExecutionId(execution.getId());
@@ -85,7 +87,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             }
 
             job.setJobType(JobEntity.JOB_TYPE_EXTERNAL_WORKER);
-            job.setRetries(1);
+            job.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
 
             // Inherit tenant id (if applicable)
             if (execution.getTenantId() != null) {

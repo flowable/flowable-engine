@@ -96,7 +96,9 @@ import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobProviderImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -105,6 +107,10 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Daniel Meyer
  */
 public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RuntimeService {
+
+    public RuntimeServiceImpl(ProcessEngineConfigurationImpl configuration) {
+        super(configuration);
+    }
 
     @Override
     public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
@@ -762,6 +768,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public ExternalWorkerJobProvider createExternalWorkerProvider() {
         return new ExternalWorkerJobProviderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override

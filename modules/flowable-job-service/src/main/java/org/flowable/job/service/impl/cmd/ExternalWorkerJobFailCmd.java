@@ -10,14 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.cmd;
+package org.flowable.job.service.impl.cmd;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
@@ -25,15 +23,16 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerJobFailCmd extends AbstractExternalWorkerJobCmd implements Command<Void> {
+public class ExternalWorkerJobFailCmd extends AbstractExternalWorkerJobCmd {
 
     protected int retries;
     protected Duration retryTimeout;
     protected String errorMessage;
     protected String errorDetails;
 
-    public ExternalWorkerJobFailCmd(String externalJobId, String workerId, int retries, Duration retryTimeout, String errorMessage, String errorDetails) {
-        super(externalJobId, workerId);
+    public ExternalWorkerJobFailCmd(String externalJobId, String workerId, int retries, Duration retryTimeout, String errorMessage, String errorDetails,
+            JobServiceConfiguration jobServiceConfiguration) {
+        super(externalJobId, workerId, jobServiceConfiguration);
         this.retries = retries;
         this.retryTimeout = retryTimeout;
         this.errorMessage = errorMessage;
@@ -42,13 +41,20 @@ public class ExternalWorkerJobFailCmd extends AbstractExternalWorkerJobCmd imple
 
     @Override
     protected void runJobLogic(ExternalWorkerJobEntity externalWorkerJob, CommandContext commandContext) {
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
 
         externalWorkerJob.setExceptionMessage(errorMessage);
         externalWorkerJob.setExceptionStacktrace(errorDetails);
 
-        if (retries > 0) {
-            externalWorkerJob.setRetries(retries);
+        int newRetries;
+
+        if (retries >= 0) {
+            newRetries = retries;
+        } else {
+            newRetries = externalWorkerJob.getRetries() - 1;
+        }
+
+        if (newRetries > 0) {
+            externalWorkerJob.setRetries(newRetries);
             externalWorkerJob.setLockOwner(null);
             if (retryTimeout == null) {
                 externalWorkerJob.setLockExpirationTime(null);
@@ -57,7 +63,7 @@ public class ExternalWorkerJobFailCmd extends AbstractExternalWorkerJobCmd imple
                 externalWorkerJob.setLockExpirationTime(Date.from(lockExpirationTime));
             }
         } else {
-            CommandContextUtil.getJobService(commandContext).moveJobToDeadLetterJob(externalWorkerJob);
+            jobServiceConfiguration.getJobService().moveJobToDeadLetterJob(externalWorkerJob);
         }
     }
 }
