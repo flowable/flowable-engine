@@ -151,6 +151,23 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         // Tenant id like
         assertResultsPresentInDataResponse(url + "?tenantIdLike=" + encode("%enant"), 1, task2.getId());
         assertResultsPresentInDataResponse(url + "?tenantIdLike=anotherTenant", 0);
+
+    }
+
+    @Test
+    @Deployment
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCES);
+
+        assertResultsPresentInDataResponse(url + "?taskCandidateGroup=sales", 1, task.getId());
+        assertEmptyResultsPresentInDataResponse(url + "?taskCandidateGroup=notExisting");
+
+        taskService.claim(task.getId(), "johnDoe");
+        assertEmptyResultsPresentInDataResponse(url + "?taskCandidateGroup=sales");
+        assertResultsPresentInDataResponse(url + "?taskCandidateGroup=sales&ignoreTaskAssignee=true", 1, task.getId());
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {

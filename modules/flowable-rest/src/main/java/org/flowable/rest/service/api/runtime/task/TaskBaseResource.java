@@ -183,6 +183,9 @@ public class TaskBaseResource {
         if (request.getCandidateGroupIn() != null) {
             taskQuery.taskCandidateGroupIn(request.getCandidateGroupIn());
         }
+        if (request.isIgnoreAssignee()) {
+            taskQuery.ignoreAssigneeValue();
+        }
         if (request.getProcessInstanceId() != null) {
             taskQuery.processInstanceId(request.getProcessInstanceId());
         }

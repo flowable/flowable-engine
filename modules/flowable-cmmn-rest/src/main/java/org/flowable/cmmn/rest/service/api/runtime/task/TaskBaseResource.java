@@ -183,6 +183,9 @@ public class TaskBaseResource {
         if (request.getCandidateGroupIn() != null) {
             taskQuery.taskCandidateGroupIn(request.getCandidateGroupIn());
         }
+        if (request.isIgnoreAssignee()) {
+            taskQuery.ignoreAssigneeValue();
+        }
         if (request.getCaseInstanceId() != null) {
             taskQuery.caseInstanceId(request.getCaseInstanceId());
         }
@@ -240,6 +243,22 @@ public class TaskBaseResource {
 
         if (request.getCaseDefinitionId() != null) {
             taskQuery.caseDefinitionId(request.getCaseDefinitionId());
+        }
+
+        if (request.getCaseDefinitionKey() != null) {
+            taskQuery.caseDefinitionKey(request.getCaseDefinitionKey());
+        }
+
+        if (request.getCaseDefinitionKeys() != null) {
+            taskQuery.caseDefinitionKeyIn(request.getCaseDefinitionKeys());
+        }
+
+        if (request.getCaseDefinitionKeyLike() != null) {
+            taskQuery.caseDefinitionKeyLike(request.getCaseDefinitionKeyLike());
+        }
+
+        if (request.getCaseDefinitionKeyLikeIgnoreCase() != null) {
+            taskQuery.caseDefinitionKeyLikeIgnoreCase(request.getCaseDefinitionKeyLikeIgnoreCase());
         }
 
         if (request.getTaskVariables() != null) {

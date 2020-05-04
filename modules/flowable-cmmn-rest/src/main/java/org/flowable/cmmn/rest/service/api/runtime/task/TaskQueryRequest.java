@@ -44,10 +44,15 @@ public class TaskQueryRequest extends PaginateRequest {
     private String candidateUser;
     private String candidateGroup;
     private Collection<String> candidateGroupIn;
+    private boolean ignoreAssignee;
     private String involvedUser;
     private String caseInstanceId;
     private String caseInstanceIdWithChildren;
     private String caseDefinitionId;
+    private String caseDefinitionKey;
+    private String caseDefinitionKeyLike;
+    private String caseDefinitionKeyLikeIgnoreCase;
+    private Collection<String> caseDefinitionKeys;
     private Date createdOn;
     private Date createdBefore;
     private Date createdAfter;
@@ -196,6 +201,14 @@ public class TaskQueryRequest extends PaginateRequest {
         this.candidateGroupIn = candidateGroupIn;
     }
 
+    public boolean isIgnoreAssignee() {
+        return ignoreAssignee;
+    }
+
+    public void setIgnoreAssignee(boolean ignoreAssignee) {
+        this.ignoreAssignee = ignoreAssignee;
+    }
+
     public String getInvolvedUser() {
         return involvedUser;
     }
@@ -276,6 +289,35 @@ public class TaskQueryRequest extends PaginateRequest {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public void setCaseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public void setCaseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+    }
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+    public void setCaseDefinitionKeys(Collection<String> caseDefinitionKeys) {
+        this.caseDefinitionKeys = caseDefinitionKeys;
+    }
     public Date getDueDate() {
         return dueDate;
     }
