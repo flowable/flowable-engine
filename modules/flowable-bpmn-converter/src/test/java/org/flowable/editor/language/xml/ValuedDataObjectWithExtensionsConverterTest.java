@@ -167,18 +167,17 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         assertThat(localization.getLabeledEntityIdForDescription()).isEqualTo("leifd-1");
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(SubProcess.class);
-        assertThat(flowElement.getId()).isEqualTo("subprocess1");
-        SubProcess subProcess = (SubProcess) flowElement;
-        assertThat(subProcess.getFlowElements()).hasSize(6);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getFlowElements()).hasSize(6);
 
-        // verify the sub process data objects
-        dataObjects = subProcess.getDataObjects();
-        assertThat(dataObjects).hasSize(1);
+                    // verify the sub process data objects
+                    assertThat(subProcess.getDataObjects()).hasSize(1);
+                });
 
         objectMap = new HashMap<>();
-        for (ValuedDataObject valueObj : dataObjects) {
+        for (ValuedDataObject valueObj : ((SubProcess)flowElement).getDataObjects()) {
             objectMap.put(valueObj.getId(), valueObj);
         }
 

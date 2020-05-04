@@ -92,35 +92,28 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
                 .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
                     assertThat(subProcess.getId()).isEqualTo("subprocess1");
                     assertThat(subProcess.getFlowElements()).hasSize(11);
-                });
 
-        // verify subprocess
-        SubProcess subProcess = (SubProcess) flowElement;
-        artifacts = subProcess.getArtifacts();
-        dataObjects = subProcess.getDataObjects();
+                    // verify subprocess
+                    assertThat(subProcess.getArtifacts()).hasSize(2);
+                    assertThat(subProcess.getDataObjects()).hasSize(6);
 
-        assertThat(artifacts).hasSize(2);
-        assertThat(dataObjects).hasSize(6);
+                    assertThat(subProcess.getArtifacts().iterator().next())
+                            .isInstanceOfSatisfying(TextAnnotation.class, art -> {
+                                assertThat(art.getId()).isEqualTo("textannotation2");
+                                assertThat(art.getText()).isEqualTo("Sub Test Annotation");
+                            });
 
-        artifact = artifacts.iterator().next();
-        assertThat(artifact)
-                .isInstanceOfSatisfying(TextAnnotation.class, art -> {
-                    assertThat(art.getId()).isEqualTo("textannotation2");
-                    assertThat(art.getText()).isEqualTo("Sub Test Annotation");
-                });
+                    assertThat(subProcess.getFlowElement("subStartEvent"))
+                            .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                                assertThat(startEvent.getId()).isEqualTo("subStartEvent");
+                            });
 
-        flowElement = subProcess.getFlowElement("subStartEvent");
-        assertThat(flowElement)
-                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
-                    assertThat(startEvent.getId()).isEqualTo("subStartEvent");
-                });
-
-        flowElement = subProcess.getFlowElement("subUserTask1");
-        assertThat(flowElement)
-                .isInstanceOfSatisfying(UserTask.class, userTask -> {
-                    assertThat(userTask.getName()).isEqualTo("User task 2");
-                    assertThat(userTask.getCandidateUsers()).isEmpty();
-                    assertThat(userTask.getCandidateGroups()).isEmpty();
+                    assertThat(subProcess.getFlowElement("subUserTask1"))
+                            .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                                assertThat(userTask.getName()).isEqualTo("User task 2");
+                                assertThat(userTask.getCandidateUsers()).isEmpty();
+                                assertThat(userTask.getCandidateGroups()).isEmpty();
+                            });
                 });
     }
 
