@@ -13,9 +13,11 @@
 package org.flowable.job.service.impl;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
@@ -51,8 +53,17 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
     }
 
     @Override
-    public List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId) {
-        return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, lockDuration, numberOfTasks, topic));
+    public List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId, int numberOfRetries) {
+        while (numberOfRetries > 0) {
+            try {
+                return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, lockDuration, numberOfTasks, topic));
+            } catch (FlowableOptimisticLockingException ignored) {
+                // Query for jobs until there is no FlowableOptimisticLockingException
+                // It is potentially possible multiple workers to query in the exact same time
+                numberOfRetries--;
+            }
+        }
+        return Collections.emptyList();
     }
 
     public String getTopic() {

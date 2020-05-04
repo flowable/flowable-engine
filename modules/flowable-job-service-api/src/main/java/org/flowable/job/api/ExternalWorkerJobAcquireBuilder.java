@@ -29,11 +29,26 @@ public interface ExternalWorkerJobAcquireBuilder {
     ExternalWorkerJobAcquireBuilder topic(String topic, Duration lockDuration);
 
     /**
-     * Acquire and lock the given number of jobs for the given worker id
+     * Acquire and lock the given number of jobs for the given worker id.
+     * By default it will try to acquire jobs 5 times.
+     * Use {@link #acquireAndLock(int, String, int)} if you need more retries.
+     * If it fails to lock the jobs / scope after 5 retries it will return an empty list
      *
      * @param numberOfTasks the number of jobs to acquire
      * @param workerId the id of the worker acquiring the jobs
      */
-    List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId);
+    default List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId) {
+        return acquireAndLock(numberOfTasks, workerId, 5);
+    }
+
+    /**
+     * Acquire and lock the given number of jobs for the given worker id.
+     * If it fails to lock the jobs / scope after {@code numberOfRetries} it will return an empty list
+     *
+     * @param numberOfTasks the number of jobs to acquire
+     * @param workerId the id of the worker acquiring the jobs
+     * @param numberOfRetries the number of retries if an optimistic lock exception occurs during acquiring
+     */
+    List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId, int numberOfRetries);
 
 }
