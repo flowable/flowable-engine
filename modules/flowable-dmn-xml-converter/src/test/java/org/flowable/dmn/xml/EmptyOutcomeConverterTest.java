@@ -20,8 +20,6 @@ import java.util.List;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.dmn.model.InputClause;
-import org.flowable.dmn.model.OutputClause;
 import org.junit.Test;
 
 public class EmptyOutcomeConverterTest extends AbstractConverterTest {
