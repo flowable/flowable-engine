@@ -73,16 +73,16 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
                             .extracting(IOParameter::getSource, IOParameter::getTarget)
                             .containsExactly(tuple("eventProperty", "newVariable"));
                     assertThat(sendEventServiceTask.getEventOutParameters().get(0).getAttributeValue(null, "sourceType")).isEqualTo("integer");
-                });
 
-        List<ExtensionElement> correlationParameters = flowElement.getExtensionElements()
-                .get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);
-        assertThat(correlationParameters).hasSize(2);
-        ExtensionElement correlationElement = correlationParameters.get(0);
-        assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("customerId");
-        assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");
-        correlationElement = correlationParameters.get(1);
-        assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("orderId");
-        assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${orderIdVar}");
+                    List<ExtensionElement> correlationParameters = flowElement.getExtensionElements()
+                            .get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);
+                    assertThat(correlationParameters).hasSize(2);
+                    ExtensionElement correlationElement = correlationParameters.get(0);
+                    assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("customerId");
+                    assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");
+                    correlationElement = correlationParameters.get(1);
+                    assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("orderId");
+                    assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${orderIdVar}");
+                });
     }
 }

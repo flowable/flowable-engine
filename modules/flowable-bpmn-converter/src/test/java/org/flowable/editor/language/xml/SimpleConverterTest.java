@@ -15,7 +15,6 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
@@ -61,15 +60,15 @@ public class SimpleConverterTest extends AbstractConverterTest {
                 });
 
         flowElement = model.getMainProcess().getFlowElement("catchEvent");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
-        assertThat(flowElement.getId()).isEqualTo("catchEvent");
-        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
-        EventDefinition eventDefinition = catchEvent.getEventDefinitions().get(0);
-        assertThat(eventDefinition).isInstanceOf(TimerEventDefinition.class);
-        TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
-        assertThat(timerDefinition.getTimeDuration()).isEqualTo("PT5M");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(IntermediateCatchEvent.class, intermediateCatchEvent -> {
+                    assertThat(intermediateCatchEvent.getId()).isEqualTo("catchEvent");
+                    assertThat(intermediateCatchEvent.getEventDefinitions()).hasSize(1);
+                    assertThat(intermediateCatchEvent.getEventDefinitions().get(0))
+                            .isInstanceOfSatisfying(TimerEventDefinition.class, timerEventDefinition -> {
+                                assertThat(timerEventDefinition.getTimeDuration()).isEqualTo("PT5M");
+                            });
+                });
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
         assertThat(flowElement)
