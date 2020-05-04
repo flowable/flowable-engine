@@ -18,25 +18,25 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.service.impl.cmd.AcquireExternalWorkerJobsCmd;
 
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerJobProviderImpl implements ExternalWorkerJobProvider {
+public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcquireBuilder {
 
     protected final CommandExecutor commandExecutor;
 
     protected String topic;
     protected Duration lockDuration;
 
-    public ExternalWorkerJobProviderImpl(CommandExecutor commandExecutor) {
+    public ExternalWorkerJobAcquireBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
     }
 
     @Override
-    public ExternalWorkerJobProvider topic(String topic, Duration lockDuration) {
+    public ExternalWorkerJobAcquireBuilder topic(String topic, Duration lockDuration) {
         if (topic == null) {
             throw new FlowableIllegalArgumentException("topic is null");
         }

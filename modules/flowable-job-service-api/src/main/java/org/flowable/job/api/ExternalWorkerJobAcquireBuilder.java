@@ -18,10 +18,22 @@ import java.util.List;
 /**
  * @author Filip Hrisafov
  */
-public interface ExternalWorkerJobProvider {
+public interface ExternalWorkerJobAcquireBuilder {
 
-    ExternalWorkerJobProvider topic(String topic, Duration lockDuration);
+    /**
+     * The topic and lock duration for the requested jobs
+     *
+     * @param topic the topic of the jobs
+     * @param lockDuration the duration for locking the jobs
+     */
+    ExternalWorkerJobAcquireBuilder topic(String topic, Duration lockDuration);
 
+    /**
+     * Acquire and lock the given number of jobs for the given worker id
+     *
+     * @param numberOfTasks the number of jobs to acquire
+     * @param workerId the id of the worker acquiring the jobs
+     */
     List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId);
 
 }

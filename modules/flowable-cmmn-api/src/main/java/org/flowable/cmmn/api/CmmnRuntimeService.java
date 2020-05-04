@@ -32,7 +32,7 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
-import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -330,9 +330,9 @@ public interface CmmnRuntimeService {
     // External Worker
 
     /**
-     * Create an {@link ExternalWorkerJobProvider} that can be used to acquire jobs for an external worker.
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
      */
-    ExternalWorkerJobProvider createExternalWorkerProvider();
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
 
     /**
      * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.

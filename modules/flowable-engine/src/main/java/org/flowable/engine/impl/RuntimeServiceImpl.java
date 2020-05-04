@@ -97,9 +97,9 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
-import org.flowable.job.api.ExternalWorkerJobProvider;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
-import org.flowable.job.service.impl.ExternalWorkerJobProviderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -766,8 +766,8 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public ExternalWorkerJobProvider createExternalWorkerProvider() {
-        return new ExternalWorkerJobProviderImpl(commandExecutor);
+    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
     }
 
     @Override
