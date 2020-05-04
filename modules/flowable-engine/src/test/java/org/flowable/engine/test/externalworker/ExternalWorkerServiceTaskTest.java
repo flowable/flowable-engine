@@ -189,6 +189,43 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testSimpleSuspendProcessInstance() {
+        ProcessInstance processInstance1 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+        ProcessInstance processInstance2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(managementService.createExternalWorkerJobQuery().list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
+
+        assertThat(managementService.createSuspendedJobQuery().list()).isEmpty();
+
+        runtimeService.suspendProcessInstanceById(processInstance1.getId());
+
+        assertThat(managementService.createExternalWorkerJobQuery().list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsExactlyInAnyOrder(processInstance2.getId());
+
+        assertThat(managementService.createSuspendedJobQuery().list())
+                .extracting(Job::getProcessInstanceId)
+                .containsExactlyInAnyOrder(processInstance1.getId());
+
+        runtimeService.activateProcessInstanceById(processInstance1.getId());
+
+        assertThat(managementService.createExternalWorkerJobQuery().list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
+
+        assertThat(managementService.createSuspendedJobQuery().list()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
     void testExternalWorkerVariablesShouldBeDeletedWhenProcessInstancesIsCanceled() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("simpleExternalWorker")

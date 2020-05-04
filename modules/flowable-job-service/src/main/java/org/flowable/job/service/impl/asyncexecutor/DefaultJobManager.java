@@ -205,7 +205,7 @@ public class DefaultJobManager implements JobManager {
             jobServiceConfiguration.getTimerJobEntityManager().insert((TimerJobEntity) activatedJob);
 
         } else if (Job.JOB_TYPE_EXTERNAL_WORKER.equals(job.getJobType())) {
-            activatedJob = createExecutableJobFromOtherJob(job);
+            activatedJob = createExternalWorkerJobFromOtherJob(job);
             jobServiceConfiguration.getExternalWorkerJobEntityManager().insert((ExternalWorkerJobEntity) activatedJob);
 
         } else {
