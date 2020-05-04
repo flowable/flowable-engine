@@ -41,7 +41,7 @@ public class AppRestResponseFactory {
 
     public List<AppDefinitionResponse> createAppDefinitionResponseList(List<AppDefinition> appDefinitions) {
         AppRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<AppDefinitionResponse> responseList = new ArrayList<>();
+        List<AppDefinitionResponse> responseList = new ArrayList<>(appDefinitions.size());
         for (AppDefinition appDefinition : appDefinitions) {
             responseList.add(createAppDefinitionResponse(appDefinition, urlBuilder));
         }
@@ -50,7 +50,7 @@ public class AppRestResponseFactory {
 
     public List<AppDeploymentResponse> createAppDeploymentResponseList(List<AppDeployment> deployments) {
         AppRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<AppDeploymentResponse> responseList = new ArrayList<>();
+        List<AppDeploymentResponse> responseList = new ArrayList<>(deployments.size());
         for (AppDeployment deployment : deployments) {
             responseList.add(createAppDeploymentResponse(deployment, urlBuilder));
         }
@@ -68,7 +68,7 @@ public class AppRestResponseFactory {
     public List<AppDeploymentResourceResponse> createDeploymentResourceResponseList(String deploymentId, List<String> resourceList, ContentTypeResolver contentTypeResolver) {
         AppRestUrlBuilder urlBuilder = createUrlBuilder();
         // Add additional metadata to the artifact-strings before returning
-        List<AppDeploymentResourceResponse> responseList = new ArrayList<>();
+        List<AppDeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
             String contentType = null;
             if (resourceId.toLowerCase().endsWith(".app")) {

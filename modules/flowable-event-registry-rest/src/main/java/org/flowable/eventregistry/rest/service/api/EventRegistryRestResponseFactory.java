@@ -44,7 +44,7 @@ public class EventRegistryRestResponseFactory {
 
     public List<EventDeploymentResponse> createDeploymentResponseList(List<EventDeployment> deployments) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<EventDeploymentResponse> responseList = new ArrayList<>();
+        List<EventDeploymentResponse> responseList = new ArrayList<>(deployments.size());
         for (EventDeployment instance : deployments) {
             responseList.add(createDeploymentResponse(instance, urlBuilder));
         }
@@ -62,7 +62,7 @@ public class EventRegistryRestResponseFactory {
     public List<DeploymentResourceResponse> createDeploymentResourceResponseList(String deploymentId, List<String> resourceList, ContentTypeResolver contentTypeResolver) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         // Add additional metadata to the artifact-strings before returning
-        List<DeploymentResourceResponse> responseList = new ArrayList<>();
+        List<DeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
             String contentType = null;
             if (resourceId.toLowerCase().endsWith(".cmmn")) {
@@ -105,7 +105,7 @@ public class EventRegistryRestResponseFactory {
 
     public List<EventDefinitionResponse> createEventDefinitionResponseList(List<EventDefinition> eventDefinitions) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<EventDefinitionResponse> responseList = new ArrayList<>();
+        List<EventDefinitionResponse> responseList = new ArrayList<>(eventDefinitions.size());
         for (EventDefinition eventDef : eventDefinitions) {
             responseList.add(createEventDefinitionResponse(eventDef, urlBuilder));
         }
@@ -138,7 +138,7 @@ public class EventRegistryRestResponseFactory {
     
     public List<ChannelDefinitionResponse> createChannelDefinitionResponseList(List<ChannelDefinition> channelDefinitions) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<ChannelDefinitionResponse> responseList = new ArrayList<>();
+        List<ChannelDefinitionResponse> responseList = new ArrayList<>(channelDefinitions.size());
         for (ChannelDefinition channelDef : channelDefinitions) {
             responseList.add(createChannelDefinitionResponse(channelDef, urlBuilder));
         }
