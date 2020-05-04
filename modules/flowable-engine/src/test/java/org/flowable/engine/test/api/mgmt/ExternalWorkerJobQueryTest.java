@@ -173,11 +173,11 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
     public void testQueryByException() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        runtimeService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
                 .errorMessage("Error message")
                 .errorDetails("Error details")
                 .fail();
@@ -199,11 +199,11 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
     public void testQueryByExceptionMessage() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        runtimeService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
                 .errorMessage("Error message")
                 .errorDetails("Error details")
                 .fail();
@@ -230,7 +230,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
     public void testQueryByLockedAndUnlocked() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 
-        runtimeService.createExternalWorkerJobAcquireBuilder()
+        managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
@@ -264,11 +264,11 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
     public void testQueryByLockOwner() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 
-        runtimeService.createExternalWorkerJobAcquireBuilder()
+        managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker1");
 
-        runtimeService.createExternalWorkerJobAcquireBuilder()
+        managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("customerService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker2");
 

@@ -198,11 +198,11 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("externalWorkerJobQueryTest")
                 .start();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnRuntimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
                 .errorMessage("Error message")
                 .errorDetails("Error details")
                 .fail();
@@ -226,11 +226,11 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("externalWorkerJobQueryTest")
                 .start();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnRuntimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        cmmnRuntimeService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(acquiredJobs.get(0).getId(), "testWorker")
                 .errorMessage("Error message")
                 .errorDetails("Error details")
                 .fail();
@@ -259,7 +259,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("externalWorkerJobQueryTest")
                 .start();
 
-        cmmnRuntimeService.createExternalWorkerJobAcquireBuilder()
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
@@ -295,11 +295,11 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("externalWorkerJobQueryTest")
                 .start();
 
-        cmmnRuntimeService.createExternalWorkerJobAcquireBuilder()
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker1");
 
-        cmmnRuntimeService.createExternalWorkerJobAcquireBuilder()
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("customerService", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker2");
 

@@ -15,8 +15,11 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
@@ -247,5 +250,25 @@ public interface CmmnManagementService {
      *             when there is no historyJob with the given id.
      */
     void executeHistoryJob(String historyJobId);
+
+    // External Worker
+
+    /**
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
+     */
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
+
+    /**
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create a {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
+     */
+    CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 
 }

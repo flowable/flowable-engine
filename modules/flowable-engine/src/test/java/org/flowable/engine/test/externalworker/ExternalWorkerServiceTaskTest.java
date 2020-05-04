@@ -90,7 +90,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -119,7 +119,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
 
         assertThat(taskService.createTaskQuery().list()).isEmpty();
         assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
@@ -158,7 +158,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -166,7 +166,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
 
-        runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
                 .variable("name", "gonzo")
                 .complete();
 
@@ -205,7 +205,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -213,7 +213,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
 
-        runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
                 .variable("name", "gonzo")
                 .complete();
 
@@ -249,7 +249,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -266,12 +266,12 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
         assertThat(acquiredJobs).isEmpty();
 
-        runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
 
         assertThat(taskService.createTaskQuery().list()).isEmpty();
         assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
@@ -306,7 +306,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -319,7 +319,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "otherWorker").complete())
+        assertThatThrownBy(() -> managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "otherWorker").complete())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("otherWorker does not hold a lock on the requested job");
 
@@ -341,7 +341,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -354,7 +354,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "otherWorker")
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "otherWorker")
                 .retries(3)
                 .retryTimeout(Duration.ofMinutes(10))
                 .fail())
@@ -379,7 +379,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -392,7 +392,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "otherWorker").bpmnError("testError"))
+        assertThatThrownBy(() -> managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "otherWorker").bpmnError("testError"))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("otherWorker does not hold a lock on the requested job");
 
@@ -420,7 +420,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         assertThat(externalWorkerJob.getLockOwner()).isNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -445,7 +445,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         Instant executionTime = startTime.plus(20, ChronoUnit.MINUTES);
         setTime(executionTime);
-        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
                 .retries(4)
@@ -464,7 +464,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().list()).isEmpty();
         assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNotNull();
 
-        acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(10))
                 .acquireAndLock(4, "testWorker");
 
@@ -483,7 +483,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob.getLockOwner()).isNull();
         assertThat(externalWorkerJob.getExceptionMessage()).isEqualTo("Failed to run job");
 
-        acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(10))
                 .acquireAndLock(4, "testWorker");
 
@@ -494,7 +494,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isEqualTo(Date.from(resetTime.plus(10, ChronoUnit.MINUTES)));
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker").complete();
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker").complete();
 
         Job executableJob = managementService.createJobQuery().singleResult();
 
@@ -526,7 +526,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -538,7 +538,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                         entry("name", "kermit")
                 );
 
-        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
                 .retries(0)
@@ -575,7 +575,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(externalWorkerJob).isNotNull();
         assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -587,7 +587,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                         entry("name", "kermit")
                 );
 
-        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
                 .fail();
@@ -616,11 +616,11 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        runtimeService.createExternalWorkerJobAcquireBuilder()
+        managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(10))
                 .acquireAndLock(1, "testWorker");
 
-        runtimeService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
+        managementService.createExternalWorkerJobFailureBuilder(externalWorkerJob.getId(), "testWorker")
                 .errorMessage("Failed to run job")
                 .errorDetails("Some complex error details")
                 .retries(0)
@@ -670,7 +670,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -678,7 +678,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
 
-        runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker").bpmnError("errorOne");
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker").bpmnError("errorOne");
 
         assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
 
@@ -705,7 +705,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(externalWorkerJob).isNotNull();
 
-        List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerJobAcquireBuilder()
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("simple", Duration.ofMinutes(30))
                 .acquireAndLock(4, "testWorker");
 
@@ -713,7 +713,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
 
-        runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
                 .variable("name", "gonzo")
                 .bpmnError("errorOne");
 
@@ -737,23 +737,17 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
     @Test
     void testAcquireWithInvalidArguments() {
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerJobAcquireBuilder().acquireAndLock(10, "someWorker"))
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().acquireAndLock(10, "someWorker"))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("topic must not be empty");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(0, "someWorker"))
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(0, "someWorker"))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("requested number of jobs must not be smaller than 1");
 
-        assertThatThrownBy(() -> runtimeService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(10, null))
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(10, null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("workerId must not be empty");
-    }
-
-    protected List<ByteArrayEntity> allByteArrays() {
-        return managementService.executeCommand(commandContext -> {
-            return CommandContextUtil.getByteArrayEntityManager(commandContext).findAll();
-        });
     }
 
     protected void setTime(Instant time) {

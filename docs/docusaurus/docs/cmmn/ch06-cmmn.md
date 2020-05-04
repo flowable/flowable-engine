@@ -546,10 +546,10 @@ Once the External Worker is done with the job and notifies Flowable of the compl
 
 #### Acquiring External Worker Job
 
-External Worker Jobs are acquired via the `CmmnRuntimeService#createExternalWorkerProvider` by using a `ExternalWorkerJobProvider`
+External Worker Jobs are acquired via the `CmmnManagementService#createExternalWorkerJobAcquireBuilder` by using a `ExternalWorkerJobAcquireBuilder`
 
 ```java
-List<AcquiredExternalWorkerJob> acquiredJobs = cmmnRuntimeService.createExternalWorkerProvider()
+List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(30))
                 .acquireAndLock(5, "orderWorker-1");
 ```
@@ -567,10 +567,10 @@ When the External Worker Task is exclusive, acquiring the job will lock the Case
 
 #### Completing an External Worker Job
 
-External Worker Jobs are completed via the `CmmnRuntimeService#createCmmnExternalWorkerTransitionBuilder(String, String)` by using a `CmmnExternalWorkerTransitionBuilder`
+External Worker Jobs are completed via the `CmmnManagementService#createCmmnExternalWorkerTransitionBuilder(String, String)` by using a `CmmnExternalWorkerTransitionBuilder`
 
 ```java
-cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "orderWorker-1")
+cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "orderWorker-1")
                 .variable("orderStatus", "COMPLETED")
                 .complete();
 ```
@@ -586,16 +586,18 @@ It is also possible to use `CmmnExternalWorkerTransitionBuilder#terminate()` to 
 
 #### Error handling for an External Worker Job
 
-The `CmmnExternalWorkerTransitionBuilder` is also used to fail a job (schedule it for a new execution in the future)
+The `ExternalWorkerJobFailureBuilder` is used to fail a job (schedule it for a new execution in the future)
 
 In order to fail a job the following can be used:
 
 
 ```java
-cmmnRuntimeService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "orderWorker-1")
+cmmnManagementService.createExternalWorkerJobFailureBuilder(acquiredJob.getId(), "orderWorker-1")
                 .errorMessage("Failed to run job. Database not accessible")
                 .errorDetails("Some complex and long error details")
-                .failure(4, Duration.ofHours(1));
+                .retries(4)
+                .retryTimeout(Duration.ofHours(1))
+                .fail();
 ```
 
 With this snippet the following will be done:
@@ -605,8 +607,7 @@ With this snippet the following will be done:
 * The job will be available for acquiring after 1 hour
 
 The Job can only be failed by the worker that acquired it.
-Flowable will not automatically decrease the number of retries for a job.
-This has to be done explicitly by the External Worker.
+If no retries have been set, flowable will automatically decrease the number of retries for a job by 1.
 When the number of retries is 0 the job will be moved to the DeadLetter table job and will no longer be available for acquiring.
 
 #### Querying External Worker Jobs

@@ -3464,10 +3464,10 @@ Once the External Worker is done with the job and notifies Flowable of the compl
 
 #### Acquiring External Worker Job
 
-External Worker Jobs are acquired via the `RuntimeService#createExternalWorkerProvider` by using a `ExternalWorkerJobProvider`
+External Worker Jobs are acquired via the `ManagementService#createExternalWorkerJobAcquireBuilder` by using a `ExternalWorkerJobAcquireBuilder`
 
 ```java
-List<AcquiredExternalWorkerJob> acquiredJobs = runtimeService.createExternalWorkerProvider()
+List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
                 .topic("orderService", Duration.ofMinutes(30))
                 .acquireAndLock(5, "orderWorker-1");
 ```
@@ -3485,10 +3485,10 @@ When the External Worker Task is exclusive, acquiring the job will lock the Proc
 
 #### Completing an External Worker Job
 
-External Worker Jobs are completed via the `RuntimeService#createExternalWorkerCompletionBuilder(String, String)` by using a `ExternalWorkerCompletionBuilder`
+External Worker Jobs are completed via the `ManagementService#createExternalWorkerCompletionBuilder(String, String)` by using an `ExternalWorkerCompletionBuilder`
 
 ```java
-runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
+managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
                 .variable("orderStatus", "COMPLETED")
                 .complete();
 ```
@@ -3503,14 +3503,13 @@ Any steps in the model that follow after the external worker task will be execut
 
 #### Error handling for an External Worker Job
 
+There are 2 ways of handling errors for an external worker job:
 
-The `ExternalWorkerCompletionBuilder` is also used to fail a job (schedule it for a new execution in the future) or throw a BPMN Error.
-
-In order to throw a BPMN error the following can be used:
+* Business error via `ManagementService#createExternalWorkerCompletionBuilder(String, String)` by using an `ExternalWorkerCompletionBuilder`
 
 
 ```java
-runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
+managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
                 .variable("orderStatus", "FAILED")
                 .bpmnError("orderFailed");
 ```
@@ -3518,14 +3517,16 @@ runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "order
 With this snippet the *orderStatus* variable will be set on the process and a BPMN Error with the code *orderFailed* will be thrown.
 A BPMN Error can only be thrown by the worker that acquired the job.
 
-In order to fail a job the following can be used:
+* Technical error via `ManagementService#createExternalWorkerJobFailureBuilder(String, String)` by using an `ExternalWorkerJobFailureBuilder`
 
 
 ```java
-runtimeService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
+managementService.createExternalWorkerJobFailureBuilder(acquiredJob.getId(), "orderWorker-1")
                 .errorMessage("Failed to run job. Database not accessible")
                 .errorDetails("Some complex and long error details")
-                .failure(4, Duration.ofHours(1));
+                .retries(4)
+                .retryTimeout(Duration.ofHours(1))
+                .fail();
 ```
 
 With this snippet the following will be done:
@@ -3535,8 +3536,7 @@ With this snippet the following will be done:
 * The job will be available for acquiring after 1 hour
 
 The Job can only be failed by the worker that acquired it.
-Flowable will not automatically decrease the number of retries for a job.
-This has to be done explicitly by the External Worker.
+If no retries have been set, flowable will automatically decrease the number of retries for a job by 1.
 When the number of retries is 0 the job will be moved to the DeadLetter table job and will no longer be available for acquiring.
 
 #### Querying External Worker Jobs

@@ -19,7 +19,6 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
-import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -31,8 +30,6 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
-import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -327,23 +324,4 @@ public interface CmmnRuntimeService {
      */
     void updateBusinessKey(String caseInstanceId, String businessKey);
 
-    // External Worker
-
-    /**
-     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
-     */
-    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
-
-    /**
-     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
-     *
-     * @param externalJobId the id of the external worker job
-     * @param workerId the id of the worker doing the action
-     */
-    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
-
-    /**
-     * Create a {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
-     */
-    CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 }

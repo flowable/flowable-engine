@@ -54,8 +54,12 @@ import org.flowable.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
+import org.flowable.engine.impl.externalworker.ExternalWorkerCompletionBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
@@ -63,6 +67,8 @@ import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -387,6 +393,21 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void deleteEventLogEntry(long logNr) {
         commandExecutor.execute(new DeleteEventLogEntry(logNr));
+    }
+
+    @Override
+    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
+    }
+
+    @Override
+    public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
 
 }

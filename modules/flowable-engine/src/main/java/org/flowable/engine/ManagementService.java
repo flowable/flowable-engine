@@ -29,7 +29,10 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
@@ -429,5 +432,25 @@ public interface ManagementService {
      * Delete a EventLogEntry. Typically only used in testing, as deleting log entries defeats the whole purpose of keeping a log.
      */
     void deleteEventLogEntry(long logNr);
+
+    // External Worker
+
+    /**
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
+     */
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
+
+    /**
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
+     */
+    ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
 
 }

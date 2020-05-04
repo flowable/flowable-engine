@@ -22,7 +22,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
-import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -76,10 +75,6 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
-import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
-import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
-import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -363,18 +358,4 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
     }
 
-    @Override
-    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
-        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
-    }
-
-    @Override
-    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
-        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
-    }
-
-    @Override
-    public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
-        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
-    }
 }

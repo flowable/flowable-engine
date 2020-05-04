@@ -31,7 +31,6 @@ import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
-import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.engine.runtime.NativeActivityInstanceQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
@@ -45,8 +44,6 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
-import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -1380,25 +1377,5 @@ public interface RuntimeService {
      * The all events related to the given Process Instance.
      */
     List<Event> getProcessInstanceEvents(String processInstanceId);
-
-    // External Worker
-
-    /**
-     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
-     */
-    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
-
-    /**
-     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
-     *
-     * @param externalJobId the id of the external worker job
-     * @param workerId the id of the worker doing the action
-     */
-    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
-
-    /**
-     * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
-     */
-    ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
 
 }
