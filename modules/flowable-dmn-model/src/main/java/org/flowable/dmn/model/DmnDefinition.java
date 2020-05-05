@@ -13,7 +13,9 @@
 package org.flowable.dmn.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -27,6 +29,10 @@ public class DmnDefinition extends NamedElement {
     protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
     protected List<Decision> decisions = new ArrayList<>();
     protected List<DecisionService> decisionServices = new ArrayList<>();
+    protected Map<String, DmnDiDiagram> diDiagrams = new LinkedHashMap<>();
+    protected Map<String, Map<String, GraphicInfo>> locationMap = new LinkedHashMap<>();
+    protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, List<GraphicInfo>>> flowLocationMap = new LinkedHashMap<>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;
@@ -105,4 +111,78 @@ public class DmnDefinition extends NamedElement {
         }
         return null;
     }
+
+    public DmnDiDiagram getDiDiagram(String diagramId) {
+        return diDiagrams.get(diagramId);
+    }
+
+    public Map<String, DmnDiDiagram> getDiDiagrams() {
+        return diDiagrams;
+    }
+    public void addDiDiagram(DmnDiDiagram diDiagram) {
+        this.diDiagrams.put(diDiagram.getId(), diDiagram);
+    }
+
+    public void addGraphicInfo(String diagramId, String key, GraphicInfo graphicInfo) {
+        locationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        locationMap.get(diagramId).put(key, graphicInfo);
+    }
+
+    public Map<String, Map<String, GraphicInfo>> getGraphicInfo() {
+        return locationMap;
+    }
+
+    public Map<String, GraphicInfo> getGraphicInfo(String diagramId) {
+        return locationMap.get(diagramId);
+    }
+
+    public GraphicInfo getGraphicInfo(String diagramId, String key) {
+        return locationMap.get(diagramId).get(key);
+    }
+
+    public void removeGraphicInfo(String diagramId) {
+        locationMap.remove(diagramId);
+    }
+
+    public Map<String, List<GraphicInfo>> getFlowLocationGraphicInfo(String diagramId) {
+        return flowLocationMap.get(diagramId);
+    }
+
+    public Map<String, Map<String, List<GraphicInfo>>> getFlowLocationGraphicInfo() {
+        return flowLocationMap;
+    }
+
+    public void removeFlowGraphicInfoList(String diagramId) {
+        flowLocationMap.remove(diagramId);
+    }
+
+    public Map<String, Map<String, GraphicInfo>> getLocationMap() {
+        return locationMap;
+    }
+
+    public Map<String, Map<String, List<GraphicInfo>>> getFlowLocationMap() {
+        return flowLocationMap;
+    }
+
+    public GraphicInfo getLabelGraphicInfo(String diagramId) {
+        return labelLocationMap.get(diagramId);
+    }
+
+    public void addLabelGraphicInfo(String key, GraphicInfo graphicInfo) {
+        labelLocationMap.put(key, graphicInfo);
+    }
+
+    public void removeLabelGraphicInfo(String key) {
+        labelLocationMap.remove(key);
+    }
+
+    public Map<String, GraphicInfo> getLabelLocationMap() {
+        return labelLocationMap;
+    }
+
+    public void addFlowGraphicInfoList(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
+        flowLocationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        flowLocationMap.get(diagramId).put(key, graphicInfoList);
+    }
+
 }
