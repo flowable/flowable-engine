@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.rest.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +24,8 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to sub tasks.
@@ -49,27 +54,28 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
         taskService.saveTask(subTask2);
 
         // Request all sub tasks
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_SUBTASKS_COLLECTION, parentTask.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_SUBTASKS_COLLECTION, parentTask.getId())),
+                HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        System.out.println(responseNode.toPrettyString());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(2, responseNode.size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThat(responseNode).hasSize(2);
 
-        boolean foundSubtask1 = false;
-        boolean foundSubtask2 = false;
-        for (int i = 0; i < responseNode.size(); i++) {
-            JsonNode var = responseNode.get(i);
-            if ("sub task 1".equals(var.get("name").asText())) {
-                foundSubtask1 = true;
-                assertEquals(subTask.getId(), var.get("id").asText());
-            } else if ("sub task 2".equals(var.get("name").asText())) {
-                foundSubtask2 = true;
-                assertEquals(subTask2.getId(), var.get("id").asText());
-            }
-        }
-        assertTrue(foundSubtask1);
-        assertTrue(foundSubtask2);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "{"
+                        + "    name: 'sub task 1',"
+                        + "    id: '" + subTask.getId() + "'"
+                        + "},"
+                        + "{"
+                        + "    name: 'sub task 2',"
+                        + "    id: '" + subTask2.getId() + "'"
+                        + "}"
+                        + "]");
 
         taskService.deleteTask(parentTask.getId());
         taskService.deleteTask(subTask.getId());
