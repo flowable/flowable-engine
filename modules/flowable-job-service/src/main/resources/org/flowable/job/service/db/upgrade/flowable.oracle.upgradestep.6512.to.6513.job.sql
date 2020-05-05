@@ -45,4 +45,4 @@ create index ACT_IDX_EJOB_SCOPE on ACT_RU_EXTERNAL_JOB(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_EJOB_SUB_SCOPE on ACT_RU_EXTERNAL_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_EJOB_SCOPE_DEF on ACT_RU_EXTERNAL_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-update ACT_GE_PROPERTY set VALUE_ = '6.5.1.4' where NAME_ = 'job.schema.version';
+update ACT_GE_PROPERTY set VALUE_ = '6.5.1.3' where NAME_ = 'job.schema.version';
