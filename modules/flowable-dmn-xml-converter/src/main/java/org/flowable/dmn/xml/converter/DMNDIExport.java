@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.converter.util.DmnXMLUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnDiDiagram;
@@ -24,7 +25,10 @@ public class DMNDIExport implements DmnXMLConstants {
             // start DI diagram
             xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_DIAGRAM, DMNDI_NAMESPACE);
             xtw.writeAttribute(ATTRIBUTE_ID, diDiagram.getId());
-            xtw.writeAttribute(ATTRIBUTE_NAME, diDiagram.getName());
+
+            if (StringUtils.isNotEmpty(diDiagram.getName())) {
+                xtw.writeAttribute(ATTRIBUTE_NAME, diDiagram.getName());
+            }
 
             // DI size
             if (diDiagram.getGraphicInfo() != null) {
