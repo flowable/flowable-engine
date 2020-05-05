@@ -26,24 +26,19 @@ import org.flowable.dmn.model.ItemDefinition;
 public class ItemDefinitionXMLConverter extends BaseDmnXMLConverter {
 
     @Override
-    public Class<? extends DmnElement> getDmnElementType() {
-        return ItemDefinition.class;
-    }
-
-    @Override
     protected String getXMLElementName() {
         return ELEMENT_ITEM_DEFINITION;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         ItemDefinition itemDefinition = new ItemDefinition();
         itemDefinition.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         itemDefinition.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
         itemDefinition.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
         itemDefinition.setCollection(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_IS_COLLECTION)));
 
-        parseChildElements(getXMLElementName(), itemDefinition, decision, xtr);
+        parseChildElements(getXMLElementName(), itemDefinition, conversionHelper.getCurrentDecision(), xtr);
 
         return itemDefinition;
     }

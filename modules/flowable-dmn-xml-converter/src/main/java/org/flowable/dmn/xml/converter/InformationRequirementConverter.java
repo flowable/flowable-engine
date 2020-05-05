@@ -14,21 +14,16 @@ import org.flowable.dmn.model.InformationRequirement;
 public class InformationRequirementConverter extends BaseDmnXMLConverter {
 
     @Override
-    public Class<? extends DmnElement> getDmnElementType() {
-        return InformationRequirement.class;
-    }
-
-    @Override
     protected String getXMLElementName() {
         return ELEMENT_INFORMATION_REQUIREMENT;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         InformationRequirement informationRequirement = new InformationRequirement();
         informationRequirement.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         informationRequirement.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        parseChildElements(getXMLElementName(), informationRequirement, decision, xtr);
+        parseChildElements(getXMLElementName(), informationRequirement, conversionHelper.getCurrentDecision(), xtr);
 
         return informationRequirement;
     }

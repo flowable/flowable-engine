@@ -15,6 +15,7 @@ package org.flowable.dmn.converter.util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -259,6 +260,19 @@ public class DmnXMLUtil implements DmnXMLConstants {
             }
 
             xtw.writeEndElement();
+        }
+    }
+
+    public static String getUniqueElementId() {
+        return getUniqueElementId(null);
+    }
+
+    public static String getUniqueElementId(String prefix) {
+        UUID uuid = UUID.randomUUID();
+        if (StringUtils.isEmpty(prefix)) {
+            return uuid.toString();
+        } else {
+            return String.format("%s_%s", prefix, uuid.toString());
         }
     }
 }

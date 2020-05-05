@@ -4,7 +4,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.dmn.model.AuthorityRequirement;
-import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 
@@ -14,21 +13,16 @@ import org.flowable.dmn.model.DmnElement;
 public class AuthorityRequirementConverter extends BaseDmnXMLConverter {
 
     @Override
-    public Class<? extends DmnElement> getDmnElementType() {
-        return AuthorityRequirement.class;
-    }
-
-    @Override
     protected String getXMLElementName() {
         return ELEMENT_AUTHORITY_REQUIREMENT;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         AuthorityRequirement authorityRequirement = new AuthorityRequirement();
         authorityRequirement.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         authorityRequirement.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        parseChildElements(getXMLElementName(), authorityRequirement, decision, xtr);
+        parseChildElements(getXMLElementName(), authorityRequirement, conversionHelper.getCurrentDecision(), xtr);
 
         return authorityRequirement;
     }

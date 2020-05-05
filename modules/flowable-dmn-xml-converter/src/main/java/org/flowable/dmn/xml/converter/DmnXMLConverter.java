@@ -78,7 +78,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseDmnXMLConverter> convertersToDmnMap = new HashMap<>();
-    protected static Map<Class<? extends DmnElement>, BaseDmnXMLConverter> convertersToXMLMap = new HashMap<>();
 
     protected ClassLoader classloader;
 
@@ -92,15 +91,16 @@ public class DmnXMLConverter implements DmnXMLConstants {
         addConverter(new InputDataXMLConverter());
         addConverter(new VariableXMLConverter());
         addConverter(new DecisionServiceXMLConverter());
+        addConverter(new DmnDiDiagramXmlConverter());
+        addConverter(new DmnDiShapeXmlConverter());
+        addConverter(new DmnDiBoundsXmlConverter());
+        addConverter(new DmnDiEdgeXmlConverter());
+        addConverter(new DmnDiWaypointXmlConverter());
+        addConverter(new DmnDiSizeXmlConverter());
     }
 
     public static void addConverter(BaseDmnXMLConverter converter) {
-        addConverter(converter, converter.getDmnElementType());
-    }
-
-    public static void addConverter(BaseDmnXMLConverter converter, Class<? extends DmnElement> elementType) {
         convertersToDmnMap.put(converter.getXMLElementName(), converter);
-        convertersToXMLMap.put(elementType, converter);
     }
 
     public void setClassloader(ClassLoader classloader) {
@@ -232,6 +232,9 @@ public class DmnXMLConverter implements DmnXMLConstants {
         Decision currentDecision = null;
         DecisionTable currentDecisionTable = null;
 
+        ConversionHelper conversionHelper = new ConversionHelper();
+        conversionHelper.setDmnDefinition(model);
+
         try {
             while (xtr.hasNext()) {
                 try {
@@ -268,6 +271,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     }
 
                     parentElement = currentDecision;
+                    conversionHelper.setCurrentDecision(currentDecision);
                 } else if (ELEMENT_DECISION_TABLE.equals(xtr.getLocalName())) {
                     currentDecisionTable = new DecisionTable();
                     currentDecisionTable.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
@@ -300,7 +304,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     }
                 } else if (convertersToDmnMap.containsKey(xtr.getLocalName())) {
                     BaseDmnXMLConverter converter = convertersToDmnMap.get(xtr.getLocalName());
-                    converter.convertToDmnModel(xtr, model, currentDecision);
+                    converter.convertToDmnModel(xtr, conversionHelper);
                 }
             }
         } catch (DmnXMLException e) {
@@ -309,7 +313,22 @@ public class DmnXMLConverter implements DmnXMLConstants {
             LOGGER.error("Error processing DMN document", e);
             throw new DmnXMLException("Error processing DMN document", e);
         }
+
+        processDiElements(conversionHelper);
         return model;
+    }
+
+    protected void processDiElements(ConversionHelper conversionHelper) {
+        DmnDefinition dmnDefinition = conversionHelper.getDmnDefinition();
+
+        conversionHelper.getDiDiagrams()
+            .forEach(diDiagram -> {
+                dmnDefinition.addDiDiagram(diDiagram);
+                conversionHelper.getDiShapes(diDiagram.getId())
+                    .forEach(dmnDiShape -> dmnDefinition.addGraphicInfo(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo()));
+                conversionHelper.getDiEdges(diDiagram.getId())
+                    .forEach(dmnDiEdge -> dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getId(), dmnDiEdge.getWaypoints()));
+            });
     }
 
     public byte[] convertToXML(DmnDefinition model) {
@@ -328,6 +347,9 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
             xtw.writeStartElement(ELEMENT_DEFINITIONS);
             xtw.writeDefaultNamespace(DMN_NAMESPACE);
+            xtw.writeNamespace(DMNDI_PREFIX, DMNDI_NAMESPACE);
+            xtw.writeNamespace(OMGDC_PREFIX, OMGDC_NAMESPACE);
+            xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
             xtw.writeAttribute(ATTRIBUTE_ID, model.getId());
             if (StringUtils.isNotEmpty(model.getName())) {
                 xtw.writeAttribute(ATTRIBUTE_NAME, model.getName());
@@ -592,6 +614,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                 xtw.writeEndElement();
             }
+
+            DMNDIExport.writeDMNDI(model, xtw);
 
             // end definitions root element
             xtw.writeEndElement();

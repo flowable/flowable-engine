@@ -12,35 +12,34 @@
  */
 package org.flowable.dmn.xml.converter;
 
-import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.InputClause;
-import org.flowable.dmn.model.OutputClause;
-
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnDiEdge;
+import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.xml.constants.DmnXMLConstants;
+
 /**
- * @author Yvo Swillens
+ * @author Tijs Rademakers
  */
-public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
+public class DmnDiEdgeXmlConverter extends BaseDmnXMLConverter {
 
     @Override
     protected String getXMLElementName() {
-        return ELEMENT_OUTPUT_CLAUSE;
+        return ELEMENT_DI_EDGE;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
-        OutputClause clause = new OutputClause();
-        clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
-        clause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
-        clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        clause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
-        parseChildElements(getXMLElementName(), clause, conversionHelper.getCurrentDecision(), xtr);
-        return clause;
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        DmnDiEdge diEdge = new DmnDiEdge();
+        diEdge.setId(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_ID));
+        diEdge.setDmnElementRef(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_DMN_ELEMENT_REF));
+        diEdge.setTargetDmnElementRef(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_TARGET_DMN_ELEMENT_REF));
+        
+        conversionHelper.addDiEdge(diEdge);
+        
+        return diEdge;
     }
 
     @Override
@@ -52,5 +51,4 @@ public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
     protected void writeAdditionalChildElements(DmnElement element, DmnDefinition model, XMLStreamWriter xtw) throws Exception {
 
     }
-
 }

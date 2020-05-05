@@ -69,6 +69,50 @@ public class Chapter11Test extends AbstractConverterTest {
             .hasSize(2)
             .extracting(DmnElementReference::getHref)
             .containsExactly("#_d14df033-f4a2-47e3-9590-84e9ff04db4e", "#_fe938494-ee59-425e-8728-2347ea703563");
+
+        assertThat(model.getDiDiagrams().entrySet())
+            .hasSize(6)
+            .hasSameSizeAs(model.getLocationMap().entrySet())
+            .hasSameSizeAs(model.getFlowLocationGraphicInfo().entrySet());
+
+        assertThat(model.getFlowLocationGraphicInfo().entrySet())
+            .hasSize(6);
+
+        assertThat(model.getGraphicInfo("_ce4a4c00-c3a3-46a6-8938-055239f6b326"))
+            .hasSize(30);
+
+        assertThat(model.getFlowLocationGraphicInfo("_ce4a4c00-c3a3-46a6-8938-055239f6b326"))
+            .hasSize(46);
+
+        assertThat(model.getGraphicInfo("_0e22b6cf-0a6e-40e1-a81e-44b31ad86262"))
+            .hasSize(21);
+
+        assertThat(model.getFlowLocationGraphicInfo("_0e22b6cf-0a6e-40e1-a81e-44b31ad86262"))
+            .hasSize(27);
+
+        assertThat(model.getGraphicInfo("_3275163a-921d-48f8-967a-21c4373b1197"))
+            .hasSize(18);
+
+        assertThat(model.getFlowLocationGraphicInfo("_3275163a-921d-48f8-967a-21c4373b1197"))
+            .hasSize(22);
+
+        assertThat(model.getGraphicInfo("_a35ef6e9-0408-4288-b8f2-d28ac4baca3b"))
+            .hasSize(6);
+
+        assertThat(model.getFlowLocationGraphicInfo("_a35ef6e9-0408-4288-b8f2-d28ac4baca3b"))
+            .hasSize(5);
+
+        assertThat(model.getGraphicInfo("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
+            .hasSize(10);
+
+        assertThat(model.getFlowLocationGraphicInfo("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
+            .hasSize(13);
+
+        assertThat(model.getGraphicInfo("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+            .hasSize(9);
+
+        assertThat(model.getFlowLocationGraphicInfo("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+            .hasSize(11);
     }
 
 }

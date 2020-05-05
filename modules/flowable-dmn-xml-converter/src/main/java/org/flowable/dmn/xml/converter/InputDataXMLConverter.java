@@ -15,6 +15,7 @@ package org.flowable.dmn.xml.converter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.Conversion;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
@@ -27,21 +28,16 @@ import org.flowable.dmn.model.InputData;
 public class InputDataXMLConverter extends BaseDmnXMLConverter {
 
     @Override
-    public Class<? extends DmnElement> getDmnElementType() {
-        return InputData.class;
-    }
-
-    @Override
     protected String getXMLElementName() {
         return ELEMENT_INPUT_DATA;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         InputData inputData = new InputData();
         inputData.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         inputData.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        parseChildElements(getXMLElementName(), inputData, decision, xtr);
+        parseChildElements(getXMLElementName(), inputData, conversionHelper.getCurrentDecision(), xtr);
 
         return inputData;
     }

@@ -48,13 +48,13 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     private int elementCounter;
 
-    public void convertToDmnModel(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
-        DmnElement parsedElement = convertXMLToElement(xtr, model, decision);
+    public void convertToDmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
+        DmnElement parsedElement = convertXMLToElement(xtr, conversionHelper);
 
         //TODO: this needs to change when we support more expression types
         Optional<DecisionTable> decisionTable = null;
-        if (decision != null && decision.getExpression() != null) {
-            DecisionTable decisionTableExpression = (DecisionTable) decision.getExpression();
+        if (conversionHelper.getCurrentDecision() != null && conversionHelper.getCurrentDecision().getExpression() != null) {
+            DecisionTable decisionTableExpression = (DecisionTable) conversionHelper.getCurrentDecision().getExpression();
             decisionTable = Optional.of(decisionTableExpression);
         }
 
@@ -81,31 +81,31 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
                 elementCounter++;
             });
         } else if (parsedElement instanceof ItemDefinition) {
-            model.addItemDefinition((ItemDefinition) parsedElement);
+            conversionHelper.getDmnDefinition().addItemDefinition((ItemDefinition) parsedElement);
         } else if (parsedElement instanceof InputData) {
             InputData inputData = (InputData) parsedElement;
             // TODO: handle inputData as href in DecisionService (same tag)
             if (inputData.getVariable() != null) {
-                model.addInputData(inputData);
+                conversionHelper.getDmnDefinition().addInputData(inputData);
             }
         } else if (parsedElement instanceof InformationRequirement) {
             InformationRequirement informationRequirement = (InformationRequirement) parsedElement;
             if (informationRequirement.getRequiredDecision() != null) {
-                decision.addRequiredDecision(informationRequirement);
+                conversionHelper.getCurrentDecision().addRequiredDecision(informationRequirement);
             } else if (informationRequirement.getRequiredInput() != null) {
-                decision.addRequiredInput(informationRequirement);
+                conversionHelper.getCurrentDecision().addRequiredInput(informationRequirement);
             }
         } else if (parsedElement instanceof AuthorityRequirement) {
             AuthorityRequirement authorityRequirement = (AuthorityRequirement) parsedElement;
-            decision.addAuthorityRequirement(authorityRequirement);
+            conversionHelper.getCurrentDecision().addAuthorityRequirement(authorityRequirement);
         } else if (parsedElement instanceof InformationItem) {
-            if (decision.getVariable() == null) {
-                decision.setVariable((InformationItem) parsedElement);
+            if (conversionHelper.getCurrentDecision().getVariable() == null) {
+                conversionHelper.getCurrentDecision().setVariable((InformationItem) parsedElement);
             }
         }  else if (parsedElement instanceof DecisionService) {
             DecisionService decisionService = (DecisionService) parsedElement;
-            decisionService.setDmnDefinition(model);
-            model.addDecisionService(decisionService);
+            decisionService.setDmnDefinition(conversionHelper.getDmnDefinition());
+            conversionHelper.getDmnDefinition().addDecisionService(decisionService);
         }
 
     }
@@ -121,9 +121,7 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
         xtw.writeEndElement();
     }
 
-    protected abstract Class<? extends DmnElement> getDmnElementType();
-
-    protected abstract DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception;
+    protected abstract DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception;
 
     protected abstract String getXMLElementName();
 

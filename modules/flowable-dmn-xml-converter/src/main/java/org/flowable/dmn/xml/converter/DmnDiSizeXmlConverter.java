@@ -12,45 +12,42 @@
  */
 package org.flowable.dmn.xml.converter;
 
-import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.InputClause;
-import org.flowable.dmn.model.OutputClause;
-
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.GraphicInfo;
+import org.flowable.dmn.xml.constants.DmnXMLConstants;
 
 /**
  * @author Yvo Swillens
  */
-public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
-
+public class DmnDiSizeXmlConverter extends BaseDmnXMLConverter {
+    
     @Override
-    protected String getXMLElementName() {
-        return ELEMENT_OUTPUT_CLAUSE;
+    public String getXMLElementName() {
+        return DmnXMLConstants.ELEMENT_DI_SIZE;
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
-        OutputClause clause = new OutputClause();
-        clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
-        clause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
-        clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        clause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
-        parseChildElements(getXMLElementName(), clause, conversionHelper.getCurrentDecision(), xtr);
-        return clause;
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        GraphicInfo graphicInfo = new GraphicInfo();
+
+        graphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_HEIGHT)));
+        graphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_WIDTH)));
+        
+        conversionHelper.getCurrentDiDiagram().setGraphicInfo(graphicInfo);
+        
+        return graphicInfo;
     }
 
     @Override
     protected void writeAdditionalAttributes(DmnElement element, DmnDefinition model, XMLStreamWriter xtw) throws Exception {
 
     }
-
     @Override
     protected void writeAdditionalChildElements(DmnElement element, DmnDefinition model, XMLStreamWriter xtw) throws Exception {
 
     }
-
 }
