@@ -49,9 +49,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Frederik Heremans
  */
@@ -117,9 +114,6 @@ public class TaskResource extends TaskBaseResource {
         if (actionRequest == null) {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
-
-        // Scoped variables feature
-        actionRequest.setWithScopedVariables(true);
 
         Task task = getTaskFromRequest(taskId);
 

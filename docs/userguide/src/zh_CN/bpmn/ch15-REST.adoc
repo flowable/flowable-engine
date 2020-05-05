@@ -3027,7 +3027,18 @@ Completes the task. Optional variable array can be passed in using the +variable
 
 Note that also a _transientVariables_ property is accepted as part of this json, that follows the same structure as the _variables_ property.
 
-You can activate the alternative behavior with the scope that is applied to variables REST. It is activated by setting the variable withScopedVariables of the ActionRequest class to true.
+You can activate the alternative behavior with the scope that is applied to variables REST. This new behavior ensures that the scope of the variables is respected. It is activated by setting the property withScopedVariables of JSON to true.
+
+*Complete a task with scoped variables - Body JSON:*
+
+[source,json,linenums]
+----
+{
+  "action": "complete",
+  "withScopedVariables": true,
+  "variables": []
+}
+----
 
 *Claim a task - Body JSON:*
 

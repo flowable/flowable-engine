@@ -22,9 +22,13 @@ public class CompleteWithScopedVariablesTaskCmd extends NeedsActiveTaskCmd<Void>
     public CompleteWithScopedVariablesTaskCmd(String taskId, ScopedVariableContainerHelper scopedVariableContainerHelper) {
         super(taskId);
         this.scopedVariableContainerHelper = scopedVariableContainerHelper;
+    }
+
+    @Override
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+        // Backwards compatibility
         this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
 
-        // Compatibility code
         if (scopedVariableContainerHelper.hasAnyVariables()) {
             this.variables = scopedVariableContainerHelper.getAllVariables();
         }
@@ -32,11 +36,7 @@ public class CompleteWithScopedVariablesTaskCmd extends NeedsActiveTaskCmd<Void>
         if (scopedVariableContainerHelper.hasAnyTransientVariables()) {
             this.transientVariables = scopedVariableContainerHelper.getAllTransientVariables();
         }
-    }
 
-    @Override
-    protected Void execute(CommandContext commandContext, TaskEntity task) {
-        // Backwards compatibility
         if (task.getProcessDefinitionId() != null) {
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

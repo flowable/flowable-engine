@@ -33,16 +33,17 @@ public class CompleteWithScopedVariablesTaskWithFormCmd extends NeedsActiveTaskC
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.scopedVariableContainerHelper = scopedVariableContainerHelper;
-        this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
-
-        // Compatibility code
-        if (scopedVariableContainerHelper.hasAnyVariables()) {
-            this.variables = scopedVariableContainerHelper.getAllVariables();
-        }
     }
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        // Backwards compatibility
+        this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
+
+        if (scopedVariableContainerHelper.hasAnyVariables()) {
+            this.variables = scopedVariableContainerHelper.getAllVariables();
+        }
+
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
