@@ -48,6 +48,16 @@
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
             and HANDLER_CFG_ = #{parameter.topic, jdbcType=VARCHAR}
+            <if test="parameter.scopeType != null">
+                <choose>
+                    <when test="parameter.scopeType == 'bpmn'">
+                        and PROCESS_INSTANCE_ID_ is not null
+                    </when>
+                    <otherwise>
+                        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+                    </otherwise>
+                </choose>
+            </if>
             and LOCK_EXP_TIME_ is null
         </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>

@@ -42,12 +42,14 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
     protected final Duration lockDuration;
     protected final int numberOfJobs;
     protected final String topic;
+    protected final String scopeType;
 
-    public AcquireExternalWorkerJobsCmd(String workerId, Duration lockDuration, int numberOfJobs, String topic) {
+    public AcquireExternalWorkerJobsCmd(String workerId, Duration lockDuration, int numberOfJobs, String topic, String scopeType) {
         this.workerId = workerId;
         this.numberOfJobs = numberOfJobs;
         this.topic = topic;
         this.lockDuration = lockDuration;
+        this.scopeType = scopeType;
     }
 
     @Override
@@ -68,7 +70,7 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
         ExternalWorkerJobEntityManager externalWorkerJobEntityManager = jobServiceConfiguration.getExternalWorkerJobEntityManager();
         InternalJobManager internalJobManager = jobServiceConfiguration.getInternalJobManager();
 
-        List<ExternalWorkerJobEntity> jobs = externalWorkerJobEntityManager.findExternalJobsToExecute(topic, numberOfJobs);
+        List<ExternalWorkerJobEntity> jobs = externalWorkerJobEntityManager.findExternalJobsToExecute(topic, numberOfJobs, scopeType);
 
         int lockTimeInMillis = (int) lockDuration.abs().toMillis();
         List<AcquiredExternalWorkerJob> acquiredJobs = new ArrayList<>(jobs.size());

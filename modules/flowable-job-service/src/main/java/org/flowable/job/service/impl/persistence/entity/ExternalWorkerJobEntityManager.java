@@ -47,6 +47,6 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
      */
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
-    List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults);
+    List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType);
 
 }

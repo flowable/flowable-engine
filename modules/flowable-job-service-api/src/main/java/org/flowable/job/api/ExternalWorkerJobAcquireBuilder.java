@@ -29,6 +29,24 @@ public interface ExternalWorkerJobAcquireBuilder {
     ExternalWorkerJobAcquireBuilder topic(String topic, Duration lockDuration);
 
     /**
+     * Acquire only jobs which are linked to a process instance.
+     * Cannot be combined with {@link #onlyCmmn()} and {@link #scopeType(String)}
+     */
+    ExternalWorkerJobAcquireBuilder onlyBpmn();
+
+    /**
+     * Acquire only jobs which are linked to a case instance.
+     * Cannot be combined with {@link #onlyBpmn()} and {@link #scopeType(String)}
+     */
+    ExternalWorkerJobAcquireBuilder onlyCmmn();
+
+    /**
+     * Acquire only jobs which are linked to the given scope type.
+     * Cannot be combined with {@link #onlyBpmn()} or {@link #onlyCmmn()}
+     */
+    ExternalWorkerJobAcquireBuilder scopeType(String scopeType);
+
+    /**
      * Acquire and lock the given number of jobs for the given worker id.
      * By default it will try to acquire jobs 5 times.
      * Use {@link #acquireAndLock(int, String, int)} if you need more retries.

@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -323,6 +324,100 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(executableJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         assertThat(((JobEntity) executableJob).getLockExpirationTime()).isNull();
         assertThat(((JobEntity) executableJob).getLockOwner()).isNull();
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
+
+        assertThat(taskService.createTaskQuery().list()).hasSize(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testSimpleAcquireOnlyBpmn() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .onlyCmmn()
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .onlyBpmn()
+                .acquireAndLock(4, "testWorker");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+        assertThat(acquiredJobs).isEmpty();
+
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
+
+        assertThat(taskService.createTaskQuery().list()).hasSize(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testSimpleAcquireByScopeType() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .scopeType(ScopeTypes.TASK)
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .scopeType(ScopeTypes.BPMN)
+                .acquireAndLock(4, "testWorker");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+        assertThat(acquiredJobs).isEmpty();
+
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
 
         waitForJobExecutorToProcessAllJobs(5000, 300);
 
@@ -785,6 +880,22 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(10, null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("workerId must not be empty");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().onlyCmmn().onlyBpmn().acquireAndLock(10, null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Cannot combine onlyCmmn() with onlyBpmn() in the same query");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().onlyBpmn().onlyCmmn().acquireAndLock(10, null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Cannot combine onlyBpmn() with onlyCmmn() in the same query");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().scopeType(ScopeTypes.TASK).onlyBpmn().acquireAndLock(10, null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Cannot combine scopeType(String) with onlyBpmn() in the same query");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().scopeType(ScopeTypes.TASK).onlyCmmn().acquireAndLock(10, null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Cannot combine scopeType(String) with onlyCmmn() in the same query");
     }
 
     protected void setTime(Instant time) {

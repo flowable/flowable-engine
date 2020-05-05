@@ -131,9 +131,10 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults) {
+    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("topic", topic);
+        params.put("scopeType", scopeType);
 
         return getDbSqlSession().selectList("selectExternalWorkerJobsToExecute", params, new Page(0, maxResults));
     }
