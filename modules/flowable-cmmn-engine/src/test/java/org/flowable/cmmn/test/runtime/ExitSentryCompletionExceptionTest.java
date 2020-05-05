@@ -13,7 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 
 import java.util.List;
@@ -31,22 +31,18 @@ public class ExitSentryCompletionExceptionTest extends FlowableCmmnTestCase {
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ExitSentryCompletionExceptionTestCase.cmmn")
     public void testStageExitSentryCompletionFailureMessage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("exitSentryCompletionExceptionTestCase")
-            .start();
+                .caseDefinitionKey("exitSentryCompletionExceptionTestCase")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
 
-        try {
-            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
-
-            // must fail
-            fail("Triggering Task B must fail as the stage is not yet completable.");
-        } catch (FlowableIllegalArgumentException e) {
-            assertThat(e.getMessage()).endsWith("The plan item 'Task A (humanTask1)' prevented it from completion.");
-        }
+        // Triggering Task B must fail as the stage is not yet completable.
+        assertThatThrownBy(() -> cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B")))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("The plan item 'Task A (humanTask1)' prevented it from completion.");
 
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
@@ -61,22 +57,18 @@ public class ExitSentryCompletionExceptionTest extends FlowableCmmnTestCase {
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ExitSentryCompletionExceptionTestCase.cmmn")
     public void testCaseExitSentryCompletionFailureMessage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("exitSentryCompletionExceptionTestCase")
-            .start();
+                .caseDefinitionKey("exitSentryCompletionExceptionTestCase")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
 
-        try {
-            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
-
-            // must fail
-            fail("Triggering Task B must fail as the stage is not yet completable.");
-        } catch (FlowableIllegalArgumentException e) {
-            assertThat(e.getMessage()).endsWith("The plan item 'Stage (expandedStage1)' prevented it from completion.");
-        }
+        // Triggering Task C must fail as the stage is not yet completable.
+        assertThatThrownBy(() -> cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C")))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("The plan item 'Stage (expandedStage1)' prevented it from completion.");
 
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
