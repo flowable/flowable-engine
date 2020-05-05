@@ -23,6 +23,7 @@ import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -102,10 +103,15 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
                 // if the stage should exit with a complete event instead of exit, we need to make sure it is completable
                 // we don't use the completion flag directly on the entity as it gets evaluated only at the end of an evaluation cycle which we didn't hit yet
                 // at this point, so we need a proper evaluation of the completion
-                if (!PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, planItemInstanceEntity, true).isCompletable()) {
+                CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+                    .shouldPlanItemContainerComplete(commandContext, planItemInstanceEntity, true);
+
+                if (!completionEvaluationResult.isCompletable()) {
                     // we can't complete the stage as it is currently not completable, so we need to throw an exception
                     throw new FlowableIllegalArgumentException(
-                        "Cannot exit stage with 'complete' event type as the stage '" + planItemInstanceEntity.getId() + "' is not yet completable.");
+                        "Cannot exit stage with 'complete' event type as the stage '" + planItemInstanceEntity.getId() + "' is not yet completable. The plan item '" +
+                            completionEvaluationResult.getPlanItemInstance().getName() + " (" +
+                            completionEvaluationResult.getPlanItemInstance().getPlanItemDefinitionId() + ")' prevented it from completion.");
                 }
             }
 
