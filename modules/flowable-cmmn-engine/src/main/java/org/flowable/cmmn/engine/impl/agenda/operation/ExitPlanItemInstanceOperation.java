@@ -100,6 +100,8 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
         if (isStage()) {
             if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType)) {
                 // if the stage should exit with a complete event instead of exit, we need to make sure it is completable
+                // we don't use the completion flag directly on the entity as it gets evaluated only at the end of an evaluation cycle which we didn't hit yet
+                // at this point, so we need a proper evaluation of the completion
                 if (!PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, planItemInstanceEntity, true).isCompletable()) {
                     // we can't complete the stage as it is currently not completable, so we need to throw an exception
                     throw new FlowableIllegalArgumentException(
