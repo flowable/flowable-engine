@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -29,6 +30,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
@@ -63,6 +65,13 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(engineConfiguration, processEngineConfiguration);
 
         initProcessEngine();
+
+        JobServiceConfiguration engineJobServiceConfiguration = getJobServiceConfiguration(engineConfiguration);
+        if (engineJobServiceConfiguration != null) {
+            engineJobServiceConfiguration.getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.BPMN,
+                            ((ProcessEngineConfigurationImpl) processEngineConfiguration).getJobServiceConfiguration().getInternalJobManager());
+        }
 
         initServiceConfigurations(engineConfiguration, processEngineConfiguration);
     }
@@ -120,4 +129,13 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
         this.processEngineConfiguration = processEngineConfiguration;
         return this;
     }
+
+    protected JobServiceConfiguration getJobServiceConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        if (engineConfiguration.getServiceConfigurations().containsKey(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG)) {
+            return (JobServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+        }
+
+        return null;
+    }
+
 }

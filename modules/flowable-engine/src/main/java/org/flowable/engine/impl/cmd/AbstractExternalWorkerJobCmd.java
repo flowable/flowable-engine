@@ -15,8 +15,10 @@ package org.flowable.engine.impl.cmd;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -41,6 +43,11 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
     @Override
     public final Void execute(CommandContext commandContext) {
         ExternalWorkerJobEntity externalWorkerJob = resolveJob(commandContext);
+        if (externalWorkerJob.getProcessInstanceId() == null) {
+            throw new FlowableException(
+                    "External worker job with id " + externalJobId + " is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
+        }
+
         runJobLogic(externalWorkerJob, commandContext);
         if (externalWorkerJob.isExclusive()) {
             // Part of the same transaction to avoid a race condition with the

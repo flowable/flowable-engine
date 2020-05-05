@@ -39,6 +39,7 @@ import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
@@ -50,7 +51,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultInternalJobManager implements InternalJobManager {
+public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -59,7 +60,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
     
     @Override
-    public VariableScope resolveVariableScope(Job job) {
+    protected VariableScope resolveVariableScopeInternal(Job job) {
         if (job.getExecutionId() != null) {
             return getExecutionEntityManager().findById(job.getExecutionId());
         }
@@ -67,7 +68,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public boolean handleJobInsert(Job job) {
+    protected boolean handleJobInsertInternal(Job job) {
         // add link to execution
         if (job.getExecutionId() != null) {
             ExecutionEntity execution = getExecutionEntityManager().findById(job.getExecutionId());
@@ -120,7 +121,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void handleJobDelete(Job job) {
+    protected void handleJobDeleteInternal(Job job) {
         if (job.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(job.getExecutionId());
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
@@ -146,7 +147,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void lockJobScope(Job job) {
+    protected void lockJobScopeInternal(Job job) {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
@@ -161,13 +162,13 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void clearJobScopeLock(Job job) {
+    protected void clearJobScopeLockInternal(Job job) {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getProcessInstanceId());
         if (execution != null) {
             executionEntityManager.clearProcessInstanceLockTime(execution.getId());
         }
-        
+
         if (processEngineConfiguration.isLoggingSessionEnabled()) {
             ExecutionEntity localExecution = executionEntityManager.findById(job.getExecutionId());
             FlowElement flowElement = localExecution.getCurrentFlowElement();
@@ -177,7 +178,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope) {
+    protected void preTimerJobDeleteInternal(JobEntity jobEntity, VariableScope variableScope) {
         String activityId = jobEntity.getJobHandlerConfiguration();
 
         if (jobEntity.getJobHandlerType().equalsIgnoreCase(TimerStartEventJobHandler.TYPE) ||
@@ -224,7 +225,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
     
     @Override
-    public void preRepeatedTimerSchedule(TimerJobEntity ti, VariableScope variableScope) {
+    protected void preRepeatedTimerScheduleInternal(TimerJobEntity ti, VariableScope variableScope) {
         // Nothing to do
     }
 
