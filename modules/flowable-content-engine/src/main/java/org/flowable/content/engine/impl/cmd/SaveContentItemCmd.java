@@ -81,14 +81,21 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             }
 
             ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
-            ContentObject createContentObject = contentStorage.createContentObject(inputStream, metaData);
-            contentItemEntity.setContentStoreId(createContentObject.getId());
+            String contentStoreId = contentItemEntity.getContentStoreId();
+            ContentObject contentObject;
+            if (contentStoreId != null) {
+                contentObject = contentStorage.updateContentObject(contentStoreId, inputStream, metaData);
+            } else {
+                contentObject = contentStorage.createContentObject(inputStream, metaData);
+                contentItemEntity.setContentStoreId(contentObject.getId());
+            }
+            
             contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
             contentItemEntity.setContentAvailable(true);
 
             // After storing the stream, store the length to be accessible without having to consult the
             // underlying content storage to get file size
-            contentItemEntity.setContentSize(createContentObject.getContentLength());
+            contentItemEntity.setContentSize(contentObject.getContentLength());
 
             // Make lastModified timestamp update whenever the content changes
             contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
