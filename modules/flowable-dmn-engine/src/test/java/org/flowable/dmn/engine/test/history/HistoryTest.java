@@ -47,19 +47,27 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertThat(decisionExecution.getExecutionJson()).isNotNull();
 
         JsonNode executionNode = dmnEngineConfiguration.getObjectMapper().readTree(decisionExecution.getExecutionJson());
-        assertThat(executionNode.get("decisionKey").asText()).isEqualTo("decision1");
-        assertThat(executionNode.get("decisionName").asText()).isEqualTo("Full Decision");
-        assertThat(executionNode.get("hitPolicy").asText()).isEqualTo("FIRST");
+        assertThatJson(executionNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "    decisionKey: 'decision1',"
+                        + "    decisionName: 'Full Decision',"
+                        + "    hitPolicy: 'FIRST'"
+                        + "}");
 
         JsonNode inputVariables = executionNode.get("inputVariables");
         assertThat(inputVariables.isObject()).isTrue();
-        assertThat(inputVariables.has("inputVariable1")).isTrue();
-        assertThat(inputVariables.get("inputVariable1").asLong()).isEqualTo(11);
+        assertThatJson(inputVariables)
+                .isEqualTo("{"
+                        + "    inputVariable1: 11"
+                        + "}");
 
         JsonNode inputVariableTypes = executionNode.get("inputVariableTypes");
         assertThat(inputVariableTypes.isObject()).isTrue();
-        assertThat(inputVariableTypes.has("inputVariable1")).isTrue();
-        assertThat(inputVariableTypes.get("inputVariable1").asText()).isEqualTo("number");
+        assertThatJson(inputVariableTypes)
+                .isEqualTo("{"
+                        + "    inputVariable1: 'number'"
+                        + "}");
 
         JsonNode decisionResultArray = executionNode.get("decisionResult");
         assertThat(decisionResultArray.isArray()).isTrue();

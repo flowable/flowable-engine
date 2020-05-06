@@ -58,7 +58,6 @@ public class CustomConfigRuntimeTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
 
-        assertThat(result.get("output1").getClass()).isSameAs(String.class);
         assertThat(result.get("output1")).isEqualTo("test2");
     }
 
