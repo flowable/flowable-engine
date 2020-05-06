@@ -21,9 +21,15 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ClearCaseInstanceLockTimesCmd implements Command<Void> {
 
+    protected String lockOwner;
+
+    public ClearCaseInstanceLockTimesCmd(String lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).clearAllLockTimes();
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).clearAllLockTimes(lockOwner);
         return null;
     }
 

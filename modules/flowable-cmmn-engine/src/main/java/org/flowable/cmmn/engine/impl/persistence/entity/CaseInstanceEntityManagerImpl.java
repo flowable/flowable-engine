@@ -14,9 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -33,14 +31,13 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityMa
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
-import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
@@ -192,17 +189,10 @@ public class CaseInstanceEntityManagerImpl
     }
 
     @Override
-    public void updateLockTime(String caseInstanceId) {
+    public void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime) {
         Date expirationTime = getClock().getCurrentTime();
-        AsyncExecutor asyncExecutor = engineConfiguration.getAsyncExecutor();
-        int lockMillis = asyncExecutor.getAsyncJobLockTimeInMillis();
 
-        GregorianCalendar lockCal = new GregorianCalendar();
-        lockCal.setTime(expirationTime);
-        lockCal.add(Calendar.MILLISECOND, lockMillis);
-        Date lockDate = lockCal.getTime();
-
-        dataManager.updateLockTime(caseInstanceId, lockDate, asyncExecutor.getLockOwner(), expirationTime);
+        dataManager.updateLockTime(caseInstanceId, lockTime, lockOwner, expirationTime);
     }
 
     @Override
@@ -211,10 +201,8 @@ public class CaseInstanceEntityManagerImpl
     }
 
     @Override
-    public void clearAllLockTimes() {
-        if (engineConfiguration.getAsyncExecutor() != null) {
-            dataManager.clearAllLockTimes(engineConfiguration.getAsyncExecutor().getLockOwner());
-        }
+    public void clearAllLockTimes(String lockOwner) {
+        dataManager.clearAllLockTimes(lockOwner);
     }
 
     @Override

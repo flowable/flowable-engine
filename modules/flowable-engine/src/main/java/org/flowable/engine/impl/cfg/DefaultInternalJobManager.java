@@ -14,7 +14,9 @@
 package org.flowable.engine.impl.cfg;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,12 +40,12 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -151,7 +153,23 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
-            executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId());
+            String lockOwner;
+            Date lockExpirationTime;
+
+            if (job instanceof JobInfoEntity) {
+                lockOwner = ((JobInfoEntity) job).getLockOwner();
+                lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
+            } else {
+                int lockMillis = processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
+                GregorianCalendar lockCal = new GregorianCalendar();
+                lockCal.setTime(processEngineConfiguration.getClock().getCurrentTime());
+                lockCal.add(Calendar.MILLISECOND, lockMillis);
+
+                lockOwner = processEngineConfiguration.getAsyncExecutor().getLockOwner();
+                lockExpirationTime = lockCal.getTime();
+            }
+
+            executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId(), lockOwner, lockExpirationTime);
         }
         
         if (processEngineConfiguration.isLoggingSessionEnabled()) {

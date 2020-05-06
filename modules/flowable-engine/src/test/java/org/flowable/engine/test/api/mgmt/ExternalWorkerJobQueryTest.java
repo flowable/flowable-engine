@@ -24,8 +24,8 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -173,7 +173,9 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
                 for (String tenantId : tenantInfoHolder.getAllTenants()) {
                     tenantInfoHolder.setCurrentTenantId(tenantId);
 
-                    commandExecutor.execute(new ClearProcessInstanceLockTimesCmd());
+                    if (asyncExecutor != null) {
+                        commandExecutor.execute(new ClearProcessInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+                    }
 
                     commandExecutor.execute(getProcessEngineCloseCommand());
                     tenantInfoHolder.clearCurrentTenantId();

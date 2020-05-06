@@ -2640,7 +2640,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return () -> {
 
             // Async executor will have cleared the jobs lock owner/times, but not yet the process instance lock time/owner
-            commandExecutor.execute(new ClearProcessInstanceLockTimesCmd());
+            if (asyncExecutor != null) {
+                commandExecutor.execute(new ClearProcessInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+            }
 
             commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
         };

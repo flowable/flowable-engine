@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.callback;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -19,14 +23,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -63,7 +66,23 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     @Override
     protected void lockJobScopeInternal(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        caseInstanceEntityManager.updateLockTime(job.getScopeId());
+        String lockOwner;
+        Date lockExpirationTime;
+
+        if (job instanceof JobInfoEntity) {
+            lockOwner = ((JobInfoEntity) job).getLockOwner();
+            lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
+        } else {
+            int lockMillis = cmmnEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
+            GregorianCalendar lockCal = new GregorianCalendar();
+            lockCal.setTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+            lockCal.add(Calendar.MILLISECOND, lockMillis);
+
+            lockOwner = cmmnEngineConfiguration.getAsyncExecutor().getLockOwner();
+            lockExpirationTime = lockCal.getTime();
+        }
+
+        caseInstanceEntityManager.updateLockTime(job.getScopeId(), lockOwner, lockExpirationTime);
         
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
             PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());

@@ -26,13 +26,15 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -894,6 +896,81 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.createExternalWorkerJobAcquireBuilder().scopeType(ScopeTypes.TASK).onlyCmmn().acquireAndLock(10, null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("Cannot combine scopeType(String) with onlyCmmn() in the same query");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testProcessInstanceIsCorrectlyLocked() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+
+        managementService.executeCommand(new ClearProcessInstanceLockTimesCmd(processEngineConfiguration.getAsyncExecutor().getLockOwner()));
+
+        // Clearing the async executor jobs times should not clear the ones which are locked by the external worker
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+
+        managementService.executeCommand(new ClearProcessInstanceLockTimesCmd("worker1"));
+
+        // Clearing the worker1 jobs times should clear the ones which are locked by it
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isNull();
+        assertThat(processInstance.getLockTime()).isNull();
+
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleNotExclusive.bpmn20.xml")
+    void testProcessInstanceIsNotLockedByNotExclusiveJob() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isNull();
+        assertThat(processInstance.getLockTime()).isNull();
     }
 
     protected void setTime(Instant time) {
