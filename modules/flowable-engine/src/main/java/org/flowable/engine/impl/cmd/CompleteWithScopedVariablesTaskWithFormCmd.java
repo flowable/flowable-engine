@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,7 +28,6 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import java.util.Map;
 
 /**
  * @author Ievgenii Bespal
