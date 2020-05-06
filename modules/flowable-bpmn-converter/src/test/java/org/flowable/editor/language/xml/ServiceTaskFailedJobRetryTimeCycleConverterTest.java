@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -43,13 +41,11 @@ public class ServiceTaskFailedJobRetryTimeCycleConverterTest extends AbstractCon
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ServiceTask);
-        assertEquals("servicetask", flowElement.getId());
-        ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Service task", serviceTask.getName());
-
-        assertEquals("R5/PT5M", serviceTask.getFailedJobRetryTimeCycleValue());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask");
+                    assertThat(serviceTask.getName()).isEqualTo("Service task");
+                    assertThat(serviceTask.getFailedJobRetryTimeCycleValue()).isEqualTo("R5/PT5M");
+                });
     }
 }

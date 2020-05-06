@@ -12,10 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -47,24 +44,20 @@ public class ServiceTaskTransientVariableTest extends AbstractConverterTest {
         FlowElement flowElement2 = model.getMainProcess().getFlowElement("servicetask2");
         FlowElement flowElement3 = model.getMainProcess().getFlowElement("servicetask3");
 
-        assertNotNull(flowElement1);
-        assertNotNull(flowElement2);
-        assertNotNull(flowElement3);
-
-        assertTrue(flowElement1 instanceof ServiceTask);
-        assertTrue(flowElement2 instanceof ServiceTask);
-        assertTrue(flowElement3 instanceof ServiceTask);
-
-        assertEquals("servicetask1", flowElement1.getId());
-        assertEquals("servicetask2", flowElement2.getId());
-        assertEquals("servicetask3", flowElement3.getId());
-
-        ServiceTask serviceTask1 = (ServiceTask) flowElement1;
-        ServiceTask serviceTask2 = (ServiceTask) flowElement2;
-        ServiceTask serviceTask3 = (ServiceTask) flowElement3;
-
-        assertTrue(serviceTask1.isStoreResultVariableAsTransient());
-        assertFalse(serviceTask2.isStoreResultVariableAsTransient());
-        assertFalse(serviceTask3.isStoreResultVariableAsTransient());
+        assertThat(flowElement1)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask1");
+                    assertThat(serviceTask.isStoreResultVariableAsTransient()).isTrue();
+                });
+        assertThat(flowElement2)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask2");
+                    assertThat(serviceTask.isStoreResultVariableAsTransient()).isFalse();
+                });
+        assertThat(flowElement3)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask3");
+                    assertThat(serviceTask.isStoreResultVariableAsTransient()).isFalse();
+                });
     }
 }

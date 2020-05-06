@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -56,41 +54,35 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("sendEventServiceTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SendEventServiceTask);
-        SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
-        assertEquals("sendEventServiceTask", sendEventServiceTask.getId());
-        assertEquals("Send event task", sendEventServiceTask.getName());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SendEventServiceTask.class, sendEventServiceTask -> {
+                    assertThat(sendEventServiceTask.getId()).isEqualTo("sendEventServiceTask");
+                    assertThat(sendEventServiceTask.getName()).isEqualTo("Send event task");
+                    assertThat(sendEventServiceTask.getEventType()).isEqualTo("myEvent");
+                    assertThat(sendEventServiceTask.isTriggerable()).isTrue();
+                    assertThat(sendEventServiceTask.getTriggerEventType()).isEqualTo("triggerMyEvent");
+                    assertThat(sendEventServiceTask.isSendSynchronously()).isFalse();
+                    assertThat(sendEventServiceTask.getEventInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(
+                                    tuple("${myVariable}", "customerId"),
+                                    tuple("anotherProperty", "anotherCustomerId")
+                            );
+                    assertThat(sendEventServiceTask.getEventInParameters().get(1).getAttributeValue(null, "targetType")).isEqualTo("string");
+                    assertThat(sendEventServiceTask.getEventOutParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(tuple("eventProperty", "newVariable"));
+                    assertThat(sendEventServiceTask.getEventOutParameters().get(0).getAttributeValue(null, "sourceType")).isEqualTo("integer");
 
-        assertEquals("myEvent", sendEventServiceTask.getEventType());
-        assertTrue(sendEventServiceTask.isTriggerable());
-        assertEquals("triggerMyEvent", sendEventServiceTask.getTriggerEventType());
-        assertFalse(sendEventServiceTask.isSendSynchronously());
-
-        List<IOParameter> parameters = sendEventServiceTask.getEventInParameters();
-        assertEquals(2, parameters.size());
-        IOParameter parameter = parameters.get(0);
-        assertEquals("${myVariable}", parameter.getSource());
-        assertEquals("customerId", parameter.getTarget());
-        parameter = parameters.get(1);
-        assertEquals("anotherProperty", parameter.getSource());
-        assertEquals("anotherCustomerId", parameter.getTarget());
-        assertEquals("string", parameter.getAttributeValue(null, "targetType"));
-
-        parameters = sendEventServiceTask.getEventOutParameters();
-        assertEquals(1, parameters.size());
-        parameter = parameters.get(0);
-        assertEquals("eventProperty", parameter.getSource());
-        assertEquals("integer", parameter.getAttributeValue(null, "sourceType"));
-        assertEquals("newVariable", parameter.getTarget());
-        
-        List<ExtensionElement> correlationParameters = sendEventServiceTask.getExtensionElements().get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);
-        assertEquals(2, correlationParameters.size());
-        ExtensionElement correlationElement = correlationParameters.get(0);
-        assertEquals("customerId", correlationElement.getAttributeValue(null, "name"));
-        assertEquals("${customerIdVar}", correlationElement.getAttributeValue(null, "value"));
-        correlationElement = correlationParameters.get(1);
-        assertEquals("orderId", correlationElement.getAttributeValue(null, "name"));
-        assertEquals("${orderIdVar}", correlationElement.getAttributeValue(null, "value"));
+                    List<ExtensionElement> correlationParameters = flowElement.getExtensionElements()
+                            .get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);
+                    assertThat(correlationParameters).hasSize(2);
+                    ExtensionElement correlationElement = correlationParameters.get(0);
+                    assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("customerId");
+                    assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");
+                    correlationElement = correlationParameters.get(1);
+                    assertThat(correlationElement.getAttributeValue(null, "name")).isEqualTo("orderId");
+                    assertThat(correlationElement.getAttributeValue(null, "value")).isEqualTo("${orderIdVar}");
+                });
     }
 }
