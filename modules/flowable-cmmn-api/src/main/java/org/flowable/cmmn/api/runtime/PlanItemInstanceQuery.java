@@ -367,6 +367,16 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      *            cannot be null.
      */
     PlanItemInstanceQuery caseVariableNotExists(String name);
+
+    /**
+     * Localize plan item name to specified locale.
+     */
+    PlanItemInstanceQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    PlanItemInstanceQuery withLocalizationFallback();
     
     PlanItemInstanceQuery orderByCreateTime();
     PlanItemInstanceQuery orderByEndTime();

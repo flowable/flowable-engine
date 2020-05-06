@@ -20,7 +20,9 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -179,6 +181,43 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastUpdatedTime().asc().list()).hasSize(16);
         assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().orderByLastUpdatedTime().desc().list()).hasSize(16);
+    }
+
+    @Test
+    public void testLocalization() {
+        startInstances(1);
+
+        cmmnEngineConfiguration.setPlanItemLocalizationManager(new PlanItemLocalizationManager() {
+            @Override
+            public void localize(PlanItemInstance planItemInstance, String locale, boolean withLocalizationFallback) {
+
+            }
+
+            @Override
+            public void localize(HistoricPlanItemInstance historicPlanItemInstance, String locale, boolean withLocalizationFallback) {
+                if ("pt".equals(locale)) {
+                    historicPlanItemInstance.setLocalizedName("Plano traduzido");
+                }
+            }
+        });
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                .extracting(HistoricPlanItemInstance::getName)
+                .containsExactlyInAnyOrder(
+                        "Stage one",
+                        "Stage two",
+                        "A",
+                        "B"
+                );
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().locale("pt").list())
+                .extracting(HistoricPlanItemInstance::getName)
+                .containsExactlyInAnyOrder(
+                        "Plano traduzido",
+                        "Plano traduzido",
+                        "Plano traduzido",
+                        "Plano traduzido"
+                );
     }
 
     private List<String> startInstances(int numberOfInstances) {

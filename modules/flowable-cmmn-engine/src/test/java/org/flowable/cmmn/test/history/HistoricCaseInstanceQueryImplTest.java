@@ -20,7 +20,9 @@ import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CaseLocalizationManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -998,6 +1000,34 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             cmmnHistoryService.deleteHistoricCaseInstance(caseInstance1.getId());
         }
 
+    }
+
+    @Test
+    public void testLocalization() {
+        CaseInstance createdCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .name("Default name")
+                .start();
+
+        cmmnEngineConfiguration.setCaseLocalizationManager(new CaseLocalizationManager() {
+            @Override
+            public void localize(CaseInstance caseInstance, String locale, boolean withLocalizationFallback) {
+
+            }
+
+            @Override
+            public void localize(HistoricCaseInstance historicCaseInstance, String locale, boolean withLocalizationFallback) {
+                if ("pt".equals(locale)) {
+                    historicCaseInstance.setLocalizedName("Caso 1");
+                }
+            }
+        });
+
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).singleResult();
+        assertThat(caseInstance.getName()).isEqualTo("Default name");
+
+        caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).locale("pt").singleResult();
+        assertThat(caseInstance.getName()).isEqualTo("Caso 1");
     }
 
 }

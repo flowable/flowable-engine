@@ -72,6 +72,17 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery endedAfter(Date endedAfter);
     HistoricPlanItemInstanceQuery ended();
     HistoricPlanItemInstanceQuery notEnded();
+
+    /**
+     * Localize plan item name to specified locale.
+     */
+    HistoricPlanItemInstanceQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    HistoricPlanItemInstanceQuery withLocalizationFallback();
+
     HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
     HistoricPlanItemInstanceQuery orderByLastAvailableTime();

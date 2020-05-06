@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
@@ -41,6 +42,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     protected String referenceType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected List<HistoricVariableInstanceEntity> queryVariables;
+    protected String localizedName;
 
     @Override
     public Object getPersistentState() {
@@ -71,6 +73,9 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     }
     @Override
     public String getName() {
+        if (StringUtils.isNotBlank(localizedName)) {
+            return localizedName;
+        }
         return name;
     }
     @Override
@@ -189,5 +194,14 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
 
     public void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables) {
         this.queryVariables = queryVariables;
+    }
+
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
     }
 }

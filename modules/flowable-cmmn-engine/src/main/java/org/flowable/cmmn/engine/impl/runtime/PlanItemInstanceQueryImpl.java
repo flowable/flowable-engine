@@ -19,6 +19,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -81,7 +82,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Collection<String> involvedGroups;
     protected String tenantId;
     protected boolean withoutTenantId;
-    
+    protected String locale;
+    protected boolean withLocalizationFallback;
+
     public PlanItemInstanceQueryImpl() {
         
     }
@@ -618,6 +621,18 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
+    @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
@@ -626,7 +641,16 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        List<PlanItemInstance> planItems = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getPlanItemLocalizationManager() != null) {
+            for (PlanItemInstance planItemInstance : planItems) {
+                cmmnEngineConfiguration.getPlanItemLocalizationManager().localize(planItemInstance, locale, withLocalizationFallback);
+            }
+        }
+
+        return planItems;
     }
     
     @Override

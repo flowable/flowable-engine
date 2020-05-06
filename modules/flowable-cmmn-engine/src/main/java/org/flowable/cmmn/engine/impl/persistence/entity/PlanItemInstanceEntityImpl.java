@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -79,6 +80,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
+    protected String localizedName;
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
@@ -203,6 +205,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
     @Override
     public String getName() {
+        if (StringUtils.isNotBlank(localizedName)) {
+            return localizedName;
+        }
         return name;
     }
     @Override
@@ -547,6 +552,15 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.currentFlowableListener = flowableListener;
     }
 
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -554,7 +568,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
             .append(id);
 
         if (getName() != null) {
-            stringBuilder.append(", name: ").append(name);
+            stringBuilder.append(", name: ").append(getName());
         }
         stringBuilder.append(", definitionId: ")
             .append(planItemDefinitionId)
