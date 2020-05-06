@@ -16,6 +16,7 @@ public class DmnDiShape extends DmnDiDiagramElement {
 
     protected String dmnElementRef;
     protected GraphicInfo graphicInfo;
+    protected DmnDiDecisionServiceDividerLine decisionServiceDividerLine;
 
     public String getDmnElementRef() {
         return dmnElementRef;
@@ -28,5 +29,11 @@ public class DmnDiShape extends DmnDiDiagramElement {
     }
     public void setGraphicInfo(GraphicInfo graphicInfo) {
         this.graphicInfo = graphicInfo;
+    }
+    public DmnDiDecisionServiceDividerLine getDecisionServiceDividerLine() {
+        return decisionServiceDividerLine;
+    }
+    public void setDecisionServiceDividerLine(DmnDiDecisionServiceDividerLine decisionServiceDividerLine) {
+        this.decisionServiceDividerLine = decisionServiceDividerLine;
     }
 }

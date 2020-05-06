@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DiEdge;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnDiDiagram;
-import org.flowable.dmn.model.DmnDiEdge;
 import org.flowable.dmn.model.DmnDiShape;
 
 public class ConversionHelper {
@@ -29,11 +29,11 @@ public class ConversionHelper {
     protected Decision currentDecision;
     protected DmnDiDiagram currentDiDiagram;
     protected DmnDiShape currentDiShape;
-    protected DmnDiEdge currentDiEdge;
+    protected DiEdge currentDiEdge;
 
     protected List<DmnDiDiagram> diDiagrams = new ArrayList<>();
     protected Map<String, List<DmnDiShape>> diShapes = new LinkedHashMap<>();
-    protected Map<String, List<DmnDiEdge>> diEdges = new LinkedHashMap<>();
+    protected Map<String, List<DiEdge>> diEdges = new LinkedHashMap<>();
 
     public DmnDefinition getDmnDefinition() {
         return dmnDefinition;
@@ -59,7 +59,7 @@ public class ConversionHelper {
         setCurrentDiShape(diShape);
     }
 
-    public void addDiEdge(DmnDiEdge diEdge) {
+    public void addDiEdge(DiEdge diEdge) {
         diEdges.computeIfAbsent(getCurrentDiDiagram().getId(), k -> new ArrayList<>());
         diEdges.get(getCurrentDiDiagram().getId()).add(diEdge);
         setCurrentDiEdge(diEdge);
@@ -79,11 +79,11 @@ public class ConversionHelper {
         this.currentDiShape = currentDiShape;
     }
 
-    public DmnDiEdge getCurrentDiEdge() {
+    public DiEdge getCurrentDiEdge() {
         return currentDiEdge;
     }
 
-    public void setCurrentDiEdge(DmnDiEdge currentDiEdge) {
+    public void setCurrentDiEdge(DiEdge currentDiEdge) {
         this.currentDiEdge = currentDiEdge;
     }
 
@@ -93,7 +93,7 @@ public class ConversionHelper {
     public List<DmnDiShape> getDiShapes(String diagramId) {
         return diShapes.get(diagramId);
     }
-    public List<DmnDiEdge> getDiEdges(String diagramId) {
+    public List<DiEdge> getDiEdges(String diagramId) {
         return diEdges.get(diagramId);
     }
 

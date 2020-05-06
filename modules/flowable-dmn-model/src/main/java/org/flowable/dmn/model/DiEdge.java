@@ -12,21 +12,20 @@
  */
 package org.flowable.dmn.model;
 
-public class DmnDiEdge extends DiEdge {
+import java.util.ArrayList;
+import java.util.List;
 
-    protected String dmnElementRef;
-    protected String targetDmnElementRef;
+public abstract class DiEdge extends DmnDiDiagramElement {
+    protected List<GraphicInfo> waypoints = new ArrayList<>();
 
-    public String getDmnElementRef() {
-        return dmnElementRef;
+    public void addWaypoint(GraphicInfo graphicInfo) {
+        this.waypoints.add(graphicInfo);
     }
-    public void setDmnElementRef(String dmnElementRef) {
-        this.dmnElementRef = dmnElementRef;
+    public List<GraphicInfo> getWaypoints() {
+        return waypoints;
     }
-    public String getTargetDmnElementRef() {
-        return targetDmnElementRef;
+    public void setWaypoints(List<GraphicInfo> waypoints) {
+        this.waypoints = waypoints;
     }
-    public void setTargetDmnElementRef(String targetDmnElementRef) {
-        this.targetDmnElementRef = targetDmnElementRef;
-    }
+
 }

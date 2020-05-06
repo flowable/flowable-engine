@@ -40,10 +40,21 @@ public class DMNDIExport implements DmnXMLConstants {
 
             // DI shape
             for (Map.Entry<String, GraphicInfo> graphicInfoEntry : graphicInfoMap.entrySet()) {
-                createDmnShape(graphicInfoEntry.getKey(), graphicInfoEntry.getValue(), xtw);
+                xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_SHAPE, DMNDI_NAMESPACE);
+                xtw.writeAttribute(ATTRIBUTE_ID, DmnXMLUtil.getUniqueElementId("DMNShape"));
+                xtw.writeAttribute(ATTRIBUTE_DI_DMN_ELEMENT_REF, graphicInfoEntry.getKey());
+
+                createDmnShapeBounds(graphicInfoEntry.getValue(), xtw);
+
+                if (model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()) != null
+                    && model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).containsKey(graphicInfoEntry.getKey())) {
+                    createDmnDecisionServiceDividerLine(model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).get(graphicInfoEntry.getKey()), xtw);
+                }
+
+                xtw.writeEndElement();
             }
 
-            // DI endge
+            // DI edge
             Map<String, List<GraphicInfo>> flowLocationGraphicInfoMap = model.getFlowLocationGraphicInfo(diDiagram.getId());
             for (Map.Entry<String, List<GraphicInfo>> flowLocationGraphicInfoEntry : flowLocationGraphicInfoMap.entrySet()) {
                 createDmnEdge(flowLocationGraphicInfoEntry.getKey(), flowLocationGraphicInfoEntry.getValue(), xtw);
@@ -57,17 +68,24 @@ public class DMNDIExport implements DmnXMLConstants {
         // end DI information
     }
 
-    protected static void createDmnShape(String elementId, GraphicInfo graphicInfo, XMLStreamWriter xtw) throws Exception {
-        xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_SHAPE, DMNDI_NAMESPACE);
-        xtw.writeAttribute(ATTRIBUTE_ID, DmnXMLUtil.getUniqueElementId("DMNShape"));
-        xtw.writeAttribute(ATTRIBUTE_DI_DMN_ELEMENT_REF, elementId);
-
+    protected static void createDmnShapeBounds(GraphicInfo graphicInfo, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
         xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(graphicInfo.getHeight()));
         xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(graphicInfo.getWidth()));
         xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
         xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
         xtw.writeEndElement();
+    }
+
+    protected static void createDmnDecisionServiceDividerLine(List<GraphicInfo> graphicInfoList, XMLStreamWriter xtw) throws Exception {
+        xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_DECISION_SERVICE_DIVIDER_LINE, DMNDI_NAMESPACE);
+
+        for (GraphicInfo graphicInfo : graphicInfoList) {
+            xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_WAYPOINT, OMGDC_NAMESPACE);
+            xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
+            xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
+            xtw.writeEndElement();
+        }
 
         xtw.writeEndElement();
     }

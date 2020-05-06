@@ -33,6 +33,7 @@ public class DmnDefinition extends NamedElement {
     protected Map<String, Map<String, GraphicInfo>> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, Map<String, List<GraphicInfo>>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, List<GraphicInfo>>> decisionServiceDividerLocationMap = new LinkedHashMap<>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;
@@ -152,6 +153,14 @@ public class DmnDefinition extends NamedElement {
         return flowLocationMap;
     }
 
+    public Map<String, Map<String, List<GraphicInfo>>> getDecisionServiceDividerGraphicInfo() {
+        return decisionServiceDividerLocationMap;
+    }
+
+    public Map<String, List<GraphicInfo>> getDecisionServiceDividerGraphicInfo(String diagramId) {
+        return decisionServiceDividerLocationMap.get(diagramId);
+    }
+
     public void removeFlowGraphicInfoList(String diagramId) {
         flowLocationMap.remove(diagramId);
     }
@@ -183,6 +192,16 @@ public class DmnDefinition extends NamedElement {
     public void addFlowGraphicInfoList(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
         flowLocationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
         flowLocationMap.get(diagramId).put(key, graphicInfoList);
+    }
+
+    public Map<String, Map<String, List<GraphicInfo>>> getDecisionServiceDividerLocationMap() {
+        return decisionServiceDividerLocationMap;
+    }
+
+
+    public void addDecisionServiceDividerGraphicInfoList(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
+        decisionServiceDividerLocationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        decisionServiceDividerLocationMap.get(diagramId).put(key, graphicInfoList);
     }
 
 }

@@ -113,6 +113,12 @@ public class Chapter11Test extends AbstractConverterTest {
 
         assertThat(model.getFlowLocationGraphicInfo("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
             .hasSize(11);
+
+        assertThat(model.getDecisionServiceDividerGraphicInfo("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
+            .hasSize(1);
+
+        assertThat(model.getDecisionServiceDividerGraphicInfo("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+            .hasSize(1);
     }
 
 }

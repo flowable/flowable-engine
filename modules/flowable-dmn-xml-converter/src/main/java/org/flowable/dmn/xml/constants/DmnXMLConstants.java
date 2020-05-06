@@ -86,6 +86,7 @@ public interface DmnXMLConstants {
     String ELEMENT_DI_LABEL = "DMNLabel";
     String ELEMENT_DI_BOUNDS = "Bounds";
     String ELEMENT_DI_WAYPOINT = "waypoint";
+    String ELEMENT_DI_DECISION_SERVICE_DIVIDER_LINE = "DMNDecisionServiceDividerLine";
     String ATTRIBUTE_DI_DMN_ELEMENT_REF = "dmnElementRef";
     String ATTRIBUTE_DI_TARGET_DMN_ELEMENT_REF = "targetDMNElementRef";
     String ATTRIBUTE_DI_WIDTH = "width";

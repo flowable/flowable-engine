@@ -97,6 +97,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
         addConverter(new DmnDiEdgeXmlConverter());
         addConverter(new DmnDiWaypointXmlConverter());
         addConverter(new DmnDiSizeXmlConverter());
+        addConverter(new DmnDiDecisionServiceDividerLineXmlConverter());
     }
 
     public static void addConverter(BaseDmnXMLConverter converter) {
@@ -325,9 +326,19 @@ public class DmnXMLConverter implements DmnXMLConstants {
             .forEach(diDiagram -> {
                 dmnDefinition.addDiDiagram(diDiagram);
                 conversionHelper.getDiShapes(diDiagram.getId())
-                    .forEach(dmnDiShape -> dmnDefinition.addGraphicInfo(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo()));
+                    .forEach(dmnDiShape -> {
+                        dmnDefinition.addGraphicInfo(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo());
+                        if (dmnDiShape.getDecisionServiceDividerLine() != null) {
+                            dmnDefinition.addDecisionServiceDividerGraphicInfoList(diDiagram.getId(), dmnDiShape.getDmnElementRef(),
+                                dmnDiShape.getDecisionServiceDividerLine().getWaypoints());
+                        }
+                    });
                 conversionHelper.getDiEdges(diDiagram.getId())
-                    .forEach(dmnDiEdge -> dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getId(), dmnDiEdge.getWaypoints()));
+                    .forEach(dmnDiEdge -> {
+                        if (dmnDiEdge.getId() != null) {
+                            dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getId(), dmnDiEdge.getWaypoints());
+                        }
+                    });
             });
     }
 
