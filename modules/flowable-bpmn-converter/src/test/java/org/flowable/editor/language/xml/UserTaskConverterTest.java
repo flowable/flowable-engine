@@ -13,7 +13,10 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.Collections;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -58,18 +61,18 @@ public class UserTaskConverterTest extends AbstractConverterTest {
                     assertThat(userTask.getBusinessCalendarName()).isEqualTo("customCalendarName");
 
                     assertThat(userTask.getAssignee()).isEqualTo("kermit");
-                    assertThat(userTask.getCandidateUsers()).hasSize(2);
-                    assertThat(userTask.getCandidateUsers().contains("kermit")).isTrue();
-                    assertThat(userTask.getCandidateUsers().contains("fozzie")).isTrue();
-                    assertThat(userTask.getCandidateGroups()).hasSize(2);
-                    assertThat(userTask.getCandidateGroups().contains("management")).isTrue();
-                    assertThat(userTask.getCandidateGroups().contains("sales")).isTrue();
+                    assertThat(userTask.getCandidateUsers()).containsExactlyInAnyOrder("kermit", "fozzie");
+                    assertThat(userTask.getCandidateGroups()).containsExactlyInAnyOrder("management", "sales");
 
                     assertThat(userTask.getCustomUserIdentityLinks()).hasSize(1);
                     assertThat(userTask.getCustomGroupIdentityLinks()).hasSize(2);
-                    assertThat(userTask.getCustomUserIdentityLinks().get("businessAdministrator").contains("kermit")).isTrue();
-                    assertThat(userTask.getCustomGroupIdentityLinks().get("manager").contains("management")).isTrue();
-                    assertThat(userTask.getCustomGroupIdentityLinks().get("businessAdministrator").contains("management")).isTrue();
+                    assertThat(userTask.getCustomUserIdentityLinks())
+                            .containsOnly(entry("businessAdministrator", Collections.singleton("kermit")));
+                    assertThat(userTask.getCustomGroupIdentityLinks())
+                            .containsOnly(
+                                    entry("manager", Collections.singleton("management")),
+                                    entry("businessAdministrator", Collections.singleton("management"))
+                            );
 
                     assertThat(userTask.getFormProperties())
                             .extracting(FormProperty::getId, FormProperty::getName, FormProperty::getType, FormProperty::getVariable,

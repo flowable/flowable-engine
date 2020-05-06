@@ -13,7 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.BpmnModel;
@@ -72,10 +72,7 @@ public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
                     assertThat(subProcess.getDataObjects())
                             .extracting(ValuedDataObject::getName, ValuedDataObject::getValue)
                             .containsExactly(tuple("SubTest", "Testing"));
-                    assertThat(subProcess.getDataObjects().get(0).getItemSubjectRef().getStructureRef())
-                            .isInstanceOfSatisfying(String.class, structRef -> {
-                                assertThat(structRef).isEqualTo("xsd:string");
-                            });
+                    assertThat(subProcess.getDataObjects().get(0).getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
                 });
     }
 }

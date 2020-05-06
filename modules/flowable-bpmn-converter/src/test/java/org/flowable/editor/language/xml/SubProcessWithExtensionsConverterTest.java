@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -147,9 +148,10 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
          * Verify Subprocess attributes extension
          */
         Map<String, String> attributes = getSubprocessAttributes(flowElement);
-        assertThat(attributes).containsOnlyKeys("Attr3", "Attr4");
-        assertThat(attributes).containsEntry("Attr3", "3");
-        assertThat(attributes).containsEntry("Attr4", "4");
+        assertThat(attributes).containsOnly(
+                entry("Attr3", "3"),
+                entry("Attr4", "4")
+        );
 
         /*
          * Verify Subprocess localization extension

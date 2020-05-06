@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -153,9 +154,10 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
          * Verify DataObject attributes extension
          */
         Map<String, String> attributes = getDataObjectAttributes(dataObj);
-        assertThat(attributes).containsOnlyKeys("Attr1", "Attr2");
-        assertThat(attributes).containsEntry("Attr1", "1");
-        assertThat(attributes).containsEntry("Attr2", "2");
+        assertThat(attributes).containsOnly(
+                entry("Attr1", "1"),
+                entry("Attr2", "2")
+        );
 
         /*
          * Verify DataObject localization extension
@@ -192,9 +194,10 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
          * Verify DataObject attributes extension
          */
         attributes = getDataObjectAttributes(dataObj);
-        assertThat(attributes).containsOnlyKeys("Attr3", "Attr4");
-        assertThat(attributes).containsEntry("Attr3", "3");
-        assertThat(attributes).containsEntry("Attr4", "4");
+        assertThat(attributes).containsOnly(
+                entry("Attr3", "3"),
+                entry("Attr4", "4")
+        );
 
         /*
          * Verify DataObject localization extension
