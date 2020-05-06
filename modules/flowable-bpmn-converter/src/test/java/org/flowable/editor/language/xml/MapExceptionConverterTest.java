@@ -36,14 +36,16 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
     public void testMapExceptionWithInvalidHasChildren() throws Exception {
         resourceName = "mapException/mapExceptionInvalidHasChildrenModel.bpmn";
         assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class);
+                .isExactlyInstanceOf(XMLException.class)
+                .hasMessageContaining("is not valid boolean");
     }
 
     @Test
     public void testMapExceptionWithNoErrorCode() throws Exception {
         resourceName = "mapException/mapExceptionNoErrorCode.bpmn";
         assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class);
+                .isExactlyInstanceOf(XMLException.class)
+                .hasMessageContaining("No errorCode defined mapException with errorCode=null");
     }
 
     @Test
