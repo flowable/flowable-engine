@@ -49,7 +49,7 @@ public class UserTaskSameDeploymentFalseConverterTest extends AbstractConverterT
                     assertThat(task.getId()).isEqualTo("userTask");
                     assertThat(task.getFormKey()).isEqualTo("testKey");
                     assertThat(task.isSameDeployment()).isFalse();
+                    assertThat(task.getAttributes()).isEmpty();
                 });
-        assertThat(flowElement.getAttributes()).isEmpty();
     }
 }
