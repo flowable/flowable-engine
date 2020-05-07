@@ -12,6 +12,9 @@
  */
 package org.flowable.eventregistry.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,6 +30,8 @@ import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a resources that is part of a deployment.
@@ -50,12 +55,14 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-
-            // Check URL's for the resource
-            assertEquals(responseNode.get("url").textValue(), buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
-            assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
-            assertEquals("application/json", responseNode.get("mediaType").textValue());
-            assertEquals("eventDefinition", responseNode.get("type").textValue());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "url: '" + buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName) + "',"
+                            + "mediaType: 'application/json',"
+                            + "contentUrl: '" + buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName) + "',"
+                            + "type: 'eventDefinition'"
+                            + "}");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -102,16 +109,23 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
         try {
             EventDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("simpleChannel.channel").deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, 
-                            deployment.getId(), "simpleChannel.channel"));
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT,
+                    deployment.getId(), "simpleChannel.channel"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             String responseAsString = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
-            assertNotNull(responseAsString);
+            assertThat(responseAsString).isNotNull();
             JsonNode channelNode = objectMapper.readTree(responseAsString);
-            assertEquals("myChannel", channelNode.get("key").asText());
-            assertEquals("myEvent", channelNode.get("channelEventKeyDetection").get("fixedValue").asText());
+            assertThatJson(channelNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "key: 'myChannel',"
+                            + "channelEventKeyDetection:"
+                            + " {"
+                            + "   fixedValue: 'myEvent'"
+                            + " }"
+                            + "}");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
