@@ -16,9 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -27,6 +24,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Valentin Zickner
@@ -126,7 +127,7 @@ public class DmnTaskTest {
         Object resultObject = processVariables.get("DecisionTable");
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
-        assertThat(result).hasSize(0);
+        assertThat(result).isEmpty();
     }
 
 }
