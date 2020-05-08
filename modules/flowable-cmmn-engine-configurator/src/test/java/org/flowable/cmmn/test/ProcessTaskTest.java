@@ -1155,7 +1155,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
+                .terminatePlanItemDefinitionId("oneexpandedstage1")
+                .activatePlanItemDefinitionId("oneprocesstask3")
                 .changeState();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
@@ -1213,7 +1214,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
+                .terminatePlanItemDefinitionId("oneexpandedstage1")
+                .activatePlanItemDefinitionId("oneprocesstask3")
                 .changeState();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
@@ -1281,7 +1283,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
             cmmnRuntimeService.createChangePlanItemStateBuilder()
                     .caseInstanceId(caseInstance.getId())
-                    .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
+                    .terminatePlanItemDefinitionId("oneexpandedstage1")
+                    .activatePlanItemDefinitionId("oneprocesstask3")
                     .changeState();
 
             assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(2);

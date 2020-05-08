@@ -12,10 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.common.engine.api.FlowableException;
@@ -28,10 +29,9 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     protected CmmnRuntimeServiceImpl runtimeService;
 
     protected String caseInstanceId;
-    protected List<MovePlanItemInstanceIdContainer> movePlanItemInstanceIdList = new ArrayList<>();
-    protected List<MovePlanItemDefinitionIdContainer> movePlanItemDefinitionIdList = new ArrayList<>();
-    protected List<String> activatePlanItemDefinitionIdList = new ArrayList<>();
-    protected List<String> changePlanItemToAvailableIdList = new ArrayList<>();
+    protected Set<String> activatePlanItemDefinitionIds = new HashSet<>();
+    protected Set<String> changeToAvailableStatePlanItemDefinitionIds = new HashSet<>();
+    protected Set<String> terminatePlanItemDefinitionIds = new HashSet<>();
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
 
@@ -49,86 +49,38 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     }
 
     @Override
-    public ChangePlanItemStateBuilder movePlanItemInstanceToPlanItemDefinitionId(String planItemInstanceId, String planItemDefinitionId) {
-        return moveExecutionToActivityId(planItemInstanceId, planItemDefinitionId, null);
-    }
-
-    public ChangePlanItemStateBuilder moveExecutionToActivityId(String planItemInstanceId, String planItemDefinitionId, String newAssigneeId) {
-        movePlanItemInstanceIdList.add(new MovePlanItemInstanceIdContainer(planItemInstanceId, planItemDefinitionId, newAssigneeId));
-        return this;
-    }
-
-    @Override
-    public ChangePlanItemStateBuilder movePlanItemInstancesToSinglePlanItemDefinitionId(List<String> planItemInstanceIds, String planItemDefinitionId) {
-        return movePlanItemInstancesToSinglePlanItemDefinitionId(planItemInstanceIds, planItemDefinitionId, null);
-    }
-
-    public ChangePlanItemStateBuilder movePlanItemInstancesToSinglePlanItemDefinitionId(List<String> planItemInstanceIds, String planItemDefinitionId, String newAssigneeId) {
-        movePlanItemInstanceIdList.add(new MovePlanItemInstanceIdContainer(planItemInstanceIds, planItemDefinitionId, newAssigneeId));
-        return this;
-    }
-
-    @Override
-    public ChangePlanItemStateBuilder moveSinglePlanItemInstanceToPlanItemDefinitionIds(String executionId, List<String> activityIds) {
-        return moveSinglePlanItemInstanceToPlanItemDefinitionIds(executionId, activityIds, null);
-    }
-
-    public ChangePlanItemStateBuilder moveSinglePlanItemInstanceToPlanItemDefinitionIds(String executionId, List<String> activityIds, String newAssigneeId) {
-        movePlanItemInstanceIdList.add(new MovePlanItemInstanceIdContainer(executionId, activityIds, newAssigneeId));
-        return this;
-    }
-
-    @Override
-    public ChangePlanItemStateBuilder movePlanItemDefinitionIdTo(String currentPlanItemDefinitionId, String newPlanItemDefinitionId) {
-        return movePlanItemDefinitionIdTo(currentPlanItemDefinitionId, newPlanItemDefinitionId, null);
-    }
-
-    public ChangePlanItemStateBuilder movePlanItemDefinitionIdTo(String currentPlanItemDefinitionId, String newPlanItemDefinitionId, String newAssigneeId) {
-        movePlanItemDefinitionIdList.add(new MovePlanItemDefinitionIdContainer(currentPlanItemDefinitionId, newPlanItemDefinitionId, newAssigneeId));
-        return this;
-    }
-
-    @Override
-    public ChangePlanItemStateBuilder movePlanItemDefinitionIdsToSinglePlanItemDefinitionId(List<String> planItemDefinitionIds, String planItemDefinitionId) {
-        return movePlanItemDefinitionIdsToSinglePlanItemDefinitionId(planItemDefinitionIds, planItemDefinitionId, null);
-    }
-
-    public ChangePlanItemStateBuilder movePlanItemDefinitionIdsToSinglePlanItemDefinitionId(List<String> planItemDefinitionIds, String planItemDefinitionId, String newAssigneeId) {
-        movePlanItemDefinitionIdList.add(new MovePlanItemDefinitionIdContainer(planItemDefinitionIds, planItemDefinitionId, newAssigneeId));
-        return this;
-    }
-
-    @Override
-    public ChangePlanItemStateBuilder moveSinglePlanItemDefinitionIdToPlanItemDefinitionIds(String currentPlanItemDefinitionId, List<String> newPlanItemDefinitionIds) {
-        return moveSinglePlanItemDefinitionIdToPlanItemDefinitionIds(currentPlanItemDefinitionId, newPlanItemDefinitionIds, null);
-    }
-
-    public ChangePlanItemStateBuilder moveSinglePlanItemDefinitionIdToPlanItemDefinitionIds(String currentPlanItemDefinitionId, List<String> newPlanItemDefinitionIds, String newAssigneeId) {
-        movePlanItemDefinitionIdList.add(new MovePlanItemDefinitionIdContainer(currentPlanItemDefinitionId, newPlanItemDefinitionIds, newAssigneeId));
-        return this;
-    }
-
-    @Override
     public ChangePlanItemStateBuilder activatePlanItemDefinitionId(String planItemDefinitionId) {
-        activatePlanItemDefinitionIdList.add(planItemDefinitionId);
+        activatePlanItemDefinitionIds.add(planItemDefinitionId);
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
-        activatePlanItemDefinitionIdList.addAll(planItemDefinitionIds);
+        activatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
         return this;
     }
 
     @Override
-    public ChangePlanItemStateBuilder changePlanItemInstanceToAvailableByPlanItemDefinitionId(String planItemDefinitionId) {
-        changePlanItemToAvailableIdList.add(planItemDefinitionId);
+    public ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionId(String planItemDefinitionId) {
+        changeToAvailableStatePlanItemDefinitionIds.add(planItemDefinitionId);
         return this;
     }
 
     @Override
-    public ChangePlanItemStateBuilder changePlanItemInstancesToAvailableByPlanItemDefinitionId(List<String> planItemDefinitionIds) {
-        changePlanItemToAvailableIdList.addAll(planItemDefinitionIds);
+    public ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionIds(List<String> planItemDefinitionIds) {
+        changeToAvailableStatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
+        return this;
+    }
+    
+    @Override
+    public ChangePlanItemStateBuilder terminatePlanItemDefinitionId(String planItemDefinitionId) {
+        terminatePlanItemDefinitionIds.add(planItemDefinitionId);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder terminatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
+        terminatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
         return this;
     }
 
@@ -174,20 +126,16 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
         return caseInstanceId;
     }
 
-    public List<MovePlanItemInstanceIdContainer> getMovePlanItemInstanceIdList() {
-        return movePlanItemInstanceIdList;
+    public Set<String> getActivatePlanItemDefinitionIds() {
+        return activatePlanItemDefinitionIds;
     }
 
-    public List<MovePlanItemDefinitionIdContainer> getMovePlanItemDefinitionIdList() {
-        return movePlanItemDefinitionIdList;
+    public Set<String> getChangeToAvailableStatePlanItemDefinitionIds() {
+        return changeToAvailableStatePlanItemDefinitionIds;
     }
 
-    public List<String> getActivatePlanItemDefinitionIdList() {
-        return activatePlanItemDefinitionIdList;
-    }
-
-    public List<String> getChangePlanItemToAvailableIdList() {
-        return changePlanItemToAvailableIdList;
+    public Set<String> getTerminatePlanItemDefinitionIds() {
+        return terminatePlanItemDefinitionIds;
     }
 
     public Map<String, Object> getCaseVariables() {

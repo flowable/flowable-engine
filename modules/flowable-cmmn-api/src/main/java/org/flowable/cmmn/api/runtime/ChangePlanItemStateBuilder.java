@@ -33,54 +33,34 @@ public interface ChangePlanItemStateBuilder {
     ChangePlanItemStateBuilder caseInstanceId(String caseInstanceId);
 
     /**
-     * Set the id of the plan item instance for which the plan item state should be changed
-     **/
-    ChangePlanItemStateBuilder movePlanItemInstanceToPlanItemDefinitionId(String planItemInstanceId, String planItemDefinitionId);
-
-    /**
-     * Set the ids of the plan item instances which should be changed to a single plan item instance with the provided plan item definition id.
-     **/
-    ChangePlanItemStateBuilder movePlanItemInstancesToSinglePlanItemDefinitionId(List<String> planItemInstanceIds, String planItemDefinitionId);
-
-    /**
-     * Set the id of a plan item instance which should be changed to multiple plan item instances with the provided plan item definition ids.
-     **/
-    ChangePlanItemStateBuilder moveSinglePlanItemInstanceToPlanItemDefinitionIds(String planItemInstanceId, List<String> planItemDefinitionIds);
-
-    /**
-     * Moves the plan item instance with the current plan item definition id to the provided new plan item definition id
-     */
-    ChangePlanItemStateBuilder movePlanItemDefinitionIdTo(String currentPlanItemDefinitionId, String newPlanItemDefinitionId);
-
-    /**
-     * Set the plan item definition ids that should be changed to a single plan item definition id.
-     */
-    ChangePlanItemStateBuilder movePlanItemDefinitionIdsToSinglePlanItemDefinitionId(List<String> currentPlanItemDefinitionIds, String newPlanItemDefinitionId);
-
-    /**
-     * Set the plan item definition id that should be changed to multiple plan item definition ids.
-     */
-    ChangePlanItemStateBuilder moveSinglePlanItemDefinitionIdToPlanItemDefinitionIds(String currentPlanItemDefinitionId, List<String> newPlanItemDefinitionIds);
-
-    /**
-     * Activate a plan item by definition id without terminating another plan item instance.
+     * Activate a plan item by definition id.
      */
     ChangePlanItemStateBuilder activatePlanItemDefinitionId(String planItemDefinitionId);
     
     /**
-     * Activate multiple plan items by definition id without terminating another plan item instance.
+     * Activate multiple plan items by definition id.
      */
     ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds);
     
     /**
-     * Set an enabled or active plan item to available state by definition id.
+     * Set a plan item to available state by definition id.
      */
-    ChangePlanItemStateBuilder changePlanItemInstanceToAvailableByPlanItemDefinitionId(String planItemDefinitionId);
+    ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionId(String planItemDefinitionId);
     
     /**
-     * Set multiple enabled or active plan items to available state by definition id.
+     * Set multiple plan items to available state by definition id.
      */
-    ChangePlanItemStateBuilder changePlanItemInstancesToAvailableByPlanItemDefinitionId(List<String> planItemDefinitionIds);
+    ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionIds(List<String> planItemDefinitionIds);
+    
+    /**
+     * Terminate a plan item by definition id without terminating another plan item instance.
+     */
+    ChangePlanItemStateBuilder terminatePlanItemDefinitionId(String planItemDefinitionId);
+    
+    /**
+     * Terminate multiple plan items by definition id without terminating another plan item instance.
+     */
+    ChangePlanItemStateBuilder terminatePlanItemDefinitionIds(List<String> planItemDefinitionIds);
     
     /**
      * Set the case variable that should be set as part of the change plan item state action.

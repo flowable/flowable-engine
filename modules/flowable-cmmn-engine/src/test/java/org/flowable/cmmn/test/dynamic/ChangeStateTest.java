@@ -37,7 +37,8 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "task2")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
                 .changeState();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
@@ -61,7 +62,8 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "task2")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
                 .changeState();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
@@ -85,7 +87,8 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "subTask1")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("subTask1")
                 .changeState();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
@@ -111,7 +114,8 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("subTask1", "task1")
+                .terminatePlanItemDefinitionId("subTask1")
+                .activatePlanItemDefinitionId("task1")
                 .changeState();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
@@ -121,7 +125,7 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
                         PlanItemInstanceState.COMPLETED,
                         PlanItemInstanceState.ACTIVE,
                         PlanItemInstanceState.TERMINATED,
-                        PlanItemInstanceState.TERMINATED,
+                        PlanItemInstanceState.COMPLETED,
                         PlanItemInstanceState.AVAILABLE);
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

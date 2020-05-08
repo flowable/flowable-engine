@@ -139,4 +139,6 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
+
+    void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
 }

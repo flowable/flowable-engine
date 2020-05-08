@@ -65,6 +65,7 @@ public abstract class FlowableCmmnTestCase extends AbstractFlowableCmmnTestCase 
         this.dynamicCmmnService = cmmnEngineConfiguration.getDynamicCmmnService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
     }
 
     protected EventRepositoryService getEventRepositoryService() {

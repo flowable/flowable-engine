@@ -126,7 +126,8 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "task2")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
                 .activatePlanItemDefinitionId("task3")
                 .changeState();
 
@@ -195,6 +196,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
                 .activatePlanItemDefinitionId("task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task2")
                 .changeState();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -229,7 +231,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .changePlanItemInstanceToAvailableByPlanItemDefinitionId("task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task1")
                 .changeState();
 
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);

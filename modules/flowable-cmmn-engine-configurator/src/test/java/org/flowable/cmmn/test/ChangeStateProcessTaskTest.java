@@ -85,7 +85,8 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("theTask", "theProcess")
+                .terminatePlanItemDefinitionId("theTask")
+                .activatePlanItemDefinitionId("theProcess")
                 .changeState();
 
         ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
@@ -275,7 +276,8 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("theTask", "theTask2")
+                .terminatePlanItemDefinitionId("theTask")
+                .activatePlanItemDefinitionId("theTask2")
                 .activatePlanItemDefinitionId("theProcess")
                 .childInstanceTaskVariable("theProcess", "textVar", "Some text")
                 .childInstanceTaskVariable("theProcess", "numVar", 10)
@@ -360,7 +362,8 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("theTask", "theProcess")
+                .terminatePlanItemDefinitionId("theTask")
+                .activatePlanItemDefinitionId("theProcess")
                 .childInstanceTaskVariable("theProcess", "textVar", "Some text")
                 .childInstanceTaskVariable("theProcess", "numVar", 10)
                 .changeState();
