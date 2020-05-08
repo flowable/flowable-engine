@@ -12,12 +12,6 @@
  */
 package org.flowable.content.rest.service.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -59,12 +53,19 @@ import org.flowable.content.rest.ContentRestUrlBuilder;
 import org.flowable.content.rest.conf.ApplicationConfiguration;
 import org.flowable.content.rest.util.TestServerUtil;
 import org.flowable.content.rest.util.TestServerUtil.TestServer;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 public abstract class BaseSpringContentRestTestCase extends AbstractContentTestCase {
 
@@ -353,5 +354,12 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         contentItem.setLastModifiedBy(lastModifiedBy);
 
         return contentItem;
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 }
