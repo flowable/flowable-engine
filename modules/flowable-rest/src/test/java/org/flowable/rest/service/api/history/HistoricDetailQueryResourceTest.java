@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -95,7 +94,7 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPost, 200);
 
         // Check status and size
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
 
@@ -108,14 +107,14 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
                 byteVarFound = true;
                 String valueUrl = variableNode.get("valueUrl").textValue();
                 response = executeRequest(new HttpGet(valueUrl), 200);
-                assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+                assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
                 byte[] varInput = IOUtils.toByteArray(response.getEntity().getContent());
                 closeResponse(response);
-                assertEquals("test", new String(varInput));
+                assertThat(new String(varInput)).isEqualTo("test");
                 break;
             }
         }
-        assertTrue(byteVarFound);
+        assertThat(byteVarFound).isTrue();
     }
 
     protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
@@ -126,10 +125,10 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPost, 200);
 
         // Check status and size
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (variableName != null) {
@@ -141,15 +140,15 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asBoolean(), (boolean) (Boolean) variableValue);
+                        assertThat((boolean) (Boolean) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asBoolean());
                     } else if (variableValue instanceof Integer) {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
+                        assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asText(), (String) variableValue);
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
                 }
             }
-            assertTrue("Variable " + variableName + " is missing", variableFound);
+            assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
     }
 }
