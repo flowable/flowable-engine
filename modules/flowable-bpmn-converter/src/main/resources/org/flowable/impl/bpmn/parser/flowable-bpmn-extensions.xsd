@@ -256,9 +256,17 @@
   <attribute name="resultVariable" type="string">
     <annotation>
       <documentation>
-        Attribute on Service and Script Task corresponding with a process variable name.
-        The result of executing the service task logic or the script will be stored
-        in this process variable.
+        Attribute on Script Task corresponding with a process variable name.
+        The result of executing the script will be stored in this process variable.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="resultVariableName" type="string">
+    <annotation>
+      <documentation>
+        Attribute on Service Task corresponding with a process variable name.
+        The result of executing the task logic will be stored in this process variable.
       </documentation>
     </annotation>
   </attribute>
