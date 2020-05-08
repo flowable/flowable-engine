@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +22,6 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,7 +59,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     @Test
     public void decisionKeyDeploymentIdTenantId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, TEST_PARENT_DEPLOYMENT_ID);
-        Assert.assertEquals("result2", result.get("outputVariable1"));
+        assertThat(result.get("outputVariable1")).isEqualTo("result2");
     }
 
 
@@ -66,7 +67,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     public void fallBackDecisionKeyDeploymentIdTenantIdWrongDeploymentId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, "WRONG_PARENT_DEPLOYMENT_ID");
 
-        Assert.assertEquals("result2", result.get("outputVariable1"));
+        assertThat(result.get("outputVariable1")).isEqualTo("result2");
     }
 
     @Test
@@ -97,7 +98,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         try {
             Map<String, Object> result = executeDecision(null, TEST_PARENT_DEPLOYMENT_ID);
 
-            Assert.assertEquals("result2", result.get("outputVariable1"));
+            assertThat(result.get("outputVariable1")).isEqualTo("result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }
@@ -106,7 +107,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     @Test
     public void decisionKeyTenantId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, null);
-        Assert.assertEquals("result2", result.get("outputVariable1"));
+        assertThat(result.get("outputVariable1")).isEqualTo("result2");
     }
 
 
@@ -121,7 +122,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         try {
             Map<String, Object> result = executeDecision(null, "WRONG_PARENT_DEPLOYMENT_ID");
 
-            Assert.assertEquals("result2", result.get("outputVariable1"));
+            assertThat(result.get("outputVariable1")).isEqualTo("result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }
@@ -148,7 +149,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
                 .fallbackToDefaultTenant()
                 .executeWithSingleResult();
 
-            Assert.assertEquals("result2", result.get("outputVariable1"));
+            assertThat(result.get("outputVariable1")).isEqualTo("result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }
