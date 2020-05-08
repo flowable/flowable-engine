@@ -13,6 +13,8 @@
 
 package org.flowable.variable.service.impl.persistence.entity;
 
+import java.util.Collection;
+
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
@@ -79,4 +81,13 @@ public class VariableInstanceEntityManagerImpl
         dataManager.deleteByScopeIdAndScopeType(scopeId, scopeType);
     }
 
+    @Override
+    public void deleteByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        dataManager.deleteByScopeIdAndScopeTypes(scopeId, scopeTypes);
+    }
+
+    @Override
+    public void deleteBySubScopeIdAndScopeTypes(String subScopeId, Collection<String> scopeTypes) {
+        dataManager.deleteBySubScopeIdAndScopeTypes(subScopeId, scopeTypes);
+    }
 }

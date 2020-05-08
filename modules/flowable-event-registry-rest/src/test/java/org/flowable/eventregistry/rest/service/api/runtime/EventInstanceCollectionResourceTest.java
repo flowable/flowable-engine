@@ -13,6 +13,8 @@
 
 package org.flowable.eventregistry.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 
 import org.apache.http.HttpStatus;
@@ -37,7 +39,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
     public void testSendEvent() throws Exception {
         ProcessInstance processInstance = processRuntimeService.startProcessInstanceByKey("process", Collections.singletonMap("customerIdVar", "123"));
         Task task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
         
         ObjectNode requestNode = objectMapper.createObjectNode();
         
@@ -54,7 +56,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         
         task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
 
         // now send event with matching correlation value
         requestNode.put("eventDefinitionKey", "myEvent");
@@ -68,6 +70,6 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         
         task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfterBoundary", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
     }
 }

@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**

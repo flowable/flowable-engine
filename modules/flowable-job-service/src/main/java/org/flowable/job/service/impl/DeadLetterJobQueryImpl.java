@@ -49,6 +49,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
+    protected boolean onlyExternalWorkers;
     protected Date duedateHigherThan;
     protected Date duedateLowerThan;
     protected Date duedateHigherThanOrEqual;
@@ -228,6 +229,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
         this.onlyTimers = true;
         return this;
     }
@@ -237,9 +242,29 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (onlyTimers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
+
         this.onlyMessages = true;
         return this;
     }
+
+    @Override
+    public DeadLetterJobQueryImpl externalWorkers() {
+        if (onlyMessages) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyMessages() with onlyExternalWorkers() in the same query");
+        }
+
+        if (onlyTimers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
+        }
+
+        this.onlyTimers = true;
+        return this;
+    }
+
 
     @Override
     public DeadLetterJobQueryImpl duedateHigherThan(Date date) {
@@ -430,6 +455,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public boolean isOnlyMessages() {
         return onlyMessages;
+    }
+
+    public boolean isOnlyExternalWorkers() {
+        return onlyExternalWorkers;
     }
 
     public Date getDuedateHigherThan() {

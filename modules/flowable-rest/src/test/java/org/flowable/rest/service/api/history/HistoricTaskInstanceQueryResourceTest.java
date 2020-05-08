@@ -258,6 +258,24 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, task.getId(), finishedTaskProcess1.getId(), task2.getId());
     }
 
+    @Test
+    @Deployment
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("taskCandidateGroup", "sales");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+
+        taskService.claim(task.getId(), "johnDoe");
+        requestNode.put("taskCandidateGroup", "sales");
+        requestNode.put("ignoreTaskAssignee", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+    }
+
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {
         // Do the actual call
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);

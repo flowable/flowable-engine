@@ -147,6 +147,41 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task2.getId());
 
         requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionId", caseInstance.getCaseDefinitionId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionId", "notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKey", "myCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKey", "notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLike", "%Case");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLike", "%notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLikeIgnoreCase", "%case");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        ArrayNode caseDefinitionKeyIn = requestNode.putArray("caseDefinitionKeys");
+        caseDefinitionKeyIn.add("myCase");
+        caseDefinitionKeyIn.add("another");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceIdWithChildren", caseInstance.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId());
 
@@ -213,6 +248,26 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskDefinitionKey", "task1");
         assertResultsPresentInPostDataResponse(url, requestNode, finishedTaskCase1.getId(), task2.getId());
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_QUERY);
+
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("taskCandidateGroup", "test");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+
+        taskService.claim(task.getId(), "johnDoe");
+        requestNode.put("taskCandidateGroup", "test");
+        requestNode.put("ignoreTaskAssignee", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds)

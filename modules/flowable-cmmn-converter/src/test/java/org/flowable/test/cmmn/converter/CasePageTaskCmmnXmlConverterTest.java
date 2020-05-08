@@ -67,41 +67,43 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(planItems).hasSize(2);
 
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
-        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
         assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
-        assertThat(planItemDefinition).isInstanceOf(CasePageTask.class);
-
-        CasePageTask taskA = (CasePageTask) planItemDefinition;
-        assertThat(taskA.getType()).isEqualTo(CasePageTask.TYPE);
-        assertThat(taskA.getName()).isEqualTo("A");
-        assertThat(taskA.getFormKey()).isEqualTo("testKey");
-        assertThat(taskA.getLabel()).isEqualTo("Label 1");
-        assertThat(taskA.getIcon()).isEqualTo("Icon 1");
-        assertThat(taskA.getAssignee()).isEqualTo("johndoe");
-        assertThat(taskA.getOwner()).isEqualTo("janedoe");
-        assertThat(taskA.getCandidateUsers()).containsExactly("johndoe", "janedoe");
-        assertThat(taskA.getCandidateGroups()).containsExactly("sales", "management");
         assertThat(planItemTaskA.getItemControl()).isNotNull();
         assertThat(planItemTaskA.getItemControl().getParentCompletionRule()).isNotNull();
         assertThat(planItemTaskA.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
 
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(CasePageTask.class, taskA -> {
+                    assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+                    assertThat(taskA.getType()).isEqualTo(CasePageTask.TYPE);
+                    assertThat(taskA.getName()).isEqualTo("A");
+                    assertThat(taskA.getFormKey()).isEqualTo("testKey");
+                    assertThat(taskA.getLabel()).isEqualTo("Label 1");
+                    assertThat(taskA.getIcon()).isEqualTo("Icon 1");
+                    assertThat(taskA.getAssignee()).isEqualTo("johndoe");
+                    assertThat(taskA.getOwner()).isEqualTo("janedoe");
+                    assertThat(taskA.getCandidateUsers()).containsExactly("johndoe", "janedoe");
+                    assertThat(taskA.getCandidateGroups()).containsExactly("sales", "management");
+                });
+
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
         assertThat(planItemTaskB.getEntryCriteria()).hasSize(1);
-        assertThat(planItemDefinition).isInstanceOf(CasePageTask.class);
-        CasePageTask taskB = (CasePageTask) planItemDefinition;
-        assertThat(taskB.getType()).isEqualTo(CasePageTask.TYPE);
-        assertThat(taskB.getName()).isEqualTo("B");
         assertThat(planItemTaskB.getItemControl()).isNotNull();
         assertThat(planItemTaskB.getItemControl().getParentCompletionRule()).isNotNull();
         assertThat(planItemTaskB.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
-
-        assertThat(taskB.getExtensionElements()).hasSize(1);
-        List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
-        assertThat(extensionElements).hasSize(1);
-        assertThat(extensionElements)
-                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-                .containsExactly(tuple("index", "0"));
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(CasePageTask.class, taskB -> {
+                    assertThat(taskB.getType()).isEqualTo(CasePageTask.TYPE);
+                    assertThat(taskB.getName()).isEqualTo("B");
+                    assertThat(taskB.getExtensionElements()).hasSize(1);
+                    List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
+                    assertThat(extensionElements).hasSize(1);
+                    assertThat(extensionElements)
+                            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                            .containsExactly(tuple("index", "0"));
+                });
     }
 
 }

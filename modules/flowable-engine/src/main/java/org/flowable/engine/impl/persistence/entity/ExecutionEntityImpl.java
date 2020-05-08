@@ -133,6 +133,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected int timerJobCount;
     protected int suspendedJobCount;
     protected int deadLetterJobCount;
+    protected int externalWorkerJobCount;
     protected int variableCount;
     protected int identityLinkCount;
     
@@ -1258,6 +1259,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setDeadLetterJobCount(int deadLetterJobCount) {
         this.deadLetterJobCount = deadLetterJobCount;
+    }
+
+    @Override
+    public int getExternalWorkerJobCount() {
+        return externalWorkerJobCount;
+    }
+
+    @Override
+    public void setExternalWorkerJobCount(int externalWorkerJobCount) {
+        this.externalWorkerJobCount = externalWorkerJobCount;
     }
 
     @Override

@@ -85,14 +85,19 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     SuspendedJobQuery executable();
 
     /**
-     * Only select jobs that are timers. Cannot be used together with {@link #messages()}
+     * Only select jobs that are timers. Cannot be used together with {@link #messages()} or {@link #externalWorkers()}
      */
     SuspendedJobQuery timers();
 
     /**
-     * Only select jobs that are messages. Cannot be used together with {@link #timers()}
+     * Only select jobs that are messages. Cannot be used together with {@link #timers()} or {@link #externalWorkers()}
      */
     SuspendedJobQuery messages();
+
+    /**
+     * Only select external worker jobs. Cannot be used together with {@link #timers()} or {@link #messages()}
+     */
+    SuspendedJobQuery externalWorkers();
 
     /** Only select jobs where the duedate is lower than the given date. */
     SuspendedJobQuery duedateLowerThan(Date date);

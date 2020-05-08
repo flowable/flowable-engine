@@ -323,4 +323,5 @@ public interface CmmnRuntimeService {
      *     new businessKey value
      */
     void updateBusinessKey(String caseInstanceId, String businessKey);
+
 }

@@ -237,17 +237,36 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=kermit";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
             
             // Candidate user with group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Involved user filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            // Claim task
+            taskService.claim(processTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales&ignoreAssignee=true";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting&ignoreAssignee";
+            assertEmptyResultsPresentInDataResponse(url);
 
             // Process instance filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceId=" + processInstance.getId();

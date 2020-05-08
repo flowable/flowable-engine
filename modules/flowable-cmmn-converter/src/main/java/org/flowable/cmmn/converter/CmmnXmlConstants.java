@@ -106,6 +106,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
     String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
+    String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
+
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
 

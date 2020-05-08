@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+
 /**
  * A class holding the result from evaluating a stage or case plan model for completion. Evaluation can happen on two modes: with autocompletion in mind or
  * without. The difference being whether there is still optional work available or not.
@@ -21,10 +23,13 @@ package org.flowable.cmmn.engine.impl.util;
 public class CompletionEvaluationResult {
     protected final boolean isCompletable;
     protected final boolean shouldBeCompleted;
+    protected final PlanItemInstanceEntity planItemInstance;
 
-    public CompletionEvaluationResult(boolean isCompletable, boolean shouldBeCompleted) {
+    public CompletionEvaluationResult(boolean isCompletable, boolean shouldBeCompleted,
+        PlanItemInstanceEntity planItemInstance) {
         this.isCompletable = isCompletable;
         this.shouldBeCompleted = shouldBeCompleted;
+        this.planItemInstance = planItemInstance;
     }
 
     /**
@@ -46,5 +51,15 @@ public class CompletionEvaluationResult {
      */
     public boolean shouldBeCompleted() {
         return shouldBeCompleted;
+    }
+
+    /**
+     * Returns the first plan item preventing the stage or case from being completed. This will be null, if {@link #isCompletable()} is true, otherwise it
+     * contains the plan item which first prevented it from being completed.
+     *
+     * @return the plan item first preventing the case or stage from being completable, might be null if it is actually completable
+     */
+    public PlanItemInstanceEntity getPlanItemInstance() {
+        return planItemInstance;
     }
 }

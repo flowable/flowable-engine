@@ -10,7 +10,7 @@
     insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_)
     values (
       #{id ,jdbcType=VARCHAR},
@@ -40,6 +40,7 @@
       #{timerJobCount, jdbcType=INTEGER},
       #{suspendedJobCount, jdbcType=INTEGER},
       #{deadLetterJobCount, jdbcType=INTEGER},
+      #{externalWorkerJobCount, jdbcType=INTEGER},
       #{variableCount, jdbcType=INTEGER},
       #{identityLinkCount, jdbcType=INTEGER},
       #{callbackId, jdbcType=VARCHAR},
@@ -54,7 +55,7 @@
     insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
@@ -85,6 +86,7 @@
          #{execution.timerJobCount, jdbcType=INTEGER},
          #{execution.suspendedJobCount, jdbcType=INTEGER},
          #{execution.deadLetterJobCount, jdbcType=INTEGER},
+         #{execution.externalWorkerJobCount, jdbcType=INTEGER},
          #{execution.variableCount, jdbcType=INTEGER},
          #{execution.identityLinkCount, jdbcType=INTEGER},
          #{execution.callbackId, jdbcType=VARCHAR},
@@ -102,7 +104,7 @@
         into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                         IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                         TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                         CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_) VALUES
             (
              #{execution.id ,jdbcType=VARCHAR},
@@ -132,6 +134,7 @@
              #{execution.timerJobCount, jdbcType=INTEGER},
              #{execution.suspendedJobCount, jdbcType=INTEGER},
              #{execution.deadLetterJobCount, jdbcType=INTEGER},
+             #{execution.externalWorkerJobCount, jdbcType=INTEGER},
              #{execution.variableCount, jdbcType=INTEGER},
              #{execution.identityLinkCount, jdbcType=INTEGER},
              #{execution.callbackId, jdbcType=VARCHAR},
@@ -209,6 +212,9 @@
             </if>
             <if test="originalPersistentState.deadLetterJobCount != deadLetterJobCount">
                 DEADLETTER_JOB_COUNT_ = #{deadLetterJobCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.externalWorkerJobCount != externalWorkerJobCount">
+                EXTERNAL_WORKER_JOB_COUNT_ = #{externalWorkerJobCount, jdbcType=INTEGER},
             </if>
             <if test="originalPersistentState.variableCount != variableCount">
                 VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
@@ -342,6 +348,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -388,6 +395,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -425,6 +433,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -482,6 +491,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />

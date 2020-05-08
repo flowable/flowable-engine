@@ -240,6 +240,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(caseTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales&ignoreAssignee=true";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting&ignoreAssignee";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Case instance filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceId=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
@@ -296,6 +306,27 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKey=oneHumanTaskCase";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKey=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLike=" + encode("%TaskCase");
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLike=" + encode("%notExisting");
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%taskcase");
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%notexisting");
+            assertEmptyResultsPresentInDataResponse(url);
 
             // Tenant id filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?tenantId=myTenant";

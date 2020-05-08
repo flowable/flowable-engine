@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
-import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 import org.springframework.kafka.core.KafkaOperations;
 
 /**

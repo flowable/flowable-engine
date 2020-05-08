@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -296,7 +297,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
     
             processEngineConfiguration.getAsyncExecutor().start();
-            Thread.sleep(4000);
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 4000, 300, false);
             
             // the job is done
             assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());

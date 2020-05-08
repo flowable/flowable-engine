@@ -29,4 +29,8 @@ public class DefaultAsyncHistoryJobExecutor extends DefaultAsyncJobExecutor {
         }
     }
 
+    @Override
+    protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
+        return new ResetExpiredJobsRunnable(resetRunnableName, this, jobServiceConfiguration.getHistoryJobEntityManager());
+    }
 }

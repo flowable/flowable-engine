@@ -40,6 +40,9 @@ public interface CountingExecutionEntity {
     void setDeadLetterJobCount(int deadLetterJobCount);
     int getDeadLetterJobCount();
 
+    void setExternalWorkerJobCount(int externalWorkerJobCount);
+    int getExternalWorkerJobCount();
+
     void setVariableCount(int variableCount);
     int getVariableCount();
 

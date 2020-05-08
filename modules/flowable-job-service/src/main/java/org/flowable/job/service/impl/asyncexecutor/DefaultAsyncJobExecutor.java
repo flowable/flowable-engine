@@ -175,6 +175,14 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     }
 
+    @Override
+    protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
+        return new ResetExpiredJobsRunnable(resetRunnableName, this,
+                jobServiceConfiguration.getJobEntityManager(),
+                jobServiceConfiguration.getExternalWorkerJobEntityManager()
+        );
+    }
+
     protected void initAsyncJobExecutionThreadPool() {
         if (threadPoolQueue == null) {
             LOGGER.info("Creating thread pool queue of size {}", queueSize);

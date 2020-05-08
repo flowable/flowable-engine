@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -43,11 +41,10 @@ public class TextAnnotationConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getFlowElement("_5");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ScriptTask);
-        assertEquals("_5", flowElement.getId());
-        ScriptTask scriptTask = (ScriptTask) flowElement;
-        assertEquals("_5", scriptTask.getId());
-        assertEquals("Send Hello Message", scriptTask.getName());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(ScriptTask.class, scriptTask -> {
+                    assertThat(scriptTask.getId()).isEqualTo("_5");
+                    assertThat(scriptTask.getName()).isEqualTo("Send Hello Message");
+                });
     }
 }

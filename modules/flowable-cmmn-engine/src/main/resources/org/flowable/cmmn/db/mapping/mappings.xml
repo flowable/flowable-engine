@@ -64,6 +64,7 @@
     <mapper resource="org/flowable/job/service/db/mapping/entity/HistoryJob.xml" />
     <mapper resource="org/flowable/job/service/db/mapping/entity/Job.xml" />
     <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
+    <mapper resource="org/flowable/job/service/db/mapping/entity/ExternalWorkerJob.xml" />
     <mapper resource="org/flowable/job/service/db/mapping/entity/TimerJob.xml" />
     
   </mappers>

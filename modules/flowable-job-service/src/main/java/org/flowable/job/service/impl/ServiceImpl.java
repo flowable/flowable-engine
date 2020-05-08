@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
@@ -56,6 +57,10 @@ public class ServiceImpl extends CommonServiceImpl<JobServiceConfiguration> {
         return configuration.getSuspendedJobEntityManager();
     }
     
+    public ExternalWorkerJobEntityManager getExternalWorkerJobEntityManager() {
+        return configuration.getExternalWorkerJobEntityManager();
+    }
+
     public TimerJobEntityManager getTimerJobEntityManager() {
         return configuration.getTimerJobEntityManager();
     }

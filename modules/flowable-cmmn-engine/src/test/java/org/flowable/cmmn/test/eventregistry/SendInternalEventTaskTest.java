@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.CmmnDeploymentId;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.junit.After;
 import org.junit.Test;

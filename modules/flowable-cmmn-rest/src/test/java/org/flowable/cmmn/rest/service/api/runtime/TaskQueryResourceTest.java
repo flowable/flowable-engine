@@ -174,6 +174,15 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("involvedUser", "misspiggy");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(caseTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            requestNode.removeAll();
+            requestNode.put("candidateGroup", "sales");
+            requestNode.put("ignoreAssignee", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
             // Case instance filtering
             requestNode.removeAll();
             requestNode.put("caseInstanceId", caseInstance.getId());
@@ -187,6 +196,30 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("caseInstanceIdWithChildren", "noexisting");
             assertResultsPresentInPostDataResponse(url, requestNode);
+
+            // Case definition id
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionId", caseInstance.getCaseDefinitionId());
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            // Case definition key
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKeyLike", "%TaskCase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKeyLikeIgnoreCase", "%taskcase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            ArrayNode caseDefinitionKeyIn = requestNode.putArray("caseDefinitionKeys");
+            caseDefinitionKeyIn.add("oneHumanTaskCase");
+            caseDefinitionKeyIn.add("another");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
 
             // CreatedOn filtering
             requestNode.removeAll();

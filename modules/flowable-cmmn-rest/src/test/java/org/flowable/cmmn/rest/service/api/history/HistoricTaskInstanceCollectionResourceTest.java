@@ -89,6 +89,12 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId(), 2, task.getId());
 
+            assertResultsPresentInDataResponse(url + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId(), 2, task.getId());
+
+            assertResultsPresentInDataResponse(url + "?caseDefinitionkey=myCase", 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionkeyLike=%Case", 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionKeyLikeIgnoreCase=%case", 3, task.getId());
+
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance2.getId(), 1, task2.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=" + caseInstance.getId(), 2, task.getId());
@@ -135,6 +141,23 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES);
+
+        assertResultsPresentInDataResponse(url + "?taskCandidateGroup=test", 1, task.getId());
+        assertEmptyResultsPresentInDataResponse(url + "?taskCandidateGroup=notExisting");
+
+        taskService.claim(task.getId(), "johnDoe");
+        assertEmptyResultsPresentInDataResponse(url + "?taskCandidateGroup=test");
+        assertResultsPresentInDataResponse(url + "?taskCandidateGroup=test&ignoreTaskAssignee=true", 1, task.getId());
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds)

@@ -60,6 +60,7 @@ create table ACT_RU_EXECUTION (
     TIMER_JOB_COUNT_ int,
     SUSP_JOB_COUNT_ int,
     DEADLETTER_JOB_COUNT_ int,
+    EXTERNAL_WORKER_JOB_COUNT_ int,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
     CALLBACK_ID_ nvarchar(255),

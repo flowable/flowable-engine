@@ -83,7 +83,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
 
-        if (exceptionByteArrayRef != null) {
+        if (exceptionByteArrayRef != null && exceptionByteArrayRef.getId() != null) {
             persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
 
