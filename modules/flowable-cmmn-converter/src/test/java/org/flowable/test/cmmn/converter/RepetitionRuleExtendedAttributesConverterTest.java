@@ -13,7 +13,6 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -76,13 +75,9 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
             .filter(caseElement -> caseElement instanceof PlanItem && planItemName.equals(caseElement.getName()))
             .collect(Collectors.toList());
 
-        if (planItems.size() == 0) {
-            fail("No plan item found with name " + planItemName);
-        }
+        assertThat(planItems).as("No plan item found with name " + planItemName).isNotEmpty();
 
-        if (planItems.size() > 1) {
-            fail("More than one plan item found with name " + planItemName + ", make sure it is unique for testing purposes");
-        }
+        assertThat(planItems).as("More than one plan item found with name " + planItemName + ", make sure it is unique for testing purposes").hasSize(1);
 
         RepetitionRule repetitionRule = ((PlanItem) planItems.get(0)).getItemControl().getRepetitionRule();
         assertThat(repetitionRule).as("no repetition rule found for plan item with name '" + planItemName + "'").isNotNull();

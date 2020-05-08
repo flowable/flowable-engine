@@ -71,29 +71,31 @@ public class ScriptServiceTaskCmmnXmlConverterTest extends AbstractConverterTest
         assertThat(planItems).hasSize(2);
 
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
-        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
-
         assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
-        assertThat(planItemDefinition).isInstanceOf(ScriptServiceTask.class);
-        ScriptServiceTask scriptTask = (ScriptServiceTask) planItemDefinition;
-        assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
-        assertThat(scriptTask.getScriptFormat()).isEqualTo("javascript");
-        assertThat(scriptTask.getResultVariableName()).isEqualTo("scriptResult");
-        assertThat(scriptTask.isAutoStoreVariables()).isFalse();
-        assertThat(scriptTask.isBlocking()).isTrue();
-        assertThat(scriptTask.isAsync()).isFalse();
 
-        assertThat(scriptTask.getFieldExtensions())
-                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
-                .containsExactly(tuple("script", "var a = 5;"));
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.getScriptFormat()).isEqualTo("javascript");
+                    assertThat(scriptTask.getResultVariableName()).isEqualTo("scriptResult");
+                    assertThat(scriptTask.isAutoStoreVariables()).isFalse();
+                    assertThat(scriptTask.isBlocking()).isTrue();
+                    assertThat(scriptTask.isAsync()).isFalse();
+
+                    assertThat(scriptTask.getFieldExtensions())
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+                            .containsExactly(tuple("script", "var a = 5;"));
+                });
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
-        assertThat(planItemDefinition).isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
-            assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
-            assertThat(scriptServiceTask.getScript()).isEqualTo("var b = 5;");
-            assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
-        });
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
+                    assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
+                    assertThat(scriptServiceTask.getScript()).isEqualTo("var b = 5;");
+                    assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+                });
     }
 
 }

@@ -50,8 +50,6 @@ public class CaseCustomExtensionElementXmlConverterTest extends AbstractConverte
         assertThat(primaryCase.getExtensionElements()).containsOnlyKeys("customElement");
 
         List<ExtensionElement> customElements = primaryCase.getExtensionElements().get("customElement");
-        assertThat(customElements).hasSize(1);
-
         assertThat(customElements)
                 .extracting(ExtensionElement::getElementText, ExtensionElement::getNamespacePrefix, ExtensionElement::getNamespace)
                 .containsExactly(tuple("Element text", "flowable", "http://flowable.org/cmmn"));
