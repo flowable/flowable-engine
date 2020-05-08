@@ -18,7 +18,6 @@ import java.util.Collections;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.PlanItem;
 
