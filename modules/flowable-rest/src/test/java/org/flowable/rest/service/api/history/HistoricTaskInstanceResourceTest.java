@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,12 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -70,24 +74,26 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
             // Check resulting task
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertThat(responseNode.get("id").asText()).isEqualTo(task.getId());
-            assertThat(responseNode.get("assignee").asText()).isEqualTo(task.getAssignee());
-            assertThat(responseNode.get("owner").asText()).isEqualTo(task.getOwner());
-            assertThat(responseNode.get("formKey").asText()).isEqualTo(task.getFormKey());
-            assertThat(responseNode.get("executionId").asText()).isEqualTo(task.getExecutionId());
-            assertThat(responseNode.get("description").asText()).isEqualTo(task.getDescription());
-            assertThat(responseNode.get("name").asText()).isEqualTo(task.getName());
-            assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-            assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
-            assertThat(responseNode.get("priority").asInt()).isEqualTo(task.getPriority());
-            assertThat(responseNode.get("endTime").isNull()).isTrue();
-            assertThat(responseNode.get("parentTaskId").isNull()).isTrue();
-            assertThat(responseNode.get("tenantId").textValue()).isEqualTo("");
-
-            assertThat(responseNode.get("processInstanceUrl").asText())
-                    .isEqualTo(buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, task.getProcessInstanceId()));
-            assertThat(responseNode.get("processDefinitionUrl").asText()).isEqualTo(buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()));
-            assertThat(url).isEqualTo(responseNode.get("url").asText());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: '" + task.getId() + "',"
+                            + " assignee: '" + task.getAssignee() + "',"
+                            + " owner: '" + task.getOwner() + "',"
+                            + " formKey: '" + task.getFormKey() + "',"
+                            + " executionId: '" + task.getExecutionId() + "',"
+                            + " description: '" + task.getDescription() + "',"
+                            + " name: '" + task.getName() + "',"
+                            + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
+                            + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                            + " priority: " + task.getPriority() + ","
+                            + " endTime: null,"
+                            + " parentTaskId: null,"
+                            + " tenantId: \"\","
+                            + " processInstanceUrl: '" + buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
+                            + " processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
+                            + " url: '" + url + "'"
+                            + "}");
         }
     }
 
@@ -98,13 +104,13 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessAdhoc() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
-    
+
                 Calendar now = Calendar.getInstance();
                 processEngineConfiguration.getClock().setCurrentTime(now.getTime());
-    
+
                 Task parentTask = taskService.newTask();
                 taskService.saveTask(parentTask);
-    
+
                 Task task = taskService.newTask();
                 task.setParentTaskId(parentTask.getId());
                 task.setName("Task name");
@@ -123,24 +129,27 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 // Check resulting task
                 JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
                 closeResponse(response);
-                assertThat(responseNode.get("id").asText()).isEqualTo(task.getId());
-                assertThat(responseNode.get("assignee").asText()).isEqualTo(task.getAssignee());
-                assertThat(responseNode.get("owner").asText()).isEqualTo(task.getOwner());
-                assertThat(responseNode.get("description").asText()).isEqualTo(task.getDescription());
-                assertThat(responseNode.get("name").asText()).isEqualTo(task.getName());
-                assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-                assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
-                assertThat(responseNode.get("priority").asInt()).isEqualTo(task.getPriority());
-                assertThat(responseNode.get("parentTaskId").asText()).isEqualTo(task.getParentTaskId());
-                assertThat(responseNode.get("executionId").isNull()).isTrue();
-                assertThat(responseNode.get("processInstanceId").isNull()).isTrue();
-                assertThat(responseNode.get("processDefinitionId").isNull()).isTrue();
-                assertThat(responseNode.get("tenantId").textValue()).isEqualTo("");
-
-                assertThat(url).isEqualTo(responseNode.get("url").asText());
+                assertThatJson(responseNode)
+                        .when(Option.IGNORING_EXTRA_FIELDS)
+                        .isEqualTo("{"
+                                + " id: '" + task.getId() + "',"
+                                + " assignee: '" + task.getAssignee() + "',"
+                                + " owner: '" + task.getOwner() + "',"
+                                + " description: '" + task.getDescription() + "',"
+                                + " name: '" + task.getName() + "',"
+                                + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
+                                + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                                + " priority: " + task.getPriority() + ","
+                                + " parentTaskId: '" + task.getParentTaskId() + "',"
+                                + " executionId: null,"
+                                + " processInstanceId: null,"
+                                + " processDefinitionId: null,"
+                                + " tenantId: \"\","
+                                + " url: '" + url + "'"
+                                + "}");
 
             } finally {
-    
+
                 // Clean adhoc-tasks even if test fails
                 List<Task> tasks = taskService.createTaskQuery().list();
                 for (Task task : tasks) {
@@ -174,7 +183,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 for (Task task : tasks) {
                     taskService.deleteTask(task.getId(), true);
                 }
-    
+
                 // Clean historic tasks with no runtime-counterpart
                 List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
                 for (HistoricTaskInstance task : historicTasks) {
@@ -261,12 +270,19 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
 
             } finally {
                 formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
-                
+
                 List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
                 for (FormDeployment formDeployment : formDeployments) {
                     formRepositoryService.deleteDeployment(formDeployment.getId());
                 }
             }
         }
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 }
