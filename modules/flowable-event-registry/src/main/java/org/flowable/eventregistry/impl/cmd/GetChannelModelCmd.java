@@ -89,7 +89,7 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
                     channelDefinitionEntity = channelDefinitionEntityManager.findLatestChannelDefinitionByKey(channelDefinitionKey);
                 }
             }
-            
+
             if (channelDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No channel definition found for key '" + channelDefinitionKey + "' for tenant identifier " + tenantId, ChannelDefinitionEntity.class);
             }

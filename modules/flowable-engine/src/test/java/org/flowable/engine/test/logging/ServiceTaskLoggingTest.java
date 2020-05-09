@@ -13,7 +13,12 @@
 
 package org.flowable.engine.test.logging;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -29,8 +34,10 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.bpmn.servicetask.TriggerableServiceTask;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,6 +49,11 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/logging/logging.test.flowable.cfg.xml");
     }
     
+    @AfterEach
+    void tearDown() {
+        FlowableLoggingListener.clear();
+    }
+
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/serviceTask.bpmn20.xml")
     public void testServiceTaskException() {
@@ -1511,6 +1523,168 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
 
         FlowableLoggingListener.clear();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableServiceTaskTest.testDelegateExpression.bpmn20.xml")
+    void testTriggerableServiceTaskWithDelegateExpression() {
+        FlowableLoggingListener.clear();
+
+        TriggerableServiceTask delegate = new TriggerableServiceTask();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", delegate)
+                .start();
+
+        String processId = processInstance.getId();
+        String processDefinitionId = processInstance.getProcessDefinitionId();
+
+        List<ObjectNode> loggingNodes = FlowableLoggingListener.TEST_LOGGING_NODES;
+        assertThat(loggingNodes)
+                .extracting(node -> node.path("type").asText("__invalid"))
+                .containsExactly(
+                        LoggingSessionConstants.TYPE_PROCESS_STARTED,
+                        LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE,
+                        LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE,
+                        LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE,
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER,
+                        LoggingSessionConstants.TYPE_VARIABLE_CREATE,
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
+                        LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE
+                );
+
+        assertThatJson(loggingNodes.get(0))
+                .isEqualTo("{"
+                        + "  type: 'processStarted',"
+                        + "  message: 'Started process instance with id " + processId + "',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 1"
+                        + "}");
+
+        assertThatJson(loggingNodes.get(3))
+                .isEqualTo("{"
+                        + "  type: 'activityBehaviorExecute',"
+                        + "  message: 'In ServiceTask, executing ServiceTaskDelegateExpressionActivityBehavior',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  elementId: 'service1',"
+                        + "  elementType: 'ServiceTask',"
+                        + "  elementSubType: '${triggerableServiceTask}',"
+                        + "  activityBehavior: 'ServiceTaskDelegateExpressionActivityBehavior',"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 4"
+                        + "}");
+
+        assertThatJson(loggingNodes.get(4))
+                .isEqualTo("{"
+                        + "  type: 'serviceTaskEnter',"
+                        + "  message: 'Executing service task with delegate " + delegate + "',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  elementId: 'service1',"
+                        + "  elementType: 'ServiceTask',"
+                        + "  elementSubType: '${triggerableServiceTask}',"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 5"
+                        + "}");
+
+        assertThatJson(loggingNodes.get(6))
+                .isEqualTo("{"
+                        + "  type: 'serviceTaskExit',"
+                        + "  message: 'Executed service task with delegate " + delegate + "',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  elementId: 'service1',"
+                        + "  elementType: 'ServiceTask',"
+                        + "  elementSubType: '${triggerableServiceTask}',"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 7"
+                        + "}");
+
+        FlowableLoggingListener.clear();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
+        runtimeService.trigger(execution.getId(), Collections.emptyMap(), Collections.singletonMap("triggerableServiceTask", delegate));
+
+        loggingNodes = FlowableLoggingListener.TEST_LOGGING_NODES;
+
+        assertThat(loggingNodes)
+                .extracting(node -> node.path("type").asText("__invalid"))
+                .containsExactly(
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                        LoggingSessionConstants.TYPE_VARIABLE_UPDATE,
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                        LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE,
+                        LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE,
+                        LoggingSessionConstants.TYPE_USER_TASK_CREATE,
+                        LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE
+                );
+
+        assertThatJson(loggingNodes.get(0))
+                .isEqualTo("{"
+                        + "  type: 'serviceTaskBeforeTrigger',"
+                        + "  message: 'Triggering service task with delegate " + delegate + "',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  elementId: 'service1',"
+                        + "  elementType: 'ServiceTask',"
+                        + "  elementSubType: '${triggerableServiceTask}',"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 1"
+                        + "}");
+
+        assertThatJson(loggingNodes.get(2))
+                .isEqualTo("{"
+                        + "  type: 'serviceTaskAfterTrigger',"
+                        + "  message: 'Triggered service task with delegate " + delegate + "',"
+                        + "  scopeId: '" + processId + "',"
+                        + "  subScopeId: '${json-unit.any-string}',"
+                        + "  scopeType: 'bpmn',"
+                        + "  scopeDefinitionId: '" + processDefinitionId + "',"
+                        + "  scopeDefinitionKey: 'process',"
+                        + "  scopeDefinitionName: null,"
+                        + "  elementId: 'service1',"
+                        + "  elementType: 'ServiceTask',"
+                        + "  elementSubType: '${triggerableServiceTask}',"
+                        + "  __id: '${json-unit.any-string}',"
+                        + "  __timeStamp: '${json-unit.any-string}',"
+                        + "  __transactionId: '${json-unit.any-string}',"
+                        + "  __logNumber: 3"
+                        + "}");
+
+
     }
 
     public static class ExceptionServiceTaskDelegate implements JavaDelegate {

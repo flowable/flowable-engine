@@ -63,7 +63,6 @@ public class ExitCriteriaBlockingExpressionCmmnXmlConverterTest extends Abstract
         assertThat(planItemTaskA).isNotNull();
         assertThat(planItemTaskA.getDefinitionRef()).isEqualTo("taskDefinition");
 
-
         PlanItem planItemTaskB = cmmnModel.findPlanItem("taskB");
         assertThat(planItemTaskB).isNotNull();
         assertThat(planItemTaskB.getDefinitionRef()).isEqualTo("taskDefinition");

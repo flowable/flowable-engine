@@ -12,7 +12,7 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class CaseStartEventXmlConverterTest extends AbstractConverterTest {
     }
     
     public void validateModel(CmmnModel cmmnModel) {
-        assertEquals("myEvent", cmmnModel.getPrimaryCase().getStartEventType());
+        assertThat(cmmnModel.getPrimaryCase().getStartEventType()).isEqualTo("myEvent");
     }
 
 }

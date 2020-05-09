@@ -108,4 +108,6 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     void clearProcessInstanceLockTime(String processInstanceId);
 
+    void clearAllProcessInstanceLockTimes();
+
 }

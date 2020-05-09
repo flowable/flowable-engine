@@ -79,6 +79,8 @@ public class CmmnListenerNotificationHelper {
             taskListener = listenerFactory.createExpressionTaskListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
             taskListener = listenerFactory.createDelegateExpressionTaskListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
+            taskListener = (TaskListener) listener.getInstance();
         }
 
         return taskListener;
@@ -94,6 +96,8 @@ public class CmmnListenerNotificationHelper {
             lifecycleListener = listenerFactory.createExpressionLifeCycleListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
             lifecycleListener = listenerFactory.createDelegateExpressionLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = (PlanItemInstanceLifecycleListener) listener.getInstance();
         }
 
         return lifecycleListener;
@@ -168,6 +172,8 @@ public class CmmnListenerNotificationHelper {
             lifecycleListener = listenerFactory.createExpressionCaseLifeCycleListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
             lifecycleListener = listenerFactory.createDelegateExpressionCaseLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = (CaseInstanceLifecycleListener) listener.getInstance();
         }
 
         return lifecycleListener;

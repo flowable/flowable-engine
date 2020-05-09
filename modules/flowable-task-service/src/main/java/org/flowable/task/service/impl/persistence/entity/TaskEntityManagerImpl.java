@@ -327,7 +327,7 @@ public class TaskEntityManagerImpl
 
     protected void recordHistoryUserTaskLog(HistoricTaskLogEntryType logEntryType, TaskInfo task, ObjectNode dataNode) {
         HistoricTaskLogEntryBuilder taskLogEntryBuilder = createHistoricTaskLogEntryBuilder(task, logEntryType);
-        taskLogEntryBuilder.data( dataNode.toString());
+        taskLogEntryBuilder.data(dataNode.toString());
         serviceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
     }
 

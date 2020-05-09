@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -37,6 +38,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +59,156 @@ public class JsonTest extends PluggableFlowableTestCase {
     public static final String BIG_JSON_OBJ = "bigJsonObj";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testCreateAndUpdateJsonValueDuringExecution() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+
+                ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+                execution.setVariable("customer", objectMapper.createObjectNode());
+
+                Expression expression = expressionManager.createExpression("${customer.name}");
+                expression.setValue("Kermit", execution);
+
+                expression = expressionManager.createExpression("${customer.address}");
+                expression.setValue(objectMapper.createObjectNode(), execution);
+
+                expression = expressionManager.createExpression("${customer.address.street}");
+                expression.setValue("Sesame Street", execution);
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("updateJsonValue")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+        JsonNode customerVar = (JsonNode) customerVarInstance.getValue();
+        assertThatJson(customerVar)
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) customerHistoricVarInstance.getValue();
+            assertThatJson(customerVar)
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testCreateJsonArrayDuringExecution() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+            	ArrayNode testArrayNode = objectMapper.createArrayNode();
+            	testArrayNode.addObject();
+            	execution.setVariable("jsonArrayTest", testArrayNode);
+                execution.setVariable("${jsonArrayTest[0].name}", "test");
+                
+                execution.setVariable("jsonObjectTest", objectMapper.createObjectNode());
+                execution.setVariable("${jsonObjectTest.name}", "anotherTest");
+            }
+        };
+        
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("createJsonArray")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        	List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery()
+        	        .processInstanceId(processInstance.getId())
+        	        .orderByVariableName()
+        	        .asc()
+        	        .list();
+        	assertThat(varInstances).hasSize(2);
+        	HistoricVariableInstance varInstance = varInstances.get(0);
+        	assertThatJson(varInstance.getValue()).isEqualTo("[{"
+                    + "  name: 'test'"
+                    + "}]");
+        	
+        	varInstance = varInstances.get(1);
+            assertThatJson(varInstance.getValue()).isEqualTo("{"
+                    + "  name: 'anotherTest'"
+                    + "}");
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testCreateAndUpdateJsonValueDuringExecutionWithoutWaitState() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+
+                ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+                execution.setVariable("customer", objectMapper.createObjectNode());
+
+                Expression expression = expressionManager.createExpression("${customer.name}");
+                expression.setValue("Kermit", execution);
+
+                expression = expressionManager.createExpression("${customer.address}");
+                expression.setValue(objectMapper.createObjectNode(), execution);
+
+                expression = expressionManager.createExpression("${customer.address.street}");
+                expression.setValue("Sesame Street", execution);
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("updateJsonValue")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        JsonNode customerVar = (JsonNode) processInstance.getProcessVariables().get("customer");
+        assertThatJson(customerVar)
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) customerHistoricVarInstance.getValue();
+            assertThatJson(customerVar)
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
+        }
+    }
 
     @Test
     @Deployment
@@ -113,6 +266,66 @@ public class JsonTest extends PluggableFlowableTestCase {
                     + "  }"
                     + "}");
         }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testUpdateFromSmallToLongJsonValue() {
+        // Set customer.street to 'Sesame Street'
+        ObjectNode customer = objectMapper.createObjectNode();
+        customer.put("street", "Sesame Street");
+        JavaDelegate javaDelegate = execution -> {};
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("customer", customer)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        VariableInstance customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
+
+        Object customerActual = customerVariableInstance.getValue();
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street");
+        HistoricVariableInstance customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street");
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
+
+        // Set customer.street to long value
+        String randomLongValue = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        customer.put("street", randomLongValue);
+        runtimeService.setVariable(processInstance.getId(), "customer", customer);
+
+        customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        customerActual = customerVariableInstance.getValue();
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo(randomLongValue);
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNotNull();
+
+        customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo(randomLongValue);
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNotNull();
+
+        // Set customer.street back to a small value
+        customer.put("street", "Sesame Street 2");
+        runtimeService.setVariable(processInstance.getId(), "customer", customer);
+
+        customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        customerActual = customerVariableInstance.getValue();
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street 2");
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
+
+        customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("customer").singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street 2");
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
     }
 
     @Test
@@ -556,8 +769,12 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .variable("customer", objectMapper.createObjectNode())
                 .start();
 
-        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-                .isEqualTo("{}");
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer")).isEqualTo("{}");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                    .isEqualTo("{}");
+        }
+        
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
             expression.setValue(Instant.parse("2020-02-16T14:24:45.583Z"), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));

@@ -59,10 +59,13 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<JobEntity> findJobsToExecute(Page page) {
+    public List<JobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         
+        if (enabledCategories != null && enabledCategories.size() > 0) {
+            params.put("enabledCategories", enabledCategories);
+        }
         return getDbSqlSession().selectList("selectJobsToExecute", params, page);
     }
 
@@ -86,13 +89,17 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<JobEntity> findExpiredJobs(Page page) {
+    public List<JobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
         Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
+        
+        if (enabledCategories != null && enabledCategories.size() > 0) {
+            params.put("enabledCategories", enabledCategories);
+        }
         return getDbSqlSession().selectList("selectExpiredJobs", params, page);
     }
 

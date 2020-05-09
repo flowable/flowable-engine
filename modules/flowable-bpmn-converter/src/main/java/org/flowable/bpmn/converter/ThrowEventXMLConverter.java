@@ -12,9 +12,14 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -24,6 +29,13 @@ import org.flowable.bpmn.model.ThrowEvent;
  * @author Tijs Rademakers
  */
 public class ThrowEventXMLConverter extends BaseBpmnXMLConverter {
+    
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+
+    public ThrowEventXMLConverter() {
+        OutParameterParser outParameterParser = new OutParameterParser();
+        childParserMap.put(outParameterParser.getElementName(), outParameterParser);
+    }
 
     @Override
     public Class<? extends BaseElement> getBpmnElementType() {
@@ -39,7 +51,7 @@ public class ThrowEventXMLConverter extends BaseBpmnXMLConverter {
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         ThrowEvent throwEvent = new ThrowEvent();
         BpmnXMLUtil.addXMLLocation(throwEvent, xtr);
-        parseChildElements(getXMLElementName(), throwEvent, model, xtr);
+        parseChildElements(getXMLElementName(), throwEvent, childParserMap, model, xtr);
         return throwEvent;
     }
 

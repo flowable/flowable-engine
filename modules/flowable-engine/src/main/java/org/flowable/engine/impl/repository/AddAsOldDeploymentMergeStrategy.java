@@ -13,14 +13,15 @@
 
 package org.flowable.engine.impl.repository;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.ProcessDefinition;
-
-import java.util.List;
 
 /**
  * @author Valentin Zickner
@@ -41,12 +42,20 @@ public class AddAsOldDeploymentMergeStrategy implements DeploymentMergeStrategy 
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
         for (ProcessDefinition processDefinition : processDefinitions) {
-            List<ProcessDefinition> alreadyExistingProcessDefinitions = new ProcessDefinitionQueryImpl()
-                    .processDefinitionTenantId(newTenantId)
+            
+            ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl();
+            if (StringUtils.isEmpty(newTenantId)) {
+                processDefinitionQuery.processDefinitionWithoutTenantId();
+            } else {
+                processDefinitionQuery.processDefinitionTenantId(newTenantId);
+            }
+            
+            List<ProcessDefinition> alreadyExistingProcessDefinitions = processDefinitionQuery
                     .processDefinitionKey(processDefinition.getKey())
                     .orderByProcessDefinitionVersion()
                     .desc()
                     .list();
+            
             for (ProcessDefinition alreadyExistingProcessDefinition : alreadyExistingProcessDefinitions) {
                 if (!alreadyExistingProcessDefinition.getId().equals(processDefinition.getId())) {
                     processDefinitionEntityManager.updateProcessDefinitionVersionForProcessDefinitionId(alreadyExistingProcessDefinition.getId(), alreadyExistingProcessDefinition.getVersion() + 1);

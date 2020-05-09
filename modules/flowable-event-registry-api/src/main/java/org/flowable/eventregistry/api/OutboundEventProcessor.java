@@ -12,13 +12,17 @@
  */
 package org.flowable.eventregistry.api;
 
+import java.util.Collection;
+
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.model.ChannelModel;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface OutboundEventProcessor {
 
-    void sendEvent(EventInstance eventInstance);
+    void sendEvent(EventInstance eventInstance, Collection<ChannelModel> channelModels);
 
 }

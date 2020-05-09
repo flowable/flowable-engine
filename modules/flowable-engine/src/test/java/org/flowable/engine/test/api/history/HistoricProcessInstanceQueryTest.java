@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,9 +38,9 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).list();
-            assertEquals(1, processes.size());
-            assertNull(processes.get(0).getName());
-            assertNull(processes.get(0).getDescription());
+            assertThat(processes).hasSize(1);
+            assertThat(processes.get(0).getName()).isNull();
+            assertThat(processes.get(0).getDescription()).isNull();
 
             ObjectNode infoNode = dynamicBpmnService.changeLocalizationName("en-GB", "historicProcessLocalization", "Historic Process Name 'en-GB'");
             dynamicBpmnService.changeLocalizationDescription("en-GB", "historicProcessLocalization", "Historic Process Description 'en-GB'", infoNode);
@@ -51,51 +51,52 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             dynamicBpmnService.saveProcessDefinitionInfo(processInstance.getProcessDefinitionId(), infoNode);
 
             processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).list();
-            assertEquals(1, processes.size());
-            assertNull(processes.get(0).getName());
-            assertNull(processes.get(0).getDescription());
+            assertThat(processes).hasSize(1);
+            assertThat(processes.get(0).getName()).isNull();
+            assertThat(processes.get(0).getDescription()).isNull();
 
             processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-GB").list();
-            assertEquals(1, processes.size());
-            assertEquals("Historic Process Name 'en-GB'", processes.get(0).getName());
-            assertEquals("Historic Process Description 'en-GB'", processes.get(0).getDescription());
+            assertThat(processes).hasSize(1);
+            assertThat(processes.get(0).getName()).isEqualTo("Historic Process Name 'en-GB'");
+            assertThat(processes.get(0).getDescription()).isEqualTo("Historic Process Description 'en-GB'");
 
             processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).listPage(0, 10);
-            assertEquals(1, processes.size());
-            assertNull(processes.get(0).getName());
-            assertNull(processes.get(0).getDescription());
+            assertThat(processes).hasSize(1);
+            assertThat(processes.get(0).getName()).isNull();
+            assertThat(processes.get(0).getDescription()).isNull();
 
             processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-GB").listPage(0, 10);
-            assertEquals(1, processes.size());
-            assertEquals("Historic Process Name 'en-GB'", processes.get(0).getName());
-            assertEquals("Historic Process Description 'en-GB'", processes.get(0).getDescription());
+            assertThat(processes).hasSize(1);
+            assertThat(processes.get(0).getName()).isEqualTo("Historic Process Name 'en-GB'");
+            assertThat(processes.get(0).getDescription()).isEqualTo("Historic Process Description 'en-GB'");
 
             HistoricProcessInstance process = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            assertNull(process.getName());
-            assertNull(process.getDescription());
+            assertThat(process.getName()).isNull();
+            assertThat(process.getDescription()).isNull();
 
             process = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-GB").singleResult();
-            assertEquals("Historic Process Name 'en-GB'", process.getName());
-            assertEquals("Historic Process Description 'en-GB'", process.getDescription());
+            assertThat(process.getName()).isEqualTo("Historic Process Name 'en-GB'");
+            assertThat(process.getDescription()).isEqualTo("Historic Process Description 'en-GB'");
 
             process = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en").singleResult();
-            assertEquals("Historic Process Name 'en'", process.getName());
-            assertEquals("Historic Process Description 'en'", process.getDescription());
+            assertThat(process.getName()).isEqualTo("Historic Process Name 'en'");
+            assertThat(process.getDescription()).isEqualTo("Historic Process Description 'en'");
 
-            process = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-AU").withLocalizationFallback().singleResult();
-            assertEquals("Historic Process Name 'en'", process.getName());
-            assertEquals("Historic Process Description 'en'", process.getDescription());
+            process = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-AU").withLocalizationFallback()
+                    .singleResult();
+            assertThat(process.getName()).isEqualTo("Historic Process Name 'en'");
+            assertThat(process.getDescription()).isEqualTo("Historic Process Description 'en'");
         }
     }
-    
+
     @Test
     public void testQueryByDeploymentId() {
         deployOneTaskTestProcess();
         String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertNotNull(historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).singleResult());
-            assertEquals(1, historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).singleResult()).isNotNull();
+            assertThat(historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).count()).isEqualTo(1);
         }
     }
 
@@ -103,38 +104,82 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
     public void testQueryByReferenceId() {
         deployOneTaskTestProcess();
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .referenceId("testReferenceId")
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .referenceId("testReferenceId")
+                .start();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceId("testReferenceId").list())
-            .extracting(HistoricProcessInstance::getId)
-            .contains(processInstance.getId());
+                .extracting(HistoricProcessInstance::getId)
+                .contains(processInstance.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().or()
                 .processInstanceReferenceId("testReferenceId").processInstanceName("doesn't exist").list())
-            .extracting(HistoricProcessInstance::getId)
-            .contains(processInstance.getId());
+                .extracting(HistoricProcessInstance::getId)
+                .contains(processInstance.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceId("invalid").list()).isEmpty();
+    }
+    
+    @Test
+    public void testQueryByInvolvedUser() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "specialLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "undefined").processDefinitionKey("undefined").endOr().count());
+    }
+    
+    @Test
+    public void testQueryByInvolvedGroup() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "sales", "specialLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "undefined").processDefinitionKey("undefined").endOr().count());
     }
 
     @Test
     public void testQueryByReferenceType() {
         deployOneTaskTestProcess();
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .referenceType("testReferenceType")
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .referenceType("testReferenceType")
+                .start();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceType("testReferenceType").list())
-            .extracting(HistoricProcessInstance::getId)
-            .contains(processInstance.getId());
+                .extracting(HistoricProcessInstance::getId)
+                .contains(processInstance.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().or()
-            .processInstanceReferenceType("testReferenceType").processInstanceName("doesn't exist").list())
-            .extracting(HistoricProcessInstance::getId)
-            .contains(processInstance.getId());
+                .processInstanceReferenceType("testReferenceType").processInstanceName("doesn't exist").list())
+                .extracting(HistoricProcessInstance::getId)
+                .contains(processInstance.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceType("invalid").list()).isEmpty();
     }
@@ -146,10 +191,10 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         String[] ids = new String[7];
         for (int i = 0; i < ids.length; i++) {
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("oneTaskProcess")
-                .referenceId("testReferenceId")
-                .referenceType("testReferenceType")
-                .start();
+                    .processDefinitionKey("oneTaskProcess")
+                    .referenceId("testReferenceId")
+                    .referenceType("testReferenceType")
+                    .start();
 
             ids[i] = processInstance.getId();
         }
@@ -157,8 +202,8 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         assertThat(historyService.createHistoricProcessInstanceQuery()
                 .processInstanceReferenceId("testReferenceId")
                 .processInstanceReferenceType("testReferenceType").list())
-            .extracting(HistoricProcessInstance::getId)
-            .containsExactlyInAnyOrder(ids);
+                .extracting(HistoricProcessInstance::getId)
+                .containsExactlyInAnyOrder(ids);
 
     }
 

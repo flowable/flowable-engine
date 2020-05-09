@@ -20,6 +20,7 @@ public class ProcessTask extends ChildTask {
     protected String processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected boolean sameDeployment;
     protected String processInstanceIdVariableName;
 
     protected Process process;
@@ -54,6 +55,14 @@ public class ProcessTask extends ChildTask {
 
     public Boolean getFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public String getProcessInstanceIdVariableName() {

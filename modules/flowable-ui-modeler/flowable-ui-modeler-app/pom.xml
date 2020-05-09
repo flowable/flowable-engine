@@ -134,26 +134,6 @@
 
     <profiles>
         <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>h2mem</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -223,7 +203,7 @@
                         <configuration>
                             <arguments>
                                 <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
-                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8&amp;serverTimezone=UTC</argument>
                                 <argument>--spring.datasource.username=flowable</argument>
                                 <argument>--spring.datasource.password=flowable</argument>
                                 <argument>--flowable.modeler.app.deployment-api-url=http://localhost:9999/flowable-task/app-api</argument>

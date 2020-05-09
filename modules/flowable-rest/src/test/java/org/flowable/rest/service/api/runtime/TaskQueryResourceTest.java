@@ -182,6 +182,15 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("involvedUser", "misspiggy");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(processTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            requestNode.removeAll();
+            requestNode.put("candidateGroup", "sales");
+            requestNode.put("ignoreAssignee", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
             // Process instance filtering
             requestNode.removeAll();
             requestNode.put("processInstanceId", processInstance.getId());

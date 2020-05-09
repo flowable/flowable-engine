@@ -265,6 +265,10 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskCandidateGroup() != null) {
             query.taskCandidateGroup(queryRequest.getTaskCandidateGroup());
         }
+
+        if (queryRequest.isIgnoreTaskAssignee()) {
+            query.ignoreAssigneeValue();
+        }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -110,6 +111,13 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         // Save the data
         CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {

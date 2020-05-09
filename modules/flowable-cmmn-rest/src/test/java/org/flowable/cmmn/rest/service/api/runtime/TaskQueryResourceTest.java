@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class TaskQueryResourceTest extends BaseSpringRestTestCase {
@@ -174,19 +174,52 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("involvedUser", "misspiggy");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(caseTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            requestNode.removeAll();
+            requestNode.put("candidateGroup", "sales");
+            requestNode.put("ignoreAssignee", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
             // Case instance filtering
             requestNode.removeAll();
             requestNode.put("caseInstanceId", caseInstance.getId());
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
-            
+
             // Case instance with children filtering
             requestNode.removeAll();
             requestNode.put("caseInstanceIdWithChildren", caseInstance.getId());
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
-            
+
             requestNode.removeAll();
             requestNode.put("caseInstanceIdWithChildren", "noexisting");
             assertResultsPresentInPostDataResponse(url, requestNode);
+
+            // Case definition id
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionId", caseInstance.getCaseDefinitionId());
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            // Case definition key
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKeyLike", "%TaskCase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            requestNode.put("caseDefinitionKeyLikeIgnoreCase", "%taskcase");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+            requestNode.removeAll();
+            ArrayNode caseDefinitionKeyIn = requestNode.putArray("caseDefinitionKeys");
+            caseDefinitionKeyIn.add("oneHumanTaskCase");
+            caseDefinitionKeyIn.add("another");
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
 
             // CreatedOn filtering
             requestNode.removeAll();

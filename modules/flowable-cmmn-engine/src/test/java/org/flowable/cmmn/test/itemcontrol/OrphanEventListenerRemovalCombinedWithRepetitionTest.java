@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -37,11 +36,11 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/OrphanEventListenerRemovalCombinedWithRepetitionTest.testRemovalOfOrphanedEventListeners.cmmn")
     public void testRemovalOfOrphanedEventListenersWithOuterStart() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListeners")
-            .start();
+                .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListeners")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start Task A 1", AVAILABLE);
@@ -53,7 +52,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Stage A", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
@@ -65,7 +64,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "kill Stage A", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
 
         assertPlanItemInstanceState(planItemInstances, "start Task A 1", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start Task A 2", AVAILABLE);
@@ -73,12 +72,12 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         // starting Task A through both event listeners must also start the stages again
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Task A 1", AVAILABLE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(1, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(1);
         assertPlanItemInstanceState(planItemInstances, "start Task A 2", AVAILABLE);
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Task A 2", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
@@ -88,19 +87,19 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        Assert.assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        Assert.assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/OrphanEventListenerRemovalCombinedWithRepetitionTest.testRemovalOfOrphanedEventListeners.cmmn")
     public void testRemovalOfOrphanedEventListenersWithInnerStart() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListeners")
-            .start();
+                .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListeners")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start Task A 1", AVAILABLE);
@@ -113,7 +112,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Task A 2", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
@@ -124,19 +123,19 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "kill Stage A", AVAILABLE));
 
         assertCaseInstanceEnded(caseInstance);
-        Assert.assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        Assert.assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/OrphanEventListenerRemovalCombinedWithRepetitionTwoTest.testRemovalOfOrphanedEventListeners.cmmn")
     public void testRemovalOfOrphanedEventListenersWithOuterStartAndInnerExitEventListener() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListenersTwo")
-            .start();
+                .caseDefinitionKey("nestedRepetitionPlanItemsWithOrphanedEventListenersTwo")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start Task A 1", AVAILABLE);
@@ -149,7 +148,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Stage A", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
@@ -162,7 +161,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "kill Stage A", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         assertPlanItemInstanceState(planItemInstances, "start Task A 1", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start Task A 2", AVAILABLE);
@@ -171,12 +170,12 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         // starting Task A through both event listeners must also start the stages again
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Task A 1", AVAILABLE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "start Task A 2", AVAILABLE);
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start Task A 2", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
@@ -187,7 +186,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        Assert.assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        Assert.assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
     }
 }

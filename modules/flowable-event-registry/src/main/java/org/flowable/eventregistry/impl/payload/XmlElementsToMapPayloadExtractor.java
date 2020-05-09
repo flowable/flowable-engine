@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.slf4j.Logger;
@@ -34,14 +32,6 @@ import org.w3c.dom.NodeList;
 public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtractor<Document> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
-
-    @Override
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, Document event) {
-        return eventDefinition.getCorrelationParameters().stream()
-            .filter(parameterDefinition -> getChildNode(event, parameterDefinition.getName()) != null)
-            .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
-            .collect(Collectors.toList());
-    }
 
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Document event) {
@@ -68,6 +58,9 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
 
             } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
                 return Double.valueOf(textContent);
+
+            } else if (EventPayloadTypes.LONG.equals(definitionType)) {
+                return Long.valueOf(textContent);
 
             } else {
                 LOGGER.warn("Unsupported payload type: {} ", definitionType);
@@ -96,6 +89,37 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
         }
         return null;
     }
+
+    //
+    // Commented out for now: mapping xml to json when type is JSON
+    //
+//    protected ObjectNode xmlToJson(Node childNode) {
+//        ObjectMapper objectMapper = CommandContextUtil.getEventRegistryConfiguration().getObjectMapper();
+//        ObjectNode objectNode = objectMapper.createObjectNode();
+//        xmlToJson(childNode, objectMapper, objectNode);
+//        return objectNode;
+//    }
+//
+//    protected void xmlToJson(Node childNode, ObjectMapper objectMapper, ObjectNode objectNode) {
+//        NodeList childNodes = childNode.getChildNodes();
+//        List<Element> childElements = new ArrayList<>();
+//        for (int i = 0; i < childNodes.getLength(); i++) {
+//            Node item = childNodes.item(i);
+//            if (item instanceof Element) {
+//                childElements.add((Element) item);
+//            }
+//        }
+//
+//        if (!childElements.isEmpty()) {
+//            ObjectNode childObjectNode = objectNode.putObject(childNode.getLocalName());
+//            for (Element childElement : childElements) {
+//                xmlToJson(childElement, objectMapper, childObjectNode);
+//            }
+//        } else {
+//            objectNode.put(childNode.getLocalName(), childNode.getTextContent());
+//        }
+//
+//    }
 
 
 }

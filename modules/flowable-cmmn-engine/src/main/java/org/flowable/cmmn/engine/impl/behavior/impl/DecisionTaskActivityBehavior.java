@@ -45,6 +45,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
 
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
     protected static final String STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    protected static final String STRING_DECISION_TABLE_SAME_DEPLOYMENT = "sameDeployment";
 
     protected DecisionTask decisionTask;
     protected Expression decisionRefExpression;
@@ -79,8 +80,9 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
         ExecuteDecisionBuilder executeDecisionBuilder = dmnRuleService.createExecuteDecisionBuilder().
-            parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
             decisionKey(externalRef).
             instanceId(planItemInstanceEntity.getCaseInstanceId()).
             executionId(planItemInstanceEntity.getId()).
@@ -92,6 +94,18 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         String fallBackToDefaultTenantValue = getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallBackToDefaultTenantValue != null && Boolean.parseBoolean(fallBackToDefaultTenantValue)) {
             executeDecisionBuilder.fallbackToDefaultTenant();
+        }
+
+        String sameDeploymentValue = getFieldString(STRING_DECISION_TABLE_SAME_DEPLOYMENT);
+        if (sameDeploymentValue != null) {
+            if (Boolean.parseBoolean(sameDeploymentValue)) {
+                executeDecisionBuilder.parentDeploymentId(
+                        CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration));
+            }
+        } else {
+            // backwards compatibility (always apply parent deployment id)
+            executeDecisionBuilder
+                    .parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration));
         }
 
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
@@ -120,29 +134,31 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
             cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), 
                             externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             
         } else {
-            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef, 
-                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
+            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef,
+                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
         }
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 
-    protected void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, 
-                    PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+    protected void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey,
+                                                  PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper,
+                                                  boolean multipleResults) {
         
-        if (executionResult == null || executionResult.isEmpty()) {
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
             return;
         }
 
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
-        if (executionResult.size() > 1) {
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
             ArrayNode ruleResultNode = objectMapper.createArrayNode();
 
             for (Map<String, Object> ruleResult : executionResult) {

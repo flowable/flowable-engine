@@ -1,1 +1,1 @@
-alter table ACT_HI_ENTITYLINK add column HIERARCHY_TYPE_ nvarchar(255);
+alter table ACT_HI_ENTITYLINK add HIERARCHY_TYPE_ nvarchar(255);

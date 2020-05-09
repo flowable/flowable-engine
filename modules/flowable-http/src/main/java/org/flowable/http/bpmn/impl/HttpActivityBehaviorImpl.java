@@ -109,6 +109,10 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected HttpActivityExecutor httpActivityExecutor;
 
     public HttpActivityBehaviorImpl() {
+        this.httpActivityExecutor = createHttpActivityExecutor();
+    }
+
+    protected HttpActivityExecutor createHttpActivityExecutor() {
         HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
@@ -142,7 +146,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             httpClientBuilder.useSystemProperties();
         }
 
-        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(),
+        return new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(),
                 CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
     }
 

@@ -1,9 +1,6 @@
 {
   "key": "customer",
   "name": "My event",
-  "outboundChannelKeys": [
-    "outboundCustomer"
-  ],
   "correlationParameters": [
     {
       "name": "customer",

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:flowable="http://flowable.org/bpmn" 
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+	typeLanguage="http://www.w3.org/2001/XMLSchema" 
+	expressionLanguage="http://www.w3.org/1999/XPath" 
+	targetNamespace="http://www.flowable.org/processdef">
+	
+  <process id="timerProcess" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="firstTask" />
+    <userTask id="firstTask" name="First Task" />
+    <boundaryEvent id="boundaryTimerEvent" name="Timer event" attachedToRef="firstTask" cancelActivity="true">
+      <extensionElements>
+      	<flowable:jobCategory>${categoryValue}</flowable:jobCategory>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>PT10M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow2" sourceRef="firstTask" targetRef="gateway" />
+    <exclusiveGateway id="gateway" />
+    <sequenceFlow id="flow3" sourceRef="gateway" targetRef="end1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${myVar=="yes"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="gateway" targetRef="end2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${myVar=="no"}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="end1"></endEvent>
+    
+    <endEvent id="end2"></endEvent>
+    
+    <sequenceFlow id="flow5" sourceRef="boundaryTimerEvent" targetRef="secondTask" />
+    <userTask id="secondTask" name="Second Task" />
+    
+     <sequenceFlow id="flow6" sourceRef="secondTask" targetRef="end3" />
+    
+    <endEvent id="end3"></endEvent>
+  </process>
+</definitions>

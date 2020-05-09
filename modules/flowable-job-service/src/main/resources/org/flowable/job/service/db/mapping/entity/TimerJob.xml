@@ -9,6 +9,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
         <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
@@ -70,6 +71,12 @@
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+            <if test="category != null">
+                and RES.CATEGORY_ = #{category}
+            </if>
+            <if test="categoryLike != null">
+                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
             </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId}
@@ -142,6 +149,12 @@
         </if>
         and DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
         and LOCK_OWNER_ is null
+        <if test="parameter.enabledCategories != null">
+            and CATEGORY_ in
+            <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
@@ -151,6 +164,7 @@
         insert into ${prefix}ACT_RU_TIMER_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -174,6 +188,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=VARCHAR},
         #{exclusive, jdbcType=BOOLEAN},
         #{executionId, jdbcType=VARCHAR},
@@ -202,6 +217,7 @@
         INSERT INTO ${prefix}ACT_RU_TIMER_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -226,6 +242,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -256,6 +273,7 @@
             INTO ${prefix}ACT_RU_TIMER_JOB (
             ID_,
             REV_,
+            CATEGORY_,
             TYPE_,
             EXCLUSIVE_,
             EXECUTION_ID_,
@@ -279,6 +297,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -320,6 +339,9 @@
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.category != category">
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.elementId != elementId">
                 ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
             </if>
@@ -333,7 +355,7 @@
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
-                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
                 EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}

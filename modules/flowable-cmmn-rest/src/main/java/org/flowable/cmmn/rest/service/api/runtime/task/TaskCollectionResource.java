@@ -65,12 +65,16 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "candidateUser", dataType = "string", value = "Only return tasks that can be claimed by the given user. This includes both tasks where the user is an explicit candidate for and task that are claimable by a group that the user is a member of.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroups", dataType = "string", value = "Only return tasks that can be claimed by a user in the given groups. Values split by comma.", paramType = "query"),
+            @ApiImplicitParam(name = "ignoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with candidateGroups or candidateUser) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup or candidateUser)"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return tasks in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "Only return tasks with the given task definition id.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKeyLike", dataType = "string", value = "Only return tasks with a given task definition id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return tasks which are part of the case instance with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the case instance and its children with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
             @ApiImplicitParam(name = "createdOn", dataType = "string",format = "date-time", value = "Only return tasks which are created on the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string",format = "date-time", value = "Only return tasks which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string",format = "date-time", value = "Only return tasks which are created after the given date.", paramType = "query"),
@@ -168,8 +172,24 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setCandidateGroupIn(groups);
         }
 
+        if (requestParams.containsKey("ignoreAssignee") && Boolean.valueOf(requestParams.get("ignoreAssignee"))) {
+            request.setIgnoreAssignee(true);
+        }
+
         if (requestParams.containsKey("caseDefinitionId")) {
             request.setCaseDefinitionId(requestParams.get("caseDefinitionId"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKey")) {
+            request.setCaseDefinitionKey(requestParams.get("caseDefinitionKey"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKeyLike")) {
+            request.setCaseDefinitionKeyLike(requestParams.get("caseDefinitionKeyLike"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKeyLikeIgnoreCase")) {
+            request.setCaseDefinitionKeyLikeIgnoreCase(requestParams.get("caseDefinitionKeyLikeIgnoreCase"));
         }
 
         if (requestParams.containsKey("caseInstanceId")) {

@@ -27,6 +27,11 @@ public class TestQueryCaseInstanceWithIncludeVariablesDelegate implements PlanIt
 
     public static Map<String, Object> HISTORIC_VARIABLES;
 
+    public static void reset() {
+        VARIABLES = null;
+        HISTORIC_VARIABLES = null;
+    }
+
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
         planItemInstance.setVariable("varFromTheServiceTask", "valueFromTheServiceTask");

@@ -13,12 +13,15 @@
 
 package org.flowable.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -27,7 +30,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.validation.validator.Problems;
@@ -69,6 +74,32 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertEquals(0, createEventSubscriptionQuery().count());
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalWithInParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalWithOutParameters.bpmn20.xml" })
+    public void testSignalCatchIntermediateWithParameters() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
+
+        assertEquals(1, createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+        Map<String, Object> signalVariableMap = new HashMap<>();
+        signalVariableMap.put("textVar", "John Doe");
+        signalVariableMap.put("numberVar", 1);
+        runtimeService.startProcessInstanceByKey("throwSignal", signalVariableMap);
+
+        assertEquals(0, createEventSubscriptionQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        
+        Map<String, Object> variableMap = runtimeService.getVariables(processInstance.getId());
+        assertEquals(2, variableMap.size());
+        assertEquals("John Doe", variableMap.get("myNewTextVar"));
+        assertEquals(1, variableMap.get("myNewNumberVar"));
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundary.bpmn20.xml",
@@ -99,11 +130,63 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         assertEquals("catchSignal", runtimeService.getVariable(pi.getId(), "processName"));
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundaryWithInParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalWithOutParameters.bpmn20.xml" })
+    public void testSignalCatchBoundaryWithParameters() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
+
+        assertEquals(1, createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+        Map<String, Object> signalVariableMap = new HashMap<>();
+        signalVariableMap.put("textVar", "John Doe");
+        signalVariableMap.put("numberVar", 1);
+        runtimeService.startProcessInstanceByKey("throwSignal", signalVariableMap);
+
+        assertEquals(0, createEventSubscriptionQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        
+        Map<String, Object> variableMap = runtimeService.getVariables(processInstance.getId());
+        assertEquals(2, variableMap.size());
+        assertEquals("John Doe", variableMap.get("myNewTextVar"));
+        assertEquals(1, variableMap.get("myNewNumberVar"));
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundaryWithInParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalWithOutParameterExpressions.bpmn20.xml" })
+    public void testSignalCatchBoundaryWithParameterExpressions() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
+
+        assertEquals(1, createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+        Map<String, Object> signalVariableMap = new HashMap<>();
+        signalVariableMap.put("firstNameVar", "John");
+        signalVariableMap.put("lastNameVar", "Doe");
+        runtimeService.startProcessInstanceByKey("throwSignal", signalVariableMap);
+
+        assertEquals(0, createEventSubscriptionQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        
+        Map<String, Object> variableMap = runtimeService.getVariables(processInstance.getId());
+        assertEquals(2, variableMap.size());
+        assertEquals("John Doe", variableMap.get("myNewTextVar"));
+        assertEquals(2l, variableMap.get("myNewNumberVar"));
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsynch.bpmn20.xml" })
-    public void testSignalCatchIntermediateAsynch() {
+    public void testSignalCatchIntermediateAsync() {
 
         runtimeService.startProcessInstanceByKey("catchSignal");
 
@@ -128,7 +211,42 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         } finally {
             processEngineConfiguration.getClock().setCurrentTime(new Date());
         }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundaryWithInParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsynchWithOutParameters.bpmn20.xml" })
+    public void testSignalCatchBoundaryAsyncWithParameters() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
 
+        assertEquals(1, createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+        Map<String, Object> signalVariableMap = new HashMap<>();
+        signalVariableMap.put("textVar", "John Doe");
+        signalVariableMap.put("numberVar", 1);
+        runtimeService.startProcessInstanceByKey("throwSignal", signalVariableMap);
+
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        
+        assertEquals(1, managementService.createJobQuery().count());
+        
+        try {
+            processEngineConfiguration.getClock().setCurrentTime(new Date(System.currentTimeMillis() + 1000));
+            waitForJobExecutorToProcessAllJobs(10000, 100l);
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNotNull(task);
+            
+            Map<String, Object> variableMap = runtimeService.getVariables(processInstance.getId());
+            assertEquals(2, variableMap.size());
+            assertEquals("John Doe", variableMap.get("myNewTextVar"));
+            assertEquals(1, variableMap.get("myNewNumberVar"));
+            
+        } finally {
+            processEngineConfiguration.getClock().setCurrentTime(new Date());
+        }
     }
 
     @Test
@@ -249,6 +367,39 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         currentTask = tasks.get(0);
         assertEquals("My Second User Task", currentTask.getName());
+    }
+    
+    @Test
+    @Deployment
+    public void testNonInterruptingSignalWithInParameters() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingSignalEvent");
+
+        Task task = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("testVar", "test");
+        payload.put("anotherVar", "anotherTest");
+        payload.put("nameVar", "John Doe");
+        runtimeService.signalEventReceived("alert", payload);
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).list();
+        assertEquals(2, tasks.size());
+
+        for (Task localTask : tasks) {
+            if (!localTask.getName().equals("My User Task") && !localTask.getName().equals("My Second User Task")) {
+                fail("Expected: <My User Task> or <My Second User Task> but was <" + localTask.getName() + ">.");
+            }
+        }
+        
+        Map<String, Object> processVariableMap = runtimeService.getVariables(pi.getProcessInstanceId());
+        assertEquals(2, processVariableMap.size());
+        assertEquals("test", processVariableMap.get("myTestVar"));
+        assertEquals("anotherTest", processVariableMap.get("myAnotherVar"));
+
+        taskService.complete(taskService.createTaskQuery().taskName("My User Task").singleResult().getId());
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+        assertEquals("My Second User Task", task.getName());
     }
 
     /**
@@ -838,6 +989,37 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived("mySignal");
         
         assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstanceId).count());
+    }
+
+    @Test
+    @Deployment
+    public void testSignalExpression() {
+        assertSignalEventSubscriptions("startSignal");
+
+        runtimeService.signalEventReceived("startSignal", CollectionUtil.singletonMap("catchSignal", "actualCatchSignalValue"));
+        assertSignalEventSubscriptions("actualCatchSignalValue", "eventSubprocessSignal", "startSignal");
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwSignal", "eventSubprocessSignal");
+        vars.put("boundarySignal", "actualBoundarySignalValue");
+        runtimeService.signalEventReceived("actualCatchSignalValue", vars);
+
+        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("T1", "T3");
+
+        assertSignalEventSubscriptions("actualBoundarySignalValue", "eventSubprocessSignal", "startSignal");
+        runtimeService.signalEventReceived("actualBoundarySignalValue");
+    }
+
+    protected void assertSignalEventSubscriptions(String ... names) {
+        Tuple[] tuples = new Tuple[names.length];
+        for (int i = 0; i < names.length; i++) {
+            tuples[i] = Tuple.tuple(SignalEventSubscriptionEntity.EVENT_TYPE, names[i]);
+        }
+
+        assertThat(runtimeService.createEventSubscriptionQuery().orderByEventName().asc().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getEventName)
+            .containsOnly(tuples);
     }
 
     private void validateTaskCounts(long taskACount, long taskBCount, long taskCCount) {

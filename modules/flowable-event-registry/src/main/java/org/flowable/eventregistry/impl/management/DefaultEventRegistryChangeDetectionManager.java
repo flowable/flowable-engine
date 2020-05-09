@@ -71,6 +71,7 @@ public class DefaultEventRegistryChangeDetectionManager implements EventRegistry
         Set<String> latestChannelDefinitionIds = channelDefinitions.stream().map(ChannelDefinition::getId).collect(Collectors.toSet());
         for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
             if (!latestChannelDefinitionIds.contains(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId())) {
+                // The cache is a synchronized map (default impl), so no need to synchronize, both adds (during deployment) and remove (here) are synchronized
                 deploymentManager.removeChannelDefinitionFromCache(channelDefinitionCacheEntry.getChannelDefinitionEntity());
             }
         }

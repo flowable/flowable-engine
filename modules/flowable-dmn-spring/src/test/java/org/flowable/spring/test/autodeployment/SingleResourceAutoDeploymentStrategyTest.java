@@ -13,9 +13,7 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -44,14 +42,14 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
     public void before() throws Exception {
         super.before();
         classUnderTest = new SingleResourceAutoDeploymentStrategy();
-        assertNotNull(classUnderTest);
+        assertThat(classUnderTest).isNotNull();
     }
 
     @Test
     public void testHandlesMode() {
-        assertTrue(classUnderTest.handlesMode(SingleResourceAutoDeploymentStrategy.DEPLOYMENT_MODE));
-        assertFalse(classUnderTest.handlesMode("other-mode"));
-        assertFalse(classUnderTest.handlesMode(null));
+        assertThat(classUnderTest.handlesMode(SingleResourceAutoDeploymentStrategy.DEPLOYMENT_MODE)).isTrue();
+        assertThat(classUnderTest.handlesMode("other-mode")).isFalse();
+        assertThat(classUnderTest.handlesMode(null)).isFalse();
     }
 
     @Test

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,6 @@
 package org.flowable.rest.service.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 
@@ -35,7 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the process instance query resource.
- * 
+ *
  * @author Frederik Heremans
  */
 public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
@@ -169,11 +168,11 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         JsonNode dataNode = rootNode.get("data");
-        assertEquals(3, dataNode.size());
+        assertThat(dataNode).hasSize(3);
 
-        assertEquals(processInstance3.getId(), dataNode.get(0).get("id").asText());
-        assertEquals(processInstance2.getId(), dataNode.get(1).get("id").asText());
-        assertEquals(processInstance1.getId(), dataNode.get(2).get("id").asText());
+        assertThat(dataNode.get(0).get("id").asText()).isEqualTo(processInstance3.getId());
+        assertThat(dataNode.get(1).get("id").asText()).isEqualTo(processInstance2.getId());
+        assertThat(dataNode.get(2).get("id").asText()).isEqualTo(processInstance1.getId());
 
         // Check paging size
         requestNode = objectMapper.createObjectNode();
@@ -185,7 +184,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         dataNode = rootNode.get("data");
-        assertEquals(1, dataNode.size());
+        assertThat(dataNode).hasSize(1);
 
         // Check paging start and size
         requestNode = objectMapper.createObjectNode();
@@ -199,11 +198,11 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         dataNode = rootNode.get("data");
-        assertEquals(1, dataNode.size());
+        assertThat(dataNode).hasSize(1);
         JsonNode valueNode = dataNode.get(0);
-        assertEquals(processInstance2.getId(), valueNode.get("id").asText());
-        assertEquals("The One Task Process", valueNode.get("processDefinitionName").asText());
-        assertEquals("One task process description", valueNode.get("processDefinitionDescription").asText());
+        assertThat(valueNode.get("id").asText()).isEqualTo(processInstance2.getId());
+        assertThat(valueNode.get("processDefinitionName").asText()).isEqualTo("The One Task Process");
+        assertThat(valueNode.get("processDefinitionDescription").asText()).isEqualTo("One task process description");
         assertThat(valueNode.has("startTime")).as("has startTime").isTrue();
         assertThat(valueNode.get("startUserId").textValue()).as("startUserId").isEqualTo(processInstance2.getStartUserId());
     }

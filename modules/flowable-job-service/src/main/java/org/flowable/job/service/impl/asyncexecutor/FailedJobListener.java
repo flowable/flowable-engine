@@ -76,4 +76,13 @@ public class FailedJobListener implements CommandContextCloseListener {
         commandExecutor.execute(commandConfig, cmd);
     }
 
+    @Override
+    public Integer order() {
+        return 20;
+    }
+    
+    @Override
+    public boolean multipleAllowed() {
+        return true;
+    }
 }

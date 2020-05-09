@@ -7,6 +7,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
         <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -61,6 +62,7 @@
         insert into ${prefix}ACT_RU_SUSPENDED_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -84,6 +86,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=VARCHAR},
         #{exclusive, jdbcType=BOOLEAN},
         #{executionId, jdbcType=VARCHAR},
@@ -112,6 +115,7 @@
         INSERT INTO ${prefix}ACT_RU_SUSPENDED_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -136,6 +140,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -166,6 +171,7 @@
             INTO ${prefix}ACT_RU_SUSPENDED_JOB (
             ID_,
             REV_,
+            CATEGORY_,
             TYPE_,
             EXCLUSIVE_,
             EXECUTION_ID_,
@@ -189,6 +195,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -245,6 +252,12 @@
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
             </if>
+            <if test="category != null">
+                and RES.CATEGORY_ = #{category}
+            </if>
+            <if test="categoryLike != null">
+                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+            </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId}
             </if>
@@ -274,6 +287,9 @@
             </if>
             <if test="onlyMessages">
                 and RES.TYPE_ = 'message'
+            </if>
+            <if test="onlyExternalWorkers">
+                and RES.TYPE_ = 'externalWorker'
             </if>
             <if test="duedateHigherThan != null">
                 and RES.DUEDATE_ &gt; #{duedateHigherThan}
@@ -346,6 +362,9 @@
             </if>
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.category != category">
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.elementId != elementId">
                 ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},

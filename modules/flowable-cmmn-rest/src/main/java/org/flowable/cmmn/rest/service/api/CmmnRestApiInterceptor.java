@@ -36,6 +36,7 @@ import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceQuery
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceCreateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceUpdateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
@@ -74,6 +75,8 @@ public interface CmmnRestApiInterceptor {
     void deleteCaseInstance(CaseInstance caseInstance);
     
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
+
+    void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
     
     void accessPlanItemInstanceInfoById(PlanItemInstance planItemInstance);
 
@@ -136,4 +139,6 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
+
+    void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
 }

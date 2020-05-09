@@ -26,7 +26,7 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  */
 public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
 
-    List<TimerJobEntity> findTimerJobsToExecute(Page page);
+    List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page);
 
     List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId);
 

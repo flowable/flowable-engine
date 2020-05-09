@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
@@ -44,7 +46,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.server.Server;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -402,7 +403,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        Assertions.assertThat(dataNode)
+        assertThat(dataNode)
             .extracting(node -> node.get("id").textValue())
             .as("Expected result ids")
             .containsExactly(expectedResourceIds);

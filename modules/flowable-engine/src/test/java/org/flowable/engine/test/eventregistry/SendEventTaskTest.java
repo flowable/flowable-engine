@@ -52,14 +52,12 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         inboundEventChannelAdapter = setupTestInboundChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("eventProperty", EventPayloadTypes.STRING)
             .deploy();
         
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("anotherEvent")
             .resourceName("anotherEvent.event")
             .payload("nameProperty", EventPayloadTypes.STRING)
@@ -67,11 +65,9 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
             .deploy();
         
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploy();
     }
 
@@ -252,6 +248,32 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
     }
+
+    @Test
+    @Deployment
+    public void testTriggerableSendEventTransientVariable() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
+        ObjectNode json = objectMapper.createObjectNode();
+        json.put("type", "myTriggerEvent");
+        json.put("customerId", "testId");
+        getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "anotherVariable")).isNull(); // should not have been stored, as it's transient
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("testId");
+    }
     
     @Test
     @Deployment
@@ -359,7 +381,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

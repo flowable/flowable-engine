@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     START_TIME_ timestamp,
     START_USER_ID_ varchar(255),
     LOCK_TIME_ timestamp,
+    LOCK_OWNER_ varchar(255),
     IS_COUNT_ENABLED_ smallint check(IS_COUNT_ENABLED_ in (1,0)),
     EVT_SUBSCR_COUNT_ integer, 
     TASK_COUNT_ integer, 
@@ -59,6 +60,7 @@ create table ACT_RU_EXECUTION (
     TIMER_JOB_COUNT_ integer,
     SUSP_JOB_COUNT_ integer,
     DEADLETTER_JOB_COUNT_ integer,
+    EXTERNAL_WORKER_JOB_COUNT_ integer,
     VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
     CALLBACK_ID_ varchar(255),
@@ -336,7 +338,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.1.0', 1);
+values ('schema.version', '6.5.1.3', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.1.0)', 1);
+values ('schema.history', 'create(6.5.1.3)', 1);

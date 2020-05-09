@@ -12,8 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -43,17 +43,15 @@ public class GenericEventListenerCmmnXmlConverterTest extends AbstractConverterT
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
 
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
-        assertEquals(2, humanTasks.size());
+        assertThat(humanTasks).hasSize(2);
 
-        List<GenericEventListener> genericEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(GenericEventListener.class, true);
-        assertEquals(1, genericEventListeners.size());
-
-        GenericEventListener genericEventListener = genericEventListeners.get(0);
-        assertEquals("myGenericEventListener", genericEventListener.getName());
-        assertEquals("genericActionListener",genericEventListener.getId());
-        assertEquals("GenericEventListener documentation", genericEventListener.getDocumentation());
+        List<GenericEventListener> genericEventListeners = cmmnModel.getPrimaryCase().getPlanModel()
+                .findPlanItemDefinitionsOfType(GenericEventListener.class, true);
+        assertThat(genericEventListeners)
+                .extracting(GenericEventListener::getName, GenericEventListener::getId, GenericEventListener::getDocumentation)
+                .containsExactly(tuple("myGenericEventListener", "genericActionListener", "GenericEventListener documentation"));
     }
 }

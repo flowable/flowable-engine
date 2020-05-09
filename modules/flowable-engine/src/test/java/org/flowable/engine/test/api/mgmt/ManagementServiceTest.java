@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,38 +46,28 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testGetMetaDataForUnexistingTable() {
         TableMetaData metaData = managementService.getTableMetaData("unexistingtable");
-        assertNull(metaData);
+        assertThat(metaData).isNull();
     }
 
     @Test
     public void testGetMetaDataNullTableName() {
-        try {
-            managementService.getTableMetaData(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("tableName is null", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.getTableMetaData(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("tableName is null");
     }
 
     @Test
     public void testExecuteJobNullJobId() {
-        try {
-            managementService.executeJob(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("JobId is null", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.executeJob(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JobId is null");
     }
 
     @Test
     public void testExecuteJobUnexistingJob() {
-        try {
-            managementService.executeJob("unexistingjob");
-            fail("ActivitiException expected");
-        } catch (JobNotFoundException jnfe) {
-            assertTextPresent("No job found with id", jnfe.getMessage());
-            assertEquals(Job.class, jnfe.getObjectClass());
-        }
+        assertThatThrownBy(() -> managementService.executeJob("unexistingjob"))
+                .isExactlyInstanceOf(JobNotFoundException.class)
+                .hasMessageContaining("No job found with id");
     }
 
     @Test
@@ -87,50 +77,44 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         // The execution is waiting in the first usertask. This contains a boundary
         // timer event which we will execute manual for testing purposes.
-        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        final Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertNotNull("No job found for process instance", timerJob);
+        assertThat(timerJob).as("No job found for process instance").isNotNull();
 
-        try {
+        assertThatThrownBy(() -> {
             managementService.moveTimerToExecutableJob(timerJob.getId());
             managementService.executeJob(timerJob.getId());
-            fail("RuntimeException from within the script task expected");
-        } catch (RuntimeException re) {
-            assertTextPresent("This is an exception thrown from scriptTask", re.getCause().getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("This is an exception thrown from scriptTask");
 
         // Fetch the task to see that the exception that occurred is persisted
-        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertNotNull(timerJob);
-        assertNotNull(timerJob.getExceptionMessage());
-        assertTextPresent("This is an exception thrown from scriptTask", timerJob.getExceptionMessage());
+        assertThat(timerJob2).isNotNull();
+        assertThat(timerJob2.getExceptionMessage()).isNotNull();
+        assertThat(timerJob2.getExceptionMessage())
+                .contains("This is an exception thrown from scriptTask");
 
         // Get the full stacktrace using the managementService
-        String exceptionStack = managementService.getTimerJobExceptionStacktrace(timerJob.getId());
-        assertNotNull(exceptionStack);
-        assertTextPresent("This is an exception thrown from scriptTask", exceptionStack);
+        String exceptionStack = managementService.getTimerJobExceptionStacktrace(timerJob2.getId());
+        assertThat(exceptionStack).isNotNull();
+        assertThat(exceptionStack)
+                .contains("This is an exception thrown from scriptTask");
     }
 
     @Test
     public void testgetJobExceptionStacktraceUnexistingJobId() {
-        try {
-            managementService.getJobExceptionStacktrace("unexistingjob");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException re) {
-            assertTextPresent("No job found with id unexistingjob", re.getMessage());
-            assertEquals(Job.class, re.getObjectClass());
-        }
+        assertThatThrownBy(() -> managementService.getJobExceptionStacktrace("unexistingjob"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No job found with id unexistingjob");
     }
 
     @Test
     public void testgetJobExceptionStacktraceNullJobId() {
-        try {
-            managementService.getJobExceptionStacktrace(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("jobId is null", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.getJobExceptionStacktrace(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("jobId is null");
     }
 
     @Test
@@ -143,14 +127,14 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         Date duedate = timerJob.getDuedate();
 
-        assertNotNull("No job found for process instance", timerJob);
-        assertEquals(processEngineConfiguration.getAsyncExecutorNumberOfRetries(), timerJob.getRetries());
+        assertThat(timerJob).as("No job found for process instance").isNotNull();
+        assertThat(timerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
 
         managementService.setTimerJobRetries(timerJob.getId(), 5);
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(5, timerJob.getRetries());
-        assertEquals(duedate, timerJob.getDuedate());
+        assertThat(timerJob.getRetries()).isEqualTo(5);
+        assertThat(timerJob.getDuedate()).isEqualTo(duedate);
     }
 
     @Test
@@ -163,125 +147,103 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 .processInstanceId(processInstance.getId())
                 .singleResult();
 
-        assertNotNull("No job found for process instance", asyncJob);
-        assertEquals(processEngineConfiguration.getAsyncExecutorNumberOfRetries(), asyncJob.getRetries());
+        assertThat(asyncJob).as("No job found for process instance").isNotNull();
+        assertThat(asyncJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
 
-        try {
-            managementService.executeJob(asyncJob.getId());
-            fail("Exception expected");
-        } catch (Exception e) {
-            // expected exception
-        }
+        final String asyncId = asyncJob.getId();
+        assertThatThrownBy(() -> managementService.executeJob(asyncId))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("problem evaluating script");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
 
-        assertEquals(2, asyncJob.getRetries());
-        assertEquals("theScriptTask", asyncJob.getElementId());
-        assertEquals("Execute script", asyncJob.getElementName());
+        assertThat(asyncJob.getRetries()).isEqualTo(2);
+        assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
+        assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
 
-        try {
-            asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
-            managementService.executeJob(asyncJob.getId());
-            fail("Exception expected");
-        } catch (Exception e) {
-            // expected exception
-        }
+        final String jobId = asyncJob.getId();
+        assertThatThrownBy(() -> {
+            Job job = managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(job.getId());
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("problem evaluating script");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
-        assertEquals("theScriptTask", asyncJob.getElementId());
-        assertEquals("Execute script", asyncJob.getElementName());
+        assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
+        assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
 
-        try {
-            asyncJob = managementService.moveTimerToExecutableJob(asyncJob.getId());
-            managementService.executeJob(asyncJob.getId());
-            fail("Exception expected");
-        } catch (Exception e) {
-            // expected exception
-        }
+        final String jobId2 = asyncJob.getId();
+        assertThatThrownBy(() -> {
+            Job job = managementService.moveTimerToExecutableJob(jobId2);
+            managementService.executeJob(jobId2);
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("problem evaluating script");
 
         asyncJob = managementService.createDeadLetterJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
-        
-        assertEquals("theScriptTask", asyncJob.getElementId());
-        assertEquals("Execute script", asyncJob.getElementName());
+
+        assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
+        assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
 
         managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
 
         asyncJob = managementService.createJobQuery()
                 .processInstanceId(processInstance.getId())
                 .singleResult();
-        
-        assertEquals("theScriptTask", asyncJob.getElementId());
-        assertEquals("Execute script", asyncJob.getElementName());
 
-        assertEquals(5, asyncJob.getRetries());
+        assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
+        assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+
+        assertThat(asyncJob.getRetries()).isEqualTo(5);
     }
 
     @Test
     public void testSetJobRetriesUnexistingJobId() {
-        try {
-            managementService.setJobRetries("unexistingjob", 5);
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException re) {
-            assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
-            assertEquals(Job.class, re.getObjectClass());
-        }
+        assertThatThrownBy(() -> managementService.setJobRetries("unexistingjob", 5))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No job found with id 'unexistingjob'.");
     }
 
     @Test
     public void testSetJobRetriesEmptyJobId() {
-        try {
-            managementService.setJobRetries("", 5);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.setJobRetries("", 5))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("The job id is mandatory, but '' has been provided.");
     }
 
     @Test
     public void testSetJobRetriesJobIdNull() {
-        try {
-            managementService.setJobRetries(null, 5);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("The job id is mandatory, but 'null' has been provided.", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.setJobRetries(null, 5))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("The job id is mandatory, but 'null' has been provided.");
     }
 
     @Test
     public void testSetJobRetriesNegativeNumberOfRetries() {
-        try {
-            managementService.setJobRetries("unexistingjob", -1);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("The number of job retries must be a non-negative Integer, but '-1' has been provided.", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.setJobRetries("unexistingjob", -1))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("The number of job retries must be a non-negative Integer, but '-1' has been provided.");
     }
 
     @Test
     public void testDeleteJobNullJobId() {
-        try {
-            managementService.deleteJob(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException re) {
-            assertTextPresent("jobId is null", re.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.deleteJob(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("jobId is null");
     }
 
     @Test
     public void testDeleteJobUnexistingJob() {
-        try {
-            managementService.deleteJob("unexistingjob");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("No job found with id", ae.getMessage());
-            assertEquals(Job.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> managementService.deleteJob("unexistingjob"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No job found with id");
     }
 
     @Test
@@ -290,11 +252,11 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertNotNull("Task timer should be there", timerJob);
+        assertThat(timerJob).as("Task timer should be there").isNotNull();
         managementService.deleteTimerJob(timerJob.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull("There should be no job now. It was deleted", timerJob);
+        assertThat(timerJob).as("There should be no job now. It was deleted").isNull();
     }
 
     @Test
@@ -315,12 +277,9 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         commandExecutor.execute(acquireJobsCmd);
 
         // Try to delete the job. This should fail.
-        try {
-            managementService.deleteJob(timerJob.getId());
-            fail();
-        } catch (FlowableException e) {
-            // Exception is expected
-        }
+        assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No job found with id");
 
         // Clean up
         managementService.moveTimerToExecutableJob(timerJob.getId());
@@ -332,7 +291,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testGetTableName() {
         String table = managementService.getTableName(EventSubscriptionEntity.class, false);
-        assertEquals("ACT_RU_EVENT_SUBSCR", table);
+        assertThat(table).isEqualTo("ACT_RU_EVENT_SUBSCR");
     }
 
     @Test
@@ -373,8 +332,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
             LockManager testLockManager2 = managementService.getLockManager(lockName);
             assertThatThrownBy(() -> testLockManager2.waitForLock(Duration.ofMillis(250)))
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Could not acquire lock testWaitForLock. Current lock value:");
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessageContaining("Could not acquire lock testWaitForLock. Current lock value:");
             assertThat(testLockManager2.acquireLock()).isFalse();
 
             testLockManager1.releaseLock();

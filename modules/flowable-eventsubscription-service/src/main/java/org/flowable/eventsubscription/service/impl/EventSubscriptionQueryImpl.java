@@ -20,18 +20,20 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery, QueryCacheValues {
+public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription>
+        implements EventSubscriptionQuery, CacheAwareQuery<EventSubscriptionEntity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -243,9 +245,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdBefore = createdBefore;
+            this.currentOrQueryObject.createdBefore = beforeTime;
         } else {
-            this.createdBefore = createdBefore;
+            this.createdBefore = beforeTime;
         }
 
         return this;
@@ -258,9 +260,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdAfter = createdAfter;
+            this.currentOrQueryObject.createdAfter = afterTime;
         } else {
-            this.createdAfter = createdAfter;
+            this.createdAfter = afterTime;
         }
 
         return this;
@@ -392,6 +394,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     @Override
     public EventSubscriptionQuery orderByCreateDate() {
         return orderBy(EventSubscriptionQueryProperty.CREATED);
+    }
+
+    @Override
+    public EventSubscriptionQuery orderByEventName() {
+        return orderBy(EventSubscriptionQueryProperty.EVENT_NAME);
     }
 
     @Override

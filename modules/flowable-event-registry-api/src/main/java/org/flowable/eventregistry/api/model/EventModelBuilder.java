@@ -12,10 +12,7 @@
  */
 package org.flowable.eventregistry.api.model;
 
-import java.util.Collection;
-
 import org.flowable.eventregistry.api.EventDeployment;
-import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -56,28 +53,6 @@ public interface EventModelBuilder {
     EventModelBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
-     * {@link EventModel} can be bound to inbound or outbound channels.
-     * Calling this method will bind it to an inbound channel with the given key.
-     */
-    EventModelBuilder inboundChannelKey(String channelKey);
-
-    /**
-     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
-     */
-    EventModelBuilder inboundChannelKeys(Collection<String> channelKeys);
-
-    /**
-     * {@link EventModel} can be bound to inbound or outbound channels.
-     * Calling this method will bind it to an inbound channel with the given key.
-     */
-    EventModelBuilder outboundChannelKey(String channelKey);
-
-    /**
-     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
-     */
-    EventModelBuilder outboundChannelKeys(Collection<String> channelKeys);
-
-    /**
      * Defines one payload element of an event definition.
      * Such payload elements are data that is contained within an event.
      * If certain payload needs to be used to correlate runtime instances,
@@ -91,7 +66,7 @@ public interface EventModelBuilder {
      * Defines one parameters for correlation that can be used in models to map onto.
      * Each correlation parameter is automatically a {@link #payload(String, String)} element.
      *
-     * Will create a {@link EventCorrelationParameter} behind the scenes.
+     * Will create a correlation {@link org.flowable.eventregistry.model.EventPayload EventPayload} behind the scenes.
      */
     EventModelBuilder correlationParameter(String name, String type);
     

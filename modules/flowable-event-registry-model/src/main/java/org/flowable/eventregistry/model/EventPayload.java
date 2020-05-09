@@ -12,13 +12,19 @@
  */
 package org.flowable.eventregistry.model;
 
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class EventPayload {
 
     protected String name;
     protected String type;
+    protected boolean correlationParameter;
     
     public EventPayload() {}
 
@@ -43,4 +49,35 @@ public class EventPayload {
         this.type = type;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isCorrelationParameter() {
+        return correlationParameter;
+    }
+
+    public void setCorrelationParameter(boolean correlationParameter) {
+        this.correlationParameter = correlationParameter;
+    }
+
+    public static EventPayload correlation(String name, String type) {
+        EventPayload payload = new EventPayload(name, type);
+        payload.setCorrelationParameter(true);
+        return payload;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EventPayload that = (EventPayload) o;
+        return Objects.equals(name, that.name) && Objects.equals(type, that.type) && correlationParameter == that.correlationParameter;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
+    }
 }

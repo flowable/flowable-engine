@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,7 +133,18 @@ public class CommandContext {
         if (closeListeners == null) {
             closeListeners = new ArrayList<>();
         }
+        
+        if (!commandContextCloseListener.multipleAllowed()) {
+            for (CommandContextCloseListener closeListenerItem : closeListeners) {
+    			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
+    				return;
+    			}
+    		}
+        }
+        
         closeListeners.add(commandContextCloseListener);
+        
+        closeListeners.sort(Comparator.comparing(CommandContextCloseListener::order));
     }
 
     public List<CommandContextCloseListener> getCloseListeners() {
@@ -142,7 +154,7 @@ public class CommandContext {
     protected void executeCloseListenersClosing() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
+            	for (CommandContextCloseListener listener : closeListeners) {
                     listener.closing(this);
                 }
             } catch (Throwable exception) {

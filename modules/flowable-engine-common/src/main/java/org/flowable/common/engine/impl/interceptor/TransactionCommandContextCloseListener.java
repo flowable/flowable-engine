@@ -46,4 +46,13 @@ public class TransactionCommandContextCloseListener implements CommandContextClo
         transactionContext.rollback();
     }
 
+    @Override
+    public Integer order() {
+        return 10000;
+    }
+    
+    @Override
+    public boolean multipleAllowed() {
+        return false;
+    }
 }

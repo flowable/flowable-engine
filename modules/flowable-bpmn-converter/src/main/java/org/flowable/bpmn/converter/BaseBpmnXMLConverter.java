@@ -512,7 +512,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 }
             }
         }
-        writeDefaultAttribute(ATTRIBUTE_MESSAGE_REF, messageRef, xtw);
+
+        if (StringUtils.isNotEmpty(messageRef)) {
+            writeDefaultAttribute(ATTRIBUTE_MESSAGE_REF, messageRef, xtw);
+        }
+        if (StringUtils.isNotEmpty(messageDefinition.getMessageExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MESSAGE_EXPRESSION, messageDefinition.getMessageExpression());
+        }
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(messageDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();

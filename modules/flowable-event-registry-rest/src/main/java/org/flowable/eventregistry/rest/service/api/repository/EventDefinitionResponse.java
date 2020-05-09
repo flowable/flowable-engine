@@ -29,6 +29,7 @@ public class EventDefinitionResponse {
     private String tenantId;
     private String deploymentId;
     private String deploymentUrl;
+    private String resourceName;
     private String resource;
     private String category;
 
@@ -111,6 +112,15 @@ public class EventDefinitionResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @ApiModelProperty(example = "oneEvent.event")
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public void setResource(String resource) {

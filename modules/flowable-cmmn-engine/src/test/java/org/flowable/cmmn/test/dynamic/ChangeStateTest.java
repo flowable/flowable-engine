@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.dynamic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ import org.flowable.task.api.Task;
 import org.junit.Test;
 
 public class ChangeStateTest extends FlowableCmmnTestCase {
-    
+
     protected String oneTaskCaseDeploymentId;
 
     @Test
@@ -34,35 +33,22 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
     public void testChangeHumanTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("task1", "task2")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
+                .changeState();
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertEquals(2, planItemInstances.size());
-        
-        boolean planItem1Found = false;
-        boolean planItem2Found = false;
-        for (PlanItemInstance planItemInstance : planItemInstances) {
-            if ("planItem1".equals(planItemInstance.getElementId())) {
-                planItem1Found = true;
-                assertEquals(PlanItemInstanceState.TERMINATED, planItemInstance.getState());
-                
-            } else if ("planItem2".equals(planItemInstance.getElementId())) {
-                planItem2Found = true;
-                assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-            }
-        }
-        
-        assertTrue(planItem1Found);
-        assertTrue(planItem2Found);
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE);
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task Two", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
@@ -72,89 +58,51 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
     public void testChangeHumanTaskInStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("task1", "task2")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
+                .changeState();
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertEquals(3, planItemInstances.size());
-        
-        boolean planItem1Found = false;
-        boolean planItem2Found = false;
-        boolean stagePlanItemFound = false;
-        for (PlanItemInstance planItemInstance : planItemInstances) {
-            if ("planItem1".equals(planItemInstance.getElementId())) {
-                planItem1Found = true;
-                assertEquals(PlanItemInstanceState.TERMINATED, planItemInstance.getState());
-                
-            } else if ("planItem2".equals(planItemInstance.getElementId())) {
-                planItem2Found = true;
-                assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-            
-            } else if ("planItemStage".equals(planItemInstance.getElementId())) {
-                stagePlanItemFound = true;
-                assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-            }
-        }
-        
-        assertTrue(planItem1Found);
-        assertTrue(planItem2Found);
-        assertTrue(stagePlanItemFound);
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.ACTIVE);
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task Two", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testChangeHumanTaskToStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("task1", "subTask1")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("subTask1")
+                .changeState();
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertEquals(3, planItemInstances.size());
-        
-        boolean planItem1Found = false;
-        boolean subPlanItem1Found = false;
-        boolean stagePlanItemFound = false;
-        for (PlanItemInstance planItemInstance : planItemInstances) {
-            if ("planItem1".equals(planItemInstance.getElementId())) {
-                planItem1Found = true;
-                assertEquals(PlanItemInstanceState.TERMINATED, planItemInstance.getState());
-                
-            } else if ("subPlanItem1".equals(planItemInstance.getElementId())) {
-                subPlanItem1Found = true;
-                assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-            
-            } else if ("planItemStage".equals(planItemInstance.getElementId())) {
-                stagePlanItemFound = true;
-                assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-            }
-        }
-        
-        assertTrue(planItem1Found);
-        assertTrue(subPlanItem1Found);
-        assertTrue(stagePlanItemFound);
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.ACTIVE);
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Sub task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Sub task One");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testChangeHumanTaskFromStage() {
@@ -162,66 +110,40 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Sub task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Sub task One");
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("subTask1", "task1")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("subTask1")
+                .activatePlanItemDefinitionId("task1")
+                .changeState();
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertEquals(5, planItemInstances.size());
-        
-        boolean planItem1CompletedFound = false;
-        boolean planItem1ActiveFound = false;
-        boolean subPlanItem1Found = false;
-        boolean stagePlanItemTerminatedFound = false;
-        boolean stagePlanItemAvailableFound = false;
-        for (PlanItemInstance planItemInstance : planItemInstances) {
-            if ("planItem1".equals(planItemInstance.getElementId())) {
-                if (PlanItemInstanceState.COMPLETED.equals(planItemInstance.getState())) {
-                    planItem1CompletedFound = true;
-                } else {
-                    assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-                    planItem1ActiveFound = true;
-                }
-                
-            } else if ("subPlanItem1".equals(planItemInstance.getElementId())) {
-                subPlanItem1Found = true;
-                assertEquals(PlanItemInstanceState.TERMINATED, planItemInstance.getState());
-            
-            } else if ("planItemStage".equals(planItemInstance.getElementId())) {
-                if (PlanItemInstanceState.TERMINATED.equals(planItemInstance.getState())) {
-                    stagePlanItemTerminatedFound = true;
-                } else {
-                    assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstance.getState());
-                    stagePlanItemAvailableFound = true;
-                }
-            }
-        }
-        
-        assertTrue(planItem1CompletedFound);
-        assertTrue(planItem1ActiveFound);
-        assertTrue(subPlanItem1Found);
-        assertTrue(stagePlanItemTerminatedFound);
-        assertTrue(stagePlanItemAvailableFound);
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        PlanItemInstanceState.COMPLETED,
+                        PlanItemInstanceState.ACTIVE,
+                        PlanItemInstanceState.TERMINATED,
+                        PlanItemInstanceState.COMPLETED,
+                        PlanItemInstanceState.AVAILABLE);
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnTaskService.complete(task.getId());
-        
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertEquals(6, planItemInstances.size());
-        
+        assertThat(planItemInstances).hasSize(6);
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertEquals(2, planItemInstances.size());
-        
+        assertThat(planItemInstances).hasSize(2);
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Sub task One", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Sub task One");
+
         cmmnTaskService.complete(task.getId());
-        
+
         assertCaseInstanceEnded(caseInstance);
     }
 }

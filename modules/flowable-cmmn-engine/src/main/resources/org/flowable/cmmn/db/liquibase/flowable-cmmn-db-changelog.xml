@@ -506,4 +506,12 @@
 
     </changeSet>
 
+    <changeSet id="12" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="LOCK_OWNER_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

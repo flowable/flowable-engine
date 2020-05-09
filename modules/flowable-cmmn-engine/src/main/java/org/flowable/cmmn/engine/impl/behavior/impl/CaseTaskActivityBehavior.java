@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -49,6 +50,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     protected Expression caseRefExpression;
     protected String caseRef;
     protected Boolean fallbackToDefaultTenant;
+    protected boolean sameDeployment;
     protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
@@ -56,6 +58,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         this.caseRefExpression = caseRefExpression;
         this.caseRef = caseTask.getCaseRef();
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
+        this.sameDeployment = caseTask.isSameDeployment();
         this.caseTask = caseTask;
     }
 
@@ -99,6 +102,11 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         caseInstanceBuilder.variables(finalVariableMap);
         caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
+
+        if (sameDeployment) {
+            caseInstanceBuilder.caseDefinitionParentDeploymentId(
+                    CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration));
+        }
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
 

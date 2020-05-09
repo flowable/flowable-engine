@@ -14,16 +14,15 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
@@ -50,18 +49,10 @@ public class BoundaryMessageEventActivityBehavior extends BoundaryEventActivityB
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String messageName = null;
-        if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
-            messageName = messageEventDefinition.getMessageRef();
-        } else {
-            Expression messageExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager()
-                    .createExpression(messageEventDefinition.getMessageExpression());
-            messageName = messageExpression.getValue(execution).toString();
-        }
-        
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, execution);
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                         .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
-                        .eventName(messageEventDefinition.getMessageRef())
+                        .eventName(messageName)
                         .executionId(executionEntity.getId())
                         .processInstanceId(executionEntity.getProcessInstanceId())
                         .activityId(executionEntity.getCurrentActivityId())
@@ -86,11 +77,13 @@ public class BoundaryMessageEventActivityBehavior extends BoundaryEventActivityB
         BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
 
         if (boundaryEvent.isCancelActivity()) {
+
+            String messageName = EventDefinitionExpressionUtil.determineMessageName(Context.getCommandContext(), messageEventDefinition, execution);
+
             EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
-
+                if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageName)) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
                     CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
                 }

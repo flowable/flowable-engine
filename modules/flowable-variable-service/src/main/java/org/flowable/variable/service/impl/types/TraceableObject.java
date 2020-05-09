@@ -14,7 +14,6 @@ package org.flowable.variable.service.impl.types;
 
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
  * @param <O> The type of the original object
@@ -29,20 +28,23 @@ public class TraceableObject<O, C> {
     protected O tracedObject;
     protected C tracedObjectOriginalValue;
     protected VariableInstanceEntity variableInstanceEntity;
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
-    public TraceableObject(MutableVariableType<O, C> type, O tracedObject, C tracedObjectOriginalValue, VariableInstanceEntity variableInstanceEntity) {
+    public TraceableObject(MutableVariableType<O, C> type, O tracedObject, C tracedObjectOriginalValue, 
+                    VariableInstanceEntity variableInstanceEntity, VariableServiceConfiguration variableServiceConfiguration) {
+        
         this.type = type;
         this.tracedObject = tracedObject;
         this.tracedObjectOriginalValue = tracedObjectOriginalValue;
         this.variableInstanceEntity = variableInstanceEntity;
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     public void updateIfValueChanged() {
-        if (tracedObject == variableInstanceEntity.getCachedValue() && !variableInstanceEntity.isDeleted()) {
+        if (tracedObject == variableInstanceEntity.getCachedValue()) {
             if (type.updateValueIfChanged(tracedObject, tracedObjectOriginalValue, variableInstanceEntity)) {
-                VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
-                variableServiceConfiguration.getInternalHistoryVariableManager()
-                    .recordVariableUpdate(variableInstanceEntity, variableServiceConfiguration.getClock().getCurrentTime());
+                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(
+                                variableInstanceEntity, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
     }

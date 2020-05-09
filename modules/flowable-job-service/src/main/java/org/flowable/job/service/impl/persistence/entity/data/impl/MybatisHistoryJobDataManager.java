@@ -54,7 +54,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findJobsToExecute(Page page) {
+    public List<HistoryJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
         
         ListQueryParameterObject params = new ListQueryParameterObject();
         params.setParameter(jobServiceConfiguration.getHistoryJobExecutionScope());
@@ -79,7 +79,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findExpiredJobs(Page page) {
+    public List<HistoryJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobServiceConfiguration.getHistoryJobExecutionScope());
         Date now = jobServiceConfiguration.getClock().getCurrentTime();

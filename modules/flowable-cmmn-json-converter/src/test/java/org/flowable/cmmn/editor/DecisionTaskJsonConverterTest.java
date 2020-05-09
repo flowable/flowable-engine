@@ -14,9 +14,6 @@ package org.flowable.cmmn.editor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -30,6 +27,7 @@ import org.flowable.cmmn.model.Stage;
  * @author martin.grofcik
  */
 public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
+
     @Override
     protected String getResource() {
         return "test.dmnTaskModel.json";
@@ -38,31 +36,31 @@ public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("dmnExportCase", caseModel.getId());
-        assertEquals("dmnExportCase", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("dmnExportCase");
+        assertThat(caseModel.getName()).isEqualTo("dmnExportCase");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
-        assertEquals("casePlanModel", planModelStage.getId());
+        assertThat(planModelStage).isNotNull();
+        assertThat(planModelStage.getId()).isEqualTo("casePlanModel");
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("dmnTask", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("dmnTask");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof DecisionTask);
+        assertThat(planItemDefinition).isNotNull();
+        assertThat(planItemDefinition).isInstanceOf(DecisionTask.class);
         DecisionTask decisionTask = (DecisionTask) planItemDefinition;
-        assertEquals("sid-F4BCA0C7-8737-4279-B50F-59272C7C65A2", decisionTask.getId());
-        assertEquals("dmnTask", decisionTask.getName());
+        assertThat(decisionTask.getId()).isEqualTo("sid-F4BCA0C7-8737-4279-B50F-59272C7C65A2");
+        assertThat(decisionTask.getName()).isEqualTo("dmnTask");
 
         assertThat(decisionTask.getFieldExtensions())
-            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
-            .as("fieldName, stringValue")
-            .contains(
-                tuple("fallbackToDefaultTenant", "true"),
-                tuple("decisionTaskThrowErrorOnNoHits", "false")
-            );
+                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+                .as("fieldName, stringValue")
+                .contains(
+                        tuple("fallbackToDefaultTenant", "true"),
+                        tuple("decisionTaskThrowErrorOnNoHits", "false")
+                );
     }
 
 }

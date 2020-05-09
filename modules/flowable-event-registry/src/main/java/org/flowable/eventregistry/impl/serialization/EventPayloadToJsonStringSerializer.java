@@ -22,6 +22,7 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -43,20 +44,76 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
         for (EventPayloadInstance payloadInstance : payloadInstances) {
 
             String definitionType = payloadInstance.getDefinitionType();
-            if (EventPayloadTypes.STRING.equals(definitionType)) {
-                objectNode.put(payloadInstance.getDefinitionName(), (String) payloadInstance.getValue());
+            Object payloadInstanceValue = payloadInstance.getValue();
 
-            } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
-                objectNode.put(payloadInstance.getDefinitionName(), (Double) payloadInstance.getValue());
+            if (payloadInstanceValue != null) {
 
-            } else if (EventPayloadTypes.INTEGER.equals(definitionType)) {
-                objectNode.put(payloadInstance.getDefinitionName(), (Integer) payloadInstance.getValue());
+                if (EventPayloadTypes.STRING.equals(definitionType)) {
+                    objectNode.put(payloadInstance.getDefinitionName(), payloadInstanceValue.toString());
 
-            } else if (EventPayloadTypes.BOOLEAN.equals(definitionType)) {
-                objectNode.put(payloadInstance.getDefinitionName(), (Boolean) payloadInstance.getValue());
+                } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
+
+                    if (payloadInstanceValue instanceof Number) {
+                        objectNode.put(payloadInstance.getDefinitionName(), ((Number) payloadInstanceValue).doubleValue());
+                    } else if (payloadInstanceValue instanceof String) {
+                        objectNode.put(payloadInstance.getDefinitionName(), Double.valueOf((String) payloadInstanceValue));
+                    } else {
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'double'");
+                    }
+
+                } else if (EventPayloadTypes.INTEGER.equals(definitionType)) {
+
+                    if (payloadInstanceValue instanceof Number) {
+                        objectNode.put(payloadInstance.getDefinitionName(), ((Number) payloadInstanceValue).intValue());
+                    } else if (payloadInstanceValue instanceof String) {
+                        objectNode.put(payloadInstance.getDefinitionName(), Integer.valueOf((String) payloadInstanceValue));
+                    } else {
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'integer'");
+                    }
+
+                } else if (EventPayloadTypes.LONG.equals(definitionType)) {
+
+                    if (payloadInstanceValue instanceof Number) {
+                        objectNode.put(payloadInstance.getDefinitionName(), ((Number) payloadInstanceValue).longValue());
+                    } else if (payloadInstanceValue instanceof String) {
+                        objectNode.put(payloadInstance.getDefinitionName(), Long.valueOf((String) payloadInstanceValue));
+                    } else {
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'long'");
+                    }
+
+                } else if (EventPayloadTypes.BOOLEAN.equals(definitionType)) {
+
+                    if (payloadInstanceValue instanceof Boolean) {
+                        objectNode.put(payloadInstance.getDefinitionName(), (Boolean) payloadInstanceValue);
+                    } else if (payloadInstanceValue instanceof String) {
+                        objectNode.put(payloadInstance.getDefinitionName(), Boolean.valueOf((String) payloadInstanceValue));
+                    }  else {
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'boolean'");
+                    }
+
+                } else if (EventPayloadTypes.JSON.equals(definitionType)) {
+
+                    if (payloadInstanceValue instanceof JsonNode) {
+                        objectNode.set(payloadInstance.getDefinitionName(), (JsonNode) payloadInstanceValue);
+                    } else if (payloadInstanceValue instanceof String) {
+                        JsonNode jsonNode = null;
+                        try {
+                            jsonNode = objectMapper.readTree((String) payloadInstanceValue);
+                        } catch (JsonProcessingException e) {
+                            throw new FlowableIllegalArgumentException("Could not read json event payload", e);
+                        }
+                        objectNode.set(payloadInstance.getDefinitionName(), jsonNode);
+                    }  else {
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'json'");
+                    }
+
+                } else {
+                    throw new FlowableIllegalArgumentException("Unsupported event payload instance type: " + definitionType);
+                }
 
             } else {
-                throw new FlowableIllegalArgumentException("Unsupported event payload instance type: " + definitionType);
+                objectNode.putNull(payloadInstance.getDefinitionName());
+
             }
 
         }

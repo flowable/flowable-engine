@@ -17,12 +17,13 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
 public class SentryExport implements CmmnXmlConstants {
     
-    public static void writeSentry(Sentry sentry, XMLStreamWriter xtw) throws Exception {
+    public static void writeSentry(CmmnModel model, Sentry sentry, XMLStreamWriter xtw) throws Exception {
         // start sentry element
         xtw.writeStartElement(ELEMENT_SENTRY);
         xtw.writeAttribute(ATTRIBUTE_ID, sentry.getId());
@@ -42,7 +43,7 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeEndElement();
         }
 
-        boolean didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(sentry, false, null, xtw);
+        boolean didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(sentry, false, model.getNamespaces(), xtw);
         if (didWriteExtensionElement) {
             xtw.writeEndElement();
         }

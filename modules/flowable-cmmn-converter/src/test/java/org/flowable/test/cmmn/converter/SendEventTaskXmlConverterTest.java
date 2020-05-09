@@ -38,13 +38,12 @@ public class SendEventTaskXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition("sendEventTask1");
-        assertThat(planItemDefinition).isInstanceOf(SendEventServiceTask.class);
-
-        SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) planItemDefinition;
-        assertThat(sendEventServiceTask.getEventType()).isEqualTo("testEvent");
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(SendEventServiceTask.class, sendEventServiceTask -> {
+                    assertThat(sendEventServiceTask.getEventType()).isEqualTo("testEvent");
+                });
     }
-
 }

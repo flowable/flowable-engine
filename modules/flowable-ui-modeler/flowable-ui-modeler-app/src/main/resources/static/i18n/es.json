@@ -251,6 +251,12 @@
             "DESCRIPTION" : "Configura la tarea de servicio para ser disparable (triggerable)"
           }
         },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Establecer variable resultante como transitoria",
+            "DESCRIPTION" : "Atributo que establece que el resultado de la expresión no será persistido al finalizar la transacción de base de datos"
+          }
+        },
         "SCRIPTFORMATPACKAGE" : {
           "SCRIPTFORMAT" : {
             "TITLE" : "Formato del script",
@@ -1708,6 +1714,11 @@
             "TITLE": "Incluir en visión general",
             "DESCRIPTION": "Indica si esta etapa debe ser considerada para la visión general"
           }
+        },"MILESTONEVARIABLEPACKAGE" : {
+          "MILESTONEVARIABLE": {
+            "TITLE": "Milestone variable",
+            "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+          }
         },
         "SCRIPTFORMATPACKAGE": {
           "SCRIPTFORMAT": {
@@ -1731,6 +1742,12 @@
           "AVAILABLECONDITION": {
             "TITLE": "Condición de disponibilidad",
             "DESCRIPTION": "Una expresión de condición opciónal sobre un gestor de eventos para indicar cuándo se vuelve disponible."
+          }
+        },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Establecer variable resultante como transitoria",
+            "DESCRIPTION" : "Atributo que establece que el resultado de la expresión no será persistido al finalizar la transacción de base de datos"
           }
         }
       },

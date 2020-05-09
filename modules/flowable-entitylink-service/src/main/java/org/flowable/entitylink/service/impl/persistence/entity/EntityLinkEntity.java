@@ -36,6 +36,10 @@ public interface EntityLinkEntity extends EntityLink, Entity {
     
     void setReferenceScopeDefinitionId(String referenceScopeDefinitionId);
 
+    void setRootScopeId(String rootScopeId);
+
+    void setRootScopeType(String rootScopeType);
+
     void setHierarchyType(String hierarchyType);
 
     void setCreateTime(Date createTime);

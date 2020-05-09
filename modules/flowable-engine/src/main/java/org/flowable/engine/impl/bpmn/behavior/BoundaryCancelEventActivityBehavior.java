@@ -61,9 +61,7 @@ public class BoundaryCancelEventActivityBehavior extends BoundaryEventActivityBe
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         List<CompensateEventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findCompensateEventSubscriptionsByExecutionId(subProcessExecution.getParentId());
 
-        if (eventSubscriptions.isEmpty()) {
-            leave(execution);
-        } else {
+        if (!eventSubscriptions.isEmpty()) {
 
             String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + "(" + boundaryEvent.getId() + ")";
 
@@ -82,7 +80,7 @@ public class BoundaryCancelEventActivityBehavior extends BoundaryEventActivityBe
                     }
                 }
             }
-            leave(execution);
         }
+        leave(execution);
     }
 }

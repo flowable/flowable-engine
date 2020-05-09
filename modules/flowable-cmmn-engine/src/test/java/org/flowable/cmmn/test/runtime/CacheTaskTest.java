@@ -14,92 +14,190 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
+import org.junit.After;
 import org.junit.Test;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CacheTaskTest extends FlowableCmmnTestCase {
-    
+
+    @After
+    public void tearDown() {
+        ServiceCacheTask.reset();
+        CacheTaskListener.reset();
+        CacheMilestoneListener.reset();
+        TestQueryCaseInstanceWithIncludeVariablesDelegate.reset();
+    }
+
     @Test
     @CmmnDeployment
     public void testCaseCache() {
+        assertThat(ServiceCacheTask.caseInstanceId).isNull();
+        assertThat(ServiceCacheTask.historicCaseInstanceId).isNull();
+        assertThat(ServiceCacheTask.planItemInstanceId).isNull();
+        assertThat(ServiceCacheTask.historicPlanItemInstanceId).isNull();
+
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .start();
-        
-        HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        
-        assertNotNull(ServiceCacheTask.caseInstanceId);
-        assertEquals(caseInstance.getId(), ServiceCacheTask.caseInstanceId);
-        assertNotNull(ServiceCacheTask.historicCaseInstanceId);
-        assertEquals(caseInstance.getId(), ServiceCacheTask.historicCaseInstanceId);
-        assertNotNull(ServiceCacheTask.planItemInstanceId);
-        assertEquals(planItemInstance.getId(), ServiceCacheTask.planItemInstanceId);
-        assertNotNull(ServiceCacheTask.historicPlanItemInstanceId);
-        assertEquals(planItemInstance.getId(), ServiceCacheTask.historicPlanItemInstanceId);
+                .caseDefinitionKey("myCase")
+                .start();
+
+        HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult();
+
+        assertThat(ServiceCacheTask.caseInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.caseInstanceId).isEqualTo(caseInstance.getId());
+        assertThat(ServiceCacheTask.historicCaseInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.historicCaseInstanceId).isEqualTo(caseInstance.getId());
+        assertThat(ServiceCacheTask.planItemInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.planItemInstanceId).isEqualTo(planItemInstance.getId());
+        assertThat(ServiceCacheTask.historicPlanItemInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.historicPlanItemInstanceId).isEqualTo(planItemInstance.getId());
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTaskListenerCache() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .start();
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(CacheTaskListener.taskId).isNull();
+        assertThat(CacheTaskListener.historicTaskId).isNull();
 
-        assertNotNull(CacheTaskListener.taskId);
-        assertEquals(task.getId(), CacheTaskListener.taskId);
-        assertNotNull(CacheTaskListener.historicTaskId);
-        assertEquals(task.getId(), CacheTaskListener.historicTaskId);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(CacheTaskListener.taskId).isNotNull();
+        assertThat(CacheTaskListener.taskId).isEqualTo(task.getId());
+        assertThat(CacheTaskListener.historicTaskId).isNotNull();
+        assertThat(CacheTaskListener.historicTaskId).isEqualTo(task.getId());
     }
-    
+
     @Test
     @CmmnDeployment
     public void testMilestoneListenerCache() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .start();
-        HistoricMilestoneInstance milestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(milestoneInstance);
+        assertThat(CacheMilestoneListener.milestoneInstanceId).isNull();
+        assertThat(CacheMilestoneListener.historicMilestoneInstanceId).isNull();
 
-        assertNotNull(CacheMilestoneListener.milestoneInstanceId);
-        assertEquals(milestoneInstance.getId(), CacheMilestoneListener.milestoneInstanceId);
-        assertNotNull(CacheMilestoneListener.historicMilestoneInstanceId);
-        assertEquals(milestoneInstance.getId(), CacheMilestoneListener.historicMilestoneInstanceId);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+        HistoricMilestoneInstance milestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(milestoneInstance).isNotNull();
+
+        assertThat(CacheMilestoneListener.milestoneInstanceId).isNotNull();
+        assertThat(CacheMilestoneListener.milestoneInstanceId).isEqualTo(milestoneInstance.getId());
+        assertThat(CacheMilestoneListener.historicMilestoneInstanceId).isNotNull();
+        assertThat(CacheMilestoneListener.historicMilestoneInstanceId).isEqualTo(milestoneInstance.getId());
     }
 
     @Test
     @CmmnDeployment
     public void testCaseInstanceQueryWithIncludeVariables() {
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).isNull();
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).isNull();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testCaseInstanceQueryWithIncludeVariables")
-            .variable("myVar1", "Hello")
-            .variable("myVar2", "World")
-            .variable("myVar3", 123)
-            .start();
+                .caseDefinitionKey("testCaseInstanceQueryWithIncludeVariables")
+                .variable("myVar1", "Hello")
+                .variable("myVar2", "World")
+                .variable("myVar3", 123)
+                .start();
 
         Map.Entry[] entries = {
-            entry("myVar1", "Hello"),
-            entry("myVar2", "World"),
-            entry("myVar3", 123),
-            entry("varFromTheServiceTask", "valueFromTheServiceTask")
+                entry("myVar1", "Hello"),
+                entry("myVar2", "World"),
+                entry("myVar3", 123),
+                entry("varFromTheServiceTask", "valueFromTheServiceTask")
         };
 
         assertThat(caseInstance.getCaseVariables()).containsOnly(entries);
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).containsOnly(entries);
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseInstanceQueryWithIncludeVariablesAfterWaitState() {
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).isNull();
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).isNull();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCaseInstanceQueryWithIncludeVariables")
+                .variable("var1", "Hello")
+                .variable("var2", "World")
+                .variable("var3", 123)
+                .start();
+
+        assertThat(caseInstance.getCaseVariables()).containsOnly(
+                entry("var1", "Hello"),
+                entry("var2", "World"),
+                entry("var3", 123)
+        );
+
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).isNull();
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).isNull();
+
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        cmmnTaskService.complete(task.getId());
+
+        Map.Entry[] entries = {
+                entry("var1", "Hello"),
+                entry("var2", "World"),
+                entry("var3", 123),
+                entry("varFromTheServiceTask", "valueFromTheServiceTask")
+        };
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            // Make sure that it is loaded in the cache
+            CaseInstance queriedCaseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstance.getId());
+            assertThat(queriedCaseInstance.getCaseVariables()).isEmpty();
+
+            queriedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(queriedCaseInstance.getCaseVariables()).isEmpty();
+
+            queriedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .includeCaseVariables()
+                    .singleResult();
+            assertThat(queriedCaseInstance.getCaseVariables()).containsOnly(entries);
+
+            // Make sure that it is loaded in the cache
+            HistoricCaseInstance historicQueriedCaseInstance = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext)
+                    .findById(caseInstance.getId());
+            assertThat(historicQueriedCaseInstance.getCaseVariables()).isEmpty();
+
+            historicQueriedCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(historicQueriedCaseInstance.getCaseVariables()).isEmpty();
+
+            historicQueriedCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .includeCaseVariables()
+                    .singleResult();
+            assertThat(historicQueriedCaseInstance.getCaseVariables()).containsOnly(entries);
+
+            return null;
+        });
         assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).containsOnly(entries);
         assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
     }

@@ -28,12 +28,11 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
-import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
@@ -92,7 +91,6 @@ class JmsChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
-            .inboundChannelKey("testChannel")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -120,7 +118,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("name", "Kermit the Frog")
             );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -157,7 +155,7 @@ class JmsChannelDefinitionProcessorTest {
                     tuple("name", "Kermit the Frog")
                 );
             assertThat(eventInstance.getCorrelationParameterInstances())
-                .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
                 .containsExactlyInAnyOrder(
                     tuple("customer", "kermit")
                 );
@@ -178,7 +176,6 @@ class JmsChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
-            .inboundChannelKey("testChannel")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -216,7 +213,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("name", "Kermit the Frog")
             );
         assertThat(kermitEvent.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
@@ -231,7 +228,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("name", "Fozzie Bear")
             );
         assertThat(fozzieEvent.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
             .containsExactlyInAnyOrder(
                 tuple("customer", "fozzie")
             );
@@ -242,7 +239,6 @@ class JmsChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("customer")
-            .outboundChannelKey("outboundCustomer")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -255,14 +251,14 @@ class JmsChannelDefinitionProcessorTest {
             .jsonSerializer()
             .deploy();
 
-        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
 
-        eventRegistry.sendEventOutbound(kermitEvent);
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
         Object message = jmsTemplate.receiveAndConvert("outbound-customer");
         assertThat(message).isNotNull();
@@ -282,14 +278,14 @@ class JmsChannelDefinitionProcessorTest {
 
         try {
 
-            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
 
-            eventRegistry.sendEventOutbound(kermitEvent);
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
             Object message = jmsTemplate.receiveAndConvert("outbound-customer");
             assertThat(message).isNotNull();

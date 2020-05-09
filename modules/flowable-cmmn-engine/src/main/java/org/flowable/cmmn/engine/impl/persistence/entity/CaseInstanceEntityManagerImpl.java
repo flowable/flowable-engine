@@ -33,12 +33,16 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityMa
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
@@ -87,7 +91,7 @@ public class CaseInstanceEntityManagerImpl
         CaseInstanceEntity caseInstanceEntity = dataManager.findById(caseInstanceId);
 
         // Variables
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
         
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
@@ -159,6 +163,12 @@ public class CaseInstanceEntityManagerImpl
             deadLetterJobEntityManager.delete(deadLetterJob.getId());
         }
 
+        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+        List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(new ExternalWorkerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        for (ExternalWorkerJob externalWorkerJob : externalWorkerJobs) {
+            externalWorkerJobEntityManager.delete(externalWorkerJob.getId());
+        }
+
         // Actual case instance
         delete(caseInstanceEntity);
     }
@@ -184,19 +194,27 @@ public class CaseInstanceEntityManagerImpl
     @Override
     public void updateLockTime(String caseInstanceId) {
         Date expirationTime = getClock().getCurrentTime();
-        int lockMillis = engineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
+        AsyncExecutor asyncExecutor = engineConfiguration.getAsyncExecutor();
+        int lockMillis = asyncExecutor.getAsyncJobLockTimeInMillis();
 
         GregorianCalendar lockCal = new GregorianCalendar();
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
         Date lockDate = lockCal.getTime();
 
-        dataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
+        dataManager.updateLockTime(caseInstanceId, lockDate, asyncExecutor.getLockOwner(), expirationTime);
     }
 
     @Override
     public void clearLockTime(String caseInstanceId) {
         dataManager.clearLockTime(caseInstanceId);
+    }
+
+    @Override
+    public void clearAllLockTimes() {
+        if (engineConfiguration.getAsyncExecutor() != null) {
+            dataManager.clearAllLockTimes(engineConfiguration.getAsyncExecutor().getLockOwner());
+        }
     }
 
     @Override

@@ -24,11 +24,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -88,9 +90,15 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
         if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                    new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields)
-                ));
+                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
+                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
+                                    commandContext.getCurrentEngineConfiguration();
+                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
+                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                        new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                    ));
+                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
+                }
             }
         }
     }

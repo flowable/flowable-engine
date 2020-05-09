@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.IOParameter;
 
 public class OutParameterParser extends BaseChildElementParser {
@@ -54,6 +55,9 @@ public class OutParameterParser extends BaseChildElementParser {
                 
             } else if (parentElement instanceof CaseServiceTask) {
                 ((CaseServiceTask) parentElement).getOutParameters().add(parameter);
+            
+            } else if (parentElement instanceof Event) {
+                ((Event) parentElement).getOutParameters().add(parameter);
             }
         }
     }

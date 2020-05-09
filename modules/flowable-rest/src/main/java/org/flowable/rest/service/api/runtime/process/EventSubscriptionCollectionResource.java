@@ -64,6 +64,8 @@ public class EventSubscriptionCollectionResource {
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return event subscriptions with the given execution id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return event subscriptions part of a process with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return event subscriptions with the given process definition id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return event subscriptions part of a scope with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return event subscriptions with the given scope definition id", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string", format="date-time", value = "Only return event subscriptions which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string", format="date-time", value = "Only return event subscriptions which are created after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return event subscriptions with the given tenant id.", paramType = "query"),
@@ -74,7 +76,7 @@ public class EventSubscriptionCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/runtime/event-subscriptions", produces = "application/json")
-    public DataResponse<EventSubscriptionResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<EventSubscriptionResponse> getEventSubscriptions(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -97,6 +99,12 @@ public class EventSubscriptionCollectionResource {
         }
         if (allRequestParams.containsKey("processDefinitionId")) {
             query.processDefinitionId(allRequestParams.get("processDefinitionId"));
+        }
+        if (allRequestParams.containsKey("scopeId")) {
+            query.scopeId(allRequestParams.get("scopeId"));
+        }
+        if (allRequestParams.containsKey("scopeDefinitionId")) {
+            query.scopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
         }
         if (allRequestParams.containsKey("createdBefore")) {
             query.createdBefore(RequestUtil.getDate(allRequestParams, "createdBefore"));

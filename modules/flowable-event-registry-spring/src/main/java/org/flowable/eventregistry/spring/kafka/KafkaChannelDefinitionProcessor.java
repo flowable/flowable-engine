@@ -104,7 +104,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         endpoint.setClientIdPrefix(resolveExpressionAsString(channelModel.getClientIdPrefix(), "clientIdPrefix"));
 
         endpoint.setConcurrency(resolveExpressionAsInteger(channelModel.getConcurrency(), "concurrency"));
-        endpoint.setConsumerProperties(resolveProperties(channelModel.getProperties()));
+        endpoint.setConsumerProperties(resolveProperties(channelModel.getCustomProperties()));
 
         endpoint.setMessageListener(createMessageListener(eventRegistry, channelModel));
         return endpoint;
@@ -298,11 +298,11 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         }
     }
 
-    protected Properties resolveProperties(Map<String, String> consumerProperties) {
+    protected Properties resolveProperties(List<KafkaInboundChannelModel.CustomProperty> consumerProperties) {
         if (consumerProperties != null && !consumerProperties.isEmpty()) {
             Properties properties = new Properties();
-            for (Map.Entry<String, String> entry : consumerProperties.entrySet()) {
-                properties.put(entry.getKey(), resolveExpressionAsString(entry.getValue(), entry.getKey()));
+            for (KafkaInboundChannelModel.CustomProperty consumerProperty : consumerProperties) {
+                properties.put(consumerProperty.getName(), resolveExpressionAsString(consumerProperty.getValue(), consumerProperty.getName()));
             }
 
             return properties;

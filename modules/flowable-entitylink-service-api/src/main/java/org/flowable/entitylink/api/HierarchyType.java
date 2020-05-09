@@ -23,4 +23,6 @@ public class HierarchyType {
 
     public static final String PARENT = "parent";
 
+    public static final String GRAND_PARENT = "grandParent";
+
 }

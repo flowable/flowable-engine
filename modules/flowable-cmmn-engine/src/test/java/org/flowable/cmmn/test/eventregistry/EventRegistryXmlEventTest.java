@@ -40,32 +40,29 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
-            .key("myEvent")
-            .resourceName("myEvent.event")
-            .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .correlationParameter("customerId", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+                .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
         getEventRepositoryService().createInboundChannelModelBuilder()
-            .key("test-channel")
-            .resourceName("test.channel")
-            .channelAdapter("${inboundEventChannelAdapter}")
-            .xmlDeserializer()
-            .fixedEventKey("myEvent")
-            .xmlElementsMapDirectlyToPayload()
-            .deploy();
-        
+                .key("test-channel")
+                .resourceName("test.channel")
+                .channelAdapter("${inboundEventChannelAdapter}")
+                .xmlDeserializer()
+                .fixedEventKey("myEvent")
+                .xmlElementsMapDirectlyToPayload()
+                .deploy();
 
         return inboundEventChannelAdapter;
     }
-
 
     @After
     public void unregisterEventDefinition() {
@@ -103,10 +100,10 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
 
         public void testSendXmlEvent() {
             String event = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<customerEvent>\n"
-                + "    <customerId>12345</customerId>\n"
-                + "    <name>Customer name</name>\n"
-                + "</customerEvent>";
+                    + "<customerEvent>\n"
+                    + "    <customerId>12345</customerId>\n"
+                    + "    <name>Customer name</name>\n"
+                    + "</customerEvent>";
 
             eventRegistry.eventReceived(inboundChannelModel, event);
         }

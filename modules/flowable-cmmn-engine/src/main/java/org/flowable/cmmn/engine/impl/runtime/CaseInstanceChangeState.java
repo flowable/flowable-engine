@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 
 public class CaseInstanceChangeState {
@@ -25,10 +27,10 @@ public class CaseInstanceChangeState {
     protected String caseInstanceId;
     protected CaseDefinition caseDefinitionToMigrateTo;
     protected Map<String, Object> caseVariables = new HashMap<>();
-    protected Map<String, List<PlanItemInstance>> currentStageInstances;
-    protected List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainers;
-    protected List<String> activatePlanItemDefinitionIds;
-    protected List<String> changePlanItemToAvailableIdList;
+    protected Map<String, List<PlanItemInstanceEntity>> currentPlanItemInstances;
+    protected Set<String> activatePlanItemDefinitionIds;
+    protected Set<String> changePlanItemToAvailableIds;
+    protected Set<String> terminatePlanItemDefinitionIds;
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
     protected HashMap<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
 
@@ -62,39 +64,101 @@ public class CaseInstanceChangeState {
         return this;
     }
 
-    public Map<String, List<PlanItemInstance>> getCurrentStageInstances() {
-        return currentStageInstances;
+    public Map<String, List<PlanItemInstanceEntity>> getCurrentPlanItemInstances() {
+        return currentPlanItemInstances;
     }
 
-    public CaseInstanceChangeState setCurrentStageInstances(Map<String, List<PlanItemInstance>> currentStageInstances) {
-        this.currentStageInstances = currentStageInstances;
-        return this;
+    public void setCurrentPlanItemInstances(Map<String, List<PlanItemInstanceEntity>> currentPlanItemInstances) {
+        this.currentPlanItemInstances = currentPlanItemInstances;
+    }
+    
+    public PlanItemInstanceEntity getRuntimePlanItemInstance(String planItemDefinitionId) {
+        if (currentPlanItemInstances != null && currentPlanItemInstances.containsKey(planItemDefinitionId)) {
+            List<PlanItemInstanceEntity> currentPlanItemInstanceList = currentPlanItemInstances.get(planItemDefinitionId);
+            for (PlanItemInstanceEntity planItemInstance : currentPlanItemInstanceList) {
+                if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
+                    return planItemInstance;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    public Map<String, List<PlanItemInstanceEntity>> getActivePlanItemInstances() {
+        Map<String, List<PlanItemInstanceEntity>> activePlanItemInstanceMap = new HashMap<>();
+        if (currentPlanItemInstances != null) {
+            for (String planItemDefinitionId : currentPlanItemInstances.keySet()) {
+                List<PlanItemInstanceEntity> planItemInstances = currentPlanItemInstances.get(planItemDefinitionId);
+                List<PlanItemInstanceEntity> activePlanItemInstances = null;
+                for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+                    if (PlanItemInstanceState.ACTIVE_STATES.contains(planItemInstance.getState())) {
+                        if (activePlanItemInstances == null) {
+                            activePlanItemInstances = new ArrayList<>();
+                        }
+                        
+                        activePlanItemInstances.add(planItemInstance);
+                    }
+                }
+                
+                if (activePlanItemInstances != null) {
+                    activePlanItemInstanceMap.put(planItemDefinitionId, activePlanItemInstances);
+                }
+            }
+        }
+        
+        return activePlanItemInstanceMap;
+    }
+    
+    public Map<String, List<PlanItemInstanceEntity>> getRuntimePlanItemInstances() {
+        Map<String, List<PlanItemInstanceEntity>> runtimePlanItemInstanceMap = new HashMap<>();
+        if (currentPlanItemInstances != null) {
+            for (String planItemDefinitionId : currentPlanItemInstances.keySet()) {
+                List<PlanItemInstanceEntity> planItemInstances = currentPlanItemInstances.get(planItemDefinitionId);
+                List<PlanItemInstanceEntity> runtimePlanItemInstances = null;
+                for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+                    if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
+                        if (runtimePlanItemInstances == null) {
+                            runtimePlanItemInstances = new ArrayList<>();
+                        }
+                        
+                        runtimePlanItemInstances.add(planItemInstance);
+                    }
+                }
+                
+                if (runtimePlanItemInstances != null) {
+                    runtimePlanItemInstanceMap.put(planItemDefinitionId, runtimePlanItemInstances);
+                }
+            }
+        }
+        
+        return runtimePlanItemInstanceMap;
     }
 
-    public List<MovePlanItemInstanceEntityContainer> getMovePlanItemInstanceEntityContainers() {
-        return movePlanItemInstanceEntityContainers;
-    }
-
-    public CaseInstanceChangeState setMovePlanItemInstanceEntityContainers(List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainers) {
-        this.movePlanItemInstanceEntityContainers = movePlanItemInstanceEntityContainers;
-        return this;
-    }
-
-    public List<String> getActivatePlanItemDefinitionIds() {
+    public Set<String> getActivatePlanItemDefinitionIds() {
         return activatePlanItemDefinitionIds;
     }
 
-    public CaseInstanceChangeState setActivatePlanItemDefinitionIds(List<String> activatePlanItemDefinitionIds) {
+    public CaseInstanceChangeState setActivatePlanItemDefinitionIds(Set<String> activatePlanItemDefinitionIds) {
         this.activatePlanItemDefinitionIds = activatePlanItemDefinitionIds;
         return this;
     }
     
-    public List<String> getChangePlanItemToAvailableIdList() {
-        return changePlanItemToAvailableIdList;
+    public Set<String> getChangePlanItemToAvailableIds() {
+        return changePlanItemToAvailableIds;
     }
 
-    public CaseInstanceChangeState setChangePlanItemToAvailableIdList(List<String> changePlanItemToAvailableIdList) {
-        this.changePlanItemToAvailableIdList = changePlanItemToAvailableIdList;
+    public CaseInstanceChangeState setChangePlanItemToAvailableIds(Set<String> changePlanItemToAvailableIds) {
+        this.changePlanItemToAvailableIds = changePlanItemToAvailableIds;
+        return this;
+    }
+
+    public Set<String> getTerminatePlanItemDefinitionIds() {
+        return terminatePlanItemDefinitionIds;
+    }
+
+    public CaseInstanceChangeState setTerminatePlanItemDefinitionIds(Set<String> terminatePlanItemDefinitionIds) {
+        this.terminatePlanItemDefinitionIds = terminatePlanItemDefinitionIds;
         return this;
     }
 

@@ -132,6 +132,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances with which the user with the given id is involved.
      */
     ProcessInstanceQuery involvedUser(String userId);
+    
+    /**
+     * Select the process instances with which the user with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /**
+     * Select the process instances with which the group with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
     /**
      * Select the process instances with which the {@link org.flowable.idm.api.Group}s with the given ids are involved.

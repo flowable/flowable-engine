@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.repository;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
@@ -33,9 +34,18 @@ public class CaseDefinitionUtil {
     }
 
     public static String getDefinitionDeploymentId(String caseDefinitionId) {
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration().getDeploymentManager();
+        return getDefinitionDeploymentId(caseDefinitionId, CommandContextUtil.getCmmnEngineConfiguration());
+    }
+
+    public static String getDefinitionDeploymentId(String caseDefinitionId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinitionCacheEntry cacheEntry = deploymentManager.getCaseDefinitionCache().get(caseDefinitionId);
         CaseDefinition caseDefinition = getCaseDefinition(caseDefinitionId, deploymentManager, cacheEntry);
+        return getDefinitionDeploymentId(caseDefinition, cmmnEngineConfiguration);
+    }
+
+    public static String getDefinitionDeploymentId(CaseDefinition caseDefinition, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CmmnDeploymentEntity caseDeployment = deploymentManager.getDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (StringUtils.isEmpty(caseDeployment.getParentDeploymentId())) {
             return caseDefinition.getDeploymentId();

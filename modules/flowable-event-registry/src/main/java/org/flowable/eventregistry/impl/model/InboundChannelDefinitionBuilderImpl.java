@@ -292,7 +292,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundKafkaChannelBuilder property(String name, String value) {
-            kafkaChannel.addProperty(name, value);
+            kafkaChannel.addCustomProperty(name, value);
             return this;
         }
 

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
@@ -28,6 +29,10 @@ import org.flowable.dmn.model.HitPolicy;
  * @author Yvo Swillens
  */
 public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
+
+    public HitPolicyOutputOrder() {
+        super(true);
+    }
 
     @Override
     public String getHitPolicyName() {
@@ -74,6 +79,8 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
             }
         });
 
-        executionContext.getAuditContainer().setDecisionResult(ruleResults);
+        DecisionExecutionAuditContainer auditContainer = executionContext.getAuditContainer();
+        auditContainer.setDecisionResult(ruleResults);
+        auditContainer.setMultipleResults(true);
     }
 }

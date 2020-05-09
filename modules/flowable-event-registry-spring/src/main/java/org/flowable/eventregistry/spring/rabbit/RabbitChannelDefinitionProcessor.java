@@ -148,7 +148,7 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
 
         List<String> resultQueues = new ArrayList<>();
 
-        for (String queue : channelDefinition.getQueues()) {
+        for (String queue : queues) {
             resolveQueues(resolveExpression(queue), resultQueues, channelDefinition);
         }
 

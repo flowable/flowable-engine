@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+        xmlns:flowable="http://flowable.org/cmmn"
+        targetNamespace="http://flowable.org/cmmn">
+
+    <case id="casePageCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItemTaskA" definitionRef="casePageTaskSameDeployment"/>
+            <planItem id="planItemTaskB" definitionRef="casePageTaskSameDeploymentFalse"/>
+            <planItem id="planItemTaskC" definitionRef="casePageTaskSameDeploymentGlobal"/>
+
+            <task id="casePageTaskSameDeployment" name="A" flowable:type="casePage" flowable:formKey="testKey" flowable:sameDeployment="true"/>
+            <task id="casePageTaskSameDeploymentFalse" name="B" flowable:type="casePage" flowable:formKey="testKey2" flowable:sameDeployment="false"/>
+            <task id="casePageTaskSameDeploymentGlobal" name="Global" flowable:type="casePage" flowable:formKey="testKey3" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

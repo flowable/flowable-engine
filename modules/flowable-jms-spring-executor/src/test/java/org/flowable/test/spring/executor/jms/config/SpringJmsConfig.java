@@ -41,7 +41,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration(proxyBeanMethods = false)
 public class SpringJmsConfig {
 
-    @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000}")
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")

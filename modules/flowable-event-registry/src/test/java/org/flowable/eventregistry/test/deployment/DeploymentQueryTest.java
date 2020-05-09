@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.test.deployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -32,11 +33,8 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     
     private String eventModel = "{\n" + 
             "    \"key\": \"$changeme$\",\n" + 
-            "    \"name\": \"My first event\",\n" + 
-            "    \"inboundChannelKeys\": [\n" + 
-            "       \"$changemechannel\"\n" + 
-            "    ]\n" + 
-            "}\n" + 
+            "    \"name\": \"My first event\"\n" +
+            "}\n" +
             "";
     
     private String channelModel = "{\n" + 
@@ -86,114 +84,114 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     
     @Test
     public void testQueryById() {
-        assertNotNull(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentId(deploymentId1).list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentId(deploymentId1).count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult()).isNotNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
         
-        assertNull(repositoryService.createDeploymentQuery().deploymentId("invalid").singleResult());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentId("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentId("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByName() {
-        assertNotNull(repositoryService.createDeploymentQuery().deploymentName("test2.event").singleResult());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentName("test2.event").list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentName("test2.event").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.event").singleResult()).isNotNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.event").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.event").count()).isEqualTo(1);
         
-        assertNull(repositoryService.createDeploymentQuery().deploymentName("invalid").singleResult());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentName("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentName("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").singleResult()).isNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByNameLike() {
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentNameLike("test%").list().size());
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentNameLike("test%").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").count()).isEqualTo(3);
         
-        assertNull(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").singleResult());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentNameLike("inva").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentNameLike("inva").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").singleResult()).isNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByCategory() {
-        assertNotNull(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").singleResult());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").singleResult()).isNotNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").count()).isEqualTo(1);
         
-        assertNull(repositoryService.createDeploymentQuery().deploymentCategory("inva%").singleResult());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentCategory("inva%").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentCategory("inva%").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").singleResult()).isNull();
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByCategoryNotEquals() {
-        assertEquals(2, repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").list().size());
-        assertEquals(2, repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").count()).isEqualTo(2);
         
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").list().size());
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").count()).isEqualTo(3);
     }
     
     @Test
     public void testQueryByTenantId() {
-        assertEquals(2, repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").list().size());
-        assertEquals(2, repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").count()).isEqualTo(2);
         
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentTenantId("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentTenantId("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByTenantIdLike() {
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").list().size());
-        assertEquals(3, repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").count()).isEqualTo(3);
         
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByEventDefinitionKey() {
-        assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKey("event2").list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKey("event2").count());
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKey("event2").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKey("event2").count()).isEqualTo(1);
         
-        assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKey("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKey("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKey("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKey("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByEventDefinitionKeyLike() {
-        assertEquals(3, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").list().size());
-        assertEquals(3, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").count());
-        assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(0, 1).size());
-        assertEquals(2, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(0, 2).size());
-        assertEquals(2, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(1, 2).size());
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").count()).isEqualTo(3);
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(0, 1)).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(0, 2)).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(1, 2)).hasSize(2);
         
-        assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").count());
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByChannelDefinitionKey() {
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").count());
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").count()).isEqualTo(1);
         
-        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").count());
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").count()).isEqualTo(0);
     }
     
     @Test
     public void testQueryByChannelDefinitionKeyLike() {
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").list().size());
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").count());
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 1).size());
-        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 2).size());
-        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(1, 2).size());
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").count()).isEqualTo(1);
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 1)).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 2)).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(1, 2)).isEmpty();
         
-        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").list().size());
-        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").count());
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").count()).isEqualTo(0);
     }
     
 }

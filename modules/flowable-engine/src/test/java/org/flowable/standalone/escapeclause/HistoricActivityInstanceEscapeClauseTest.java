@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.standalone.escapeclause;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.junit.jupiter.api.AfterEach;
@@ -53,13 +55,13 @@ public class HistoricActivityInstanceEscapeClauseTest extends AbstractEscapeClau
         runtimeService.startProcessInstanceByKeyAndTenantId("noopProcess", "Two_");
 
         HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%|%%");
-        assertEquals("One%", query.singleResult().getTenantId());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        assertThat(query.singleResult().getTenantId()).isEqualTo("One%");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
 
         query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%|_%");
-        assertEquals("Two_", query.singleResult().getTenantId());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        assertThat(query.singleResult().getTenantId()).isEqualTo("Two_");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 }

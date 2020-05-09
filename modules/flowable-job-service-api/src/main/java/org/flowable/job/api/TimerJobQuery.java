@@ -37,6 +37,12 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     TimerJobQuery processDefinitionId(String processDefinitionid);
     
+    /** Only select jobs which exist for the given category */
+    TimerJobQuery category(String category);
+    
+    /** Only select jobs like for the given category value */
+    TimerJobQuery categoryLike(String categoryLike);
+    
     /** Only select jobs which exist for the given element id */
     TimerJobQuery elementId(String elementId);
     

@@ -72,10 +72,16 @@ public class VariableByteArrayRef implements Serializable {
                 entity.setBytes(bytes);
                 byteArrayEntityManager.insert(entity);
                 id = entity.getId();
+                deleted = false;
             }
         } else {
             ensureInitialized();
-            entity.setBytes(bytes);
+            if (bytes != null) {
+                entity.setBytes(bytes);
+            } else {
+                // If the bytes are null delete this
+                delete();
+            }
         }
     }
 

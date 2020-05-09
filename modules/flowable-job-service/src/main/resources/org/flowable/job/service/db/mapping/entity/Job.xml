@@ -9,6 +9,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.JobEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
         <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
@@ -55,10 +56,16 @@
             <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
                 LOCK_EXP_TIME_ is null
             </if>
+            <if test="parameter.enabledCategories != null">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
-
+    
     <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
@@ -73,10 +80,17 @@
             </if>
               and ((LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
               or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP}))
+
+            <if test="parameter.enabledCategories">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where> 
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
-
+    
     <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
@@ -131,6 +145,12 @@
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+            <if test="category != null">
+                and RES.CATEGORY_ = #{category}
+            </if>
+            <if test="categoryLike != null">
+                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
             </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId}
@@ -245,6 +265,7 @@
         insert into ${prefix}ACT_RU_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         LOCK_OWNER_,
         LOCK_EXP_TIME_,
@@ -270,6 +291,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=VARCHAR},
         #{lockOwner, jdbcType=VARCHAR},
         #{lockExpirationTime, jdbcType=TIMESTAMP},
@@ -300,6 +322,7 @@
         INSERT INTO ${prefix}ACT_RU_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         LOCK_OWNER_,
         LOCK_EXP_TIME_,
@@ -326,6 +349,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.lockOwner, jdbcType=VARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -358,6 +382,7 @@
             INTO ${prefix}ACT_RU_JOB (
             ID_,
             REV_,
+            CATEGORY_,
             TYPE_,
             LOCK_OWNER_,
             LOCK_EXP_TIME_,
@@ -382,6 +407,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.lockOwner, jdbcType=VARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -419,6 +445,9 @@
             </if>
             <if test="originalPersistentState.lockOwner != lockOwner">
                 LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.category != category">
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.jobHandlerType != jobHandlerType">
                 HANDLER_TYPE_ = #{jobHandlerType, jdbcType=VARCHAR},

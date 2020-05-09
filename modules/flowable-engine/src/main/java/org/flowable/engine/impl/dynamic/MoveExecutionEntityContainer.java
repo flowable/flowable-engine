@@ -14,6 +14,7 @@ package org.flowable.engine.impl.dynamic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class MoveExecutionEntityContainer {
     protected ExecutionEntity superExecution;
     protected String newAssigneeId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
-    protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new HashMap<>();
+    protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new LinkedHashMap<>();
 
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;

@@ -1382,7 +1382,7 @@ A message intermediate event is defined as an <<bpmnIntermediateCatchingEvent,in
 [source,xml,linenums]
 ----
 <intermediateCatchEvent id="message">
-  <messageEventDefinition signalRef="newCustomerMessage" />
+  <messageEventDefinition messageRef="newCustomerMessage" />
 </intermediateCatchEvent>
 ----
 

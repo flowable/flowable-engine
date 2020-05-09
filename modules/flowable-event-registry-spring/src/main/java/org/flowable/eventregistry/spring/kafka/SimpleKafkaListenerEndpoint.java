@@ -36,6 +36,7 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
     protected String clientIdPrefix;
     protected Integer concurrency;
     protected Properties consumerProperties;
+    protected boolean splitIterables = true;
 
     protected GenericMessageListener<ConsumerRecord<K, V>> messageListener;
 
@@ -130,6 +131,15 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
         GenericMessageListener<ConsumerRecord<K, V>> messageListener = getMessageListener();
         Assert.state(messageListener != null, () -> "Endpoint [" + this + "] must provide a non null message listener");
         listenerContainer.setupMessageListener(messageListener);
+    }
+
+    @Override
+    public boolean isSplitIterables() {
+        return splitIterables;
+    }
+
+    public void setSplitIterables(boolean splitIterables) {
+        this.splitIterables = splitIterables;
     }
 
     @Override

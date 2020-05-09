@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -47,29 +45,29 @@ public class CallActivityWithFallbackValueFalseConverterTest extends AbstractCon
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof CallActivity);
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;
-        assertEquals("callactivity", callActivity.getId());
-        assertEquals("Call activity", callActivity.getName());
+        assertThat(callActivity.getId()).isEqualTo("callactivity");
+        assertThat(callActivity.getName()).isEqualTo("Call activity");
 
-        assertEquals("processId", callActivity.getCalledElement());
+        assertThat(callActivity.getCalledElement()).isEqualTo("processId");
 
-        assertFalse(callActivity.getFallbackToDefaultTenant());
+        assertThat(callActivity.getFallbackToDefaultTenant()).isFalse();
 
         List<IOParameter> parameters = callActivity.getInParameters();
-        assertEquals(2, parameters.size());
-        IOParameter parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
-        parameter = parameters.get(1);
-        assertEquals("${test}", parameter.getSourceExpression());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                .containsExactly(
+                        tuple("test", "test", null),
+                        tuple(null, "test", "${test}")
+                );
 
         parameters = callActivity.getOutParameters();
-        assertEquals(1, parameters.size());
-        parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget)
+                .containsExactly(
+                        tuple("test", "test")
+                );
     }
 }

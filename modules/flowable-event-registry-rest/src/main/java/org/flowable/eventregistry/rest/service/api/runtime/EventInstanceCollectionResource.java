@@ -25,7 +25,6 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.ChannelModel;
-import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestApiInterceptor;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestResponseFactory;
@@ -42,10 +41,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 /**
- * Modified the "createCaseInstance" method to conditionally call a "createCaseInstanceResponse" method with a different signature, which will conditionally return the case variables that
- * exist when the case instance either enters its first wait state or completes. In this case, the different method is always called with a flag of true, which means that it will always return
- * those variables. If variables are not to be returned, the original method is called, which doesn't return the variables.
- * 
  * @author Tijs Rademakers
  */
 @RestController
@@ -79,16 +74,7 @@ public class EventInstanceCollectionResource {
         if (restApiInterceptor != null) {
             restApiInterceptor.createEventInstance(request);
         }
-        
-        if (request.getEventDefinitionId() == null && request.getEventDefinitionKey() == null) {
-            throw new FlowableIllegalArgumentException("Either eventDefinitionId or eventDefinitionKey is required.");
-        }
-
-        int paramsSet = ((request.getEventDefinitionId() != null) ? 1 : 0) + ((request.getEventDefinitionKey() != null) ? 1 : 0);
-
-        if (paramsSet > 1) {
-            throw new FlowableIllegalArgumentException("Only one of eventDefinitionId or eventDefinitionKey should be set.");
-        }
+        validateRequestParameters(request);
 
         EventDefinition eventDefinition = null;
         if (request.getEventDefinitionId() != null) {
@@ -106,18 +92,37 @@ public class EventInstanceCollectionResource {
         if (eventDefinition == null) {
             throw new FlowableObjectNotFoundException("No event definition found");
         }
-        
-        EventModel eventModel = repositoryService.getEventModelById(eventDefinition.getId());
 
-        String channelKey = eventModel.getInboundChannelKeys().iterator().next();
         ChannelModel channelModel = null;
-        if (StringUtils.isNotEmpty(request.getTenantId())) {
-            channelModel = repositoryService.getChannelModelByKey(channelKey, request.getTenantId());
+        if (StringUtils.isNotEmpty(request.getChannelDefinitionId())) {
+            channelModel = repositoryService.getChannelModelById(request.getChannelDefinitionId());
+        } else if (StringUtils.isNotEmpty(request.getTenantId())) {
+            channelModel = repositoryService.getChannelModelByKey(request.getChannelDefinitionKey(), request.getTenantId());
         } else {
-            channelModel = repositoryService.getChannelModelByKey(channelKey);
+            channelModel = repositoryService.getChannelModelByKey(request.getChannelDefinitionKey());
         }
-        
+
         eventRegistry.eventReceived((InboundChannelModel) channelModel, request.getEventPayload().toString());
         response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+
+    protected void validateRequestParameters(@RequestBody EventInstanceCreateRequest request) {
+        if (request.getEventDefinitionId() == null && request.getEventDefinitionKey() == null) {
+            throw new FlowableIllegalArgumentException("Either eventDefinitionId or eventDefinitionKey is required.");
+        }
+
+        int paramsSet = ((request.getEventDefinitionId() != null) ? 1 : 0) + ((request.getEventDefinitionKey() != null) ? 1 : 0);
+        if (paramsSet > 1) {
+            throw new FlowableIllegalArgumentException("Only one of eventDefinitionId or eventDefinitionKey should be set.");
+        }
+
+        if (request.getChannelDefinitionId() == null && request.getChannelDefinitionKey() == null) {
+            throw new FlowableIllegalArgumentException("Either channelDefinitionId or channelDefinitionKey is required.");
+        }
+
+        paramsSet = ((request.getChannelDefinitionId() != null) ? 1 : 0) + ((request.getChannelDefinitionKey() != null) ? 1 : 0);
+        if (paramsSet > 1) {
+            throw new FlowableIllegalArgumentException("Only one of eventDefinitionId or eventDefinitionKey should be set.");
+        }
     }
 }

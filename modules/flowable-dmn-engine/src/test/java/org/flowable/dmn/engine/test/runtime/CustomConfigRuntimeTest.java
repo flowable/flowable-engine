@@ -12,8 +12,7 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -58,9 +57,8 @@ public class CustomConfigRuntimeTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        
-        assertSame(String.class, result.get("output1").getClass());
-        assertEquals("test2", result.get("output1"));
+
+        assertThat(result.get("output1")).isEqualTo("test2");
     }
 
     @Test
@@ -77,8 +75,8 @@ public class CustomConfigRuntimeTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithAuditTrail();
-        
-        assertEquals(0, result.getDecisionResult().size());
-        assertEquals(true, result.isFailed());
+
+        assertThat(result.getDecisionResult()).isEmpty();
+        assertThat(result.isFailed()).isTrue();
     }
 }

@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.runtime;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
@@ -51,7 +52,9 @@ public interface PlanItemDefinitionType {
     String CASE_TASK = CaseTask.class.getSimpleName().toLowerCase();
     
     String CASE_PAGE_TASK = CasePageTask.class.getSimpleName().toLowerCase();
-    
+
+    String EXTERNAL_WORKER_TASK = ExternalWorkerServiceTask.class.getSimpleName().toLowerCase();
+
     String PROCESS_TASK = ProcessTask.class.getSimpleName().toLowerCase();
     
     String DECISION_TASK = DecisionTask.class.getSimpleName().toLowerCase();

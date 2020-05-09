@@ -32,6 +32,26 @@ public interface WebServiceMock {
     void inc() throws MaxValueReachedFault;
 
     /**
+     * Add the given value to the counter
+     */
+    void add(@WebParam(name = "value") int value);
+
+    /**
+     * Add the given values to the counter
+     */
+    void addMulti(@WebParam(name = "values") int[] values);
+
+    /**
+     * Add the given values and add result to the counter
+     */
+    void addition(@WebParam(name = "value1") int value1, @WebParam(name = "value2") int value2);
+
+    /**
+     * Add the given values and add result to the counter
+     */
+    void addOperands(@WebParam(name = "args") Operands args);
+
+    /**
      * Returns the current count
      *
      * @return the count

@@ -37,6 +37,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String category;
+    protected String jobType;
+    
     protected String elementId;
     protected String elementName;
     
@@ -61,7 +64,6 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String exceptionMessage;
 
     protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
-    protected String jobType;
 
     @Override
     public Object getPersistentState() {
@@ -72,6 +74,8 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
         persistentState.put("processDefinitionId", processDefinitionId);
+        persistentState.put("category", category);
+        persistentState.put("jobType", jobType);
         persistentState.put("elementId", elementId);
         persistentState.put("elementName", elementName);
         
@@ -79,7 +83,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
 
-        if (exceptionByteArrayRef != null) {
+        if (exceptionByteArrayRef != null && exceptionByteArrayRef.getId() != null) {
             persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
 
@@ -217,7 +221,27 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
     }
+    
+    @Override
+    public String getCategory() {
+        return category;
+    }
 
+    @Override
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public String getJobType() {
+        return jobType;
+    }
+
+    @Override
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+    
     @Override
     public String getRepeat() {
         return repeat;
@@ -284,16 +308,6 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
             customValuesByteArrayRef = new JobByteArrayRef();
         }
         customValuesByteArrayRef.setValue("jobCustomValues", customValues);
-    }
-
-    @Override
-    public String getJobType() {
-        return jobType;
-    }
-
-    @Override
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     @Override

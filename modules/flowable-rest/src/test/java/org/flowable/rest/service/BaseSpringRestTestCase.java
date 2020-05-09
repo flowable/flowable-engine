@@ -105,7 +105,10 @@ public class BaseSpringRestTestCase {
             "ACT_GE_PROPERTY",
             "ACT_ID_PROPERTY",
             "ACT_FO_DATABASECHANGELOG",
-            "ACT_FO_DATABASECHANGELOGLOCK");
+            "ACT_FO_DATABASECHANGELOGLOCK",
+            "FLW_EV_DATABASECHANGELOG",
+            "FLW_EV_DATABASECHANGELOGLOCK"
+    );
     
     @Rule 
     public TestName testName = new TestName();

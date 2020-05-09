@@ -40,6 +40,12 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     DeadLetterJobQuery processDefinitionId(String processDefinitionId);
     
+    /** Only select jobs which exist for the given category */
+    DeadLetterJobQuery category(String category);
+    
+    /** Only select jobs like for the given category value */
+    DeadLetterJobQuery categoryLike(String categoryLike);
+    
     /** Only select jobs which exist for the given element id */
     DeadLetterJobQuery elementId(String elementId);
     
@@ -73,14 +79,19 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     DeadLetterJobQuery executable();
 
     /**
-     * Only select jobs that are timers. Cannot be used together with {@link #messages()}
+     * Only select jobs that are timers. Cannot be used together with {@link #messages()} or {@link #externalWorkers()}
      */
     DeadLetterJobQuery timers();
 
     /**
-     * Only select jobs that are messages. Cannot be used together with {@link #timers()}
+     * Only select jobs that are messages. Cannot be used together with {@link #timers()} or {@link #externalWorkers()}
      */
     DeadLetterJobQuery messages();
+
+    /**
+     * Only select external worker jobs. Cannot be used together with {@link #timers()} or {@link #messages()}
+     */
+    DeadLetterJobQuery externalWorkers();
 
     /** Only select jobs where the duedate is lower than the given date. */
     DeadLetterJobQuery duedateLowerThan(Date date);

@@ -19,11 +19,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -31,7 +33,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Joram Barrez
  */
-public class DefaultInternalCmmnJobManager implements InternalJobManager {
+public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager {
     
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
@@ -40,7 +42,7 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     }
 
     @Override
-    public VariableScope resolveVariableScope(Job job) {
+    protected VariableScope resolveVariableScopeInternal(Job job) {
         if (job.getSubScopeId() != null) {
             return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
         }
@@ -48,18 +50,18 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     }
 
     @Override
-    public boolean handleJobInsert(Job job) {
+    protected boolean handleJobInsertInternal(Job job) {
         // Currently, nothing extra needed (but counting relationships can be added later here).
         return true;
     }
 
     @Override
-    public void handleJobDelete(Job job) {
+    protected void handleJobDeleteInternal(Job job) {
         // Currently, nothing extra needed (but counting relationships can be added later here).        
     }
 
     @Override
-    public void lockJobScope(Job job) {
+    protected void lockJobScopeInternal(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         caseInstanceEntityManager.updateLockTime(job.getScopeId());
         
@@ -73,7 +75,7 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     }
 
     @Override
-    public void clearJobScopeLock(Job job) {
+    protected void clearJobScopeLockInternal(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         caseInstanceEntityManager.clearLockTime(job.getScopeId());
         
@@ -87,12 +89,12 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     }
 
     @Override
-    public void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope) {
+    protected void preTimerJobDeleteInternal(JobEntity jobEntity, VariableScope variableScope) {
         // Nothing additional needed (no support for endDate for cmmn timer yet)
     }
     
     @Override
-    public void preRepeatedTimerSchedule(TimerJobEntity timerJobEntity, VariableScope variableScope) {
+    protected void preRepeatedTimerScheduleInternal(TimerJobEntity timerJobEntity, VariableScope variableScope) {
 
         // In CMMN (and contrary to BPMN), when a timer is repeated a new plan item instance needs to be created
         // as the original one is removed when the timer event has occurred.

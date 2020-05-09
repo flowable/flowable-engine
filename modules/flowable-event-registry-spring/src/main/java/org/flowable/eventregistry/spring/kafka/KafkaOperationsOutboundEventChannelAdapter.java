@@ -21,7 +21,7 @@ import org.springframework.kafka.core.KafkaOperations;
 /**
  * @author Filip Hrisafov
  */
-public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
     protected KafkaOperations<Object, Object> kafkaOperations;
     protected String topic;

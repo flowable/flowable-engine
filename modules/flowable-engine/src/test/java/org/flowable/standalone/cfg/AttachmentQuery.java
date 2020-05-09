@@ -15,15 +15,14 @@ package org.flowable.standalone.cfg;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 
 /**
  * @author Bassam Al-Sarori
- * 
  */
 public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> {
 
@@ -34,7 +33,7 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
     protected String userId;
     protected String taskId;
     protected String processInstanceId;
-    
+
     public AttachmentQuery(CommandExecutor commandExecutor) {
         super(commandExecutor);
     }

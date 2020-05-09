@@ -12,9 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -35,31 +34,36 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
     public void completionNeutralDefinedAtPlanItem() throws Exception {
         String cmmnResource = "org/flowable/test/cmmn/converter/completionNeutralAtPlanItem.cmmn";
         Consumer<CmmnModel> modelValidator = cmmnModel -> {
-            assertNotNull(cmmnModel);
+            assertThat(cmmnModel).isNotNull();
             Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
             List<PlanItem> planItems = planModel.getPlanItems();
-            assertEquals(4, planItems.size());
+            assertThat(planItems)
+                    .hasSize(4)
+                    .extracting(
+                            planItem -> planItem.getItemControl(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule().getCondition())
+                    .doesNotContainNull();
             planItems.forEach(planItem -> {
-                assertNotNull(planItem.getItemControl());
-                assertNotNull(planItem.getItemControl().getCompletionNeutralRule());
-                assertNotNull(planItem.getItemControl().getCompletionNeutralRule().getCondition());
-                assertEquals("${" + planItem.getId() + "}", planItem.getItemControl().getCompletionNeutralRule().getCondition());
+                assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + planItem.getId() + "}");
             });
 
             Stage stageOne = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageOne");
             List<PlanItem> planItems1 = stageOne.getPlanItems();
-            assertEquals(1, planItems1.size());
+
+            assertThat(planItems1)
+                    .hasSize(1)
+                    .extracting(
+                            planItem -> planItem.getItemControl(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule())
+                    .doesNotContainNull();
             PlanItem planItem = planItems1.get(0);
-            assertNotNull(planItem.getItemControl());
-            assertNotNull(planItem.getItemControl().getCompletionNeutralRule());
-            assertNull(planItem.getItemControl().getCompletionNeutralRule().getCondition());
-            
-            assertEquals(1, planItem.getExtensionElements().size());
+            assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isNull();
+
             List<ExtensionElement> extensionElements = planItem.getExtensionElements().get("planItemTest");
-            assertEquals(1, extensionElements.size());
-            ExtensionElement extensionElement = extensionElements.get(0);
-            assertEquals("planItemTest", extensionElement.getName());
-            assertEquals("hello", extensionElement.getElementText());
+            assertThat(extensionElements)
+                    .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                    .containsExactly(tuple("planItemTest", "hello"));
         };
 
         validateModel(cmmnResource, modelValidator);
@@ -69,24 +73,22 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
     public void completionNeutralDefinedAtPlanItemDefinition() throws Exception {
         String cmmnResource = "org/flowable/test/cmmn/converter/completionNeutralAtPlanItemDefinition.cmmn";
         Consumer<CmmnModel> modelValidator = cmmnModel -> {
-            assertNotNull(cmmnModel);
+            assertThat(cmmnModel).isNotNull();
             Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
             List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-            assertEquals(4, planItemDefinitions.size());
+            assertThat(planItemDefinitions).hasSize(4);
             planItemDefinitions.forEach(definition -> {
-                assertNotNull(definition.getDefaultControl());
-                assertNotNull(definition.getDefaultControl().getCompletionNeutralRule());
-                assertNotNull(definition.getDefaultControl().getCompletionNeutralRule().getCondition());
-                assertEquals("${" + definition.getId() + "}", definition.getDefaultControl().getCompletionNeutralRule().getCondition());
+                assertThat(definition.getDefaultControl()).isNotNull();
+                assertThat(definition.getDefaultControl().getCompletionNeutralRule()).isNotNull();
+                assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isNotNull();
+                assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + definition.getId() + "}");
             });
-            
+
             PlanItemDefinition planItemDef = cmmnModel.findPlanItemDefinition("taskTwo");
-            assertEquals(1, planItemDef.getExtensionElements().size());
             List<ExtensionElement> extensionElements = planItemDef.getExtensionElements().get("taskTest");
-            assertEquals(1, extensionElements.size());
-            ExtensionElement extensionElement = extensionElements.get(0);
-            assertEquals("taskTest", extensionElement.getName());
-            assertEquals("hello", extensionElement.getElementText());
+            assertThat(extensionElements)
+                    .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                    .containsExactly(tuple("taskTest", "hello"));
         };
 
         validateModel(cmmnResource, modelValidator);

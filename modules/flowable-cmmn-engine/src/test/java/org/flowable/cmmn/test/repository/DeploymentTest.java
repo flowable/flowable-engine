@@ -14,9 +14,6 @@ package org.flowable.cmmn.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -41,7 +38,7 @@ public class DeploymentTest extends FlowableCmmnTestCase {
     /**
      * Simplest test possible: deploy the simple-case.cmmn (from the cmmn-converter module) and see if 
      * - a deployment exists
-     * - a resouce exists
+     * - a resource exists
      * - a case definition was created 
      * - that case definition is in the cache
      * - case definition properties set
@@ -56,44 +53,53 @@ public class DeploymentTest extends FlowableCmmnTestCase {
             .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDeployed.cmmn").deploy().getId();
 
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(cmmnDeployment);
+        assertThat(cmmnDeployment).isNotNull();
         
         List<String> resourceNames = cmmnRepositoryService.getDeploymentResourceNames(cmmnDeployment.getId());
-        assertEquals(1, resourceNames.size());
-        assertEquals("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDeployed.cmmn", resourceNames.get(0));
+        assertThat(resourceNames).hasSize(1);
+        assertThat(resourceNames.get(0)).isEqualTo("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDeployed.cmmn");
         
         InputStream inputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), resourceNames.get(0));
-        assertNotNull(inputStream);
+        assertThat(inputStream).isNotNull();
         inputStream.close();
         
-        assertEquals(1, ((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll().size());
+        assertThat(((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll()).hasSize(1);
 
         CaseDefinitionCacheEntry cachedCaseDefinition = ((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll().iterator().next();
-        assertNotNull(cachedCaseDefinition.getCase());
-        assertNotNull(cachedCaseDefinition.getCmmnModel());
-        assertNotNull(cachedCaseDefinition.getCaseDefinition());
+        assertThat(cachedCaseDefinition)
+                .extracting(
+                        CaseDefinitionCacheEntry::getCase,
+                        CaseDefinitionCacheEntry::getCmmnModel,
+                        CaseDefinitionCacheEntry::getCaseDefinition)
+                .isNotNull();
         
         CaseDefinition caseDefinition = cachedCaseDefinition.getCaseDefinition();
-        assertNotNull(caseDefinition.getId());
-        assertNotNull(caseDefinition.getDeploymentId());
-        assertNotNull(caseDefinition.getKey());
-        assertNotNull(caseDefinition.getResourceName());
-        assertTrue(caseDefinition.getVersion() > 0);
+        assertThat(caseDefinition)
+                .extracting(
+                        CaseDefinition::getId,
+                        CaseDefinition::getDeploymentId,
+                        CaseDefinition::getKey,
+                        CaseDefinition::getResourceName)
+                .isNotNull();
+        assertThat(caseDefinition.getVersion()).isPositive();
         
         caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
-        assertNotNull(caseDefinition.getId());
-        assertNotNull(caseDefinition.getDeploymentId());
-        assertNotNull(caseDefinition.getKey());
-        assertNotNull(caseDefinition.getResourceName());
-        assertEquals(1, caseDefinition.getVersion());
+        assertThat(caseDefinition)
+                .extracting(
+                        CaseDefinition::getId,
+                        CaseDefinition::getDeploymentId,
+                        CaseDefinition::getKey,
+                        CaseDefinition::getResourceName)
+                .isNotNull();
+        assertThat(caseDefinition.getVersion()).isEqualTo(1);
         
         CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
         
         // CmmnParser should have added behavior to plan items
-        for (PlanItem planItem : cmmnModel.getPrimaryCase().getPlanModel().getPlanItems()) {
-            assertNotNull(planItem.getBehavior());
-        }
+        assertThat(cmmnModel.getPrimaryCase().getPlanModel().getPlanItems())
+                .extracting(PlanItem::getBehavior)
+                .isNotNull();
 
         cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
@@ -102,28 +108,28 @@ public class DeploymentTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testCaseDefinitionDI() throws Exception {
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(cmmnDeployment);
+        assertThat(cmmnDeployment).isNotNull();
         
         List<String> resourceNames = cmmnRepositoryService.getDeploymentResourceNames(cmmnDeployment.getId());
-        assertEquals(2, resourceNames.size());
+        assertThat(resourceNames).hasSize(2);
         
         String resourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.cmmn";
         String diagramResourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.caseB.png";
-        assertTrue(resourceNames.contains(resourceName));
-        assertTrue(resourceNames.contains(diagramResourceName));
+        assertThat(resourceNames.contains(resourceName)).isTrue();
+        assertThat(resourceNames.contains(diagramResourceName)).isTrue();
         
         InputStream inputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), resourceName);
-        assertNotNull(inputStream);
+        assertThat(inputStream).isNotNull();
         IOUtils.closeSilently(inputStream);
         
         InputStream diagramInputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), diagramResourceName);
-        assertNotNull(diagramInputStream);
+        assertThat(diagramInputStream).isNotNull();
         IOUtils.closeSilently(diagramInputStream);
         
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
         
         InputStream caseDiagramInputStream = cmmnRepositoryService.getCaseDiagram(caseDefinition.getId());
-        assertNotNull(caseDiagramInputStream);
+        assertThat(caseDiagramInputStream).isNotNull();
         IOUtils.closeSilently(caseDiagramInputStream);
     }
 

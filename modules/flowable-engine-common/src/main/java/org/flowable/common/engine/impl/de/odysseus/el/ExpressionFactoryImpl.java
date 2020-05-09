@@ -133,8 +133,8 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 	 */
 	public static final String PROP_CACHE_SIZE = "javax.el.cacheSize";
 
-	private final TreeStore store;
-	private final TypeConverter converter;
+	protected final TreeStore store;
+	protected final TypeConverter converter;
 
 	/**
 	 * Create a new expression factory using the default builder and cache implementations. The
@@ -385,7 +385,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 	protected TreeBuilder createTreeBuilder(Properties properties, Feature... features) {
 		Class<?> clazz = load(TreeBuilder.class, properties);
 		if (clazz == null) {
-			return new Builder(features);
+			return createDefaultTreeBuilder(features);
 		}
 		try {
 			if (Builder.class.isAssignableFrom(clazz)) {
@@ -405,6 +405,10 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 		} catch (Exception e) {
 			throw new ELException("TreeBuilder " + clazz + " could not be instantiated", e);
 		}
+	}
+
+	protected TreeBuilder createDefaultTreeBuilder(Feature... features) {
+		return new Builder(features);
 	}
 
 	private Class<?> load(Class<?> clazz, Properties properties) {

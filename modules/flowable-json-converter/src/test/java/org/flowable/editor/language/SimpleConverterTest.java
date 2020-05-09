@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
@@ -22,7 +20,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SimpleConverterTest extends AbstractConverterTest {
 
@@ -45,31 +43,31 @@ public class SimpleConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(BpmnModel model) {
-        assertEquals("simpleProcess", model.getMainProcess().getId());
-        assertEquals("Simple process", model.getMainProcess().getName());
-        assertTrue(model.getMainProcess().isExecutable());
+        assertThat(model.getMainProcess().getId()).isEqualTo("simpleProcess");
+        assertThat(model.getMainProcess().getName()).isEqualTo("Simple process");
+        assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("flow1", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SequenceFlow);
-        assertEquals("flow1", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getId()).isEqualTo("flow1");
 
         flowElement = model.getMainProcess().getFlowElement("catchEvent", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof IntermediateCatchEvent);
-        assertEquals("catchEvent", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
+        assertThat(flowElement.getId()).isEqualTo("catchEvent");
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertEquals(1, catchEvent.getEventDefinitions().size());
+        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
         EventDefinition eventDefinition = catchEvent.getEventDefinitions().get(0);
-        assertTrue(eventDefinition instanceof TimerEventDefinition);
+        assertThat(eventDefinition).isInstanceOf(TimerEventDefinition.class);
         TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
-        assertEquals("PT5M", timerDefinition.getTimeDuration());
+        assertThat(timerDefinition.getTimeDuration()).isEqualTo("PT5M");
 
         flowElement = model.getMainProcess().getFlowElement("flow1Condition", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SequenceFlow);
-        assertEquals("flow1Condition", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getId()).isEqualTo("flow1Condition");
         SequenceFlow flow = (SequenceFlow) flowElement;
-        assertEquals("${number <= 1}", flow.getConditionExpression());
+        assertThat(flow.getConditionExpression()).isEqualTo("${number <= 1}");
     }
 }

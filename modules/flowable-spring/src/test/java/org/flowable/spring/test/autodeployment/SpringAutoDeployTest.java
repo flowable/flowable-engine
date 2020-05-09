@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,6 +89,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
         createAppContext(properties);
     }
+
     protected void createAppContextWithSingleResourceDeploymentMode() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "single-resource");
@@ -107,7 +108,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         applicationContext.register(SpringAutoDeployTestConfiguration.class);
         applicationContext.getEnvironment().getPropertySources()
-            .addLast(new MapPropertySource("springAutoDeploy", properties));
+                .addLast(new MapPropertySource("springAutoDeploy", properties));
         applicationContext.refresh();
         this.applicationContext = applicationContext;
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
@@ -138,22 +139,22 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         expectedProcessDefinitionKeys.add("b");
         expectedProcessDefinitionKeys.add("c");
 
-        assertEquals(expectedProcessDefinitionKeys, processDefinitionKeys);
+        assertThat(expectedProcessDefinitionKeys).isEqualTo(processDefinitionKeys);
     }
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        assertEquals(1, deploymentQuery.count());
+        assertThat(deploymentQuery.count()).isEqualTo(1);
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-        assertEquals(3, processDefinitionQuery.count());
+        assertThat(processDefinitionQuery.count()).isEqualTo(3);
 
         // Creating a new app context with same resources doesn't lead to more
         // deployments
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3);
     }
 
     // Updating the bpmn20 file should lead to a new deployment when restarting
@@ -161,50 +162,47 @@ public class SpringAutoDeployTest extends AbstractTestCase {
     @Test
     public void testResourceRedeploymentAfterProcessDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
         applicationContext.close();
 
         String filePath = "org/flowable/spring/test/autodeployment/autodeploy.a.bpmn20.xml";
         String originalBpmnFileContent = IoUtil.readFileAsString(filePath);
         String updatedBpmnFileContent = originalBpmnFileContent.replace("flow1", "fromStartToEndFlow");
-        assertTrue(updatedBpmnFileContent.length() > originalBpmnFileContent.length());
+        assertThat(updatedBpmnFileContent.length()).isGreaterThan(originalBpmnFileContent.length());
         IoUtil.writeStringToFile(updatedBpmnFileContent, filePath);
 
         // Classic produced/consumer problem here:
         // The file is already written in Java, but not yet completely persisted
-        // by
-        // the OS
+        // by the OS
         // Constructing the new app context reads the same file which is
-        // sometimes
-        // not yet fully written to disk
+        // sometimes not yet fully written to disk
         waitUntilFileIsWritten(filePath, updatedBpmnFileContent.length());
 
         try {
             createAppContextWithoutDeploymentMode();
         } finally {
-            // Reset file content such that future test are not seeing something
-            // funny
+            // Reset file content such that future test are not seeing something funny
             IoUtil.writeStringToFile(originalBpmnFileContent, filePath);
         }
 
         // Assertions come AFTER the file write! Otherwise the process file is
         // messed up if the assertions fail.
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(6, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(6);
     }
 
     @Test
     public void testAutoDeployWithCreateDropOnCleanDb() {
         createAppContextWithCreateDropDb();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3);
     }
 
     @Test
@@ -213,16 +211,16 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         properties.put("deploymentMode", "default");
         properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(XMLException.class);
+                .hasCauseInstanceOf(XMLException.class);
         assertThat(repositoryService).isNull();
 
         // Some of the resources should have been deployed
         properties.put("deploymentResources", "classpath*:/notExisting*.bpmn20.xml");
         createAppContext(properties);
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+                .extracting(ProcessDefinition::getKey)
+                .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -234,16 +232,16 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext(properties);
 
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+                .extracting(ProcessDefinition::getKey)
+                .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
-        assertEquals(3, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(3);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3);
     }
 
     @Test
@@ -252,15 +250,15 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         properties.put("deploymentMode", "single-resource");
         properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(XMLException.class);
+                .hasCauseInstanceOf(XMLException.class);
         assertThat(repositoryService).isNull();
 
         // Some of the resources should have been deployed
         properties.put("deploymentResources", "classpath*:/notExisting*.bpmn20.xml");
         createAppContext(properties);
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .containsExactlyInAnyOrder("a", "b", "c");
+                .extracting(ProcessDefinition::getKey)
+                .containsExactlyInAnyOrder("a", "b", "c");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(3);
     }
 
@@ -273,16 +271,16 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext(properties);
 
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .containsExactlyInAnyOrder("a", "b", "c");
+                .extracting(ProcessDefinition::getKey)
+                .containsExactlyInAnyOrder("a", "b", "c");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(3);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParenFolderDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(4, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(4);
     }
 
     @Test
@@ -291,7 +289,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         properties.put("deploymentMode", "resource-parent-folder");
         properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(XMLException.class);
+                .hasCauseInstanceOf(XMLException.class);
         assertThat(repositoryService).isNull();
 
         // Start a new application context to verify that there are no deployments
@@ -299,9 +297,9 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext(properties);
 
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+                .extracting(ProcessDefinition::getKey)
+                .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -312,8 +310,8 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         properties.put("throwExceptionOnDeploymentFailure", false);
         createAppContext(properties);
         assertThat(repositoryService.createProcessDefinitionQuery().list())
-            .extracting(ProcessDefinition::getKey)
-            .containsExactlyInAnyOrder("d");
+                .extracting(ProcessDefinition::getKey)
+                .containsExactlyInAnyOrder("d");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }
 
@@ -344,10 +342,10 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
         @Bean
         public SimpleDriverDataSource dataSource(
-            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
-            @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
-            @Value("${jdbc.username:sa}") String username,
-            @Value("${jdbc.password:}") String password
+                @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+                @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
+                @Value("${jdbc.username:sa}") String username,
+                @Value("${jdbc.password:}") String password
         ) {
             SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
             dataSource.setDriverClass(driverClass);
@@ -365,11 +363,11 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
         @Bean
         public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
-            @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
-            @Value("${deploymentMode:#{null}}") String deploymentMode,
-            @Value("${deploymentResources}") Resource[] deploymentResources,
-            @Value("${throwExceptionOnDeploymentFailure:#{null}}") Boolean throwExceptionOnDeploymentFailure
-            ) {
+                @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
+                @Value("${deploymentMode:#{null}}") String deploymentMode,
+                @Value("${deploymentResources}") Resource[] deploymentResources,
+                @Value("${throwExceptionOnDeploymentFailure:#{null}}") Boolean throwExceptionOnDeploymentFailure
+        ) {
             SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
             processEngineConfiguration.setDataSource(dataSource);
             processEngineConfiguration.setTransactionManager(transactionManager);
@@ -383,11 +381,12 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
             if (throwExceptionOnDeploymentFailure != null) {
                 processEngineConfiguration.getDeploymentStrategies()
-                    .forEach(strategy -> {
-                        if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<ProcessEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
-                        }
-                    });
+                        .forEach(strategy -> {
+                            if (strategy instanceof CommonAutoDeploymentStrategy) {
+                                ((CommonAutoDeploymentStrategy<ProcessEngine>) strategy).getDeploymentProperties()
+                                        .setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            }
+                        });
             }
 
             return processEngineConfiguration;

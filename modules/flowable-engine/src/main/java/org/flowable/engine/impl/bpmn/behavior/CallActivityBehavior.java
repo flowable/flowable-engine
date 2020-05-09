@@ -204,8 +204,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
         
         if (processEngineConfiguration.isEnableEntityLinks()) {
-            EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
-            EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
+            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
         }
 
         if (StringUtils.isNotEmpty(callActivity.getProcessInstanceIdVariableName())) {

@@ -16,20 +16,28 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
+import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
@@ -140,6 +148,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
 
     @Override
+    public ExternalWorkerJobQuery createExternalWorkerJobQuery() {
+        return new ExternalWorkerJobQueryImpl(commandExecutor);
+    }
+
+    @Override
     public TimerJobQuery createTimerJobQuery() {
         return new TimerJobQueryImpl(commandExecutor);
     }
@@ -175,6 +188,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     @Override
+    public String getExternalWorkerJobErrorDetails(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.EXTERNAL_WORKER));
+    }
+
+    @Override
     public void handleHistoryCleanupTimerJob() {
         commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
@@ -182,6 +200,21 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
+    }
+
+    @Override
+    public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
+        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
 
 }

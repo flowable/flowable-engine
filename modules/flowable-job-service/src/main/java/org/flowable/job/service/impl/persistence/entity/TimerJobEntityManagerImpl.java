@@ -61,8 +61,8 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
-    public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
-        return dataManager.findTimerJobsToExecute(page);
+    public List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page) {
+        return dataManager.findTimerJobsToExecute(enabledCategories, page);
     }
 
     @Override
@@ -165,6 +165,7 @@ public class TimerJobEntityManagerImpl
         newTimerEntity.setRepeat(te.getRepeat());
         newTimerEntity.setRetries(te.getRetries());
         newTimerEntity.setEndDate(te.getEndDate());
+        newTimerEntity.setCategory(te.getCategory());
         newTimerEntity.setExecutionId(te.getExecutionId());
         newTimerEntity.setProcessInstanceId(te.getProcessInstanceId());
         newTimerEntity.setProcessDefinitionId(te.getProcessDefinitionId());

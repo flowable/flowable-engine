@@ -137,7 +137,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             for (String variableName : variableNamesToFetch) {
                 requestedVariables.put(variableName, allVariables.get(variableName));
             }
-            return requestedVariables;
 
         } else {
 
@@ -153,9 +152,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 requestedVariables.put(variable.getName(), variable.getValue());
             }
 
-            return requestedVariables;
-
         }
+        return requestedVariables;
 
     }
 
@@ -184,7 +182,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             for (String variableName : variableNamesToFetch) {
                 requestedVariables.put(variableName, allVariables.get(variableName));
             }
-            return requestedVariables;
 
         } else {
 
@@ -200,9 +197,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 requestedVariables.put(variable.getName(), variable);
             }
 
-            return requestedVariables;
-
         }
+        return requestedVariables;
 
     }
 
@@ -306,8 +302,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 return parentScope.getVariableInstance(variableName, true);
             }
 
-            return null;
-
         } else {
 
             if (variableInstances != null && variableInstances.containsKey(variableName)) {
@@ -326,9 +320,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 return parentScope.getVariableInstance(variableName, false);
             }
 
-            return null;
-
         }
+        return null;
     }
 
     protected abstract VariableInstanceEntity getSpecificVariable(String variableName);
@@ -372,7 +365,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             if (variableInstance != null) {
                 return variableInstance;
             }
-            return null;
 
         } else {
 
@@ -389,8 +381,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 return variable;
             }
 
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -719,7 +711,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 VariableInstanceEntity variable = getSpecificVariable(variableName);
                 if (variable != null) {
                     updateVariableInstance(variable, value);
-                    usedVariablesCache.put(variableName, variable);
                 } else {
 
                     VariableScopeImpl parent = getParentVariableScope();
@@ -729,9 +720,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                     }
 
                     variable = createVariableInstance(variableName, value);
-                    usedVariablesCache.put(variableName, variable);
 
                 }
+                usedVariablesCache.put(variableName, variable);
 
             }
 
@@ -773,8 +764,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 updateVariableInstance(variableInstance, value);
             }
 
-            return null;
-
         } else {
 
             if (usedVariablesCache.containsKey(variableName)) {
@@ -793,9 +782,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
             }
 
-            return null;
-
         }
+        return null;
     }
 
     /**

@@ -30,6 +30,11 @@ public class CacheMilestoneListener implements PlanItemInstanceLifecycleListener
     public static String milestoneInstanceId;
     public static String historicMilestoneInstanceId;
 
+    public static void reset() {
+        milestoneInstanceId = null;
+        historicMilestoneInstanceId = null;
+    }
+
     @Override
     public String getSourceState() {
         return null;

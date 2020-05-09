@@ -56,11 +56,11 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
         inboundEventChannelAdapter = setupTestInboundChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("tenantAProperty", EventPayloadTypes.STRING)
@@ -70,7 +70,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("tenantBProperty", EventPayloadTypes.STRING)
@@ -80,20 +79,16 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploymentTenantId(TENANT_A)
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploymentTenantId(TENANT_B)
             .deploy();
     }
@@ -141,6 +136,8 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             repositoryService.deleteDeployment(cleanupDeploymentId, true);
         }
         cleanupDeploymentIds.clear();
+
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(false);
     }
 
     private void deployProcessModel(String modelResource, String tenantId) {
@@ -261,7 +258,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

@@ -15,7 +15,7 @@ package org.flowable.examples.bpmn.tasklistener;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.ExecutionHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**
@@ -29,7 +29,7 @@ public class TaskCompleteListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(delegateTask.getExecutionId());
         execution.setVariable("greeting", "Hello from " + greeter.getValue(execution));
         execution.setVariable("shortName", shortName.getValue(execution));
 

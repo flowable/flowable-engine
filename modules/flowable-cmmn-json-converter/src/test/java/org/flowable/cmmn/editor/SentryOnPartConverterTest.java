@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.editor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
@@ -19,11 +23,6 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class SentryOnPartConverterTest extends AbstractConverterTest {
 
@@ -36,21 +35,21 @@ public class SentryOnPartConverterTest extends AbstractConverterTest {
     protected void validateModel(CmmnModel model) {
         //Confirm a EntryCriteria attached to taskB sourced by "complete" transition of taskA
         PlanItemDefinition taskB = model.findPlanItemDefinition("taskB");
-        assertNotNull(taskB);
+        assertThat(taskB).isNotNull();
         PlanItem taskBIntance = model.findPlanItem(taskB.getPlanItemRef());
-        assertNotNull(taskBIntance);
+        assertThat(taskBIntance).isNotNull();
         List<Criterion> entryCriterions = taskBIntance.getEntryCriteria();
-        assertNotNull(entryCriterions);
-        assertEquals(1, entryCriterions.size());
+        assertThat(entryCriterions)
+                .extracting(Criterion::getId)
+                .containsExactly("entryCriterion");
         Criterion criterion = entryCriterions.get(0);
-        assertEquals("entryCriterion", criterion.getId());
         Sentry sentry = criterion.getSentry();
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         List<SentryOnPart> onParts = sentry.getOnParts();
-        assertNotNull(onParts);
-        assertEquals(1, onParts.size());
+        assertThat(onParts)
+                .extracting(SentryOnPart::getStandardEvent)
+                .containsExactly(PlanItemTransition.COMPLETE);
         SentryOnPart sentryOnPart = onParts.get(0);
-        assertEquals("taskA", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("taskA");
     }
 }

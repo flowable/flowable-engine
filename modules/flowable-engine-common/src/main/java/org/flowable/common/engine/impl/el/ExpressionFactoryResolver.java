@@ -23,6 +23,6 @@ import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 public abstract class ExpressionFactoryResolver {
 
     public static ExpressionFactory resolveExpressionFactory() {
-        return new org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl();
+        return new FlowableExpressionFactory();
     }
 }

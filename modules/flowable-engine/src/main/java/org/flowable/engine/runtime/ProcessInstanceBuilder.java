@@ -41,6 +41,17 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey);
 
     /**
+     * When looking up for a process definition by key it would first lookup for a process definition
+     * within the given parent deployment.
+     * Then it would fallback to the latest process definition with the given key.
+     * <p>
+     * This is typically needed when the ProcessInstanceBuilder is called for example
+     * from the case engine to start a process instance and it needs to
+     * look up the process definition in the same deployment as the case.
+     */
+    ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId);
+
+    /**
      * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
      */
     ProcessInstanceBuilder messageName(String messageName);

@@ -83,26 +83,6 @@
 
     <profiles>
         <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>buildExecutableWar</id>
             <build>
                 <plugins>
@@ -174,7 +154,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-process</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/process</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -212,7 +192,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-idm</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/idm</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -250,7 +230,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-decision</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/dmn</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -268,8 +248,7 @@
                                     <host>${swagger.host}</host>
                                     <basePath>/flowable-rest/event-registry-api</basePath>
                                     <info>
-                                        <title>Flowable Event Registry
-                                            REST API</title>
+                                        <title>Flowable Event Registry REST API</title>
                                         <version>v1</version>
                                         <contact>
                                             <email></email>
@@ -289,7 +268,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-eventregistry</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/eventregistry</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -327,7 +306,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-form</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/form</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -365,7 +344,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-content</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/content</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -403,7 +382,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-app</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/app</swaggerDirectory>
                                 </apiSource>
                                 <!-- ++++++++++ -->
@@ -441,7 +420,7 @@
                                     </securityDefinitions>
                                     <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                                     <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable</swaggerFileName>
+                                    <swaggerFileName>flowable-swagger-cmmn</swaggerFileName>
                                     <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/cmmn</swaggerDirectory>
                                 </apiSource>
                             </apiSources>

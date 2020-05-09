@@ -24,6 +24,7 @@ public interface Job extends JobInfo {
 
     String JOB_TYPE_TIMER = "timer";
     String JOB_TYPE_MESSAGE = "message";
+    String JOB_TYPE_EXTERNAL_WORKER = "externalWorker";
 
     boolean DEFAULT_EXCLUSIVE = true;
     int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
@@ -47,6 +48,16 @@ public interface Job extends JobInfo {
      * Returns the specific process definition on which the job was created
      */
     String getProcessDefinitionId();
+    
+    /**
+     * Get the category for this job.
+     */
+    String getCategory();
+    
+    /**
+     * Get the job type for this job.
+     */
+    String getJobType();
     
     /**
      * Reference to an element identifier or null if none is set.
@@ -82,11 +93,6 @@ public interface Job extends JobInfo {
      * Is the job exclusive?
      */
     boolean isExclusive();
-
-    /**
-     * Get the job type for this job.
-     */
-    String getJobType();
     
     /**
      * Returns the create datetime of the job.

@@ -60,6 +60,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
@@ -995,9 +996,11 @@ public abstract class AbstractDynamicStateManager {
                         messageExecution.setCurrentFlowElement(startEvent);
                         messageExecution.setEventScope(true);
                         messageExecution.setActive(false);
+
+                        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
                         EventSubscriptionEntity messageSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
-                                        .eventName(messageEventDefinition.getMessageRef())
+                                        .eventName(messageName)
                                         .executionId(messageExecution.getId())
                                         .processInstanceId(messageExecution.getProcessInstanceId())
                                         .activityId(messageExecution.getCurrentActivityId())
@@ -1027,9 +1030,12 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setCurrentFlowElement(startEvent);
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
+
+                        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+
                         EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                                        .eventName(signalEventDefinition.getSignalRef())
+                                        .eventName(eventName)
                                         .signal(signal)
                                         .executionId(signalExecution.getId())
                                         .processInstanceId(signalExecution.getProcessInstanceId())
@@ -1056,7 +1062,7 @@ public abstract class AbstractDynamicStateManager {
                             timerExecution.setCurrentFlowElement(startEvent);
                             timerExecution.setEventScope(true);
                             timerExecution.setActive(false);
-                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
                                 TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
                             if (timerJob != null) {
                                 timerJobService.scheduleTimerJob(timerJob);

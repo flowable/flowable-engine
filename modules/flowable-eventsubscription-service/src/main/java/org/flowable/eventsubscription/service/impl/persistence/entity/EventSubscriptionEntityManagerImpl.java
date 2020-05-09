@@ -16,6 +16,7 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -207,14 +208,24 @@ public class EventSubscriptionEntityManagerImpl
         SignalEventSubscriptionEntity subscriptionEntity = createSignalEventSubscription();
         subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());
         subscriptionEntity.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
+        subscriptionEntity.setEventName(eventSubscriptionBuilder.getEventName());
+
         Signal signal = eventSubscriptionBuilder.getSignal();
         if (signal != null) {
-            subscriptionEntity.setEventName(signal.getName());
+
+            // Eventname set by the builder has precedence
+            if (eventSubscriptionBuilder.getEventName() == null) {
+                if (StringUtils.isNotEmpty(signal.getName())) {
+                    subscriptionEntity.setEventName(signal.getName());
+                } else {
+                    subscriptionEntity.setEventName(signal.getId());
+                }
+            }
+
             if (signal.getScope() != null) {
                 subscriptionEntity.setConfiguration(signal.getScope());
             }
-        } else {
-            subscriptionEntity.setEventName(eventSubscriptionBuilder.getEventName());
+
         }
 
         subscriptionEntity.setActivityId(eventSubscriptionBuilder.getActivityId());

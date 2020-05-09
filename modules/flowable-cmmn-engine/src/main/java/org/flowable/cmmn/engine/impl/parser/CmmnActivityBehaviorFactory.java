@@ -17,6 +17,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
@@ -35,6 +36,7 @@ import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
@@ -79,6 +81,8 @@ public interface CmmnActivityBehaviorFactory {
     MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task);
 
     SendEventActivityBehavior createSendEventActivityBehavior(PlanItem planItem, SendEventServiceTask sendEventServiceTask);
+
+    ExternalWorkerTaskActivityBehavior createExternalWorkerActivityBehaviour(PlanItem planItem, ExternalWorkerServiceTask externalWorkerServiceTask);
 
     TimerEventListenerActivityBehaviour createTimerEventListenerActivityBehavior(PlanItem planItem, TimerEventListener timerEventListener);
     

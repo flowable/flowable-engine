@@ -48,6 +48,9 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String category;
+    protected String jobType;
+    
     protected String elementId;
     protected String elementName;
     
@@ -72,7 +75,6 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected String exceptionMessage;
 
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-    protected String jobType;
 
     public void setExecution(ExecutionEntity execution) {
         executionId = execution.getId();
@@ -214,6 +216,24 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     }
     
     @Override
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+    
+    @Override
     public String getElementId() {
         return elementId;
     }
@@ -308,15 +328,6 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
 
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
-    }
-
-    @Override
-    public String getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     @Override

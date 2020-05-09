@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.async;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -21,19 +22,17 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-/**
- * 
- * @author Daniel Meyer
- */
 public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     public static boolean INVOCATION;
@@ -218,6 +217,154 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
         // the job is done
         assertEquals(0, managementService.createJobQuery().count());
+    }
+    
+    @Test
+    @Deployment
+    public void testAsyncTaskWithJobCategory() {
+        // start process
+        runtimeService.startProcessInstanceByKey("asyncTask");
+        // now there should be one job in the database:
+        assertEquals(1, managementService.createJobQuery().count());
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals("task", job.getElementId());
+        assertEquals("testCategory", job.getCategory());
+
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
+
+        // the job is done
+        assertEquals(0, managementService.createJobQuery().count());
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategory.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask");
+    
+            try {
+                waitForJobExecutorToProcessAllJobs(4000L, 200L);
+                fail("should fail");
+            } catch (Exception e ) {
+                // expected
+            }
+            
+            // job is not executed because of different job category value
+            assertEquals(1, managementService.createJobQuery().count());
+            
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertEquals(0, managementService.createJobQuery().count());
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategory.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithCategoryConfigurationSetAndRunningAsyncExecutor() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            
+            processEngineConfiguration.getAsyncExecutor().start();
+            processEngineConfiguration.setAsyncExecutorActivate(true);
+            
+            // start process
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
+            
+            JobEntity job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNull(job.getLockOwner());
+            assertNull(job.getLockExpirationTime());
+            
+            Thread.sleep(4000);
+            
+            // job is not executed because of different job category value
+            assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+            
+            job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertNull(job.getLockOwner());
+            assertNull(job.getLockExpirationTime());
+            
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+            
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
+    
+            processEngineConfiguration.getAsyncExecutor().start();
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 4000, 300, false);
+            
+            // the job is done
+            assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+            
+            assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+            processEngineConfiguration.setAsyncExecutorActivate(false);
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testAsyncTaskWithJobCategoryExpression() {
+        // start process
+        runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "myCategory"));
+        // now there should be one job in the database:
+        assertEquals(1, managementService.createJobQuery().count());
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals("myCategory", job.getCategory());
+
+        waitForJobExecutorToProcessAllJobs(5000L, 200L);
+
+        // the job is done
+        assertEquals(0, managementService.createJobQuery().count());
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategoryExpression.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryExpressionWithCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "myCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertEquals(0, managementService.createJobQuery().count());
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategoryExpression.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithMultipleCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("anotherCategory");
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("testCategory");
+            
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "testCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertEquals(0, managementService.createJobQuery().count());
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
     }
 
     @Test

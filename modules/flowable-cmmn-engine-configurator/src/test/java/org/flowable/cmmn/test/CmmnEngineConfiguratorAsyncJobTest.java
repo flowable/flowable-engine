@@ -12,10 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
@@ -50,16 +47,16 @@ public class CmmnEngineConfiguratorAsyncJobTest {
     @After
     public void cleanup() {
         processEngine.getRepositoryService()
-            .createDeploymentQuery()
-            .list()
-            .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
+                .createDeploymentQuery()
+                .list()
+                .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
         cmmnEngine.getCmmnRepositoryService()
-            .createDeploymentQuery()
-            .list()
-            .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
+                .createDeploymentQuery()
+                .list()
+                .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
         // Execute history jobs for the delete deployments
         processEngine.getManagementService().createHistoryJobQuery().list()
-            .forEach(historyJob -> processEngine.getManagementService().executeHistoryJob(historyJob.getId()));
+                .forEach(historyJob -> processEngine.getManagementService().executeHistoryJob(historyJob.getId()));
 
         cmmnEngine.close();
         processEngine.close();
@@ -70,33 +67,35 @@ public class CmmnEngineConfiguratorAsyncJobTest {
         // The async executor should be the same instance
         AsyncExecutor processEngineAsyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncExecutor();
         AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncExecutor();
-        assertNotNull(processEngineAsyncExecutor);
-        assertNotNull(cmmnEngineAsyncExecutor);
+        assertThat(processEngineAsyncExecutor).isNotNull();
+        assertThat(cmmnEngineAsyncExecutor).isNotNull();
 
         // Contrary to the asyncHistoryExecutor, the async executors are not shared between the engines (by default)
-        assertNotSame(processEngineAsyncExecutor, cmmnEngineAsyncExecutor);
+        assertThat(cmmnEngineAsyncExecutor).isNotSameAs(processEngineAsyncExecutor);
 
-        assertNull(processEngineAsyncExecutor.getJobServiceConfiguration().getJobExecutionScope());
-        assertEquals(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN, cmmnEngineAsyncExecutor.getJobServiceConfiguration().getJobExecutionScope());
+        assertThat(processEngineAsyncExecutor.getJobServiceConfiguration().getJobExecutionScope()).isNull();
+        assertThat(cmmnEngineAsyncExecutor.getJobServiceConfiguration().getJobExecutionScope()).isEqualTo(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN);
 
         // Deploy and start test processes/cases
         // Trigger one plan item instance to start the process
-        processEngine.getRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.taskAndTimer.bpmn20.xml").deploy();
-        cmmnEngine.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.processAndTimer.cmmn.xml").deploy();
+        processEngine.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.taskAndTimer.bpmn20.xml").deploy();
+        cmmnEngine.getCmmnRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.processAndTimer.cmmn.xml").deploy();
 
         // Starting the case instance starts the process task. The process has an async job at the beginning
         cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder().caseDefinitionKey("timerAndProcess").start();
         Job job = processEngine.getManagementService().createJobQuery().singleResult();
-        assertNull(job.getScopeType());
+        assertThat(job.getScopeType()).isNull();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngine.getManagementService(), 10000L, 100L);
 
         // There should now be two timers, one for the case and one for the process
         List<Job> timerJobs = processEngine.getManagementService().createTimerJobQuery().list();
         timerJobs.forEach(timerJob -> {
             if (timerJob.getScopeId() != null) { // cmmn
-                assertEquals(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN, timerJob.getScopeType());
+                assertThat(timerJob.getScopeType()).isEqualTo(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN);
             } else {
-                assertNull(timerJob.getScopeType());
+                assertThat(timerJob.getScopeType()).isNull();
             }
 
             processEngine.getManagementService().moveTimerToExecutableJob(timerJob.getId());
@@ -119,12 +118,12 @@ public class CmmnEngineConfiguratorAsyncJobTest {
 
         // There should be one user task which is async (from the case)
         job = processEngine.getManagementService().createJobQuery().singleResult();
-        assertEquals(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN, job.getScopeType());
+        assertThat(job.getScopeType()).isEqualTo(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN);
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 10000L, 100L, true);
 
         // There should be two user tasks now: one after the timer of the case and one after the timer of the process
-        assertEquals(2, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(2, cmmnEngine.getCmmnTaskService().createTaskQuery().count());
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(2);
+        assertThat(cmmnEngine.getCmmnTaskService().createTaskQuery().count()).isEqualTo(2);
 
     }
 

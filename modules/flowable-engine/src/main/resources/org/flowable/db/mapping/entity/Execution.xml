@@ -10,7 +10,7 @@
     insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_)
     values (
       #{id ,jdbcType=VARCHAR},
@@ -40,6 +40,7 @@
       #{timerJobCount, jdbcType=INTEGER},
       #{suspendedJobCount, jdbcType=INTEGER},
       #{deadLetterJobCount, jdbcType=INTEGER},
+      #{externalWorkerJobCount, jdbcType=INTEGER},
       #{variableCount, jdbcType=INTEGER},
       #{identityLinkCount, jdbcType=INTEGER},
       #{callbackId, jdbcType=VARCHAR},
@@ -54,7 +55,7 @@
     insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
@@ -85,6 +86,7 @@
          #{execution.timerJobCount, jdbcType=INTEGER},
          #{execution.suspendedJobCount, jdbcType=INTEGER},
          #{execution.deadLetterJobCount, jdbcType=INTEGER},
+         #{execution.externalWorkerJobCount, jdbcType=INTEGER},
          #{execution.variableCount, jdbcType=INTEGER},
          #{execution.identityLinkCount, jdbcType=INTEGER},
          #{execution.callbackId, jdbcType=VARCHAR},
@@ -102,7 +104,7 @@
         into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
                                         IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                         TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
-                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                         CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_) VALUES
             (
              #{execution.id ,jdbcType=VARCHAR},
@@ -132,6 +134,7 @@
              #{execution.timerJobCount, jdbcType=INTEGER},
              #{execution.suspendedJobCount, jdbcType=INTEGER},
              #{execution.deadLetterJobCount, jdbcType=INTEGER},
+             #{execution.externalWorkerJobCount, jdbcType=INTEGER},
              #{execution.variableCount, jdbcType=INTEGER},
              #{execution.identityLinkCount, jdbcType=INTEGER},
              #{execution.callbackId, jdbcType=VARCHAR},
@@ -210,6 +213,9 @@
             <if test="originalPersistentState.deadLetterJobCount != deadLetterJobCount">
                 DEADLETTER_JOB_COUNT_ = #{deadLetterJobCount, jdbcType=INTEGER},
             </if>
+            <if test="originalPersistentState.externalWorkerJobCount != externalWorkerJobCount">
+                EXTERNAL_WORKER_JOB_COUNT_ = #{externalWorkerJobCount, jdbcType=INTEGER},
+            </if>
             <if test="originalPersistentState.variableCount != variableCount">
                 VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
             </if>
@@ -272,7 +278,8 @@
   <update id="updateProcessInstanceLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION
     set
-      LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+      LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+      LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
     where ID_ = #{id}
       and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
   </update>
@@ -280,8 +287,17 @@
   <update id="clearProcessInstanceLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION
     set
-      LOCK_TIME_ = null
+      LOCK_TIME_ = null,
+      LOCK_OWNER_ = null
     where ID_ = #{id}
+  </update>
+
+  <update id="clearAllProcessInstanceLockTimes" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_EXECUTION
+    set
+      LOCK_TIME_ = null,
+      LOCK_OWNER_ = null
+    where LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
   </update>
 
   <update id="updateExecutionRelatedEntityCountEnabled" parameterType="boolean">
@@ -332,6 +348,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -367,6 +384,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
@@ -377,6 +395,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -414,6 +433,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -460,6 +480,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
@@ -470,6 +491,7 @@
     <result property="timerJobCount" column="TIMER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="suspendedJobCount" column="SUSP_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
+    <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -853,6 +875,10 @@
       <if test="involvedUser != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{involvedUser})
       </if>
+      <if test="involvedUserIdentityLink != null">
+        and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
+        I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
+      </if>
       <if test="involvedGroups != null">
         and EXISTS(
           select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.GROUP_ID_ in
@@ -860,6 +886,10 @@
               #{involvedGroup}
           </foreach>
         )
+      </if>
+      <if test="involvedGroupIdentityLink != null">
+        and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
+        I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
       </if>
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
@@ -1074,6 +1104,10 @@
           <if test="orQueryObject.involvedUser != null">
             or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{orQueryObject.involvedUser})
           </if>
+          <if test="orQueryObject.involvedUserIdentityLink != null">
+	        or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
+	        I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+	      </if>
           <if test="orQueryObject.involvedGroups != null">
             or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.GROUP_ID_ in
               <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
@@ -1081,6 +1115,10 @@
               </foreach>
             )
           </if>
+          <if test="orQueryObject.involvedGroupIdentityLink != null">
+	        or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
+	        I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
+	      </if>
           <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
           <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
             or

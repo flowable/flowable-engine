@@ -39,11 +39,11 @@ class LocalDateVariableTest extends PluggableFlowableTestCase {
         LocalDate oneYearBefore = nowLocalDate.minusYears(1);
         LocalDate oneYearLater = nowLocalDate.plusYears(1);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("nowLocalDate", nowLocalDate)
-            .variable("oneYearBefore", oneYearBefore)
-            .variable("oneYearLater", oneYearLater)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("nowLocalDate", nowLocalDate)
+                .variable("oneYearBefore", oneYearBefore)
+                .variable("oneYearLater", oneYearLater)
+                .start();
 
         VariableInstance nowLocalDateVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "nowLocalDate");
         assertThat(nowLocalDateVariableInstance.getTypeName()).isEqualTo(LocalDateType.TYPE_NAME);
@@ -58,19 +58,19 @@ class LocalDateVariableTest extends PluggableFlowableTestCase {
         assertThat(oneYearLaterVariableInstance.getValue()).isEqualTo(oneYearLater);
 
         assertThat(runtimeService.getVariables(processInstance.getId()))
-            .containsOnly(
-                entry("nowLocalDate", nowLocalDate),
-                entry("oneYearBefore", oneYearBefore),
-                entry("oneYearLater", oneYearLater)
-            );
+                .containsOnly(
+                        entry("nowLocalDate", nowLocalDate),
+                        entry("oneYearBefore", oneYearBefore),
+                        entry("oneYearLater", oneYearLater)
+                );
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void testGetLocalDateVariableFromTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .start();
 
         Map<String, Object> variables = new HashMap<>();
         LocalDate nowLocalDate = LocalDate.now();
@@ -89,9 +89,9 @@ class LocalDateVariableTest extends PluggableFlowableTestCase {
         assertThat(oneYearLaterVariableInstance.getValue()).isEqualTo(oneYearLater);
 
         assertThat(taskService.getVariables(task.getId()))
-            .containsOnly(
-                entry("nowLocalDate", nowLocalDate),
-                entry("oneYearLater", oneYearLater)
-            );
+                .containsOnly(
+                        entry("nowLocalDate", nowLocalDate),
+                        entry("oneYearLater", oneYearLater)
+                );
     }
 }

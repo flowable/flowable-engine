@@ -12,6 +12,8 @@
  */
 package org.flowable.http.bpmn;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -507,15 +509,15 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables);
-        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result"));
-        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result2"));
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result2")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
 
         Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", true);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables2);
         assertNull(runtimeService.getVariable(pi2.getId(), "result"));
-        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result2"));
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result2")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())

@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.impl;
 
 import java.util.Collection;
-import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -38,33 +37,21 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
     }
     
     @Override
-    public void sendEvent(EventInstance eventInstance) {
-        Collection<String> outboundChannelKeys = eventInstance.getEventModel().getOutboundChannelKeys();
-        for (String outboundChannelKey : outboundChannelKeys) {
+    public void sendEvent(EventInstance eventInstance, Collection<ChannelModel> channelModels) {
+        if (channelModels == null || channelModels.isEmpty()) {
+            throw new FlowableException("No channel model set for outgoing event " + eventInstance.getEventKey());
+        }
 
-            ChannelModel channelModel = null;
-            if (Objects.equals(EventRegistryEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                channelModel = eventRepositoryService.getChannelModelByKey(outboundChannelKey);
-            } else {
-                channelModel = eventRepositoryService.getChannelModelByKey(outboundChannelKey, eventInstance.getTenantId());
-            }
-            
-            if (channelModel == null) {
-                throw new FlowableException("Could not find outbound channel model for " + outboundChannelKey);
-            }
-            
-            if (!(channelModel instanceof OutboundChannelModel)) {
-                throw new FlowableException("Channel model is not an outbound channel model for " + outboundChannelKey);
-            }
-            
+        for (ChannelModel channelModel : channelModels) {
+
             OutboundChannelModel outboundChannelModel = (OutboundChannelModel) channelModel;
 
-            OutboundEventProcessingPipeline outboundEventProcessingPipeline = (OutboundEventProcessingPipeline) outboundChannelModel.getOutboundEventProcessingPipeline();
-            String rawEvent = outboundEventProcessingPipeline.run(eventInstance);
+            OutboundEventProcessingPipeline<?> outboundEventProcessingPipeline = (OutboundEventProcessingPipeline<?>) outboundChannelModel.getOutboundEventProcessingPipeline();
+            Object rawEvent = outboundEventProcessingPipeline.run(eventInstance);
 
-            OutboundEventChannelAdapter outboundEventChannelAdapter = (OutboundEventChannelAdapter) outboundChannelModel.getOutboundEventChannelAdapter();
+            OutboundEventChannelAdapter outboundEventChannelAdapter = (OutboundEventChannelAdapter<?>) outboundChannelModel.getOutboundEventChannelAdapter();
             if (outboundEventChannelAdapter == null) {
-                throw new FlowableException("Could not find an outbound channel adapter for channel " + outboundChannelKey);
+                throw new FlowableException("Could not find an outbound channel adapter for channel " + channelModel.getKey());
             }
             
             outboundEventChannelAdapter.sendEvent(rawEvent);

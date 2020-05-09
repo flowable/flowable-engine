@@ -38,6 +38,8 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String category;
+    protected String categoryLike;
     protected String elementId;
     protected String elementName;
     protected String scopeId;
@@ -47,6 +49,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
+    protected boolean onlyExternalWorkers;
     protected Date duedateHigherThan;
     protected Date duedateLowerThan;
     protected Date duedateHigherThanOrEqual;
@@ -92,6 +95,24 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public DeadLetterJobQueryImpl category(String category) {
+        if (category == null) {
+            throw new FlowableIllegalArgumentException("Provided category is null");
+        }
+        this.category = category;
+        return this;
+    }
+    
+    @Override
+    public DeadLetterJobQueryImpl categoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("Provided categoryLike is null");
+        }
+        this.categoryLike = categoryLike;
         return this;
     }
     
@@ -208,6 +229,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
         this.onlyTimers = true;
         return this;
     }
@@ -217,9 +242,29 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (onlyTimers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
+
         this.onlyMessages = true;
         return this;
     }
+
+    @Override
+    public DeadLetterJobQueryImpl externalWorkers() {
+        if (onlyMessages) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyMessages() with onlyExternalWorkers() in the same query");
+        }
+
+        if (onlyTimers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
+        }
+
+        this.onlyTimers = true;
+        return this;
+    }
+
 
     @Override
     public DeadLetterJobQueryImpl duedateHigherThan(Date date) {
@@ -364,16 +409,28 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return withoutTenantId;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
     public String getId() {
         return id;
     }
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public String getElementName() {
+        return elementName;
     }
     
     public String getScopeId() {
@@ -398,6 +455,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public boolean isOnlyMessages() {
         return onlyMessages;
+    }
+
+    public boolean isOnlyExternalWorkers() {
+        return onlyExternalWorkers;
     }
 
     public Date getDuedateHigherThan() {

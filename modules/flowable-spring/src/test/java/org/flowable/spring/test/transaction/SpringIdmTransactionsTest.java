@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,8 @@
  */
 package org.flowable.spring.test.transaction;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -78,13 +77,13 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
     public void testCommitOnNoException() {
 
         // No users should exist prior to this test
-        assertEquals(0, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).isEmpty();
 
         runtimeService.startProcessInstanceByKey("testProcess");
         Task task = taskService.createTaskQuery().singleResult();
 
         taskService.complete(task.getId());
-        assertEquals(1, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).hasSize(1);
 
     }
 
@@ -93,27 +92,22 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
     public void testTransactionRolledBackOnException() {
 
         // No users should exist prior to this test
-        assertEquals(0, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).isEmpty();
 
         runtimeService.startProcessInstanceByKey("testProcess");
         Task task = taskService.createTaskQuery().singleResult();
 
         // Completing the task throws an exception
-        try {
-            taskService.complete(task.getId());
-            fail();
-        } catch (Exception e) {
-            // Exception expected
-        }
+        assertThatThrownBy(() -> taskService.complete(task.getId()))
+                .isInstanceOf(Exception.class);
 
         // Should have rolled back to task
-        assertNotNull(taskService.createTaskQuery().singleResult());
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().finished().count());
+        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+        assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isZero();
 
         // The logic in the tasklistener (creating a new user) should rolled back too:
         // no new user should have been created
-        assertEquals(0, identityService.createUserQuery().list().size());
-
+        assertThat(identityService.createUserQuery().list()).isEmpty();
     }
 
     @Test
@@ -123,10 +117,10 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
         // The service task should have created a user which is part of the admin group
         User user = identityService.createUserQuery().singleResult();
-        assertEquals("Kermit", user.getId());
+        assertThat(user.getId()).isEqualTo("Kermit");
         Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
-        assertNotNull(group);
-        assertEquals("admin", group.getId());
+        assertThat(group).isNotNull();
+        assertThat(group.getId()).isEqualTo("admin");
 
         identityService.deleteMembership("Kermit", "admin");
     }
@@ -148,13 +142,13 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         identityService.createMembership(mat.getId(), group.getId());
 
         // verify that the group has been created
-        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult()).isNotNull();
         // verify that the users have been created
-        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
-        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult()).isNotNull();
+        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult()).isNotNull();
         // verify that the users are members of the group
-        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
-        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult()).isNotNull();
+        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult()).isNotNull();
     }
 
     @Test
@@ -165,6 +159,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
         TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
         txTemplate.execute(new TransactionCallbackWithoutResult() {
+
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 // save group
@@ -179,13 +174,13 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         });
 
         // verify that the group has been created
-        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult()).isNotNull();
         // verify that the users have been created
-        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
-        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult()).isNotNull();
+        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult()).isNotNull();
         // verify that the users are members of the group
-        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
-        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult()).isNotNull();
+        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult()).isNotNull();
     }
 
     @Test
@@ -198,15 +193,15 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
         // verify that the process instance has been started
-        assertThat(processInstance, is(notNullValue()));
+        assertThat(processInstance).isNotNull();
         // verify that the group has been created
-        assertThat(identityService.createGroupQuery().groupId("group").singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupId("group").singleResult()).isNotNull();
         // verify that the users have been created
-        assertThat(identityService.createUserQuery().userId("tom").singleResult(), is(notNullValue()));
-        assertThat(identityService.createUserQuery().userId("mat").singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId("tom").singleResult()).isNotNull();
+        assertThat(identityService.createUserQuery().userId("mat").singleResult()).isNotNull();
         // verify that the users are members of the group
-        assertThat(identityService.createGroupQuery().groupMember("tom").singleResult(), is(notNullValue()));
-        assertThat(identityService.createGroupQuery().groupMember("mat").singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember("tom").singleResult()).isNotNull();
+        assertThat(identityService.createGroupQuery().groupMember("mat").singleResult()).isNotNull();
     }
 
     /*
@@ -250,6 +245,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
             ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
             managementService.executeCommand(new Command<Void>() {
+
                 @Override
                 public Void execute(CommandContext commandContext) {
                     return null;

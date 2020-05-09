@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.http.HttpStatus;
@@ -181,5 +182,34 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         // Activating again should result in conflict
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_CONFLICT));
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"name one\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessKey\": \"key one\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertEquals("key one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessKey\": \"key two\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertEquals("key two", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+
     }
 }

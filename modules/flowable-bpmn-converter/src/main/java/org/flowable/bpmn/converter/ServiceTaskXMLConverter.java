@@ -35,6 +35,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CustomProperty;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SendEventServiceTask;
@@ -87,6 +88,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else if (ServiceTask.SEND_EVENT_TASK.equals(serviceTaskType)) {
             serviceTask = new SendEventServiceTask();
             
+        } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType)) {
+            serviceTask = new ExternalWorkerServiceTask();
         } else {
             serviceTask = new ServiceTask();
         }
@@ -114,7 +117,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
         }
 
-        serviceTask.setUseLocalScopeForResultVariable(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, xtr)));
+        serviceTask.setUseLocalScopeForResultVariable(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, xtr)));
+        serviceTask.setStoreResultVariableAsTransient(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT, xtr)));
 
         serviceTask.setType(serviceTaskType);
         serviceTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
@@ -127,6 +131,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             convertCaseServiceTaskXMLProperties((CaseServiceTask) serviceTask, model, xtr);
         } else if (serviceTask instanceof SendEventServiceTask) {
             convertSendEventServiceTaskXMLProperties((SendEventServiceTask) serviceTask, model, xtr);
+        } else if (serviceTask instanceof ExternalWorkerServiceTask) {
+            convertExternalWorkerTaskXMLProperties((ExternalWorkerServiceTask) serviceTask, model, xtr);
         } else {
             parseChildElements(getXMLElementName(), serviceTask, model, xtr);
         }
@@ -143,6 +149,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else if (element instanceof SendEventServiceTask) {
             writeSendEventServiceAdditionalAttributes(element, model, xtw);
 
+        } else if (element instanceof ExternalWorkerServiceTask) {
+            writeExternalTaskAdditionalAttributes((ExternalWorkerServiceTask) element, model, xtw);
         } else {
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
 
@@ -192,6 +200,20 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
+    protected void writeExternalTaskAdditionalAttributes(ExternalWorkerServiceTask externalWorkerTask, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+        writeQualifiedAttribute(ATTRIBUTE_TYPE, ServiceTask.EXTERNAL_WORKER_TASK, xtw);
+        writeQualifiedAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, externalWorkerTask.getTopic(), xtw);
+
+        if (!externalWorkerTask.isAsynchronous() && externalWorkerTask.isNotExclusive()) {
+            // Write the not exclusive only if not async (otherwise it is added in the base)
+            writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
+        }
+
+        if (StringUtils.isNotEmpty(externalWorkerTask.getSkipExpression())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, externalWorkerTask.getSkipExpression(), xtw);
+        }
+    }
+
     protected void writeServiceTaskAdditionalAttributes(ServiceTask element, XMLStreamWriter xtw) throws Exception {
         ServiceTask serviceTask = element;
 
@@ -221,6 +243,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         if (serviceTask.isUseLocalScopeForResultVariable()) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, "true", xtw);
+        }
+
+        if (serviceTask.isStoreResultVariableAsTransient()) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT, "true", xtw);
         }
     }
 
@@ -357,6 +383,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             }
 
         }
+    }
+
+    protected void convertExternalWorkerTaskXMLProperties(ExternalWorkerServiceTask externalWorkerServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) {
+        externalWorkerServiceTask.setTopic(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, xtr));
     }
     
     protected boolean writeCustomProperties(ServiceTask serviceTask, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
