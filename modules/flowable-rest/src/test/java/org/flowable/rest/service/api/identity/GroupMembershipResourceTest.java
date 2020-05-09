@@ -13,10 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,6 +29,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -56,18 +56,23 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testuser", responseNode.get("userId").textValue());
-            assertEquals("testgroup", responseNode.get("groupId").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_MEMBERSHIP, testGroup.getId(), testUser.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " userId: 'testuser',"
+                            + " groupId: 'testgroup',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_GROUP_MEMBERSHIP, testGroup.getId(), testUser.getId()) + "'"
+                            + "}");
 
             Group createdGroup = identityService.createGroupQuery().groupId("testgroup").singleResult();
-            assertNotNull(createdGroup);
-            assertEquals("Test group", createdGroup.getName());
-            assertEquals("Test type", createdGroup.getType());
+            assertThat(createdGroup).isNotNull();
+            assertThat(createdGroup.getName()).isEqualTo("Test group");
+            assertThat(createdGroup.getType()).isEqualTo("Test type");
 
-            assertNotNull(identityService.createUserQuery().memberOfGroup("testgroup").singleResult());
-            assertEquals("testuser", identityService.createUserQuery().memberOfGroup("testgroup").singleResult().getId());
+            assertThat(identityService.createUserQuery().memberOfGroup("testgroup").singleResult()).isNotNull();
+            assertThat(identityService.createUserQuery().memberOfGroup("testgroup").singleResult().getId()).isEqualTo("testuser");
         } finally {
             try {
                 identityService.deleteGroup("testgroup");
@@ -140,7 +145,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             // Check if membership is actually deleted
-            assertNull(identityService.createUserQuery().memberOfGroup("testgroup").singleResult());
+            assertThat(identityService.createUserQuery().memberOfGroup("testgroup").singleResult()).isNull();
         } finally {
             try {
                 identityService.deleteGroup("testgroup");

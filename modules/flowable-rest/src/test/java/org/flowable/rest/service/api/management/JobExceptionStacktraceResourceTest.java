@@ -12,9 +12,8 @@
  */
 package org.flowable.rest.service.api.management;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
@@ -49,16 +48,15 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.TRUE));
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         // Force execution of job
-        try {
-            managementService.moveTimerToExecutableJob(timerJob.getId());
-            managementService.executeJob(timerJob.getId());
-            fail();
-        } catch (FlowableException expected) {
-            // Ignore, we expect the exception
-        }
+        Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(timerJob2.getId());
+            managementService.executeJob(timerJob2.getId());
+        })
+                .isExactlyInstanceOf(FlowableException.class);
 
         Calendar now = Calendar.getInstance();
         now.set(Calendar.MILLISECOND, 0);
@@ -68,11 +66,11 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
                 SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_OK);
 
         String stack = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-        assertNotNull(stack);
-        assertEquals(managementService.getTimerJobExceptionStacktrace(timerJob.getId()), stack);
+        assertThat(stack).isNotNull();
+        assertThat(stack).isEqualTo(managementService.getTimerJobExceptionStacktrace(timerJob.getId()));
 
         // Also check content-type
-        assertEquals("text/plain", response.getEntity().getContentType().getValue());
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("text/plain");
         closeResponse(response);
     }
 
@@ -92,7 +90,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
     public void testGetStackForJobWithoutException() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.FALSE));
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_NOT_FOUND));
     }
