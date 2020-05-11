@@ -693,7 +693,6 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
         assertThat(taskId).isNotNull();
-        System.out.println("******" + dataNode.toPrettyString());
 
         // Claim
         assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isZero();
