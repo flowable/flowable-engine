@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -165,29 +166,26 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(caseInstanceQueryByCaseDefinitionId);
 
         for (CaseInstance caseInstance : caseInstances) {
-            doMigrateCaseInstance(caseInstance, caseDefinitionToMigrateTo, document, commandContext);
+            doMigrateCaseInstance((CaseInstanceEntity) caseInstance, caseDefinitionToMigrateTo, document, commandContext);
         }
     }
 
-    protected void doMigrateCaseInstance(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, CommandContext commandContext) {
+    protected void doMigrateCaseInstance(CaseInstanceEntity caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, CommandContext commandContext) {
         LOGGER.debug("Start migration of case instance with Id:'{}' to case definition identified by {}", caseInstance.getId(), printCaseDefinitionIdentifierMessage(document));
         ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = prepareChangeStateBuilder(caseInstance, caseDefinitionToMigrateTo, document);
 
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
-        ((CaseInstanceEntity) caseInstance).setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
+        caseInstance.setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
 
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
                 .setCaseInstanceId(caseInstance.getId())
                 .setCaseDefinitionToMigrateTo(caseDefinitionToMigrateTo)
-                .setActivatePlanItemDefinitionIds(changePlanItemStateBuilder.getActivatePlanItemDefinitionIds())
-                .setTerminatePlanItemDefinitionIds(changePlanItemStateBuilder.getTerminatePlanItemDefinitionIds())
-                .setChangePlanItemToAvailableIds(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitionIds())
+                .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
+                .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
+                .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, commandContext);
-
-        LOGGER.debug("Updating case definition of unchanged case tasks");
-        // TODO? need to handle case tasks?
 
         LOGGER.debug("Updating case definition reference in plan item instances");
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).updatePlanItemInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
@@ -209,7 +207,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         changePlanItemStateBuilder.caseInstanceId(caseInstanceId);
 
         for (ActivatePlanItemDefinitionMapping planItemDefinitionMapping : document.getActivatePlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.activatePlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.activatePlanItemDefinition(planItemDefinitionMapping);
         }
         
         for (TerminatePlanItemDefinitionMapping planItemDefinitionMapping : document.getTerminatePlanItemDefinitionMappings()) {
@@ -223,8 +221,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         return changePlanItemStateBuilder;
     }
 
-    protected void changeCaseDefinitionReferenceOfHistory(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, CommandContext commandContext) {
-        // TODO
+    protected void changeCaseDefinitionReferenceOfHistory(CaseInstanceEntity caseInstance, CaseDefinition caseDefinitionToMigrateTo, CommandContext commandContext) {
+        CmmnHistoryManager historyManager = CommandContextUtil.getCmmnHistoryManager(commandContext);
+        historyManager.updateCaseDefinitionIdInHistory(caseDefinitionToMigrateTo, caseInstance);
     }
 
     @Override

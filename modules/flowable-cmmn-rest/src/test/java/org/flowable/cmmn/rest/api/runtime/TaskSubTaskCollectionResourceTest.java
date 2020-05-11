@@ -58,7 +58,7 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
                 new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_SUBTASKS_COLLECTION, parentTask.getId())),
                 HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        System.out.println(responseNode.toPrettyString());
+        
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();

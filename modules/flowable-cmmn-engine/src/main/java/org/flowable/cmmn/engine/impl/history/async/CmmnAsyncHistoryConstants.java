@@ -60,6 +60,7 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
+    String TYPE_UPDATE_CASE_DEFINITION_CASCADE = "cmmn-update-case-definition-cascade";
     String TYPE_HISTORIC_USER_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
     String TYPE_HISTORIC_USER_TASK_LOG_DELETE = "cmmn-historic-user-task-log-delete";
 

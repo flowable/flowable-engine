@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.common.engine.api.FlowableException;
 
@@ -29,9 +32,9 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     protected CmmnRuntimeServiceImpl runtimeService;
 
     protected String caseInstanceId;
-    protected Set<String> activatePlanItemDefinitionIds = new HashSet<>();
-    protected Set<String> changeToAvailableStatePlanItemDefinitionIds = new HashSet<>();
-    protected Set<String> terminatePlanItemDefinitionIds = new HashSet<>();
+    protected Set<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitions = new HashSet<>();
+    protected Set<MoveToAvailablePlanItemDefinitionMapping> changeToAvailableStatePlanItemDefinitions = new HashSet<>();
+    protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions = new HashSet<>();
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
 
@@ -50,37 +53,61 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
 
     @Override
     public ChangePlanItemStateBuilder activatePlanItemDefinitionId(String planItemDefinitionId) {
-        activatePlanItemDefinitionIds.add(planItemDefinitionId);
+        activatePlanItemDefinitions.add(new ActivatePlanItemDefinitionMapping(planItemDefinitionId));
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
-        activatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
+        if (planItemDefinitionIds != null) {
+            for (String planItemDefinitionId : planItemDefinitionIds) {
+                activatePlanItemDefinitions.add(new ActivatePlanItemDefinitionMapping(planItemDefinitionId));
+            }
+        }
+        return this;
+    }
+    
+    @Override
+    public ChangePlanItemStateBuilder activatePlanItemDefinition(ActivatePlanItemDefinitionMapping planItemDefinitionMapping) {
+        activatePlanItemDefinitions.add(planItemDefinitionMapping);
+        return this;
+    }
+    
+    @Override
+    public ChangePlanItemStateBuilder activatePlanItemDefinitions(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings) {
+        activatePlanItemDefinitions.addAll(planItemDefinitionMappings);
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionId(String planItemDefinitionId) {
-        changeToAvailableStatePlanItemDefinitionIds.add(planItemDefinitionId);
+        changeToAvailableStatePlanItemDefinitions.add(new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId));
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionIds(List<String> planItemDefinitionIds) {
-        changeToAvailableStatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
+        if (planItemDefinitionIds != null) {
+            for (String planItemDefinitionId : planItemDefinitionIds) {
+                changeToAvailableStatePlanItemDefinitions.add(new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId));
+            }
+        }
         return this;
     }
     
     @Override
     public ChangePlanItemStateBuilder terminatePlanItemDefinitionId(String planItemDefinitionId) {
-        terminatePlanItemDefinitionIds.add(planItemDefinitionId);
+        terminatePlanItemDefinitions.add(new TerminatePlanItemDefinitionMapping(planItemDefinitionId));
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder terminatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
-        terminatePlanItemDefinitionIds.addAll(planItemDefinitionIds);
+        if (planItemDefinitionIds != null) {
+            for (String planItemDefinitionId : planItemDefinitionIds) {
+                terminatePlanItemDefinitions.add(new TerminatePlanItemDefinitionMapping(planItemDefinitionId));
+            }
+        }
         return this;
     }
 
@@ -126,16 +153,16 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
         return caseInstanceId;
     }
 
-    public Set<String> getActivatePlanItemDefinitionIds() {
-        return activatePlanItemDefinitionIds;
+    public Set<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitions() {
+        return activatePlanItemDefinitions;
     }
 
-    public Set<String> getChangeToAvailableStatePlanItemDefinitionIds() {
-        return changeToAvailableStatePlanItemDefinitionIds;
+    public Set<MoveToAvailablePlanItemDefinitionMapping> getChangeToAvailableStatePlanItemDefinitions() {
+        return changeToAvailableStatePlanItemDefinitions;
     }
 
-    public Set<String> getTerminatePlanItemDefinitionIds() {
-        return terminatePlanItemDefinitionIds;
+    public Set<TerminatePlanItemDefinitionMapping> getTerminatePlanItemDefinitions() {
+        return terminatePlanItemDefinitions;
     }
 
     public Map<String, Object> getCaseVariables() {

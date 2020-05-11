@@ -37,12 +37,14 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.delegate.ActivityWithMigrationContextBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.engine.logging.LogMDC;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobService;
@@ -64,17 +66,19 @@ public class ContinueProcessOperation extends AbstractOperation {
 
     protected boolean forceSynchronousOperation;
     protected boolean inCompensation;
+    protected MigrationContext migrationContext;
 
     public ContinueProcessOperation(CommandContext commandContext, ExecutionEntity execution,
-            boolean forceSynchronousOperation, boolean inCompensation) {
+            boolean forceSynchronousOperation, boolean inCompensation, MigrationContext migrationContext) {
 
         super(commandContext, execution);
         this.forceSynchronousOperation = forceSynchronousOperation;
         this.inCompensation = inCompensation;
+        this.migrationContext = migrationContext;
     }
 
     public ContinueProcessOperation(CommandContext commandContext, ExecutionEntity execution) {
-        this(commandContext, execution, false, false);
+        this(commandContext, execution, false, false, null);
     }
 
     @Override
@@ -302,7 +306,13 @@ public class ContinueProcessOperation extends AbstractOperation {
         }
 
         try {
-            activityBehavior.execute(execution);
+            if (migrationContext != null && activityBehavior instanceof ActivityWithMigrationContextBehavior) {
+                ActivityWithMigrationContextBehavior activityWithMigrationContextBehavior = (ActivityWithMigrationContextBehavior) activityBehavior;
+                activityWithMigrationContextBehavior.execute(execution, migrationContext);
+            } else {
+                activityBehavior.execute(execution);
+            }
+            
         } catch (RuntimeException e) {
             if (LogMDC.isMDCEnabled()) {
                 LogMDC.putMDCExecution(execution);

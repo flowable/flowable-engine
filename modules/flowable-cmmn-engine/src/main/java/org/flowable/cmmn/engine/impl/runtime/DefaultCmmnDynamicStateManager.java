@@ -32,9 +32,9 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
         
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
             .setCaseInstanceId(caseInstanceId)
-            .setActivatePlanItemDefinitionIds(changePlanItemStateBuilder.getActivatePlanItemDefinitionIds())
-            .setTerminatePlanItemDefinitionIds(changePlanItemStateBuilder.getTerminatePlanItemDefinitionIds())
-            .setChangePlanItemToAvailableIds(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitionIds())
+            .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
+            .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
+            .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
             .setCaseVariables(changePlanItemStateBuilder.getCaseVariables())
             .setChildInstanceTaskVariables(changePlanItemStateBuilder.getChildInstanceTaskVariables());
         

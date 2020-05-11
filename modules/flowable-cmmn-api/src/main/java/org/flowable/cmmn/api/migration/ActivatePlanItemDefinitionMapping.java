@@ -17,12 +17,12 @@ import java.util.Map;
 
 public class ActivatePlanItemDefinitionMapping extends PlanItemDefinitionMapping {
 
-    protected String withNewAssignee;
+    protected String newAssignee;
     protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
-    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String withNewAssignee, Map<String, Object> withLocalVariables) {
+    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String newAssignee, Map<String, Object> withLocalVariables) {
         super(planItemDefinitionId);
-        this.withNewAssignee = withNewAssignee;
+        this.newAssignee = newAssignee;
         this.withLocalVariables = withLocalVariables;
     }
     
@@ -30,12 +30,12 @@ public class ActivatePlanItemDefinitionMapping extends PlanItemDefinitionMapping
         super(planItemDefinitionId);
     }
 
-    public String getWithNewAssignee() {
-        return withNewAssignee;
+    public String getNewAssignee() {
+        return newAssignee;
     }
 
-    public void setWithNewAssignee(String withNewAssignee) {
-        this.withNewAssignee = withNewAssignee;
+    public void setNewAssignee(String newAssignee) {
+        this.newAssignee = newAssignee;
     }
 
     public Map<String, Object> getWithLocalVariables() {

@@ -25,9 +25,9 @@ public class PlanItemDefinitionMappingBuilder {
     }
     
     public static ActivatePlanItemDefinitionMapping createActivatePlanItemDefinitionMappingFor(String planItemDefinitionId,
-            String withNewAssignee, Map<String, Object> withLocalVariables) {
+            String newAssignee, Map<String, Object> withLocalVariables) {
         
-        return new ActivatePlanItemDefinitionMapping(planItemDefinitionId, withNewAssignee, withLocalVariables);
+        return new ActivatePlanItemDefinitionMapping(planItemDefinitionId, newAssignee, withLocalVariables);
     }
     
     public static TerminatePlanItemDefinitionMapping createTerminatePlanItemDefinitionMappingFor(String planItemDefinitionId) {

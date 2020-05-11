@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -28,9 +31,9 @@ public class CaseInstanceChangeState {
     protected CaseDefinition caseDefinitionToMigrateTo;
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, List<PlanItemInstanceEntity>> currentPlanItemInstances;
-    protected Set<String> activatePlanItemDefinitionIds;
-    protected Set<String> changePlanItemToAvailableIds;
-    protected Set<String> terminatePlanItemDefinitionIds;
+    protected Set<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitions;
+    protected Set<MoveToAvailablePlanItemDefinitionMapping> changePlanItemToAvailables;
+    protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions;
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
     protected HashMap<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
 
@@ -135,30 +138,30 @@ public class CaseInstanceChangeState {
         return runtimePlanItemInstanceMap;
     }
 
-    public Set<String> getActivatePlanItemDefinitionIds() {
-        return activatePlanItemDefinitionIds;
+    public Set<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitions() {
+        return activatePlanItemDefinitions;
     }
 
-    public CaseInstanceChangeState setActivatePlanItemDefinitionIds(Set<String> activatePlanItemDefinitionIds) {
-        this.activatePlanItemDefinitionIds = activatePlanItemDefinitionIds;
+    public CaseInstanceChangeState setActivatePlanItemDefinitions(Set<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings) {
+        this.activatePlanItemDefinitions = planItemDefinitionMappings;
         return this;
     }
     
-    public Set<String> getChangePlanItemToAvailableIds() {
-        return changePlanItemToAvailableIds;
+    public Set<MoveToAvailablePlanItemDefinitionMapping> getChangePlanItemDefinitionsToAvailable() {
+        return changePlanItemToAvailables;
     }
 
-    public CaseInstanceChangeState setChangePlanItemToAvailableIds(Set<String> changePlanItemToAvailableIds) {
-        this.changePlanItemToAvailableIds = changePlanItemToAvailableIds;
+    public CaseInstanceChangeState setChangePlanItemDefinitionsToAvailable(Set<MoveToAvailablePlanItemDefinitionMapping> planItemDefinitionMappings) {
+        this.changePlanItemToAvailables = planItemDefinitionMappings;
         return this;
     }
 
-    public Set<String> getTerminatePlanItemDefinitionIds() {
-        return terminatePlanItemDefinitionIds;
+    public Set<TerminatePlanItemDefinitionMapping> getTerminatePlanItemDefinitions() {
+        return terminatePlanItemDefinitions;
     }
 
-    public CaseInstanceChangeState setTerminatePlanItemDefinitionIds(Set<String> terminatePlanItemDefinitionIds) {
-        this.terminatePlanItemDefinitionIds = terminatePlanItemDefinitionIds;
+    public CaseInstanceChangeState setTerminatePlanItemDefinitions(Set<TerminatePlanItemDefinitionMapping> planItemDefinitionMappings) {
+        this.terminatePlanItemDefinitions = planItemDefinitionMappings;
         return this;
     }
 

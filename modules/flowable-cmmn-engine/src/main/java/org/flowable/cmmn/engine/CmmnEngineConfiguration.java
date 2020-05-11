@@ -28,11 +28,11 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
-import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -99,6 +99,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -1696,6 +1697,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer());
 
         historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
         historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());

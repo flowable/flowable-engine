@@ -16,10 +16,12 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityWithMigrationContextBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -30,6 +32,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
 
     protected String entryCriterionId;
     protected Map<String, Object> variables;
+    protected MigrationContext migrationContext;
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         super(commandContext, planItemInstanceEntity);
@@ -41,6 +44,13 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
         
         this(commandContext, planItemInstanceEntity, entryCriterionId);
         this.variables = variables;
+    }
+    
+    public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
+            String entryCriterionId, MigrationContext migrationContext) {
+        
+        this(commandContext, planItemInstanceEntity, entryCriterionId);
+        this.migrationContext = migrationContext;
     }
     
     @Override
@@ -66,7 +76,10 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
 
     protected void executeActivityBehavior() {
         CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        if (activityBehavior instanceof ChildTaskActivityBehavior) {
+        if (migrationContext != null && activityBehavior instanceof CmmnActivityWithMigrationContextBehavior) {
+            ((CmmnActivityWithMigrationContextBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, migrationContext);
+            
+        } else if (activityBehavior instanceof ChildTaskActivityBehavior) {
             ((ChildTaskActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, variables);
             
         } else if (activityBehavior instanceof CoreCmmnActivityBehavior) {

@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.test.migration;
 
+import java.util.List;
+
+import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -23,8 +26,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.FlowableCmmnTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-
-import java.util.List;
 
 /**
  * @author Valentin Zickner
@@ -37,6 +38,7 @@ public class AbstractCaseMigrationTest {
     protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnMigrationService cmmnMigrationService;
     protected CmmnTaskService cmmnTaskService;
+    protected CmmnHistoryService cmmnHistoryService;
 
     @BeforeEach
     protected void setUp(CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -45,6 +47,7 @@ public class AbstractCaseMigrationTest {
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
     }
 
     @AfterEach

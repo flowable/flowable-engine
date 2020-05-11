@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.runtime;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
@@ -41,6 +42,16 @@ public interface ChangePlanItemStateBuilder {
      * Activate multiple plan items by definition id.
      */
     ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds);
+    
+    /**
+     * Activate a plan item by definition mapping.
+     */
+    ChangePlanItemStateBuilder activatePlanItemDefinition(ActivatePlanItemDefinitionMapping planItemDefinitionMapping);
+    
+    /**
+     * Activate multiple plan items by definition mapping.
+     */
+    ChangePlanItemStateBuilder activatePlanItemDefinitions(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings);
     
     /**
      * Set a plan item to available state by definition id.

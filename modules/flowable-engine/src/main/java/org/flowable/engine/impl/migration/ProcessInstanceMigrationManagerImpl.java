@@ -414,8 +414,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo,
             document, commandContext);
 
-        LOGGER
-            .debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
+        LOGGER.debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
         ((ExecutionEntity) processInstance).setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Resolve activity executions to migrate");

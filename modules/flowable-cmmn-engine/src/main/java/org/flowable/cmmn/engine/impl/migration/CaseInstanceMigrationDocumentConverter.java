@@ -101,7 +101,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (ActivatePlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
-            mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getWithNewAssignee());
+            mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getNewAssignee());
             mappingsArray.add(mappingNode);
         }
 
@@ -152,7 +152,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     ActivatePlanItemDefinitionMapping activateDefinitionMapping = new ActivatePlanItemDefinitionMapping(planItemDefinitionId);
                     String newAssginee = getJsonProperty(NEW_ASSIGNEE_JSON_PROPERTY, mappingNode);
-                    activateDefinitionMapping.setWithNewAssignee(newAssginee);
+                    activateDefinitionMapping.setNewAssignee(newAssginee);
                     
                     documentBuilder.addActivatePlanItemDefinitionMapping(activateDefinitionMapping);
                 }

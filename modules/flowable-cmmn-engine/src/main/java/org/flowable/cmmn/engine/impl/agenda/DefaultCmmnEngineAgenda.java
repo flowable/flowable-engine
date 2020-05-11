@@ -39,6 +39,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOpe
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
@@ -162,6 +163,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, variables));
     }
     
+    @Override
+    public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, MigrationContext migrationContext) {
+        addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, migrationContext));
+    }
+
     @Override
     public void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new EnablePlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId));

@@ -1139,6 +1139,66 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         assertProcessEnded(processInstance.getId());
     }
+    
+    @Test
+    public void testReceiveTaskToUserTaskMigration() {
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/receive-task-process.bpmn20.xml");
+
+        // Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        // Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("MP")
+                .list();
+
+        assertThat(processDefinitions).hasSize(2);
+
+        // Migrate process
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("receiveTask", "userTask1Id").withNewAssignee("johndoe"))
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
+        assertThat(executionsAfter).hasSize(2); //includes root execution
+        for (Execution execution : executionsAfter) {
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        }
+
+        List<Task> tasksAfter = taskService.createTaskQuery().list();
+        assertThat(tasksAfter.size()).isEqualTo(1);
+        Task taskAfter = tasksAfter.get(0);
+        assertThat(taskAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(taskAfter.getTaskDefinitionKey()).isEqualTo("userTask1Id");
+        assertThat(taskAfter.getAssignee()).isEqualTo("johndoe");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTaskInstancesAfter = historyService.createHistoricTaskInstanceQuery().list();
+            assertThat(historicTaskInstancesAfter.size()).isEqualTo(1);
+            HistoricTaskInstance historicTaskAfter = historicTaskInstancesAfter.get(0);
+            assertThat(historicTaskAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+            assertThat(historicTaskAfter.getTaskDefinitionKey()).isEqualTo("userTask1Id");
+            assertThat(historicTaskAfter.getAssignee()).isEqualTo("johndoe");
+        }
+
+        //The first process version only had one activity, there should be a second activity in the process now
+        taskService.complete(tasksAfter.get(0).getId());
+        tasksAfter = taskService.createTaskQuery().list();
+        assertThat(tasksAfter)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("userTask2Id");
+
+        taskService.complete(tasksAfter.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
 
     @Test
     public void testMigrateActivityFromProcessRootIntoNestedEmbeddedSubProcess() {
