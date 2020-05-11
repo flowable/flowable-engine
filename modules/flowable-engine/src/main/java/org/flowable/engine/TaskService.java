@@ -39,7 +39,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * Service which provides access to {@link Task} and form related operations.
- * 
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  */
@@ -289,7 +289,7 @@ public interface TaskService {
 
     /**
      * Called when the task is successfully executed, and the task form has been submitted.
-     * 
+     *
      * @param taskId
      *            the id of the task to complete, cannot be null.
      * @param formDefinitionId
@@ -304,7 +304,7 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables);
+                              Map<String, Object> variables, Map<String, Object> transientVariables);
 
     /**
      * Called when the task is successfully executed, and the task form has been submitted.

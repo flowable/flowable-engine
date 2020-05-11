@@ -19,9 +19,9 @@ import java.util.Map;
  * @author Ievgenii Bespal
  */
 public class ScopedVariableContainerImpl implements ScopedVariableContainer {
-    private Map<String, Object> variables;
-    private Map<String, Object> variablesLocal;
-    private final boolean isTransient;
+    protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
+    protected final boolean isTransient;
 
     public ScopedVariableContainerImpl(boolean isTransient) {
         this.isTransient = isTransient;

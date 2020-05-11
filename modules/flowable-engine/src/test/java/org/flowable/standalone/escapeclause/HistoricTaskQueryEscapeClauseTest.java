@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -72,25 +73,37 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         Map<String, Object> vars2 = new HashMap<>();
         vars2.put("var1", "Two_");
 
+        ScopedVariableContainerHelper scopedVariableContainerHelperTaskOne = new ScopedVariableContainerHelper();
+        scopedVariableContainerHelperTaskOne.setVariablesLocal(vars1);
+
         task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.setAssignee(task1.getId(), "assignee%");
         taskService.setOwner(task1.getId(), "owner%");
-        taskService.complete(task1.getId(), vars1, true);
+        taskService.complete(task1.getId(), scopedVariableContainerHelperTaskOne);
+
+        ScopedVariableContainerHelper scopedVariableContainerHelperTaskTwo = new ScopedVariableContainerHelper();
+        scopedVariableContainerHelperTaskTwo.setVariablesLocal(vars2);
 
         task2 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.setAssignee(task2.getId(), "assignee_");
         taskService.setOwner(task2.getId(), "owner_");
-        taskService.complete(task2.getId(), vars2, true);
+        taskService.complete(task2.getId(), scopedVariableContainerHelperTaskTwo);
+
+        ScopedVariableContainerHelper scopedVariableContainerHelperTaskThree = new ScopedVariableContainerHelper();
+        scopedVariableContainerHelperTaskThree.setVariablesLocal(vars1);
 
         task3 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
         taskService.setAssignee(task3.getId(), "assignee%");
         taskService.setOwner(task3.getId(), "owner%");
-        taskService.complete(task3.getId(), vars1, true);
+        taskService.complete(task3.getId(), scopedVariableContainerHelperTaskThree);
+
+        ScopedVariableContainerHelper scopedVariableContainerHelperTaskFour = new ScopedVariableContainerHelper();
+        scopedVariableContainerHelperTaskFour.setVariablesLocal(vars2);
 
         task4 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
         taskService.setAssignee(task4.getId(), "assignee_");
         taskService.setOwner(task4.getId(), "owner_");
-        taskService.complete(task4.getId(), vars2, true);
+        taskService.complete(task4.getId(), scopedVariableContainerHelperTaskFour);
 
     }
 

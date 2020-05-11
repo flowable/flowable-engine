@@ -22,6 +22,7 @@ import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -67,7 +68,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, false, commandContext);
+                TaskHelper.completeTask(task, new ScopedVariableContainerHelper(),  commandContext);
             }
         }
 

@@ -239,19 +239,10 @@ public class TaskResource extends TaskBaseResource {
         }
 
         if (actionRequest.getFormDefinitionId() != null) {
-            if (actionRequest.isWithScopedVariables()) {
-                taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
+            taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
                         scopedVariableContainerHelper);
-            } else {
-                taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
-                        scopedVariableContainerHelper.getAllVariables(), scopedVariableContainerHelper.getAllTransientVariables());
-            }
         } else {
-            if (actionRequest.isWithScopedVariables()) {
-                taskService.complete(task.getId(), scopedVariableContainerHelper);
-            } else {
-                taskService.complete(task.getId(), scopedVariableContainerHelper.getAllVariables(), scopedVariableContainerHelper.getAllTransientVariables());
-            }
+            taskService.complete(task.getId(), scopedVariableContainerHelper);
         }
     }
 

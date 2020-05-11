@@ -50,6 +50,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -1118,10 +1119,11 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Complete first task
-        Map<String, Object> taskParams = new HashMap<>();
-        taskParams.put("a", 1);
-        taskParams.put("b", 1);
-        taskService.complete(task.getId(), taskParams, true);
+        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
+        scopedVariableContainerHelper.setVariableLocal("a", 1);
+        scopedVariableContainerHelper.setVariableLocal("b", 1);
+
+        taskService.complete(task.getId(), scopedVariableContainerHelper);
 
         // Verify vars are not stored process instance wide
         assertNull(runtimeService.getVariable(processInstance.getId(), "a"));

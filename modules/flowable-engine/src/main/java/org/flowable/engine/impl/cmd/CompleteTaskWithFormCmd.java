@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -33,6 +34,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
+    protected ScopedVariableContainerHelper scopedVariableContainerHelper;
     protected String formDefinitionId;
     protected String outcome;
     protected Map<String, Object> variables;
@@ -41,9 +43,18 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);
+        this.scopedVariableContainerHelper = new ScopedVariableContainerHelper();
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.variables = variables;
+
+        if (this.variables != null) {
+            this.scopedVariableContainerHelper.setVariables(this.variables);
+        }
+
+        if (this.transientVariables != null) {
+            this.scopedVariableContainerHelper.setTransientVariables(this.transientVariables);
+        }
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
@@ -54,10 +65,22 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+                                   Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
+        scopedVariableContainerHelper.setTransientVariables(transientVariables);
         this.transientVariables = transientVariables;
+    }
+
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
+                                                      ScopedVariableContainerHelper scopedVariableContainerHelper) {
+        super(taskId);
+        this.formDefinitionId = formDefinitionId;
+        this.outcome = outcome;
+        this.variables = scopedVariableContainerHelper.getAllVariables();
+        this.transientVariables = scopedVariableContainerHelper.getAllTransientVariables();
+        this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
+        this.scopedVariableContainerHelper = scopedVariableContainerHelper;
     }
 
     @Override
@@ -92,11 +115,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
-            TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);
-
-        } else {
-            TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
         }
+        TaskHelper.completeTask(task, this.scopedVariableContainerHelper, commandContext);
+
 
         return null;
     }

@@ -68,8 +68,6 @@ import org.flowable.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
-import org.flowable.engine.impl.cmd.CompleteWithScopedVariablesTaskCmd;
-import org.flowable.engine.impl.cmd.CompleteWithScopedVariablesTaskWithFormCmd;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
@@ -208,7 +206,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public void complete(String taskId) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, null));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, (Map<String, Object>) null));
     }
 
     @Override
@@ -228,7 +226,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public void complete(String taskId, ScopedVariableContainerHelper scopedVariableContainerHelper) {
-        commandExecutor.execute(new CompleteWithScopedVariablesTaskCmd(taskId, scopedVariableContainerHelper));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, scopedVariableContainerHelper));
     }
 
     @Override
@@ -242,7 +240,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
-
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
@@ -253,7 +250,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
                                      ScopedVariableContainerHelper scopedVariableContainerHelper) {
-        commandExecutor.execute(new CompleteWithScopedVariablesTaskWithFormCmd(taskId, formDefinitionId, outcome, scopedVariableContainerHelper));
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, scopedVariableContainerHelper));
     }
 
     @Override

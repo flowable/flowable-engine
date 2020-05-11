@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -68,7 +69,9 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
             assertEquals("approval", task.getCategory());
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("outcome", "approve");
-            taskService.complete(task.getId(), taskVariables, true);
+            ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
+            scopedVariableContainerHelper.setVariablesLocal(taskVariables);
+            taskService.complete(task.getId(), scopedVariableContainerHelper);
         }
 
         // After completion, the task category should be changed in the script listener working on the delegate task

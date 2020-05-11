@@ -22,8 +22,8 @@ import org.flowable.common.engine.api.variable.ScopedVariableContainerImpl;
  * @author Ievgenii Bespal
  */
 public class ScopedVariableContainerHelper {
-    private final ScopedVariableContainer variables;
-    private final ScopedVariableContainer transientVariables;
+    protected final ScopedVariableContainer variables;
+    protected final ScopedVariableContainer transientVariables;
 
     public ScopedVariableContainerHelper() {
         this.variables = new ScopedVariableContainerImpl(false);
@@ -31,19 +31,19 @@ public class ScopedVariableContainerHelper {
     }
 
     public void setVariables(Map<String, Object> variables) {
-        this.variables.setVariables(new HashMap<>(variables), false);
+        this.variables.setVariables(variables, false);
     }
 
     public void setVariablesLocal(Map<String, Object> variablesLocal) {
-        this.variables.setVariables(new HashMap<>(variablesLocal), true);
+        this.variables.setVariables(variablesLocal, true);
     }
 
     public void setTransientVariables(Map<String, Object> transientVariables) {
-        this.transientVariables.setVariables(new HashMap<>(transientVariables), false);
+        this.transientVariables.setVariables(transientVariables, false);
     }
 
     public void setTransientVariablesLocal(Map<String, Object> transientVariablesLocal) {
-        this.transientVariables.setVariables(new HashMap<>(transientVariablesLocal), true);
+        this.transientVariables.setVariables(transientVariablesLocal, true);
     }
 
     public void setVariable(String variableName, Object variableValue) {

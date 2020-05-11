@@ -56,84 +56,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TaskHelper {
 
-    public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables,
-            Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
-
-        // Task complete logic
-
-        if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
-            throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
-        }
-
-        if (variables != null) {
-            if (localScope) {
-                taskEntity.setVariablesLocal(variables);
-
-            } else if (taskEntity.getExecutionId() != null) {
-                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
-                if (execution != null) {
-                    execution.setVariables(variables);
-                }
-
-            } else {
-                taskEntity.setVariables(variables);
-            }
-        }
-
-        if (transientVariables != null) {
-            if (localScope) {
-                taskEntity.setTransientVariablesLocal(transientVariables);
-            } else {
-                taskEntity.setTransientVariables(transientVariables);
-            }
-        }
-
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
-        
-        if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
-            processEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
-        }
-
-        logUserTaskCompleted(taskEntity);
-
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            if (variables != null) {
-                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
-                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope));
-            } else {
-                eventDispatcher.dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
-            }
-        }
-        
-        if (processEngineConfiguration.isLoggingSessionEnabled() && taskEntity.getExecutionId() != null) {
-            String taskLabel = null;
-            if (StringUtils.isNotEmpty(taskEntity.getName())) {
-                taskLabel = taskEntity.getName();
-            } else {
-                taskLabel = taskEntity.getId();
-            }
-        
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
-            if (execution != null) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE, 
-                                "User task '" + taskLabel + "' completed", taskEntity, execution);
-            }
-        }
-
-        deleteTask(taskEntity, null, false, true, true);
-
-        // Continue process (if not a standalone task)
-        if (taskEntity.getExecutionId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
-            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
-        }
-    }
-
-    public static void completeTaskWithScopedVariables(TaskEntity taskEntity, ScopedVariableContainerHelper scopedVariableContainerHelper,
-                                                       CommandContext commandContext) {
+    public static void completeTask(TaskEntity taskEntity, ScopedVariableContainerHelper scopedVariableContainerHelper,
+                                    CommandContext commandContext) {
         // Task complete logic
 
         Map<String, Object> variables = null;
@@ -156,7 +80,7 @@ public class TaskHelper {
             } else if (taskEntity.getExecutionId() != null) {
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
                 if (execution != null) {
-                    execution.setVariables(scopedVariableContainerHelper.getVariables());
+                    execution.setVariables(scopedVariableContainerHelper.getAllVariables());
                 }
 
             } else {
@@ -172,7 +96,7 @@ public class TaskHelper {
                     taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariablesLocal());
                 }
             } else {
-                taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariablesLocal());
+                taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariables());
             }
         }
 
