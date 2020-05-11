@@ -12,11 +12,11 @@
  */
 package org.flowable.rest.service.api.management;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,10 +30,15 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -50,35 +55,45 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     public void testGetJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         Calendar now = Calendar.getInstance();
         now.set(Calendar.MILLISECOND, 0);
         processEngineConfiguration.getClock().setCurrentTime(now.getTime());
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId())), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(timerJob.getId(), responseNode.get("id").textValue());
-        assertEquals(timerJob.getExceptionMessage(), responseNode.get("exceptionMessage").textValue());
-        assertEquals(timerJob.getExecutionId(), responseNode.get("executionId").textValue());
-        assertEquals(timerJob.getProcessDefinitionId(), responseNode.get("processDefinitionId").textValue());
-        assertEquals(timerJob.getProcessInstanceId(), responseNode.get("processInstanceId").textValue());
-        assertEquals("escalationTimer", responseNode.get("elementId").textValue());
-        assertEquals("Escalation", responseNode.get("elementName").textValue());
-        assertEquals(timerJob.getRetries(), responseNode.get("retries").intValue());
-        assertEquals(timerJob.getDuedate(), getDateFromISOString(responseNode.get("dueDate").textValue()));
-        assertEquals("", responseNode.get("tenantId").textValue());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + timerJob.getId() + "',"
+                        + "exceptionMessage: " + timerJob.getExceptionMessage() + ","
+                        + "executionId: '" + timerJob.getExecutionId() + "',"
+                        + "processDefinitionId: '" + timerJob.getProcessDefinitionId() + "',"
+                        + "processInstanceId: '" + timerJob.getProcessInstanceId() + "',"
+                        + "elementId: 'escalationTimer',"
+                        + "elementName: 'Escalation',"
+                        + "retries: " + timerJob.getRetries() + ","
+                        + "dueDate: " + new TextNode(getISODateStringWithTZ(timerJob.getDuedate())) + ","
+                        + "tenantId: ''"
+                        + "}");
 
         // Set tenant on deployment
         managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
 
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId())), HttpStatus.SC_OK);
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId())),
+                HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("myTenant", responseNode.get("tenantId").textValue());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "tenantId: 'myTenant'"
+                        + "}");
     }
 
     /**
@@ -98,7 +113,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     public void testExecuteJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         managementService.moveTimerToExecutableJob(timerJob.getId());
 
@@ -111,7 +126,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         // Job should be executed
-        assertNull(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
     }
 
     /**
@@ -122,7 +137,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     public void testExecuteUnexistingJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "execute");
@@ -141,7 +156,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     public void testIllegalActionOnJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "unexistinAction");
@@ -160,14 +175,14 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     public void testDeleteJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
         // Job should be deleted
-        assertNull(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
     }
 
     /**
@@ -178,5 +193,12 @@ public class JobResourceTest extends BaseSpringRestTestCase {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB, "unexistingjob"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 }
