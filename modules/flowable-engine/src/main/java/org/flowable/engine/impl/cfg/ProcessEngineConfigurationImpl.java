@@ -88,7 +88,9 @@ import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
@@ -282,8 +284,6 @@ import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
@@ -311,7 +311,6 @@ import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
@@ -325,7 +324,6 @@ import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDat
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisCommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisDeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventLogEntryDataManager;
@@ -462,7 +460,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // DATA MANAGERS /////////////////////////////////////////////////////////////
 
     protected AttachmentDataManager attachmentDataManager;
-    protected ByteArrayDataManager byteArrayDataManager;
     protected CommentDataManager commentDataManager;
     protected DeploymentDataManager deploymentDataManager;
     protected EventLogEntryDataManager eventLogEntryDataManager;
@@ -479,7 +476,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
     protected AttachmentEntityManager attachmentEntityManager;
-    protected ByteArrayEntityManager byteArrayEntityManager;
     protected CommentEntityManager commentEntityManager;
     protected DeploymentEntityManager deploymentEntityManager;
     protected EventLogEntryEntityManager eventLogEntryEntityManager;
@@ -1249,9 +1245,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (attachmentDataManager == null) {
             attachmentDataManager = new MybatisAttachmentDataManager(this);
         }
-        if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager(this);
-        }
         if (commentDataManager == null) {
             commentDataManager = new MybatisCommentDataManager(this);
         }
@@ -1300,9 +1293,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         super.initEntityManagers();
         if (attachmentEntityManager == null) {
             attachmentEntityManager = new AttachmentEntityManagerImpl(this, attachmentDataManager);
-        }
-        if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(this, byteArrayDataManager);
         }
         if (commentEntityManager == null) {
             commentEntityManager = new CommentEntityManagerImpl(this, commentDataManager);
@@ -3830,10 +3820,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
     public ProcessEngineConfigurationImpl setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
         this.byteArrayDataManager = byteArrayDataManager;
         return this;
@@ -3960,10 +3946,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setAttachmentEntityManager(AttachmentEntityManager attachmentEntityManager) {
         this.attachmentEntityManager = attachmentEntityManager;
         return this;
-    }
-
-    public ByteArrayEntityManager getByteArrayEntityManager() {
-        return byteArrayEntityManager;
     }
 
     public ProcessEngineConfigurationImpl setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {

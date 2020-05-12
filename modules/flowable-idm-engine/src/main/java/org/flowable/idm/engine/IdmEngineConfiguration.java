@@ -102,7 +102,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
-    protected ByteArrayDataManager byteArrayDataManager;
+    protected ByteArrayDataManager idmByteArrayDataManager;
     protected GroupDataManager groupDataManager;
     protected IdentityInfoDataManager identityInfoDataManager;
     protected MembershipDataManager membershipDataManager;
@@ -113,7 +113,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     protected PrivilegeMappingDataManager privilegeMappingDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    protected ByteArrayEntityManager byteArrayEntityManager;
+    protected ByteArrayEntityManager idmByteArrayEntityManager;
     protected GroupEntityManager groupEntityManager;
     protected IdentityInfoEntityManager identityInfoEntityManager;
     protected MembershipEntityManager membershipEntityManager;
@@ -231,8 +231,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initDataManagers() {
         super.initDataManagers();
-        if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager(this);
+        if (idmByteArrayDataManager == null) {
+            idmByteArrayDataManager = new MybatisByteArrayDataManager(this);
         }
         if (groupDataManager == null) {
             groupDataManager = new MybatisGroupDataManager(this);
@@ -263,8 +263,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initEntityManagers() {
         super.initEntityManagers();
-        if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(this, byteArrayDataManager);
+        if (idmByteArrayEntityManager == null) {
+            idmByteArrayEntityManager = new ByteArrayEntityManagerImpl(this, idmByteArrayDataManager);
         }
         if (groupEntityManager == null) {
             groupEntityManager = new GroupEntityManagerImpl(this, groupDataManager);
@@ -539,12 +539,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
+    public ByteArrayDataManager getIdmByteArrayDataManager() {
+        return idmByteArrayDataManager;
     }
 
-    public IdmEngineConfiguration setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+    public IdmEngineConfiguration setIdmByteArrayDataManager(ByteArrayDataManager idmByteArrayDataManager) {
+        this.idmByteArrayDataManager = idmByteArrayDataManager;
         return this;
     }
 
@@ -620,12 +620,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ByteArrayEntityManager getByteArrayEntityManager() {
-        return byteArrayEntityManager;
+    public ByteArrayEntityManager getIdmByteArrayEntityManager() {
+        return idmByteArrayEntityManager;
     }
 
-    public IdmEngineConfiguration setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
-        this.byteArrayEntityManager = byteArrayEntityManager;
+    public IdmEngineConfiguration setIdmByteArrayEntityManager(ByteArrayEntityManager idmByteArrayEntityManager) {
+        this.idmByteArrayEntityManager = idmByteArrayEntityManager;
         return this;
     }
 

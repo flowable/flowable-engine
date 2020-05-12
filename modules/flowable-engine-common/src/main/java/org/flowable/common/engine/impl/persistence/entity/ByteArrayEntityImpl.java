@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class ByteArrayEntityImpl extends AbstractBpmnEngineEntity implements ByteArrayEntity, Serializable {
+public class ByteArrayEntityImpl extends AbstractEntity implements ByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,6 +32,11 @@ public class ByteArrayEntityImpl extends AbstractBpmnEngineEntity implements Byt
 
     public ByteArrayEntityImpl() {
 
+    }
+
+    @Override
+    public String getIdPrefix() {
+        return "";
     }
 
     @Override

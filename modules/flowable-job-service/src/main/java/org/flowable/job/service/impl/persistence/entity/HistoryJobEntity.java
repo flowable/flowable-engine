@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.HistoryJob;
 
@@ -26,15 +27,15 @@ public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, Has
 
     void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
 
-    JobByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
+    ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
 
     void setCreateTime(Date createTime);
 
-    void setAdvancedJobHandlerConfigurationByteArrayRef(JobByteArrayRef configurationByteArrayRef);
+    void setAdvancedJobHandlerConfigurationByteArrayRef(ByteArrayRef configurationByteArrayRef);
 
-    void setCustomValuesByteArrayRef(JobByteArrayRef customValuesByteArrayRef);
+    void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef);
 
-    void setExceptionByteArrayRef(JobByteArrayRef exceptionByteArrayRef);
+    void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef);
     
     void setScopeType(String scopeType);
 

@@ -11,23 +11,26 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
-
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 /**
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
 public class ByteArrayEntityManagerImpl
-    extends AbstractProcessEngineEntityManager<ByteArrayEntity, ByteArrayDataManager>
+    extends AbstractEntityManager<ByteArrayEntity, ByteArrayDataManager>
     implements ByteArrayEntityManager {
 
-    public ByteArrayEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ByteArrayDataManager byteArrayDataManager) {
-        super(processEngineConfiguration, byteArrayDataManager);
+    protected Supplier<FlowableEventDispatcher> eventDispatcherSupplier;
+
+    public ByteArrayEntityManagerImpl(ByteArrayDataManager byteArrayDataManager, Supplier<FlowableEventDispatcher> eventDispatcherSupplier) {
+        super(byteArrayDataManager);
+        this.eventDispatcherSupplier = eventDispatcherSupplier;
     }
 
     @Override
@@ -40,4 +43,12 @@ public class ByteArrayEntityManagerImpl
         dataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
     }
 
+    @Override
+    protected FlowableEventDispatcher getEventDispatcher() {
+        return eventDispatcherSupplier.get();
+    }
+
+    public void setEventDispatcherSupplier(Supplier<FlowableEventDispatcher> eventDispatcherSupplier) {
+        this.eventDispatcherSupplier = eventDispatcherSupplier;
+    }
 }

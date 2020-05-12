@@ -10,28 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity.data;
 
-import org.flowable.common.engine.impl.db.HasRevision;
-import org.flowable.common.engine.impl.persistence.entity.Entity;
+import java.util.List;
+
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 
 /**
- * @author Tom Baeyens
- * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public interface ByteArrayEntity extends Entity, HasRevision {
+public interface ByteArrayDataManager extends DataManager<ByteArrayEntity> {
 
-    byte[] getBytes();
+    List<ByteArrayEntity> findAll();
 
-    String getName();
-
-    void setName(String name);
-
-    String getDeploymentId();
-
-    void setDeploymentId(String deploymentId);
-
-    void setBytes(byte[] bytes);
+    void deleteByteArrayNoRevisionCheck(String byteArrayEntityId);
 
 }

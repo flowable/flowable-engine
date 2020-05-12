@@ -10,39 +10,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.job.service.impl.persistence.entity.data.impl;
+package org.flowable.common.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
 import org.flowable.common.engine.impl.db.AbstractDataManager;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntity;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisJobByteArrayDataManager extends AbstractDataManager<JobByteArrayEntity> implements JobByteArrayDataManager {
+public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEntity> implements ByteArrayDataManager {
 
     @Override
-    public JobByteArrayEntity create() {
-        return new JobByteArrayEntityImpl();
+    public ByteArrayEntity create() {
+        return new ByteArrayEntityImpl();
     }
 
     @Override
-    public Class<? extends JobByteArrayEntity> getManagedEntityClass() {
-        return JobByteArrayEntityImpl.class;
+    public Class<? extends ByteArrayEntity> getManagedEntityClass() {
+        return ByteArrayEntityImpl.class;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<JobByteArrayEntity> findAll() {
-        return getDbSqlSession().selectList("selectJobByteArrays");
+    public List<ByteArrayEntity> findAll() {
+        return getDbSqlSession().selectList("selectByteArrays");
     }
 
     @Override
     public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
-        getDbSqlSession().delete("deleteJobByteArrayNoRevisionCheck", byteArrayEntityId, JobByteArrayEntityImpl.class);
+        getDbSqlSession().delete("deleteByteArrayNoRevisionCheck", byteArrayEntityId, ByteArrayEntityImpl.class);
     }
 
 }

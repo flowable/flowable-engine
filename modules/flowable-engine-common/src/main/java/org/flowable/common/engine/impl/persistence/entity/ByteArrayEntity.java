@@ -10,20 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.variable.service.impl.persistence.entity.data;
+package org.flowable.common.engine.impl.persistence.entity;
 
-import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntity;
+import org.flowable.common.engine.impl.db.HasRevision;
 
 /**
+ * @author Tom Baeyens
+ * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public interface VariableByteArrayDataManager extends DataManager<VariableByteArrayEntity> {
+public interface ByteArrayEntity extends Entity, HasRevision {
 
-    List<VariableByteArrayEntity> findAll();
+    byte[] getBytes();
 
-    void deleteByteArrayNoRevisionCheck(String byteArrayEntityId);
+    String getName();
+
+    void setName(String name);
+
+    String getDeploymentId();
+
+    void setDeploymentId(String deploymentId);
+
+    void setBytes(byte[] bytes);
 
 }

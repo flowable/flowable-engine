@@ -14,16 +14,12 @@ package org.flowable.batch.service;
 
 import org.flowable.batch.api.BatchService;
 import org.flowable.batch.service.impl.BatchServiceImpl;
-import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityManager;
-import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityManagerImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityManager;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityManagerImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityManager;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityManagerImpl;
-import org.flowable.batch.service.impl.persistence.entity.data.BatchByteArrayDataManager;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchDataManager;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
-import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatchByteArrayDataManager;
 import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatchDataManager;
 import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatchPartDataManager;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
@@ -44,13 +40,11 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
 
     protected BatchDataManager batchDataManager;
     protected BatchPartDataManager batchPartDataManager;
-    protected BatchByteArrayDataManager batchByteArrayDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     
     protected BatchEntityManager batchEntityManager;
     protected BatchPartEntityManager batchPartEntityManager;
-    protected BatchByteArrayEntityManager batchByteArrayEntityManager;
     
     protected ObjectMapper objectMapper;
     
@@ -76,9 +70,6 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
         if (batchPartDataManager == null) {
             batchPartDataManager = new MybatisBatchPartDataManager();
         }
-        if (batchByteArrayDataManager == null) {
-            batchByteArrayDataManager = new MybatisBatchByteArrayDataManager();
-        }
     }
 
     public void initEntityManagers() {
@@ -87,9 +78,6 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (batchPartEntityManager == null) {
             batchPartEntityManager = new BatchPartEntityManagerImpl(this, batchPartDataManager);
-        }
-        if (batchByteArrayEntityManager == null) {
-            batchByteArrayEntityManager = new BatchByteArrayEntityManagerImpl(this, batchByteArrayDataManager);
         }
     }
 
@@ -127,15 +115,6 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public BatchByteArrayDataManager getBatchByteArrayDataManager() {
-        return batchByteArrayDataManager;
-    }
-
-    public BatchServiceConfiguration setBatchByteArrayDataManager(BatchByteArrayDataManager batchByteArrayDataManager) {
-        this.batchByteArrayDataManager = batchByteArrayDataManager;
-        return this;
-    }
-
     public BatchEntityManager getBatchEntityManager() {
         return batchEntityManager;
     }
@@ -151,15 +130,6 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
 
     public BatchServiceConfiguration setBatchPartEntityManager(BatchPartEntityManager batchPartEntityManager) {
         this.batchPartEntityManager = batchPartEntityManager;
-        return this;
-    }
-
-    public BatchByteArrayEntityManager getBatchByteArrayEntityManager() {
-        return batchByteArrayEntityManager;
-    }
-
-    public BatchServiceConfiguration setBatchByteArrayEntityManager(BatchByteArrayEntityManager batchByteArrayEntityManager) {
-        this.batchByteArrayEntityManager = batchByteArrayEntityManager;
         return this;
     }
 

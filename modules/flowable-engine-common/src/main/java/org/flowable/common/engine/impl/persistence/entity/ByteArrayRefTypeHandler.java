@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.variable.service.impl.persistence;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -23,51 +23,50 @@ import org.apache.ibatis.type.TypeReference;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 
 /**
- * MyBatis TypeHandler for {@link VariableByteArrayRef}.
+ * MyBatis TypeHandler for {@link ByteArrayRef}.
  * 
  * @author Marcus Klimstra (CGI)
  */
-public class VariableByteArrayRefTypeHandler extends TypeReference<VariableByteArrayRef> implements TypeHandler<VariableByteArrayRef> {
+public class ByteArrayRefTypeHandler extends TypeReference<ByteArrayRef> implements TypeHandler<ByteArrayRef> {
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, VariableByteArrayRef parameter, JdbcType jdbcType) throws SQLException {
+    public void setParameter(PreparedStatement ps, int i, ByteArrayRef parameter, JdbcType jdbcType) throws SQLException {
         ps.setString(i, getValueToSet(parameter));
     }
 
-    private String getValueToSet(VariableByteArrayRef parameter) {
+    private String getValueToSet(ByteArrayRef parameter) {
         if (parameter == null) {
-            // Note that this should not happen: VariableByteArrayRefs should always be initialized.
+            // Note that this should not happen: ByteArrayRefs should always be initialized.
             return null;
         }
         return parameter.getId();
     }
 
     @Override
-    public VariableByteArrayRef getResult(ResultSet rs, String columnName) throws SQLException {
+    public ByteArrayRef getResult(ResultSet rs, String columnName) throws SQLException {
         String id = rs.getString(columnName);
         return createVariableByteArrayRef(id);
     }
 
     @Override
-    public VariableByteArrayRef getResult(ResultSet rs, int columnIndex) throws SQLException {
+    public ByteArrayRef getResult(ResultSet rs, int columnIndex) throws SQLException {
         String id = rs.getString(columnIndex);
         return createVariableByteArrayRef(id);
     }
 
     @Override
-    public VariableByteArrayRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public ByteArrayRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String id = cs.getString(columnIndex);
         return createVariableByteArrayRef(id);
     }
 
-    protected VariableByteArrayRef createVariableByteArrayRef(String id) {
+    protected ByteArrayRef createVariableByteArrayRef(String id) {
         if (id == null) {
             return null;
         }
-        return new VariableByteArrayRef(id, getCommandExecutor());
+        return new ByteArrayRef(id, getCommandExecutor());
     }
 
 

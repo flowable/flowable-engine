@@ -29,6 +29,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.history.HistoricActivityInstance;

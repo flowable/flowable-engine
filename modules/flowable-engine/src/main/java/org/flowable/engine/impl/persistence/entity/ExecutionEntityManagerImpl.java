@@ -34,6 +34,8 @@ import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -68,7 +70,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -868,7 +869,7 @@ public class ExecutionEntityManagerImpl
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             if (!executionVariables.isEmpty()) {
                 
-                ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+                List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
                 for (VariableInstance variableInstance : executionVariables) {
                     if (variableInstance instanceof VariableInstanceEntity) {
                         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
@@ -888,7 +889,7 @@ public class ExecutionEntityManagerImpl
                 }
                 
                 // First byte arrays that reference variable, then variables in bulk
-                for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                for (ByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
                     getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
                 }
                 

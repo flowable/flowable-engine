@@ -13,13 +13,13 @@
 package org.flowable.batch.service.impl.util;
 
 import org.flowable.batch.service.BatchServiceConfiguration;
-import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityManager;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityManager;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityManager;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 
 public class CommandContextUtil {
 
@@ -59,12 +59,12 @@ public class CommandContextUtil {
         return getBatchServiceConfiguration(commandContext).getBatchPartEntityManager();
     }
     
-    public static BatchByteArrayEntityManager getBatchByteArrayEntityManager() {
+    public static ByteArrayEntityManager getBatchByteArrayEntityManager() {
         return getBatchByteArrayEntityManager(getCommandContext());
     }
     
-    public static BatchByteArrayEntityManager getBatchByteArrayEntityManager(CommandContext commandContext) {
-        return getBatchServiceConfiguration(commandContext).getBatchByteArrayEntityManager();
+    public static ByteArrayEntityManager getBatchByteArrayEntityManager(CommandContext commandContext) {
+        return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
     }
     
     public static CommandContext getCommandContext() {

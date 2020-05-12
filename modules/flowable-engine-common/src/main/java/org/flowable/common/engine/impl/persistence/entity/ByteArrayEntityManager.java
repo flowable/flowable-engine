@@ -10,21 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.batch.service.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
-
-public interface BatchByteArrayEntityManager extends EntityManager<BatchByteArrayEntity> {
+/**
+ * @author Joram Barrez
+ */
+public interface ByteArrayEntityManager extends EntityManager<ByteArrayEntity> {
 
     /**
-     * Returns all {@link BatchByteArrayEntity}.
+     * Returns all {@link ByteArrayEntity}.
      */
-    List<BatchByteArrayEntity> findAll();
+    List<ByteArrayEntity> findAll();
 
     /**
-     * Deletes the {@link BatchByteArrayEntity} with the given id from the database. Important: this operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this method
+     * Deletes the {@link ByteArrayEntity} with the given id from the database. Important: this operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this method
      * only in conjunction with an entity that has optimistic locking!.
      */
     void deleteByteArrayById(String byteArrayEntityId);

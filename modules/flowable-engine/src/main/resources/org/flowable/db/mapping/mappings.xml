@@ -8,25 +8,22 @@
         <setting name="lazyLoadingEnabled" value="false" />
     </settings>
     <typeAliases>
-        <typeAlias type="org.flowable.engine.impl.persistence.ByteArrayRefTypeHandler" alias="ByteArrayRefTypeHandler" />
-        <typeAlias type="org.flowable.variable.service.impl.persistence.VariableByteArrayRefTypeHandler" alias="VariableByteArrayRefTypeHandler" />
-        <typeAlias type="org.flowable.job.service.impl.persistence.JobByteArrayRefTypeHandler" alias="JobByteArrayRefTypeHandler" />
-        <typeAlias type="org.flowable.batch.service.impl.persistence.BatchByteArrayRefTypeHandler" alias="BatchByteArrayRefTypeHandler" />
+        <typeAlias type="org.flowable.common.engine.impl.persistence.entity.ByteArrayRefTypeHandler" alias="ByteArrayRefTypeHandler" />
+        <typeAlias type="org.flowable.common.engine.impl.persistence.entity.ByteArrayRefTypeHandler" alias="VariableByteArrayRefTypeHandler" />
+        <typeAlias type="org.flowable.common.engine.impl.persistence.entity.ByteArrayRefTypeHandler" alias="JobByteArrayRefTypeHandler" />
+        <typeAlias type="org.flowable.common.engine.impl.persistence.entity.ByteArrayRefTypeHandler" alias="BatchByteArrayRefTypeHandler" />
     </typeAliases>
     <typeHandlers>
-        <typeHandler handler="ByteArrayRefTypeHandler" javaType="org.flowable.engine.impl.persistence.entity.ByteArrayRef" jdbcType="VARCHAR" />
-        <typeHandler handler="VariableByteArrayRefTypeHandler" javaType="org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef" jdbcType="VARCHAR" />
-        <typeHandler handler="JobByteArrayRefTypeHandler" javaType="org.flowable.job.service.impl.persistence.entity.JobByteArrayRef" jdbcType="VARCHAR" />
-        <typeHandler handler="BatchByteArrayRefTypeHandler" javaType="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayRef" jdbcType="VARCHAR" />
+        <typeHandler handler="ByteArrayRefTypeHandler" javaType="org.flowable.common.engine.impl.persistence.entity.ByteArrayRef" jdbcType="VARCHAR" />
+        <typeHandler handler="VariableByteArrayRefTypeHandler" javaType="org.flowable.common.engine.impl.persistence.entity.ByteArrayRef" jdbcType="VARCHAR" />
+        <typeHandler handler="JobByteArrayRefTypeHandler" javaType="org.flowable.common.engine.impl.persistence.entity.ByteArrayRef" jdbcType="VARCHAR" />
+        <typeHandler handler="BatchByteArrayRefTypeHandler" javaType="org.flowable.common.engine.impl.persistence.entity.ByteArrayRef" jdbcType="VARCHAR" />
     </typeHandlers>
 
     <mappers>
         <mapper resource="org/flowable/db/mapping/common.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
-        <mapper resource="org/flowable/db/mapping/entity/ByteArray.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
-        <mapper resource="org/flowable/variable/service/db/mapping/entity/ByteArray.xml" />
-        <mapper resource="org/flowable/job/service/db/mapping/entity/ByteArray.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Comment.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Deployment.xml" />
@@ -48,6 +45,7 @@
         <mapper resource="org/flowable/db/mapping/entity/ProcessDefinition.xml" />
         <mapper resource="org/flowable/db/mapping/entity/ProcessDefinitionInfo.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+        <mapper resource="org/flowable/common/db/mapping/entity/ByteArray.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Resource.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/ExternalWorkerJob.xml" />
@@ -60,7 +58,6 @@
         <mapper resource="org/flowable/db/mapping/entity/EventLogEntry.xml" />
         <mapper resource="org/flowable/batch/service/db/mapping/entity/Batch.xml" />
         <mapper resource="org/flowable/batch/service/db/mapping/entity/BatchPart.xml" />
-        <mapper resource="org/flowable/batch/service/db/mapping/entity/ByteArray.xml" />
     </mappers>
 
 </configuration>

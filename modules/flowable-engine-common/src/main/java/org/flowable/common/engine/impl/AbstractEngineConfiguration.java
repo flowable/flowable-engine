@@ -84,10 +84,14 @@ import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -313,10 +317,12 @@ public abstract class AbstractEngineConfiguration {
     // DATA MANAGERS //////////////////////////////////////////////////////////////////
 
     protected PropertyDataManager propertyDataManager;
+    protected ByteArrayDataManager byteArrayDataManager;
 
     // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
 
     protected PropertyEntityManager propertyEntityManager;
+    protected ByteArrayEntityManager byteArrayEntityManager;
 
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
@@ -662,6 +668,10 @@ public abstract class AbstractEngineConfiguration {
         if (propertyDataManager == null) {
             propertyDataManager = new MybatisPropertyDataManager();
         }
+
+        if (byteArrayDataManager == null) {
+            byteArrayDataManager = new MybatisByteArrayDataManager();
+        }
     }
 
     // Entity managers //////////////////////////////////////////////////////////
@@ -669,6 +679,10 @@ public abstract class AbstractEngineConfiguration {
     public void initEntityManagers() {
         if (propertyEntityManager == null) {
             propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
+        }
+
+        if (byteArrayEntityManager == null) {
+            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, this::getEventDispatcher);
         }
     }
 
@@ -1823,6 +1837,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
         this.propertyEntityManager = propertyEntityManager;
+        return this;
+    }
+
+    public ByteArrayDataManager getByteArrayDataManager() {
+        return byteArrayDataManager;
+    }
+
+    public AbstractEngineConfiguration setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
+        this.byteArrayDataManager = byteArrayDataManager;
+        return this;
+    }
+
+    public ByteArrayEntityManager getByteArrayEntityManager() {
+        return byteArrayEntityManager;
+    }
+
+    public AbstractEngineConfiguration setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
+        this.byteArrayEntityManager = byteArrayEntityManager;
         return this;
     }
 

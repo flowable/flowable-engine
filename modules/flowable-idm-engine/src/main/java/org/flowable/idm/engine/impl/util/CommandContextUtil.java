@@ -57,12 +57,12 @@ public class CommandContextUtil {
         return getIdmEngineConfiguration(commandContext).getTableDataManager();
     }
     
-    public static ByteArrayEntityManager getByteArrayEntityManager() {
-        return getByteArrayEntityManager(getCommandContext());
+    public static ByteArrayEntityManager getIdmByteArrayEntityManager() {
+        return getIdmByteArrayEntityManager(getCommandContext());
     }
     
-    public static ByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
-        return getIdmEngineConfiguration(commandContext).getByteArrayEntityManager();
+    public static ByteArrayEntityManager getIdmByteArrayEntityManager(CommandContext commandContext) {
+        return getIdmEngineConfiguration(commandContext).getIdmByteArrayEntityManager();
     }
     
     public static PropertyEntityManager getPropertyEntityManager() {

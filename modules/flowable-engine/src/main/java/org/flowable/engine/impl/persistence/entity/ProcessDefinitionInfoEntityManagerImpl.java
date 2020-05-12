@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 
@@ -52,7 +53,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
     public void updateInfoJson(String id, byte[] json) {
         ProcessDefinitionInfoEntity processDefinitionInfo = findById(id);
         if (processDefinitionInfo != null) {
-            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
+            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId(), null);
             ref.setValue("json", json);
 
             if (processDefinitionInfo.getInfoJsonId() == null) {
@@ -66,7 +67,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
     @Override
     public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
         if (processDefinitionInfo.getInfoJsonId() != null) {
-            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
+            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId(), null);
             ref.delete();
         }
     }
@@ -78,7 +79,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
 
     @Override
     public byte[] findInfoJsonById(String infoJsonId) {
-        ByteArrayRef ref = new ByteArrayRef(infoJsonId);
+        ByteArrayRef ref = new ByteArrayRef(infoJsonId, null);
         return ref.getBytes();
     }
 }

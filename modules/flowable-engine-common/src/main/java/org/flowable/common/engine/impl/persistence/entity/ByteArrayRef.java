@@ -10,35 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.job.service.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
 /**
  * <p>
- * Encapsulates the logic for transparently working with {@link JobByteArrayEntity} .
+ * Encapsulates the logic for transparently working with {@link ByteArrayEntity} .
  * </p>
  *
  * @author Marcus Klimstra (CGI)
  */
-public class JobByteArrayRef implements Serializable {
+public class ByteArrayRef implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    protected CommandExecutor commandExecutor;
+
     private String id;
     private String name;
-    private JobByteArrayEntity entity;
+    private ByteArrayEntity entity;
     protected boolean deleted;
 
-    public JobByteArrayRef() {
+    public ByteArrayRef() {
     }
 
     // Only intended to be used by ByteArrayRefTypeHandler
-    public JobByteArrayRef(String id) {
+    public ByteArrayRef(String id, CommandExecutor commandExecutor) {
         this.id = id;
+        this.commandExecutor = commandExecutor;
     }
 
     public String getId() {
@@ -90,20 +95,26 @@ public class JobByteArrayRef implements Serializable {
     private void setBytes(byte[] bytes) {
         if (id == null) {
             if (bytes != null) {
-                JobByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getJobByteArrayEntityManager();
+                ByteArrayEntityManager byteArrayEntityManager = Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager();
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
                 byteArrayEntityManager.insert(entity);
                 id = entity.getId();
+                deleted = false;
             }
         } else {
             ensureInitialized();
-            entity.setBytes(bytes);
+            if (bytes != null) {
+                entity.setBytes(bytes);
+            } else {
+                // If the bytes are null delete this
+                delete();
+            }
         }
     }
 
-    public JobByteArrayEntity getEntity() {
+    public ByteArrayEntity getEntity() {
         ensureInitialized();
         return entity;
     }
@@ -113,9 +124,9 @@ public class JobByteArrayRef implements Serializable {
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                CommandContextUtil.getJobByteArrayEntityManager().delete(entity);
+                Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager().delete(entity);
             } else {
-                CommandContextUtil.getJobByteArrayEntityManager().deleteByteArrayById(id);
+                Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager().deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -125,7 +136,14 @@ public class JobByteArrayRef implements Serializable {
 
     private void ensureInitialized() {
         if (id != null && entity == null) {
-            entity = CommandContextUtil.getJobByteArrayEntityManager().findById(id);
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                entity = commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager().findById(id);
+            } else if (commandExecutor != null) {
+                entity = commandExecutor.execute(context -> context.getCurrentEngineConfiguration().getByteArrayEntityManager().findById(id));
+            } else {
+                throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
+            }
 
             if (entity != null) {
                 name = entity.getName();
@@ -138,12 +156,12 @@ public class JobByteArrayRef implements Serializable {
     }
 
     /**
-     * This makes a copy of this {@link JobByteArrayRef}: a new
-     * {@link JobByteArrayRef} instance will be created, however with the same id,
-     * name and {@link JobByteArrayEntity} instances.
+     * This makes a copy of this {@link ByteArrayRef}: a new
+     * {@link ByteArrayRef} instance will be created, however with the same id,
+     * name and {@link ByteArrayEntity} instances.
      */
-    public JobByteArrayRef copy() {
-        JobByteArrayRef copy = new JobByteArrayRef();
+    public ByteArrayRef copy() {
+        ByteArrayRef copy = new ByteArrayRef();
         copy.id = id;
         copy.name = name;
         copy.entity = entity;
