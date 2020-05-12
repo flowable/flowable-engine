@@ -89,7 +89,14 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected static final String EMPTY_LINE = "\n";
     protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
                     "ACT_GE_PROPERTY",
-                    "ACT_ID_PROPERTY");
+                    "ACT_ID_PROPERTY",
+                    "ACT_CMMN_DATABASECHANGELOG",
+                    "ACT_CMMN_DATABASECHANGELOGLOCK",
+                    "ACT_FO_DATABASECHANGELOG",
+                    "ACT_FO_DATABASECHANGELOGLOCK",
+                    "FLW_EV_DATABASECHANGELOG",
+                    "FLW_EV_DATABASECHANGELOGLOCK"
+    );
 
     protected static String SERVER_URL_PREFIX;
     protected static RestUrlBuilder URL_BUILDER;

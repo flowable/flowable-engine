@@ -89,6 +89,8 @@ import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
@@ -318,6 +320,7 @@ public abstract class AbstractEngineConfiguration {
 
     protected PropertyDataManager propertyDataManager;
     protected ByteArrayDataManager byteArrayDataManager;
+    protected TableDataManager tableDataManager;
 
     // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
 
@@ -683,6 +686,10 @@ public abstract class AbstractEngineConfiguration {
 
         if (byteArrayEntityManager == null) {
             byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, this::getEventDispatcher);
+        }
+
+        if (tableDataManager == null) {
+            tableDataManager = new TableDataManagerImpl();
         }
     }
 
@@ -1855,6 +1862,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
         this.byteArrayEntityManager = byteArrayEntityManager;
+        return this;
+    }
+
+    public TableDataManager getTableDataManager() {
+        return tableDataManager;
+    }
+
+    public AbstractEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+        this.tableDataManager = tableDataManager;
         return this;
     }
 

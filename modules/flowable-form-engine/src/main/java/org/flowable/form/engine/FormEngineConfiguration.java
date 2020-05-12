@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
@@ -57,8 +58,6 @@ import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManage
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManagerImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManagerImpl;
-import org.flowable.form.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.form.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataManager;
@@ -100,7 +99,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     protected FormDefinitionEntityManager formDefinitionEntityManager;
     protected FormResourceEntityManager resourceEntityManager;
     protected FormInstanceEntityManager formInstanceEntityManager;
-    protected TableDataManager tableDataManager;
 
     protected ExpressionManager expressionManager;
 
@@ -245,9 +243,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         }
         if (formInstanceEntityManager == null) {
             formInstanceEntityManager = new FormInstanceEntityManagerImpl(this, formInstanceDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -581,10 +576,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     public FormEngineConfiguration setFormInstanceEntityManager(FormInstanceEntityManager formInstanceEntityManager) {
         this.formInstanceEntityManager = formInstanceEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public FormEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

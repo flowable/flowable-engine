@@ -12,6 +12,8 @@
  */
 package org.flowable.app.engine.test.impl;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +39,19 @@ public class AppTestRunner extends BlockJUnit4ClassRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppTestRunner.class);
     
     protected static AppEngineConfiguration appEngineConfiguration;
+
+    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
+            "ACT_GE_PROPERTY",
+            "ACT_ID_PROPERTY",
+            "ACT_APP_DATABASECHANGELOG",
+            "ACT_APP_DATABASECHANGELOGLOCK",
+            "ACT_CMMN_DATABASECHANGELOG",
+            "ACT_CMMN_DATABASECHANGELOGLOCK",
+            "ACT_FO_DATABASECHANGELOG",
+            "ACT_FO_DATABASECHANGELOGLOCK",
+            "FLW_EV_DATABASECHANGELOG",
+            "FLW_EV_DATABASECHANGELOGLOCK"
+    );
 
     public AppTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -117,9 +132,12 @@ public class AppTestRunner extends BlockJUnit4ClassRunner {
         
         StringBuilder outputMessage = new StringBuilder();
         for (String table : tableCounts.keySet()) {
-            long count = tableCounts.get(table);
-            if (count != 0) {
-                outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
+            String tableNameWithoutPrefix = table.replace(appEngineConfiguration.getDatabaseTablePrefix(), "");
+            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
+                Long count = tableCounts.get(table);
+                if (count != 0L) {
+                    outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
+                }
             }
         }
         

@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
@@ -63,8 +64,6 @@ import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityMan
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManagerImpl;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityManager;
@@ -118,7 +117,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     protected IdentityInfoEntityManager identityInfoEntityManager;
     protected MembershipEntityManager membershipEntityManager;
     protected PropertyEntityManager idmPropertyEntityManager;
-    protected TableDataManager tableDataManager;
     protected TokenEntityManager tokenEntityManager;
     protected UserEntityManager userEntityManager;
     protected PrivilegeEntityManager privilegeEntityManager;
@@ -277,9 +275,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         }
         if (idmPropertyEntityManager == null) {
             idmPropertyEntityManager = new PropertyEntityManagerImpl(this, idmPropertyDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
         if (tokenEntityManager == null) {
             tokenEntityManager = new TokenEntityManagerImpl(this, tokenDataManager);
@@ -699,10 +694,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     public IdmEngineConfiguration setPrivilegeMappingEntityManager(PrivilegeMappingEntityManager privilegeMappingEntityManager) {
         this.privilegeMappingEntityManager = privilegeMappingEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public IdmEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

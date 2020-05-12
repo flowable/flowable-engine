@@ -10,14 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
-import org.flowable.engine.impl.TablePageQueryImpl;
 
 /**
  * @author Joram Barrez
@@ -29,8 +28,6 @@ public interface TableDataManager {
     List<String> getTablesPresentInDatabase();
 
     TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
-
-    String getTableName(Class<?> entityClass, boolean withPrefix);
 
     TableMetaData getTableMetaData(String tableName);
 

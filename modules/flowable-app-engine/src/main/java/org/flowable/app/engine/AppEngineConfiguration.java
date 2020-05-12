@@ -47,11 +47,9 @@ import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityManagerI
 import org.flowable.app.engine.impl.persistence.entity.data.AppDefinitionDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDeploymentDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.AppResourceDataManager;
-import org.flowable.app.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDefinitionDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDeploymentDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.app.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -71,6 +69,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
@@ -113,7 +112,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected AppManagementService appManagementService = new AppManagementServiceImpl(this);
     protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl(this);
     
-    protected TableDataManager tableDataManager;
     protected AppDeploymentDataManager deploymentDataManager;
     protected AppResourceDataManager resourceDataManager;
     protected AppDefinitionDataManager appDefinitionDataManager;
@@ -300,9 +298,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initDataManagers() {
         super.initDataManagers();
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
-        }
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisAppDeploymentDataManager(this);
         }
@@ -540,10 +535,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public IdmIdentityService getIdmIdentityService() {
         return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

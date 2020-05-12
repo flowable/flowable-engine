@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.test.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,18 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     
     protected static CmmnEngineConfiguration cmmnEngineConfiguration;
     protected static String deploymentId;
+
+    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
+            "ACT_GE_PROPERTY",
+            "ACT_ID_PROPERTY",
+            "ACT_CMMN_DATABASECHANGELOG",
+            "ACT_CMMN_DATABASECHANGELOGLOCK",
+            "ACT_FO_DATABASECHANGELOG",
+            "ACT_FO_DATABASECHANGELOGLOCK",
+            "FLW_EV_DATABASECHANGELOG",
+            "FLW_EV_DATABASECHANGELOGLOCK"
+    );
+
 
     public CmmnTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -186,9 +199,12 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         
         StringBuilder outputMessage = new StringBuilder();
         for (String table : tableCounts.keySet()) {
-            long count = tableCounts.get(table);
-            if (count != 0) {
-                outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
+            String tableNameWithoutPrefix = table.replace(cmmnEngineConfiguration.getDatabaseTablePrefix(), "");
+            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
+                Long count = tableCounts.get(table);
+                if (count != 0L) {
+                    outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
+                }
             }
         }
         

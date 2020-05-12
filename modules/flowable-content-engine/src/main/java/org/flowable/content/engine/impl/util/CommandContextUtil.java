@@ -16,9 +16,9 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
-import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
 
 public class CommandContextUtil {
     
