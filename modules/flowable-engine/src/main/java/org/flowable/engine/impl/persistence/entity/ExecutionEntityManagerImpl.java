@@ -14,11 +14,9 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -998,17 +996,10 @@ public class ExecutionEntityManagerImpl
     // OTHER METHODS
 
     @Override
-    public void updateProcessInstanceLockTime(String processInstanceId) {
+    public void updateProcessInstanceLockTime(String processInstanceId, String lockOwner, Date lockTime) {
         Date expirationTime = getClock().getCurrentTime();
-        AsyncExecutor asyncExecutor = getAsyncExecutor();
-        int lockMillis = asyncExecutor.getAsyncJobLockTimeInMillis();
 
-        GregorianCalendar lockCal = new GregorianCalendar();
-        lockCal.setTime(expirationTime);
-        lockCal.add(Calendar.MILLISECOND, lockMillis);
-        Date lockDate = lockCal.getTime();
-
-        dataManager.updateProcessInstanceLockTime(processInstanceId, lockDate, asyncExecutor.getLockOwner(), expirationTime);
+        dataManager.updateProcessInstanceLockTime(processInstanceId, lockTime, lockOwner, expirationTime);
     }
 
     @Override
@@ -1017,10 +1008,8 @@ public class ExecutionEntityManagerImpl
     }
 
     @Override
-    public void clearAllProcessInstanceLockTimes() {
-        if (engineConfiguration.getAsyncExecutor() != null) {
-            dataManager.clearAllProcessInstanceLockTimes(engineConfiguration.getAsyncExecutor().getLockOwner());
-        }
+    public void clearAllProcessInstanceLockTimes(String lockOwner) {
+        dataManager.clearAllProcessInstanceLockTimes(lockOwner);
     }
     @Override
     public String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey) {

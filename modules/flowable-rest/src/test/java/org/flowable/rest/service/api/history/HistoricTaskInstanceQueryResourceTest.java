@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -283,7 +282,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (expectedTaskIds != null) {
@@ -293,7 +292,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
                 String id = it.next().get("id").textValue();
                 toBeFound.remove(id);
             }
-            assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
         }
     }
 }

@@ -110,7 +110,7 @@ public class ClearCaseInstanceLocksTest extends FlowableCmmnTestCase {
         }
 
         // Clearing the locks should now remove the lock owner and lock time from all process instances
-        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd());
+        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(cmmnEngineConfiguration.getAsyncExecutor().getLockOwner()));
 
         for (CaseInstance caseInstance : cmmnRuntimeService.createCaseInstanceQuery().list()) {
             assertThat(((CaseInstanceEntity) caseInstance).getLockTime()).isNull();

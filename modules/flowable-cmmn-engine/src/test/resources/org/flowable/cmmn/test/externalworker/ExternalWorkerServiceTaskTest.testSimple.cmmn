@@ -21,7 +21,7 @@
                     <standardEvent>terminate</standardEvent>
                 </planItemOnPart>
             </sentry>
-            <task id="externalWorkerTask" name="External Worker" flowable:type="external-worker" flowable:topic="simple"/>
+            <task id="externalWorkerTask" name="External Worker" flowable:type="external-worker" flowable:exclusive="true" flowable:topic="simple"/>
             <humanTask id="afterExternalWorkerCompleteTask" name="After External Worker Complete"/>
             <humanTask id="afterExternalWorkerTerminateTask" name="After External Worker Terminate"/>
         </casePlanModel>

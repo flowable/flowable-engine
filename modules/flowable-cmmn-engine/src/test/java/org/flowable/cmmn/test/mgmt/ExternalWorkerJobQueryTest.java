@@ -24,8 +24,8 @@ import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.junit.Test;
 
 /**

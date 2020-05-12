@@ -26,14 +26,16 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -871,6 +873,81 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThatThrownBy(() -> cmmnManagementService.createExternalWorkerJobAcquireBuilder().topic("simple", Duration.ofMinutes(10)).acquireAndLock(10, null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("workerId must not be empty");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testCaseInstanceIsCorrectlyLocked() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        CaseInstanceEntity caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(cmmnEngineConfiguration.getAsyncExecutor().getLockOwner()));
+
+        // Clearing the async executor jobs times should not clear the ones which are locked by the external worker
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd("worker1"));
+
+        // Clearing the worker1 jobs times should not clear the ones which are locked by the external worker
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isNull();
+        assertThat(caseInstance.getLockTime()).isNull();
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleNotExclusive.cmmn")
+    public void testCaseInstanceIsNotLockedByNotExclusiveJob() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        CaseInstanceEntity caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isNull();
+        assertThat(caseInstance.getLockTime()).isNull();
     }
 
     protected Map<String, Object> getExternalWorkerVariablesForPlanItemInstance(String planItemInstanceId) {
