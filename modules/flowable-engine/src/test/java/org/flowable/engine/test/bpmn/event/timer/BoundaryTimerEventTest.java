@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -330,14 +332,23 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testBoundaryTimerEvent() throws Exception {
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
         Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
         processEngineConfiguration.getClock().setCurrentTime(currentTime);
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("patient", "kermit");
-        runtimeService.startProcessInstanceByKey("process1", vars);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1", vars);
+        
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(4, activityInstances.size());
+        List<String> activityInstanceIds = new ArrayList<>();
+        for (ActivityInstance activityInstance : activityInstances) {
+            activityInstanceIds.add(activityInstance.getActivityId());
+        }
+        assertTrue(activityInstanceIds.contains("startEvent"));
+        assertTrue(activityInstanceIds.contains("first_task"));
+        assertTrue(activityInstanceIds.contains("boundaryTimerEvent"));
 
         // just wait for 2 seconds to run any job if it's the case
         try {
@@ -393,6 +404,18 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("Second Task", tasks.get(0).getName());
+        
+        activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, activityInstances.size());
+        Map<String, ActivityInstance> activityInstanceMap = new HashMap<>();
+        for (ActivityInstance activityInstance : activityInstances) {
+            activityInstanceMap.put(activityInstance.getActivityId(), activityInstance);
+        }
+        assertNotNull(activityInstanceMap.get("startEvent").getEndTime());
+        assertNotNull(activityInstanceMap.get("first_task").getEndTime());
+        assertNotNull(activityInstanceMap.get("boundaryTimerEvent").getEndTime());
+        assertNull(activityInstanceMap.get("second_task").getEndTime());
+        
         jobList = managementService.createJobQuery().list();
         assertEquals(0, jobList.size());
         jobList = managementService.createTimerJobQuery().list();

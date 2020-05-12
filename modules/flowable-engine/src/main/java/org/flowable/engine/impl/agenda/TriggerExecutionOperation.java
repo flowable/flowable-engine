@@ -58,7 +58,7 @@ public class TriggerExecutionOperation extends AbstractOperation {
                 if (currentFlowElement instanceof BoundaryEvent
                         || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
                     
-                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
+                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
                 }
 
                 if (!triggerAsync) {
@@ -75,7 +75,7 @@ public class TriggerExecutionOperation extends AbstractOperation {
                     job.setJobHandlerType(AsyncTriggerJobHandler.TYPE);
                     
                     // Inherit tenant id (if applicable)
-                    if(execution.getTenantId() != null) {
+                    if (execution.getTenantId() != null) {
                         job.setTenantId(execution.getTenantId());
                     }
 

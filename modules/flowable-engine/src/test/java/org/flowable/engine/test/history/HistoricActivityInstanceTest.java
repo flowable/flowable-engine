@@ -59,6 +59,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicActivityInstance.getEndTime());
         assertTrue(historicActivityInstance.getDurationInMillis() >= 0);
     }
+    
     @Test
     @Deployment
     public void testOneTaskProcessActivityTypes() {
@@ -393,10 +394,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        // Check if there is NO historic activity instance for a boundary-event that has not triggered
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
-
-        assertNull(historicActivityInstance);
+        assertNotNull(historicActivityInstance);
 
         // Now check the history when the boundary-event is fired
         processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");

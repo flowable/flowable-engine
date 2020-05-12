@@ -984,9 +984,6 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
-        <if test="withoutDeleteReason">
-            and (RES.DELETE_REASON_ = '' or RES.DELETE_REASON_ is null)
-        </if>
       <choose>
         <when test="bothCandidateAndAssigned">
           <!-- if dbIdentityUsed set true in process engine configuration -->
@@ -1415,9 +1412,6 @@
             </if>
             <if test="orQueryObject.withoutTenantId">
               or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
-            </if>
-            <if test="orQueryObject.withoutDeleteReason">
-              or (RES.DELETE_REASON_ = '' or RES.DELETE_REASON_ is null)
             </if>
             <choose>
               <when test="orQueryObject.bothCandidateAndAssigned">

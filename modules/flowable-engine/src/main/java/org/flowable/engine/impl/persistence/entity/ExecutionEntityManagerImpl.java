@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -530,8 +529,7 @@ public class ExecutionEntityManagerImpl
     public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean cancel, FlowElement cancelActivity) {
         if (!deleteHistory && executionEntity.isActive()
                 && executionEntity.getCurrentFlowElement() != null
-                && !executionEntity.isMultiInstanceRoot()
-                && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
+                && !executionEntity.isMultiInstanceRoot()) {
             
             CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }

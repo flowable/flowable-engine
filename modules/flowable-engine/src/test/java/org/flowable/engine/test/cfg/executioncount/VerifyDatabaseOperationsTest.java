@@ -389,15 +389,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             // Start process instance
             assertDatabaseSelects("StartProcessInstanceCmd", 
-                            "selectLatestProcessDefinitionByKey", 1L,
-                            "selectEntityLinksByReferenceScopeIdAndType", 1L);
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectEntityLinksByReferenceScopeIdAndType", 1L);
+            
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "ExecutionEntityImpl-bulk-with-3", 1L,
                     "TaskEntityImpl", 1L,
                     "TimerJobEntityImpl", 1L,
                     "EntityLinkEntityImpl", 1L,
-                    "ActivityInstanceEntityImpl-bulk-with-3", 1L,
-                    "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-4", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-4", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
                     "HistoricTaskLogEntryEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -407,12 +408,12 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // org.flowable.task.service.Task Complete
 
             assertDatabaseDeletes("CompleteTaskCmd",
-                            "TaskEntityImpl", 1L,
-                            "TimerJobEntityImpl", 1L,
-                            "ExecutionEntityImpl", 3L,
-                            "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L,
-                            "Bulk-delete-deleteTasksByExecutionId", 1L,
-                            "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L); 
+                    "TaskEntityImpl", 1L,
+                    "TimerJobEntityImpl", 1L,
+                    "ExecutionEntityImpl", 3L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L,
+                    "Bulk-delete-deleteTasksByExecutionId", 1L,
+                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L);
         }
     }
 
