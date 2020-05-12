@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
   <process id="process1" isExecutable="true">
-    <startEvent id="sid-BB0C0E7C-0F30-4561-A800-158C480FC2C3" activiti:initiator="initiator">
+    <startEvent id="startEvent" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="doctor" name="Doctor" type="string" required="true"></activiti:formProperty>
         <activiti:formProperty id="patient" name="patient" type="string"></activiti:formProperty>
@@ -16,8 +16,8 @@
       </extensionElements>
     </userTask>
     <endEvent id="sid-E06054CE-7882-4839-922F-8CC0521C56F0"></endEvent>
-    <sequenceFlow id="sid-958CEAE2-9760-42A2-B29F-E643B0812D24" sourceRef="sid-BB0C0E7C-0F30-4561-A800-158C480FC2C3" targetRef="first_task"></sequenceFlow>
-    <userTask id="sceond_task" name="Second Task"></userTask>
+    <sequenceFlow id="sid-958CEAE2-9760-42A2-B29F-E643B0812D24" sourceRef="startEvent" targetRef="first_task"></sequenceFlow>
+    <userTask id="second_task" name="Second Task"></userTask>
     <endEvent id="sid-47C35172-EC6A-4148-90EC-35663BFE66C9"></endEvent>
     <exclusiveGateway id="sid-3897D60D-5FDB-4477-94DA-EB005A6B66BE"></exclusiveGateway>
     <endEvent id="sid-1084D551-6963-4A5B-B32E-F1C9415B8164"></endEvent>
@@ -33,12 +33,12 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${consult=="yes"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-3FD93BBB-0508-4511-9473-B49D3BD818E5" sourceRef="first_task" targetRef="sid-3897D60D-5FDB-4477-94DA-EB005A6B66BE"></sequenceFlow>
-    <sequenceFlow id="sid-656542B0-C148-4E15-A06F-B2C8673127C0" sourceRef="boundaryTimerEvent" targetRef="sceond_task"></sequenceFlow>
-    <sequenceFlow id="sid-FC24CACC-F64B-4B46-B579-1DA94F191F18" sourceRef="sceond_task" targetRef="sid-47C35172-EC6A-4148-90EC-35663BFE66C9"></sequenceFlow>
+    <sequenceFlow id="sid-656542B0-C148-4E15-A06F-B2C8673127C0" sourceRef="boundaryTimerEvent" targetRef="second_task"></sequenceFlow>
+    <sequenceFlow id="sid-FC24CACC-F64B-4B46-B579-1DA94F191F18" sourceRef="second_task" targetRef="sid-47C35172-EC6A-4148-90EC-35663BFE66C9"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_process1">
     <bpmndi:BPMNPlane bpmnElement="process1" id="BPMNPlane_process1">
-      <bpmndi:BPMNShape bpmnElement="sid-BB0C0E7C-0F30-4561-A800-158C480FC2C3" id="BPMNShape_sid-BB0C0E7C-0F30-4561-A800-158C480FC2C3">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
         <omgdc:Bounds height="30.0" width="30.0" x="167.25" y="167.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="first_task" id="BPMNShape_first_task">
@@ -47,7 +47,7 @@
       <bpmndi:BPMNShape bpmnElement="sid-E06054CE-7882-4839-922F-8CC0521C56F0" id="BPMNShape_sid-E06054CE-7882-4839-922F-8CC0521C56F0">
         <omgdc:Bounds height="28.0" width="28.0" x="795.0" y="168.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sceond_task" id="BPMNShape_sceond_task">
+      <bpmndi:BPMNShape bpmnElement="second_task" id="BPMNShape_second_task">
         <omgdc:Bounds height="80.0" width="100.0" x="405.0" y="294.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-47C35172-EC6A-4148-90EC-35663BFE66C9" id="BPMNShape_sid-47C35172-EC6A-4148-90EC-35663BFE66C9">

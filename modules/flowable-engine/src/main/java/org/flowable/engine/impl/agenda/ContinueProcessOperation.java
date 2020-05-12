@@ -391,6 +391,8 @@ public class ContinueProcessOperation extends AbstractOperation {
             childExecutionEntity.setScope(false);
             boundaryEventExecutions.add(childExecutionEntity);
             
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(childExecutionEntity);
+            
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             if (processEngineConfiguration.isLoggingSessionEnabled()) {
                 BpmnLoggingSessionUtil.addLoggingData(BpmnLoggingSessionUtil.getBoundaryCreateEventType(boundaryEvent), 
