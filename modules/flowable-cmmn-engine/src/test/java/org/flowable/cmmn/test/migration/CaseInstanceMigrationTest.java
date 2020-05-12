@@ -52,6 +52,10 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
         assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Two Task Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .list();

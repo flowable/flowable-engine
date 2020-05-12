@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -244,6 +245,21 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
                 .startAsync())
                 .isInstanceOf(FlowableObjectNotFoundException.class)
                 .hasMessage("Case definition was not found by key 'oneTaskCase'. Fallback to default tenant was also used.");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void createCaseInstanceHasCaseDefinitionInfo() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(caseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
+        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(caseDefinition.getDeploymentId());
     }
 
 }

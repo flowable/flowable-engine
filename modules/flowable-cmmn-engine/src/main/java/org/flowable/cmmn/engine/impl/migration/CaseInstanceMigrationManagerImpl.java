@@ -176,6 +176,10 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
         caseInstance.setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
+        caseInstance.setCaseDefinitionKey(caseDefinitionToMigrateTo.getKey());
+        caseInstance.setCaseDefinitionName(caseDefinitionToMigrateTo.getName());
+        caseInstance.setCaseDefinitionVersion(caseDefinitionToMigrateTo.getVersion());
+        caseInstance.setCaseDefinitionDeploymentId(caseDefinitionToMigrateTo.getDeploymentId());
 
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
                 .setCaseInstanceId(caseInstance.getId())

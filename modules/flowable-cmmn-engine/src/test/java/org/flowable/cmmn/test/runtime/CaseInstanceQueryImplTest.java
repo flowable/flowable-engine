@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -1217,4 +1218,42 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         Assertions.assertThat(caseInstance).isNull();
     }
 
+    @Test
+    public void testQueryCaseInstanceReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(caseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(caseInstance.getCaseVariables()).isEmpty();
+    }
+
+    @Test
+    public void testQueryCaseInstanceWithVariablesReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(caseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(caseInstance.getCaseVariables()).containsOnly(
+                entry("stringVar","test")
+        );
+    }
 }
