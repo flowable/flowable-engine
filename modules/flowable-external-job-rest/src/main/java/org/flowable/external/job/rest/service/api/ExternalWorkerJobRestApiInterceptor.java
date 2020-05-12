@@ -13,6 +13,10 @@
 package org.flowable.external.job.rest.service.api;
 
 import org.flowable.external.job.rest.service.api.acquire.AcquireExternalWorkerJobRequest;
+import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobCompleteRequest;
+import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobErrorRequest;
+import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobFailureRequest;
+import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobTerminateRequest;
 import org.flowable.external.job.rest.service.api.query.ExternalWorkerJobQueryRequest;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
@@ -28,4 +32,12 @@ public interface ExternalWorkerJobRestApiInterceptor {
     void accessExternalWorkerJobById(ExternalWorkerJob job);
 
     void accessAcquireExternalWorkerJobs(ExternalWorkerJobAcquireBuilder acquireBuilder, AcquireExternalWorkerJobRequest request);
+
+    void completeExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobCompleteRequest request);
+
+    void bpmnErrorExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobErrorRequest request);
+
+    void cmmnTerminateExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobTerminateRequest request);
+
+    void failExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobFailureRequest request);
 }

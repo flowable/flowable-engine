@@ -112,6 +112,10 @@ public class ExternalWorkerAcquireJobResource extends ExternalWorkerJobBaseResou
 
         if (job.getProcessInstanceId() != null) {
             if (managementService != null) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.completeExternalWorkerJob(job, request);
+                }
+
                 managementService.createExternalWorkerCompletionBuilder(job.getId(), workerId)
                         .variables(extractVariables(request.getVariables()))
                         .complete();
@@ -120,6 +124,10 @@ public class ExternalWorkerAcquireJobResource extends ExternalWorkerJobBaseResou
             }
         } else if (ScopeTypes.CMMN.equals(job.getScopeType())) {
             if (cmmnManagementService != null) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.completeExternalWorkerJob(job, request);
+                }
+
                 cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(job.getId(), workerId)
                         .variables(extractVariables(request.getVariables()))
                         .complete();
@@ -156,6 +164,10 @@ public class ExternalWorkerAcquireJobResource extends ExternalWorkerJobBaseResou
 
         if (job.getProcessInstanceId() != null) {
             if (managementService != null) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.bpmnErrorExternalWorkerJob(job, request);
+                }
+
                 managementService.createExternalWorkerCompletionBuilder(job.getId(), workerId)
                         .variables(extractVariables(request.getVariables()))
                         .bpmnError(request.getErrorCode());
@@ -192,6 +204,10 @@ public class ExternalWorkerAcquireJobResource extends ExternalWorkerJobBaseResou
 
         if (ScopeTypes.CMMN.equals(job.getScopeType())) {
             if (cmmnManagementService != null) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.cmmnTerminateExternalWorkerJob(job, request);
+                }
+
                 cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(job.getId(), workerId)
                         .variables(extractVariables(request.getVariables()))
                         .terminate();
@@ -242,6 +258,10 @@ public class ExternalWorkerAcquireJobResource extends ExternalWorkerJobBaseResou
 
         if (request.getRetryTimeout() != null) {
             failureBuilder.retryTimeout(request.getRetryTimeout());
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.failExternalWorkerJob(job, request);
         }
 
         failureBuilder.fail();
