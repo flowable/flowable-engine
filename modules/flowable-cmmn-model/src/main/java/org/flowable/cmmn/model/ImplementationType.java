@@ -17,5 +17,6 @@ public class ImplementationType {
     public static final String IMPLEMENTATION_TYPE_CLASS = "class";
     public static final String IMPLEMENTATION_TYPE_EXPRESSION = "expression";
     public static final String IMPLEMENTATION_TYPE_DELEGATEEXPRESSION = "delegateExpression";
+    public static final String IMPLEMENTATION_TYPE_INSTANCE = "instance";
 
 }

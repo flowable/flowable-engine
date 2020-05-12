@@ -12,102 +12,71 @@
  */
 package org.flowable.eventregistry.impl.runtime;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
-import org.flowable.eventregistry.api.ChannelDefinition;
-import org.flowable.eventregistry.api.EventDefinition;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.model.ChannelModel;
-import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 
 /**
  * @author Joram Barrez
  */
 public class EventInstanceImpl implements EventInstance {
 
-    protected EventDefinition eventDefinition;
-    protected EventModel eventModel;
-    protected Collection<ChannelDefinition> channelDefinitions;
-    protected Collection<ChannelModel> channelModels;
-    protected Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
-    protected Collection<EventCorrelationParameterInstance> correlationParameterInstances = new ArrayList<>();
+    protected String eventKey;
+    protected Collection<EventPayloadInstance> payloadInstances;
+    protected Collection<EventPayloadInstance> correlationPayloadInstances;
     protected String tenantId;
 
-    public EventInstanceImpl() {
-
+    public EventInstanceImpl(String eventKey,
+            Collection<EventPayloadInstance> payloadInstances) {
+        this(eventKey, payloadInstances, EventRegistryEngineConfiguration.NO_TENANT_ID);
     }
 
-    public EventInstanceImpl(EventModel eventModel,
-        List<ChannelModel> channelModels,
-        Collection<EventCorrelationParameterInstance> correlationParameterInstances,
-        Collection<EventPayloadInstance> payloadInstances) {
-
-        this.eventModel = eventModel;
-        this.channelModels = channelModels;
-        this.correlationParameterInstances = correlationParameterInstances;
-        this.payloadInstances = payloadInstances;
-    }
-
-    public EventInstanceImpl(EventModel eventModel,
-            List<ChannelModel> channelModels,
-            Collection<EventCorrelationParameterInstance> correlationParameterInstances,
+    public EventInstanceImpl(String eventKey,
             Collection<EventPayloadInstance> payloadInstances,
             String tenantId) {
-        this(eventModel, channelModels, correlationParameterInstances, payloadInstances);
+        this.eventKey = eventKey;
+        this.payloadInstances = payloadInstances;
+        this.correlationPayloadInstances = this.payloadInstances.stream()
+                .filter(eventPayloadInstance -> eventPayloadInstance.getEventPayloadDefinition().isCorrelationParameter())
+                .collect(Collectors.toList());
         this.tenantId = tenantId;
     }
 
     @Override
-    public EventDefinition getEventDefinition() {
-        return eventDefinition;
+    public String getEventKey() {
+        return eventKey;
     }
-    public void setEventDefinition(EventDefinition eventDefinition) {
-        this.eventDefinition = eventDefinition;
+
+    public void setEventKey(String eventKey) {
+        this.eventKey = eventKey;
     }
-    @Override
-    public EventModel getEventModel() {
-        return eventModel;
-    }
-    public void setEventModel(EventModel eventModel) {
-        this.eventModel = eventModel;
-    }
-    @Override
-    public Collection<ChannelDefinition> getChannelDefinitions() {
-        return channelDefinitions;
-    }
-    public void setChannelDefinitions(Collection<ChannelDefinition> channelDefinitions) {
-        this.channelDefinitions = channelDefinitions;
-    }
-    @Override
-    public Collection<ChannelModel> getChannelModels() {
-        return channelModels;
-    }
-    public void setChannelModels(Collection<ChannelModel> channelModels) {
-        this.channelModels = channelModels;
-    }
+
     @Override
     public Collection<EventPayloadInstance> getPayloadInstances() {
         return payloadInstances;
     }
+
     public void setPayloadInstances(Collection<EventPayloadInstance> payloadInstances) {
         this.payloadInstances = payloadInstances;
     }
+
     @Override
-    public Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances() {
-        return correlationParameterInstances;
+    public Collection<EventPayloadInstance> getCorrelationParameterInstances() {
+        return correlationPayloadInstances;
     }
-    public void setCorrelationParameterInstances(
-        Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
-        this.correlationParameterInstances = correlationParameterInstances;
+
+    public void setCorrelationParameterInstances(Collection<EventPayloadInstance> correlationParameterInstances) {
+        this.correlationPayloadInstances = correlationParameterInstances;
     }
+
     @Override
     public String getTenantId() {
         return tenantId;
     }
+
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

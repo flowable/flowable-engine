@@ -29,6 +29,7 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -110,6 +111,15 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
             for (JobEntity job : jobs) {
                 jobService.moveJobToSuspendedJob(job);
             }
+
+            List<ExternalWorkerJobEntity> externalWorkerJobs = CommandContextUtil.getJobServiceConfiguration(commandContext)
+                    .getExternalWorkerJobEntityManager()
+                    .findJobsByProcessInstanceId(processInstanceId);
+
+            for (ExternalWorkerJobEntity externalWorkerJob : externalWorkerJobs) {
+                jobService.moveJobToSuspendedJob(externalWorkerJob);
+            }
+
         }
 
         return null;

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.spring.test.usertask;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,14 +39,14 @@ public class UserTaskSpringTest extends SpringFlowableTestCase {
     @Deployment(resources = "org/flowable/spring/test/usertask/VacationRequest.bpmn20.xml")
     public void testFormProperties() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("vacationRequest").singleResult();
-        assertNull(formService.getStartFormKey(processDefinition.getId()));
+        assertThat(formService.getStartFormKey(processDefinition.getId())).isNull();
         StartFormData startFormData = formService.getStartFormData(processDefinition.getId());
-        assertEquals(3, startFormData.getFormProperties().size());
+        assertThat(startFormData.getFormProperties()).hasSize(3);
 
         List<FormProperty> formProperties = startFormData.getFormProperties();
-        assertEquals("numberOfDays", formProperties.get(0).getId());
-        assertEquals("startDate", formProperties.get(1).getId());
-        assertEquals("vacationMotivation", formProperties.get(2).getId());
+        assertThat(formProperties.get(0).getId()).isEqualTo("numberOfDays");
+        assertThat(formProperties.get(1).getId()).isEqualTo("startDate");
+        assertThat(formProperties.get(2).getId()).isEqualTo("vacationMotivation");
 
         Map<String, String> startProperties = new HashMap<>();
         startProperties.put("numberOfDays", "10");
@@ -53,20 +55,20 @@ public class UserTaskSpringTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = formService.submitStartFormData(processDefinition.getId(), startProperties);
 
         Task requestTask = taskService.createTaskQuery().taskDefinitionKey("handleRequest").processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(requestTask);
+        assertThat(requestTask).isNotNull();
 
         TaskFormData taskFormData = formService.getTaskFormData(requestTask.getId());
-        assertEquals(2, taskFormData.getFormProperties().size());
+        assertThat(taskFormData.getFormProperties()).hasSize(2);
 
         formProperties = taskFormData.getFormProperties();
-        assertEquals("vacationApproved", formProperties.get(0).getId());
-        assertEquals("managerMotivation", formProperties.get(1).getId());
+        assertThat(formProperties.get(0).getId()).isEqualTo("vacationApproved");
+        assertThat(formProperties.get(1).getId()).isEqualTo("managerMotivation");
 
         Map<String, String> taskProperties = new HashMap<>();
         taskProperties.put("vacationApproved", "true");
         formService.submitTaskFormData(requestTask.getId(), taskProperties);
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
     }
 
 }

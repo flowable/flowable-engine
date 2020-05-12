@@ -56,33 +56,16 @@
             <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
                 LOCK_EXP_TIME_ is null
             </if>
+            <if test="parameter.enabledCategories != null">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
     
-    <select id="selectJobsToExecuteWithEnabledCategories" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        from ${prefix}ACT_RU_JOB RES
-        <where>
-            <if test="parameter.jobExecutionScope == null">
-                SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
-            </if>
-            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
-                SCOPE_TYPE_ = #{parameter.jobExecutionScope, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
-            </if>
-            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
-                LOCK_EXP_TIME_ is null
-            </if>
-            and CATEGORY_ in
-            <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-	          #{item}
-	        </foreach>
-        </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-    </select>
-
     <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
@@ -97,33 +80,17 @@
             </if>
               and ((LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
               or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP}))
+
+            <if test="parameter.enabledCategories">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where> 
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
     
-    <select id="selectExpiredJobsWithEnabledCategories" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        from ${prefix}ACT_RU_JOB RES
-        <where>
-            <if test="parameter.jobExecutionScope == null">
-                SCOPE_TYPE_ is null
-            </if>
-            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
-                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
-            </if>
-              and ((LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-              or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP}))
-              
-              and CATEGORY_ in
-            <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-	          #{item}
-	        </foreach>
-        </where> 
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-    </select>
-
     <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}

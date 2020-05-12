@@ -14,10 +14,12 @@ package org.flowable.cmmn.api;
 
 public interface CmmnEngineConfigurationApi {
 
-    public CmmnManagementService getCmmnManagementService();
-    public CmmnRepositoryService getCmmnRepositoryService();
-    public CmmnRuntimeService getCmmnRuntimeService();
-    public DynamicCmmnService getDynamicCmmnService();
-    public CmmnTaskService getCmmnTaskService();
-    public CmmnHistoryService getCmmnHistoryService();
+    CmmnManagementService getCmmnManagementService();
+    CmmnRepositoryService getCmmnRepositoryService();
+    CmmnRuntimeService getCmmnRuntimeService();
+    DynamicCmmnService getDynamicCmmnService();
+    CmmnTaskService getCmmnTaskService();
+    CmmnHistoryService getCmmnHistoryService();
+    CmmnMigrationService getCmmnMigrationService();
+
 }

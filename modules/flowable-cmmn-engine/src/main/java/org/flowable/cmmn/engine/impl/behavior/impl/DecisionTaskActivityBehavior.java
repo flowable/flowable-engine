@@ -139,23 +139,26 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                             externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             
         } else {
-            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef, 
-                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
+            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef,
+                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
         }
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 
-    protected void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, 
-                    PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+    protected void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey,
+                                                  PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper,
+                                                  boolean multipleResults) {
         
-        if (executionResult == null || executionResult.isEmpty()) {
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
             return;
         }
 
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
-        if (executionResult.size() > 1) {
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
             ArrayNode ruleResultNode = objectMapper.createArrayNode();
 
             for (Map<String, Object> ruleResult : executionResult) {

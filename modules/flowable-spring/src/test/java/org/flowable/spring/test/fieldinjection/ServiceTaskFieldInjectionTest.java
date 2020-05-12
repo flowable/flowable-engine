@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.spring.test.fieldinjection;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -35,13 +37,13 @@ public class ServiceTaskFieldInjectionTest extends SpringFlowableTestCase {
         Map<String, Object> variables = taskService.getVariables(task.getId());
 
         Integer resultServiceTask1 = (Integer) variables.get("resultServiceTask1");
-        assertEquals(202, resultServiceTask1.intValue());
+        assertThat(resultServiceTask1.intValue()).isEqualTo(202);
 
         Integer resultServiceTask2 = (Integer) variables.get("resultServiceTask2");
-        assertEquals(579, resultServiceTask2.intValue());
+        assertThat(resultServiceTask2.intValue()).isEqualTo(579);
 
         // Verify only one instance was created
-        assertEquals(1, SingletonDelegateExpressionBean.INSTANCE_COUNT.get());
+        assertThat(SingletonDelegateExpressionBean.INSTANCE_COUNT.get()).isEqualTo(1);
     }
 
     @Test
@@ -52,13 +54,13 @@ public class ServiceTaskFieldInjectionTest extends SpringFlowableTestCase {
         Map<String, Object> variables = taskService.getVariables(task.getId());
 
         Integer resultServiceTask1 = (Integer) variables.get("resultServiceTask1");
-        assertEquals(202, resultServiceTask1.intValue());
+        assertThat(resultServiceTask1.intValue()).isEqualTo(202);
 
         Integer resultServiceTask2 = (Integer) variables.get("resultServiceTask2");
-        assertEquals(579, resultServiceTask2.intValue());
+        assertThat(resultServiceTask2.intValue()).isEqualTo(579);
 
         // Verify TWO INSTANCES were created
-        assertEquals(2, PrototypeDelegateExpressionBean.INSTANCE_COUNT.get());
+        assertThat(PrototypeDelegateExpressionBean.INSTANCE_COUNT.get()).isEqualTo(2);
     }
 
 }

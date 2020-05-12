@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
@@ -45,24 +43,24 @@ public class UserTaskWithEventRegistryBoundaryEventConverterTest extends Abstrac
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("usertask", flowElement.getId());
-        UserTask userTask = (UserTask) flowElement;
-        assertEquals("usertask", userTask.getId());
-        assertEquals("kermit", userTask.getAssignee());
-        
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("usertask");
+                    assertThat(userTask.getName()).isEqualTo("User task");
+                    assertThat(userTask.getAssignee()).isEqualTo("kermit");
+                });
+
         flowElement = model.getMainProcess().getFlowElement("eventRegistryEvent");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof BoundaryEvent);
-        BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-        assertEquals("eventRegistryEvent", boundaryEvent.getId());
-        assertEquals("usertask", boundaryEvent.getAttachedToRefId());
-        assertEquals(2, boundaryEvent.getExtensionElements().size());
-        ExtensionElement extensionElement = boundaryEvent.getExtensionElements().get("eventType").get(0);
-        assertEquals("myEvent", extensionElement.getElementText());
-        extensionElement = boundaryEvent.getExtensionElements().get("eventCorrelationParameter").get(0);
-        assertEquals("customerId", extensionElement.getAttributeValue(null, "name"));
-        assertEquals("${customerIdVar}", extensionElement.getAttributeValue(null, "value"));
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(BoundaryEvent.class, boundaryEvent -> {
+                    assertThat(boundaryEvent.getId()).isEqualTo("eventRegistryEvent");
+                    assertThat(boundaryEvent.getAttachedToRefId()).isEqualTo("usertask");
+                    assertThat(boundaryEvent.getExtensionElements()).hasSize(2);
+                    ExtensionElement extensionElement = boundaryEvent.getExtensionElements().get("eventType").get(0);
+                    assertThat(extensionElement.getElementText()).isEqualTo("myEvent");
+                    extensionElement = boundaryEvent.getExtensionElements().get("eventCorrelationParameter").get(0);
+                    assertThat(extensionElement.getAttributeValue(null, "name")).isEqualTo("customerId");
+                    assertThat(extensionElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");
+                });
     }
 }

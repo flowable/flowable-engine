@@ -12,7 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -28,9 +29,13 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a resources that is part of a deployment.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
@@ -52,10 +57,14 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             // Check URL's for the resource
-            assertEquals(responseNode.get("url").textValue(), buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
-            assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
-            assertEquals("text/xml", responseNode.get("mediaType").textValue());
-            assertEquals("caseDefinition", responseNode.get("type").textValue());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " 'url': '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName) + "',"
+                            + " 'contentUrl': '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName) + "',"
+                            + " 'mediaType': 'text/xml',"
+                            + " 'type': 'caseDefinition'"
+                            + "}");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -70,7 +79,8 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
      * Test getting a single resource for an unexisting deployment. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
     public void testGetDeploymentResourceUnexistingDeployment() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
         httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "image/png,application/json"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
@@ -80,9 +90,11 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
      */
     public void testGetDeploymentResourceUnexistingResource() throws Exception {
         try {
-            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
+            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "unexisting-resource.png"));
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls
+                    .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "unexisting-resource.png"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "image/png,application/json"));
             closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
 
@@ -100,15 +112,17 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
      */
     public void testGetDeploymentResourceContent() throws Exception {
         try {
-            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
+            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
+            HttpGet httpGet = new HttpGet(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "text/plain"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             String responseAsString = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
-            assertNotNull(responseAsString);
-            assertEquals("Test content", responseAsString);
+            assertThat(responseAsString).isNotNull();
+            assertThat(responseAsString).isEqualTo("Test content");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

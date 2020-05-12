@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.impl.pipeline;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -24,7 +23,6 @@ import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
@@ -75,9 +73,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         ChannelModel channelModel = multiTenant ? eventRepositoryService.getChannelModelByKey(channelKey, tenantId) : eventRepositoryService.getChannelModelByKey(channelKey);
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
-            eventModel,
-            Collections.singletonList(channelModel),
-            extractCorrelationParameters(eventModel, event),
+            eventModel.getKey(),
             extractPayload(eventModel, event),
             tenantId
         );
@@ -91,10 +87,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
     public String detectEventDefinitionKey(T event) {
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
-    }
-
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, T event) {
-        return inboundEventPayloadExtractor.extractCorrelationParameters(eventDefinition, event);
     }
 
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event) {

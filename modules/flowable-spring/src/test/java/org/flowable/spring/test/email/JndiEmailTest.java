@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.test.email;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -65,6 +67,6 @@ public class JndiEmailTest extends SpringFlowableTestCase {
     public void testEmailUsingJndi() {
         Map<String, Object> variables = new HashMap<>();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EmailJndiProcess", variables);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

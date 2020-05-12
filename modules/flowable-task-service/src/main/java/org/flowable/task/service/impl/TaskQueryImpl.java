@@ -81,7 +81,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    protected boolean withoutDeleteReason;
     protected String processInstanceId;
     protected Collection<String> processInstanceIds;
     protected String executionId;
@@ -118,6 +117,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
+    protected String caseDefinitionKey;
+    protected String caseDefinitionKeyLike;
+    protected String caseDefinitionKeyLikeIgnoreCase;
+    protected Collection<String> caseDefinitionKeys;
     protected Date dueDate;
     protected Date dueBefore;
     protected Date dueAfter;
@@ -648,16 +651,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery taskWithoutDeleteReason() {
-        if (orActive) {
-            currentOrQueryObject.withoutDeleteReason = true;
-        } else {
-            this.withoutDeleteReason = true;
-        }
-        return this;
-    }
-
-    @Override
     public TaskQueryImpl processInstanceId(String processInstanceId) {
         if (orActive) {
             currentOrQueryObject.processInstanceId = processInstanceId;
@@ -749,6 +742,46 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         } else {
             this.scopeDefinitionId(caseDefinitionId);
             this.scopeType(ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseDefinitionKey(String caseDefinitionKey) {
+        if (orActive) {
+            currentOrQueryObject.caseDefinitionKey = caseDefinitionKey;
+        } else {
+            this.caseDefinitionKey = caseDefinitionKey;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        if (orActive) {
+            currentOrQueryObject.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        } else {
+            this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        if (orActive) {
+            currentOrQueryObject.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        } else {
+            this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseDefinitionKeyIn(Collection<String> caseDefinitionKeys) {
+        if (orActive) {
+            currentOrQueryObject.caseDefinitionKeys = caseDefinitionKeys;
+        } else {
+            this.caseDefinitionKeys = caseDefinitionKeys;
         }
         return this;
     }
@@ -1721,10 +1754,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public void enhanceCachedValue(TaskEntity task) {
         if (includeProcessVariables) {
             task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService()
-                    .findVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
+                    .findVariableInstancesByExecutionId(task.getProcessInstanceId()));
         } else if (includeTaskLocalVariables) {
             task.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskId(task.getId()));
+                    .addAll(task.getVariableInstanceEntities().values());
         }
     }
 
@@ -1825,7 +1858,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public String getTaskId() {
         return taskId;
     }
-    
+
     @Override
     public String getId() {
         return taskId;
@@ -2065,10 +2098,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getProcessDefinitionKeyLikeIgnoreCase() {
         return processDefinitionKeyLikeIgnoreCase;
-    }
-
-    public boolean isWithoutDeleteReason() {
-        return withoutDeleteReason;
     }
 
     public String getLocale() {

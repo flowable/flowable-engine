@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.standalone.rules;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,16 +43,16 @@ public class RulesDeployerTest extends ResourceFlowableTestCase {
         variableMap.put("order", order);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rulesDeployment", variableMap);
-        assertNotNull(processInstance);
-        assertTrue(processInstance.getProcessDefinitionId().startsWith("rulesDeployment:1"));
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionId().startsWith("rulesDeployment:1")).isTrue();
 
         runtimeService.getVariable(processInstance.getId(), "order");
-        assertTrue(order.isValid());
+        assertThat(order.isValid()).isTrue();
 
         Collection<Object> ruleOutputList = (Collection<Object>) runtimeService.getVariable(processInstance.getId(), "rulesOutput");
-        assertNotNull(ruleOutputList);
-        assertEquals(1, ruleOutputList.size());
+        assertThat(ruleOutputList).isNotNull();
+        assertThat(ruleOutputList).hasSize(1);
         order = (Order) ruleOutputList.iterator().next();
-        assertTrue(order.isValid());
+        assertThat(order.isValid()).isTrue();
     }
 }

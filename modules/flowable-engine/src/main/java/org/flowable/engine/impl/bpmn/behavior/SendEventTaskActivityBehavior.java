@@ -104,32 +104,31 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 execution.getCurrentFlowElement(),
                 eventModel);
 
-            List<ChannelModel> channelModels = getChannelModels(commandContext, execution);
-            EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel, channelModels, Collections.emptyList(), eventPayloadInstances);
-            eventRegistry.sendEventOutbound(eventInstance);
+            boolean sendOnSystemChannel = isSendOnSystemChannel(execution);
+            List<ChannelModel> channelModels = getChannelModels(commandContext, execution, sendOnSystemChannel);
+            EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventPayloadInstances, execution.getTenantId());
+            if (!channelModels.isEmpty()) {
+                eventRegistry.sendEventOutbound(eventInstance, channelModels);
+            }
+
+            if (sendOnSystemChannel) {
+                eventRegistry.sendSystemEventOutbound(eventInstance);
+            }
 
         }
 
         if (sendEventServiceTask.isTriggerable() && !executedAsAsyncJob) {
-            EventModel triggerEventDefinition = null;
+            String triggerEventDefinitionKey;
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
-
-                if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService(commandContext)
-                        .getEventModelByKey(sendEventServiceTask.getTriggerEventType());
-                } else {
-                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService(commandContext)
-                        .getEventModelByKey(sendEventServiceTask.getTriggerEventType(),
-                                    execution.getTenantId());
-                }
+                triggerEventDefinitionKey = sendEventServiceTask.getTriggerEventType();
 
             } else {
-                triggerEventDefinition = eventModel;
+                triggerEventDefinitionKey = eventModel.getKey();
             }
             
             EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil
                 .getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                    .eventType(triggerEventDefinition.getKey())
+                    .eventType(triggerEventDefinitionKey)
                     .executionId(execution.getId())
                     .processInstanceId(execution.getProcessInstanceId())
                     .activityId(execution.getCurrentActivityId())
@@ -165,7 +164,12 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         return eventModel;
     }
 
-    protected List<ChannelModel> getChannelModels(CommandContext commandContext, DelegateExecution execution) {
+    protected boolean isSendOnSystemChannel(DelegateExecution execution) {
+        List<ExtensionElement> systemChannels = execution.getCurrentFlowElement().getExtensionElements().getOrDefault("systemChannel", Collections.emptyList());
+        return !systemChannels.isEmpty();
+    }
+
+    protected List<ChannelModel> getChannelModels(CommandContext commandContext, DelegateExecution execution, boolean sendOnSystemChannel) {
         List<String> channelKeys = new ArrayList<>();
 
         Map<String, List<ExtensionElement>> extensionElements = execution.getCurrentFlowElement().getExtensionElements();
@@ -199,7 +203,12 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         }
 
         if (channelKeys.isEmpty()) {
-            throw new FlowableException("No channel keys configured");
+            if (!sendOnSystemChannel) {
+                // If the event is going to be send on the system channel then it is allowed to not define any other channels
+                throw new FlowableException("No channel keys configured");
+            } else {
+                return Collections.emptyList();
+            }
         }
 
         EventRepositoryService eventRepositoryService = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext).getEventRepositoryService();

@@ -12,6 +12,9 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
@@ -24,9 +27,11 @@ import org.flowable.app.rest.service.BaseSpringRestTestCase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to listing the resources that are part of a deployment.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
@@ -37,32 +42,32 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     public void testGetDeploymentResources() throws Exception {
 
         try {
-            AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/app/rest/service/api/repository/oneApp.app")
+            AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addClasspathResource("org/flowable/app/rest/service/api/repository/oneApp.app")
                     .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
             HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertTrue(responseNode.isArray());
-            assertEquals(2, responseNode.size());
+            assertThat(responseNode.isArray()).isTrue();
+            assertThat(responseNode).hasSize(2);
 
             // Since resources can be returned in any arbitrary order, find the
-            // right one to check
-            JsonNode txtNode = null;
-            for (int i = 0; i < responseNode.size(); i++) {
-                if ("test.txt".equals(responseNode.get(i).get("id").textValue())) {
-                    txtNode = responseNode.get(i);
-                    break;
-                }
-            }
-
-            // Check URL's for the resource
-            assertNotNull(txtNode);
-            assertTrue(txtNode.get("url").textValue().endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt")));
-            assertTrue(txtNode.get("contentUrl").textValue().endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt")));
-            assertTrue(txtNode.get("mediaType").isNull());
-            assertEquals("resource", txtNode.get("type").textValue());
+            // Check URL's for the resource: test.txt
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER)
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: 'test.txt',"
+                            + "    url: '" + SERVER_URL_PREFIX + AppRestUrls
+                            .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
+                            + "    contentUrl: '" + SERVER_URL_PREFIX + AppRestUrls
+                            .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
+                            + "    mediaType: null,"
+                            + "    type: 'resource'"
+                            + "  }"
+                            + "]");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

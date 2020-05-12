@@ -22,6 +22,7 @@ import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 
@@ -73,6 +74,10 @@ public interface JobService {
     JobEntity createJob();
     
     void insertJob(JobEntity job);
+
+    ExternalWorkerJobEntity createExternalWorkerJob();
+
+    void insertExternalWorkerJob(ExternalWorkerJobEntity job);
     
     DeadLetterJobEntity createDeadLetterJob();
     
@@ -89,4 +94,6 @@ public interface JobService {
     void deleteSuspendedJobsByExecutionId(String executionId);
     
     void deleteDeadLetterJobsByExecutionId(String executionId);
+
+    void deleteExternalWorkerJobsByExecutionId(String executionId);
 }

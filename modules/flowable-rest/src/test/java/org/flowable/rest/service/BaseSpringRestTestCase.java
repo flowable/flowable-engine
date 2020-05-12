@@ -12,9 +12,8 @@
  */
 package org.flowable.rest.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -83,7 +82,6 @@ import org.flowable.rest.util.TestServerUtil.TestServer;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -105,7 +103,10 @@ public class BaseSpringRestTestCase {
             "ACT_GE_PROPERTY",
             "ACT_ID_PROPERTY",
             "ACT_FO_DATABASECHANGELOG",
-            "ACT_FO_DATABASECHANGELOGLOCK");
+            "ACT_FO_DATABASECHANGELOGLOCK",
+            "FLW_EV_DATABASECHANGELOG",
+            "FLW_EV_DATABASECHANGELOGLOCK"
+    );
     
     @Rule 
     public TestName testName = new TestName();
@@ -313,7 +314,7 @@ public class BaseSpringRestTestCase {
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
@@ -323,7 +324,7 @@ public class BaseSpringRestTestCase {
                 }
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
@@ -529,7 +530,7 @@ public class BaseSpringRestTestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -538,7 +539,7 @@ public class BaseSpringRestTestCase {
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound.isEmpty()).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isTrue();
     }
 
     /**
@@ -565,7 +566,7 @@ public class BaseSpringRestTestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(0, dataNode.size());
+        assertThat(dataNode).isEmpty();
     }
 
     /**
@@ -590,7 +591,7 @@ public class BaseSpringRestTestCase {
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -600,7 +601,7 @@ public class BaseSpringRestTestCase {
                     String id = it.next().get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
             }
         }
 

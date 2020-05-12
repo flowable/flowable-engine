@@ -12,6 +12,9 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -26,6 +29,8 @@ import org.flowable.app.rest.service.HttpMultipartHelper;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single Deployment resource.
@@ -50,32 +55,25 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             String deploymentId = responseNode.get("id").textValue();
-            String name = responseNode.get("name").textValue();
-            String category = responseNode.get("category").textValue();
-            String deployTime = responseNode.get("deploymentTime").textValue();
-            String url = responseNode.get("url").textValue();
-            String tenantId = responseNode.get("tenantId").textValue();
 
-            assertEquals("", tenantId);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
-            assertNotNull(deploymentId);
-            assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
-
-            assertNotNull(name);
-            assertEquals("oneApp", name);
-
-            assertNotNull(url);
-            assertTrue(url.endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId)));
-
-            // No deployment-category should have been set
-            assertNull(category);
-            assertNotNull(deployTime);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: '${json-unit.any-string}',"
+                            + " name: 'oneApp',"
+                            + " category: null,"
+                            + " deploymentTime: '${json-unit.any-string}',"
+                            + " tenantId: \"\","
+                            + " url: '" + SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                            + "}");
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
-            assertEquals(1L, resources.size());
-            assertEquals("oneApp.app", resources.get(0));
-            assertEquals(1L, repositoryService.createAppDefinitionQuery().deploymentId(deploymentId).count());
+            assertThat(resources).hasSize(1);
+            assertThat(resources.get(0)).isEqualTo("oneApp.app");
+            assertThat(repositoryService.createAppDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -102,31 +100,25 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             String deploymentId = responseNode.get("id").textValue();
-            String name = responseNode.get("name").textValue();
-            String category = responseNode.get("category").textValue();
-            String deployTime = responseNode.get("deploymentTime").textValue();
-            String url = responseNode.get("url").textValue();
-            String tenantId = responseNode.get("tenantId").textValue();
 
-            assertEquals("", tenantId);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
-            assertNotNull(deploymentId);
-            assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
-
-            assertNotNull(name);
-            assertEquals("vacationRequest", name);
-
-            assertNotNull(url);
-            assertTrue(url.endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId)));
-
-            // No deployment-category should have been set
-            assertNull(category);
-            assertNotNull(deployTime);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: '${json-unit.any-string}',"
+                            + " name: 'vacationRequest',"
+                            + " category: null,"
+                            + " deploymentTime: '${json-unit.any-string}',"
+                            + " tenantId: \"\","
+                            + " url: '" + SERVER_URL_PREFIX + AppRestUrls
+                            .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                            + "}");
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
-            assertEquals(4L, resources.size());
-            
+            assertThat(resources).hasSize(4);
+
             boolean vacationRequestAppFound = false;
             for (String resourceName : resources) {
                 if ("vacationRequestApp.app".equals(resourceName)) {
@@ -134,9 +126,9 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                     break;
                 }
             }
-            assertTrue(vacationRequestAppFound);
-            
-            assertEquals(1L, repositoryService.createAppDefinitionQuery().deploymentId(deploymentId).count());
+            assertThat(vacationRequestAppFound).isTrue();
+
+            assertThat(repositoryService.createAppDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -169,29 +161,19 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        
         closeResponse(response);
 
-        String deploymentId = responseNode.get("id").textValue();
-        String name = responseNode.get("name").textValue();
-        String category = responseNode.get("category").textValue();
-        String deployTime = responseNode.get("deploymentTime").textValue();
-        String url = responseNode.get("url").textValue();
-        String tenantId = responseNode.get("tenantId").textValue();
-
-        assertEquals("", tenantId);
-        assertNotNull(deploymentId);
-        assertEquals(existingDeployment.getId(), deploymentId);
-
-        assertNotNull(name);
-        assertEquals(existingDeployment.getName(), name);
-
-        assertEquals(existingDeployment.getCategory(), category);
-
-        assertNotNull(deployTime);
-
-        assertNotNull(url);
-        assertTrue(url.endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId)));
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: '" + existingDeployment.getId() + "',"
+                        + " name: '" + existingDeployment.getName() + "',"
+                        + " category: null,"
+                        + " deploymentTime: '${json-unit.any-string}',"
+                        + " tenantId: \"\","
+                        + " url: '" + SERVER_URL_PREFIX + AppRestUrls
+                        .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, existingDeployment.getId()) + "'"
+                        + "}");
     }
 
     /**
@@ -209,7 +191,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     @org.flowable.app.engine.test.AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testDeleteDeployment() throws Exception {
         AppDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(existingDeployment);
+        assertThat(existingDeployment).isNotNull();
 
         // Delete the deployment
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
@@ -217,7 +199,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNull(existingDeployment);
+        assertThat(existingDeployment).isNull();
     }
 
     /**

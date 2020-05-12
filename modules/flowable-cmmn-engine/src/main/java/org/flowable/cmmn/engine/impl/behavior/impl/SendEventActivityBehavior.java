@@ -59,13 +59,20 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
 
         EventModel eventModel = getEventModel(planItemInstanceEntity, key);
-        List<ChannelModel> channelModels = getChannelModels(commandContext, planItemInstanceEntity);
+        boolean sendOnSystemChannel = isSendOnSystemChannel(planItemInstanceEntity);
+        List<ChannelModel> channelModels = getChannelModels(commandContext, planItemInstanceEntity, sendOnSystemChannel);
 
         Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
             .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
-        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel, channelModels, Collections.emptyList(),  eventPayloadInstances);
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventPayloadInstances, planItemInstanceEntity.getTenantId());
 
-        eventRegistry.sendEventOutbound(eventInstance);
+        if (!channelModels.isEmpty()) {
+            eventRegistry.sendEventOutbound(eventInstance, channelModels);
+        }
+
+        if (sendOnSystemChannel) {
+            eventRegistry.sendSystemEventOutbound(eventInstance);
+        }
 
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
@@ -84,7 +91,13 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         return eventModel;
     }
 
-    protected List<ChannelModel> getChannelModels(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected boolean isSendOnSystemChannel(PlanItemInstanceEntity planItemInstanceEntity) {
+        List<ExtensionElement> systemChannels = planItemInstanceEntity.getPlanItemDefinition().getExtensionElements()
+                .getOrDefault("systemChannel", Collections.emptyList());
+        return !systemChannels.isEmpty();
+    }
+
+    protected List<ChannelModel> getChannelModels(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, boolean sendOnSystemChannel) {
         List<String> channelKeys = new ArrayList<>();
 
         Map<String, List<ExtensionElement>> extensionElements = planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getExtensionElements();
@@ -118,7 +131,12 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         }
 
         if (channelKeys.isEmpty()) {
-            throw new FlowableException("No channel keys configured");
+            if (!sendOnSystemChannel) {
+                // If the event is going to be send on the system channel then it is allowed to not define any other channels
+                throw new FlowableException("No channel keys configured");
+            } else {
+                return Collections.emptyList();
+            }
         }
 
         EventRepositoryService eventRepositoryService = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext).getEventRepositoryService();

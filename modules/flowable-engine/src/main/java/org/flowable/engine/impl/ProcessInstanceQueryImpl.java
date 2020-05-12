@@ -835,7 +835,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public void enhanceCachedValue(ExecutionEntity processInstance) {
         if (includeProcessVariables) {
             processInstance.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableService().findVariableInstancesByProcessInstanceId(processInstance.getId()));
+                    .addAll(CommandContextUtil.getVariableService().findVariableInstancesByExecutionId(processInstance.getId()));
         }
     }
 

@@ -12,10 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -44,14 +41,13 @@ public class SendEventServiceTaskSynchronouslyConverterTest extends AbstractConv
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("sendEventServiceTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SendEventServiceTask);
-        SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
-        assertEquals("sendEventServiceTask", sendEventServiceTask.getId());
-        assertEquals("Send sync event task", sendEventServiceTask.getName());
-
-        assertEquals("myEvent", sendEventServiceTask.getEventType());
-        assertFalse(sendEventServiceTask.isTriggerable());
-        assertTrue(sendEventServiceTask.isSendSynchronously());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SendEventServiceTask.class, sendEventServiceTask -> {
+                    assertThat(sendEventServiceTask.getId()).isEqualTo("sendEventServiceTask");
+                    assertThat(sendEventServiceTask.getName()).isEqualTo("Send sync event task");
+                    assertThat(sendEventServiceTask.getEventType()).isEqualTo("myEvent");
+                    assertThat(sendEventServiceTask.isTriggerable()).isFalse();
+                    assertThat(sendEventServiceTask.isSendSynchronously()).isTrue();
+                });
     }
 }

@@ -32,7 +32,6 @@ import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
@@ -106,7 +105,6 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         assertThat(testInboundEventDeserializer.counter.get()).isEqualTo(1);
         assertThat(testInboundEventKeyDetector.counter.get()).isEqualTo(1);
         assertThat(testInboundEventTenantDetector.counter.get()).isEqualTo(1);
-        assertThat(testInboundEventPayloadExtractor.correlationCounter.get()).isEqualTo(1);
         assertThat(testInboundEventPayloadExtractor.payloadCounter.get()).isEqualTo(1);
         assertThat(testInboundEventTransformer.counter.get()).isEqualTo(1);
 
@@ -167,10 +165,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
         ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
-        EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventModel(eventModel);
-        eventInstance.setChannelModels(Collections.singletonList(channelModel));
-        eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance);
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), "testTenantId");
+        eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance, Collections.singleton(channelModel));
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);
         assertThat(testOutboundEventSerializer.counter.get()).isEqualTo(1);
@@ -202,10 +198,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
         ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
-        EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventModel(eventModel);
-        eventInstance.setChannelModels(Collections.singletonList(channelModel));
-        eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance);
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), "testTenantId");
+        eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance, Collections.singleton(channelModel));
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);
         assertThat(testOutboundEventProcessingPipeline.counter.get()).isEqualTo(1);
@@ -266,14 +260,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
 
     private static class TestInboundEventPayloadExtractor implements InboundEventPayloadExtractor<String> {
 
-        public AtomicInteger correlationCounter = new AtomicInteger(0);
         public AtomicInteger payloadCounter = new AtomicInteger(0);
-
-        @Override
-        public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, String event) {
-            correlationCounter.incrementAndGet();
-            return Collections.emptyList();
-        }
 
         @Override
         public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, String event) {
@@ -305,7 +292,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         }
     }
 
-    private static class TestOutboundChannelAdapter implements OutboundEventChannelAdapter {
+    private static class TestOutboundChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public AtomicInteger counter = new AtomicInteger(0);
 
@@ -339,7 +326,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         }
     }
 
-    private static class TestOutboundEventProcessingPipeline implements OutboundEventProcessingPipeline {
+    private static class TestOutboundEventProcessingPipeline implements OutboundEventProcessingPipeline<String> {
 
         public AtomicInteger counter = new AtomicInteger(0);
 

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 
 package org.flowable.standalone.jpa;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -73,88 +76,88 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
     @BeforeEach
     protected void setUp() {
         entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
-            .getEntityManagerFactory();
+                .getEntityManagerFactory();
         setupJPAEntities();
     }
 
     public void setupJPAEntities() {
 
-            EntityManager manager = entityManagerFactory.createEntityManager();
-            manager.getTransaction().begin();
+        EntityManager manager = entityManagerFactory.createEntityManager();
+        manager.getTransaction().begin();
 
-            // Simple test data
-            simpleEntityFieldAccess = new FieldAccessJPAEntity();
-            simpleEntityFieldAccess.setId(1L);
-            simpleEntityFieldAccess.setValue("value1");
-            manager.persist(simpleEntityFieldAccess);
+        // Simple test data
+        simpleEntityFieldAccess = new FieldAccessJPAEntity();
+        simpleEntityFieldAccess.setId(1L);
+        simpleEntityFieldAccess.setValue("value1");
+        manager.persist(simpleEntityFieldAccess);
 
-            simpleEntityPropertyAccess = new PropertyAccessJPAEntity();
-            simpleEntityPropertyAccess.setId(1L);
-            simpleEntityPropertyAccess.setValue("value2");
-            manager.persist(simpleEntityPropertyAccess);
+        simpleEntityPropertyAccess = new PropertyAccessJPAEntity();
+        simpleEntityPropertyAccess.setId(1L);
+        simpleEntityPropertyAccess.setValue("value2");
+        manager.persist(simpleEntityPropertyAccess);
 
-            subclassFieldAccess = new SubclassFieldAccessJPAEntity();
-            subclassFieldAccess.setId(1L);
-            subclassFieldAccess.setValue("value3");
-            manager.persist(subclassFieldAccess);
+        subclassFieldAccess = new SubclassFieldAccessJPAEntity();
+        subclassFieldAccess.setId(1L);
+        subclassFieldAccess.setValue("value3");
+        manager.persist(subclassFieldAccess);
 
-            subclassPropertyAccess = new SubclassPropertyAccessJPAEntity();
-            subclassPropertyAccess.setId(1L);
-            subclassPropertyAccess.setValue("value4");
-            manager.persist(subclassPropertyAccess);
+        subclassPropertyAccess = new SubclassPropertyAccessJPAEntity();
+        subclassPropertyAccess.setId(1L);
+        subclassPropertyAccess.setValue("value4");
+        manager.persist(subclassPropertyAccess);
 
-            // Test entities with all possible ID types
-            byteIdJPAEntity = new ByteIdJPAEntity();
-            byteIdJPAEntity.setByteId((byte) 1);
-            manager.persist(byteIdJPAEntity);
+        // Test entities with all possible ID types
+        byteIdJPAEntity = new ByteIdJPAEntity();
+        byteIdJPAEntity.setByteId((byte) 1);
+        manager.persist(byteIdJPAEntity);
 
-            shortIdJPAEntity = new ShortIdJPAEntity();
-            shortIdJPAEntity.setShortId((short) 123);
-            manager.persist(shortIdJPAEntity);
+        shortIdJPAEntity = new ShortIdJPAEntity();
+        shortIdJPAEntity.setShortId((short) 123);
+        manager.persist(shortIdJPAEntity);
 
-            integerIdJPAEntity = new IntegerIdJPAEntity();
-            integerIdJPAEntity.setIntId(123);
-            manager.persist(integerIdJPAEntity);
+        integerIdJPAEntity = new IntegerIdJPAEntity();
+        integerIdJPAEntity.setIntId(123);
+        manager.persist(integerIdJPAEntity);
 
-            longIdJPAEntity = new LongIdJPAEntity();
-            longIdJPAEntity.setLongId(123456789L);
-            manager.persist(longIdJPAEntity);
+        longIdJPAEntity = new LongIdJPAEntity();
+        longIdJPAEntity.setLongId(123456789L);
+        manager.persist(longIdJPAEntity);
 
-            floatIdJPAEntity = new FloatIdJPAEntity();
-            floatIdJPAEntity.setFloatId((float) 123.45678);
-            manager.persist(floatIdJPAEntity);
+        floatIdJPAEntity = new FloatIdJPAEntity();
+        floatIdJPAEntity.setFloatId((float) 123.45678);
+        manager.persist(floatIdJPAEntity);
 
-            doubleIdJPAEntity = new DoubleIdJPAEntity();
-            doubleIdJPAEntity.setDoubleId(12345678.987654);
-            manager.persist(doubleIdJPAEntity);
+        doubleIdJPAEntity = new DoubleIdJPAEntity();
+        doubleIdJPAEntity.setDoubleId(12345678.987654);
+        manager.persist(doubleIdJPAEntity);
 
-            charIdJPAEntity = new CharIdJPAEntity();
-            charIdJPAEntity.setCharId('g');
-            manager.persist(charIdJPAEntity);
+        charIdJPAEntity = new CharIdJPAEntity();
+        charIdJPAEntity.setCharId('g');
+        manager.persist(charIdJPAEntity);
 
-            dateIdJPAEntity = new DateIdJPAEntity();
-            dateIdJPAEntity.setDateId(new java.util.Date());
-            manager.persist(dateIdJPAEntity);
+        dateIdJPAEntity = new DateIdJPAEntity();
+        dateIdJPAEntity.setDateId(new java.util.Date());
+        manager.persist(dateIdJPAEntity);
 
-            sqlDateIdJPAEntity = new SQLDateIdJPAEntity();
-            sqlDateIdJPAEntity.setDateId(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
-            manager.persist(sqlDateIdJPAEntity);
+        sqlDateIdJPAEntity = new SQLDateIdJPAEntity();
+        sqlDateIdJPAEntity.setDateId(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+        manager.persist(sqlDateIdJPAEntity);
 
-            stringIdJPAEntity = new StringIdJPAEntity();
-            stringIdJPAEntity.setStringId("azertyuiop");
-            manager.persist(stringIdJPAEntity);
+        stringIdJPAEntity = new StringIdJPAEntity();
+        stringIdJPAEntity.setStringId("azertyuiop");
+        manager.persist(stringIdJPAEntity);
 
-            bigDecimalIdJPAEntity = new BigDecimalIdJPAEntity();
-            bigDecimalIdJPAEntity.setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
-            manager.persist(bigDecimalIdJPAEntity);
+        bigDecimalIdJPAEntity = new BigDecimalIdJPAEntity();
+        bigDecimalIdJPAEntity.setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
+        manager.persist(bigDecimalIdJPAEntity);
 
-            bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
-            bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("12345678912345678912345678900000"));
-            manager.persist(bigIntegerIdJPAEntity);
+        bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
+        bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("12345678912345678912345678900000"));
+        manager.persist(bigIntegerIdJPAEntity);
 
-            manager.flush();
-            manager.getTransaction().commit();
-            manager.close();
+        manager.flush();
+        manager.getTransaction().commit();
+        manager.close();
 
     }
 
@@ -217,43 +220,43 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         // Read entity with @Id on field
         Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertTrue(fieldAccessResult instanceof FieldAccessJPAEntity);
-        assertEquals(1L, ((FieldAccessJPAEntity) fieldAccessResult).getId().longValue());
-        assertEquals("value1", ((FieldAccessJPAEntity) fieldAccessResult).getValue());
+        assertThat(fieldAccessResult).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(((FieldAccessJPAEntity) fieldAccessResult).getId().longValue()).isEqualTo(1L);
+        assertThat(((FieldAccessJPAEntity) fieldAccessResult).getValue()).isEqualTo("value1");
 
         // Read entity with @Id on property
         Object propertyAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityPropertyAccess");
-        assertTrue(propertyAccessResult instanceof PropertyAccessJPAEntity);
-        assertEquals(1L, ((PropertyAccessJPAEntity) propertyAccessResult).getId().longValue());
-        assertEquals("value2", ((PropertyAccessJPAEntity) propertyAccessResult).getValue());
+        assertThat(propertyAccessResult).isInstanceOf(PropertyAccessJPAEntity.class);
+        assertThat(((PropertyAccessJPAEntity) propertyAccessResult).getId().longValue()).isEqualTo(1L);
+        assertThat(((PropertyAccessJPAEntity) propertyAccessResult).getValue()).isEqualTo("value2");
 
         // Read entity with @Id on field of mapped superclass
         Object subclassFieldResult = runtimeService.getVariable(processInstance.getId(), "subclassFieldAccess");
-        assertTrue(subclassFieldResult instanceof SubclassFieldAccessJPAEntity);
-        assertEquals(1L, ((SubclassFieldAccessJPAEntity) subclassFieldResult).getId().longValue());
-        assertEquals("value3", ((SubclassFieldAccessJPAEntity) subclassFieldResult).getValue());
+        assertThat(subclassFieldResult).isInstanceOf(SubclassFieldAccessJPAEntity.class);
+        assertThat(((SubclassFieldAccessJPAEntity) subclassFieldResult).getId().longValue()).isEqualTo(1L);
+        assertThat(((SubclassFieldAccessJPAEntity) subclassFieldResult).getValue()).isEqualTo("value3");
 
         // Read entity with @Id on property of mapped superclass
         Object subclassPropertyResult = runtimeService.getVariable(processInstance.getId(), "subclassPropertyAccess");
-        assertTrue(subclassPropertyResult instanceof SubclassPropertyAccessJPAEntity);
-        assertEquals(1L, ((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getId().longValue());
-        assertEquals("value4", ((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getValue());
+        assertThat(subclassPropertyResult).isInstanceOf(SubclassPropertyAccessJPAEntity.class);
+        assertThat(((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getId().longValue()).isEqualTo(1L);
+        assertThat(((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getValue()).isEqualTo("value4");
 
         // -----------------------------------------------------------------------------
         // Test updating JPA-entity to null-value and back again
         // -----------------------------------------------------------------------------
         Object currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertNotNull(currentValue);
+        assertThat(currentValue).isNotNull();
         // Set to null
         runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess", null);
         currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertNull(currentValue);
+        assertThat(currentValue).isNull();
         // Set to JPA-entity again
         runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
         currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertNotNull(currentValue);
-        assertTrue(currentValue instanceof FieldAccessJPAEntity);
-        assertEquals(1L, ((FieldAccessJPAEntity) currentValue).getId().longValue());
+        assertThat(currentValue).isNotNull();
+        assertThat(currentValue).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(((FieldAccessJPAEntity) currentValue).getId().longValue()).isEqualTo(1L);
 
         // -----------------------------------------------------------------------------
         // Test all allowed types of ID values
@@ -277,52 +280,52 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         // stored in the DB.
         ProcessInstance processInstanceAllTypes = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
         Object byteIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "byteIdJPAEntity");
-        assertTrue(byteIdResult instanceof ByteIdJPAEntity);
-        assertEquals(byteIdJPAEntity.getByteId(), ((ByteIdJPAEntity) byteIdResult).getByteId());
+        assertThat(byteIdResult).isInstanceOf(ByteIdJPAEntity.class);
+        assertThat(((ByteIdJPAEntity) byteIdResult).getByteId()).isEqualTo(byteIdJPAEntity.getByteId());
 
         Object shortIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "shortIdJPAEntity");
-        assertTrue(shortIdResult instanceof ShortIdJPAEntity);
-        assertEquals(shortIdJPAEntity.getShortId(), ((ShortIdJPAEntity) shortIdResult).getShortId());
+        assertThat(shortIdResult).isInstanceOf(ShortIdJPAEntity.class);
+        assertThat(((ShortIdJPAEntity) shortIdResult).getShortId()).isEqualTo(shortIdJPAEntity.getShortId());
 
         Object integerIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "integerIdJPAEntity");
-        assertTrue(integerIdResult instanceof IntegerIdJPAEntity);
-        assertEquals(integerIdJPAEntity.getIntId(), ((IntegerIdJPAEntity) integerIdResult).getIntId());
+        assertThat(integerIdResult).isInstanceOf(IntegerIdJPAEntity.class);
+        assertThat(((IntegerIdJPAEntity) integerIdResult).getIntId()).isEqualTo(integerIdJPAEntity.getIntId());
 
         Object longIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "longIdJPAEntity");
-        assertTrue(longIdResult instanceof LongIdJPAEntity);
-        assertEquals(longIdJPAEntity.getLongId(), ((LongIdJPAEntity) longIdResult).getLongId());
+        assertThat(longIdResult).isInstanceOf(LongIdJPAEntity.class);
+        assertThat(((LongIdJPAEntity) longIdResult).getLongId()).isEqualTo(longIdJPAEntity.getLongId());
 
         Object floatIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "floatIdJPAEntity");
-        assertTrue(floatIdResult instanceof FloatIdJPAEntity);
-        assertEquals(floatIdJPAEntity.getFloatId(), ((FloatIdJPAEntity) floatIdResult).getFloatId());
+        assertThat(floatIdResult).isInstanceOf(FloatIdJPAEntity.class);
+        assertThat(((FloatIdJPAEntity) floatIdResult).getFloatId()).isEqualTo(floatIdJPAEntity.getFloatId());
 
         Object doubleIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "doubleIdJPAEntity");
-        assertTrue(doubleIdResult instanceof DoubleIdJPAEntity);
-        assertEquals(doubleIdJPAEntity.getDoubleId(), ((DoubleIdJPAEntity) doubleIdResult).getDoubleId());
+        assertThat(doubleIdResult).isInstanceOf(DoubleIdJPAEntity.class);
+        assertThat(((DoubleIdJPAEntity) doubleIdResult).getDoubleId()).isEqualTo(doubleIdJPAEntity.getDoubleId());
 
         Object charIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "charIdJPAEntity");
-        assertTrue(charIdResult instanceof CharIdJPAEntity);
-        assertEquals(charIdJPAEntity.getCharId(), ((CharIdJPAEntity) charIdResult).getCharId());
+        assertThat(charIdResult).isInstanceOf(CharIdJPAEntity.class);
+        assertThat(((CharIdJPAEntity) charIdResult).getCharId()).isEqualTo(charIdJPAEntity.getCharId());
 
         Object stringIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "stringIdJPAEntity");
-        assertTrue(stringIdResult instanceof StringIdJPAEntity);
-        assertEquals(stringIdJPAEntity.getStringId(), ((StringIdJPAEntity) stringIdResult).getStringId());
+        assertThat(stringIdResult).isInstanceOf(StringIdJPAEntity.class);
+        assertThat(((StringIdJPAEntity) stringIdResult).getStringId()).isEqualTo(stringIdJPAEntity.getStringId());
 
         Object dateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "dateIdJPAEntity");
-        assertTrue(dateIdResult instanceof DateIdJPAEntity);
-        assertEquals(dateIdJPAEntity.getDateId(), ((DateIdJPAEntity) dateIdResult).getDateId());
+        assertThat(dateIdResult).isInstanceOf(DateIdJPAEntity.class);
+        assertThat(((DateIdJPAEntity) dateIdResult).getDateId()).isEqualTo(dateIdJPAEntity.getDateId());
 
         Object sqlDateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "sqlDateIdJPAEntity");
-        assertTrue(sqlDateIdResult instanceof SQLDateIdJPAEntity);
-        assertEquals(sqlDateIdJPAEntity.getDateId(), ((SQLDateIdJPAEntity) sqlDateIdResult).getDateId());
+        assertThat(sqlDateIdResult).isInstanceOf(SQLDateIdJPAEntity.class);
+        assertThat(((SQLDateIdJPAEntity) sqlDateIdResult).getDateId()).isEqualTo(sqlDateIdJPAEntity.getDateId());
 
         Object bigDecimalIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
-        assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
-        assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity) bigDecimalIdResult).getBigDecimalId());
+        assertThat(bigDecimalIdResult).isInstanceOf(BigDecimalIdJPAEntity.class);
+        assertThat(((BigDecimalIdJPAEntity) bigDecimalIdResult).getBigDecimalId()).isEqualTo(bigDecimalIdJPAEntity.getBigDecimalId());
 
         Object bigIntegerIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "bigIntegerIdJPAEntity");
-        assertTrue(bigIntegerIdResult instanceof BigIntegerIdJPAEntity);
-        assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(), ((BigIntegerIdJPAEntity) bigIntegerIdResult).getBigIntegerId());
+        assertThat(bigIntegerIdResult).isInstanceOf(BigIntegerIdJPAEntity.class);
+        assertThat(((BigIntegerIdJPAEntity) bigIntegerIdResult).getBigIntegerId()).isEqualTo(bigIntegerIdJPAEntity.getBigIntegerId());
     }
 
     @Test
@@ -343,35 +346,35 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         // Read entity with @Id on field
         Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertTrue(fieldAccessResult instanceof List<?>);
+        assertThat(fieldAccessResult).isInstanceOf(List.class);
         List<?> list = (List<?>) fieldAccessResult;
-        assertEquals(3L, list.size());
-        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-        assertEquals(((FieldAccessJPAEntity) list.get(0)).getId(), simpleEntityFieldAccess.getId());
+        assertThat(list.size()).isEqualTo(3L);
+        assertThat(list.get(0)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(simpleEntityFieldAccess.getId()).isEqualTo(((FieldAccessJPAEntity) list.get(0)).getId());
 
         // Read entity with @Id on property
         Object propertyAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityPropertyAccess");
-        assertTrue(propertyAccessResult instanceof List<?>);
+        assertThat(propertyAccessResult).isInstanceOf(List.class);
         list = (List<?>) propertyAccessResult;
-        assertEquals(3L, list.size());
-        assertTrue(list.get(0) instanceof PropertyAccessJPAEntity);
-        assertEquals(((PropertyAccessJPAEntity) list.get(0)).getId(), simpleEntityPropertyAccess.getId());
+        assertThat(list.size()).isEqualTo(3L);
+        assertThat(list.get(0)).isInstanceOf(PropertyAccessJPAEntity.class);
+        assertThat(simpleEntityPropertyAccess.getId()).isEqualTo(((PropertyAccessJPAEntity) list.get(0)).getId());
 
         // Read entity with @Id on field of mapped superclass
         Object subclassFieldResult = runtimeService.getVariable(processInstance.getId(), "subclassFieldAccess");
-        assertTrue(subclassFieldResult instanceof List<?>);
+        assertThat(subclassFieldResult).isInstanceOf(List.class);
         list = (List<?>) subclassFieldResult;
-        assertEquals(3L, list.size());
-        assertTrue(list.get(0) instanceof SubclassFieldAccessJPAEntity);
-        assertEquals(((SubclassFieldAccessJPAEntity) list.get(0)).getId(), simpleEntityPropertyAccess.getId());
+        assertThat(list.size()).isEqualTo(3L);
+        assertThat(list.get(0)).isInstanceOf(SubclassFieldAccessJPAEntity.class);
+        assertThat(simpleEntityPropertyAccess.getId()).isEqualTo(((SubclassFieldAccessJPAEntity) list.get(0)).getId());
 
         // Read entity with @Id on property of mapped superclass
         Object subclassPropertyResult = runtimeService.getVariable(processInstance.getId(), "subclassPropertyAccess");
-        assertTrue(subclassPropertyResult instanceof List<?>);
+        assertThat(subclassPropertyResult).isInstanceOf(List.class);
         list = (List<?>) subclassPropertyResult;
-        assertEquals(3L, list.size());
-        assertTrue(list.get(0) instanceof SubclassPropertyAccessJPAEntity);
-        assertEquals(((SubclassPropertyAccessJPAEntity) list.get(0)).getId(), simpleEntityPropertyAccess.getId());
+        assertThat(list.size()).isEqualTo(3L);
+        assertThat(list.get(0)).isInstanceOf(SubclassPropertyAccessJPAEntity.class);
+        assertThat(simpleEntityPropertyAccess.getId()).isEqualTo(((SubclassPropertyAccessJPAEntity) list.get(0)).getId());
     }
 
     @Test
@@ -379,47 +382,44 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
     public void testStoreJPAEntityListAsVariableEdgeCases() {
 
         // Test using mixed JPA-entities which are not serializable, should not
-        // be picked up by JPA list type en therefor fail
-        // due to serialization error
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityPropertyAccess));
-
-        try {
+        // be picked up by JPA list type en therefor fail due to serialization error
+        assertThatThrownBy(() ->
+        {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityPropertyAccess));
             runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            // Expected
-        }
+        })
+                .isExactlyInstanceOf(FlowableException.class);
 
         // Test updating value to an empty list and back
-        variables = new HashMap<>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
 
         runtimeService.setVariable(processInstance.getId(), "list", new ArrayList<String>());
-        assertEquals(0L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).isEmpty();
 
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(FieldAccessJPAEntity.class);
 
         // Test updating to list of Strings
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList("TEST", "TESTING"));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof String);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(String.class);
 
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(FieldAccessJPAEntity.class);
 
         // Test updating to null
         runtimeService.setVariable(processInstance.getId(), "list", null);
-        assertNull(runtimeService.getVariable(processInstance.getId(), "list"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "list")).isNull();
 
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
+        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(FieldAccessJPAEntity.class);
     }
 
     // https://activiti.atlassian.net/browse/ACT-995
@@ -454,7 +454,7 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         runtimeService.setVariable(executionId, variableName, newVariable);
 
         Object variable = runtimeService.getVariable(executionId, variableName);
-        assertEquals(newVariable.getId(), ((FieldAccessJPAEntity) variable).getId());
+        assertThat(((FieldAccessJPAEntity) variable).getId()).isEqualTo(newVariable.getId());
     }
 
     @Test
@@ -463,61 +463,51 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         setupIllegalJPAEntities();
         // Starting process instance with a variable that has a compound primary
         // key, which is not supported.
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("compoundIdJPAEntity", compoundIdJPAEntity);
-
-        try {
+        assertThatThrownBy(() -> {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("compoundIdJPAEntity", compoundIdJPAEntity);
             runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Cannot find field or method with annotation @Id on class", ae.getMessage());
-            assertTextPresent("only single-valued primary keys are supported on JPA-entities", ae.getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot find field or method with annotation @Id on class")
+                .hasMessageContaining("only single-valued primary keys are supported on JPA-entities");
 
         // Starting process instance with a variable that has null as ID-value
-        variables = new HashMap<>();
-        variables.put("nullValueEntity", new FieldAccessJPAEntity());
-
-        try {
+        assertThatThrownBy(() -> {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("nullValueEntity", new FieldAccessJPAEntity());
             runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("Value of primary key for JPA-Entity cannot be null", ae.getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Value of primary key for JPA-Entity cannot be null");
 
         // Starting process instance with an invalid type of ID
         // Under normal circumstances, JPA will throw an exception for this of
-        // the class is
-        // present in the PU when creating EntityManagerFactory, but we test it
+        // the class is present in the PU when creating EntityManagerFactory, but we test it
         // *just in case*
-        variables = new HashMap<>();
-        IllegalIdClassJPAEntity illegalIdTypeEntity = new IllegalIdClassJPAEntity();
-        illegalIdTypeEntity.setId(Calendar.getInstance());
-        variables.put("illegalTypeId", illegalIdTypeEntity);
-
-        try {
+        assertThatThrownBy(() -> {
+            Map<String, Object> variables = new HashMap<>();
+            IllegalIdClassJPAEntity illegalIdTypeEntity = new IllegalIdClassJPAEntity();
+            illegalIdTypeEntity.setId(Calendar.getInstance());
+            variables.put("illegalTypeId", illegalIdTypeEntity);
             runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Unsupported Primary key type for JPA-Entity", ae.getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Unsupported Primary key type for JPA-Entity");
 
         // Start process instance with JPA-entity which has an ID but isn't
-        // persisted. When reading
-        // the variable we should get an exception.
-        variables = new HashMap<>();
-        FieldAccessJPAEntity nonPersistentEntity = new FieldAccessJPAEntity();
-        nonPersistentEntity.setId(9999L);
-        variables.put("nonPersistentEntity", nonPersistentEntity);
+        // persisted. When reading the variable we should get an exception.
+        assertThatThrownBy(() -> {
+            Map<String, Object> variables = new HashMap<>();
+            FieldAccessJPAEntity nonPersistentEntity = new FieldAccessJPAEntity();
+            nonPersistentEntity.setId(9999L);
+            variables.put("nonPersistentEntity", nonPersistentEntity);
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
-
-        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
             runtimeService.getVariable(processInstance.getId(), "nonPersistentEntity");
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Entity does not exist: " + FieldAccessJPAEntity.class.getName() + " - 9999", ae.getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Entity does not exist: " + FieldAccessJPAEntity.class.getName() + " - 9999");
     }
 
     @Test
@@ -532,8 +522,8 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         // Query the processInstance
         ProcessInstance result = runtimeService.createProcessInstanceQuery().variableValueEquals("entityToQuery", entityToQuery).singleResult();
-        assertNotNull(result);
-        assertEquals(result.getId(), processInstance.getId());
+        assertThat(result).isNotNull();
+        assertThat(processInstance.getId()).isEqualTo(result.getId());
 
         // Query with the same entity-type but with different ID should have no
         // result
@@ -541,39 +531,24 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         unexistingEntity.setId(8888L);
 
         result = runtimeService.createProcessInstanceQuery().variableValueEquals("entityToQuery", unexistingEntity).singleResult();
-        assertNull(result);
+        assertThat(result).isNull();
 
         // All other operators are unsupported
-        try {
-            runtimeService.createProcessInstanceQuery().variableValueNotEquals("entityToQuery", entityToQuery).singleResult();
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
-        }
-        try {
-            runtimeService.createProcessInstanceQuery().variableValueGreaterThan("entityToQuery", entityToQuery).singleResult();
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
-        }
-        try {
-            runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("entityToQuery", entityToQuery).singleResult();
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
-        }
-        try {
-            runtimeService.createProcessInstanceQuery().variableValueLessThan("entityToQuery", entityToQuery).singleResult();
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
-        }
-        try {
-            runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("entityToQuery", entityToQuery).singleResult();
-            fail("Exception expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().variableValueNotEquals("entityToQuery", entityToQuery).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JPA entity variables can only be used in 'variableValueEquals'");
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().variableValueGreaterThan("entityToQuery", entityToQuery).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JPA entity variables can only be used in 'variableValueEquals'");
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("entityToQuery", entityToQuery).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JPA entity variables can only be used in 'variableValueEquals'");
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().variableValueLessThan("entityToQuery", entityToQuery).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JPA entity variables can only be used in 'variableValueEquals'");
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("entityToQuery", entityToQuery).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("JPA entity variables can only be used in 'variableValueEquals'");
     }
 
     @Test
@@ -588,7 +563,7 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         // Servicetask in process 'UpdateJPAValuesProcess' should have set value
         // on entityToUpdate.
         Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
-        assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
-        assertEquals("updatedValue", ((FieldAccessJPAEntity) updatedEntity).getValue());
+        assertThat(updatedEntity).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(((FieldAccessJPAEntity) updatedEntity).getValue()).isEqualTo("updatedValue");
     }
 }

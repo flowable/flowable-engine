@@ -82,7 +82,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploymentTenantId(TENANT_A)
             .deploy();
 
@@ -90,7 +89,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploymentTenantId(TENANT_B)
             .deploy();
     }
@@ -260,7 +258,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

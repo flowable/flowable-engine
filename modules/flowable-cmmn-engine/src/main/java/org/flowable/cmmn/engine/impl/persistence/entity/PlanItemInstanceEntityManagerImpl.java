@@ -44,10 +44,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -409,12 +411,16 @@ public class PlanItemInstanceEntityManagerImpl
         
         // Variables
         if (countingPlanItemInstanceEntity.getVariableCount() > 0) {
-            VariableInstanceEntityManager variableInstanceEntityManager 
-                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-            List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN);
+
+            VariableService variableService
+                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableService();
+            List<VariableInstanceEntity> variableInstanceEntities = variableService
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(planItemInstanceEntity.getId())
+                    .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                    .list();
             for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-                variableInstanceEntityManager.delete(variableInstanceEntity);
+                variableService.deleteVariableInstance(variableInstanceEntity);
             }
         }
         
@@ -443,8 +449,34 @@ public class PlanItemInstanceEntityManagerImpl
                 identityLinkEntityManager.delete(identityLinkEntity);
             }
         }
+
+        if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.EXTERNAL_WORKER_TASK)) {
+            ExternalWorkerJobEntityManager externalWorkerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                    .getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+            List<ExternalWorkerJobEntity> externalWorkerJobEntities = externalWorkerJobEntityManager
+                    .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+
+            for (ExternalWorkerJobEntity externalWorkerJobEntity : externalWorkerJobEntities) {
+                externalWorkerJobEntityManager.delete(externalWorkerJobEntity);
+            }
+        }
         
         getDataManager().delete(planItemInstanceEntity);
+    }
+
+    @Override
+    public void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        PlanItemInstanceQuery planItemQuery = new PlanItemInstanceQueryImpl()
+                .caseInstanceId(caseInstanceId)
+                .includeEnded();
+        List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
+        if (planItemInstances != null) {
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+                planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(planItemInstanceEntity);
+            }
+        }
     }
 
     protected CaseInstanceEntityManager getCaseInstanceEntityManager() {

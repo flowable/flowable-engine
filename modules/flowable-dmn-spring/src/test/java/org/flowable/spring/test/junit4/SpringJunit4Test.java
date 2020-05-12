@@ -12,8 +12,7 @@
  */
 package org.flowable.spring.test.junit4;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -60,8 +59,8 @@ public class SpringJunit4Test {
                 .decisionKey("decision1")
                 .variable("input1", "testString")
                 .executeWithSingleResult();
-        
-        assertEquals("test1", executionResult.get("output1"));
-        assertNotNull(flowableDmnSpringRule.getRepositoryService());
+
+        assertThat(executionResult.get("output1")).isEqualTo("test1");
+        assertThat(flowableDmnSpringRule.getRepositoryService()).isNotNull();
     }
 }

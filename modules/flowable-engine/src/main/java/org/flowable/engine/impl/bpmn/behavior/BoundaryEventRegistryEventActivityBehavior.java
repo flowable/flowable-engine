@@ -23,9 +23,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -33,7 +31,6 @@ import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
-import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
@@ -56,9 +53,9 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        EventModel eventModel = getEventModel(execution);
+        String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                        .eventType(eventModel.getKey())
+                        .eventType(eventDefinitionKey)
                         .executionId(executionEntity.getId())
                         .processInstanceId(executionEntity.getProcessInstanceId())
                         .activityId(executionEntity.getCurrentActivityId())
@@ -70,16 +67,6 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
-    }
-
-    protected EventModel getEventModel(DelegateExecution execution) {
-        EventModel eventModel = null;
-        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(eventDefinitionKey);
-        } else {
-            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(eventDefinitionKey, execution.getTenantId());
-        }
-        return eventModel;
     }
 
     @Override
@@ -97,9 +84,9 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             
             CommandContext commandContext = Context.getCommandContext();
-            EventModel eventModel = getEventModel(commandContext, executionEntity);
+            String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                if (Objects.equals(eventModel.getKey(), eventSubscription.getEventType())) {
+                if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
                     CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
                 }
@@ -108,20 +95,20 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
 
         super.trigger(executionEntity, triggerName, triggerData);
     }
-    
-    protected EventModel getEventModel(CommandContext commandContext, ExecutionEntity executionEntity) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
-        String key = null;
+    protected String getEventDefinitionKey(CommandContext commandContext, ExecutionEntity executionEntity) {
+        Object key = null;
+
         if (StringUtils.isNotEmpty(eventDefinitionKey)) {
-            Expression expression = processEngineConfiguration.getExpressionManager().createExpression(eventDefinitionKey);
-            key = expression.getValue(executionEntity).toString();
+            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager()
+                    .createExpression(eventDefinitionKey);
+            key = expression.getValue(executionEntity);
         }
 
-        EventModel eventModel = getEventModel(executionEntity);
-        if (eventModel == null) {
-            throw new FlowableException("Could not find event model for key " +key);
+        if (key == null) {
+            throw new FlowableException("Could not resolve key for: " + eventDefinitionKey);
         }
-        return eventModel;
+
+        return key.toString();
     }
 }

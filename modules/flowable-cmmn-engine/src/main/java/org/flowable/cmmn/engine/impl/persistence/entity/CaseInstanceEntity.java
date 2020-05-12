@@ -40,5 +40,11 @@ public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstance
     void setCompletable(boolean completable);
     void setTenantId(String tenantId);
 
+    Date getLockTime();
+    void setLockTime(Date lockTime);
+
+    String getLockOwner();
+    void setLockOwner(String lockOwner);
+
     List<VariableInstanceEntity> getQueryVariables();
 }

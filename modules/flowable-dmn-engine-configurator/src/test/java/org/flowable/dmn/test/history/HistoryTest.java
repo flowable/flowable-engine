@@ -12,10 +12,7 @@
  */
 package org.flowable.dmn.test.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,19 +44,20 @@ public class HistoryTest extends AbstractFlowableDmnEngineConfiguratorTest {
     public void deployNestedProcessAndDecisionTable() {
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivityProcess", Collections.singletonMap("inputVariable1", 10));
-    
+
             DmnHistoryService dmnHistoryService = DmnEngines.getDefaultDmnEngine().getDmnHistoryService();
-            DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
-            assertEquals("decision1", decisionExecution.getDecisionKey());
+            DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery()
+                    .processInstanceIdWithChildren(processInstance.getId()).singleResult();
+            assertThat(decisionExecution.getDecisionKey()).isEqualTo("decision1");
             String subProcessInstanceId = decisionExecution.getInstanceId();
-            assertNotEquals(subProcessInstanceId, processInstance.getId());
-            
+            assertThat(processInstance.getId()).isNotEqualTo(subProcessInstanceId);
+
             decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().instanceId(processInstance.getId()).singleResult();
-            assertNull(decisionExecution);
-            
+            assertThat(decisionExecution).isNull();
+
             decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().instanceId(subProcessInstanceId).singleResult();
-            assertEquals("decision1", decisionExecution.getDecisionKey());
-            
+            assertThat(decisionExecution.getDecisionKey()).isEqualTo("decision1");
+
         } finally {
             deleteAllDmnDeployments();
         }
@@ -81,37 +79,38 @@ public class HistoryTest extends AbstractFlowableDmnEngineConfiguratorTest {
             
             DmnHistoryService dmnHistoryService = DmnEngines.getDefaultDmnEngine().getDmnHistoryService();
             List<DmnHistoricDecisionExecution> decisionExecutions = dmnHistoryService.createHistoricDecisionExecutionQuery().caseInstanceIdWithChildren(caseInstance.getId()).list();
-            assertEquals(1, decisionExecutions.size());
+            assertThat(decisionExecutions).hasSize(1);
             
             PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                             .caseInstanceId(caseInstance.getId())
                             .planItemDefinitionId("task")
                             .singleResult();
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-            
+
             decisionExecutions = dmnHistoryService.createHistoricDecisionExecutionQuery().caseInstanceIdWithChildren(caseInstance.getId()).list();
-            assertEquals(2, decisionExecutions.size());
-            
+            assertThat(decisionExecutions).hasSize(2);
+
             String caseInstanceId = null;
             String processInstanceId = null;
             for (DmnHistoricDecisionExecution dmnExecution : decisionExecutions) {
-                assertEquals("decision1", dmnExecution.getDecisionKey());
+                assertThat(dmnExecution.getDecisionKey()).isEqualTo("decision1");
                 if (caseInstance.getId().equals(dmnExecution.getInstanceId())) {
                     caseInstanceId = dmnExecution.getInstanceId();
                 } else {
                     processInstanceId = dmnExecution.getInstanceId();
                 }
             }
-            
-            assertNotNull(caseInstanceId);
-            assertNotNull(processInstanceId);
-            
-            DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().instanceId(processInstanceId).singleResult();
-            assertEquals("decision1", decisionExecution.getDecisionKey());
-            
+
+            assertThat(caseInstanceId).isNotNull();
+            assertThat(processInstanceId).isNotNull();
+
+            DmnHistoricDecisionExecution decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().instanceId(processInstanceId)
+                    .singleResult();
+            assertThat(decisionExecution.getDecisionKey()).isEqualTo("decision1");
+
             decisionExecution = dmnHistoryService.createHistoricDecisionExecutionQuery().processInstanceIdWithChildren(processInstanceId).singleResult();
-            assertEquals("decision1", decisionExecution.getDecisionKey());
-            
+            assertThat(decisionExecution.getDecisionKey()).isEqualTo("decision1");
+
         } finally {
             deleteAllDmnDeployments();
         }

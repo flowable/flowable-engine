@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,10 +65,10 @@ public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         
         Process mainProcess = parsedModel.getMainProcess();
-        
+
         // verify the main process data objects
         List<ValuedDataObject> processDataObjects = mainProcess.getDataObjects();
-        assertEquals(1, processDataObjects.size());
+        assertThat(processDataObjects).hasSize(1);
 
         Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -76,10 +76,10 @@ public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
         }
 
         ValuedDataObject dataObj = objectMap.get("dObj1");
-        assertEquals("dObj1", dataObj.getId());
-        assertEquals("stringDataObject", dataObj.getName());
-        assertEquals("xsd:string", dataObj.getItemSubjectRef().getStructureRef());
-        assertEquals("test", dataObj.getValue());
+        assertThat(dataObj.getId()).isEqualTo("dObj1");
+        assertThat(dataObj.getName()).isEqualTo("stringDataObject");
+        assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
+        assertThat(dataObj.getValue()).isEqualTo("test");
     }
 
     @Override

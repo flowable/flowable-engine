@@ -357,4 +357,5 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void changePlanItemState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
         commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
     }
+
 }

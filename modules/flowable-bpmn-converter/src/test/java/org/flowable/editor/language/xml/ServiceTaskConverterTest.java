@@ -12,6 +12,9 @@
  */
 package org.flowable.editor.language.xml;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -20,12 +23,6 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ServiceTaskConverterTest extends AbstractConverterTest {
 
@@ -49,46 +46,29 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ServiceTask);
-        assertEquals("servicetask", flowElement.getId());
-        ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Service task", serviceTask.getName());
-
-        List<FieldExtension> fields = serviceTask.getFieldExtensions();
-        assertEquals(2, fields.size());
-        FieldExtension field = fields.get(0);
-        assertEquals("testField", field.getFieldName());
-        assertEquals("test", field.getStringValue());
-        field = fields.get(1);
-        assertEquals("testField2", field.getFieldName());
-        assertEquals("${test}", field.getExpression());
-
-        List<MapExceptionEntry> exceptions = serviceTask.getMapExceptions();
-        assertEquals(2, exceptions.size());
-        MapExceptionEntry exception = exceptions.get(0);
-        assertEquals("java", exception.getErrorCode());
-        exception = exceptions.get(1);
-        assertEquals("java", exception.getErrorCode());
-        assertEquals("MyClass", exception.getClassName());
-        assertTrue(exception.isAndChildren());
-
-        List<FlowableListener> listeners = serviceTask.getExecutionListeners();
-        assertEquals(3, listeners.size());
-        FlowableListener listener = listeners.get(0);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-        assertEquals("org.test.TestClass", listener.getImplementation());
-        assertEquals("start", listener.getEvent());
-        listener = listeners.get(1);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
-        assertEquals("${testExpression}", listener.getImplementation());
-        assertEquals("end", listener.getEvent());
-        listener = listeners.get(2);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
-        assertEquals("${delegateExpression}", listener.getImplementation());
-        assertEquals("start", listener.getEvent());
-
-        assertEquals("R5/PT5M", serviceTask.getFailedJobRetryTimeCycleValue());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask");
+                    assertThat(serviceTask.getName()).isEqualTo("Service task");
+                    assertThat(serviceTask.getFieldExtensions())
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+                            .containsExactly(
+                                    tuple("testField", "test", null),
+                                    tuple("testField2", null, "${test}")
+                            );
+                    assertThat(serviceTask.getMapExceptions())
+                            .extracting(MapExceptionEntry::getErrorCode, MapExceptionEntry::getClassName, MapExceptionEntry::isAndChildren)
+                            .containsExactly(
+                                    tuple("java", "", false),
+                                    tuple("java", "MyClass", true)
+                            );
+                    assertThat(serviceTask.getExecutionListeners())
+                            .extracting(FlowableListener::getImplementationType, FlowableListener::getImplementation, FlowableListener::getEvent)
+                            .containsExactly(
+                                    tuple(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.test.TestClass", "start"),
+                                    tuple(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${testExpression}", "end"),
+                                    tuple(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${delegateExpression}", "start")
+                            );
+                });
     }
 }

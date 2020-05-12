@@ -14,16 +14,13 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -530,8 +527,7 @@ public class ExecutionEntityManagerImpl
     public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean cancel, FlowElement cancelActivity) {
         if (!deleteHistory && executionEntity.isActive()
                 && executionEntity.getCurrentFlowElement() != null
-                && !executionEntity.isMultiInstanceRoot()
-                && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
+                && !executionEntity.isMultiInstanceRoot()) {
             
             CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }
@@ -898,7 +894,35 @@ public class ExecutionEntityManagerImpl
                 
                 CommandContextUtil.getVariableService(commandContext).deleteVariablesByExecutionId(executionEntity.getId());
             }
+
+            List<VariableInstanceEntity> variableInstances = CommandContextUtil.getVariableService(commandContext)
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(executionEntity.getId())
+                    .scopeTypes(ScopeTypes.BPMN_DEPENDENT)
+                    .list();
+            boolean deleteVariableInstances = !variableInstances.isEmpty();
+
+            for (VariableInstanceEntity variableInstance : variableInstances) {
+                if (eventDispatcherEnabled) {
+                    FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+                    if (eventDispatcher != null) {
+                        eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
+                        eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
+                    }
+                }
+
+                if (variableInstance.getByteArrayRef() != null && variableInstance.getByteArrayRef().getId() != null) {
+                    variableInstance.getByteArrayRef().delete();
+                }
+            }
+
+            if (deleteVariableInstances) {
+                CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager()
+                        .deleteBySubScopeIdAndScopeTypes(executionEntity.getId(), ScopeTypes.BPMN_DEPENDENT);
+            }
+
         }
+
     }
 
     protected void deleteUserTasks(ExecutionEntity executionEntity, String deleteReason, CommandContext commandContext, 
@@ -935,6 +959,10 @@ public class ExecutionEntityManagerImpl
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
             jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
+
+        if (!enableExecutionRelationshipCounts || ((CountingExecutionEntity) executionEntity).getExternalWorkerJobCount() > 0) {
+            jobService.deleteExternalWorkerJobsByExecutionId(executionEntity.getId());
+        }
     }
 
     protected void deleteEventSubScriptions(ExecutionEntity executionEntity, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
@@ -968,16 +996,10 @@ public class ExecutionEntityManagerImpl
     // OTHER METHODS
 
     @Override
-    public void updateProcessInstanceLockTime(String processInstanceId) {
+    public void updateProcessInstanceLockTime(String processInstanceId, String lockOwner, Date lockTime) {
         Date expirationTime = getClock().getCurrentTime();
-        int lockMillis = getAsyncExecutor().getAsyncJobLockTimeInMillis();
 
-        GregorianCalendar lockCal = new GregorianCalendar();
-        lockCal.setTime(expirationTime);
-        lockCal.add(Calendar.MILLISECOND, lockMillis);
-        Date lockDate = lockCal.getTime();
-
-        dataManager.updateProcessInstanceLockTime(processInstanceId, lockDate, expirationTime);
+        dataManager.updateProcessInstanceLockTime(processInstanceId, lockTime, lockOwner, expirationTime);
     }
 
     @Override
@@ -985,6 +1007,10 @@ public class ExecutionEntityManagerImpl
         dataManager.clearProcessInstanceLockTime(processInstanceId);
     }
 
+    @Override
+    public void clearAllProcessInstanceLockTimes(String lockOwner) {
+        dataManager.clearAllProcessInstanceLockTimes(lockOwner);
+    }
     @Override
     public String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey) {
         if (executionEntity.isProcessInstanceType() && businessKey != null) {

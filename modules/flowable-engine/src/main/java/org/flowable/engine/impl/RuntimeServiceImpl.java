@@ -102,6 +102,10 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  */
 public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RuntimeService {
 
+    public RuntimeServiceImpl(ProcessEngineConfigurationImpl configuration) {
+        super(configuration);
+    }
+
     @Override
     public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
         return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, null, null));
@@ -754,5 +758,4 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
-
 }

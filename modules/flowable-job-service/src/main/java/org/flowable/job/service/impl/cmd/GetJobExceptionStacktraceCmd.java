@@ -58,6 +58,9 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
         case DEADLETTER:
             job = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(jobId);
             break;
+        case EXTERNAL_WORKER:
+            job = CommandContextUtil.getExternalWorkerJobEntityManager(commandContext).findById(jobId);
+            break;
         }
 
         if (job == null) {

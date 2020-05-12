@@ -67,6 +67,8 @@ public interface Problems {
     String SEND_EVENT_TASK_NO_EVENT_TYPE = "flowable-sendeventtask-no-event-type";
     String SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL = "flowable-sendeventtask-no-outbound-channel";
 
+    String EXTERNAL_WORKER_TASK_NO_TOPIC = "flowable-externalworkertask-no-topic";
+
     String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW = "flowable-exclusive-gateway-condition-on-seq-flow";

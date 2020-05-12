@@ -149,27 +149,12 @@
         </if>
         and DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
         and LOCK_OWNER_ is null
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-    </select>
-    
-    <select id="selectTimerJobsToExecuteWithEnabledCategories" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        from ${prefix}ACT_RU_TIMER_JOB RES
-        where 
-        <if test="parameter.jobExecutionScope == null">
-            SCOPE_TYPE_ is null
+        <if test="parameter.enabledCategories != null">
+            and CATEGORY_ in
+            <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
-        <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
-            SCOPE_TYPE_ = #{parameter.jobExecutionScope}
-        </if>
-        and DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
-        and LOCK_OWNER_ is null
-        and CATEGORY_ in
-        <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-        	#{item}
-       	</foreach>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
@@ -370,7 +355,7 @@
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
-                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
                 EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}

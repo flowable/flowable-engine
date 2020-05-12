@@ -109,7 +109,7 @@ public class ExecutionResource extends ExecutionBaseResource {
     }
     
     @ApiOperation(value = "Change the state of an execution", tags = { "Executions" },
-            notes = "")
+            notes = "", nickname = "changeExecutionActivityState")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")

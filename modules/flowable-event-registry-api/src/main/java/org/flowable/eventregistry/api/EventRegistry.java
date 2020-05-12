@@ -12,10 +12,11 @@
  */
 package org.flowable.eventregistry.api;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
@@ -37,6 +38,14 @@ public interface EventRegistry {
      * The event registry will simply pass any event it needs to send to this instance.
      */
     void setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor);
+
+    OutboundEventProcessor getSystemOutboundEventProcessor();
+
+    /**
+     * The {@link OutboundEventProcessor} is responsible for handling sending system out events.
+     * The event registry will simply pass any event it needs to send to this instance.
+     */
+    void setSystemOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor);
 
     /**
      * Registers a {@link EventRegistryEventConsumer} instance (a consumer of event registry events which
@@ -68,8 +77,12 @@ public interface EventRegistry {
     void sendEventToConsumers(EventRegistryEvent eventRegistryEvent);
 
     /**
-     * Send out an event. The corresponding {@link EventModel} will be used to
-     * decide which channel (and pipeline) will be used
+     * Send out the {@code eventInstance} via the given system {@link OutboundEventProcessor}.
      */
-    void sendEventOutbound(EventInstance eventInstance);
+    void sendSystemEventOutbound(EventInstance eventInstance);
+
+    /**
+     * Send out the {@code eventInstance} via the given {@code channelModel}(s).
+     */
+    void sendEventOutbound(EventInstance eventInstance, Collection<ChannelModel> channelModels);
 }

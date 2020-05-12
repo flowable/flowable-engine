@@ -27,39 +27,50 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 
 public class AbstractProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
-    protected void checkActivityInstances(ProcessDefinition processDefinition, ProcessInstance processInstance, String activityType, String... expectedActivityIds) {
+    protected void checkActivityInstances(ProcessDefinition processDefinition, ProcessInstance processInstance, String activityType,
+            String... expectedActivityIds) {
         List<HistoricActivityInstance> historicTaskExecutions = historyService.createHistoricActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType(activityType)
-            .list();
-        assertThat(historicTaskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder(expectedActivityIds);
-        assertThat(historicTaskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(processDefinition.getId());
+                .processInstanceId(processInstance.getId())
+                .activityType(activityType)
+                .list();
+        assertThat(historicTaskExecutions)
+                .extracting(HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(expectedActivityIds);
+        assertThat(historicTaskExecutions)
+                .extracting(HistoricActivityInstance::getProcessDefinitionId)
+                .containsOnly(processDefinition.getId());
         List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
-            .processInstanceId(processInstance.getId())
-            .activityType(activityType)
-            .list();
+                .processInstanceId(processInstance.getId())
+                .activityType(activityType)
+                .list();
         if (runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1) {
-            assertThat(activityInstances).extracting(ActivityInstance::getActivityId).containsExactlyInAnyOrder(expectedActivityIds);
+            assertThat(activityInstances)
+                    .extracting(ActivityInstance::getActivityId)
+                    .containsExactlyInAnyOrder(expectedActivityIds);
             assertThat(activityInstances).extracting(ActivityInstance::getProcessDefinitionId).containsOnly(processDefinition.getId());
             activityInstances.forEach(
-                activityInstance -> {
-                    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-                        .activityInstanceId(activityInstance.getId()).singleResult();
-                    assertThat(activityInstance).isEqualToComparingFieldByField(historicActivityInstance);
-                }
+                    activityInstance -> {
+                        HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+                                .activityInstanceId(activityInstance.getId()).singleResult();
+                        assertThat(activityInstance).isEqualToComparingFieldByField(historicActivityInstance);
+                    }
             );
         } else {
             assertThat(activityInstances).isEmpty();
         }
     }
 
-    protected void checkTaskInstance(ProcessDefinition processDefinition, ProcessInstance processInstance, String... expectestTaskDefinitionKeys) {
+    protected void checkTaskInstance(ProcessDefinition processDefinition, ProcessInstance processInstance, String... expectedTaskDefinitionKeys) {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .list();
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactlyInAnyOrder(expectestTaskDefinitionKeys);
-            assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(processDefinition.getId());
+                    .processInstanceId(processInstance.getId())
+                    .list();
+            assertThat(historicTasks)
+                    .extracting(HistoricTaskInstance::getTaskDefinitionKey)
+                    .containsExactlyInAnyOrder(expectedTaskDefinitionKeys);
+            assertThat(historicTasks)
+                    .extracting(HistoricTaskInstance::getProcessDefinitionId)
+                    .containsOnly(processDefinition.getId());
         }
     }
 

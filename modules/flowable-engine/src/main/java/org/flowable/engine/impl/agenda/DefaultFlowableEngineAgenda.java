@@ -21,6 +21,7 @@ import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +65,17 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
 
     @Override
     public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
-        planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
+        planOperation(new ContinueProcessOperation(commandContext, execution, true, false, null), execution);
+    }
+
+    @Override
+    public void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext) {
+        planOperation(new ContinueProcessOperation(commandContext, execution, false, false, migrationContext), execution);
     }
 
     @Override
     public void planContinueProcessInCompensation(ExecutionEntity execution) {
-        planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
+        planOperation(new ContinueProcessOperation(commandContext, execution, false, true, null), execution);
     }
 
     @Override

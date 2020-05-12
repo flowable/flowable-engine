@@ -12,6 +12,9 @@
  */
 package org.flowable.eventregistry.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -22,6 +25,8 @@ import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to listing the resources that are part of a deployment.
@@ -38,19 +43,23 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
         try {
             EventDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("simpleEvent.event").deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
+            HttpGet httpGet = new HttpGet(
+                    SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertTrue(responseNode.isArray());
-            assertEquals(1, responseNode.size());
-
-            // Check URL's for the resource
-            assertNotNull(responseNode.get(0));
-            assertTrue(responseNode.get(0).get("url").textValue().endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "simpleEvent.event")));
-            assertTrue(responseNode.get(0).get("contentUrl").textValue().endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "simpleEvent.event")));
-            assertEquals("application/json", responseNode.get(0).get("mediaType").textValue());
-            assertEquals("eventDefinition", responseNode.get(0).get("type").textValue());
+            assertThat(responseNode.isArray()).isTrue();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[{"
+                            + "url: '" + SERVER_URL_PREFIX + EventRestUrls
+                            .createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "simpleEvent.event") + "',"
+                            + "mediaType: 'application/json',"
+                            + "contentUrl: '" + SERVER_URL_PREFIX + EventRestUrls
+                            .createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "simpleEvent.event") + "',"
+                            + "type: 'eventDefinition'"
+                            + "}]"
+                    );
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

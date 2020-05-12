@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -45,23 +43,24 @@ public class SubProcessMultiDiagramConverterNoDITest extends AbstractConverterTe
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
-        assertEquals("start1", flowElement.getId());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("userTask1", flowElement.getId());
-        UserTask userTask = (UserTask) flowElement;
-        assertEquals(1, userTask.getCandidateUsers().size());
-        assertEquals(1, userTask.getCandidateGroups().size());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("userTask1");
+                    assertThat(userTask.getCandidateUsers()).hasSize(1);
+                    assertThat(userTask.getCandidateGroups()).hasSize(1);
+                });
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess1", flowElement.getId());
-        SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(11, subProcess.getFlowElements().size());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getFlowElements()).hasSize(11);
+                });
     }
 }

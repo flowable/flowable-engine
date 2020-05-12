@@ -32,6 +32,7 @@ import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -98,6 +99,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -107,10 +109,14 @@ import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkIntercep
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
+import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
 import org.flowable.cmmn.engine.impl.listener.DefaultCmmnListenerFactory;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManager;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManagerImpl;
+import org.flowable.cmmn.engine.impl.migration.CmmnMigrationServiceImpl;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandler;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandlers;
@@ -121,6 +127,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.CasePageTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.ExternalWorkerServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.GenericEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HttpTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
@@ -323,6 +330,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
     protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
+    protected CmmnMigrationService cmmnMigrationService = new CmmnMigrationServiceImpl(this);
 
     protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
@@ -359,6 +367,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected CmmnDynamicStateManager dynamicStateManager;
+    protected CaseInstanceMigrationManager caseInstanceMigrationManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
@@ -659,6 +668,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String asyncExecutorLockOwner;
 
     /**
+     * Whether to unlock jobs that are owned by this executor (have the same {@link #asyncExecutorLockOwner}) at startup or shutdown.
+     */
+    protected boolean asyncExecutorUnlockOwnedJobs = true;
+
+    /**
      * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor.
      * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
@@ -777,6 +791,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected boolean handleCmmnEngineExecutorsAfterEngineCreate = true;
 
+    protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -862,6 +878,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCandidateManager();
         initHistoryManager();
         initDynamicStateManager();
+        initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initIdentityLinkInterceptor();
@@ -1077,6 +1094,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
+        initService(cmmnMigrationService);
     }
 
     @Override
@@ -1267,6 +1285,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ScriptTaskParseHandler());
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
         cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
+        cmmnParseHandlers.add(new ExternalWorkerServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new CasePageTaskParseHandler());
@@ -1340,6 +1359,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initDynamicStateManager() {
         if (dynamicStateManager == null) {
             dynamicStateManager = new DefaultCmmnDynamicStateManager();
+        }
+    }
+
+    public void initCaseInstanceMigrationManager() {
+        if (caseInstanceMigrationManager == null) {
+            caseInstanceMigrationManager = new CaseInstanceMigrationManagerImpl();
         }
     }
 
@@ -1599,6 +1624,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
+        jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {
@@ -1671,6 +1697,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer());
 
         historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
         historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
@@ -1820,6 +1848,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             if (asyncExecutorLockOwner != null) {
                 defaultAsyncExecutor.setLockOwner(asyncExecutorLockOwner);
             }
+            defaultAsyncExecutor.setUnlockOwnedJobs(asyncExecutorUnlockOwnedJobs);
 
             // Reset expired
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
@@ -2011,6 +2040,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setCmmnHistoryService(CmmnHistoryService cmmnHistoryService) {
         this.cmmnHistoryService = cmmnHistoryService;
         return this;
+    }
+
+    @Override
+    public CmmnMigrationService getCmmnMigrationService() {
+        return cmmnMigrationService;
+    }
+
+    public void setCmmnMigrationService(CmmnMigrationService cmmnMigrationService) {
+        this.cmmnMigrationService = cmmnMigrationService;
     }
 
     public IdmIdentityService getIdmIdentityService() {
@@ -2248,6 +2286,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setDynamicStateManager(CmmnDynamicStateManager dynamicStateManager) {
         this.dynamicStateManager = dynamicStateManager;
+        return this;
+    }
+
+    public CaseInstanceMigrationManager getCaseInstanceMigrationManager() {
+        return caseInstanceMigrationManager;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceMigrationManager(CaseInstanceMigrationManager caseInstanceMigrationManager) {
+        this.caseInstanceMigrationManager = caseInstanceMigrationManager;
         return this;
     }
 
@@ -3102,6 +3149,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public boolean isAsyncExecutorUnlockOwnedJobs() {
+        return asyncExecutorUnlockOwnedJobs;
+    }
+
+    public void setAsyncExecutorUnlockOwnedJobs(boolean asyncExecutorUnlockOwnedJobs) {
+        this.asyncExecutorUnlockOwnedJobs = asyncExecutorUnlockOwnedJobs;
+    }
+
     public int getAsyncExecutorTimerLockTimeInMillis() {
         return asyncExecutorTimerLockTimeInMillis;
     }
@@ -3742,5 +3797,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public boolean isAlwaysUseArraysForDmnMultiHitPolicies() {
+        return alwaysUseArraysForDmnMultiHitPolicies;
+    }
 
+    public CmmnEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
+        this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
+        return this;
+    }
 }

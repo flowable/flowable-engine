@@ -339,11 +339,8 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-
-        // Check if there is NO historic activity instance for a boundary-event that has not triggered
-        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
-
-        assertNull(activityInstance);
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
         // Now check the history when the boundary-event is fired
         processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
@@ -356,7 +353,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(activityInstance);
         assertNotNull(activityInstance.getStartTime());

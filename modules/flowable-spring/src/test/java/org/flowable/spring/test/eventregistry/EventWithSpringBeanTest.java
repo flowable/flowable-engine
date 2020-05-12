@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.spring.test.eventregistry;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Random;
@@ -42,42 +44,43 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @ContextConfiguration("classpath:flowable-context.xml")
 public class EventWithSpringBeanTest extends SpringFlowableTestCase {
-    
+
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
-    
+
     @BeforeEach
     protected void setUp() {
         inboundEventChannelAdapter = setupTestChannel();
     }
-    
+
     @AfterEach
     protected void tearDown() {
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+                .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         List<EventDeployment> deployments = eventEngineConfiguration.getEventRepositoryService().createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
             eventEngineConfiguration.getEventRepositoryService().deleteDeployment(eventDeployment.getId());
         }
     }
-    
+
     protected TestInboundEventChannelAdapter setupTestChannel() {
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        
+                .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+
         eventEngineConfiguration.getEventRepositoryService().createInboundChannelModelBuilder()
-            .key("test-channel")
-            .resourceName("test.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("type")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
-        
+                .key("test-channel")
+                .resourceName("test.channel")
+                .jmsChannelAdapter("test")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("type")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService().getChannelModelByKey("test-channel");
+        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService()
+                .getChannelModelByKey("test-channel");
         inboundChannelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
-        
+
         inboundEventChannelAdapter.setEventRegistry(eventEngineConfiguration.getEventRegistry());
         inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
 
@@ -86,67 +89,68 @@ public class EventWithSpringBeanTest extends SpringFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/spring/test/eventregistry/taskWithEventProcess.bpmn20.xml",
-        "org/flowable/spring/test/eventregistry/simpleEvent.event" })
+            "org/flowable/spring/test/eventregistry/simpleEvent.event" })
     public void testEventOnUserTask() {
-        
+
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        
+                .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+
         EventDefinition eventDefinition = eventEngineConfiguration.getEventRepositoryService().createEventDefinitionQuery().singleResult();
-        assertNotNull(eventDefinition);
-        
+        assertThat(eventDefinition).isNotNull();
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskWithEventProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        
+        assertThat(task).isNotNull();
+
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
-        assertNotNull(eventSubscription);
-        assertEquals(eventSubscription.getProcessInstanceId(), processInstance.getId());
-        assertEquals("myEvent", eventSubscription.getEventType());
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
         inboundEventChannelAdapter.triggerTestEvent();
         Task afterTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("theTaskAfter", afterTask.getTaskDefinitionKey());
-        
+        assertThat(afterTask.getTaskDefinitionKey()).isEqualTo("theTaskAfter");
+
         eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
-        assertNull(eventSubscription);
-        
+        assertThat(eventSubscription).isNull();
+
         taskService.complete(afterTask.getId());
 
         assertProcessEnded(processInstance.getId());
     }
-    
+
     @Test
-    @Deployment(resources = { "org/flowable/spring/test/eventregistry/taskWithEventProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/spring/test/eventregistry/taskWithEventProcess.bpmn20.xml" })
     public void testEventOnUserTaskWithoutVariablesSeparateDeployments() {
-        
+
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        
+                .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+
         EventRepositoryService eventRepositoryService = eventEngineConfiguration.getEventRepositoryService();
-        EventDeployment eventDeployment = eventRepositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/eventregistry/simpleEvent.event").deploy();
-        
+        EventDeployment eventDeployment = eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/spring/test/eventregistry/simpleEvent.event").deploy();
+
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskWithEventProcess");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
-            
+            assertThat(task).isNotNull();
+
             EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
-            assertNotNull(eventSubscription);
-            assertEquals(eventSubscription.getProcessInstanceId(), processInstance.getId());
-            assertEquals("myEvent", eventSubscription.getEventType());
+            assertThat(eventSubscription).isNotNull();
+            assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
             inboundEventChannelAdapter.triggerTestEvent();
             Task afterTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertEquals("theTaskAfter", afterTask.getTaskDefinitionKey());
-            
+            assertThat(afterTask.getTaskDefinitionKey()).isEqualTo("theTaskAfter");
+
             eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
-            assertNull(eventSubscription);
-            
+            assertThat(eventSubscription).isNull();
+
             taskService.complete(afterTask.getId());
-    
+
             assertProcessEnded(processInstance.getId());
-            
+
         } finally {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }

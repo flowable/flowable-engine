@@ -193,7 +193,7 @@ paths:
     get:
       tags:
       - "Channel Definitions"
-      summary: "Get a channel definition JSPN model"
+      summary: "Get a channel definition JSON model"
       description: ""
       operationId: "getChannelModelResource"
       produces:
@@ -619,7 +619,7 @@ paths:
     get:
       tags:
       - "Event Definitions"
-      summary: "Get an event definition JSPN model"
+      summary: "Get an event definition JSON model"
       description: ""
       operationId: "getEventModelResource"
       produces:

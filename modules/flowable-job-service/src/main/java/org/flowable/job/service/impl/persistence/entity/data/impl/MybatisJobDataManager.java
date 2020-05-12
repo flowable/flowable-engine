@@ -65,10 +65,8 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
-            return getDbSqlSession().selectList("selectJobsToExecuteWithEnabledCategories", params, page);
-        } else {
-            return getDbSqlSession().selectList("selectJobsToExecute", params, page);
         }
+        return getDbSqlSession().selectList("selectJobsToExecute", params, page);
     }
 
     @Override
@@ -101,10 +99,8 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
-            return getDbSqlSession().selectList("selectExpiredJobsWithEnabledCategories", params, page);
-        } else {
-            return getDbSqlSession().selectList("selectExpiredJobs", params, page);
         }
+        return getDbSqlSession().selectList("selectExpiredJobs", params, page);
     }
 
     @Override

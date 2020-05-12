@@ -31,6 +31,7 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
@@ -86,6 +87,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventAc
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
@@ -171,11 +173,16 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     // Service task
 
     protected Expression getSkipExpressionFromServiceTask(ServiceTask serviceTask) {
-        Expression result = null;
-        if (StringUtils.isNotEmpty(serviceTask.getSkipExpression())) {
-            result = expressionManager.createExpression(serviceTask.getSkipExpression());
+        return createExpression(serviceTask.getSkipExpression());
+    }
+
+    protected Expression createExpression(String expressionValue) {
+        Expression expression = null;
+        if (StringUtils.isNotEmpty(expressionValue)) {
+            expression = expressionManager.createExpression(expressionValue);
         }
-        return result;
+
+        return expression;
     }
 
     @Override
@@ -400,6 +407,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask) {
         return new SendEventTaskActivityBehavior(sendEventServiceTask);
+    }
+
+    @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerTaskBehavior(ExternalWorkerServiceTask externalWorkerServiceTask) {
+        Expression topicExpression = createExpression(externalWorkerServiceTask.getTopic());
+        Expression skipExpression = getSkipExpressionFromServiceTask(externalWorkerServiceTask);
+        return new ExternalWorkerTaskActivityBehavior(externalWorkerServiceTask, topicExpression, skipExpression);
     }
 
     // Gateways

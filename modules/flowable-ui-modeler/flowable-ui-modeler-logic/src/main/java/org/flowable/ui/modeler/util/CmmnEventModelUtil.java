@@ -14,6 +14,7 @@ package org.flowable.ui.modeler.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,6 @@ import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
-import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -88,8 +88,9 @@ public class CmmnEventModelUtil {
                     eventModel.setPayload(getInParameterEventPayload(task.getExtensionElements().get("eventInParameter")));
 
                 } else {
-                    eventModel.setPayload(getOutParameterEventPayload(element.getExtensionElements().get("eventOutParameter")));
-                    eventModel.setCorrelationParameters(getEventCorrelationParameters(element.getExtensionElements().get("eventCorrelationParameter")));
+                    Map<String, EventPayload> payload = getOutParameterEventPayload(element.getExtensionElements().get("eventOutParameter"));
+                    fillEventCorrelationParameters(payload, element.getExtensionElements().get("eventCorrelationParameter"));
+                    eventModel.setPayload(payload.values());
                     
                 }
                 
@@ -191,8 +192,8 @@ public class CmmnEventModelUtil {
         channelModelMap.put(channelKey, channelModel);
     }
     
-    protected static List<EventPayload> getOutParameterEventPayload(List<ExtensionElement> parameterList) {
-        List<EventPayload> eventPayloadList = new ArrayList<>();
+    protected static Map<String, EventPayload> getOutParameterEventPayload(List<ExtensionElement> parameterList) {
+        Map<String, EventPayload> eventPayload = new LinkedHashMap<>();
         if (parameterList != null && parameterList.size() > 0) {
             for (ExtensionElement parameterElement : parameterList) {
                 String name = parameterElement.getAttributeValue(null, "source");
@@ -201,11 +202,11 @@ public class CmmnEventModelUtil {
                     type = "string";
                 }
                 
-                eventPayloadList.add(new EventPayload(name, type));
+                eventPayload.put(name, new EventPayload(name, type));
             }
         }
         
-        return eventPayloadList;
+        return eventPayload;
     }
 
     
@@ -226,8 +227,7 @@ public class CmmnEventModelUtil {
         return eventPayloadList;
     }
     
-    protected static List<EventCorrelationParameter> getEventCorrelationParameters(List<ExtensionElement> parameterList) {
-        List<EventCorrelationParameter> correlationParameterList = new ArrayList<>();
+    protected static void fillEventCorrelationParameters(Map<String, EventPayload> currentPayload, List<ExtensionElement> parameterList) {
         if (parameterList != null && parameterList.size() > 0) {
             for (ExtensionElement parameterElement : parameterList) {
                 String name = parameterElement.getAttributeValue(null, "name");
@@ -235,12 +235,16 @@ public class CmmnEventModelUtil {
                 if (StringUtils.isEmpty(type)) {
                     type = "string";
                 }
-                
-                correlationParameterList.add(new EventCorrelationParameter(name, type));
+
+                EventPayload eventPayload = currentPayload.get(name);
+
+                if (eventPayload != null) {
+                    eventPayload.setCorrelationParameter(true);
+                } else {
+                    currentPayload.put(name, EventPayload.correlation(name, type));
+                }
             }
         }
-        
-        return correlationParameterList;
     }
     
     protected static String getElementValue(String name, BaseElement elementObject) {

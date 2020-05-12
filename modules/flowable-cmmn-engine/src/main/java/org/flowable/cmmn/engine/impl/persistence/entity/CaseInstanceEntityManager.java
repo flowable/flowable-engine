@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -35,9 +36,11 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
 
     void delete(String caseInstanceId, boolean cascade, String deleteReason);
     
-    void updateLockTime(String caseInstanceId);
+    void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+
+    void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime);
 
     void clearLockTime(String caseInstanceId);
 
-    void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+    void clearAllLockTimes(String lockOwner);
 }

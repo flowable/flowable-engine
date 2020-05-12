@@ -52,7 +52,7 @@ public class BatchPartCollectionResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List batch parts", tags = { "Batches" }, nickname = "listBatches")
+    @ApiOperation(value = "List batch parts", tags = { "Batches" }, nickname = "listBatchesPart")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "status", dataType = "string", value = "Only return batch parts for the given status", paramType = "query")
     })

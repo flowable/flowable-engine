@@ -250,7 +250,10 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
         assertEquals("runSubProcess", subProcessExecution.getActivityId());
         assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
-
+        
+        Execution timerExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("timerEvent").singleResult();
+        assertNotNull(timerExecution);
+        
         taskService.complete(task.getId());
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
@@ -272,7 +275,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
-            assertEquals(14, historicActivities.size());
+            assertEquals(15, historicActivities.size());
 
             List<String> activityIds = new ArrayList<>();
             activityIds.add("theStart");
@@ -285,6 +288,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             activityIds.add("subTask");
             activityIds.add("subflow2");
             activityIds.add("subEnd");
+            activityIds.add("timerEvent");
             activityIds.add("flow5");
             activityIds.add("theTask2");
             activityIds.add("flow6");
@@ -295,27 +299,25 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
                 activityIds.remove(activityId);
 
                 if ("theStart".equalsIgnoreCase(activityId) ||
-                    "theTask1".equalsIgnoreCase(activityId) ||
-                    "flow1".equalsIgnoreCase(activityId) ||
-                    "flow2".equalsIgnoreCase(activityId)
-                ) {
+                        "theTask1".equalsIgnoreCase(activityId) ||
+                        "flow1".equalsIgnoreCase(activityId) ||
+                        "flow2".equalsIgnoreCase(activityId)) {
 
                     assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
 
                 } else if ("theTask2".equalsIgnoreCase(activityId) ||
-                    "theEnd".equalsIgnoreCase(activityId) ||
-                    "flow5".equalsIgnoreCase(activityId) ||
-                    "flow6".equalsIgnoreCase(activityId)
-                ) {
+                        "theEnd".equalsIgnoreCase(activityId) ||
+                        "flow5".equalsIgnoreCase(activityId) ||
+                        "flow6".equalsIgnoreCase(activityId)) {
 
                     assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
+                    
+                } else if ("timerEvent".equalsIgnoreCase(activityId)) {
+                    assertEquals(timerExecution.getId(), historicActivityInstance.getExecutionId());
 
                 } else if (activityId.startsWith("sub")) {
-
                     assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if ("subProcess".equalsIgnoreCase(activityId)) {
-                    assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
+                    
                 } else if (activityId.contains("flow")) {
                     assertEquals(historicActivityInstance.getStartTime(), historicActivityInstance.getEndTime());
                 }

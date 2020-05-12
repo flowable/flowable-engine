@@ -85,6 +85,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         HttpTaskJsonConverter.fillTypes(convertersToCmmnMap);
         MailTaskJsonConverter.fillTypes(convertersToCmmnMap);
         SendEventTaskJsonConverter.fillTypes(convertersToCmmnMap);
+        ExternalWorkerServiceTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         GenericEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
@@ -118,6 +119,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
+        DI_RECTANGLES.add(STENCIL_TASK_EXTERNAL_WORKER);
         DI_RECTANGLES.add(STENCIL_TASK_CASE);
         DI_RECTANGLES.add(STENCIL_TASK_PROCESS);
         DI_RECTANGLES.add(STENCIL_MILESTONE);

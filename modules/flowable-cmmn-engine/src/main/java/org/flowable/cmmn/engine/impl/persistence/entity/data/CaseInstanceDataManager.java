@@ -35,7 +35,9 @@ public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity>
 
     long countByCriteria(CaseInstanceQueryImpl query);
 
-    void updateLockTime(String caseInstanceId, Date lockDate, Date expirationTime);
+    void updateLockTime(String caseInstanceId, Date lockDate, String lockOwner, Date expirationTime);
 
     void clearLockTime(String caseInstanceId);
+
+    void clearAllLockTimes(String lockOwner);
 }

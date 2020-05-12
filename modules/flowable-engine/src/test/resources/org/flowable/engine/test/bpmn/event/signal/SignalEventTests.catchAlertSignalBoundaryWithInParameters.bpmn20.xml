@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+
+	<signal id="alertSignal" name="alert" />
+
+	<process id="catchSignal">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="task" />
+
+		<userTask id="task" flowable:assignee="kermit" />			
+		
+		<boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
+			<extensionElements>
+				<flowable:in source="outTextVar" target="myNewTextVar" />
+				<flowable:in source="outNumberVar" target="myNewNumberVar" />
+			</extensionElements>
+          	<signalEventDefinition signalRef="alertSignal"/>
+      	</boundaryEvent>
+
+		<sequenceFlow sourceRef="task" targetRef="end" />
+		
+		<sequenceFlow sourceRef="boundary" targetRef="task2" />
+		
+		<userTask id="task2" flowable:assignee="kermit" />
+		
+		<sequenceFlow sourceRef="task2" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+
+	
+
+</definitions>

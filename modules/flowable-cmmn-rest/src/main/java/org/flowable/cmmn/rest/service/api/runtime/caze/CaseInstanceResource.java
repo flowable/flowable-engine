@@ -19,10 +19,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.StageResponse;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -31,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +57,9 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     
     @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
+
+    @Autowired
+    protected CmmnMigrationService cmmnMigrationService;
 
     @ApiOperation(value = "Get a case instance", tags = { "Case Instances" }, nickname = "getCaseInstance")
     @ApiResponses(value = {
@@ -157,5 +164,22 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
         return runtimeService.getStageOverview(caseInstanceId);
     }
-    
+
+    @ApiOperation(value = "Migrate case instance", tags = { "Process Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and migration was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested case instance action cannot be executed since the case-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
+    })
+    @PostMapping(value = "/runtime/case-instances/{caseInstanceId}/migrate", produces = "application/json")
+    public void migrateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+                                       @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateCaseInstance(caseInstanceId, migrationDocumentJson);
+        }
+
+        CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.migrateCaseInstance(caseInstanceId, migrationDocument);
+    }
 }

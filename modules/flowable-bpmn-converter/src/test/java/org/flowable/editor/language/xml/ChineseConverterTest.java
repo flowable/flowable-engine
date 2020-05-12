@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.junit.Test;
@@ -22,14 +22,14 @@ public class ChineseConverterTest extends AbstractConverterTest {
     @Test
     public void convertXMLToModel() throws Exception {
         BpmnModel bpmnModel = readXMLFile();
-        assertNotNull(bpmnModel);
+        assertThat(bpmnModel).isNotNull();
     }
 
     @Test
     public void convertModelToXML() throws Exception {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        assertNotNull(parsedModel);
+        assertThat(parsedModel).isNotNull();
     }
 
     @Override

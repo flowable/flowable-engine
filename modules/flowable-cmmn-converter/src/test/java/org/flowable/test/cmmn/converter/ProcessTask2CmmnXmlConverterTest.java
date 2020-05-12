@@ -59,24 +59,26 @@ public class ProcessTask2CmmnXmlConverterTest extends AbstractConverterTest {
 
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem2");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
-        ProcessTask task1 = (ProcessTask) planItemDefinition;
-        assertThat(task1.getProcessRefExpression()).isEqualTo("myTestProcess");
-        assertThat((task1.isSameDeployment())).isTrue();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ProcessTask.class, task1 -> {
+                    assertThat(task1.getProcessRefExpression()).isEqualTo("myTestProcess");
+                    assertThat((task1.isSameDeployment())).isTrue();
 
-        assertThat(task1.getInParameters()).isEmpty();
-        assertThat(task1.getOutParameters()).isEmpty();
+                    assertThat(task1.getInParameters()).isEmpty();
+                    assertThat(task1.getOutParameters()).isEmpty();
+                });
         PlanItemDefinition taskDefinition = cmmnModel.findPlanItemDefinition("onehumantask1");
-        assertThat(taskDefinition).isInstanceOf(HumanTask.class);
-        HumanTask humanTask = (HumanTask) taskDefinition;
-        assertThat(humanTask.getName()).isEqualTo("Human task");
-        assertThat(humanTask.getAssignee()).isEqualTo("admin");
-        assertThat(humanTask.getOwner()).isEqualTo("admin");
-        assertThat(humanTask.getFormKey()).isEqualTo("aHumanTaskForm");
-        assertThat(humanTask.getPriority()).isEqualTo("50");
-        assertThat(humanTask.getDueDate()).isEqualTo("2019-01-01");
-        assertThat(humanTask.getCategory()).isEqualTo("testCategory");
-        assertThat(humanTask.getValidateFormFields()).isEqualTo("validateFormFieldsValue");
+        assertThat(taskDefinition)
+                .isInstanceOfSatisfying(HumanTask.class, humanTask -> {
+                    assertThat(humanTask.getName()).isEqualTo("Human task");
+                    assertThat(humanTask.getAssignee()).isEqualTo("admin");
+                    assertThat(humanTask.getOwner()).isEqualTo("admin");
+                    assertThat(humanTask.getFormKey()).isEqualTo("aHumanTaskForm");
+                    assertThat(humanTask.getPriority()).isEqualTo("50");
+                    assertThat(humanTask.getDueDate()).isEqualTo("2019-01-01");
+                    assertThat(humanTask.getCategory()).isEqualTo("testCategory");
+                    assertThat(humanTask.getValidateFormFields()).isEqualTo("validateFormFieldsValue");
+                });
     }
 
 }

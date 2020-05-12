@@ -52,6 +52,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     protected Date lockTime;
+    protected String lockOwner;
 
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
@@ -76,6 +77,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
+        persistentState.put("lockOwner", lockOwner);
         return persistentState;
     }
 
@@ -195,11 +197,25 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
+
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
+
+    @Override
     public void setLockTime(Date lockTime) {
         this.lockTime = lockTime;
+    }
+
+    @Override
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    @Override
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
     }
 
     @Override
@@ -263,12 +279,24 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .scopeId(id)
+                .withoutSubScopeId()
+                .scopeType(ScopeTypes.CMMN)
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .scopeId(id)
+                .withoutSubScopeId()
+                .scopeType(ScopeTypes.CMMN)
+                .names(variableNames)
+                .list();
     }
 
     @Override

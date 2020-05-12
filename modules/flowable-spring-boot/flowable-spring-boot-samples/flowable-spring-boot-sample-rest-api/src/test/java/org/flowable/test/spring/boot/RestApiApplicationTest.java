@@ -36,6 +36,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import flowable.Application;
 
 /**
@@ -179,5 +181,39 @@ public class RestApiApplicationTest {
                 tuple("user", "security-role", "users", null)
             );
         assertThat(groups.getTotal()).isEqualTo(1);
+    }
+
+    @Test
+    public void testExternalJobRestApiIntegration() {
+        String url = "http://localhost:" + serverPort + "/external-job-api/jobs";
+
+        ResponseEntity<DataResponse<JsonNode>> response = restTemplate
+                .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<JsonNode>>() {
+                });
+
+        assertThat(response.getStatusCode())
+                .as("Status code")
+                .isEqualTo(HttpStatus.OK);
+        DataResponse<JsonNode> jobs = response.getBody();
+        assertThat(jobs).isNotNull();
+        assertThat(jobs.getTotal()).isEqualTo(0);
+        assertThat(jobs.getData()).isEmpty();
+    }
+
+    @Test
+    public void testExternalJobRestApiIntegrationNotFound() {
+        String url = "http://localhost:" + serverPort + "/external-job-api/jobs/does-not-exist";
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        BasicJsonTester jsonTester = new BasicJsonTester(getClass());
+
+        assertThat(jsonTester.from(response.getBody())).isEqualToJson("{"
+                + "\"message\": \"Not found\","
+                + "\"exception\": \"Could not find external worker job with id 'does-not-exist'.\""
+                + "}");
+        assertThat(response.getStatusCode())
+                .as("Status code")
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

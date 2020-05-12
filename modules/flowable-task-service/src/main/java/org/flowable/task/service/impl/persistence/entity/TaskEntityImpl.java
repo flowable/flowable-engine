@@ -222,7 +222,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     protected List<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskId(id);
+        return CommandContextUtil.getVariableService().createInternalVariableInstanceQuery().taskId(id).list();
     }
     
     @Override
@@ -399,9 +399,12 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager().findVariableInstanceByTaskAndName(id, variableName);
 
-        return variableInstance;
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .taskId(id)
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
@@ -410,7 +413,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskAndNames(id, variableNames);
+        return CommandContextUtil.getVariableService()
+                .createInternalVariableInstanceQuery()
+                .taskId(id)
+                .names(variableNames)
+                .list();
     }
 
     // regular getters and setters ////////////////////////////////////////////////////////

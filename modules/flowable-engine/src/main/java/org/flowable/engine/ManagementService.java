@@ -29,7 +29,11 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -79,6 +83,11 @@ public interface ManagementService {
      * Returns a new JobQuery implementation, that can be used to dynamically query the jobs.
      */
     JobQuery createJobQuery();
+
+    /**
+     * Returns a new ExternalWorkerJobQuery implementation, that can be used to dynamically query the external worker jobs.
+     */
+    ExternalWorkerJobQuery createExternalWorkerJobQuery();
 
     /**
      * Returns a new TimerJobQuery implementation, that can be used to dynamically query the timer jobs.
@@ -327,6 +336,14 @@ public interface ManagementService {
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
     
+    /**
+     * Returns the full error details that were passed to the {@link ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
+     *
+     * @param jobId id of the job, cannot be null.
+     * @throws FlowableObjectNotFoundException when no job exists with the given id.
+     */
+    String getExternalWorkerJobErrorDetails(String jobId);
+
     void handleHistoryCleanupTimerJob();
     
     List<Batch> getAllBatches();
@@ -415,5 +432,25 @@ public interface ManagementService {
      * Delete a EventLogEntry. Typically only used in testing, as deleting log entries defeats the whole purpose of keeping a log.
      */
     void deleteEventLogEntry(long logNr);
+
+    // External Worker
+
+    /**
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
+     */
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
+
+    /**
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
+     */
+    ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
 
 }

@@ -42,5 +42,9 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-external-job-rest</artifactId>
+        </dependency>
     </dependencies>
 </project>

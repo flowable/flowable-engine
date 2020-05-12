@@ -993,7 +993,7 @@ paths:
       - "History Task"
       summary: "Get a historic task instance form"
       description: ""
-      operationId: "getTaskForm"
+      operationId: "getHistoricTaskForm"
       produces:
       - "application/json"
       parameters:
@@ -2029,7 +2029,7 @@ paths:
       - "Batches"
       summary: "Delete a batch"
       description: ""
-      operationId: "deleteJob"
+      operationId: "deleteBatch"
       parameters:
       - name: "batchId"
         in: "path"
@@ -2074,7 +2074,7 @@ paths:
       - "Batches"
       summary: "List batch parts"
       description: ""
-      operationId: "listBatches"
+      operationId: "listBatchesPart"
       produces:
       - "application/json"
       parameters:
@@ -4773,7 +4773,7 @@ paths:
       - "Executions"
       summary: "Change the state of an execution"
       description: ""
-      operationId: "changeActivityState"
+      operationId: "changeExecutionActivityState"
       produces:
       - "application/json"
       parameters:
@@ -5203,7 +5203,7 @@ paths:
         type: "string"
       - name: "businessKeyLike"
         in: "query"
-        description: "Only return process instancess with the businessKey like the\
+        description: "Only return process instances with the businessKey like the\
           \ given key."
         required: false
         type: "string"

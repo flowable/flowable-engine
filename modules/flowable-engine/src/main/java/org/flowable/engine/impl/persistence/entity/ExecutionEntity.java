@@ -127,6 +127,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setLockTime(Date lockTime);
 
+    String getLockOwner();
+
+    void setLockOwner(String lockOwner);
+
     void forceUpdate();
     
     String getStartActivityId();

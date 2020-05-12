@@ -39,6 +39,7 @@ import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.delegate.ActivityWithMigrationContextBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -46,6 +47,7 @@ import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
 import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
@@ -58,7 +60,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class UserTaskActivityBehavior extends TaskActivityBehavior {
+public class UserTaskActivityBehavior extends TaskActivityBehavior implements ActivityWithMigrationContextBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -72,6 +74,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     @Override
     public void execute(DelegateExecution execution) {
+        execute(execution, null);
+    }
+    
+    @Override
+    public void execute(DelegateExecution execution, MigrationContext migrationContext) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
@@ -104,7 +111,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeTaskCategory = DynamicPropertyUtil.getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
             activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
             activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
-            activeTaskAssignee = DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
+            activeTaskAssignee = getAssigneeValue(userTask, migrationContext, taskElementProperties);
             activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
@@ -117,7 +124,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeTaskCategory = userTask.getCategory();
             activeTaskFormKey = userTask.getFormKey();
             activeTaskSkipExpression = userTask.getSkipExpression();
-            activeTaskAssignee = userTask.getAssignee();
+            activeTaskAssignee = getAssigneeValue(userTask, migrationContext, null);
             activeTaskOwner = userTask.getOwner();
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
@@ -468,5 +475,17 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
      */
     protected List<String> extractCandidates(String str) {
         return Arrays.asList(str.split("[\\s]*,[\\s]*"));
+    }
+    
+    protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getAssignee() != null) {
+            return migrationContext.getAssignee();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
+        
+        } else {
+            return userTask.getAssignee();
+        }
     }
 }

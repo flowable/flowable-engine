@@ -12,6 +12,7 @@
  */
 package org.flowable.content.rest.service.api.content;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,9 @@ import org.flowable.content.rest.service.api.HttpMultipartHelper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Tijs Rademakers
@@ -50,19 +54,21 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            assertEquals(contentItem.getId(), responseNode.get("id").asText());
-            assertEquals(contentItem.getName(), responseNode.get("name").asText());
-            assertEquals(contentItem.getMimeType(), responseNode.get("mimeType").asText());
-            assertTrue(responseNode.get("taskId").isNull());
-            assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-            assertEquals("", responseNode.get("tenantId").asText());
-            assertEquals(contentItem.getCreatedBy(), responseNode.get("createdBy").asText());
-            assertEquals(contentItem.getLastModifiedBy(), responseNode.get("lastModifiedBy").asText());
-            assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-            assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
-
-            // Check URL's
-            assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: '" + contentItem.getId() + "',"
+                            + "  name: '" + contentItem.getName() + "',"
+                            + "  mimeType: '" + contentItem.getMimeType() + "',"
+                            + "  taskId: null,"
+                            + "  tenantId: '',"
+                            + "  processInstanceId: '" + contentItem.getProcessInstanceId() + "',"
+                            + "  created: " + new TextNode(getISODateStringWithTZ(contentItem.getCreated())) + ","
+                            + "  createdBy: '" + contentItem.getCreatedBy() + "',"
+                            + "  lastModified: " + new TextNode(getISODateStringWithTZ(contentItem.getLastModified())) + ","
+                            + "  lastModifiedBy: '" + contentItem.getLastModifiedBy() + "',"
+                            + "  url: '" + httpGet.getURI().toString() + "'"
+                            + "}");
 
         } finally {
             contentService.deleteContentItem(contentItemId);
@@ -87,7 +93,7 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
                     ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
 
             // Check response headers
-            assertEquals("application/pdf", response.getEntity().getContentType().getValue());
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/pdf");
             try (InputStream contentStream = response.getEntity().getContent()) {
                 assertThat(contentStream).hasContent("This is binary content");
             }
@@ -118,16 +124,20 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            assertEquals(contentItem.getId(), responseNode.get("id").asText());
-            assertEquals("test2.txt", responseNode.get("name").asText());
-            assertEquals("application/txt", responseNode.get("mimeType").asText());
-            assertTrue(responseNode.get("taskId").isNull());
-            assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-            assertEquals("", responseNode.get("tenantId").asText());
-            assertEquals("testb", responseNode.get("createdBy").asText());
-            assertEquals("testc", responseNode.get("lastModifiedBy").asText());
-            assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-            assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: '" + contentItem.getId() + "',"
+                            + "  name: 'test2.txt',"
+                            + "  mimeType: 'application/txt',"
+                            + "  taskId: null,"
+                            + "  tenantId: '',"
+                            + "  processInstanceId: '" + contentItem.getProcessInstanceId() + "',"
+                            + "  created: " + new TextNode(getISODateStringWithTZ(contentItem.getCreated())) + ","
+                            + "  createdBy: 'testb',"
+                            + "  lastModified: " + new TextNode(getISODateStringWithTZ(contentItem.getLastModified())) + ","
+                            + "  lastModifiedBy: 'testc'"
+                            + "}");
 
         } finally {
             contentService.deleteContentItem(contentItemId);
@@ -150,7 +160,7 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
     protected void executePostAndAssert(String contentItemId) throws IOException {
         ContentItem origContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
-        assertNotNull(origContentItem);
+        assertThat(origContentItem).isNotNull();
 
         try (InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes())) {
 
@@ -165,14 +175,14 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
                 ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
 
             // Check response headers
-            assertEquals("application/pdf", response.getEntity().getContentType().getValue());
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/pdf");
             try (InputStream contentStream = response.getEntity().getContent()) {
                 assertThat(contentStream).hasContent("This is binary content");
             }
             closeResponse(response);
 
             ContentItem changedContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
-            assertTrue(origContentItem.getLastModified().getTime() < changedContentItem.getLastModified().getTime());
+            assertThat(origContentItem.getLastModified().getTime() < changedContentItem.getLastModified().getTime()).isTrue();
 
         } finally {
             contentService.deleteContentItem(contentItemId);

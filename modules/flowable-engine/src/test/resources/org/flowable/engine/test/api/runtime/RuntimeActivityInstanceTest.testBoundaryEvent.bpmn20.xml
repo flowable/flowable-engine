@@ -10,8 +10,7 @@
 		
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
 		
-		<userTask id="theTask" name="Schedule meeting">
-		</userTask>
+		<userTask id="theTask" name="Schedule meeting" />
 		
 		<boundaryEvent id="boundary" attachedToRef="theTask" cancelActivity="true">       
           <signalEventDefinition signalRef="alertSignal"/>

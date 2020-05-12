@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
@@ -62,7 +64,6 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -225,7 +226,7 @@ public class BaseSpringRestTestCase extends TestCase {
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
@@ -235,7 +236,7 @@ public class BaseSpringRestTestCase extends TestCase {
                 }
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
@@ -292,7 +293,7 @@ public class BaseSpringRestTestCase extends TestCase {
             if (exception != null) {
                 throw exception;
             } else {
-                Assert.fail(outputMessage.toString());
+                fail(outputMessage.toString());
             }
         } else {
             LOGGER.info("database was clean");
@@ -335,7 +336,7 @@ public class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -344,7 +345,7 @@ public class BaseSpringRestTestCase extends TestCase {
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
     protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
@@ -354,7 +355,7 @@ public class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(0, dataNode.size());
+        assertThat(dataNode).isEmpty();
     }
 
     /**
@@ -379,7 +380,7 @@ public class BaseSpringRestTestCase extends TestCase {
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -389,7 +390,7 @@ public class BaseSpringRestTestCase extends TestCase {
                     String id = it.next().get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
             }
         }
 

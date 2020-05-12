@@ -81,10 +81,8 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
-            return getDbSqlSession().selectList("selectTimerJobsToExecuteWithEnabledCategories", params, page);
-        } else {
-            return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
         }
+        return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
     }
 
     @Override

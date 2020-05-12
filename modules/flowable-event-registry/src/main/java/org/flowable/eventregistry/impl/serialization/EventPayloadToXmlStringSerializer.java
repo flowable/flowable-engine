@@ -44,7 +44,7 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
             Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement(eventInstance.getEventModel().getKey());
+            Element rootElement = doc.createElement(eventInstance.getEventKey());
             doc.appendChild(rootElement);
 
             if (!eventInstance.getPayloadInstances().isEmpty()) {

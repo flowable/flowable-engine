@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -47,30 +45,30 @@ public class CaseServiceTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("caseServiceTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof CaseServiceTask);
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(CaseServiceTask.class);
         CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
-        assertEquals("caseServiceTask", caseServiceTask.getId());
-        assertEquals("Case task", caseServiceTask.getName());
+        assertThat(caseServiceTask.getId()).isEqualTo("caseServiceTask");
+        assertThat(caseServiceTask.getName()).isEqualTo("Case task");
 
-        assertEquals("caseId", caseServiceTask.getCaseDefinitionKey());
+        assertThat(caseServiceTask.getCaseDefinitionKey()).isEqualTo("caseId");
 
-        assertTrue(caseServiceTask.isFallbackToDefaultTenant());
-        assertFalse(caseServiceTask.isSameDeployment());
+        assertThat(caseServiceTask.isFallbackToDefaultTenant()).isTrue();
+        assertThat(caseServiceTask.isSameDeployment()).isFalse();
 
         List<IOParameter> parameters = caseServiceTask.getInParameters();
-        assertEquals(2, parameters.size());
-        IOParameter parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
-        parameter = parameters.get(1);
-        assertEquals("${test}", parameter.getSourceExpression());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                .containsExactly(
+                        tuple("test", "test", null),
+                        tuple(null, "test", "${test}")
+                );
 
         parameters = caseServiceTask.getOutParameters();
-        assertEquals(1, parameters.size());
-        parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget)
+                .containsExactly(
+                        tuple("test", "test")
+                );
     }
 }

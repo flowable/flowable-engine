@@ -18,6 +18,7 @@ import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.interceptor.MigrationContext;
 
 /**
  * This class is a simple watchdog agenda implementation. It throws exception in the case when watchdog limit is exceeded for fetching operations from agenda.
@@ -63,6 +64,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
             agenda.planContinueProcessSynchronousOperation(execution);
+        }
+
+        @Override
+        public void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext) {
+            agenda.planContinueProcessWithMigrationContextOperation(execution, migrationContext);
         }
 
         @Override

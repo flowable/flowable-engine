@@ -68,7 +68,6 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("customerId", EventPayloadTypes.STRING)
             .deploy();
     }
 
@@ -382,7 +381,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

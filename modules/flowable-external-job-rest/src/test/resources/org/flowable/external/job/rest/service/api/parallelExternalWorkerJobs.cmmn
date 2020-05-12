@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             targetNamespace="http://www.flowable.org/casedef">
+    <case id="externalWorkerJobQueryTest" name="External Worker Job Query Test">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="Customer Service" definitionRef="externalCustomer1"/>
+            <planItem id="planItem2" name="Order Service" definitionRef="externalOrder"/>
+            <task id="externalCustomer1" name="Customer Service" flowable:type="external-worker" flowable:exclusive="false" flowable:topic="customerService"/>
+            <task id="externalOrder" name="Order Service" flowable:type="external-worker" flowable:exclusive="false" flowable:topic="orderService"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_externalWorkerJobQueryTest">
+            <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+                <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="161.5" y="120.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="420.0" y="120.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

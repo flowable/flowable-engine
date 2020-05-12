@@ -74,7 +74,7 @@ public class BatchResource extends BatchBaseResource {
         return batchDocument;
     }
 
-    @ApiOperation(value = "Delete a batch", tags = { "Batches" })
+    @ApiOperation(value = "Delete a batch", tags = { "Batches" }, nickname = "deleteBatch")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the batch was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested batch was not found.")
