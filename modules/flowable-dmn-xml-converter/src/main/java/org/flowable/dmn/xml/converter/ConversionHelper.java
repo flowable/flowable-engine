@@ -21,6 +21,7 @@ import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DiEdge;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnDiDiagram;
+import org.flowable.dmn.model.DmnDiEdge;
 import org.flowable.dmn.model.DmnDiShape;
 
 public class ConversionHelper {
@@ -33,7 +34,7 @@ public class ConversionHelper {
 
     protected List<DmnDiDiagram> diDiagrams = new ArrayList<>();
     protected Map<String, List<DmnDiShape>> diShapes = new LinkedHashMap<>();
-    protected Map<String, List<DiEdge>> diEdges = new LinkedHashMap<>();
+    protected Map<String, List<DmnDiEdge>> diEdges = new LinkedHashMap<>();
 
     public DmnDefinition getDmnDefinition() {
         return dmnDefinition;
@@ -59,7 +60,7 @@ public class ConversionHelper {
         setCurrentDiShape(diShape);
     }
 
-    public void addDiEdge(DiEdge diEdge) {
+    public void addDiEdge(DmnDiEdge diEdge) {
         diEdges.computeIfAbsent(getCurrentDiDiagram().getId(), k -> new ArrayList<>());
         diEdges.get(getCurrentDiDiagram().getId()).add(diEdge);
         setCurrentDiEdge(diEdge);
@@ -93,7 +94,7 @@ public class ConversionHelper {
     public List<DmnDiShape> getDiShapes(String diagramId) {
         return diShapes.get(diagramId);
     }
-    public List<DiEdge> getDiEdges(String diagramId) {
+    public List<DmnDiEdge> getDiEdges(String diagramId) {
         return diEdges.get(diagramId);
     }
 

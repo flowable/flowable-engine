@@ -35,8 +35,7 @@ public class DmnDiEdgeXmlConverter extends BaseDmnXMLConverter {
         DmnDiEdge diEdge = new DmnDiEdge();
         diEdge.setId(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_ID));
         diEdge.setDmnElementRef(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_DMN_ELEMENT_REF));
-        diEdge.setTargetDmnElementRef(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_TARGET_DMN_ELEMENT_REF));
-        
+
         conversionHelper.addDiEdge(diEdge);
         
         return diEdge;

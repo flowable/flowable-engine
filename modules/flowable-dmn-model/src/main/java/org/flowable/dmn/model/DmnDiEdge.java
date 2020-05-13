@@ -15,18 +15,11 @@ package org.flowable.dmn.model;
 public class DmnDiEdge extends DiEdge {
 
     protected String dmnElementRef;
-    protected String targetDmnElementRef;
 
     public String getDmnElementRef() {
         return dmnElementRef;
     }
     public void setDmnElementRef(String dmnElementRef) {
         this.dmnElementRef = dmnElementRef;
-    }
-    public String getTargetDmnElementRef() {
-        return targetDmnElementRef;
-    }
-    public void setTargetDmnElementRef(String targetDmnElementRef) {
-        this.targetDmnElementRef = targetDmnElementRef;
     }
 }

@@ -336,7 +336,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 conversionHelper.getDiEdges(diDiagram.getId())
                     .forEach(dmnDiEdge -> {
                         if (dmnDiEdge.getId() != null) {
-                            dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getId(), dmnDiEdge.getWaypoints());
+                            dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getDmnElementRef(), dmnDiEdge.getWaypoints());
                         }
                     });
             });

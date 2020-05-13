@@ -35,7 +35,7 @@ public class DmnDiDecisionServiceDividerLineXmlConverter extends BaseDmnXMLConve
         DmnDiDecisionServiceDividerLine decisionServiceDividerLine = new DmnDiDecisionServiceDividerLine();
 
         conversionHelper.getCurrentDiShape().setDecisionServiceDividerLine(decisionServiceDividerLine);
-        conversionHelper.addDiEdge(decisionServiceDividerLine);
+        conversionHelper.setCurrentDiEdge(decisionServiceDividerLine);
         
         return decisionServiceDividerLine;
     }
