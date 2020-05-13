@@ -72,6 +72,8 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConve
         assertThat(taskA.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
         assertThat(taskA.getName()).isEqualTo("A");
         assertThat(taskA.getTopic()).isEqualTo("simple");
+        assertThat(taskA.isAsync()).isFalse();
+        assertThat(taskA.isExclusive()).isFalse();
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
@@ -81,6 +83,8 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConve
         assertThat(taskB.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
         assertThat(taskB.getName()).isEqualTo("B");
         assertThat(taskB.getTopic()).isNull();
+        assertThat(taskB.isAsync()).isFalse();
+        assertThat(taskB.isExclusive()).isTrue();
     }
 
 }
