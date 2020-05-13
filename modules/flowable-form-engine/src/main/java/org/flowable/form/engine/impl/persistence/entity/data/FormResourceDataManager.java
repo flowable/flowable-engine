@@ -24,6 +24,8 @@ public interface FormResourceDataManager extends DataManager<FormResourceEntity>
 
     void deleteResourcesByDeploymentId(String deploymentId);
 
+    void deleteResourcesByName(String name);
+
     FormResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName);
 
     List<FormResourceEntity> findResourcesByDeploymentId(String deploymentId);

@@ -61,7 +61,7 @@ public class DeploymentCleanerUtil {
     public static void deleteDeployments(FormEngine formEngine) {
         List<FormDeployment> formDeployments = formEngine.getFormRepositoryService().createDeploymentQuery().list();
         for (FormDeployment formDeployment : formDeployments) {
-            formEngine.getFormRepositoryService().deleteDeployment(formDeployment.getId());
+            formEngine.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true);
         }
     }
 

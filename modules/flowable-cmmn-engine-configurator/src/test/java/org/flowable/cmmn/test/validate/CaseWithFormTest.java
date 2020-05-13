@@ -87,7 +87,7 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
     public void cleanDeployments() {
         TestValidationFormEngineConfigurator.ThrowExceptionOnValidationFormService.deactivate();
         formRepositoryService.createDeploymentQuery().list().forEach(
-                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
+                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId(), true)
         );
         CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         cmmnRepositoryService.createDeploymentQuery().list().forEach(

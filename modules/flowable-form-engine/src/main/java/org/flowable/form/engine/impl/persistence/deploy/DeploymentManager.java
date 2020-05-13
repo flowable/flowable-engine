@@ -149,7 +149,7 @@ public class DeploymentManager {
         return cachedForm;
     }
 
-    public void removeDeployment(String deploymentId) {
+    public void removeDeployment(String deploymentId, boolean cascade) {
 
         FormDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
         if (deployment == null) {
@@ -160,7 +160,7 @@ public class DeploymentManager {
         List<FormDefinition> forms = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data
-        deploymentEntityManager.deleteDeployment(deploymentId);
+        deploymentEntityManager.deleteDeployment(deploymentId, cascade);
 
         for (FormDefinition form : forms) {
             formCache.remove(form.getId());

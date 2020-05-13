@@ -66,7 +66,12 @@ public class FormRepositoryServiceImpl extends CommonEngineServiceImpl<FormEngin
 
     @Override
     public void deleteDeployment(String deploymentId) {
-        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId));
+        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false));
+    }
+
+    @Override
+    public void deleteDeployment(String deploymentId, boolean cascade) {
+        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
     }
 
     @Override

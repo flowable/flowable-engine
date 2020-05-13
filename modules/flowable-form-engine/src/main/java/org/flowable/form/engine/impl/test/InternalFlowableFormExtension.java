@@ -180,10 +180,10 @@ public abstract class InternalFlowableFormExtension implements AfterEachCallback
     protected void removeDeployments(FormRepositoryService repositoryService) {
         for (FormDeployment deployment : repositoryService.createDeploymentQuery().list()) {
             try {
-                repositoryService.deleteDeployment(deployment.getId());
+                repositoryService.deleteDeployment(deployment.getId(), true);
             } catch (FlowableOptimisticLockingException flowableOptimisticLockingException) {
                 logger.warn("Caught exception, retrying", flowableOptimisticLockingException);
-                repositoryService.deleteDeployment(deployment.getId());
+                repositoryService.deleteDeployment(deployment.getId(), true);
             }
         }
     }

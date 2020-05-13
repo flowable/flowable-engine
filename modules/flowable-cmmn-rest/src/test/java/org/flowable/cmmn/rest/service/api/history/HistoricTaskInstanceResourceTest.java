@@ -253,7 +253,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
 
                 List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
                 for (FormDeployment formDeployment : formDeployments) {
-                    formRepositoryService.deleteDeployment(formDeployment.getId());
+                    formRepositoryService.deleteDeployment(formDeployment.getId(), true);
                 }
             }
         }

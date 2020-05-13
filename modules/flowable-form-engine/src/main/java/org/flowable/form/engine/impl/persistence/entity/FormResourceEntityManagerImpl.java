@@ -37,6 +37,11 @@ public class FormResourceEntityManagerImpl
     }
 
     @Override
+    public void deleteResourcesByName(String name) {
+        dataManager.deleteResourcesByName(name);
+    }
+
+    @Override
     public FormResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
         return dataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
     }
