@@ -79,6 +79,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
 import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.After;
@@ -634,6 +635,13 @@ public class BaseSpringRestTestCase {
 
     protected String getISODateString(Date time) {
         return dateFormat.format(time);
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

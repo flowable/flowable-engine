@@ -16,7 +16,6 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,8 +29,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -193,12 +190,5 @@ public class JobResourceTest extends BaseSpringRestTestCase {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB, "unexistingjob"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 }
