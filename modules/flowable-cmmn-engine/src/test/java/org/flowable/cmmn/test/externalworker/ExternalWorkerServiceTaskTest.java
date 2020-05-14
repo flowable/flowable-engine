@@ -29,6 +29,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -950,6 +953,30 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getLockTime()).isNull();
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testCreateCmmnExternalWorkerJobInterceptor() {
+        TestCreateCmmnExternalWorkerJobInterceptor interceptor = new TestCreateCmmnExternalWorkerJobInterceptor();
+        cmmnEngineConfiguration.setCreateCmmnExternalWorkerJobInterceptor(interceptor);
+
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("simpleExternalWorker")
+                    .variable("name", "kermit")
+                    .start();
+
+            ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+            assertThat(externalWorkerJob).isNotNull();
+            assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simpleTest");
+
+            assertThat(interceptor.beforeCounter).isEqualTo(1);
+            assertThat(interceptor.afterCounter).isEqualTo(1);
+        } finally {
+            cmmnEngineConfiguration.setCreateCmmnExternalWorkerJobInterceptor(null);
+        }
+    }
+
     protected Map<String, Object> getExternalWorkerVariablesForPlanItemInstance(String planItemInstanceId) {
         return cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
@@ -967,5 +994,22 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
     protected void setTime(Instant time) {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(time));
+    }
+
+
+    protected static class TestCreateCmmnExternalWorkerJobInterceptor implements CreateCmmnExternalWorkerJobInterceptor {
+        protected int beforeCounter = 0;
+        protected int afterCounter = 0;
+
+        @Override
+        public void beforeCreateExternalWorkerJob(CreateCmmnExternalWorkerJobBeforeContext beforeContext) {
+            beforeCounter++;
+            beforeContext.setJobTopicExpression(beforeContext.getJobTopicExpression() + "Test");
+        }
+
+        @Override
+        public void afterCreateExternalWorkerJob(CreateCmmnExternalWorkerJobAfterContext afterContext) {
+            afterCounter++;
+        }
     }
 }
