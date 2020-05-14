@@ -36,7 +36,7 @@ public class CaseModelsResource {
     protected FlowableCaseModelService caseService;
 
     @GetMapping(produces = "application/json")
-    public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
+    public ResultListDataRepresentation getCaseModels(HttpServletRequest request) {
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filter = null;
         String excludeId = null;

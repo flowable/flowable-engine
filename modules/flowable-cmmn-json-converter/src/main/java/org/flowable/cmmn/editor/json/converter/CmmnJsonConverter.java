@@ -333,7 +333,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModel cmmnModel = new CmmnModel();
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
-
         cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overriden later with actual value
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
@@ -429,7 +428,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 if (resourceNode != null) {
                     planModelExitCriteriaRefs.add(resourceNode.asText());
                     CriterionJsonConverter criterionJsonConverter = new CriterionJsonConverter();
-                    criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
+                    Criterion exitCriterion = (Criterion) criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
+                    exitCriterion.setAttachedToRefId(planModelStage.getId());
                 }
             }
         }
@@ -610,6 +610,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     hasEntryCriteriaElement.addEntryCriterion(criterion);
                 } else if (criterion.isExitCriterion()) {
                     hasExitCriteriaElement.addExitCriterion(criterion);
+                    if (planItemDefinition instanceof Stage) {
+                        Stage planItemDefinitionStage = (Stage) planItemDefinition;
+                        if (!planItemDefinitionStage.getExitCriteria().contains(criterion)) {
+                            planItemDefinitionStage.addExitCriterion(criterion);
+                        }
+                    }
                 }
             }
 
