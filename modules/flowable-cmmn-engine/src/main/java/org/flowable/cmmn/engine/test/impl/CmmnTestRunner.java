@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.test.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -24,8 +23,8 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.runner.notification.RunNotifier;
@@ -195,29 +194,14 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {
-        Map<String, Long> tableCounts = cmmnEngineConfiguration.getCmmnManagementService().getTableCounts();
-        
-        StringBuilder outputMessage = new StringBuilder();
-        for (String table : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = table.replace(cmmnEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(table);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
-                }
-            }
-        }
-        
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB not clean for test " + getTestClass().getName() + "." + method.getName() + ": \n");
-            LOGGER.error("\n");
-            LOGGER.error(outputMessage.toString());
-            Assert.fail(outputMessage.toString());
-
-        } else {
-            LOGGER.info("database was clean");
-            
-        }
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getTestClass().getName() + "." + method.getName(),
+                LOGGER,
+                cmmnEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                true,
+                null
+        );
     }
 
 }

@@ -14,7 +14,6 @@ package org.flowable.app.engine.test.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.api.AppRepositoryService;
@@ -22,7 +21,7 @@ import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.test.AppDeployment;
 import org.flowable.common.engine.api.FlowableException;
-import org.junit.Assert;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.junit.Ignore;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -128,29 +127,14 @@ public class AppTestRunner extends BlockJUnit4ClassRunner {
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {
-        Map<String, Long> tableCounts = appEngineConfiguration.getAppManagementService().getTableCounts();
-        
-        StringBuilder outputMessage = new StringBuilder();
-        for (String table : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = table.replace(appEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(table);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(table).append(": ").append(count).append(" record(s) ");
-                }
-            }
-        }
-        
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB not clean for test " + getTestClass().getName() + "." + method.getName() + ": \n");
-            LOGGER.error("\n");
-            LOGGER.error(outputMessage.toString());
-            Assert.fail(outputMessage.toString());
-
-        } else {
-            LOGGER.info("database was clean");
-            
-        }
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getTestClass().getName() + "." + method.getName(),
+                LOGGER,
+                appEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                true,
+                null
+        );
     }
 
 }

@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
@@ -63,7 +62,7 @@ import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
@@ -308,41 +307,19 @@ public abstract class BaseSpringRestTestCase extends TestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCounts();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(cmmnEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getName(),
+                LOGGER,
+                cmmnEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                commandContext -> {
+                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
+                    return null;
                 }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
-            commandExecutor.execute(commandContext -> {
-                SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
-                schemaManager.schemaDrop();
-                schemaManager.schemaCreate();
-                return null;
-            });
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                Assert.fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.info("database was clean");
-        }
+        );
     }
 
     protected void closeHttpConnections() {
