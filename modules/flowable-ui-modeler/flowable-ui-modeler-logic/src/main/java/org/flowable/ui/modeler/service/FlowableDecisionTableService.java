@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.editor.dmn.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;

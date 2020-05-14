@@ -1,0 +1,71 @@
+{
+  "id": "9d9dd959-2153-11e8-826c-1eba751c480b",
+  "modelVersion": "2",
+  "name": "Collections Table",
+  "key": "COLDEC1",
+  "hitIndicator": "ANY",
+  "inputExpressions": [
+    {
+      "id": "1",
+      "variableId": "collection1",
+      "variableType": null,
+      "type": "collection",
+      "label": "Input One",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    },
+    {
+      "id": "3",
+      "variableId": "input2",
+      "variableType": null,
+      "type": "number",
+      "label": "",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "2",
+      "variableId": "output1",
+      "variableType": null,
+      "type": "string",
+      "label": "Output One",
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": false
+    }
+  ],
+  "rules": [
+    {
+      "2": "both TEST1 and TEST2 not in collection1",
+      "1_operator": "NOT IN",
+      "1_expression": "\"TEST1\", \"TEST2\"",
+      "3_expression": "\"TEST1\", \"TEST2\"",
+      "3_operator": "NOT IN"
+    },
+    {
+      "2": "TEST1 and or TEST5 not in collection1",
+      "1_operator": "NOT ANY",
+      "1_expression": "\"TEST1\", \"TEST5\"",
+      "3_expression": "\"TEST1\", \"TEST5\"",
+      "3_operator": "NOT ANY"
+    },
+    {
+      "2": "TEST1 or TEST6 in collection",
+      "1_operator": "ANY",
+      "1_expression": "\"TEST1\", \"TEST6\"",
+      "3_expression":"\"TEST1\", \"TEST6\"",
+      "3_operator": "ANY"
+    },
+    {
+      "2": "TEST1 in collection1",
+      "1_operator": "IN",
+      "1_expression": "\"TEST1\"",
+      "3_expression": "\"TEST1\", \"TEST6\"",
+      "3_operator": "IN"
+    }
+  ]
+}

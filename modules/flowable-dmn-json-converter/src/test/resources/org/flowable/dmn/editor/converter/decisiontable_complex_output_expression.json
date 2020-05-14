@@ -1,0 +1,40 @@
+{
+  "id": "87105504-5011-11e7-b907-a26608126000",
+  "modelVersion": "2",
+  "name": "Complex Expression",
+  "key": "ComplexExpression",
+  "description": "",
+  "hitIndicator": "FIRST",
+  "inputExpressions": [
+    {
+      "id": "1",
+      "variableId": "input1",
+      "variableType": null,
+      "type": "string",
+      "label": "",
+      "entries": []
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "2",
+      "variableId": "output1",
+      "variableType": null,
+      "type": "string",
+      "label": "",
+      "entries": []
+    }
+  ],
+  "rules": [
+    {
+      "2": "${refVar1 * refVar2}",
+      "1_operator": "==",
+      "1_expression": "TEST"
+    },
+    {
+      "2": "#{refVar1 * refVar2}",
+      "1_operator": "==",
+      "1_expression": "TEST2"
+    }
+  ]
+}

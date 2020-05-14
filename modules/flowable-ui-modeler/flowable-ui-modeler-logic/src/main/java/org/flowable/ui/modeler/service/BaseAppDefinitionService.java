@@ -46,7 +46,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.editor.dmn.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;

@@ -13,7 +13,7 @@
 package org.flowable.ui.modeler.service;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.editor.dmn.converter.DmnJsonConverterUtil;
+import org.flowable.dmn.editor.converter.DmnJsonConverterUtil;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.domain.Model;
 import org.slf4j.Logger;
