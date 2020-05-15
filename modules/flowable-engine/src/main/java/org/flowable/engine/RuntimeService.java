@@ -1129,6 +1129,16 @@ public interface RuntimeService {
     void signalEventReceivedAsyncWithTenantId(String signalName, String tenantId);
 
     /**
+     * Similar to {@link #signalEventReceivedAsync(String)}, but within the variables.
+     */
+    void signalEventReceivedAsync(String signalName, Map<String, Object> processVariables);
+
+    /**
+     * Similar to {@link #signalEventReceivedAsyncWithTenantId(String, String)}, but within the variables.
+     */
+    void signalEventReceivedAsyncWithTenantId(String signalName, Map<String, Object> processVariables, String tenantId);
+
+    /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
      * <p/>
      *

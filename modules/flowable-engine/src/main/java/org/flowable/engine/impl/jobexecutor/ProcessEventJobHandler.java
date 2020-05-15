@@ -13,6 +13,10 @@
 
 package org.flowable.engine.impl.jobexecutor;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
@@ -21,6 +25,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Daniel Meyer
@@ -29,6 +34,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class ProcessEventJobHandler implements JobHandler {
 
     public static final String TYPE = "event";
+    public static final String PAYLOAD_VARIABLE_NAME = "payload";
 
     @Override
     public String getType() {
@@ -45,9 +51,25 @@ public class ProcessEventJobHandler implements JobHandler {
 
         // if event subscription is null, ignore
         if (eventSubscriptionEntity != null) {
-            EventSubscriptionUtil.eventReceived(eventSubscriptionEntity, null, false);
+            VariableInstanceEntity payloadVariable = getPayloadVariable(job);
+            Object payloadValue = null;
+            if (payloadVariable != null) {
+                payloadValue = payloadVariable.getValue();
+                removeVariable(payloadVariable);
+            }
+            EventSubscriptionUtil.eventReceived(eventSubscriptionEntity, payloadValue, false);
         }
-
     }
 
+    protected void removeVariable(VariableInstanceEntity variable) {
+        CommandContextUtil.getVariableService().deleteVariableInstance(variable);
+    }
+
+    protected VariableInstanceEntity getPayloadVariable(JobEntity job) {
+        List<VariableInstanceEntity> variableInstanceByScopeIdAndScopeType = CommandContextUtil.getVariableService()
+                .findVariableInstanceByScopeIdAndScopeType(job.getId(), ScopeTypes.JOB);
+        Optional<VariableInstanceEntity> payload = variableInstanceByScopeIdAndScopeType.stream()
+                .filter(variableInstance -> PAYLOAD_VARIABLE_NAME.equals(variableInstance.getName())).findAny();
+        return payload.orElse(null);
+    }
 }

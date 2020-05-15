@@ -49,7 +49,6 @@ public class SignalEventReceivedCmd implements Command<Void> {
         this.executionId = executionId;
         if (processVariables != null) {
             this.payload = new HashMap<>(processVariables);
-
         } else {
             this.payload = null;
         }
@@ -62,6 +61,18 @@ public class SignalEventReceivedCmd implements Command<Void> {
         this.executionId = executionId;
         this.async = async;
         this.payload = null;
+        this.tenantId = tenantId;
+    }
+
+    public SignalEventReceivedCmd(String eventName, String executionId, Map<String, Object> processVariables, boolean async, String tenantId) {
+        this.eventName = eventName;
+        this.executionId = executionId;
+        this.async = async;
+        if (processVariables != null) {
+            this.payload = new HashMap<>(processVariables);
+        } else {
+            this.payload = null;
+        }
         this.tenantId = tenantId;
     }
 

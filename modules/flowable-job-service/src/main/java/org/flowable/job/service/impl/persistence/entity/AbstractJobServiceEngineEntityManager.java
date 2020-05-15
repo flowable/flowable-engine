@@ -27,8 +27,8 @@ import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>>
     extends AbstractServiceEngineEntityManager<JobServiceConfiguration, EntityImpl, DM> {
 
-    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration variableServiceConfiguration, DM dataManager) {
-        super(variableServiceConfiguration, dataManager);
+    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration jobServiceConfiguration, DM dataManager) {
+        super(jobServiceConfiguration, dataManager);
     }
 
     @Override
