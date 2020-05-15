@@ -112,7 +112,10 @@ public class JobEntityManagerImpl
                     jobVariable.getByteArrayRef().delete();
                 }
             }
-            variableServiceConfiguration.getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(jobId, ScopeTypes.JOB);
+            if (!jobVariables.isEmpty()) {
+                variableServiceConfiguration.getVariableInstanceEntityManager()
+                        .deleteByScopeIdAndScopeType(jobId, ScopeTypes.JOB);
+            }
         }
     }
 }
