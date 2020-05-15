@@ -28,14 +28,6 @@ public interface EntityLinkEntityManager extends EntityManager<EntityLinkEntity>
     
     List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
 
-    List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType);
-
-    List<EntityLink> deleteScopeEntityLink(String scopeId, String scopeType, String linkType);
-
-    List<EntityLink> deleteScopeDefinitionEntityLink(String scopeDefinitionId, String scopeType, String linkType);
-
     void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
-    void deleteEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
-
 }

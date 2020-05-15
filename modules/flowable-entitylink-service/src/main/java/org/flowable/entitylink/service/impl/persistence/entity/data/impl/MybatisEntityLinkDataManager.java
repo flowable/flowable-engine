@@ -54,7 +54,7 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
         parameters.put("linkType", linkType);
         return (List) getList("selectEntityLinksByScopeIdAndType", parameters, entityLinksByScopeIdAndTypeMatcher, true);
     }
-    
+
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
@@ -76,29 +76,11 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeDefinitionId", scopeDefinitionId);
-        parameters.put("scopeType", scopeType);
-        parameters.put("linkType", linkType);
-        return getDbSqlSession().selectList("selectEntityLinksByScopeDefinitionAndType", parameters);
-    }
-
-    @Override
     public void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         bulkDelete("deleteEntityLinksByScopeIdAndScopeType", entityLinksByScopeIdAndTypeMatcher, parameters);
-    }
-    
-    @Override
-    public void deleteEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeDefinitionId", scopeDefinitionId);
-        parameters.put("scopeType", scopeType);
-        getDbSqlSession().delete("deleteEntityLinksByScopeDefinitionIdAndScopeType", parameters, EntityLinkEntityImpl.class);
     }
 
 }

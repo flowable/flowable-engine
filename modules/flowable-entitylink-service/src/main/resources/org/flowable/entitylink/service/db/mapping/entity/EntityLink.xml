@@ -82,10 +82,6 @@
     delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
   
-  <delete id="deleteEntityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
-    delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
-  </delete>
-
   <!-- ENTITY LINK RESULTMAP -->
 
   <resultMap id="entityLinkResultMap" type="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
@@ -108,17 +104,13 @@
   <select id="selectEntityLink" parameterType="string" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
-  
+
   <select id="selectEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
-  
+
   <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
-  </select>
-  
-  <select id="selectEntityLinksByScopeDefinitionAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
   
   <select id="selectEntityLinks" resultMap="entityLinkResultMap">
