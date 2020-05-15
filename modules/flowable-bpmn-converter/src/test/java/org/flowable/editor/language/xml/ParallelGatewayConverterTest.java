@@ -12,25 +12,15 @@
  */
 package org.flowable.editor.language.xml;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ParallelGateway;
 import org.junit.Test;
 
 /**
- * Test for ACT-1657
- * 
- * @author Frederik Heremans
+ * @author martin.grofcik
  */
 public class ParallelGatewayConverterTest extends AbstractConverterTest {
 
@@ -51,7 +41,7 @@ public class ParallelGatewayConverterTest extends AbstractConverterTest {
         assertThat(flowElement).isInstanceOf(ParallelGateway.class);
 
         ParallelGateway gateway = (ParallelGateway) flowElement;
-        assertTrue(gateway.isAsynchronous());
-        assertFalse(gateway.isExclusive());
+        assertThat(gateway.isAsynchronous()).isTrue();
+        assertThat(gateway.isExclusive()).isTrue();
     }
 }
