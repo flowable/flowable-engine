@@ -280,55 +280,52 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process4").singleResult();
             authorizedGroups = identityService.getPotentialStarterGroups(latestProcessDef.getId());
             assertThat(authorizedGroups)
-                .extracting(Group::getId)
-                .containsExactlyInAnyOrder("group1", "group2", "group3");
+                    .extracting(Group::getId)
+                    .containsExactlyInAnyOrder("group1", "group2", "group3");
 
             // do not mention user, all processes should be selected
             List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().list();
-
-            assertEquals(4, processDefinitions.size());
-
-            assertEquals("process1", processDefinitions.get(0).getKey());
-            assertEquals("process2", processDefinitions.get(1).getKey());
-            assertEquals("process3", processDefinitions.get(2).getKey());
-            assertEquals("process4", processDefinitions.get(3).getKey());
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactly("process1", "process2", "process3", "process4");
 
             // check user1, process3 has "user1" as only authorized starter, and
             // process2 has two authorized starters, of which one is "user1"
             processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().startableByUser("user1").list();
-
-            assertEquals(2, processDefinitions.size());
-            assertEquals("process2", processDefinitions.get(0).getKey());
-            assertEquals("process3", processDefinitions.get(1).getKey());
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactly("process2", "process3");
 
             // "user2" can only start process2
             processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user2").list();
-
-            assertEquals(1, processDefinitions.size());
-            assertEquals("process2", processDefinitions.get(0).getKey());
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactly("process2");
 
             // no process could be started with "user4"
             processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user4").list();
-            assertEquals(0, processDefinitions.size());
+            assertThat(processDefinitions).isEmpty();
 
             // "userInGroup3" is in "group3" and can start only process4 via group authorization
             processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup3").list();
-            assertEquals(1, processDefinitions.size());
-            assertEquals("process4", processDefinitions.get(0).getKey());
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactly("process4");
 
             // "userInGroup2" can start process4, via both user and group authorizations
             // but we have to be sure that process4 appears only once
             processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup2").list();
-            assertEquals(1, processDefinitions.size());
-            assertEquals("process4", processDefinitions.get(0).getKey());
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactly("process4");
 
             // when groups are defined they should be used instead
 
             // "group1" can start process4
             assertThat(identityService.createGroupQuery().groupMember("user4").list()).isEmpty();
             assertThat(repositoryService.createProcessDefinitionQuery().startableByUserOrGroups("user4", Collections.singletonList("group1")).list())
-                .extracting(ProcessDefinition::getKey)
-                .containsExactlyInAnyOrder("process4");
+                    .extracting(ProcessDefinition::getKey)
+                    .containsExactlyInAnyOrder("process4");
 
             // "userInGroup3" can only start process4 via group authorization, "unknownGroup" cannot start any process
             assertThat(repositoryService.createProcessDefinitionQuery().startableByUserOrGroups("userInGroup3", Collections.singletonList("unknownGroup")).list())
