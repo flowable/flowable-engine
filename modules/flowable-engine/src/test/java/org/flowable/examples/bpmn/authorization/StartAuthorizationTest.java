@@ -105,31 +105,31 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
         try {
             ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process1").singleResult();
-            assertNotNull(latestProcessDef);
+            assertThat(latestProcessDef).isNotNull();
             List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(0, links.size());
+            assertThat(links).isEmpty();
 
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").singleResult();
-            assertNotNull(latestProcessDef);
+            assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(2, links.size());
-            assertTrue(containsUserOrGroup("user1", null, links));
-            assertTrue(containsUserOrGroup("user2", null, links));
+            assertThat(links).hasSize(2);
+            assertThat(containsUserOrGroup("user1", null, links)).isTrue();
+            assertThat(containsUserOrGroup("user2", null, links)).isTrue();
 
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process3").singleResult();
-            assertNotNull(latestProcessDef);
+            assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(1, links.size());
-            assertEquals("user1", links.get(0).getUserId());
+            assertThat(links).hasSize(1);
+            assertThat(links.get(0).getUserId()).isEqualTo("user1");
 
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process4").singleResult();
-            assertNotNull(latestProcessDef);
+            assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(4, links.size());
-            assertTrue(containsUserOrGroup("userInGroup2", null, links));
-            assertTrue(containsUserOrGroup(null, "group1", links));
-            assertTrue(containsUserOrGroup(null, "group2", links));
-            assertTrue(containsUserOrGroup(null, "group3", links));
+            assertThat(links).hasSize(4);
+            assertThat(containsUserOrGroup("userInGroup2", null, links)).isTrue();
+            assertThat(containsUserOrGroup(null, "group1", links)).isTrue();
+            assertThat(containsUserOrGroup(null, "group2", links)).isTrue();
+            assertThat(containsUserOrGroup(null, "group3", links)).isTrue();
 
         } finally {
             tearDownUsersAndGroups();
@@ -143,34 +143,35 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         setUpUsersAndGroups();
 
         try {
-            ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarterNoDefinition").singleResult();
-            assertNotNull(latestProcessDef);
+            ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarterNoDefinition")
+                    .singleResult();
+            assertThat(latestProcessDef).isNotNull();
             List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(0, links.size());
+            assertThat(links).isEmpty();
 
             repositoryService.addCandidateStarterGroup(latestProcessDef.getId(), "group1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(1, links.size());
-            assertEquals("group1", links.get(0).getGroupId());
+            assertThat(links).hasSize(1);
+            assertThat(links.get(0).getGroupId()).isEqualTo("group1");
 
             repositoryService.addCandidateStarterUser(latestProcessDef.getId(), "user1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(2, links.size());
-            assertTrue(containsUserOrGroup(null, "group1", links));
-            assertTrue(containsUserOrGroup("user1", null, links));
+            assertThat(links).hasSize(2);
+            assertThat(containsUserOrGroup(null, "group1", links)).isTrue();
+            assertThat(containsUserOrGroup("user1", null, links)).isTrue();
 
             repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "nonexisting");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(2, links.size());
+            assertThat(links).hasSize(2);
 
             repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "group1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(1, links.size());
-            assertEquals("user1", links.get(0).getUserId());
+            assertThat(links).hasSize(1);
+            assertThat(links.get(0).getUserId()).isEqualTo("user1");
 
             repositoryService.deleteCandidateStarterUser(latestProcessDef.getId(), "user1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertEquals(0, links.size());
+            assertThat(links).isEmpty();
 
         } finally {
             tearDownUsersAndGroups();
@@ -205,7 +206,6 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             identityService.setAuthenticatedUserId("unauthorizedUser");
             try {
                 runtimeService.startProcessInstanceByKey("potentialStarter");
-
             } catch (Exception e) {
                 fail("No StartAuthorizationException expected, " + e.getClass().getName() + " caught.");
             }
@@ -215,21 +215,24 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             identityService.setAuthenticatedUserId("user1");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarter");
             assertProcessEnded(processInstance.getId());
-            assertTrue(processInstance.isEnded());
+            assertThat(processInstance.isEnded()).isTrue();
 
             // check extensionElements with : <formalExpression>group2,
             // group(group3), user(user3)</formalExpression>
             ProcessDefinition potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("user1").latestVersion().singleResult();
-            assertNotNull(potentialStarter);
+            assertThat(potentialStarter).isNotNull();
 
-            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("user3").latestVersion().singleResult();
-            assertNotNull(potentialStarter);
+            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("user3")
+                    .latestVersion().singleResult();
+            assertThat(potentialStarter).isNotNull();
 
-            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("userInGroup2").latestVersion().singleResult();
-            assertNotNull(potentialStarter);
+            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("userInGroup2")
+                    .latestVersion().singleResult();
+            assertThat(potentialStarter).isNotNull();
 
-            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("userInGroup3").latestVersion().singleResult();
-            assertNotNull(potentialStarter);
+            potentialStarter = repositoryService.createProcessDefinitionQuery().processDefinitionKey("potentialStarter").startableByUser("userInGroup3")
+                    .latestVersion().singleResult();
+            assertThat(potentialStarter).isNotNull();
         } finally {
 
             tearDownUsersAndGroups();
@@ -246,9 +249,9 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
         identityService.setAuthenticatedUserId("someOneFromMars");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarterNoDefinition");
-        assertNotNull(processInstance.getId());
+        assertThat(processInstance.getId()).isNotNull();
         assertProcessEnded(processInstance.getId());
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     // this test checks the list without user constraint
