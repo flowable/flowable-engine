@@ -15,17 +15,22 @@ package org.flowable.eventregistry.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionExecutor;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-@EventConfigurationResource("flowableChangeDetector.eventregistry.cfg.xml")
-public class DefaultEventRegistryDataChangeDetectorTest extends AbstractFlowableEventTest {
+public class DefaultEventRegistryDataChangeDetectorShutdownTest {
 
     @Test
-    public void testExecutorServiceAndRunnableCreated() {
+    public void testClosingEngineShouldShutdownExecutorService() {
+        EventRegistryEngineConfiguration configuration = EventRegistryEngineConfiguration
+                .createEventRegistryEngineConfigurationFromResource("flowableChangeDetector.eventregistry.cfg.xml");
+        EventRegistryEngine eventRegistryEngine = configuration.buildEventRegistryEngine();
         assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager()).isNotNull();
         EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
         assertThat(eventRegistryChangeDetectionExecutor).isNotNull();
@@ -34,6 +39,11 @@ public class DefaultEventRegistryDataChangeDetectorTest extends AbstractFlowable
         DefaultEventRegistryChangeDetectionExecutor executor = (DefaultEventRegistryChangeDetectionExecutor) eventRegistryChangeDetectionExecutor;
         assertThat(executor.getScheduledExecutorService()).isNotNull();
         assertThat(executor.getChangeDetectionRunnable()).isNotNull();
+        assertThat(executor.getScheduledExecutorService().isShutdown()).isFalse();
+
+        eventRegistryEngine.close();
+
+        assertThat(executor.getScheduledExecutorService().isShutdown()).isTrue();
     }
 
 }

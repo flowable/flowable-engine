@@ -22,7 +22,6 @@ import java.util.Set;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -103,14 +102,8 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
     ));
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected final String configurationResource;
 
     public FlowableEventExtension() {
-        this("flowable.eventregistry.cfg.xml");
-    }
-
-    public FlowableEventExtension(String configurationResource) {
-        this.configurationResource = configurationResource;
     }
 
     @Override
