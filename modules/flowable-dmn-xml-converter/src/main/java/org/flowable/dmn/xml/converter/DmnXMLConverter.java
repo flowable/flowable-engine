@@ -327,16 +327,16 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 dmnDefinition.addDiDiagram(diDiagram);
                 conversionHelper.getDiShapes(diDiagram.getId())
                     .forEach(dmnDiShape -> {
-                        dmnDefinition.addGraphicInfo(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo());
+                        dmnDefinition.addGraphicInfoByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo());
                         if (dmnDiShape.getDecisionServiceDividerLine() != null) {
-                            dmnDefinition.addDecisionServiceDividerGraphicInfoList(diDiagram.getId(), dmnDiShape.getDmnElementRef(),
+                            dmnDefinition.addDecisionServiceDividerGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(),
                                 dmnDiShape.getDecisionServiceDividerLine().getWaypoints());
                         }
                     });
                 conversionHelper.getDiEdges(diDiagram.getId())
                     .forEach(dmnDiEdge -> {
                         if (dmnDiEdge.getId() != null) {
-                            dmnDefinition.addFlowGraphicInfoList(diDiagram.getId(), dmnDiEdge.getDmnElementRef(), dmnDiEdge.getWaypoints());
+                            dmnDefinition.addFlowGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiEdge.getDmnElementRef(), dmnDiEdge.getWaypoints());
                         }
                     });
             });

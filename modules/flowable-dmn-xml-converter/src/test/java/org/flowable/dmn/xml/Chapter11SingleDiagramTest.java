@@ -7,7 +7,7 @@ import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.ItemDefinition;
 import org.junit.jupiter.api.Test;
 
-public class Chapter11Test extends AbstractConverterTest {
+public class Chapter11SingleDiagramTest extends AbstractConverterTest {
 
     @Test
     public void convertXMLToModel() throws Exception {
@@ -24,7 +24,7 @@ public class Chapter11Test extends AbstractConverterTest {
 
     @Override
     protected String getResource() {
-        return "chapter11multiDiagram.dmn";
+        return "chapter11singleDiagram.dmn";
     }
 
     private void validateModel(DmnDefinition model) {
@@ -70,55 +70,13 @@ public class Chapter11Test extends AbstractConverterTest {
             .extracting(DmnElementReference::getHref)
             .containsExactly("#_d14df033-f4a2-47e3-9590-84e9ff04db4e", "#_fe938494-ee59-425e-8728-2347ea703563");
 
-        assertThat(model.getDiDiagramMap().entrySet())
-            .hasSize(6)
-            .hasSameSizeAs(model.getLocationByDiagramIdMap().entrySet())
-            .hasSameSizeAs(model.getFlowLocationByDiagramIdMap().entrySet());
-
-        assertThat(model.getFlowLocationByDiagramIdMap().entrySet())
-            .hasSize(6);
-
-        assertThat(model.getLocationMapByDiagramId("_ce4a4c00-c3a3-46a6-8938-055239f6b326"))
-            .hasSize(30);
-
-        assertThat(model.getFlowLocationMapByDiagramId("_ce4a4c00-c3a3-46a6-8938-055239f6b326"))
-            .hasSize(46);
-
-        assertThat(model.getLocationMapByDiagramId("_0e22b6cf-0a6e-40e1-a81e-44b31ad86262"))
-            .hasSize(21);
-
-        assertThat(model.getFlowLocationMapByDiagramId("_0e22b6cf-0a6e-40e1-a81e-44b31ad86262"))
-            .hasSize(27);
-
-        assertThat(model.getLocationMapByDiagramId("_3275163a-921d-48f8-967a-21c4373b1197"))
-            .hasSize(18);
-
-        assertThat(model.getFlowLocationMapByDiagramId("_3275163a-921d-48f8-967a-21c4373b1197"))
-            .hasSize(22);
-
-        assertThat(model.getLocationMapByDiagramId("_a35ef6e9-0408-4288-b8f2-d28ac4baca3b"))
-            .hasSize(6);
-
-        assertThat(model.getFlowLocationMapByDiagramId("_a35ef6e9-0408-4288-b8f2-d28ac4baca3b"))
-            .hasSize(5);
-
-        assertThat(model.getLocationMapByDiagramId("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
-            .hasSize(10);
-
-        assertThat(model.getFlowLocationMapByDiagramId("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
-            .hasSize(13);
-
-        assertThat(model.getLocationMapByDiagramId("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+        assertThat(model.getLocationMap())
             .hasSize(9);
 
-        assertThat(model.getFlowLocationMapByDiagramId("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+        assertThat(model.getFlowLocationMap())
             .hasSize(11);
 
-        assertThat(model.getDecisionServiceDividerLocationMapByDiagramId("_5c111794-4c6b-4747-8dfc-99d2ad0b6313"))
-            .hasSize(1);
-
-        assertThat(model.getDecisionServiceDividerLocationMapByDiagramId("_69750f88-f46f-4b47-bb3c-fb77f574f2b3"))
+        assertThat(model.getDecisionServiceDividerLocationMap())
             .hasSize(1);
     }
-
 }

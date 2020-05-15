@@ -98,7 +98,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
     public ObjectNode convertToJson(DmnDefinition model) {
         // check if model has no DRD DI info
-        if (model.getDiDiagrams().isEmpty()) {
+        if (model.getDiDiagramMap().isEmpty()) {
             return convertDecisionTableToJson(model);
         }
 
@@ -107,7 +107,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         ObjectNode modelNode = objectMapper.createObjectNode();
 
         // get the shapes of the first diagram
-        Map.Entry<String, DmnDiDiagram> entry = model.getDiDiagrams().entrySet().iterator().next();
+        Map.Entry<String, DmnDiDiagram> entry = model.getDiDiagramMap().entrySet().iterator().next();
 
         DmnDiDiagram diDiagram = entry.getValue();
 
@@ -137,10 +137,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         modelNode.set(EDITOR_CHILD_SHAPES, shapesArrayNode);
 
         // get first decision service
-        if (model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).isEmpty()) {
+        if (model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).isEmpty()) {
             return modelNode;
         }
-        String decisionServiceId = model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).keySet().iterator().next();
+        String decisionServiceId = model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).keySet().iterator().next();
         DecisionService decisionService = model.getDecisionServiceById(decisionServiceId);
 
         // create expanded decision service node
@@ -173,7 +173,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             decisionRef -> encapsulatedDecisionChildShapeNodes.add(createEncapsulatedDecisionNode(decisionRef, decisionServiceId, diDiagram.getId(), sourceTargetRefMap, model)));
 
         // create information requirement nodes
-        model.getFlowLocationGraphicInfo(diDiagram.getId()).forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, diDiagram.getId(), model)));
+        model.getFlowLocationMapByDiagramId(diDiagram.getId()).forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, diDiagram.getId(), model)));
         return modelNode;
     }
 
@@ -226,8 +226,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             informationRequirementNode.set(EDITOR_TARGET, targetNode);
             targetNode.put(EDITOR_SHAPE_ID, targetDecisionId);
 
-            GraphicInfo sourceGraphicInfo = definition.getGraphicInfo(diagramId, sourceDecisionId);
-            GraphicInfo targetGraphicInfo = definition.getGraphicInfo(diagramId, targetDecisionId);
+            GraphicInfo sourceGraphicInfo = definition.getGraphicInfoByDiagramId(diagramId, sourceDecisionId);
+            GraphicInfo targetGraphicInfo = definition.getGraphicInfoByDiagramId(diagramId, targetDecisionId);
 
             ArrayNode dockersArrayNode = objectMapper.createArrayNode();
             informationRequirementNode.set(EDITOR_DOCKERS, dockersArrayNode);
@@ -248,8 +248,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
     protected ObjectNode createOutputDecisionNode(DmnElementReference decisionRef, String decisionServiceId, String diagramId, Map<String, List<String>> sourceTargetRefMap, DmnDefinition model) {
         Decision decision = model.getDecisionById(decisionRef.getParsedId());
-        GraphicInfo graphicInfo = model.getGraphicInfo(diagramId, decision.getId());
-        GraphicInfo decisionServiceGraphicInfo = model.getGraphicInfo(diagramId, decisionServiceId);
+        GraphicInfo graphicInfo = model.getGraphicInfoByDiagramId(diagramId, decision.getId());
+        GraphicInfo decisionServiceGraphicInfo = model.getGraphicInfoByDiagramId(diagramId, decisionServiceId);
 
         ObjectNode decisionNode = DmnJsonConverterUtil.createChildShape(decision.getId(), DmnStencilConstants.STENCIL_DECISION,
             graphicInfo.getX() - decisionServiceGraphicInfo.getX() + graphicInfo.getWidth(),
@@ -261,8 +261,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
     protected ObjectNode createEncapsulatedDecisionNode(DmnElementReference decisionRef, String decisionServiceId, String diagramId, Map<String, List<String>> sourceTargetRefMap, DmnDefinition model) {
         Decision decision = model.getDecisionById(decisionRef.getParsedId());
-        GraphicInfo graphicInfo = model.getGraphicInfo(diagramId, decision.getId());
-        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerGraphicInfo(diagramId).get(decisionServiceId);
+        GraphicInfo graphicInfo = model.getGraphicInfoByDiagramId(diagramId, decision.getId());
+        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerLocationMapByDiagramId(diagramId).get(decisionServiceId);
         GraphicInfo encapsulatedDecisionsGraphicInfo = decisionServiceDividerGraphicInfoList.get(0);
 
         ObjectNode decisionNode = DmnJsonConverterUtil.createChildShape(decision.getId(), DmnStencilConstants.STENCIL_DECISION,
@@ -294,7 +294,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected ObjectNode createOutputDecisionsNode(DecisionService decisionService, String diDiagramId, DmnDefinition model) {
-        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerGraphicInfo(diDiagramId).get(decisionService.getId());
+        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerLocationMapByDiagramId(diDiagramId).get(decisionService.getId());
         GraphicInfo outputDecisionsGraphicInfo = decisionServiceDividerGraphicInfoList.get(0);
 
         String resourceId = decisionService.getId() + "_outputDecisions";
@@ -306,7 +306,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected ObjectNode createEncapsulatedDecisionsNode(DecisionService decisionService, String diDiagramId, DmnDefinition model) {
-        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerGraphicInfo(diDiagramId).get(decisionService.getId());
+        List<GraphicInfo> decisionServiceDividerGraphicInfoList = model.getDecisionServiceDividerLocationMapByDiagramId(diDiagramId).get(decisionService.getId());
         GraphicInfo outputDecisionsGraphicInfo = decisionServiceDividerGraphicInfoList.get(0);
         GraphicInfo encapsulatedDecisionsGraphicInfo = decisionServiceDividerGraphicInfoList.get(1);
 
@@ -319,7 +319,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected ObjectNode createExpandedDecisionServiceNode(DecisionService decisionService, String diDiagramId, DmnDefinition model) {
-        GraphicInfo decisionServiceGraphicInfo = model.getGraphicInfo(diDiagramId).get(decisionService.getId());
+        GraphicInfo decisionServiceGraphicInfo = model.getLocationMapByDiagramId(diDiagramId).get(decisionService.getId());
         ObjectNode decisionServiceNode = DmnJsonConverterUtil.createChildShape(decisionService.getId(), DmnStencilConstants.STENCIL_EXPANDED_DECISION_SERVICE,
             decisionServiceGraphicInfo.getX() + decisionServiceGraphicInfo.getWidth(),
             decisionServiceGraphicInfo.getY() + decisionServiceGraphicInfo.getHeight(), decisionServiceGraphicInfo.getX(), decisionServiceGraphicInfo.getY());
@@ -557,7 +557,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
                         List<GraphicInfo> graphicInfoList = new LinkedList<>(Arrays.asList(graphicInfoLeft));
 
-                        definition.addDecisionServiceDividerGraphicInfoList(currentDiagramId, parentElementId, graphicInfoList);
+                        definition.addDecisionServiceDividerGraphicInfoListByDiagramId(currentDiagramId, parentElementId, graphicInfoList);
                         readShapeDI(jsonChildNode, upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX,
                             upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
                     } else if (STENCIL_ENCAPSULATED_DECISIONS.equals(stencilId)) {
@@ -567,7 +567,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         graphicInfoRight.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble());
                         graphicInfoRight.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble());
 
-                        definition.getDecisionServiceDividerGraphicInfo(currentDiagramId).get(parentElementId).add(graphicInfoRight);
+                        definition.getDecisionServiceDividerLocationMapByDiagramId(currentDiagramId).get(parentElementId).add(graphicInfoRight);
                         readShapeDI(jsonChildNode, upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX,
                             upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
                     } else {
@@ -578,7 +578,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - upperLeftNode.get(EDITOR_BOUNDS_X).asDouble());
                         graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble());
 
-                        definition.addGraphicInfo(currentDiagramId, currentElementId, graphicInfo);
+                        definition.addGraphicInfoByDiagramId(currentDiagramId, currentElementId, graphicInfo);
                         readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), definition, currentDiagramId, currentElementId);
                     }
                 }
@@ -589,7 +589,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     protected void readEdgeDI(Map<String, JsonNode> edgeMap, Map<String, List<JsonNode>> sourceAndTargetMap, DmnDefinition definition) {
         // for now only one DiDiagram per model is supported
         // get first diagram
-        Map.Entry<String, DmnDiDiagram> diagramEntry = definition.getDiDiagrams().entrySet().iterator().next();
+        Map.Entry<String, DmnDiDiagram> diagramEntry = definition.getDiDiagramMap().entrySet().iterator().next();
         DmnDiDiagram diDiagram = diagramEntry.getValue();
 
         for (Map.Entry<String, JsonNode> entry : edgeMap.entrySet()) {
@@ -619,8 +619,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             double sourceDockersX = dockersNode.get(0).get(EDITOR_BOUNDS_X).asDouble();
             double sourceDockersY = dockersNode.get(0).get(EDITOR_BOUNDS_Y).asDouble();
 
-            GraphicInfo sourceInfo = definition.getGraphicInfo(diDiagram.getId(), DmnJsonConverterUtil.getElementId(sourceRefNode));
-            GraphicInfo targetInfo = definition.getGraphicInfo(diDiagram.getId(), DmnJsonConverterUtil.getElementId(targetRefNode));
+            GraphicInfo sourceInfo = definition.getGraphicInfoByDiagramId(diDiagram.getId(), DmnJsonConverterUtil.getElementId(sourceRefNode));
+            GraphicInfo targetInfo = definition.getGraphicInfoByDiagramId(diDiagram.getId(), DmnJsonConverterUtil.getElementId(targetRefNode));
 
             double sourceRefLineX = sourceInfo.getX() + sourceDockersX;
             double sourceRefLineY = sourceInfo.getY() + sourceDockersY;
@@ -691,7 +691,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 }
             }
 
-            definition.addFlowGraphicInfoList(diDiagram.getId(), edgeId, graphicInfoList);
+            definition.addFlowGraphicInfoListByDiagramId(diDiagram.getId(), edgeId, graphicInfoList);
         }
     }
 

@@ -30,10 +30,14 @@ public class DmnDefinition extends NamedElement {
     protected List<Decision> decisions = new ArrayList<>();
     protected List<DecisionService> decisionServices = new ArrayList<>();
     protected Map<String, DmnDiDiagram> diDiagrams = new LinkedHashMap<>();
-    protected Map<String, Map<String, GraphicInfo>> locationMap = new LinkedHashMap<>();
+    protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, GraphicInfo>> locationByDiagramIdMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
-    protected Map<String, Map<String, List<GraphicInfo>>> flowLocationMap = new LinkedHashMap<>();
-    protected Map<String, Map<String, List<GraphicInfo>>> decisionServiceDividerLocationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, GraphicInfo>> labelLocationByDiagramIdMap = new LinkedHashMap<>();
+    protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, List<GraphicInfo>>> flowLocationByDiagramIdMap = new LinkedHashMap<>();
+    protected Map<String, List<GraphicInfo>> decisionServiceDividerLocationMap = new LinkedHashMap<>();
+    protected Map<String, Map<String, List<GraphicInfo>>> decisionServiceDividerLocationByDiagramIdMap = new LinkedHashMap<>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;
@@ -117,91 +121,119 @@ public class DmnDefinition extends NamedElement {
         return diDiagrams.get(diagramId);
     }
 
-    public Map<String, DmnDiDiagram> getDiDiagrams() {
+    public Map<String, DmnDiDiagram> getDiDiagramMap() {
         return diDiagrams;
     }
     public void addDiDiagram(DmnDiDiagram diDiagram) {
         this.diDiagrams.put(diDiagram.getId(), diDiagram);
     }
 
-    public void addGraphicInfo(String diagramId, String key, GraphicInfo graphicInfo) {
-        locationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
-        locationMap.get(diagramId).put(key, graphicInfo);
+    public void addGraphicInfo(String key, GraphicInfo graphicInfo) {
+        locationMap.put(key, graphicInfo);
     }
 
-    public Map<String, Map<String, GraphicInfo>> getGraphicInfo() {
+    public void addGraphicInfoByDiagramId(String diagramId, String key, GraphicInfo graphicInfo) {
+        locationByDiagramIdMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        locationByDiagramIdMap.get(diagramId).put(key, graphicInfo);
+        locationMap.put(key, graphicInfo);
+    }
+
+    public GraphicInfo getGraphicInfo(String key) {
+        return locationMap.get(key);
+    }
+
+    public GraphicInfo getGraphicInfoByDiagramId(String diagramId, String key) {
+        return locationByDiagramIdMap.get(diagramId).get(key);
+    }
+
+    public Map<String, GraphicInfo> getLocationMap() {
         return locationMap;
     }
 
-    public Map<String, GraphicInfo> getGraphicInfo(String diagramId) {
-        return locationMap.get(diagramId);
+    public Map<String, Map<String, GraphicInfo>> getLocationByDiagramIdMap() {
+        return locationByDiagramIdMap;
     }
 
-    public GraphicInfo getGraphicInfo(String diagramId, String key) {
-        return locationMap.get(diagramId).get(key);
+    public Map<String, GraphicInfo> getLocationMapByDiagramId(String diagramId) {
+        return locationByDiagramIdMap.get(diagramId);
     }
 
-    public void removeGraphicInfo(String diagramId) {
-        locationMap.remove(diagramId);
+    public void removeLocationByDiagramId(String diagramId) {
+        locationByDiagramIdMap.remove(diagramId);
     }
 
-    public Map<String, List<GraphicInfo>> getFlowLocationGraphicInfo(String diagramId) {
-        return flowLocationMap.get(diagramId);
-    }
-
-    public Map<String, Map<String, List<GraphicInfo>>> getFlowLocationGraphicInfo() {
+    public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
     }
 
-    public Map<String, Map<String, List<GraphicInfo>>> getDecisionServiceDividerGraphicInfo() {
-        return decisionServiceDividerLocationMap;
+    public Map<String, List<GraphicInfo>> getFlowLocationMapByDiagramId(String diagramId) {
+        return flowLocationByDiagramIdMap.get(diagramId);
     }
 
-    public Map<String, List<GraphicInfo>> getDecisionServiceDividerGraphicInfo(String diagramId) {
-        return decisionServiceDividerLocationMap.get(diagramId);
+    public Map<String, Map<String, List<GraphicInfo>>> getFlowLocationByDiagramIdMap() {
+        return flowLocationByDiagramIdMap;
     }
 
-    public void removeFlowGraphicInfoList(String diagramId) {
-        flowLocationMap.remove(diagramId);
+    public void removeFlowLocationByDiagramId(String diagramId) {
+        flowLocationByDiagramIdMap.remove(diagramId);
     }
 
-    public Map<String, Map<String, GraphicInfo>> getLocationMap() {
-        return locationMap;
+    public void addFlowGraphicInfoList(String key, List<GraphicInfo> graphicInfoList) {
+        flowLocationMap.put(key, graphicInfoList);
     }
 
-    public Map<String, Map<String, List<GraphicInfo>>> getFlowLocationMap() {
-        return flowLocationMap;
+    public void addFlowGraphicInfoListByDiagramId(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
+        flowLocationByDiagramIdMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        flowLocationByDiagramIdMap.get(diagramId).put(key, graphicInfoList);
+        flowLocationMap.put(key, graphicInfoList);
     }
 
-    public GraphicInfo getLabelGraphicInfo(String diagramId) {
-        return labelLocationMap.get(diagramId);
+    public Map<String, Map<String, GraphicInfo>> getLabelLocationByDiagramIdMap() {
+        return labelLocationByDiagramIdMap;
+    }
+
+    public Map<String, GraphicInfo> getLabelLocationByDiagramId(String diagramId) {
+        return labelLocationByDiagramIdMap.get(diagramId);
     }
 
     public void addLabelGraphicInfo(String key, GraphicInfo graphicInfo) {
         labelLocationMap.put(key, graphicInfo);
     }
 
+    public void addLabelGraphicInfoByDiagramId(String diagramId, String key, GraphicInfo graphicInfo) {
+        labelLocationByDiagramIdMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        labelLocationByDiagramIdMap.get(diagramId).put(key, graphicInfo);
+        labelLocationMap.put(key, graphicInfo);
+    }
+
     public void removeLabelGraphicInfo(String key) {
-        labelLocationMap.remove(key);
+        flowLocationMap.remove(key);
     }
 
-    public Map<String, GraphicInfo> getLabelLocationMap() {
-        return labelLocationMap;
+    public Map<String, Map<String, List<GraphicInfo>>> getDecisionServiceDividerLocationByDiagramIdMap() {
+        return decisionServiceDividerLocationByDiagramIdMap;
     }
 
-    public void addFlowGraphicInfoList(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
-        flowLocationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
-        flowLocationMap.get(diagramId).put(key, graphicInfoList);
+    public Map<String, List<GraphicInfo>> getDecisionServiceDividerLocationMapByDiagramId(String diagramId) {
+        return decisionServiceDividerLocationByDiagramIdMap.get(diagramId);
     }
 
-    public Map<String, Map<String, List<GraphicInfo>>> getDecisionServiceDividerLocationMap() {
+    public Map<String, List<GraphicInfo>> getDecisionServiceDividerLocationMap() {
         return decisionServiceDividerLocationMap;
     }
 
+    public List<GraphicInfo> getDecisionServiceDividerGraphicInfo(String key) {
+        return decisionServiceDividerLocationMap.get(key);
+    }
 
-    public void addDecisionServiceDividerGraphicInfoList(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
-        decisionServiceDividerLocationMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
-        decisionServiceDividerLocationMap.get(diagramId).put(key, graphicInfoList);
+    public void addDecisionServiceDividerGraphicInfoList(String key, List<GraphicInfo> graphicInfoList) {
+        decisionServiceDividerLocationMap.put(key, graphicInfoList);
+    }
+
+    public void addDecisionServiceDividerGraphicInfoListByDiagramId(String diagramId, String key, List<GraphicInfo> graphicInfoList) {
+        decisionServiceDividerLocationByDiagramIdMap.computeIfAbsent(diagramId, k -> new LinkedHashMap<>());
+        decisionServiceDividerLocationByDiagramIdMap.get(diagramId).put(key, graphicInfoList);
+        decisionServiceDividerLocationMap.put(key, graphicInfoList);
     }
 
 }

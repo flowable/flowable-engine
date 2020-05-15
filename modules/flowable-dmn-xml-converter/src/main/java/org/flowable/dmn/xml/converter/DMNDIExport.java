@@ -18,7 +18,7 @@ public class DMNDIExport implements DmnXMLConstants {
         // start DI information
         xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_DMN, DMNDI_NAMESPACE);
 
-        for (Map.Entry<String, Map<String, GraphicInfo>> diagramEntry : model.getGraphicInfo().entrySet()) {
+        for (Map.Entry<String, Map<String, GraphicInfo>> diagramEntry : model.getLocationByDiagramIdMap().entrySet()) {
             DmnDiDiagram diDiagram = model.getDiDiagram(diagramEntry.getKey());
             Map<String, GraphicInfo> graphicInfoMap = diagramEntry.getValue();
 
@@ -46,16 +46,16 @@ public class DMNDIExport implements DmnXMLConstants {
 
                 createDmnShapeBounds(graphicInfoEntry.getValue(), xtw);
 
-                if (model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()) != null
-                    && model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).containsKey(graphicInfoEntry.getKey())) {
-                    createDmnDecisionServiceDividerLine(model.getDecisionServiceDividerGraphicInfo(diDiagram.getId()).get(graphicInfoEntry.getKey()), xtw);
+                if (model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()) != null
+                    && model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).containsKey(graphicInfoEntry.getKey())) {
+                    createDmnDecisionServiceDividerLine(model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).get(graphicInfoEntry.getKey()), xtw);
                 }
 
                 xtw.writeEndElement();
             }
 
             // DI edge
-            Map<String, List<GraphicInfo>> flowLocationGraphicInfoMap = model.getFlowLocationGraphicInfo(diDiagram.getId());
+            Map<String, List<GraphicInfo>> flowLocationGraphicInfoMap = model.getFlowLocationMapByDiagramId(diDiagram.getId());
             for (Map.Entry<String, List<GraphicInfo>> flowLocationGraphicInfoEntry : flowLocationGraphicInfoMap.entrySet()) {
                 createDmnEdge(flowLocationGraphicInfoEntry.getKey(), flowLocationGraphicInfoEntry.getValue(), xtw);
             }
