@@ -162,6 +162,10 @@ public class DmnDefinition extends NamedElement {
         locationByDiagramIdMap.remove(diagramId);
     }
 
+    public List<GraphicInfo> getFlowLocationGraphicInfo(String key) {
+        return flowLocationMap.get(key);
+    }
+
     public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
     }

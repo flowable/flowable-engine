@@ -70,13 +70,27 @@ public class Chapter11SingleDiagramTest extends AbstractConverterTest {
             .extracting(DmnElementReference::getHref)
             .containsExactly("#_d14df033-f4a2-47e3-9590-84e9ff04db4e", "#_fe938494-ee59-425e-8728-2347ea703563");
 
-        assertThat(model.getLocationMap())
-            .hasSize(9);
+        model.getDecisions().forEach(decision -> assertThat(model.getGraphicInfo(decision.getId())).isNotNull());
 
-        assertThat(model.getFlowLocationMap())
-            .hasSize(11);
+        model.getDecisions().stream()
+            .forEach(decision -> decision.getRequiredDecisions().stream()
+                .forEach(informationRequirement ->
+                    assertThat(model.getFlowLocationGraphicInfo(informationRequirement.getId())).isNotNull()
+                )
+            );
 
-        assertThat(model.getDecisionServiceDividerLocationMap())
-            .hasSize(1);
+        model.getDecisions().stream()
+            .forEach(decision -> decision.getAuthorityRequirements().stream()
+                .forEach(authorityRequirement ->
+                    assertThat(model.getFlowLocationGraphicInfo(authorityRequirement.getId())).isNotNull()
+                )
+            );
+
+        model.getDecisions().stream()
+            .forEach(decision -> decision.getRequiredInputs().stream()
+                .forEach(informationRequirement ->
+                    assertThat(model.getFlowLocationGraphicInfo(informationRequirement.getId())).isNotNull()
+                )
+            );
     }
 }
