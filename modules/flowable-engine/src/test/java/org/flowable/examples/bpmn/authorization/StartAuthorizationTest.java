@@ -119,8 +119,9 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process3").singleResult();
             assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(1);
-            assertThat(links.get(0).getUserId()).isEqualTo("user1");
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId)
+                    .containsExactly("user1");
 
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process4").singleResult();
             assertThat(latestProcessDef).isNotNull();
@@ -151,8 +152,9 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
             repositoryService.addCandidateStarterGroup(latestProcessDef.getId(), "group1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(1);
-            assertThat(links.get(0).getGroupId()).isEqualTo("group1");
+            assertThat(links)
+                    .extracting(IdentityLink::getGroupId)
+                    .containsExactly("group1");
 
             repositoryService.addCandidateStarterUser(latestProcessDef.getId(), "user1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
@@ -166,8 +168,9 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
             repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "group1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(1);
-            assertThat(links.get(0).getUserId()).isEqualTo("user1");
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId)
+                    .containsExactly("user1");
 
             repositoryService.deleteCandidateStarterUser(latestProcessDef.getId(), "user1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
