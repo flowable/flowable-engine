@@ -81,7 +81,7 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("useExecutionAndVars", vars);
 
         Object c = runtimeService.getVariable(processInstance.getId(), "c");
-        assertThat(c instanceof Number).isTrue();
+        assertThat(c).isInstanceOf(Number.class);
         Number cNumber = (Number) c;
         assertThat(cNumber.intValue()).isEqualTo(579);
 
