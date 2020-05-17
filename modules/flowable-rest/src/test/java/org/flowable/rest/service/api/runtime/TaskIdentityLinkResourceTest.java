@@ -108,12 +108,15 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThat(responseNode).isNotNull();
-            assertThat(responseNode.get("user").textValue()).isEqualTo("kermit");
-            assertThat(responseNode.get("type").textValue()).isEqualTo("myType");
-            assertThat(responseNode.get("group").isNull()).isTrue();
-            assertThat(responseNode.get("url").textValue()
-                    .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
-                            "kermit", "myType"))).isTrue();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "  url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
+                                    "kermit", "myType") + "',"
+                            + "  user: 'kermit',"
+                            + "  group: null,"
+                            + "  type: 'myType'"
+                            + "}");
 
             // Add group link
             requestNode = objectMapper.createObjectNode();
@@ -125,12 +128,15 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThat(responseNode).isNotNull();
-            assertThat(responseNode.get("group").textValue()).isEqualTo("sales");
-            assertThat(responseNode.get("type").textValue()).isEqualTo("myType");
-            assertThat(responseNode.get("user").isNull()).isTrue();
-            assertThat(responseNode.get("url").textValue()
-                    .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS,
-                            "sales", "myType"))).isTrue();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "  url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS,
+                                    "sales", "myType") + "',"
+                            + "  user: null,"
+                            + "  group: 'sales',"
+                            + "  type: 'myType'"
+                            + "}");
 
             // Test with unexisting task
             httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, "unexistingtask"));
@@ -185,12 +191,15 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThat(responseNode).isNotNull();
-            assertThat(responseNode.get("user").textValue()).isEqualTo("kermit");
-            assertThat(responseNode.get("type").textValue()).isEqualTo("myType");
-            assertThat(responseNode.get("group").isNull()).isTrue();
-            assertThat(responseNode.get("url").textValue()
-                    .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
-                            "kermit", "myType"))).isTrue();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "  url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_IDENTITYLINK, task.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
+                                    "kermit", "myType") + "',"
+                            + "  user: 'kermit',"
+                            + "  group: null,"
+                            + "  type: 'myType'"
+                            + "}");
 
             // Test with unexisting task
             httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls
