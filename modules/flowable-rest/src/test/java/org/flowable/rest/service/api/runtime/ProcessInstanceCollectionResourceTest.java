@@ -526,7 +526,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                     .isEqualTo("{"
                             + " id: '" + formDefinition.getId() + "',"
                             + " key: '" + formDefinition.getKey() + "',"
