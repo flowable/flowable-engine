@@ -14,6 +14,7 @@
 package org.flowable.examples.bpmn.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
 import java.util.List;
@@ -112,9 +113,9 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").singleResult();
             assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(2);
-            assertThat(containsUserOrGroup("user1", null, links)).isTrue();
-            assertThat(containsUserOrGroup("user2", null, links)).isTrue();
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId)
+                    .containsExactlyInAnyOrder("user1", "user2");
 
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process3").singleResult();
             assertThat(latestProcessDef).isNotNull();
@@ -126,11 +127,14 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process4").singleResult();
             assertThat(latestProcessDef).isNotNull();
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(4);
-            assertThat(containsUserOrGroup("userInGroup2", null, links)).isTrue();
-            assertThat(containsUserOrGroup(null, "group1", links)).isTrue();
-            assertThat(containsUserOrGroup(null, "group2", links)).isTrue();
-            assertThat(containsUserOrGroup(null, "group3", links)).isTrue();
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId, IdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple("userInGroup2", null),
+                            tuple(null, "group1"),
+                            tuple(null, "group2"),
+                            tuple(null, "group3")
+                    );
 
         } finally {
             tearDownUsersAndGroups();
@@ -158,9 +162,12 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
 
             repositoryService.addCandidateStarterUser(latestProcessDef.getId(), "user1");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
-            assertThat(links).hasSize(2);
-            assertThat(containsUserOrGroup(null, "group1", links)).isTrue();
-            assertThat(containsUserOrGroup("user1", null, links)).isTrue();
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId, IdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple("user1", null),
+                            tuple(null, "group1")
+                    );
 
             repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "nonexisting");
             links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
@@ -179,20 +186,6 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         } finally {
             tearDownUsersAndGroups();
         }
-    }
-
-    private boolean containsUserOrGroup(String userId, String groupId, List<IdentityLink> links) {
-        boolean found = false;
-        for (IdentityLink identityLink : links) {
-            if (userId != null && userId.equals(identityLink.getUserId())) {
-                found = true;
-                break;
-            } else if (groupId != null && groupId.equals(identityLink.getGroupId())) {
-                found = true;
-                break;
-            }
-        }
-        return found;
     }
 
     @Test
