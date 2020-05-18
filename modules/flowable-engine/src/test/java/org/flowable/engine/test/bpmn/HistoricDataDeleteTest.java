@@ -87,6 +87,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             taskService.complete(task.getId());
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
                     
             query.delete();
 
@@ -141,6 +144,10 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             taskService.complete(task.getId());
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
                     
             HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
@@ -178,6 +185,10 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
                 taskService.complete(task.getId());
+            }
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
             }
                     
             HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
@@ -237,6 +248,10 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                     taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
                     taskService.complete(task.getId());
+                }
+
+                if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                    waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
                 }
                         
                 managementService.handleHistoryCleanupTimerJob();

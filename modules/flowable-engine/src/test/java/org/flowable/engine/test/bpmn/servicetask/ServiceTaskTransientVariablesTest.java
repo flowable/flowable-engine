@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -45,12 +47,15 @@ public class ServiceTaskTransientVariablesTest extends PluggableFlowableTestCase
     public void testStoreLocalTransientVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-        List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
-                .list();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
-        assertThat(variablesInstances)
-                .extracting(HistoricVariableInstance::getValue)
-                .containsOnly("Result is: test");
+            List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                    .list();
+
+            assertThat(variablesInstances)
+                    .extracting(HistoricVariableInstance::getValue)
+                    .containsOnly("Result is: test");
+        }
     }
 
 }

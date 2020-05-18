@@ -70,6 +70,10 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         String variableBytes = getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_BYTES_VALUE);
         if (StringUtils.isNotEmpty(variableBytes)) {
             historicVariable.setBytes(Base64.getDecoder().decode(variableBytes));
+        } else {
+            // It is possible that the value of the bytes changed from non null to null.
+            // We need to still set them so that the byte array ref can be deleted
+            historicVariable.setBytes(null);
         }
         
         historicVariable.setLastUpdatedTime(time);
