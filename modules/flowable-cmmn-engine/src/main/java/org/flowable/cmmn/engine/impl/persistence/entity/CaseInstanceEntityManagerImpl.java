@@ -191,6 +191,8 @@ public class CaseInstanceEntityManagerImpl
     }
 
     protected boolean isRootCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        // A case instance is a root case instance when it doesn't have a callback or,
+        // it is not a child of case or process instance
         return caseInstanceEntity.getCallbackId() == null ||
             (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
                 && !CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
