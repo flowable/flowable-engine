@@ -44,6 +44,11 @@ public class EntityLinkEntityManagerImpl
     }
 
     @Override
+    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        return dataManager.findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
+    }
+
+    @Override
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
@@ -61,5 +66,10 @@ public class EntityLinkEntityManagerImpl
     public void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         dataManager.deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
-    
+
+    @Override
+    public void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType) {
+        dataManager.deleteEntityLinksByRootScopeIdAndType(scopeId, scopeType);
+    }
+
 }

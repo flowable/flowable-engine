@@ -36,6 +36,11 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     }
 
     @Override
+    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        return getEntityLinkEntityManager().findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
+    }
+
+    @Override
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return getEntityLinkEntityManager().findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
@@ -59,7 +64,12 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     public void deleteEntityLinksByScopeIdAndType(String scopeId, String scopeType) {
         getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
-    
+
+    @Override
+    public void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType) {
+        getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(scopeId, scopeType);
+    }
+
     public EntityLinkEntityManager getEntityLinkEntityManager() {
         return configuration.getEntityLinkEntityManager();
     }

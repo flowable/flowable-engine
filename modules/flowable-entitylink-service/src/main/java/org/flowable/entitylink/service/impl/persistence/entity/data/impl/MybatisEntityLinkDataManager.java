@@ -23,6 +23,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.EntityLinkDataManager;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByReferenceScopeIdAndTypeMatcher;
+import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByRootScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
 
@@ -32,6 +33,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachema
 public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLinkEntity> implements EntityLinkDataManager {
 
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByScopeIdAndTypeMatcher = new EntityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<EntityLinkEntity> entityLinksByRootScopeIdAndScopeTypeMatcher = new EntityLinksByRootScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByReferenceScopeIdAndTypeMatcher = new EntityLinksByReferenceScopeIdAndTypeMatcher();
 
@@ -53,6 +55,15 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
         return (List) getList("selectEntityLinksByScopeIdAndType", parameters, entityLinksByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("rootScopeId", scopeId);
+        parameters.put("rootScopeType", scopeType);
+        return (List) getList("selectEntityLinksByRootScopeIdAndRootScopeType", parameters, entityLinksByRootScopeIdAndScopeTypeMatcher, true);
     }
 
     @Override
@@ -81,6 +92,14 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         bulkDelete("deleteEntityLinksByScopeIdAndScopeType", entityLinksByScopeIdAndTypeMatcher, parameters);
+    }
+
+    @Override
+    public void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("rootScopeId", scopeId);
+        parameters.put("rootScopeType", scopeType);
+        bulkDelete("deleteEntityLinksByRootScopeIdAndRootScopeType", entityLinksByRootScopeIdAndScopeTypeMatcher, parameters);
     }
 
 }

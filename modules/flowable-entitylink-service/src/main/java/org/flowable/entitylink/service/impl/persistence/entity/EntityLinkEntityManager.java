@@ -24,10 +24,14 @@ public interface EntityLinkEntityManager extends EntityManager<EntityLinkEntity>
 
     List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType);
 
+    List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType);
+
     List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
     
     List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
 
     void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+
+    void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType);
     
 }

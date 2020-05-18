@@ -1,0 +1,112 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.flowable.cmmn.test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.entitylink.api.EntityLink;
+import org.flowable.task.api.Task;
+import org.junit.Test;
+
+/**
+ * @author Joram Barrez
+ */
+public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest {
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+    public void testEntityLinksDeletedOnRootProcessInstanceComplete() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess2.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneCallActivityHumanTaskCaseProcess.bpmn20.xml")
+            .deploy();
+
+        // nestedCallActivityProcess
+        //   - oneCallActivity (CallActivity)
+        //    - oneHumanTaskCase (CaseTask)
+        //      - humanTask
+        //   - oneCallActivity (CallActivity)
+        //    - oneHumanTaskCase (CaseTask)
+        //      - humanTask
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
+            assertThat(getRootEntityLinks(processInstance.getId(), ScopeTypes.BPMN)).hasSize(6);
+
+            cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
+            assertThat(getRootEntityLinks(processInstance.getId(), ScopeTypes.BPMN)).hasSize(12);
+
+            cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
+
+            Task task = cmmnTaskService.createTaskQuery().singleResult();
+            assertThat(task.getName()).isEqualTo("Task before end");
+
+            // Entity links are only cleaned up when the root instance is deleted.
+            // At this point, the two child process instances and two child case instance are deleted,
+            // yet the entity links still are there
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1L); // the root instance
+
+            // Completing the root instance, deletes all entity links
+            processEngineTaskService.complete(task.getId());
+            assertThat(getRootEntityLinks(processInstance.getId(), ScopeTypes.BPMN)).hasSize(0);
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/caseWithProcessAndCaseTask.cmmn")
+    public void testEntityLinksDeletedOnRootCaseInstanceComplete() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+            .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneCallActivityHumanTaskCaseProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            assertThat(getRootEntityLinks(caseInstance.getId(), ScopeTypes.CMMN)).hasSize(11);
+
+            cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("The Task").singleResult().getId());
+
+            // Entity links are only cleaned up when the root instance is deleted.
+            // At this point, the two child process instances and two child case instance are deleted,
+            // yet the entity links still are there
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1L);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0L); // the root instance
+
+            // Completing the root instance, deletes all entity links
+            cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
+            assertThat(getRootEntityLinks(caseInstance.getId(), ScopeTypes.CMMN)).hasSize(0);
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    protected List<EntityLink> getRootEntityLinks(String rootScopeId, String rootScopeType) {
+        return processEngineManagementService.executeCommand(commandContext
+            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByRootScopeIdAndRootType(rootScopeId,rootScopeType));
+    }
+
+}

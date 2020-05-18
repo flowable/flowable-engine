@@ -33,11 +33,11 @@ public interface CallbackTypes {
 
     // The same constant is used on the entity call back as for the reference on the calling side.
     
-    String PLAN_ITEM_CHILD_CASE = ReferenceTypes.PLAN_ITEM_CHILD_CASE;
+    String PLAN_ITEM_CHILD_CASE = ReferenceTypes.PLAN_ITEM_CHILD_CASE; // Child case instance of a case instance
     
-    String PLAN_ITEM_CHILD_PROCESS = ReferenceTypes.PLAN_ITEM_CHILD_PROCESS;
+    String PLAN_ITEM_CHILD_PROCESS = ReferenceTypes.PLAN_ITEM_CHILD_PROCESS; // Child process instance of a case instance
     
-    String EXECUTION_CHILD_CASE = ReferenceTypes.EXECUTION_CHILD_CASE;
+    String EXECUTION_CHILD_CASE = ReferenceTypes.EXECUTION_CHILD_CASE; // Child case instance of a process instance
 
     String CASE_ADHOC_CHILD = "cmmn-1.1-child";
 

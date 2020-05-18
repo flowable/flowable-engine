@@ -81,6 +81,10 @@
   <delete id="deleteEntityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
     delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
+
+  <delete id="deleteEntityLinksByRootScopeIdAndRootScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{rootScopeId} and ROOT_SCOPE_TYPE_ = #{rootScopeType}
+  </delete>
   
   <!-- ENTITY LINK RESULTMAP -->
 
@@ -112,7 +116,11 @@
   <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
   </select>
-  
+
+  <select id="selectEntityLinksByRootScopeIdAndRootScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
+    select * from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{parameter.rootScopeId} and ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType}
+  </select>
+
   <select id="selectEntityLinks" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK
   </select>

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -110,9 +111,11 @@ public class CaseInstanceEntityManagerImpl
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
-        // Entity links
-        if (engineConfiguration.isEnableEntityLinks()) {
-            getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        // Entity links are deleted by a root instance only.
+        // (A callback id is always set when the case instance is a child case for a parent case/process instance)
+        // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
+        if (engineConfiguration.isEnableEntityLinks() && !isChildCaseInstance(caseInstanceEntity)) {
+            getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
         }
         
         // Tasks
@@ -185,6 +188,12 @@ public class CaseInstanceEntityManagerImpl
 
         // Actual case instance
         delete(caseInstanceEntity);
+    }
+
+    protected boolean isChildCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        return caseInstanceEntity.getCallbackId() == null &&
+            (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
+            || CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
     }
 
     protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,
