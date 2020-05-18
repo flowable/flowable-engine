@@ -868,6 +868,8 @@ public class ExecutionEntityManagerImpl
     }
 
     protected boolean isRootProcessInstance(ExecutionEntity executionEntity) {
+        // An execution is a root process instance when it doesn't have a super execution and,
+        // it has no callback or it is not a child of a case instance
         return executionEntity.getSuperExecutionId() == null
             && (executionEntity.getCallbackId() == null || !CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(executionEntity.getCallbackType()));
     }
