@@ -28,6 +28,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
@@ -644,6 +645,22 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(historicProcessInstance.getEndTime()).isNotNull();
 
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalWaitOnUserTaskBoundaryEvent.bpmn20.xml")
+    public void testSignalWaitOnUserTaskBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signal-wait");
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).signalEventSubscriptionName("waitsig").singleResult();
+        assertNotNull(execution);
+        runtimeService.signalEventReceived("waitsig", execution.getId());
+        execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).signalEventSubscriptionName("waitsig").singleResult();
+        assertNull(execution);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("Wait2", task.getName());
     }
 
     protected Task startOneTaskprocess() {
