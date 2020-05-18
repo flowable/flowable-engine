@@ -170,7 +170,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(rootNode)
-                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "data: [ {"
                         + "         id: '" + processInstance3.getId() + "'"
@@ -191,7 +191,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(rootNode)
-                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "data: [ {"
                         + "         id: '" + processInstance1.getId() + "'"
@@ -210,7 +210,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
         rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(rootNode)
-                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "data: [ {"
                         + "        id: '" + processInstance2.getId() + "',"

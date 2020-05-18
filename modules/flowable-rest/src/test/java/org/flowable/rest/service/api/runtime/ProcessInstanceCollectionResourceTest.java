@@ -488,9 +488,11 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 .isEqualTo("{"
                         + "  ended: false,"
                         + "  variables: [ {"
+                        + "               name: 'stringVariable',"
                         + "               value: 'simple string value',"
                         + "               type: 'string'"
                         + "              }, {"
+                        + "               name: 'integerVariable',"
                         + "               value: 1234,"
                         + "               type: 'integer'"
                         + "              } ]"
@@ -524,13 +526,15 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER)
                     .isEqualTo("{"
                             + " id: '" + formDefinition.getId() + "',"
                             + " key: '" + formDefinition.getKey() + "',"
                             + " name: '" + formDefinition.getName() + "',"
                             + " fields : [ {"
+                            + "               id: 'user'"
                             + "          }, {"
+                            + "               id: 'number'"
                             + "          } ]"
                             + "}");
 
