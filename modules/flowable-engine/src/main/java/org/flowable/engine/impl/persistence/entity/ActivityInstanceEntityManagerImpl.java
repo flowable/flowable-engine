@@ -60,6 +60,11 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     @Override
+    public ActivityInstanceEntity findActivityInstanceByTaskId(String taskId) {
+        return dataManager.findActivityInstanceByTaskId(taskId);
+    }
+
+    @Override
     public void deleteActivityInstancesByProcessInstanceId(String processInstanceId) {
         dataManager.deleteActivityInstancesByProcessInstanceId(processInstanceId);
     }
@@ -179,7 +184,7 @@ public class ActivityInstanceEntityManagerImpl
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
             if (!Objects.equals(getOriginalAssignee(taskEntity), taskEntity.getAssignee())) {
-                activityInstance = findUnfinishedActivityInstance(executionEntity);
+                activityInstance = findActivityInstanceByTaskId(taskEntity.getId());
                 if (activityInstance == null) {
                     HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
                     if (historicActivityInstance != null) {
@@ -235,9 +240,19 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     protected ActivityInstance recordActivityInstanceEnd(ExecutionEntity executionEntity, String deleteReason) {
-        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(executionEntity);
+        // It is possible that we record the activity instance end twice
+        // in this case if there is no finished activity instance in the DB
+        // and there is a finished runtime one we should use the runtime one
+        // It is also OK for pre 6.4.1.2 activity instances.
+        // Since the first time we go through here we won't find anything in the cache and the DB,
+        // so we will create one from the history (this will add one to the cache).
+        // The second time we go through here, there will be nothing in the DB, but one finished one in the cache.
+        // This one should be used, in order to avoid going to the historic tables again.
+        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(executionEntity, true);
         if (activityInstance != null) {
-            activityInstance.markEnded(deleteReason);
+            if (activityInstance.getEndTime() == null) {
+                activityInstance.markEnded(deleteReason);
+            }
         } else {
             // in the case of upgrade from 6.4.1.1 to 6.4.1.2 we have to create activityInstance for all already unfinished historicActivities
             // which are going to be ended
@@ -252,6 +267,10 @@ public class ActivityInstanceEntityManagerImpl
 
     @Override
     public ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution) {
+        return findUnfinishedActivityInstance(execution, false);
+    }
+
+    protected ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution, boolean returnNotFinishedFromCacheIfNothingInDb) {
         String activityId = getActivityIdForExecution(execution);
         if (activityId != null) {
             // No use looking for the ActivityInstance when no activityId is provided.
@@ -277,6 +296,8 @@ public class ActivityInstanceEntityManagerImpl
                 }
                 if (activityInstances.size() > 0) {
                     return activityInstances.get(0);
+                } else if (returnNotFinishedFromCacheIfNothingInDb) {
+                    return activityFromCache;
                 }
 
             }

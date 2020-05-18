@@ -29,6 +29,8 @@ public interface ActivityInstanceDataManager extends DataManager<ActivityInstanc
     
     List<ActivityInstanceEntity> findActivityInstancesByExecutionIdAndActivityId(String executionId, String activityId);
 
+    ActivityInstanceEntity findActivityInstanceByTaskId(String taskId);
+
     void deleteActivityInstancesByProcessInstanceId(String processInstanceId);
 
     long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
