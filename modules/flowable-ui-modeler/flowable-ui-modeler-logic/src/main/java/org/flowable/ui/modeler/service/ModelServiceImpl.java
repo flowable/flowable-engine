@@ -36,6 +36,7 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.editor.converter.DmnJsonConverterUtil;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
@@ -792,8 +793,7 @@ public class ModelServiceImpl implements ModelService {
                 handleCmmnProcessModelRelations(model, jsonNode);
 
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_FORM ||
-                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE ||
-                    model.getModelType().intValue() == Model.MODEL_TYPE_DRD) {
+                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE) {
 
                 jsonNode.put("name", model.getName());
                 jsonNode.put("key", model.getKey());
@@ -803,6 +803,10 @@ public class ModelServiceImpl implements ModelService {
 
                 modelRepository.save(model);
                 handleAppModelProcessRelations(model, jsonNode);
+            } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DRD) {
+
+                modelRepository.save(model);
+                handleDrdModelDecisionTableRelations(model, jsonNode);
             }
         }
 
@@ -858,6 +862,13 @@ public class ModelServiceImpl implements ModelService {
     protected void handleAppModelProcessRelations(AbstractModel appModel, ObjectNode appModelJsonNode) {
         Set<String> processModelIds = JsonConverterUtil.getAppModelReferencedModelIds(appModelJsonNode);
         handleModelRelations(appModel, processModelIds, ModelRelationTypes.TYPE_PROCESS_MODEL);
+    }
+
+    protected void handleDrdModelDecisionTableRelations(AbstractModel drdModel, ObjectNode editorJsonNode) {
+        List<JsonNode> decisionTableNodes = DmnJsonConverterUtil.filterOutJsonNodes(DmnJsonConverterUtil.getDmnModelDecisionTableReferences(editorJsonNode));
+        Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
+
+        handleModelRelations(drdModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
 
     /**

@@ -24,6 +24,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
     protected static double lineWidth = 0.05d;
 
     public static String getValueAsString(String name, JsonNode objectNode) {
@@ -331,112 +332,6 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         return stencilId;
     }
 
-    protected static String getDMNContainsExpressionMethod(String containsOperator) {
-        if (StringUtils.isEmpty(containsOperator)) {
-            throw new IllegalArgumentException("containsOperator must be provided");
-        }
-
-        String containsPrefixAndMethod;
-
-        switch (containsOperator) {
-            case "IS IN":
-            case "ALL OF":
-            case "IN":
-                containsPrefixAndMethod = "collection:allOf";
-                break;
-            case "IS NOT IN":
-            case "NONE OF":
-            case "NOT IN":
-                containsPrefixAndMethod = "collection:noneOf";
-                break;
-            case "ANY OF":
-            case "ANY":
-                containsPrefixAndMethod = "collection:anyOf";
-                break;
-            case "NOT ALL OF":
-            case "NOT ANY":
-                containsPrefixAndMethod = "collection:notAllOf";
-                break;
-            default:
-                containsPrefixAndMethod = null;
-        }
-
-        return containsPrefixAndMethod;
-    }
-
-    protected static String formatCollectionExpressionValue(String expressionValue) {
-        if (StringUtils.isEmpty(expressionValue)) {
-            return "\"\"";
-        }
-
-        StringBuilder formattedExpressionValue = new StringBuilder();
-
-        // if multiple values
-        if (expressionValue.contains(",")) {
-            formattedExpressionValue.append("'");
-
-            List<String> formattedValues = split(expressionValue);
-            formattedExpressionValue.append(StringUtils.join(formattedValues, ','));
-        } else {
-            String formattedValue = expressionValue;
-            formattedExpressionValue.append(formattedValue);
-        }
-
-        // if multiple values
-        if (expressionValue.contains(",")) {
-            formattedExpressionValue.append("'");
-        }
-
-        return formattedExpressionValue.toString();
-    }
-
-    protected static List<String> split(String str) {
-        String regex;
-        if (str.contains("\"")) {
-            // only split on comma between matching quotes
-            regex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
-        } else {
-            regex = ",";
-        }
-        return Stream.of(str.split(regex))
-            .map(elem -> elem.trim())
-            .collect(Collectors.toList());
-    }
-
-    protected static String transformCollectionOperation(String operatorValue, String inputType) {
-        if (StringUtils.isEmpty(operatorValue) || StringUtils.isEmpty(inputType)) {
-            throw new IllegalArgumentException("operator value and input type must be present");
-        }
-
-        if ("collection".equalsIgnoreCase(inputType)) {
-            switch (operatorValue) {
-                case "IN":
-                    return "ALL OF";
-                case "NOT IN":
-                    return "NONE OF";
-                case "ANY":
-                    return "ANY OF";
-                case "NOT ANY":
-                    return "NOT ALL OF";
-                default:
-                    return operatorValue;
-            }
-        } else {
-            switch (operatorValue) {
-                case "IN":
-                    return "IS IN";
-                case "NOT IN":
-                    return "IS NOT IN";
-                case "ANY":
-                    return "IS IN";
-                case "NOT ANY":
-                    return "IS NOT IN";
-                default:
-                    return operatorValue;
-            }
-        }
-    }
-
     public static String getElementId(JsonNode objectNode) {
         String elementId = null;
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_OVERRIDE_ID, objectNode))) {
@@ -548,4 +443,205 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         return line;
     }
 
+    public static List<JsonLookupResult> getDmnModelChildShapesPropertyValues(JsonNode editorJsonNode, String propertyName, List<String> allowedStencilTypes) {
+        List<JsonLookupResult> result = new ArrayList<>();
+        internalGetDmnChildShapePropertyValues(editorJsonNode, propertyName, allowedStencilTypes, result);
+        return result;
+    }
+
+    public static List<JsonNode> filterOutJsonNodes(List<JsonLookupResult> lookupResults) {
+        List<JsonNode> jsonNodes = new ArrayList<>(lookupResults.size());
+        for (JsonLookupResult lookupResult : lookupResults) {
+            jsonNodes.add(lookupResult.getJsonNode());
+        }
+        return jsonNodes;
+    }
+
+    public static List<JsonLookupResult> getDmnModelDecisionTableReferences(ObjectNode editorJsonNode) {
+        List<String> allowedStencilTypes = new ArrayList<>();
+        allowedStencilTypes.add(STENCIL_DECISION);
+        return getDmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISION_TABLE_REFERENCE, allowedStencilTypes);
+    }
+
+    protected static void internalGetDmnChildShapePropertyValues(JsonNode editorJsonNode, String propertyName,
+        List<String> allowedStencilTypes, List<JsonLookupResult> result) {
+
+        JsonNode childShapesNode = editorJsonNode.get("childShapes");
+        if (childShapesNode != null && childShapesNode.isArray()) {
+            ArrayNode childShapesArrayNode = (ArrayNode) childShapesNode;
+            Iterator<JsonNode> childShapeNodeIterator = childShapesArrayNode.iterator();
+            while (childShapeNodeIterator.hasNext()) {
+                JsonNode childShapeNode = childShapeNodeIterator.next();
+
+                String childShapeNodeStencilId = DmnJsonConverterUtil.getStencilId(childShapeNode);
+                boolean readPropertiesNode = allowedStencilTypes.contains(childShapeNodeStencilId);
+
+                if (readPropertiesNode) {
+                    // Properties
+                    JsonNode properties = childShapeNode.get("properties");
+                    if (properties != null && properties.has(propertyName)) {
+                        JsonNode nameNode = properties.get("name");
+                        JsonNode propertyNode = properties.get(propertyName);
+                        result.add(new JsonLookupResult(DmnJsonConverterUtil.getElementId(childShapeNode),
+                            nameNode != null ? nameNode.asText() : null, propertyNode));
+                    }
+                }
+
+                // Potential nested child shapes
+                if (childShapeNode.has("childShapes")) {
+                    internalGetDmnChildShapePropertyValues(childShapeNode, propertyName, allowedStencilTypes, result);
+                }
+
+            }
+        }
+    }
+
+    protected static String getDMNContainsExpressionMethod(String containsOperator) {
+        if (StringUtils.isEmpty(containsOperator)) {
+            throw new IllegalArgumentException("containsOperator must be provided");
+        }
+
+        String containsPrefixAndMethod;
+
+        switch (containsOperator) {
+            case "IS IN":
+            case "ALL OF":
+            case "IN":
+                containsPrefixAndMethod = "collection:allOf";
+                break;
+            case "IS NOT IN":
+            case "NONE OF":
+            case "NOT IN":
+                containsPrefixAndMethod = "collection:noneOf";
+                break;
+            case "ANY OF":
+            case "ANY":
+                containsPrefixAndMethod = "collection:anyOf";
+                break;
+            case "NOT ALL OF":
+            case "NOT ANY":
+                containsPrefixAndMethod = "collection:notAllOf";
+                break;
+            default:
+                containsPrefixAndMethod = null;
+        }
+
+        return containsPrefixAndMethod;
+    }
+
+    protected static String formatCollectionExpressionValue(String expressionValue) {
+        if (StringUtils.isEmpty(expressionValue)) {
+            return "\"\"";
+        }
+
+        StringBuilder formattedExpressionValue = new StringBuilder();
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+
+            List<String> formattedValues = split(expressionValue);
+            formattedExpressionValue.append(StringUtils.join(formattedValues, ','));
+        } else {
+            String formattedValue = expressionValue;
+            formattedExpressionValue.append(formattedValue);
+        }
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+        }
+
+        return formattedExpressionValue.toString();
+    }
+
+    protected static List<String> split(String str) {
+        String regex;
+        if (str.contains("\"")) {
+            // only split on comma between matching quotes
+            regex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        } else {
+            regex = ",";
+        }
+        return Stream.of(str.split(regex))
+            .map(elem -> elem.trim())
+            .collect(Collectors.toList());
+    }
+
+    protected static String transformCollectionOperation(String operatorValue, String inputType) {
+        if (StringUtils.isEmpty(operatorValue) || StringUtils.isEmpty(inputType)) {
+            throw new IllegalArgumentException("operator value and input type must be present");
+        }
+
+        if ("collection".equalsIgnoreCase(inputType)) {
+            switch (operatorValue) {
+                case "IN":
+                    return "ALL OF";
+                case "NOT IN":
+                    return "NONE OF";
+                case "ANY":
+                    return "ANY OF";
+                case "NOT ANY":
+                    return "NOT ALL OF";
+                default:
+                    return operatorValue;
+            }
+        } else {
+            switch (operatorValue) {
+                case "IN":
+                    return "IS IN";
+                case "NOT IN":
+                    return "IS NOT IN";
+                case "ANY":
+                    return "IS IN";
+                case "NOT ANY":
+                    return "IS NOT IN";
+                default:
+                    return operatorValue;
+            }
+        }
+    }
+
+    // Helper classes
+
+    public static class JsonLookupResult {
+
+        private String id;
+        private String name;
+        private JsonNode jsonNode;
+
+        public JsonLookupResult(String id, String name, JsonNode jsonNode) {
+            this(name, jsonNode);
+            this.id = id;
+        }
+
+        public JsonLookupResult(String name, JsonNode jsonNode) {
+            this.name = name;
+            this.jsonNode = jsonNode;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public JsonNode getJsonNode() {
+            return jsonNode;
+        }
+
+        public void setJsonNode(JsonNode jsonNode) {
+            this.jsonNode = jsonNode;
+        }
+    }
 }
