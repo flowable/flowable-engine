@@ -15,6 +15,7 @@ package org.flowable.cmmn.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -23,6 +24,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -54,6 +56,13 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
             assertThat(getRootEntityLinks(processInstance.getId(), ScopeTypes.BPMN)).hasSize(12);
 
+            List<String> caseInstanceIds = cmmnRuntimeService.createCaseInstanceQuery().list().stream()
+                .map(CaseInstance::getId)
+                .collect(Collectors.toList());
+            List<String> processInstanceIds = processEngineRuntimeService.createProcessInstanceQuery().list().stream()
+                .map(ProcessInstance::getId)
+                .collect(Collectors.toList());
+
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
 
             Task task = cmmnTaskService.createTaskQuery().singleResult();
@@ -64,6 +73,15 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
             // yet the entity links still are there
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
             assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1L); // the root instance
+            assertThat(getRootEntityLinks(processInstance.getId(), ScopeTypes.BPMN)).hasSize(13); // +1 for the task in the root instance
+
+            // All case/process instances still need to have entity links
+            for (String caseInstanceId : caseInstanceIds) {
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+            }
+            for (String processInstanceId : processInstanceIds) {
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+            }
 
             // Completing the root instance, deletes all entity links
             processEngineTaskService.complete(task.getId());
@@ -87,6 +105,13 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
             assertThat(getRootEntityLinks(caseInstance.getId(), ScopeTypes.CMMN)).hasSize(11);
 
+            List<String> caseInstanceIds = cmmnRuntimeService.createCaseInstanceQuery().list().stream()
+                .map(CaseInstance::getId)
+                .collect(Collectors.toList());
+            List<String> processInstanceIds = processEngineRuntimeService.createProcessInstanceQuery().list().stream()
+                .map(ProcessInstance::getId)
+                .collect(Collectors.toList());
+
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("The Task").singleResult().getId());
 
             // Entity links are only cleaned up when the root instance is deleted.
@@ -94,10 +119,20 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
             // yet the entity links still are there
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1L);
             assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0L); // the root instance
+            assertThat(getRootEntityLinks(caseInstance.getId(), ScopeTypes.CMMN)).hasSize(11);
+
+            // All case/process instances still need to have entity links
+            for (String caseInstanceId : caseInstanceIds) {
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+            }
+            for (String processInstanceId : processInstanceIds) {
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+            }
 
             // Completing the root instance, deletes all entity links
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
             assertThat(getRootEntityLinks(caseInstance.getId(), ScopeTypes.CMMN)).hasSize(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
@@ -106,7 +141,12 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
 
     protected List<EntityLink> getRootEntityLinks(String rootScopeId, String rootScopeType) {
         return processEngineManagementService.executeCommand(commandContext
-            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByRootScopeIdAndRootType(rootScopeId,rootScopeType));
+            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByRootScopeIdAndRootType(rootScopeId, rootScopeType));
+    }
+
+    protected List<EntityLink> getEntityLinks(String scopeId, String scopeType) {
+        return processEngineManagementService.executeCommand(commandContext
+            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByScopeIdAndType(scopeId, scopeType, EntityLinkType.CHILD));
     }
 
 }

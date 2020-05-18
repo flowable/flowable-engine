@@ -114,7 +114,7 @@ public class CaseInstanceEntityManagerImpl
         // Entity links are deleted by a root instance only.
         // (A callback id is always set when the case instance is a child case for a parent case/process instance)
         // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
-        if (engineConfiguration.isEnableEntityLinks() && !isChildCaseInstance(caseInstanceEntity)) {
+        if (engineConfiguration.isEnableEntityLinks() && isRootCaseInstance(caseInstanceEntity)) {
             getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
         }
         
@@ -190,10 +190,10 @@ public class CaseInstanceEntityManagerImpl
         delete(caseInstanceEntity);
     }
 
-    protected boolean isChildCaseInstance(CaseInstanceEntity caseInstanceEntity) {
-        return caseInstanceEntity.getCallbackId() == null &&
-            (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
-            || CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
+    protected boolean isRootCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        return caseInstanceEntity.getCallbackId() == null ||
+            (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
+                && !CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
     }
 
     protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,

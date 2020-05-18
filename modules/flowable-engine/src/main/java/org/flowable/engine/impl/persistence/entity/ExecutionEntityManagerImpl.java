@@ -848,7 +848,7 @@ public class ExecutionEntityManagerImpl
         // (A callback id is set for a child process instance of a case instance.
         // A super execution id is set for a child process instance of a process instance)
         // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
-        if (engineConfiguration.isEnableEntityLinks() && executionEntity.isProcessInstanceType() && !isChildProcessInstance(executionEntity)) {
+        if (engineConfiguration.isEnableEntityLinks() && executionEntity.isProcessInstanceType() && isRootProcessInstance(executionEntity)) {
 
             EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
             boolean deleteEntityLinks = true;
@@ -867,9 +867,9 @@ public class ExecutionEntityManagerImpl
 
     }
 
-    protected boolean isChildProcessInstance(ExecutionEntity executionEntity) {
-        return executionEntity.getSuperExecutionId() != null
-            && (executionEntity.getCallbackId() != null && CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(executionEntity.getCallbackType()));
+    protected boolean isRootProcessInstance(ExecutionEntity executionEntity) {
+        return executionEntity.getSuperExecutionId() == null
+            && (executionEntity.getCallbackId() == null || !CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(executionEntity.getCallbackType()));
     }
 
     protected void deleteVariables(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
