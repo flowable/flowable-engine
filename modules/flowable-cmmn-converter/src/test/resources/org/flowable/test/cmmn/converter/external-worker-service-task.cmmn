@@ -20,7 +20,7 @@
 
             <task id="externalWorkerTaskA" name="A" flowable:type="external-worker" flowable:topic="simple"/>
 
-            <task id="externalWorkerTaskB" name="B" flowable:type="external-worker"/>
+            <task id="externalWorkerTaskB" name="B" flowable:type="external-worker" flowable:exclusive="true" />
 
         </casePlanModel>
     </case>

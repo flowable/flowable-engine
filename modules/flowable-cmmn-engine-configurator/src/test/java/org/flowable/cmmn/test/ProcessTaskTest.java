@@ -525,7 +525,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         try {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             processEngineRepositoryService.createDeployment().
                     addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
@@ -544,7 +544,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         } finally {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             if (processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().count() == 1) {
                 HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery()
@@ -567,7 +567,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         try {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             processEngineRepositoryService.createDeployment().
                     addClasspathResource("org/flowable/cmmn/test/twoTaskProcess.bpmn20.xml").

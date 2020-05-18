@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -55,7 +54,7 @@ import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
@@ -67,7 +66,6 @@ import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -79,6 +77,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
 import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.After;
@@ -367,44 +366,22 @@ public class BaseSpringRestTestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                "",
+                LOGGER,
+                processEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                new Command<Void>() {
+                    @Override
+                    public Void execute(CommandContext commandContext) {
+                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
+                        return null;
+                    }
                 }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(System.lineSeparator());
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
-            commandExecutor.execute(new Command<Object>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
-            });
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.debug("database was clean");
-        }
+        );
     }
 
     protected void closeHttpConnections() {
@@ -634,6 +611,13 @@ public class BaseSpringRestTestCase {
 
     protected String getISODateString(Date time) {
         return dateFormat.format(time);
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

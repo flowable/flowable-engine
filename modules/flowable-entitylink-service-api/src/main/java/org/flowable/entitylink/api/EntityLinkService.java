@@ -21,28 +21,20 @@ import java.util.List;
  */
 public interface EntityLinkService {
     
-    EntityLink getEntityLink(String id);
-    
     List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType);
+
+    List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType);
 
     List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
     
     List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
     
-    List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType);
-    
     EntityLink createEntityLink();
     
     void insertEntityLink(EntityLink entityLink);
     
-    void deleteEntityLink(EntityLink entityLink);
-    
-    List<EntityLink> deleteScopeEntityLink(String scopeId, String scopeType, String linkType);
-    
-    List<EntityLink> deleteScopeDefinitionEntityLink(String scopeDefinitionId, String scopeType, String linkType);
-    
     void deleteEntityLinksByScopeIdAndType(String scopeId, String scopeType);
-    
-    void deleteEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+
+    void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType);
     
 }

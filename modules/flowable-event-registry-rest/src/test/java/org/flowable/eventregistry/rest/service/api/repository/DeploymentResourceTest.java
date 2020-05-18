@@ -68,8 +68,8 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(newDeploymentId);
-            assertThat(resources.size()).isEqualTo(1L);
-            assertThat(resources.get(0)).isEqualTo("simpleEvent.event");
+            assertThat(resources)
+                    .containsOnly("simpleEvent.event");
             assertThat(repositoryService.createEventDefinitionQuery().deploymentId(newDeploymentId).count()).isEqualTo(1L);
 
         } finally {

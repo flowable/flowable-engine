@@ -10,6 +10,7 @@ Flowable (V6)
 [License:  
 	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
 
+![Flowable Actions CI](https://github.com/flowable/flowable-engine/workflows/Flowable%20Main%20Build/badge.svg?branch=master)
 
 Homepage: https://www.flowable.org/
 

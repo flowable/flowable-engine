@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
+
 /**
  * @author Tom Baeyens
  */

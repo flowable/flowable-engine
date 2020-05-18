@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -31,7 +32,6 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
@@ -86,7 +86,7 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
             // remove identity link and variable entity classes due to foreign key handling
             dbSqlSessionFactory.getInsertionOrder().remove(IdentityLinkEntityImpl.class);
             dbSqlSessionFactory.getInsertionOrder().remove(VariableInstanceEntityImpl.class);
-            dbSqlSessionFactory.getInsertionOrder().remove(VariableByteArrayEntityImpl.class);
+            dbSqlSessionFactory.getInsertionOrder().removeIf(ByteArrayEntityImpl.class::equals);
             for (Class<? extends Entity> clazz : getEntityInsertionOrder()) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
             }
@@ -96,7 +96,7 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
             // remove identity link and variable entity classes due to foreign key handling
             dbSqlSessionFactory.getDeletionOrder().remove(IdentityLinkEntityImpl.class);
             dbSqlSessionFactory.getDeletionOrder().remove(VariableInstanceEntityImpl.class);
-            dbSqlSessionFactory.getDeletionOrder().remove(VariableByteArrayEntityImpl.class);
+            dbSqlSessionFactory.getDeletionOrder().removeIf(ByteArrayEntityImpl.class::equals);
             for (Class<? extends Entity> clazz : getEntityDeletionOrder()) {
                 dbSqlSessionFactory.getDeletionOrder().add(clazz);
             }

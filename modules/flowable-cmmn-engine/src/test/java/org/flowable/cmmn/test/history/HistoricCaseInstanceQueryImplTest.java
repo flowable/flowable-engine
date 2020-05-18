@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -998,6 +1000,47 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             cmmnHistoryService.deleteHistoricCaseInstance(caseInstance1.getId());
         }
 
+    }
+
+    @Test
+    public void testQueryCaseInstanceReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(historicCaseInstance.getCaseVariables()).isEmpty();
+    }
+
+    @Test
+    public void testQueryCaseInstanceWithVariablesReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
+                entry("stringVar","test")
+        );
     }
 
 }

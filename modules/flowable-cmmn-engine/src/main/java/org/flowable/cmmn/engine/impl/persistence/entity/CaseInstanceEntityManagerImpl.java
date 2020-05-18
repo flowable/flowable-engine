@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -31,8 +32,8 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityMa
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.job.api.Job;
 import org.flowable.job.api.ExternalWorkerJob;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -45,6 +46,7 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
@@ -88,14 +90,32 @@ public class CaseInstanceEntityManagerImpl
         CaseInstanceEntity caseInstanceEntity = dataManager.findById(caseInstanceId);
 
         // Variables
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
-        
+        // variables can have byte array refs, so fetch them and delete the byte array refs if needed
+        List<VariableInstanceEntity> variableInstances = getVariableInstanceEntityManager()
+                .createInternalVariableInstanceQuery()
+                .scopeId(caseInstanceEntity.getId())
+                .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                .list();
+        boolean deleteVariableInstances = !variableInstances.isEmpty();
+
+        for (VariableInstanceEntity variableInstance : variableInstances) {
+            if (variableInstance.getByteArrayRef() != null && variableInstance.getByteArrayRef().getId() != null) {
+                variableInstance.getByteArrayRef().delete();
+            }
+        }
+
+        if (deleteVariableInstances) {
+            getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
+        }
+
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
-        // Entity links
-        if (engineConfiguration.isEnableEntityLinks()) {
-            getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        // Entity links are deleted by a root instance only.
+        // (A callback id is always set when the case instance is a child case for a parent case/process instance)
+        // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
+        if (engineConfiguration.isEnableEntityLinks() && isRootCaseInstance(caseInstanceEntity)) {
+            getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
         }
         
         // Tasks
@@ -168,6 +188,12 @@ public class CaseInstanceEntityManagerImpl
 
         // Actual case instance
         delete(caseInstanceEntity);
+    }
+
+    protected boolean isRootCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        return caseInstanceEntity.getCallbackId() == null ||
+            (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
+                && !CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
     }
 
     protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,

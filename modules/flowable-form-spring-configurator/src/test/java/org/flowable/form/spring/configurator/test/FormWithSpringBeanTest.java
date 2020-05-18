@@ -88,7 +88,7 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             assertProcessEnded(processInstance.getId());
             
         } finally {
-            formDeploymentIds.forEach(formRepositoryService::deleteDeployment);
+            formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
 
@@ -143,7 +143,7 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             assertProcessEnded(processInstance.getId());
 
         } finally {
-            formDeploymentIds.forEach(formRepositoryService::deleteDeployment);
+            formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
     
@@ -192,7 +192,7 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             assertThat(expressionFormField.getValue()).isNull();
 
         } finally {
-            formDeploymentIds.forEach(formRepositoryService::deleteDeployment);
+            formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
 
@@ -243,7 +243,7 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             assertThat(expressionFormField.getValue()).isNull();
 
         } finally {
-            formDeploymentIds.forEach(formRepositoryService::deleteDeployment);
+            formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
     
@@ -289,7 +289,7 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             assertThat(expressionFormField.getExpression()).isEqualTo("#{testFormBean.getExpressionText(var1).concat(' V2')}");
 
         } finally {
-            formDeploymentIds.forEach(formRepositoryService::deleteDeployment);
+            formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
 

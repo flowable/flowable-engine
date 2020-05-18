@@ -78,7 +78,7 @@ public class ProcessWithFormTest {
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         formRepositoryService.createDeploymentQuery().list().
             forEach(
-                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
+                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId(), true)
             );
         SideEffectExecutionListener.reset();
     }

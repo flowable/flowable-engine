@@ -14,6 +14,7 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.VariableType;
 
 /**

@@ -172,7 +172,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemIns
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
@@ -183,7 +182,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilesto
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
@@ -196,6 +194,7 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
@@ -242,6 +241,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
@@ -332,7 +332,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
     protected CmmnMigrationService cmmnMigrationService = new CmmnMigrationServiceImpl(this);
 
-    protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
@@ -373,6 +372,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
+    protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
 
     protected boolean executeServiceSchemaManagers = true;
@@ -1100,9 +1100,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public void initDataManagers() {
         super.initDataManagers();
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
-        }
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisCmmnDeploymentDataManager(this);
         }
@@ -2064,10 +2061,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
-    }
-
     public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;
@@ -2483,6 +2476,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCreateCasePageTaskInterceptor(CreateCasePageTaskInterceptor createCasePageTaskInterceptor) {
         this.createCasePageTaskInterceptor = createCasePageTaskInterceptor;
+        return this;
+    }
+
+    public CreateCmmnExternalWorkerJobInterceptor getCreateCmmnExternalWorkerJobInterceptor() {
+        return createCmmnExternalWorkerJobInterceptor;
+    }
+
+    public CmmnEngineConfiguration setCreateCmmnExternalWorkerJobInterceptor(CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor) {
+        this.createCmmnExternalWorkerJobInterceptor = createCmmnExternalWorkerJobInterceptor;
         return this;
     }
 

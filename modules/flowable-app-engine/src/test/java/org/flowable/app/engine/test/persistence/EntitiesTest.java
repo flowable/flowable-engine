@@ -22,7 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
-import org.flowable.app.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
+import org.flowable.app.engine.impl.db.EntityToTableMap;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -58,7 +58,7 @@ public class EntitiesTest {
     public void verifyEntitiesInTableDataManager() {
         Set<String> mappedResources = getMappedResources();
         for (String mappedResource : mappedResources) {
-            assertThat(TableDataManagerImpl.entityToTableNameMap.containsKey(getAndAssertEntityInterfaceClass(mappedResource)))
+            assertThat(EntityToTableMap.entityToTableNameMap.containsKey(getAndAssertEntityInterfaceClass(mappedResource)))
                 .as("No entry in TableDataManagerImpl for " + mappedResource).isTrue();
         }
     }

@@ -87,7 +87,7 @@ public abstract class FormTestHelper {
         LOGGER.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
         if (deploymentId != null) {
             try {
-                formEngine.getFormRepositoryService().deleteDeployment(deploymentId);
+                formEngine.getFormRepositoryService().deleteDeployment(deploymentId, true);
             } catch (FlowableObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.
             }

@@ -44,7 +44,7 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
     @After
     public void deleteFormDeployment() {
         this.formRepositoryService.createDeploymentQuery().list().forEach(
-                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
+                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId(), true)
         );
     }
 

@@ -136,6 +136,18 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             for (Association association : planItem.getOutgoingAssociations()) {
                 outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
             }
+        
+        } else if (!model.getAssociations().isEmpty() && CollectionUtils.isEmpty(planItem.getOutgoingAssociations()) && 
+                CollectionUtils.isEmpty(planItem.getIncomingAssociations())) {
+            
+            for (Association association : model.getAssociations()) {
+                if (planItem.getId().equals(association.getSourceRef())) {
+                    outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+                
+                } else if (planItem.getId().equals(association.getTargetRef())) {
+                    outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+                }
+            }
         }
 
         planItemNode.set("outgoing", outgoingArrayNode);
@@ -337,6 +349,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (attachedToStage != null) {
                 ArrayNode planItemChildShapes = (ArrayNode) criterionParentPlanItemNode.get(EDITOR_CHILD_SHAPES);
                 planItemChildShapes.add(criterionNode);
+                outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
             } else {
                 shapesArrayNode.add(criterionNode);
             }

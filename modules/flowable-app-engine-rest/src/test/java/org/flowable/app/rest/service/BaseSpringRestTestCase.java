@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
@@ -60,7 +59,7 @@ import org.flowable.app.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -82,7 +81,16 @@ public class BaseSpringRestTestCase extends TestCase {
     protected static final String EMPTY_LINE = "\n";
     protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
                     "ACT_GE_PROPERTY",
-                    "ACT_ID_PROPERTY");
+                    "ACT_ID_PROPERTY",
+                    "ACT_APP_DATABASECHANGELOG",
+                    "ACT_APP_DATABASECHANGELOGLOCK",
+                    "ACT_CMMN_DATABASECHANGELOG",
+                    "ACT_CMMN_DATABASECHANGELOGLOCK",
+                    "ACT_FO_DATABASECHANGELOG",
+                    "ACT_FO_DATABASECHANGELOGLOCK",
+                    "FLW_EV_DATABASECHANGELOG",
+                    "FLW_EV_DATABASECHANGELOGLOCK"
+    );
 
     protected static String SERVER_URL_PREFIX;
     protected static RestUrlBuilder URL_BUILDER;
@@ -260,44 +268,22 @@ public class BaseSpringRestTestCase extends TestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCounts();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(appEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getName(),
+                LOGGER,
+                appEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                new Command<Void>() {
+                    @Override
+                    public Void execute(CommandContext commandContext) {
+                        SchemaManager schemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
+                        return null;
+                    }
                 }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = appEngine.getAppEngineConfiguration().getCommandExecutor();
-            commandExecutor.execute(new Command<Object>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    SchemaManager schemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
-            });
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.info("database was clean");
-        }
+        );
     }
 
     protected void closeHttpConnections() {

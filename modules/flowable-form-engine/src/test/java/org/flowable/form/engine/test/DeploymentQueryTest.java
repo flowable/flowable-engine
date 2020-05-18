@@ -68,9 +68,9 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
     
     @AfterEach
     public void cleanup() {
-        repositoryService.deleteDeployment(deploymentId1);
-        repositoryService.deleteDeployment(deploymentId2);
-        repositoryService.deleteDeployment(deploymentId3);
+        repositoryService.deleteDeployment(deploymentId1, true);
+        repositoryService.deleteDeployment(deploymentId2, true);
+        repositoryService.deleteDeployment(deploymentId3, true);
     }
     
     @Test

@@ -147,7 +147,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
 
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L,
@@ -168,7 +168,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricVariableInstanceEntityImpl-bulk-with-4", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -188,7 +188,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricVariableInstanceEntityImpl-bulk-with-50", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -208,7 +208,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
@@ -227,7 +227,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-13", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
@@ -246,7 +246,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-41", 1L,
@@ -266,7 +266,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
                     "selectVariablesByQuery", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-9", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -358,7 +358,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "selectTasksByExecutionId", 2L,
                     "selectVariablesByQuery", 2L,
                     "selectIdentityLinksByProcessInstance", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L,
                     "selectEventSubscriptionsByExecution", 1L,
                     "selectTimerJobsByExecutionId", 1L,
                     "selectSuspendedJobsByExecutionId", 1L,
@@ -380,7 +380,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "TaskEntityImpl", 1L, 
                     "ExecutionEntityImpl", 2L,
                     "Bulk-delete-deleteTasksByExecutionId", 1L,
-                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L,
+                    "Bulk-delete-deleteEntityLinksByRootScopeIdAndRootScopeType", 1L,
                     "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
         }
     }
@@ -419,9 +419,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "TaskEntityImpl", 1L,
                     "TimerJobEntityImpl", 1L,
                     "ExecutionEntityImpl", 3L,
-                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L,
                     "Bulk-delete-deleteTasksByExecutionId", 1L,
-                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L);
+                    "Bulk-delete-deleteEntityLinksByRootScopeIdAndRootScopeType", 1L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
         }
     }
 
@@ -665,7 +665,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         CommandStats stats = getStats(commandClass);
 
         if (expectedDeletes.length / 2 != stats.getDbDeletes().size()) {
-            Assert.fail("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + expectedDeletes.length);
+            Assert.fail("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2));
         }
 
         for (int i = 0; i < expectedDeletes.length; i += 2) {

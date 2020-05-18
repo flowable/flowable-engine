@@ -44,6 +44,11 @@ public class EntityLinkEntityManagerImpl
     }
 
     @Override
+    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        return dataManager.findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
+    }
+
+    @Override
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
@@ -53,32 +58,6 @@ public class EntityLinkEntityManagerImpl
         return dataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
     }
 
-    @Override
-    public List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType) {
-        return dataManager.findEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType, linkType);
-    }
-
-    @Override
-    public List<EntityLink> deleteScopeEntityLink(String scopeId, String scopeType, String linkType) {
-        List<EntityLink> entityLinks = findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
-
-        for (EntityLink entityLink : entityLinks) {
-            deleteEntityLink((EntityLinkEntity) entityLink);
-        }
-
-        return entityLinks;
-    }
-
-    @Override
-    public List<EntityLink> deleteScopeDefinitionEntityLink(String scopeDefinitionId, String scopeType, String linkType) {
-        List<EntityLink> entityLinks = findEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType, linkType);
-        for (EntityLink entityLink : entityLinks) {
-            deleteEntityLink((EntityLinkEntity) entityLink);
-        }
-        
-        return entityLinks;
-    }
-    
     public void deleteEntityLink(EntityLinkEntity identityLink) {
         delete(identityLink);
     }
@@ -87,10 +66,10 @@ public class EntityLinkEntityManagerImpl
     public void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         dataManager.deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
-    
+
     @Override
-    public void deleteEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
-        dataManager.deleteEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
+    public void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType) {
+        dataManager.deleteEntityLinksByRootScopeIdAndType(scopeId, scopeType);
     }
 
 }

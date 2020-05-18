@@ -39,8 +39,6 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityM
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManagerImpl;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManager;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
@@ -50,14 +48,12 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManagerImp
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisDeadLetterJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisHistoryJobDataManager;
-import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobByteArrayDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
@@ -92,7 +88,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected TimerJobDataManager timerJobDataManager;
     protected HistoryJobDataManager historyJobDataManager;
     protected ExternalWorkerJobDataManager externalWorkerJobDataManager;
-    protected JobByteArrayDataManager jobByteArrayDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
 
@@ -102,7 +97,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected TimerJobEntityManager timerJobEntityManager;
     protected HistoryJobEntityManager historyJobEntityManager;
     protected ExternalWorkerJobEntityManager externalWorkerJobEntityManager;
-    protected JobByteArrayEntityManager jobByteArrayEntityManager;
 
     protected CommandExecutor commandExecutor;
 
@@ -202,9 +196,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (externalWorkerJobDataManager == null) {
             externalWorkerJobDataManager = new MybatisExternalWorkerJobDataManager(this);
         }
-        if (jobByteArrayDataManager == null) {
-            jobByteArrayDataManager = new MybatisJobByteArrayDataManager();
-        }
     }
 
     public void initEntityManagers() {
@@ -225,9 +216,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (externalWorkerJobEntityManager == null) {
             externalWorkerJobEntityManager = new ExternalWorkerJobEntityManagerImpl(this, externalWorkerJobDataManager);
-        }
-        if (jobByteArrayEntityManager == null) {
-            jobByteArrayEntityManager = new JobByteArrayEntityManagerImpl(this, jobByteArrayDataManager);
         }
     }
 
@@ -327,15 +315,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public JobByteArrayDataManager getJobByteArrayDataManager() {
-        return jobByteArrayDataManager;
-    }
-
-    public JobServiceConfiguration setJobByteArrayDataManager(JobByteArrayDataManager jobByteArrayDataManager) {
-        this.jobByteArrayDataManager = jobByteArrayDataManager;
-        return this;
-    }
-
     public JobEntityManager getJobEntityManager() {
         return jobEntityManager;
     }
@@ -387,15 +366,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setExternalWorkerJobEntityManager(ExternalWorkerJobEntityManager externalWorkerJobEntityManager) {
         this.externalWorkerJobEntityManager = externalWorkerJobEntityManager;
-        return this;
-    }
-
-    public JobByteArrayEntityManager getJobByteArrayEntityManager() {
-        return jobByteArrayEntityManager;
-    }
-
-    public JobServiceConfiguration setJobByteArrayEntityManager(JobByteArrayEntityManager jobByteArrayEntityManager) {
-        this.jobByteArrayEntityManager = jobByteArrayEntityManager;
         return this;
     }
 

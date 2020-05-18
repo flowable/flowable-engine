@@ -24,6 +24,7 @@ import java.util.Map;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
@@ -34,6 +35,8 @@ import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -57,7 +60,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
-import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -68,7 +70,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -843,12 +844,16 @@ public class ExecutionEntityManagerImpl
     }
     
     protected void deleteEntityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatcherEnabled) {
-        if (engineConfiguration.isEnableEntityLinks() && executionEntity.isProcessInstanceType()) {
+        // Entity links are deleted by a root instance only.
+        // (A callback id is set for a child process instance of a case instance.
+        // A super execution id is set for a child process instance of a process instance)
+        // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
+        if (engineConfiguration.isEnableEntityLinks() && executionEntity.isProcessInstanceType() && isRootProcessInstance(executionEntity)) {
+
             EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
             boolean deleteEntityLinks = true;
             if (eventDispatcherEnabled) {
-                List<EntityLink> entityLinks = entityLinkService.findEntityLinksByScopeIdAndType(
-                                executionEntity.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+                List<EntityLink> entityLinks = entityLinkService.findEntityLinksByRootScopeIdAndRootType(executionEntity.getId(), ScopeTypes.BPMN);
                 for (EntityLink entityLink : entityLinks) {
                     fireEntityDeletedEvent((EntityLinkEntity) entityLink);
                 }
@@ -856,9 +861,15 @@ public class ExecutionEntityManagerImpl
             }
             
             if (deleteEntityLinks) {
-                entityLinkService.deleteEntityLinksByScopeIdAndType(executionEntity.getId(), ScopeTypes.BPMN);
+                entityLinkService.deleteEntityLinksByRootScopeIdAndType(executionEntity.getId(), ScopeTypes.BPMN);
             }
         }
+
+    }
+
+    protected boolean isRootProcessInstance(ExecutionEntity executionEntity) {
+        return executionEntity.getSuperExecutionId() == null
+            && (executionEntity.getCallbackId() == null || !CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(executionEntity.getCallbackType()));
     }
 
     protected void deleteVariables(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
@@ -868,7 +879,7 @@ public class ExecutionEntityManagerImpl
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             if (!executionVariables.isEmpty()) {
                 
-                ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+                List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
                 for (VariableInstance variableInstance : executionVariables) {
                     if (variableInstance instanceof VariableInstanceEntity) {
                         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
@@ -888,7 +899,7 @@ public class ExecutionEntityManagerImpl
                 }
                 
                 // First byte arrays that reference variable, then variables in bulk
-                for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                for (ByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
                     getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
                 }
                 

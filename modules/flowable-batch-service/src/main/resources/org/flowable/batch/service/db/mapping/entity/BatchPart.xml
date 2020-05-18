@@ -85,7 +85,7 @@
         update ${prefix}FLW_RU_BATCH_PART
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
-            <if test="originalPersistentState.resultDocRefId != null">
+            <if test="originalPersistentState.resultDocRefId != null or (resultDocRefId != null and resultDocRefId.id != originalPersistentState.resultDocRefId)">
                 RESULT_DOC_ID_ = #{resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.completeTime != completeTime">

@@ -46,6 +46,13 @@ public class DefaultEventRegistryChangeDetectionExecutor implements EventRegistr
         this.scheduledExecutorService.scheduleAtFixedRate(this.changeDetectionRunnable, initialDelayInMs, delayInMs, TimeUnit.MILLISECONDS);
     }
 
+    @Override
+    public void shutdown() {
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdown();
+        }
+    }
+
     protected Runnable createChangeDetectionRunnable() {
         return new EventRegistryChangeDetectionRunnable(eventRegistryChangeDetectionManager);
     }

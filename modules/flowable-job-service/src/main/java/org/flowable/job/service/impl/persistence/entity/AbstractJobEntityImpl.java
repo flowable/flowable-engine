@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -58,9 +59,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
-    protected JobByteArrayRef customValuesByteArrayRef;
+    protected ByteArrayRef customValuesByteArrayRef;
 
-    protected JobByteArrayRef exceptionByteArrayRef;
+    protected ByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
 
     protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
@@ -293,7 +294,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
-    public JobByteArrayRef getCustomValuesByteArrayRef() {
+    public ByteArrayRef getCustomValuesByteArrayRef() {
         return customValuesByteArrayRef;
     }
 
@@ -305,7 +306,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     @Override
     public void setCustomValues(String customValues) {
         if(customValuesByteArrayRef == null) {
-            customValuesByteArrayRef = new JobByteArrayRef();
+            customValuesByteArrayRef = new ByteArrayRef();
         }
         customValuesByteArrayRef.setValue("jobCustomValues", customValues);
     }
@@ -328,7 +329,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
-            exceptionByteArrayRef = new JobByteArrayRef();
+            exceptionByteArrayRef = new ByteArrayRef();
         }
 
         exceptionByteArrayRef.setValue("stacktrace", exception);
@@ -345,11 +346,11 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
-    public JobByteArrayRef getExceptionByteArrayRef() {
+    public ByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }
 
-    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+    private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }

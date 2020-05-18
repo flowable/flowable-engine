@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
@@ -43,7 +44,7 @@ public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
     
     void setSubScopeId(String subScopeId);
 
-    BatchByteArrayRef getResultDocRefId();
+    ByteArrayRef getResultDocRefId();
 
     void setResultDocumentJson(String resultDocumentJson);
     

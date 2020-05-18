@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
@@ -89,8 +90,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManagerImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.dmn.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
@@ -133,7 +132,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected DecisionTableEntityManager decisionTableEntityManager;
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
-    protected TableDataManager tableDataManager;
 
     // EXPRESSION MANAGER /////////////////////////////////////////////
     protected ExpressionManager expressionManager;
@@ -301,9 +299,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         }
         if (historicDecisionExecutionEntityManager == null) {
             historicDecisionExecutionEntityManager = new HistoricDecisionExecutionEntityManagerImpl(this, historicDecisionExecutionDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -859,10 +854,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     public DmnEngineConfiguration setResourceEntityManager(DmnResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
