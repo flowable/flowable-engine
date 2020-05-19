@@ -591,16 +591,24 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // Suspending the process instance should also stop the execution of jobs for that process instance
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertNotNull(job);
+        assertNotNull(job.getCorrelationId());
         assertEquals(1, managementService.createTimerJobQuery().count());
+
+        String correlationId = job.getCorrelationId();
         runtimeService.suspendProcessInstanceById(processInstance.getId());
         assertEquals(1, managementService.createSuspendedJobQuery().count());
 
         // The jobs should not be executed now
         processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
-        Job job = managementService.createTimerJobQuery().executable().singleResult();
+        job = managementService.createTimerJobQuery().executable().singleResult();
         assertNull(job);
 
         assertEquals(1, managementService.createSuspendedJobQuery().count());
+        Job suspendedJob = managementService.createSuspendedJobQuery().correlationId(correlationId).singleResult();
+        assertNotNull(suspendedJob);
+        assertEquals(correlationId, suspendedJob.getCorrelationId());
 
         // Activation of the process instance should now allow for job execution
         runtimeService.activateProcessInstanceById(processInstance.getId());

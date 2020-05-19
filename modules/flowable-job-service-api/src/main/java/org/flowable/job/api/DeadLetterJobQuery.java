@@ -73,6 +73,9 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     /** Only select jobs for the given plan item instance.  */
     DeadLetterJobQuery planItemInstanceId(String planItemInstanceId);
 
+    /** Only select jobs for with the given correlationId.  */
+    DeadLetterJobQuery correlationId(String correlationId);
+
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past
      **/

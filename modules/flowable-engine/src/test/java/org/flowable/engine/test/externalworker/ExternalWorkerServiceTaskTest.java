@@ -87,6 +87,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
 
         assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getCorrelationId()).isNotNull();
         assertThat(externalWorkerJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
         assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
         assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());

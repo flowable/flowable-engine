@@ -61,6 +61,11 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
+    public TimerJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
+    }
+
+    @Override
     public List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page) {
         return dataManager.findTimerJobsToExecute(enabledCategories, page);
     }
@@ -134,6 +139,9 @@ public class TimerJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }

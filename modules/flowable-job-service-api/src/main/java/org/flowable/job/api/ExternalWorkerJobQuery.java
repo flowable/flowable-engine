@@ -105,6 +105,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
     ExternalWorkerJobQuery planItemInstanceId(String planItemInstanceId);
 
     /**
+     * Only select jobs with the given correlationId.
+     */
+    ExternalWorkerJobQuery correlationId(String correlationId);
+
+    /**
      * Only select jobs where the duedate is lower than the given date.
      */
     ExternalWorkerJobQuery duedateLowerThan(Date date);

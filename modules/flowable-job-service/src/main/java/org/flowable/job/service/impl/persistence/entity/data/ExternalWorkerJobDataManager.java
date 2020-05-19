@@ -24,6 +24,8 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
  */
 public interface ExternalWorkerJobDataManager extends DataManager<ExternalWorkerJobEntity>, JobInfoDataManager<ExternalWorkerJobEntity> {
 
+    ExternalWorkerJobEntity findJobByCorrelationId(String correlationId);
+
     List<ExternalWorkerJob> findJobsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);

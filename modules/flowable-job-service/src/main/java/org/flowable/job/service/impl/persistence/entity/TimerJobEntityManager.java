@@ -36,6 +36,11 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
     boolean insertTimerJobEntity(TimerJobEntity timerJobEntity);
 
     /**
+     * Find the timer job with the given correlation id.
+     */
+    TimerJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
      * Returns the {@link TimerJobEntity} instances that are eligible to execute, meaning the due date of the timer has been passed.
      */
     List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page);

@@ -99,6 +99,7 @@ public class ExternalJobRestResponseFactory {
         T response = responseSupplier.get();
         response.setId(job.getId());
         response.setUrl(urlBuilder.buildUrl(ExternalJobRestUrls.URL_JOB, job.getId()));
+        response.setCorrelationId(job.getCorrelationId());
         response.setProcessInstanceId(job.getProcessInstanceId());
         response.setProcessDefinitionId(job.getProcessDefinitionId());
         response.setExecutionId(job.getExecutionId());

@@ -19,6 +19,7 @@ import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Filip Hrisafov
@@ -50,8 +51,16 @@ public class ExternalWorkerJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
+    }
+
+    @Override
+    public ExternalWorkerJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override

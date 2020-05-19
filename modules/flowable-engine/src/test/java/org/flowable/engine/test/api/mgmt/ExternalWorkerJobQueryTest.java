@@ -302,4 +302,20 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.singleResult()).isNull();
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryByCorrelationId() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJob workerJob = managementService.createExternalWorkerJobQuery().elementId("externalCustomer1").singleResult();
+        assertThat(workerJob).isNotNull();
+        assertThat(workerJob.getCorrelationId()).isNotNull();
+
+        ExternalWorkerJob job = managementService.createExternalWorkerJobQuery().correlationId(workerJob.getCorrelationId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getId()).isEqualTo(workerJob.getId());
+        assertThat(job.getCorrelationId()).isEqualTo(workerJob.getCorrelationId());
+
+        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult());
+    }
+
 }

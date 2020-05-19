@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -30,6 +31,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityI
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.ExternalWorkerJobsByExecutionIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.ExternalWorkerJobsByScopeIdAndSubScopeIdMatcher;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 
 /**
  * @author Filip Hrisafov
@@ -40,6 +42,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
 
     protected CachedEntityMatcher<ExternalWorkerJobEntity> jobsByExecutionIdMatcher = new ExternalWorkerJobsByExecutionIdMatcher();
     protected CachedEntityMatcher<ExternalWorkerJobEntity> externalWorkerJobsByScopeIdAndSubScopeIdMatcher = new ExternalWorkerJobsByScopeIdAndSubScopeIdMatcher();
+    protected SingleCachedEntityMatcher<ExternalWorkerJobEntity> externalWorkerJobByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
     public MybatisExternalWorkerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
@@ -53,6 +56,11 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     @Override
     public ExternalWorkerJobEntity create() {
         return new ExternalWorkerJobEntityImpl();
+    }
+
+    @Override
+    public ExternalWorkerJobEntity findJobByCorrelationId(String correlationId) {
+        return getEntity("selectExternalWorkerJobByCorrelationId", correlationId, externalWorkerJobByCorrelationIdMatcher, true);
     }
 
     @Override
@@ -132,7 +140,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     @Override
     @SuppressWarnings("unchecked")
     public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("topic", topic);
         params.put("scopeType", scopeType);
 

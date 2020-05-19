@@ -48,6 +48,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
 
     protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
@@ -79,7 +80,8 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         persistentState.put("jobType", jobType);
         persistentState.put("elementId", elementId);
         persistentState.put("elementName", elementName);
-        
+        persistentState.put("correlationId", correlationId);
+
         if (customValuesByteArrayRef != null) {
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
@@ -221,6 +223,16 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    @Override
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
     
     @Override

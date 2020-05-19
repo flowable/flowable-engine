@@ -32,6 +32,11 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
     boolean insertExternalWorkerJobEntity(ExternalWorkerJobEntity externalWorkerJobEntity);
 
     /**
+     * Find the external worker job by the given correlationId
+     */
+    ExternalWorkerJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
      * Returns all {@link ExternalWorkerJobEntity} for the given scope and subscope.
      */
     List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);

@@ -76,12 +76,14 @@ import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteExternalWorkerJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
+import org.flowable.job.service.impl.cmd.GetJobByCorrelationIdCmd;
 import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
@@ -181,6 +183,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     public void deleteDeadLetterJob(String jobId) {
         commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
     }
+
+    @Override
+    public void deleteExternalWorkerJob(String jobId) {
+        commandExecutor.execute(new DeleteExternalWorkerJobCmd(jobId));
+    }
     
     @Override
     public void deleteHistoryJob(String jobId) {
@@ -250,6 +257,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public Job findJobByCorrelationId(String jobCorrelationId) {
+        return commandExecutor.execute(new GetJobByCorrelationIdCmd(jobCorrelationId));
     }
 
     @Override

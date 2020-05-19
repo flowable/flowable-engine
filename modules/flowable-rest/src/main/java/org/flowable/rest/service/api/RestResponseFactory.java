@@ -1021,6 +1021,7 @@ public class RestResponseFactory {
     public JobResponse createJobResponse(Job job, RestUrlBuilder urlBuilder) {
         JobResponse response = new JobResponse();
         response.setId(job.getId());
+        response.setCorrelationId(job.getCorrelationId());
         response.setDueDate(job.getDuedate());
         response.setExceptionMessage(job.getExceptionMessage());
         response.setExecutionId(job.getExecutionId());

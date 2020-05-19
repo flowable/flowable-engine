@@ -67,6 +67,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "id: '" + timerJob.getId() + "',"
+                        + "correlationId: '" + timerJob.getCorrelationId() + "',"
                         + "exceptionMessage: " + timerJob.getExceptionMessage() + ","
                         + "executionId: '" + timerJob.getExecutionId() + "',"
                         + "processDefinitionId: '" + timerJob.getProcessDefinitionId() + "',"

@@ -23,6 +23,7 @@
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
         <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+        <result property="correlationId" column="CORRELATION_ID_" jdbcType="VARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -39,6 +40,12 @@
 
     <select id="selectTimerJob" parameterType="string" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_TIMER_JOB where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectTimerJobByCorrelationId" parameterType="string" resultMap="jobResultMap">
+        select *
+        from ${prefix}ACT_RU_TIMER_JOB
+        where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
     </select>
 
     <select id="selectTimerJobByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultMap="jobResultMap">
@@ -95,6 +102,9 @@
             </if>
             <if test="scopeDefinitionId != null">
                 and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+            </if>
+            <if test="correlationId != null">
+                and RES.CORRELATION_ID_ = #{correlationId}
             </if>
             <if test="onlyTimers">
                 and RES.TYPE_ = 'timer'
@@ -176,6 +186,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -200,6 +211,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{correlationId, jdbcType=VARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{exceptionMessage, jdbcType=VARCHAR},
@@ -229,6 +241,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -254,6 +267,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -285,6 +299,7 @@
             SUB_SCOPE_ID_, 
             SCOPE_TYPE_, 
             SCOPE_DEFINITION_ID_,
+            CORRELATION_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
@@ -309,6 +324,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -353,6 +369,9 @@
             </if>
             <if test="originalPersistentState.createTime != createTime">
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.correlationId != correlationId">
+                CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
