@@ -65,6 +65,29 @@
                     </otherwise>
                 </choose>
             </if>
+            <if test="parameter.tenantId != null">
+                <choose>
+                    <when test="parameter.tenantId != ''">
+                        and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+                    </when>
+                    <otherwise>
+                        and (TENANT_ID_ = '' or TENANT_ID_ is null)
+                    </otherwise>
+                </choose>
+            </if>
+            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
+                <if test="parameter.authorizedUser != null">
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{parameter.authorizedUser})
+                </if>
+                <if test="parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.isEmpty()">
+                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="parameter.authorizedGroups"
+                             open="(" separator="," close=")">
+                        #{group}
+                    </foreach>
+                    )
+                </if>
+            </trim>
             and LOCK_EXP_TIME_ is null
         </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>

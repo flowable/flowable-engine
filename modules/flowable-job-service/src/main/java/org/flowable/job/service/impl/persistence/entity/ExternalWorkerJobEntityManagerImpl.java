@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Filip Hrisafov
@@ -79,8 +79,8 @@ public class ExternalWorkerJobEntityManagerImpl
     }
 
     @Override
-    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType) {
-        return dataManager.findExternalJobsToExecute(topic, maxResults, scopeType);
+    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs) {
+        return dataManager.findExternalJobsToExecute(builder, numberOfJobs);
     }
 
     @Override

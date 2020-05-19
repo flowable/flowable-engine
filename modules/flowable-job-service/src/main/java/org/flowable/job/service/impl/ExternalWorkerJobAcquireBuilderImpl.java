@@ -13,6 +13,7 @@
 package org.flowable.job.service.impl;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
     protected String topic;
     protected Duration lockDuration;
     protected String scopeType;
+    protected String tenantId;
+    protected String authorizedUser;
+    protected Collection<String> authorizedGroups;
 
     public ExternalWorkerJobAcquireBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
@@ -85,10 +89,28 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
     }
 
     @Override
+    public ExternalWorkerJobAcquireBuilder tenantId(String tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public ExternalWorkerJobAcquireBuilder forUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("at least one of userId or groups must be provided");
+        }
+
+        this.authorizedUser = userId;
+        this.authorizedGroups = groups;
+
+        return this;
+    }
+
+    @Override
     public List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId, int numberOfRetries) {
         while (numberOfRetries > 0) {
             try {
-                return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, lockDuration, numberOfTasks, topic, scopeType));
+                return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, numberOfTasks, this));
             } catch (FlowableOptimisticLockingException ignored) {
                 // Query for jobs until there is no FlowableOptimisticLockingException
                 // It is potentially possible multiple workers to query in the exact same time
@@ -104,5 +126,21 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
 
     public Duration getLockDuration() {
         return lockDuration;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getAuthorizedUser() {
+        return authorizedUser;
+    }
+
+    public Collection<String> getAuthorizedGroups() {
+        return authorizedGroups;
     }
 }

@@ -52,7 +52,9 @@ public interface JobService {
     List<SuspendedJobEntity> findSuspendedJobsByExecutionId(String executionId);
     
     List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId);
-    
+
+    List<ExternalWorkerJobEntity> findExternalWorkerJobsByExecutionId(String executionId);
+
     List<JobEntity> findJobsByProcessInstanceId(String processInstanceId);
     
     List<SuspendedJobEntity> findSuspendedJobsByProcessInstanceId(String processInstanceId);
@@ -95,5 +97,4 @@ public interface JobService {
     
     void deleteDeadLetterJobsByExecutionId(String executionId);
 
-    void deleteExternalWorkerJobsByExecutionId(String executionId);
 }

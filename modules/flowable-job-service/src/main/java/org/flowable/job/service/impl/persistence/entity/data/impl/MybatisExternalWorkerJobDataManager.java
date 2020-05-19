@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
@@ -139,12 +140,8 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("topic", topic);
-        params.put("scopeType", scopeType);
-
-        return getDbSqlSession().selectList("selectExternalWorkerJobsToExecute", params, new Page(0, maxResults));
+    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs) {
+        return getDbSqlSession().selectList("selectExternalWorkerJobsToExecute", builder, new Page(0, numberOfJobs));
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.ExternalWorkerJob;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 
@@ -32,7 +33,7 @@ public interface ExternalWorkerJobDataManager extends DataManager<ExternalWorker
 
     void deleteJobsByExecutionId(String executionId);
 
-    List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType);
+    List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs);
 
     List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
 }

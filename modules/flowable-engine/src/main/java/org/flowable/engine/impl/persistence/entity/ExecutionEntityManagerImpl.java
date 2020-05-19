@@ -68,7 +68,10 @@ import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -974,7 +977,18 @@ public class ExecutionEntityManagerImpl
         }
 
         if (!enableExecutionRelationshipCounts || ((CountingExecutionEntity) executionEntity).getExternalWorkerJobCount() > 0) {
-            jobService.deleteExternalWorkerJobsByExecutionId(executionEntity.getId());
+            Collection<ExternalWorkerJobEntity> externalWorkerJobsForExecution = jobService.findExternalWorkerJobsByExecutionId(executionEntity.getId());
+
+            ExternalWorkerJobEntityManager externalWorkerJobEntityManager = CommandContextUtil.getJobServiceConfiguration(commandContext)
+                    .getExternalWorkerJobEntityManager();
+            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService(commandContext);
+            for (ExternalWorkerJobEntity job : externalWorkerJobsForExecution) {
+                externalWorkerJobEntityManager.delete(job);
+                identityLinkService.deleteIdentityLinksByScopeIdAndType(job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);
+                if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                }
+            }
         }
     }
 
