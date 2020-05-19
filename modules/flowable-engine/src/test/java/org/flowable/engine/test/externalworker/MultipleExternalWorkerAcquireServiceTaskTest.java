@@ -69,7 +69,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .containsOnlyNulls();
 
         waitCommandInvoker.waitLatch = new CountDownLatch(1);
-        waitCommandInvoker.workLatch = new CountDownLatch(2);
+        waitCommandInvoker.workLatch = new CountDownLatch(1);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -83,7 +83,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2"), executorService);
 
-        waitCommandInvoker.workLatch.await(5, TimeUnit.SECONDS);
+        waitCommandInvoker.workLatch.countDown();
         waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
@@ -116,7 +116,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .containsOnlyNulls();
 
         waitCommandInvoker.waitLatch = new CountDownLatch(1);
-        waitCommandInvoker.workLatch = new CountDownLatch(2);
+        waitCommandInvoker.workLatch = new CountDownLatch(1);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -130,7 +130,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2", 1), executorService);
 
-        waitCommandInvoker.workLatch.await(5, TimeUnit.SECONDS);
+        waitCommandInvoker.workLatch.countDown();
         waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
@@ -161,7 +161,11 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
         public <T> T execute(CommandConfig config, Command<T> command) {
 
             if (workLatch != null) {
-                workLatch.countDown();
+                try {
+                    workLatch.await(5, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
 
             T result = super.execute(config, command);
