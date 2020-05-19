@@ -27,6 +27,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
+import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -180,6 +181,67 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .containsOnly(
                         entry("name", "kermit")
                 );
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
+
+        assertThat(taskService.createTaskQuery().list()).hasSize(1);
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("name", "gonzo")
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
+    void testExternalWorkerJobDeadLetterWithVariables() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "testWorker")
+                .variable("name", "gonzo")
+                .complete();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("name", "kermit")
+                );
+
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        managementService.moveJobToDeadLetterJob(job.getId());
+
+        assertThat(managementService.createJobQuery().singleResult()).isNull();
+
+        job = managementService.createDeadLetterJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        managementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
 
         waitForJobExecutorToProcessAllJobs(5000, 300);
 
