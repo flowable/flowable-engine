@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -36,6 +37,7 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
     protected CachedEntityMatcher<ActivityInstanceEntity> unfinishedActivityInstanceMatcher = new UnfinishedActivityInstanceMatcher();
     protected CachedEntityMatcher<ActivityInstanceEntity> activityInstanceMatcher = new ActivityInstanceMatcher();
     protected CachedEntityMatcher<ActivityInstanceEntity> activitiesByProcessInstanceIdMatcher = new ActivityByProcessInstanceIdMatcher();
+    protected SingleCachedEntityMatcher<ActivityInstanceEntity> activityInstanceByTaskIdMatcher = (entity, param) -> param.equals(entity.getTaskId());
 
     public MybatisActivityInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -65,6 +67,11 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
         params.put("executionId", executionId);
         params.put("activityId", activityId);
         return getList("selectActivityInstanceExecutionIdAndActivityId", params, activityInstanceMatcher, true);
+    }
+
+    @Override
+    public ActivityInstanceEntity findActivityInstanceByTaskId(String taskId) {
+        return getEntity("selectActivityInstanceByTaskId", taskId, activityInstanceByTaskIdMatcher, true);
     }
 
     @Override

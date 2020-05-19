@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Joram Barrez
  */
+@EventConfigurationResource("flowableChangeDetector.eventregistry.cfg.xml")
 public class DefaultEventRegistryDataChangeDetectorTest extends AbstractFlowableEventTest {
 
     @Test

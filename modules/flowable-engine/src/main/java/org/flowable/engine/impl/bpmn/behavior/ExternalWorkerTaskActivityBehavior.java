@@ -26,6 +26,9 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.interceptor.CreateExternalWorkerJobAfterContext;
+import org.flowable.engine.interceptor.CreateExternalWorkerJobBeforeContext;
+import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
@@ -38,11 +41,13 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    protected ExternalWorkerServiceTask externalWorkerServiceTask;
     protected Expression jobTopicExpression;
     protected Expression skipExpression;
     protected boolean exclusive;
 
     public ExternalWorkerTaskActivityBehavior(ExternalWorkerServiceTask externalWorkerServiceTask, Expression jobTopicExpression, Expression skipExpression) {
+        this.externalWorkerServiceTask = externalWorkerServiceTask;
         this.jobTopicExpression = jobTopicExpression;
         this.skipExpression = skipExpression;
         this.exclusive = externalWorkerServiceTask.isExclusive();
@@ -60,6 +65,19 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
         String elementId = currentFlowElement.getId();
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, elementId, execution, commandContext);
         if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, elementId, execution, commandContext)) {
+            CreateExternalWorkerJobInterceptor interceptor = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                    .getCreateExternalWorkerJobInterceptor();
+
+            CreateExternalWorkerJobBeforeContext beforeContext = new CreateExternalWorkerJobBeforeContext(
+                    externalWorkerServiceTask,
+                    execution,
+                    getJobCategory(currentFlowElement)
+            );
+
+            if (interceptor != null) {
+                interceptor.beforeCreateExternalWorkerJob(beforeContext);
+            }
+
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
             JobService jobService = jobServiceConfiguration.getJobService();
 
@@ -72,17 +90,13 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             job.setJobHandlerType(ExternalWorkerTaskCompleteJobHandler.TYPE);
             job.setExclusive(exclusive);
 
-            List<ExtensionElement> jobCategoryElements = currentFlowElement.getExtensionElements().get("jobCategory");
-            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                    Expression categoryExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext)
-                            .getExpressionManager()
-                            .createExpression(jobCategoryElement.getElementText());
-                    Object categoryValue = categoryExpression.getValue(execution);
-                    if (categoryValue != null) {
-                        job.setCategory(categoryValue.toString());
-                    }
+            if (StringUtils.isNotEmpty(beforeContext.getJobCategory())) {
+                Expression categoryExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        .getExpressionManager()
+                        .createExpression(beforeContext.getJobCategory());
+                Object categoryValue = categoryExpression.getValue(execution);
+                if (categoryValue != null) {
+                    job.setCategory(categoryValue.toString());
                 }
             }
 
@@ -94,6 +108,14 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
                 job.setTenantId(execution.getTenantId());
             }
 
+            Expression jobTopicExpression;
+            if (StringUtils.isEmpty(beforeContext.getJobTopicExpression())) {
+                jobTopicExpression = this.jobTopicExpression;
+            } else {
+                jobTopicExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        .getExpressionManager()
+                        .createExpression(beforeContext.getJobTopicExpression());
+            }
             Object topicValue = jobTopicExpression.getValue(execution);
             if (topicValue != null && !topicValue.toString().isEmpty()) {
                 job.setJobHandlerConfiguration(topicValue.toString());
@@ -102,6 +124,14 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             }
 
             jobService.insertExternalWorkerJob(job);
+
+            if (interceptor != null) {
+                interceptor.afterCreateExternalWorkerJob(new CreateExternalWorkerJobAfterContext(
+                        (ExternalWorkerServiceTask) currentFlowElement,
+                        job,
+                        execution
+                ));
+            }
         } else {
             leave(execution);
         }
@@ -110,6 +140,15 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         leave(execution);
+    }
+
+    protected String getJobCategory(FlowElement flowElement) {
+        List<ExtensionElement> jobCategoryElements = flowElement.getExtensionElements().get("jobCategory");
+        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+            return jobCategoryElements.get(0).getElementText();
+        }
+
+        return null;
     }
 
 }

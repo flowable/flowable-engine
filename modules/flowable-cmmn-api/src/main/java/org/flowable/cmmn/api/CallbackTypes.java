@@ -32,11 +32,20 @@ import org.flowable.common.engine.api.constant.ReferenceTypes;
 public interface CallbackTypes {
 
     // The same constant is used on the entity call back as for the reference on the calling side.
-    
+
+    /**
+     * Child case instance of a case instance
+     */
     String PLAN_ITEM_CHILD_CASE = ReferenceTypes.PLAN_ITEM_CHILD_CASE;
-    
+
+    /**
+     * Child process instance of a case instance
+     */
     String PLAN_ITEM_CHILD_PROCESS = ReferenceTypes.PLAN_ITEM_CHILD_PROCESS;
-    
+
+    /**
+     * Child case instance of a process instance
+     */
     String EXECUTION_CHILD_CASE = ReferenceTypes.EXECUTION_CHILD_CASE;
 
     String CASE_ADHOC_CHILD = "cmmn-1.1-child";

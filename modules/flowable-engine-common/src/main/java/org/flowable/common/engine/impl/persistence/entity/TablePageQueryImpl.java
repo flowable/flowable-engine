@@ -10,17 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.engine.impl;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.api.management.TablePageQuery;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * 
@@ -52,13 +51,13 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
 
     @Override
     public TablePageQueryImpl orderAsc(String column) {
-        addOrder(column, AbstractQuery.SORTORDER_ASC);
+        addOrder(column, ListQueryParameterObject.SORTORDER_ASC);
         return this;
     }
 
     @Override
     public TablePageQueryImpl orderDesc(String column) {
-        addOrder(column, AbstractQuery.SORTORDER_DESC);
+        addOrder(column, ListQueryParameterObject.SORTORDER_DESC);
         return this;
     }
 
@@ -84,7 +83,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
 
     @Override
     public TablePage execute(CommandContext commandContext) {
-        return CommandContextUtil.getTableDataManager(commandContext).getTablePage(this, firstResult, maxResults);
+        return commandContext.getCurrentEngineConfiguration().getTableDataManager().getTablePage(this, firstResult, maxResults);
     }
 
     public String getOrder() {

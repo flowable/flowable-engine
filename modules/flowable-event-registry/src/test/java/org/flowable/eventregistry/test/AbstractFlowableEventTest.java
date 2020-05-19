@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.test;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -30,6 +31,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(FlowableEventExtension.class)
 @ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY",
+        "FLW_EV_DATABASECHANGELOGLOCK",
+        "FLW_EV_DATABASECHANGELOG"
+})
 public class AbstractFlowableEventTest {
 
     protected EventRegistryEngine eventRegistryEngine;

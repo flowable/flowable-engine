@@ -131,9 +131,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                             .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
                             + "contentUrl: null,"
-                            + "processInstanceUrl: null"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
                             + "}");
-            assertThat(responseNode.get("time")).isNotNull();
 
             // Get binary attachment
             response = executeRequest(
@@ -154,9 +154,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
                             + "contentUrl: '" + SERVER_URL_PREFIX + RestUrls
                             .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId()) + "',"
-                            + "processInstanceUrl: null"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
                             + "}");
-            assertThat(responseNode.get("time").isNull()).isFalse();
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -338,9 +338,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                             .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
                             + "contentUrl: null,"
-                            + "processInstanceUrl: null"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
                             + "}");
-            assertThat(responseNode.get("time")).isNotNull();
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -397,9 +397,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
                             + "contentUrl: '" + SERVER_URL_PREFIX + RestUrls
                             .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId()) + "',"
-                            + "processInstanceUrl: null"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
                             + "}");
-            assertThat(responseNode.get("time")).isNotNull();
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -514,9 +514,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                             .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
                             + "contentUrl: null,"
-                            + "processInstanceUrl: null"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
                             + "}");
-            assertThat(responseNode.get("time")).isNotNull();
 
             // Get binary attachment
             response = executeRequest(

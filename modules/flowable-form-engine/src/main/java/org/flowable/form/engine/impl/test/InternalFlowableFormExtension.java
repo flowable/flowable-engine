@@ -12,21 +12,14 @@
  */
 package org.flowable.form.engine.impl.test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.form.api.FormDeployment;
-import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
@@ -132,49 +125,24 @@ public abstract class InternalFlowableFormExtension implements AfterEachCallback
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb(FormEngine formEngine, ExtensionContext context, EnsureCleanDb ensureCleanDb) {
-        logger.debug("verifying that db is clean after test");
-        Set<String> tableNamesExcludedFromDbCleanCheck = new HashSet<>(Arrays.asList(ensureCleanDb.excludeTables()));
-        FormManagementService managementService = formEngine.getFormManagementService();
-        FormEngineConfiguration formEngineConfiguration = formEngine.getFormEngineConfiguration();
-        Map<String, Long> tableCounts = managementService.getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(formEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!tableNamesExcludedFromDbCleanCheck.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
-                }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            logger.error(EMPTY_LINE);
-            logger.error(outputMessage.toString());
-
-            logger.info("dropping and recreating db");
-
-            if (ensureCleanDb.dropDb()) {
-                CommandExecutor commandExecutor = formEngineConfiguration.getCommandExecutor();
-                CommandConfig config = new CommandConfig().transactionNotSupported();
-                commandExecutor.execute(config, new Command<Object>() {
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                context.getDisplayName(),
+                logger,
+                formEngine.getFormEngineConfiguration(),
+                ensureCleanDb,
+                !context.getExecutionException().isPresent(),
+                new Command<Void>() {
 
                     @Override
-                    public Object execute(CommandContext commandContext) {
+                    public Void execute(CommandContext commandContext) {
                         SchemaManager schemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getSchemaManager();
                         schemaManager.schemaDrop();
                         schemaManager.schemaCreate();
                         return null;
                     }
-                });
-            }
+                }
 
-            if (!context.getExecutionException().isPresent()) {
-                throw new AssertionError(outputMessage.toString());
-            }
-        } else {
-            logger.info("database was clean");
-        }
+        );
     }
 
     protected void removeDeployments(FormRepositoryService repositoryService) {

@@ -15,19 +15,16 @@ package org.flowable.content.engine.impl.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
-import org.junit.Assert;
 
 /**
  * @author Tom Baeyens
@@ -101,46 +98,22 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(contentEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getName(),
+                LOGGER,
+                contentEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                new Command<Void>() {
+                    @Override
+                    public Void execute(CommandContext commandContext) {
+                        SchemaManager schemaManager = CommandContextUtil.getContentEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
+                        return null;
+                    }
                 }
-            }
-        }
-
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = contentEngine.getContentEngineConfiguration().getCommandExecutor();
-            CommandConfig config = new CommandConfig().transactionNotSupported();
-            commandExecutor.execute(config, new Command<Object>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    SchemaManager schemaManager = CommandContextUtil.getContentEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
-            });
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                Assert.fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.info("database was clean");
-        }
+        );
     }
 
     protected void initializeServices() {

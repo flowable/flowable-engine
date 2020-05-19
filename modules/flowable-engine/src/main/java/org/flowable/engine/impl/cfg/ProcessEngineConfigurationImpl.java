@@ -307,8 +307,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.impl.persistence.entity.TableDataManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
@@ -338,6 +338,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceData
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
@@ -488,7 +489,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
     protected ResourceEntityManager resourceEntityManager;
-    protected TableDataManager tableDataManager;
 
     // Candidate Manager
 
@@ -860,6 +860,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
+    protected CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor;
     protected IdentityLinkInterceptor identityLinkInterceptor;
     protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
     protected ExecutionQueryInterceptor executionQueryInterceptor;
@@ -1329,9 +1330,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -3205,6 +3203,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public CreateExternalWorkerJobInterceptor getCreateExternalWorkerJobInterceptor() {
+        return createExternalWorkerJobInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setCreateExternalWorkerJobInterceptor(CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor) {
+        this.createExternalWorkerJobInterceptor = createExternalWorkerJobInterceptor;
+        return this;
+    }
+
     public ProcessInstanceQueryInterceptor getProcessInstanceQueryInterceptor() {
         return processInstanceQueryInterceptor;
     }
@@ -4065,10 +4072,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public ProcessEngineConfigurationImpl setTableDataManager(TableDataManager tableDataManager) {

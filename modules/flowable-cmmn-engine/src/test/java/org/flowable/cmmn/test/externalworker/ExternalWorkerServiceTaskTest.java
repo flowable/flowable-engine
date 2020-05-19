@@ -27,8 +27,12 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
+import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -186,6 +190,69 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .containsOnly(
                         entry("var", "Initial")
                 );
+        waitForJobExecutorToProcessAllJobs();
+
+        assertThat(cmmnTaskService.createTaskQuery().list())
+                .extracting(TaskInfo::getTaskDefinitionKey)
+                .containsExactlyInAnyOrder("afterExternalWorkerCompleteTask");
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Complete")
+                );
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testExternalWorkerJobDeadLetterWithVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("var", "Initial")
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Initial")
+                );
+
+        ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "testWorker")
+                .variable("var", "Complete")
+                .complete();
+
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().singleResult()).isNull();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Initial")
+                );
+
+        Job job = cmmnManagementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        cmmnManagementService.moveJobToDeadLetterJob(job.getId());
+
+        assertThat(cmmnManagementService.createJobQuery().singleResult()).isNull();
+
+        job = cmmnManagementService.createDeadLetterJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        cmmnManagementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
+
         waitForJobExecutorToProcessAllJobs();
 
         assertThat(cmmnTaskService.createTaskQuery().list())
@@ -950,6 +1017,30 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getLockTime()).isNull();
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testCreateCmmnExternalWorkerJobInterceptor() {
+        TestCreateCmmnExternalWorkerJobInterceptor interceptor = new TestCreateCmmnExternalWorkerJobInterceptor();
+        cmmnEngineConfiguration.setCreateCmmnExternalWorkerJobInterceptor(interceptor);
+
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("simpleExternalWorker")
+                    .variable("name", "kermit")
+                    .start();
+
+            ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+            assertThat(externalWorkerJob).isNotNull();
+            assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simpleTest");
+
+            assertThat(interceptor.beforeCounter).isEqualTo(1);
+            assertThat(interceptor.afterCounter).isEqualTo(1);
+        } finally {
+            cmmnEngineConfiguration.setCreateCmmnExternalWorkerJobInterceptor(null);
+        }
+    }
+
     protected Map<String, Object> getExternalWorkerVariablesForPlanItemInstance(String planItemInstanceId) {
         return cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
@@ -967,5 +1058,22 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
     protected void setTime(Instant time) {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(time));
+    }
+
+
+    protected static class TestCreateCmmnExternalWorkerJobInterceptor implements CreateCmmnExternalWorkerJobInterceptor {
+        protected int beforeCounter = 0;
+        protected int afterCounter = 0;
+
+        @Override
+        public void beforeCreateExternalWorkerJob(CreateCmmnExternalWorkerJobBeforeContext beforeContext) {
+            beforeCounter++;
+            beforeContext.setJobTopicExpression(beforeContext.getJobTopicExpression() + "Test");
+        }
+
+        @Override
+        public void afterCreateExternalWorkerJob(CreateCmmnExternalWorkerJobAfterContext afterContext) {
+            afterCounter++;
+        }
     }
 }

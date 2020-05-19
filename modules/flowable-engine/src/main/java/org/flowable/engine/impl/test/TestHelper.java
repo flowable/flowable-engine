@@ -24,10 +24,10 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -260,34 +260,22 @@ public abstract class TestHelper {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     public static void assertAndEnsureCleanDb(ProcessEngine processEngine) {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = processEngine.getManagementService().getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableName)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                "",
+                LOGGER,
+                processEngine.getProcessEngineConfiguration(),
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                true,
+                new Command<Void>() {
+                    @Override
+                    public Void execute(CommandContext commandContext) {
+                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
+                        return null;
+                    }
                 }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
-            });
-
-            throw new AssertionError(outputMessage.toString());
-        }
+        );
     }
 
     // Mockup support ////////////////////////////////////////////////////////

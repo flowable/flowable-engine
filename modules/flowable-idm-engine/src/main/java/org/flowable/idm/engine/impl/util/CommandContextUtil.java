@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -24,7 +25,6 @@ import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManager;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityManager;
 

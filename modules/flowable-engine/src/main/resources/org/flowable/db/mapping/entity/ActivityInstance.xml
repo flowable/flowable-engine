@@ -302,5 +302,11 @@
     select * from ${prefix}ACT_RU_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>
+
+  <select id="selectActivityInstanceByTaskId" parameterType="string" resultMap="ActivityInstanceResultMap">
+    select *
+    from ${prefix}ACT_RU_ACTINST RES
+    where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+  </select>
   
 </mapper>

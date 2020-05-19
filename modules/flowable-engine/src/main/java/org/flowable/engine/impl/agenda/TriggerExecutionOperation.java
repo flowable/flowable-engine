@@ -55,12 +55,6 @@ public class TriggerExecutionOperation extends AbstractOperation {
             ActivityBehavior activityBehavior = (ActivityBehavior) ((FlowNode) currentFlowElement).getBehavior();
             if (activityBehavior instanceof TriggerableActivityBehavior) {
 
-                if (currentFlowElement instanceof BoundaryEvent
-                        || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
-                    
-                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
-                }
-
                 if (!triggerAsync) {
                     ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
                     
