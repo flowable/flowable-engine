@@ -388,7 +388,7 @@ public class DefaultJobManager implements JobManager {
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);
         if (jobEntity.getId() != null) {
-            CommandContextUtil.getJobEntityManager().delete(jobEntity);
+            CommandContextUtil.getJobEntityManager().deleteJobEntityAndRelatedData(jobEntity);
         }
     }
 

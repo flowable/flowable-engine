@@ -74,6 +74,24 @@ public class DeadLetterJobEntityManagerImpl
     }
 
     @Override
+    public void deleteJobEntityAndRelatedData(DeadLetterJobEntity jobEntity) {
+        super.delete(jobEntity);
+
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
+        deleteVariables(jobEntity.getId());
+
+        if (getServiceConfiguration().getInternalJobManager() != null) {
+            getServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        }
+
+        // Send event
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+        }
+    }
+
+    @Override
     public void delete(DeadLetterJobEntity jobEntity) {
         super.delete(jobEntity);
 

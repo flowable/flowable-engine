@@ -75,12 +75,26 @@ public class JobEntityManagerImpl
     }
 
     @Override
-    public void delete(JobEntity jobEntity) {
+    public void deleteJobEntityAndRelatedData(JobEntity jobEntity) {
         super.delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
         deleteVariables(jobEntity.getId());
+
+        // Send event
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+        }
+    }
+
+    @Override
+    public void delete(JobEntity jobEntity) {
+        super.delete(jobEntity, false);
+
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
@@ -96,26 +110,5 @@ public class JobEntityManagerImpl
         }
         
         super.delete(entity, fireDeleteEvent);
-    }
-
-    protected void deleteVariables(String jobId) {
-        if (CommandContextUtil.getCommandContext().getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
-            HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
-                    CommandContextUtil.getCommandContext().getCurrentEngineConfiguration();
-
-            VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration
-                    .getVariableServiceConfiguration();
-            List<VariableInstanceEntity> jobVariables = variableServiceConfiguration.getVariableInstanceEntityManager()
-                    .createInternalVariableInstanceQuery().scopeType(ScopeTypes.JOB).scopeId(jobId).list();
-            for (VariableInstanceEntity jobVariable : jobVariables) {
-                if (jobVariable.getByteArrayRef() != null) {
-                    jobVariable.getByteArrayRef().delete();
-                }
-            }
-            if (!jobVariables.isEmpty()) {
-                variableServiceConfiguration.getVariableInstanceEntityManager()
-                        .deleteByScopeIdAndScopeType(jobId, ScopeTypes.JOB);
-            }
-        }
     }
 }

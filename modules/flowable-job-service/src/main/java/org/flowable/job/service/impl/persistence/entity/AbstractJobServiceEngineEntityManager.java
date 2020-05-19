@@ -12,14 +12,21 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
+import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -41,4 +48,27 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
             jobByteArrayRef.delete();
         }
     }
+
+    protected void deleteVariables(String jobId) {
+        if (CommandContextUtil
+                .getCommandContext().getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
+            HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
+                    CommandContextUtil.getCommandContext().getCurrentEngineConfiguration();
+
+            VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration
+                    .getVariableServiceConfiguration();
+            List<VariableInstanceEntity> jobVariables = variableServiceConfiguration.getVariableInstanceEntityManager()
+                    .createInternalVariableInstanceQuery().scopeType(ScopeTypes.JOB).scopeId(jobId).list();
+            for (VariableInstanceEntity jobVariable : jobVariables) {
+                if (jobVariable.getByteArrayRef() != null) {
+                    jobVariable.getByteArrayRef().delete();
+                }
+            }
+            if (!jobVariables.isEmpty()) {
+                variableServiceConfiguration.getVariableInstanceEntityManager()
+                        .deleteByScopeIdAndScopeType(jobId, ScopeTypes.JOB);
+            }
+        }
+    }
+
 }

@@ -48,7 +48,7 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getDeadLetterJobEntityManager(commandContext).delete(jobToDelete);
+        CommandContextUtil.getDeadLetterJobEntityManager(commandContext).deleteJobEntityAndRelatedData(jobToDelete);
         return null;
     }
 

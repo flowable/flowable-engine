@@ -74,6 +74,24 @@ public class SuspendedJobEntityManagerImpl
     }
 
     @Override
+    public void deleteJobEntityAndRelatedData(SuspendedJobEntity jobEntity) {
+        super.delete(jobEntity, false);
+
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
+        deleteVariables(jobEntity.getId());
+
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
+        }
+
+        // Send event
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+        }
+    }
+
+    @Override
     public void delete(SuspendedJobEntity jobEntity) {
         super.delete(jobEntity, false);
 
