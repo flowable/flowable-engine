@@ -55,7 +55,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(activityInstance.getStartTime()).isNotNull();
         assertThat(activityInstance.getEndTime()).isNotNull();
-        assertThat(activityInstance.getDurationInMillis()).isPositive();
+        assertThat(activityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
@@ -95,7 +95,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(activityInstance.getActivityId()).isEqualTo("receive");
         assertThat(activityInstance.getActivityType()).isEqualTo("receiveTask");
         assertThat(activityInstance.getEndTime()).isNotNull();
-        assertThat(activityInstance.getDurationInMillis()).isPositive();
+        assertThat(activityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
         assertThat(activityInstance.getProcessDefinitionId()).isNotNull();
         assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(activityInstance.getStartTime()).isNotNull();
