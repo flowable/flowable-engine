@@ -62,6 +62,10 @@
     height: calc(100% - 9rem);
 }
 
+.proc-def-list > .list-wrapper {
+    height: calc(100% - 9rem);
+}
+
 /* Process instance details */
 
 .process-instance-name {
