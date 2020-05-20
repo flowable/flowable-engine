@@ -47,7 +47,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.server.Server;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.db.SchemaManager;
@@ -529,7 +528,7 @@ public class BaseSpringRestTestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        Assertions.assertThat(dataNode)
+        assertThat(dataNode)
             .extracting(node -> node.get("id").textValue())
             .as("Expected result ids")
             .containsExactly(expectedResourceIds);
