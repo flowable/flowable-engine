@@ -399,7 +399,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         // arriving in the join), should contain end-time
         assertThat(activityInstance).hasSize(2);
         assertThat(activityInstance)
-                .extracting(ActivityInstance::getEndTime)
+                .flatExtracting(ActivityInstance::getEndTime)
                 .doesNotContainNull();
     }
 
@@ -426,13 +426,13 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         List<ActivityInstance> taskActivityInstances = runtimeService.createActivityInstanceQuery().activityType("userTask").list();
         assertThat(taskActivityInstances).hasSize(10);
         assertThat(taskActivityInstances)
-                .extracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
+                .flatExtracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
                 .doesNotContainNull();
 
         List<ActivityInstance> serviceTaskInstances = runtimeService.createActivityInstanceQuery().activityType("serviceTask").list();
         assertThat(serviceTaskInstances).hasSize(15);
         assertThat(taskActivityInstances)
-                .extracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
+                .flatExtracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
                 .doesNotContainNull();
     }
 

@@ -87,7 +87,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
             List<Event> processInstanceEvents = runtimeService.getProcessInstanceEvents(processInstanceId);
             assertThat(processInstanceEvents)
                     .extracting(Event::getAction)
-                    .contains(Event.ACTION_DELETE_GROUP_LINK);
+                    .containsExactlyInAnyOrder(Event.ACTION_DELETE_GROUP_LINK, Event.ACTION_ADD_GROUP_LINK);
             List<String> processInstanceEventMessageParts = processInstanceEvents.get(0).getMessageParts();
             assertThat(processInstanceEventMessageParts)
                     .containsOnly("muppets", IdentityLinkType.PARTICIPANT);

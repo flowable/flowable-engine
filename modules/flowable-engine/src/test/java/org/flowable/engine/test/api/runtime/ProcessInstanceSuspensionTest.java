@@ -353,18 +353,22 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Completing the task should fail
         assertThatThrownBy(() -> taskService.complete(task.getId()))
+                .as("It is not allowed to complete a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Claiming the task should fail
         assertThatThrownBy(() -> taskService.claim(task.getId(), "jos"))
+                .as("It is not allowed to claim a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Setting variable on the task should fail
         assertThatThrownBy(() -> taskService.setVariable(task.getId(), "someVar", "someValue"))
+                .as("It is not allowed to set a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Setting variable on the task should fail
         assertThatThrownBy(() -> taskService.setVariableLocal(task.getId(), "someVar", "someValue"))
+                .as("It is not allowed to set a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Setting variables on the task should fail
@@ -374,6 +378,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             variables.put("varTwo", "two");
             taskService.setVariables(task.getId(), variables);
         })
+                .as("It is not allowed to set variables on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Setting variables on the task should fail
@@ -387,54 +392,67 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Removing variable on the task should fail
         assertThatThrownBy(() -> taskService.removeVariable(task.getId(), "someVar"))
+                .as("It is not allowed to remove a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Removing variable on the task should fail
         assertThatThrownBy(() -> taskService.removeVariableLocal(task.getId(), "someVar"))
+                .as("It is not allowed to remove a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Removing variables on the task should fail
         assertThatThrownBy(() -> taskService.removeVariables(task.getId(), Arrays.asList("one", "two")))
+                .as("It is not allowed to remove a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Removing variables on the task should fail
         assertThatThrownBy(() -> taskService.removeVariablesLocal(task.getId(), Arrays.asList("one", "two")))
+                .as("It is not allowed to remove a variable on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding candidate groups on the task should fail
         assertThatThrownBy(() -> taskService.addCandidateGroup(task.getId(), "blahGroup"))
+                .as("It is not allowed to add a candidate group on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding candidate users on the task should fail
         assertThatThrownBy(() -> taskService.addCandidateUser(task.getId(), "blahUser"))
+                .as("It is not allowed to add a candidate user on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding candidate users on the task should fail
         assertThatThrownBy(() -> taskService.addGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE))
+                .as("It is not allowed to add a candidate user on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding an identity link on the task should fail
         assertThatThrownBy(() -> taskService.addUserIdentityLink(task.getId(), "blahUser", IdentityLinkType.OWNER))
+                .as("It is not allowed to add an identityLink on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding a comment on the task should fail
         assertThatThrownBy(() -> taskService.addComment(task.getId(), processInstance.getId(), "test comment"))
+                .as("It is not allowed to add a comment on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Adding an attachment on the task should fail
         assertThatThrownBy(() -> taskService.createAttachment("text", task.getId(), processInstance.getId(), "testName", "testDescription", "http://test.com"))
+                .as("It is not allowed to add an attachment on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Set an assignee on the task should fail
         assertThatThrownBy(() -> taskService.setAssignee(task.getId(), "mispiggy"))
+                .as("It is not allowed to set an assignee on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Set an owner on the task should fail
         assertThatThrownBy(() -> taskService.setOwner(task.getId(), "kermit"))
+                .as("It is not allowed to set an owner on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 
         // Set priority on the task should fail
         assertThatThrownBy(() -> taskService.setPriority(task.getId(), 99))
+                .as("It is not allowed to set a priority on a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
     }
 
@@ -498,6 +516,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Activation of the suspended job instance should throw exception because parent is suspended
         assertThatThrownBy(() -> managementService.moveSuspendedJobToExecutableJob(suspendedJob.getId()))
+                .as("FlowableIllegalArgumentException expected. Cannot activate job with suspended parent")
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessageContaining("Can not activate job " + suspendedJob.getId() + ". Parent is suspended.");
     }
