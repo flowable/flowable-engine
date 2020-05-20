@@ -17,12 +17,14 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.SuspendedJobsByExecutionIdMatcher;
 
 /**
@@ -31,6 +33,7 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.S
 public class MybatisSuspendedJobDataManager extends AbstractDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
 
     protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
+    protected SingleCachedEntityMatcher<SuspendedJobEntity> suspendedJobByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
     @Override
     public Class<? extends SuspendedJobEntity> getManagedEntityClass() {
@@ -40,6 +43,11 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
     @Override
     public SuspendedJobEntity create() {
         return new SuspendedJobEntityImpl();
+    }
+
+    @Override
+    public SuspendedJobEntity findJobByCorrelationId(String correlationId) {
+        return getEntity("selectSuspendedJobByCorrelationId", correlationId, suspendedJobByCorrelationIdMatcher, true);
     }
 
     @Override

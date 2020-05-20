@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.ExternalWorkerJob;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 
 /**
@@ -30,6 +31,11 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
      * {@link ExternalWorkerJobEntity} has been removed.
      */
     boolean insertExternalWorkerJobEntity(ExternalWorkerJobEntity externalWorkerJobEntity);
+
+    /**
+     * Find the external worker job by the given correlationId
+     */
+    ExternalWorkerJobEntity findJobByCorrelationId(String correlationId);
 
     /**
      * Returns all {@link ExternalWorkerJobEntity} for the given scope and subscope.
@@ -47,6 +53,5 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
      */
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
-    List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType);
-
+    List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs);
 }

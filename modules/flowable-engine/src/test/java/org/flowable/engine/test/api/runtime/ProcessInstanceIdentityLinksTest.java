@@ -45,16 +45,16 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
         IdentityLink identityLink = identityLinks.get(0);
 
-        assertNull(identityLink.getGroupId());
-        assertEquals("kermit", identityLink.getUserId());
-        assertEquals(IdentityLinkType.PARTICIPANT, identityLink.getType());
-        assertEquals(processInstanceId, identityLink.getProcessInstanceId());
+        assertThat(identityLink.getGroupId()).isNull();
+        assertThat(identityLink.getUserId()).isEqualTo("kermit");
+        assertThat(identityLink.getType()).isEqualTo(IdentityLinkType.PARTICIPANT);
+        assertThat(identityLink.getProcessInstanceId()).isEqualTo(processInstanceId);
 
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks).hasSize(1);
 
         runtimeService.deleteParticipantUser(processInstanceId, "kermit");
 
-        assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)).isEmpty();
     }
 
     @Test
@@ -67,49 +67,33 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         runtimeService.addParticipantGroup(processInstanceId, "muppets");
 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertEquals("muppets", identityLink.getGroupId());
-        assertNull("kermit", identityLink.getUserId());
-        assertEquals(IdentityLinkType.PARTICIPANT, identityLink.getType());
-        assertEquals(processInstanceId, identityLink.getProcessInstanceId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getProcessInstanceId)
+                .containsExactly(tuple("muppets", null, IdentityLinkType.PARTICIPANT, processInstanceId));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> processInstanceEvents = runtimeService.getProcessInstanceEvents(processInstanceId);
-            assertEquals(1, processInstanceEvents.size());
-            Event processInstanceEvent = processInstanceEvents.get(0);
-            assertEquals(Event.ACTION_ADD_GROUP_LINK, processInstanceEvent.getAction());
-            List<String> processInstanceEventMessageParts = processInstanceEvent.getMessageParts();
-            assertEquals("muppets", processInstanceEventMessageParts.get(0));
-            assertEquals(IdentityLinkType.PARTICIPANT, processInstanceEventMessageParts.get(1));
-            assertEquals(2, processInstanceEventMessageParts.size());
+            assertThat(processInstanceEvents)
+                    .extracting(Event::getAction)
+                    .containsExactly(Event.ACTION_ADD_GROUP_LINK);
+            List<String> processInstanceEventMessageParts = processInstanceEvents.get(0).getMessageParts();
+            assertThat(processInstanceEventMessageParts)
+                    .containsOnly("muppets", IdentityLinkType.PARTICIPANT);
         }
 
         runtimeService.deleteParticipantGroup(processInstanceId, "muppets");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> processInstanceEvents = runtimeService.getProcessInstanceEvents(processInstanceId);
-            Event processIsntanceEvent = findProcessInstanceEvent(processInstanceEvents, Event.ACTION_DELETE_GROUP_LINK);
-            assertEquals(Event.ACTION_DELETE_GROUP_LINK, processIsntanceEvent.getAction());
-            List<String> processInstanceEventMessageParts = processIsntanceEvent.getMessageParts();
-            assertEquals("muppets", processInstanceEventMessageParts.get(0));
-            assertEquals(IdentityLinkType.PARTICIPANT, processInstanceEventMessageParts.get(1));
-            assertEquals(2, processInstanceEventMessageParts.size());
-            assertEquals(2, processInstanceEvents.size());
+            assertThat(processInstanceEvents)
+                    .extracting(Event::getAction)
+                    .containsExactlyInAnyOrder(Event.ACTION_DELETE_GROUP_LINK, Event.ACTION_ADD_GROUP_LINK);
+            List<String> processInstanceEventMessageParts = processInstanceEvents.get(0).getMessageParts();
+            assertThat(processInstanceEventMessageParts)
+                    .containsOnly("muppets", IdentityLinkType.PARTICIPANT);
         }
 
-        assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
-    }
-
-    private Event findProcessInstanceEvent(List<Event> processInstanceEvents, String action) {
-        for (Event event : processInstanceEvents) {
-            if (action.equals(event.getAction())) {
-                return event;
-            }
-        }
-        throw new AssertionError("no process instance event found with action " + action);
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)).isEmpty();
     }
 
     @Test
@@ -122,18 +106,13 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         runtimeService.addUserIdentityLink(processInstanceId, "kermit", "interestee");
 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertNull(identityLink.getGroupId());
-        assertEquals("kermit", identityLink.getUserId());
-        assertEquals("interestee", identityLink.getType());
-        assertEquals(processInstanceId, identityLink.getProcessInstanceId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getProcessInstanceId)
+                .containsExactly(tuple(null, "kermit", "interestee", processInstanceId));
 
         runtimeService.deleteUserIdentityLink(processInstanceId, "kermit", "interestee");
 
-        assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)).isEmpty();
     }
 
     @Test
@@ -169,18 +148,13 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         runtimeService.addGroupIdentityLink(processInstanceId, "muppets", "playing");
 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertEquals("muppets", identityLink.getGroupId());
-        assertNull("kermit", identityLink.getUserId());
-        assertEquals("playing", identityLink.getType());
-        assertEquals(processInstanceId, identityLink.getProcessInstanceId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getProcessInstanceId)
+                .containsExactly(tuple("muppets", null, "playing", processInstanceId));
 
         runtimeService.deleteGroupIdentityLink(processInstanceId, "muppets", "playing");
 
-        assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)).isEmpty();
     }
 
     @Test
@@ -198,7 +172,6 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         });
 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-
         assertThat(identityLinks)
             .extracting(IdentityLinkInfo::getGroupId, IdentityLinkInfo::getType, IdentityLinkInfo::getProcessInstanceId)
             .containsExactly(

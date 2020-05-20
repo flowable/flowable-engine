@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -27,6 +28,7 @@ import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByExecutionIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByScopeIdAndSubScopeIdMatcher;
 
@@ -43,6 +45,8 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
 
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByScopeIdAndSubScopeIdMatcher = new TimerJobsByScopeIdAndSubScopeIdMatcher();
 
+    protected SingleCachedEntityMatcher<TimerJobEntity> timerJobByCorrelationId = new JobByCorrelationIdMatcher<>();
+
     public MybatisTimerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
@@ -55,6 +59,11 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
     @Override
     public TimerJobEntity create() {
         return new TimerJobEntityImpl();
+    }
+
+    @Override
+    public TimerJobEntity findJobByCorrelationId(String correlationId) {
+        return getEntity("selectTimerJobByCorrelationId", correlationId, timerJobByCorrelationId, true);
     }
 
     @Override

@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.entry;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
+import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterContext;
@@ -36,9 +39,12 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.flowable.job.api.Job;
 import org.flowable.job.api.ExternalWorkerJob;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -189,6 +195,69 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .containsOnly(
                         entry("var", "Initial")
                 );
+        waitForJobExecutorToProcessAllJobs();
+
+        assertThat(cmmnTaskService.createTaskQuery().list())
+                .extracting(TaskInfo::getTaskDefinitionKey)
+                .containsExactlyInAnyOrder("afterExternalWorkerCompleteTask");
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Complete")
+                );
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testExternalWorkerJobDeadLetterWithVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("var", "Initial")
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Initial")
+                );
+
+        ExternalWorkerJob externalWorkerJob = cmmnManagementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(acquiredJob.getId(), "testWorker")
+                .variable("var", "Complete")
+                .complete();
+
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().singleResult()).isNull();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var", "Initial")
+                );
+
+        Job job = cmmnManagementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        cmmnManagementService.moveJobToDeadLetterJob(job.getId());
+
+        assertThat(cmmnManagementService.createJobQuery().singleResult()).isNull();
+
+        job = cmmnManagementService.createDeadLetterJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(ExternalWorkerTaskCompleteJobHandler.TYPE);
+
+        cmmnManagementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
+
         waitForJobExecutorToProcessAllJobs();
 
         assertThat(cmmnTaskService.createTaskQuery().list())
@@ -975,6 +1044,166 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         } finally {
             cmmnEngineConfiguration.setCreateCmmnExternalWorkerJobInterceptor(null);
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testAcquireForUserOrGroups() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        List<ExternalWorkerJob> jobs = cmmnManagementService.createExternalWorkerJobQuery().list();
+        assertThat(jobs).hasSize(3);
+
+        ExternalWorkerJob onlyUserJob = jobs.get(0);
+        ExternalWorkerJob onlyGroupJob = jobs.get(1);
+        ExternalWorkerJob userAndGroupJob = jobs.get(2);
+
+        addUserIdentityLinkToJob(onlyUserJob, "gonzo");
+        addGroupIdentityLinkToJob(onlyGroupJob, "bears");
+        addGroupIdentityLinkToJob(userAndGroupJob, "frogs");
+        addUserIdentityLinkToJob(userAndGroupJob, "fozzie");
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .forUserOrGroups("kermit", Collections.singleton("muppets"))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .forUserOrGroups("gonzo", Collections.singleton("muppets"))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyUserJob.getId());
+
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(onlyUserJob.getId(), "testWorker").fail();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .forUserOrGroups("fozzie", Collections.singleton("bears"))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyGroupJob.getId(), userAndGroupJob.getId());
+
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(onlyGroupJob.getId(), "testWorker").fail();
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(userAndGroupJob.getId(), "testWorker").fail();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .forUserOrGroups(null, Collections.singleton("bears"))
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyGroupJob.getId());
+
+        cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(onlyGroupJob.getId(), "testWorker").terminate();
+
+        assertThat(getJobIdentityLinks(onlyGroupJob)).isEmpty();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .forUserOrGroups("fozzie", Collections.emptyList())
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(userAndGroupJob.getId());
+
+        cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(userAndGroupJob.getId(), "testWorker").complete();
+        assertThat(getJobIdentityLinks(userAndGroupJob)).isEmpty();
+
+        assertThat(getJobIdentityLinks(onlyUserJob))
+                .extracting(IdentityLink::getUserId)
+                .containsOnly("gonzo");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testAcquireByTenantId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("flowable")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("acme")
+                .start();
+
+        List<ExternalWorkerJob> jobs = cmmnManagementService.createExternalWorkerJobQuery().list();
+        assertThat(jobs).hasSize(2);
+
+        ExternalWorkerJob flowableJob = cmmnManagementService.createExternalWorkerJobQuery().jobTenantId("flowable").singleResult();
+        ExternalWorkerJob acmeJob = cmmnManagementService.createExternalWorkerJobQuery().jobTenantId("acme").singleResult();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .tenantId("megacorp")
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .tenantId("flowable")
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(flowableJob.getId());
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(flowableJob.getId(), "testWorker").fail();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .tenantId("acme")
+                .acquireAndLock(4, "testWorker");
+
+        assertThat(acquiredJobs)
+                .extracting(AcquiredExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(acmeJob.getId());
+
+        cmmnManagementService.createExternalWorkerJobFailureBuilder(acmeJob.getId(), "testWorker").fail();
+    }
+
+    protected void addUserIdentityLinkToJob(Job job, String userId) {
+        cmmnEngineConfiguration.getCommandExecutor()
+                .execute(commandContext -> {
+                    CommandContextUtil.getIdentityLinkService(commandContext)
+                            .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, userId, null, IdentityLinkType.PARTICIPANT);
+
+                    return null;
+                });
+    }
+
+    protected void addGroupIdentityLinkToJob(Job job, String groupId) {
+        cmmnEngineConfiguration.getCommandExecutor()
+                .execute(commandContext -> {
+                    CommandContextUtil.getIdentityLinkService(commandContext)
+                            .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, null, groupId, IdentityLinkType.PARTICIPANT);
+                    return null;
+                });
+    }
+
+    protected Collection<IdentityLinkEntity> getJobIdentityLinks(Job job) {
+        return cmmnEngineConfiguration.getCommandExecutor()
+                .execute(commandContext -> CommandContextUtil.getIdentityLinkService(commandContext)
+                        .findIdentityLinksByScopeIdAndType(job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER));
     }
 
     protected Map<String, Object> getExternalWorkerVariablesForPlanItemInstance(String planItemInstanceId) {

@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
@@ -39,7 +40,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigurationFlowableTestCase {
 
-    protected CustomWaitCommandInterceptor waitCommandInterceptor;
+    protected CustomWaitCommandInvoker waitCommandInvoker;
 
     public MultipleExternalWorkerAcquireServiceTaskTest() {
         super("multipleExternalWorkerAcquireTest");
@@ -47,8 +48,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        waitCommandInterceptor = new CustomWaitCommandInterceptor();
-        processEngineConfiguration.setCustomPostCommandInterceptors(Collections.singletonList(waitCommandInterceptor));
+        waitCommandInvoker = new CustomWaitCommandInvoker();
+        processEngineConfiguration.setCommandInvoker(waitCommandInvoker);
     }
 
     @Test
@@ -67,8 +68,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .extracting(ExternalWorkerJob::getLockOwner)
                 .containsOnlyNulls();
 
-        waitCommandInterceptor.waitLatch = new CountDownLatch(1);
-        waitCommandInterceptor.workLatch = new CountDownLatch(2);
+        waitCommandInvoker.waitLatch = new CountDownLatch(1);
+        waitCommandInvoker.workLatch = new CountDownLatch(1);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -82,7 +83,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2"), executorService);
 
-        waitCommandInterceptor.waitLatch.countDown();
+        waitCommandInvoker.workLatch.countDown();
+        waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
         List<AcquiredExternalWorkerJob> worker2Jobs = testWorker2.get();
@@ -113,8 +115,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .extracting(ExternalWorkerJob::getLockOwner)
                 .containsOnlyNulls();
 
-        waitCommandInterceptor.waitLatch = new CountDownLatch(1);
-        waitCommandInterceptor.workLatch = new CountDownLatch(2);
+        waitCommandInvoker.waitLatch = new CountDownLatch(1);
+        waitCommandInvoker.workLatch = new CountDownLatch(1);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -128,7 +130,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2", 1), executorService);
 
-        waitCommandInterceptor.waitLatch.countDown();
+        waitCommandInvoker.workLatch.countDown();
+        waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
         List<AcquiredExternalWorkerJob> worker2Jobs = testWorker2.get();
@@ -139,7 +142,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                     .extracting(ExternalWorkerJob::getLockOwner)
                     .containsOnly("testWorker2", null);
         } else {
-            assertThat(worker1Jobs).isNotEmpty();
+            assertThat(worker2Jobs).isEmpty();
             assertThat(managementService.createExternalWorkerJobQuery().list())
                     .extracting(ExternalWorkerJob::getLockOwner)
                     .containsOnly("testWorker1", null);
@@ -149,18 +152,23 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
 
     }
 
-    private static class CustomWaitCommandInterceptor extends AbstractCommandInterceptor {
+    private static class CustomWaitCommandInvoker extends CommandInvoker {
 
         protected CountDownLatch workLatch;
         protected CountDownLatch waitLatch;
 
         @Override
         public <T> T execute(CommandConfig config, Command<T> command) {
-            T result = next.execute(config, command);
 
             if (workLatch != null) {
-                workLatch.countDown();
+                try {
+                    workLatch.await(5, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
+
+            T result = super.execute(config, command);
 
             if (waitLatch != null) {
                 try {

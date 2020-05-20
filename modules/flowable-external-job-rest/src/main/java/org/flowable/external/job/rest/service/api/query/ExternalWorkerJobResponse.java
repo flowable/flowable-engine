@@ -32,6 +32,9 @@ public class ExternalWorkerJobResponse {
     @ApiModelProperty(value = "The url of the external job", example = "http://localhost:8182/external-job-api/jobs/8", required = true)
     protected String url;
 
+    @ApiModelProperty(value = "The correlation id of the external job", example = "50")
+    protected String correlationId;
+
     @ApiModelProperty(value = "The process instance id for the external job", example = "5")
     protected String processInstanceId;
 
@@ -97,6 +100,14 @@ public class ExternalWorkerJobResponse {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 
     public String getProcessInstanceId() {

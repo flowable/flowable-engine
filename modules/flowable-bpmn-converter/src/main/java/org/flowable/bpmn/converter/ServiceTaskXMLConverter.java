@@ -385,8 +385,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
-    protected void convertExternalWorkerTaskXMLProperties(ExternalWorkerServiceTask externalWorkerServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) {
+    protected void convertExternalWorkerTaskXMLProperties(ExternalWorkerServiceTask externalWorkerServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
         externalWorkerServiceTask.setTopic(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, xtr));
+
+        parseChildElements(getXMLElementName(), externalWorkerServiceTask, bpmnModel, xtr);
     }
     
     protected boolean writeCustomProperties(ServiceTask serviceTask, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {

@@ -1459,6 +1459,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -1487,6 +1488,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
@@ -1505,6 +1507,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
             this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -1521,6 +1524,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventSubscriptionServiceConfiguration() {
         this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
         this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         
@@ -1537,6 +1541,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
@@ -1596,6 +1601,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
+            this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
             this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
@@ -1704,6 +1710,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (batchServiceConfiguration == null) {
             this.batchServiceConfiguration = instantiateBatchServiceConfiguration();
             this.batchServiceConfiguration.setClock(this.clock);
+            this.batchServiceConfiguration.setIdGenerator(this.idGenerator);
             this.batchServiceConfiguration.setObjectMapper(this.objectMapper);
             this.batchServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 

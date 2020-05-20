@@ -61,6 +61,14 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
 
     protected abstract void runJobLogic(ExternalWorkerJobEntity externalWorkerJob, CommandContext commandContext);
 
+    protected void moveExternalWorkerJobToExecutableJob(JobServiceConfiguration jobServiceConfiguration, ExternalWorkerJobEntity externalWorkerJob,
+            CommandContext commandContext) {
+        jobServiceConfiguration.getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
+
+        CommandContextUtil.getIdentityLinkService(commandContext)
+                .deleteIdentityLinksByScopeIdAndType(externalWorkerJob.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);
+    }
+
     protected ExternalWorkerJobEntity resolveJob(CommandContext commandContext) {
         if (StringUtils.isEmpty(externalJobId)) {
             throw new FlowableIllegalArgumentException("externalJobId must not be empty");

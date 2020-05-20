@@ -13,11 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,9 +33,11 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a single Process instance resource.
- * 
+ *
  * @author Frederik Heremans
  */
 public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
@@ -51,13 +50,13 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessInstance() throws Exception {
         Authentication.setAuthenticatedUserId("testUser");
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("processOne")
-            .businessKey("myBusinessKey")
-            .callbackId("testCallbackId")
-            .callbackType("testCallbackType")
-            .referenceId("testReferenceId")
-            .referenceType("testReferenceType")
-            .start();
+                .processDefinitionKey("processOne")
+                .businessKey("myBusinessKey")
+                .callbackId("testCallbackId")
+                .callbackType("testCallbackType")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start();
         Authentication.setAuthenticatedUserId(null);
 
         String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
@@ -66,32 +65,36 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         // Check resulting instance
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(processInstance.getId(), responseNode.get("id").textValue());
-        assertTrue("has startTime", responseNode.has("startTime"));
-        assertNotNull("startTime", responseNode.get("startTime").textValue());
-        assertEquals(processInstance.getStartUserId(), responseNode.get("startUserId").textValue());
-        assertEquals(processInstance.getProcessDefinitionName(), responseNode.get("processDefinitionName").textValue());
-        assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
-        assertEquals("testCallbackId", responseNode.get("callbackId").textValue());
-        assertEquals("testCallbackType", responseNode.get("callbackType").textValue());
-        assertEquals("testReferenceId", responseNode.get("referenceId").textValue());
-        assertEquals("testReferenceType", responseNode.get("referenceType").textValue());
-        assertFalse(responseNode.get("suspended").booleanValue());
-        assertEquals("", responseNode.get("tenantId").textValue());
-
-        assertEquals(responseNode.get("url").asText(), url);
-        assertEquals(responseNode.get("processDefinitionUrl").asText(), buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + processInstance.getId() + "',"
+                        + "startTime: '${json-unit.any-string}',"
+                        + "startUserId: '" + processInstance.getStartUserId() + "',"
+                        + "processDefinitionName: '" + processInstance.getProcessDefinitionName() + "',"
+                        + "businessKey: 'myBusinessKey',"
+                        + "callbackId: 'testCallbackId',"
+                        + "callbackType: 'testCallbackType',"
+                        + "referenceId: 'testReferenceId',"
+                        + "referenceType: 'testReferenceType',"
+                        + "suspended: false,"
+                        + "tenantId: '',"
+                        + "url: '" + url + "',"
+                        + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()) + "'"
+                        + "}"
+                );
 
         // Check result after tenant has been changed
         managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId())), HttpStatus.SC_OK);
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId())),
+                HttpStatus.SC_OK);
 
         // Check resulting instance tenant id
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("myTenant", responseNode.get("tenantId").textValue());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("tenantId").textValue()).isEqualTo("myTenant");
     }
 
     /**
@@ -112,7 +115,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId())), HttpStatus.SC_NO_CONTENT));
 
         // Check if process-instance is gone
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     /**
@@ -139,14 +142,18 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
         // Check engine id instance is suspended
-        assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         // Check resulting instance is suspended
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(processInstance.getId(), responseNode.get("id").textValue());
-        assertTrue(responseNode.get("suspended").booleanValue());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + processInstance.getId() + "',"
+                        + "suspended: true"
+                        + "}");
 
         // Suspending again should result in conflict
         httpPut.setEntity(new StringEntity(requestNode.toString()));
@@ -170,14 +177,18 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
         // Check engine id instance is suspended
-        assertEquals(1, runtimeService.createProcessInstanceQuery().active().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().active().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         // Check resulting instance is suspended
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(processInstance.getId(), responseNode.get("id").textValue());
-        assertFalse(responseNode.get("suspended").booleanValue());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + processInstance.getId() + "',"
+                        + "suspended: false"
+                        + "}");
 
         // Activating again should result in conflict
         httpPut.setEntity(new StringEntity(requestNode.toString()));
@@ -194,22 +205,22 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity("{\"name\": \"name one\"}"));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
 
-        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("name one");
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey()).isNull();
 
         httpPut = new HttpPut(url);
         httpPut.setEntity(new StringEntity("{\"businessKey\": \"key one\"}"));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
 
-        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
-        assertEquals("key one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("name one");
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey()).isEqualTo("key one");
 
         httpPut = new HttpPut(url);
         httpPut.setEntity(new StringEntity("{\"businessKey\": \"key two\"}"));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
 
-        assertEquals("name one", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName());
-        assertEquals("key two", runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("name one");
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey()).isEqualTo("key two");
 
     }
 }
