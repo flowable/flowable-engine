@@ -14,6 +14,7 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +56,8 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected String authorizedUser;
+    protected Collection<String> authorizedGroups;
 
     protected String lockOwner;
     protected boolean onlyLocked;
@@ -285,6 +288,18 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
+    public ExternalWorkerJobQuery forUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("at least one of userId or groups must be provided");
+        }
+
+        this.authorizedUser = userId;
+        this.authorizedGroups = groups;
+
+        return this;
+    }
+
+    @Override
     public ExternalWorkerJobQuery lockOwner(String lockOwner) {
         this.lockOwner = lockOwner;
         return this;
@@ -382,6 +397,14 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getAuthorizedUser() {
+        return authorizedUser;
+    }
+
+    public Collection<String> getAuthorizedGroups() {
+        return authorizedGroups;
     }
 
     public String getId() {

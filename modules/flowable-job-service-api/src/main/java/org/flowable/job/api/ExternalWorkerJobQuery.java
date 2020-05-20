@@ -13,6 +13,7 @@
 
 package org.flowable.job.api;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.common.engine.api.query.Query;
@@ -143,6 +144,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
      * Only select jobs that do not have a tenant id.
      */
     ExternalWorkerJobQuery jobWithoutTenantId();
+
+    /**
+     * Only select jobs for the given user or groups.
+     */
+    ExternalWorkerJobQuery forUserOrGroups(String userId, Collection<String> groups);
 
     /**
      * Only return jobs with the given lock owner.

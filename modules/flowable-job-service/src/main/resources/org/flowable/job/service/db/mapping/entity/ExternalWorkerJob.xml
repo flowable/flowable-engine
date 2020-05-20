@@ -241,6 +241,19 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
+                <if test="authorizedUser != null">
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser})
+                </if>
+                <if test="authorizedGroups != null &amp;&amp; !authorizedGroups.isEmpty()">
+                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="authorizedGroups"
+                             open="(" separator="," close=")">
+                        #{group}
+                    </foreach>
+                    )
+                </if>
+            </trim>
         </where>
     </sql>
 
