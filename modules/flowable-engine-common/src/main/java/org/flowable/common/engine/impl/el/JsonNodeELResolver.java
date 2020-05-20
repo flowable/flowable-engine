@@ -192,12 +192,11 @@ public class JsonNodeELResolver extends ELResolver {
                 } else {
                     result = resultNode.toString();
                 }
-                context.setPropertyResolved(true);
 
-            } else if (resultNode != null) {
+            } else {
                 result = resultNode;
-                context.setPropertyResolved(true);
             }
+            context.setPropertyResolved(true);
         }
         return result;
     }

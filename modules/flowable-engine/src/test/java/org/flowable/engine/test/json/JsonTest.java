@@ -38,7 +38,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.JsonType;
@@ -802,10 +801,12 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
             .isEqualTo("{}");
 
-        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+        Object value = managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+        });
+        
+        assertThat(value).isNull();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
             .isEqualTo("{}");
@@ -860,10 +861,12 @@ public class JsonTest extends PluggableFlowableTestCase {
                 + "  }"
                 + "]");
 
-        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+        Object value = managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+        });
+        
+        assertThat(value).isNull();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
             .isEqualTo("["
