@@ -588,8 +588,11 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(valuesBytes).isNotNull();
             JsonNode instanceNode = objectMapper.readTree(valuesBytes);
             JsonNode valuesNode = instanceNode.get("values");
-            assertThat(valuesNode.get("user").asText()).isEqualTo("First value");
-            assertThat(valuesNode.get("number").asInt()).isEqualTo(789);
+            assertThatJson(valuesNode)
+                    .isEqualTo("{"
+                            + "  user: 'First value',"
+                            + "  number: '789'"
+                            + "}");
 
             if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
                 HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
@@ -626,7 +629,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.addCandidateUser(task.getId(), "newAssignee");
 
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
             // Add candidate group
             String taskId = task.getId();
 
@@ -641,7 +644,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isNull();
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
 
             // Claim the task and check result
             requestNode.put("assignee", "newAssignee");
@@ -710,7 +713,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
 
         // Unclaim
         requestNode = objectMapper.createObjectNode();
@@ -729,7 +732,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
     }
 
     /**

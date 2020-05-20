@@ -70,10 +70,14 @@ public class JpaRestTest extends BaseJPARestTestCase {
 
         // check for message variable of type serializable
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("name").asText()).isEqualTo("message");
-        assertThat(responseNode.get("scope").asText()).isEqualTo("global");
-        assertThat(responseNode.get("type").asText()).isEqualTo("serializable");
-        assertThat(responseNode.get("valueUrl")).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'message',"
+                        + "  scope: 'global',"
+                        + "  type: 'serializable',"
+                        + "  valueUrl: '${json-unit.any-string}'"
+                        + "}");
     }
 
     @Test
@@ -147,7 +151,6 @@ public class JpaRestTest extends BaseJPARestTestCase {
 
         // check for message variable of type serializable
         assertThat(responseNode).isNotNull();
-
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{data: ["
