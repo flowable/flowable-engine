@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,10 +34,11 @@ public class ProcessInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessDiagram() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleProcess");
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
                 HttpStatus.SC_OK);
-        assertNotNull(response.getEntity().getContent());
-        assertEquals("image/png", response.getEntity().getContentType().getValue());
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
         closeResponse(response);
     }
 
