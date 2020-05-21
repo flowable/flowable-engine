@@ -53,6 +53,8 @@ public interface AbstractRuntimeJobEntity extends Job, AbstractJobEntity {
 
     void setScopeDefinitionId(String scopeDefinitionId);
 
+    void setCorrelationId(String correlationId);
+
     void setDuedate(Date duedate);
 
     void setExclusive(boolean isExclusive);

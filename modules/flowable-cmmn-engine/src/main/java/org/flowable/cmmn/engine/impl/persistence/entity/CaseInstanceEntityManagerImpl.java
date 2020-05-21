@@ -184,6 +184,7 @@ public class CaseInstanceEntityManagerImpl
         List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(new ExternalWorkerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (ExternalWorkerJob externalWorkerJob : externalWorkerJobs) {
             externalWorkerJobEntityManager.delete(externalWorkerJob.getId());
+            getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(externalWorkerJob.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);
         }
 
         // Actual case instance

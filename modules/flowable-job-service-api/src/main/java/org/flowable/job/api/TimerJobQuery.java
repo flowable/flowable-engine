@@ -70,6 +70,9 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     /** Only select jobs for the given plan item instance.  */
     TimerJobQuery planItemInstanceId(String planItemInstanceId);
 
+    /** Only select jobs with the given correlationId.  */
+    TimerJobQuery correlationId(String correlationId);
+
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past
      **/

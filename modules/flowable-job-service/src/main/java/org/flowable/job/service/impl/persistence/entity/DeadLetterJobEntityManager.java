@@ -25,6 +25,11 @@ import org.flowable.job.service.impl.JobQueryImpl;
 public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobEntity> {
 
     /**
+     * Find the deadletter job with the given correlation id.
+     */
+    DeadLetterJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
      * Returns all {@link DeadLetterJobEntity} instances related to an {@link ExecutionEntity}.
      */
     List<DeadLetterJobEntity> findJobsByExecutionId(String id);

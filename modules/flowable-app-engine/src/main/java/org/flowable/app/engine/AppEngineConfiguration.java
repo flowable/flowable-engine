@@ -434,6 +434,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         this.variableServiceConfiguration = new VariableServiceConfiguration(ScopeTypes.APP);
 
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -450,6 +451,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration(ScopeTypes.APP);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 

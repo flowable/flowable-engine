@@ -689,6 +689,12 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setRevision(copyFromJob.getRevision());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
+        if (copyFromJob.getCorrelationId() != null) {
+            copyToJob.setCorrelationId(copyFromJob.getCorrelationId());
+        } else {
+            copyToJob.setCorrelationId(jobServiceConfiguration.getIdGenerator().getNextId());
+        }
+
         return copyToJob;
     }
 

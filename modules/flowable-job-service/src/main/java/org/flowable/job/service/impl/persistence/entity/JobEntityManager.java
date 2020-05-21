@@ -32,6 +32,11 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
     boolean insertJobEntity(JobEntity jobEntity);
 
     /**
+     * Find the job with the given correlation id
+     */
+    JobEntity findJobByCorrelationId(String correlationId);
+
+    /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link JobEntity} instances.
      */
     List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery);

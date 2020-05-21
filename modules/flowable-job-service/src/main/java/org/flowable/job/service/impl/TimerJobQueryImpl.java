@@ -46,6 +46,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
@@ -196,6 +197,15 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         }
         subScopeId(planItemInstanceId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public TimerJobQueryImpl correlationId(String correlationId) {
+        if (correlationId == null) {
+            throw new FlowableIllegalArgumentException("Provided correlationId is null");
+        }
+        this.correlationId = correlationId;
         return this;
     }
 
@@ -422,6 +432,10 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
     }
 
     public boolean isOnlyTimers() {

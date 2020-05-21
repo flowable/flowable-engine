@@ -135,4 +135,23 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(managementService.createTimerJobQuery().timers().duedateLowerThan(testStartTime).list()).isEmpty();
     }
 
+    @Test
+    public void testByCorrelationId() {
+        Job timerA = managementService.createTimerJobQuery().elementId("timerA").singleResult();
+
+        Job job = managementService.createTimerJobQuery().correlationId(timerA.getCorrelationId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getId()).isEqualTo(timerA.getId());
+        assertThat(job.getCorrelationId()).isEqualTo(timerA.getCorrelationId());
+        assertThat(managementService.createTimerJobQuery().correlationId(timerA.getCorrelationId()).list()).hasSize(1);
+        assertThat(managementService.createTimerJobQuery().correlationId(timerA.getCorrelationId()).count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testByInvalidCorrelationId() {
+        assertThat(managementService.createTimerJobQuery().correlationId("invalid").singleResult()).isNull();
+        assertThat(managementService.createTimerJobQuery().correlationId("invalid").list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().correlationId("invalid").count()).isEqualTo(0);
+    }
+
 }

@@ -27,12 +27,18 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -149,7 +155,9 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob).as("No job found for process instance").isNotNull();
         assertThat(asyncJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(asyncJob.getCorrelationId()).isNotNull();
 
+        String correlationId = asyncJob.getCorrelationId();
         final String asyncId = asyncJob.getId();
         assertThatThrownBy(() -> managementService.executeJob(asyncId))
                 .isExactlyInstanceOf(FlowableException.class)
@@ -162,6 +170,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertThat(asyncJob.getRetries()).isEqualTo(2);
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         final String jobId = asyncJob.getId();
         assertThatThrownBy(() -> {
@@ -176,6 +185,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 .singleResult();
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         final String jobId2 = asyncJob.getId();
         assertThatThrownBy(() -> {
@@ -191,6 +201,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
 
@@ -200,6 +211,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         assertThat(asyncJob.getRetries()).isEqualTo(5);
     }
@@ -344,5 +356,82 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         } finally {
             processEngineConfiguration.setLockPollRate(initialLockPollRate);
         }
+    }
+
+    @Test
+    void testFindJobByCorrelationId() {
+        Job asyncJob = managementService.executeCommand(context -> {
+            JobEntity job = CommandContextUtil.getJobService(context).createJob();
+            job.setJobType("testAsync");
+            CommandContextUtil.getJobService(context).insertJob(job);
+            return job;
+        });
+
+        Job timerJob = managementService.executeCommand(context -> {
+            TimerJobEntity job = CommandContextUtil.getTimerJobService(context).createTimerJob();
+            job.setJobType("testTimer");
+            CommandContextUtil.getTimerJobService(context).insertTimerJob(job);
+            return job;
+        });
+
+        Job deadLetterJob = managementService.executeCommand(context -> {
+            DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+            job.setJobType("testDeadLetter");
+            CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+            return job;
+        });
+
+        Job suspendedJob = managementService.executeCommand(context -> {
+            SuspendedJobEntity job = CommandContextUtil.getJobServiceConfiguration(context)
+                    .getSuspendedJobEntityManager()
+                    .create();
+            job.setJobType("testSuspended");
+            CommandContextUtil.getJobServiceConfiguration(context)
+                    .getSuspendedJobEntityManager()
+                    .insert(job);
+            return job;
+        });
+
+
+        Job externalWorkerJob = managementService.executeCommand(context -> {
+            ExternalWorkerJobEntity job = CommandContextUtil.getJobService(context).createExternalWorkerJob();
+            job.setJobType("testExternal");
+            CommandContextUtil.getJobService(context).insertExternalWorkerJob(job);
+            return job;
+        });
+
+        Job job = managementService.findJobByCorrelationId(asyncJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testAsync");
+        assertThat(job).isInstanceOf(JobEntity.class);
+
+        job = managementService.findJobByCorrelationId(timerJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testTimer");
+        assertThat(job).isInstanceOf(TimerJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(deadLetterJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testDeadLetter");
+        assertThat(job).isInstanceOf(DeadLetterJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(suspendedJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testSuspended");
+        assertThat(job).isInstanceOf(SuspendedJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(externalWorkerJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testExternal");
+        assertThat(job).isInstanceOf(ExternalWorkerJobEntity.class);
+
+        job = managementService.findJobByCorrelationId("unknown");
+        assertThat(job).isNull();
+
+        managementService.deleteJob(asyncJob.getId());
+        managementService.deleteTimerJob(timerJob.getId());
+        managementService.deleteDeadLetterJob(deadLetterJob.getId());
+        managementService.deleteSuspendedJob(suspendedJob.getId());
+        managementService.deleteExternalWorkerJob(externalWorkerJob.getId());
     }
 }

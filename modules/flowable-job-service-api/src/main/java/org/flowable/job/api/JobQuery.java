@@ -73,6 +73,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
     /** Only select jobs for the given plan item instance.  */
     JobQuery planItemInstanceId(String planItemInstanceId);
     
+    /** Only select jobs with the given correlationId. */
+    JobQuery correlationId(String correlationId);
+
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}
      */

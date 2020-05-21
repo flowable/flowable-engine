@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 
@@ -50,8 +51,16 @@ public class ExternalWorkerJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
+    }
+
+    @Override
+    public ExternalWorkerJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
@@ -70,8 +79,8 @@ public class ExternalWorkerJobEntityManagerImpl
     }
 
     @Override
-    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(String topic, int maxResults, String scopeType) {
-        return dataManager.findExternalJobsToExecute(topic, maxResults, scopeType);
+    public List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs) {
+        return dataManager.findExternalJobsToExecute(builder, numberOfJobs);
     }
 
     @Override

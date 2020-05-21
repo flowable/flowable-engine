@@ -25,6 +25,11 @@ import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEntity> {
 
     /**
+     * Find the suspended job with the given correlation id.
+     */
+    SuspendedJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
      * Returns all {@link SuspendedJobEntity} instances related to on {@link ExecutionEntity}.
      */
     List<SuspendedJobEntity> findJobsByExecutionId(String id);

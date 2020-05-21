@@ -338,4 +338,10 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
+
+    @Override
+    public String getCorrelationId() {
+        // v5 Jobs have no correlationId
+        return null;
+    }
 }

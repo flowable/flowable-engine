@@ -22,3 +22,8 @@ jobs:
           -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcfghistoryasync
           -pl org.flowable:flowable-engine
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: surefire-reports
+          path: '**/target/surefire-reports/*'

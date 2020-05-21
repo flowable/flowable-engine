@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.cmd;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -27,6 +26,7 @@ import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.AcquiredExternalWorkerJobImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
@@ -39,21 +39,18 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExternalWorkerJob>> {
 
     protected final String workerId;
-    protected final Duration lockDuration;
     protected final int numberOfJobs;
-    protected final String topic;
-    protected final String scopeType;
+    protected final ExternalWorkerJobAcquireBuilderImpl builder;
 
-    public AcquireExternalWorkerJobsCmd(String workerId, Duration lockDuration, int numberOfJobs, String topic, String scopeType) {
+    public AcquireExternalWorkerJobsCmd(String workerId, int numberOfJobs, ExternalWorkerJobAcquireBuilderImpl builder) {
         this.workerId = workerId;
         this.numberOfJobs = numberOfJobs;
-        this.topic = topic;
-        this.lockDuration = lockDuration;
-        this.scopeType = scopeType;
+        this.builder = builder;
     }
 
     @Override
     public List<AcquiredExternalWorkerJob> execute(CommandContext commandContext) {
+        String topic = builder.getTopic();
         if (StringUtils.isEmpty(topic)) {
             throw new FlowableIllegalArgumentException("topic must not be empty");
         }
@@ -70,9 +67,9 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
         ExternalWorkerJobEntityManager externalWorkerJobEntityManager = jobServiceConfiguration.getExternalWorkerJobEntityManager();
         InternalJobManager internalJobManager = jobServiceConfiguration.getInternalJobManager();
 
-        List<ExternalWorkerJobEntity> jobs = externalWorkerJobEntityManager.findExternalJobsToExecute(topic, numberOfJobs, scopeType);
+        List<ExternalWorkerJobEntity> jobs = externalWorkerJobEntityManager.findExternalJobsToExecute(builder, numberOfJobs);
 
-        int lockTimeInMillis = (int) lockDuration.abs().toMillis();
+        int lockTimeInMillis = (int) builder.getLockDuration().abs().toMillis();
         List<AcquiredExternalWorkerJob> acquiredJobs = new ArrayList<>(jobs.size());
 
         for (ExternalWorkerJobEntity job : jobs) {

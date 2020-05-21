@@ -96,6 +96,7 @@ class ExternalWorkerJobResourceTest {
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "  id: '" + externalOrderJob.getId() + "',"
+                        + "  correlationId: '" + externalOrderJob.getCorrelationId() + "',"
                         + "  processInstanceId: '" + processInstance1.getId() + "',"
                         + "  executionId: '" + externalOrderJob.getExecutionId() + "',"
                         + "  processDefinitionId: '" + processInstance1.getProcessDefinitionId() + "',"

@@ -28,6 +28,7 @@ public class JobResponse {
 
     protected String id;
     protected String url;
+    protected String correlationId;
     protected String processInstanceId;
     protected String processInstanceUrl;
     protected String processDefinitionId;
@@ -59,6 +60,15 @@ public class JobResponse {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @ApiModelProperty(example = "50")
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 
     @ApiModelProperty(example = "5")
