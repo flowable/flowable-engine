@@ -21,7 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public interface DecisionTableVariableManager {
 
+    @Deprecated
     void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper);
     void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper);
+
+    default void setVariablesOnPlanItemInstance(List<Map<String, Object>> decisionResult, String externalRef, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
+        setVariablesOnPlanItemInstance(decisionResult, externalRef, planItemInstance, objectMapper);
+    }
 
 }

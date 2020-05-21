@@ -17,7 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.DecisionTableVariableManager;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -576,6 +578,62 @@ public class DecisionTaskTest {
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
+    public void withCustomDecisionTableManager_ensureDecisionTableManagerIsCalled() {
+        CmmnEngineConfiguration cmmnEngineConfiguration = this.cmmnRule.getCmmnEngineConfiguration();
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnEngineConfiguration.getDecisionTableVariableManager();
+        final boolean[] setVariableOnPlanItemCalled = {false};
+        cmmnEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> decisionResult, String externalRef, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
+                setVariableOnPlanItemCalled[0] = true;
+            }
+
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "second")
+                .start();
+        assertThat(setVariableOnPlanItemCalled[0]).isTrue();
+        cmmnEngineConfiguration.setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.ruleOrder.dmn"})
+    public void withCustomDecisionTableManagerAndWithOldMethodMethod_ensureDecisionTableManagerIsCalled() {
+        CmmnEngineConfiguration cmmnEngineConfiguration = this.cmmnRule.getCmmnEngineConfiguration();
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnEngineConfiguration.getDecisionTableVariableManager();
+        final boolean[] setVariableOnPlanItemCalled = {false};
+        cmmnEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> decisionResult, String externalRef, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+                setVariableOnPlanItemCalled[0] = true;
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("testInput", "second")
+                .start();
+        assertThat(setVariableOnPlanItemCalled[0]).isTrue();
+        cmmnEngineConfiguration.setDecisionTableVariableManager(originalDecisionTableVariableManager);
     }
 
     // Helper methods

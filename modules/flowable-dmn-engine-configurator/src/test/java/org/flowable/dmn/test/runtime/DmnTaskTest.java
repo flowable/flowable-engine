@@ -14,10 +14,15 @@ package org.flowable.dmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.Deployment;
@@ -37,11 +42,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class DmnTaskTest {
 
     protected RuntimeService runtimeService;
-    protected ProcessEngineConfiguration processEngineConfiguration;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     @BeforeEach
     void setUp(ProcessEngineConfiguration processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+        this.processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngineConfiguration;
         runtimeService = processEngineConfiguration.getRuntimeService();
     }
 
@@ -130,4 +135,57 @@ public class DmnTaskTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
+    public void withCustomDecisionTableManager_ensureDecisionTableManagerIsCalled() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
+        final boolean[] setVariableOnPlanItemCalled = {false};
+        processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+                setVariableOnPlanItemCalled[0] = true;
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            }
+        });
+        this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("testInput", "second")
+                .start();
+        assertThat(setVariableOnPlanItemCalled[0]).isTrue();
+        processEngineConfiguration.setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
+    public void withCustomDecisionTableManagerAndWithOldMethodMethod_ensureDecisionTableManagerIsCalled() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
+        final boolean[] setVariableOnPlanItemCalled = {false};
+        processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+                setVariableOnPlanItemCalled[0] = true;
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            }
+        });
+        this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("testInput", "second")
+                .start();
+        assertThat(setVariableOnPlanItemCalled[0]).isTrue();
+        processEngineConfiguration.setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
 }

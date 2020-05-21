@@ -146,7 +146,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
             } else {
                 processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
-                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             }
             
         } else {

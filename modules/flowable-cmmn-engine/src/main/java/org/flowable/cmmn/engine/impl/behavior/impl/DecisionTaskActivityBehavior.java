@@ -142,7 +142,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                     externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             } else {
                 cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(),
-                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             }
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
