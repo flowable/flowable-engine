@@ -206,12 +206,8 @@ public class TaskResource extends TaskBaseResource {
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                if (var.getVariableScope() != null) {
-                    if (RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                        scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
-                    } else {
-                        scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
-                    }
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
                 } else {
                     scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
                 }
@@ -225,12 +221,8 @@ public class TaskResource extends TaskBaseResource {
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                if (var.getVariableScope() != null) {
-                    if (RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                        scopedVariableContainerHelper.setTransientVariableLocal(var.getName(), actualVariableValue);
-                    } else {
-                        scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
-                    }
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    scopedVariableContainerHelper.setTransientVariableLocal(var.getName(), actualVariableValue);
                 } else {
                     scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
                 }

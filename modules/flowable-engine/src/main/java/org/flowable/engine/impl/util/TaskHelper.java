@@ -12,7 +12,10 @@
  */
 package org.flowable.engine.impl.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
