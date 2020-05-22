@@ -74,31 +74,29 @@ public class TaskHelper {
         }
 
         if (scopedVariableContainerHelper.hasAnyVariables()) {
-            if (scopedVariableContainerHelper.hasVariablesLocal()) {
-                taskEntity.setVariablesLocal(scopedVariableContainerHelper.getVariablesLocal());
-
-                if (scopedVariableContainerHelper.hasVariables()){
-                    taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
-                }
-            } else if (taskEntity.getExecutionId() != null) {
+            if (taskEntity.getExecutionId() != null) {
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+
                 if (execution != null) {
                     execution.setVariables(scopedVariableContainerHelper.getAllVariables());
                 }
-
             } else {
-                taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+                if (scopedVariableContainerHelper.hasVariablesLocal()) {
+                    taskEntity.setVariablesLocal(scopedVariableContainerHelper.getVariablesLocal());
+                }
+
+                if (scopedVariableContainerHelper.hasVariables()) {
+                    taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+                }
             }
         }
 
         if (scopedVariableContainerHelper.hasAnyTransientVariables()) {
             if (scopedVariableContainerHelper.hasTransientVariablesLocal()) {
                 taskEntity.setTransientVariablesLocal(scopedVariableContainerHelper.getTransientVariablesLocal());
+            }
 
-                if (scopedVariableContainerHelper.hasTransientVariables()){
-                    taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariablesLocal());
-                }
-            } else {
+            if (scopedVariableContainerHelper.hasTransientVariables()) {
                 taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariables());
             }
         }
