@@ -74,19 +74,19 @@ public class TaskHelper {
         }
 
         if (scopedVariableContainerHelper.hasAnyVariables()) {
-            if (taskEntity.getExecutionId() != null) {
-                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
-
-                if (execution != null) {
-                    execution.setVariables(scopedVariableContainerHelper.getAllVariables());
-                }
-            } else {
+            if (scopedVariableContainerHelper.hasVariablesLocal() || scopedVariableContainerHelper.hasVariables()) {
                 if (scopedVariableContainerHelper.hasVariablesLocal()) {
                     taskEntity.setVariablesLocal(scopedVariableContainerHelper.getVariablesLocal());
                 }
 
                 if (scopedVariableContainerHelper.hasVariables()) {
                     taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+                }
+            } else if (taskEntity.getExecutionId() != null){
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+
+                if (execution != null) {
+                    execution.setVariables(scopedVariableContainerHelper.getAllVariables());
                 }
             }
         }
