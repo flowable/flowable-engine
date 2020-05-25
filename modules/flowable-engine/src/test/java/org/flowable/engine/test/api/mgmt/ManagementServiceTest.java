@@ -33,6 +33,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
@@ -282,6 +283,36 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // We need to move time at least one hour to make the timer executable
         processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + 7200000L));
 
+        // Move the timer to an executable job
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+
+        // Acquire job by running the acquire command manually
+        AcquireJobsCmd acquireJobsCmd = new AcquireJobsCmd(processEngine.getProcessEngineConfiguration().getAsyncExecutor(), 5,
+                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager());
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(acquireJobsCmd);
+
+        // Try to delete the job. This should fail.
+        assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot delete job when the job is being executed. Try again later.");
+
+        // Clean up
+        managementService.executeJob(timerJob.getId());
+    }
+
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+    public void testDeleteTimerJobThatWasAlreadyAcquired() {
+        processEngineConfiguration.getClock().setCurrentTime(new Date());
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        // We need to move time at least one hour to make the timer executable
+        processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + 7200000L));
+
         // Acquire job by running the acquire command manually
         ProcessEngineImpl processEngineImpl = (ProcessEngineImpl) processEngine;
         AcquireTimerJobsCmd acquireJobsCmd = new AcquireTimerJobsCmd(processEngine.getProcessEngineConfiguration().getAsyncExecutor());
@@ -289,9 +320,9 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         commandExecutor.execute(acquireJobsCmd);
 
         // Try to delete the job. This should fail.
-        assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
-                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-                .hasMessageContaining("No job found with id");
+        assertThatThrownBy(() -> managementService.deleteTimerJob(timerJob.getId()))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot delete timer job when the job is being executed. Try again later.");
 
         // Clean up
         managementService.moveTimerToExecutableJob(timerJob.getId());
