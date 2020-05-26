@@ -67,10 +67,6 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             assertThat(responseNode).isNotNull();
-            assertThat(responseNode.get("scope").asText()).isEqualTo("local");
-            assertThat(responseNode.get("value").asText()).isEqualTo("localValue");
-            assertThat(responseNode.get("name").asText()).isEqualTo("localTaskVariable");
-            assertThat(responseNode.get("type").asText()).isEqualTo("string");
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -288,8 +284,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
 
         assertThat(taskService.hasVariable(task.getId(), "overlappingVariable")).isFalse();
 
-        // Run the same delete again, variable is not there so 404 should be
-        // returned
+        // Run the same delete again, variable is not there so 404 should be returned
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
     }
 

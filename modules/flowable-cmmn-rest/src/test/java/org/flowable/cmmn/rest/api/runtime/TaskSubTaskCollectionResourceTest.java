@@ -61,9 +61,6 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
         
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.isArray()).isTrue();
-        assertThat(responseNode).hasSize(2);
-
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("["

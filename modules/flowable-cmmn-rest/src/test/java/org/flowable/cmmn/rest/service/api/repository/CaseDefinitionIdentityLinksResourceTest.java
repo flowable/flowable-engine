@@ -60,8 +60,6 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.isArray()).isTrue();
-
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("["

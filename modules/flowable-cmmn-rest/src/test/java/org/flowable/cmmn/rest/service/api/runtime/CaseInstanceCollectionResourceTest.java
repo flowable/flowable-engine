@@ -213,18 +213,16 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         rootNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(rootNode).isNotEmpty();
-        assertThat(rootNode.get("data")).hasSize(1);
-        dataNode = rootNode.get("data").get(0);
-        variableNodes = dataNode.get("variables");
-        assertThat(variableNodes).hasSize(1);
-
-        variableNodes = dataNode.get("variables");
-        assertThatJson(variableNodes)
+        assertThatJson(rootNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo("[ {"
-                        + " name: 'someVar',"
-                        + " value: 'someValue'"
-                        + "} ]");
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "         variables: [ {"
+                        + "                    name: 'someVar',"
+                        + "                    value: 'someValue'"
+                        + "                    } ]"
+                        + "      } ]"
+                        + "}");
     }
 
     /**
