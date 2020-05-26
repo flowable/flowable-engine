@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,32 +41,32 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/form/spring/configurator/test/oneTaskWithFormKeyProcess.bpmn20.xml",
-        "org/flowable/form/spring/configurator/test/simple.form" })
+            "org/flowable/form/spring/configurator/test/simple.form" })
     public void testFormOnUserTask() {
-        
+
         FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
         FormRepositoryService formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         FormDeployment formDeployment = formRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(formDeployment);
+        assertThat(formDeployment).isNotNull();
 
         Set<String> formDeploymentIds = new HashSet<>();
         formDeploymentIds.add(formDeployment.getId());
-        
+
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("var1", "test");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess", variables);
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
-            
+            assertThat(task).isNotNull();
+
             FormInfo formInfo = taskService.getTaskFormModel(task.getId());
             assertThat(formInfo.getName()).isEqualTo("My first form");
             SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
             ExpressionFormField expressionFormField = (ExpressionFormField) formModel.getFields().get(1);
-            assertEquals("#{testFormBean.getExpressionText(var1)}", expressionFormField.getExpression());
-            assertEquals("hello test", expressionFormField.getValue());
+            assertThat(expressionFormField.getExpression()).isEqualTo("#{testFormBean.getExpressionText(var1)}");
+            assertThat(expressionFormField.getValue()).isEqualTo("hello test");
 
             // deploying new Form key should return the same deployment form
 
@@ -82,11 +82,11 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             expressionFormField = (ExpressionFormField) formModel.getFields().get(1);
             assertThat(expressionFormField.getExpression()).isEqualTo("#{testFormBean.getExpressionText(var1)}");
             assertThat(expressionFormField.getValue()).isEqualTo("hello test");
-            
+
             taskService.complete(task.getId());
-    
+
             assertProcessEnded(processInstance.getId());
-            
+
         } finally {
             formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
@@ -146,18 +146,18 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
-    
+
     @Test
     @Deployment(resources = { "org/flowable/form/spring/configurator/test/oneTaskWithFormKeyProcess.bpmn20.xml",
-        "org/flowable/form/spring/configurator/test/simple.form" })
+            "org/flowable/form/spring/configurator/test/simple.form" })
     public void testFormOnUserTaskWithoutVariables() {
-        
+
         FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
         FormRepositoryService formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         FormDeployment formDeployment = formRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(formDeployment);
+        assertThat(formDeployment).isNotNull();
 
         Set<String> formDeploymentIds = new HashSet<>();
         formDeploymentIds.add(formDeployment.getId());
@@ -167,14 +167,14 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             variables.put("var1", "test");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess", variables);
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
-            
+            assertThat(task).isNotNull();
+
             FormInfo formInfo = taskService.getTaskFormModel(task.getId(), true);
             assertThat(formInfo.getName()).isEqualTo("My first form");
             SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
             ExpressionFormField expressionFormField = (ExpressionFormField) formModel.getFields().get(1);
-            assertEquals("#{testFormBean.getExpressionText(var1)}", expressionFormField.getExpression());
-            assertNull(expressionFormField.getValue());
+            assertThat(expressionFormField.getExpression()).isEqualTo("#{testFormBean.getExpressionText(var1)}");
+            assertThat(expressionFormField.getValue()).isNull();
 
             // deploying new Form key should return the same deployment form
 
@@ -246,14 +246,14 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             formDeploymentIds.forEach(id -> formRepositoryService.deleteDeployment(id, true));
         }
     }
-    
+
     @Test
-    @Deployment(resources = { "org/flowable/form/spring/configurator/test/oneTaskWithFormKeyProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/form/spring/configurator/test/oneTaskWithFormKeyProcess.bpmn20.xml" })
     public void testFormOnUserTaskWithoutVariablesSeparateDeployments() {
-        
+
         FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
-                        .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
-        
+                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+
         FormRepositoryService formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         FormDeployment formDeployment = formRepositoryService.createDeployment().addClasspathResource("org/flowable/form/spring/configurator/test/simple.form")
                 .deploy();
@@ -266,13 +266,13 @@ public class FormWithSpringBeanTest extends SpringFormFlowableTestCase {
             variables.put("var1", "test");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess", variables);
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
-            
+            assertThat(task).isNotNull();
+
             FormInfo formInfo = taskService.getTaskFormModel(task.getId(), true);
             SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
             ExpressionFormField expressionFormField = (ExpressionFormField) formModel.getFields().get(1);
-            assertEquals("#{testFormBean.getExpressionText(var1)}", expressionFormField.getExpression());
-            assertNull(expressionFormField.getValue());
+            assertThat(expressionFormField.getExpression()).isEqualTo("#{testFormBean.getExpressionText(var1)}");
+            assertThat(expressionFormField.getValue()).isNull();
 
             // deploying new Form key should return the new form
 
