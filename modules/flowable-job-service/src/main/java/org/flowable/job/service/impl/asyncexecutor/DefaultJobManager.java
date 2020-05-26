@@ -326,6 +326,8 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setLockOwner(null);
             jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
             jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
+        } else if (job instanceof TimerJobEntity) {
+            jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
         } else {
             if (job != null) {
                 // It could be a v5 job, so simply unlock it.

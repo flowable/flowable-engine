@@ -39,7 +39,6 @@ public class ResetExpiredJobsCmd implements Command<Void> {
             JobInfoEntity job = jobEntityManager.findById(jobId);
             if (job !=  null) {
                 CommandContextUtil.getJobManager(commandContext).unacquire(job);
-                jobEntityManager.resetExpiredJob(jobId);
             }
         }
         return null;

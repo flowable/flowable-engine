@@ -179,6 +179,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
         return new ResetExpiredJobsRunnable(resetRunnableName, this,
                 jobServiceConfiguration.getJobEntityManager(),
+                jobServiceConfiguration.getTimerJobEntityManager(),
                 jobServiceConfiguration.getExternalWorkerJobEntityManager()
         );
     }

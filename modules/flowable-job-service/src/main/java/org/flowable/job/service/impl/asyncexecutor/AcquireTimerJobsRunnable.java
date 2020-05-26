@@ -84,16 +84,12 @@ public class AcquireTimerJobsRunnable implements Runnable {
                             optimisticLockingException.getMessage());
                 }
 
-                if (!timerJobs.isEmpty()) {
-                    commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs));
-                }
+                unlockTimerJobs(commandExecutor, timerJobs);
             } catch (Throwable e) {
                 LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
                 millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
 
-                if (!timerJobs.isEmpty()) {
-                    commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs));
-                }
+                unlockTimerJobs(commandExecutor, timerJobs);
             }
 
             if (millisToWait > 0) {
@@ -122,6 +118,18 @@ public class AcquireTimerJobsRunnable implements Runnable {
         }
 
         LOGGER.info("stopped async job due acquisition");
+    }
+
+    protected void unlockTimerJobs(CommandExecutor commandExecutor, Collection<TimerJobEntity> timerJobs) {
+        try {
+            if (!timerJobs.isEmpty()) {
+                commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs));
+            }
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to unlock timer jobs during acquiring. This is OK since they will be unlocked when the reset expired jobs thread runs", e);
+            }
+        }
     }
 
     public void stop() {

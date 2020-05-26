@@ -24,11 +24,9 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  * @author Tijs Rademakers
  * @author Vasile Dirla
  */
-public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
+public interface TimerJobDataManager extends JobInfoDataManager<TimerJobEntity> {
 
     TimerJobEntity findJobByCorrelationId(String correlationId);
-
-    List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page);
 
     List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId);
 
@@ -36,16 +34,10 @@ public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
 
     List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId);
 
-    List<TimerJobEntity> findJobsByExecutionId(String executionId);
-
-    List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId);
-
     List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
 
     List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
 
-    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-    
 }

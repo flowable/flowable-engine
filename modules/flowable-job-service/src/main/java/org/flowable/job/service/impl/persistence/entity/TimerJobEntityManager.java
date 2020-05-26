@@ -27,7 +27,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  * @author Tijs Rademakers
  * @author Vasile Dirla
  */
-public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
+public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEntity> {
 
     /**
      * Insert the {@link TimerJobEntity}, similar to {@link #insert(TimerJobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the
@@ -39,11 +39,6 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
      * Find the timer job with the given correlation id.
      */
     TimerJobEntity findJobByCorrelationId(String correlationId);
-
-    /**
-     * Returns the {@link TimerJobEntity} instances that are eligible to execute, meaning the due date of the timer has been passed.
-     */
-    List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page);
 
     /**
      * Returns the {@link TimerJobEntity} for a given process definition.
@@ -61,16 +56,6 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
      * The same as {@link #findJobsByTypeAndProcessDefinitionId(String, String)}, but by key and specifically for the 'no tenant' mode.
      */
     List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String type, String processDefinitionKey);
-
-    /**
-     * Returns all {@link TimerJobEntity} instances related to on {@link ExecutionEntity}.
-     */
-    List<TimerJobEntity> findJobsByExecutionId(String id);
-
-    /**
-     * Returns all {@link TimerJobEntity} instances related to on {@link ExecutionEntity}.
-     */
-    List<TimerJobEntity> findJobsByProcessInstanceId(String id);
 
     /**
      * Returns all {@link TimerJobEntity} for the given scope and subscope.
@@ -94,9 +79,4 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
      */
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
 
-    /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
-     */
-    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-    
 }
