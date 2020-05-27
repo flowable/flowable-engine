@@ -13,10 +13,12 @@
 package org.flowable.http.bpmn;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,10 +58,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
-        assertEquals(1, variables.size());
-        assertEquals("test", variables.get(0).getVariableName());
-        String variableValue = variables.get(0).getValue().toString();
-        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("test");
+        assertThatJson(variables.get(0).getValue())
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(procId);
     }
 
@@ -68,10 +71,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithoutVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
-        assertEquals(1, variables.size());
-        assertEquals("httpGetResponseBody", variables.get(0).getVariableName());
-        String variableValue = variables.get(0).getValue().toString();
-        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("httpGetResponseBody");
+        assertThatJson(variables.get(0).getValue())
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(procId);
     }
 
@@ -80,20 +84,14 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
-        assertEquals(2, variables.size());
-        String firstName = null;
-        String lastName = null;
 
-        for (HistoricVariableInstance historicVariableInstance : variables) {
-            if ("firstName".equals(historicVariableInstance.getVariableName())) {
-                firstName = (String) historicVariableInstance.getValue();
-            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
-                lastName = (String) historicVariableInstance.getValue();
-            }
-        }
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("firstName", "John"),
+                        tuple("lastName", "Doe")
+                );
 
-        assertEquals("John", firstName);
-        assertEquals("Doe", lastName);
         assertProcessEnded(procId);
     }
 
@@ -102,20 +100,14 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithParametrizedResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
-        assertEquals(2, variables.size());
-        String firstName = null;
-        String lastName = null;
 
-        for (HistoricVariableInstance historicVariableInstance : variables) {
-            if ("firstName".equals(historicVariableInstance.getVariableName())) {
-                firstName = (String) historicVariableInstance.getValue();
-            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
-                lastName = (String) historicVariableInstance.getValue();
-            }
-        }
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("firstName", "John"),
+                        tuple("lastName", "Doe")
+                );
 
-        assertEquals("John", firstName);
-        assertEquals("Doe", lastName);
         assertProcessEnded(procId);
     }
 
@@ -124,10 +116,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
-        assertEquals(1, variables.size());
-        assertEquals("httpGetResponseBody", variables.get(0).getVariableName());
-        String variableValue = variables.get(0).getValue().toString();
-        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("httpGetResponseBody");
+        assertThatJson(variables.get(0).getValue())
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(procId);
     }
 
@@ -136,10 +129,10 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithBpmnThrowingResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-            .processInstanceId(procId)
-            .singleResult();
+                .processInstanceId(procId)
+                .singleResult();
 
-        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertThat(processInstance.getEndActivityId()).isEqualTo("theEnd2");
         assertProcessEnded(procId);
     }
 
@@ -148,10 +141,10 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testGetWithBpmnThrowingRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-            .processInstanceId(procId)
-            .singleResult();
+                .processInstanceId(procId)
+                .singleResult();
 
-        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertThat(processInstance.getEndActivityId()).isEqualTo("theEnd2");
         assertProcessEnded(procId);
     }
 
@@ -165,30 +158,21 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Test
     @Deployment
     public void testConnectTimeout() {
-        try {
-            runtimeService.startProcessInstanceByKey("connectTimeout");
-            fail("FlowableException expected");
-        } catch (final Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertTrue(e.getCause() instanceof IOException);
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("connectTimeout"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasCauseInstanceOf(IOException.class);
     }
 
     @Test
     @Deployment
     public void testRequestTimeout() {
-        try {
-            runtimeService.startProcessInstanceByKey("requestTimeout");
-            fail("FlowableException expected");
-        } catch (final Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertTrue(e.getCause() instanceof SocketTimeoutException
-                    || e.getCause() instanceof SocketException);
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasCauseInstanceOf(IOException.class);
     }
 
     @Test
-    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout2.bpmn20.xml" )
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout2.bpmn20.xml")
     public void testRequestTimeoutFromProcessModelHasPrecedence() {
         // set up timeout for test
         int defaultSocketTimeout = this.processEngineConfiguration.getHttpClientConfig().getSocketTimeout();
@@ -200,12 +184,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(5000);
 
         // execute test
-        try {
-            runtimeService.startProcessInstanceByKey("requestTimeout");
-            fail("Expected timeout exception");
-        } catch(Exception e) {
-            // timeout exception expected
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
+                .isExactlyInstanceOf(FlowableException.class);
 
         // restore timeouts
         this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
@@ -214,7 +194,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     }
 
     @Test
-    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout3.bpmn20.xml" )
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout3.bpmn20.xml")
     public void testRequestTimeoutFromProcessModelHasPrecedenceSuccess() {
         // set up timeout for test
         int defaultSocketTimeout = this.processEngineConfiguration.getHttpClientConfig().getSocketTimeout();
@@ -238,27 +218,19 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Test
     @Deployment
     public void testDisallowRedirects() {
-        try {
-            runtimeService.startProcessInstanceByKey("disallowRedirects");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertEquals("HTTP302", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("disallowRedirects"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP302");
     }
 
     @Test
     @Deployment
     public void testFailStatusCodes() {
         ProcessInstance process = null;
-        try {
-            process = runtimeService.startProcessInstanceByKey("failStatusCodes");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertEquals("HTTP400", e.getMessage());
-        }
-        assertNull("Process instance was not started.", process);
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failStatusCodes"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP400");
+        assertThat(process).as("Process instance was not started.").isNull();
     }
 
     @Test
@@ -286,7 +258,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpGet2XX() throws Exception {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet2XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
         // Request assertions
         Map<String, Object> request = new HashMap<>();
         request.put("resultRequestMethod", "GET");
@@ -294,15 +266,15 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         request.put("resultRequestHeaders", "Accept: application/json");
         request.put("resultRequestTimeout", 2000);
         request.put("resultIgnoreException", true);
-        assertEquals(process.getId(), request);
+        assertKeysEquals(process.getId(), request);
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("resultResponseStatusCode", 200);
         response.put("resultResponseHeaders", "Content-Type: application/json");
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         // Response body assertions
         String body = (String) runtimeService.getVariable(process.getId(), "resultResponseBody");
-        assertNotNull(body);
+        assertThat(body).isNotNull();
         JsonNode jsonNode = mapper.readValue(body, JsonNode.class);
         mapper.convertValue(jsonNode, HttpTestData.class);
         continueProcess(process);
@@ -312,31 +284,27 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpGet3XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet3XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpGetResponseStatusCode", 302);
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
 
     @Test
     @Deployment
     public void testHttpGet4XX() {
-        try {
-            runtimeService.startProcessInstanceByKey("testHttpGet4XX");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertEquals("HTTP404", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testHttpGet4XX"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP404");
     }
 
     @Test
     @Deployment
     public void testHttpGet5XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet5XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
         // Request assertions
         Map<String, Object> request = new HashMap<>();
         request.put("get500RequestMethod", "GET");
@@ -345,12 +313,12 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         request.put("get500RequestTimeout", 5000);
         request.put("get500HandleStatusCodes", "4XX, 5XX");
         request.put("get500SaveRequestVariables", true);
-        assertEquals(process.getId(), request);
+        assertKeysEquals(process.getId(), request);
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("get500ResponseStatusCode", 500);
         response.put("get500ResponseReason", "Server Error");
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
 
@@ -358,7 +326,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpPost2XX() throws Exception {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost2XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
 
         String body = "{\"test\":\"sample\",\"result\":true}";
         // Request assertions
@@ -367,17 +335,17 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         request.put("httpPostRequestUrl", "https://localhost:9799/api?code=201");
         request.put("httpPostRequestHeaders", "Content-Type: application/json");
         request.put("httpPostRequestBody", body);
-        assertEquals(process.getId(), request);
+        assertKeysEquals(process.getId(), request);
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpPostResponseStatusCode", 201);
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
-        assertNotNull(responseBody);
+        assertThat(responseBody).isNotNull();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
-        assertEquals(body, testData.getBody());
+        assertThat(testData.getBody()).isEqualTo(body);
         continueProcess(process);
     }
 
@@ -385,11 +353,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpPost3XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost3XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpPostResponseStatusCode", 302);
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
 
@@ -397,7 +365,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpPostBodyEncoding() throws Exception {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPostBodyEncoding");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
@@ -405,15 +373,15 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         request.put("httpPostRequestUrl", "http://localhost:9798/hello");
         request.put("httpPostRequestHeaders", "Content-Type: application/json; charset=utf-8");
         request.put("httpPostRequestBody", "{\"name\":\"Alen Turković\"}");
-        assertEquals(process.getId(), request);
+        assertKeysEquals(process.getId(), request);
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpPostResponseStatusCode", 200);
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
-        assertNotNull(responseBody);
-        assertEquals("{\"result\":\"Hello Alen Turković\"}", responseBody.trim());
+        assertThat(responseBody).isNotNull();
+        assertThat(responseBody.trim()).isEqualTo("{\"result\":\"Hello Alen Turković\"}");
         continueProcess(process);
     }
 
@@ -421,12 +389,12 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testHttpDelete4XX() {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpDelete4XX");
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpDeleteResponseStatusCode", 400);
         response.put("httpDeleteResponseReason", "Bad Request");
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
 
@@ -449,13 +417,16 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         variables.put("prefix", "httpPost500");
 
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPut5XX", variables);
-        assertFalse(process.isEnded());
+        assertThat(process.isEnded()).isFalse();
 
         Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
-        assertEquals("text/plain", headerMap.get("Content-Type"));
-        assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
-        assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
+                        entry("Host", "localhost:7000"),
+                        entry("Test", null)
+                );
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
@@ -463,11 +434,12 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         request.put("httpPost500RequestUrl", "https://localhost:9799/api?code=500");
         request.put("httpPost500RequestHeaders", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000");
         request.put("httpPost500RequestBody", body);
-        assertEquals(process.getId(), request);
+        assertKeysEquals(process.getId(), request);
+
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("httpPost500ResponseStatusCode", 500);
-        assertEquals(process.getId(), response);
+        assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
 
@@ -478,9 +450,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
 
         // There should be only one response variable from the second http task (the first one uses a transient variable)
-        assertEquals(1, variables.size());
-        assertTrue(variables.get("postResponse") instanceof JsonNode);
-        assertEquals("Hello John", ((JsonNode) variables.get("postResponse")).get("result").asText());
+        assertThat(variables).hasSize(1);
+        assertThat(variables.get("postResponse")).isInstanceOf(JsonNode.class);
+        JsonNode node = (JsonNode) variables.get("postResponse");
+        assertThatJson(node)
+                .isEqualTo("{ result: 'Hello John'}");
     }
 
     @Test
@@ -488,18 +462,18 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testArrayNodeResponse() {
         runtimeService.startProcessInstanceByKey("testArrayNodeResponse");
         List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
-        assertEquals("abc", tasks.get(0).getName());
-        assertEquals("def", tasks.get(1).getName());
-        assertEquals("ghi", tasks.get(2).getName());
+        assertThat(tasks).hasSize(3);
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("abc", "def", "ghi");
     }
 
     @Test
     @Deployment
     public void testDeleteResponseEmptyBody() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("testDeleteResponse").getId();
-        assertTrue(runtimeService.hasVariable(processInstanceId, "myResponse"));
-        assertNull(runtimeService.getVariable(processInstanceId, "myResponse"));
+        assertThat(runtimeService.hasVariable(processInstanceId, "myResponse")).isTrue();
+        assertThat(runtimeService.getVariable(processInstanceId, "myResponse")).isNull();
     }
 
     @Test
@@ -509,32 +483,35 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables);
-        assertThatJson(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
-        assertThatJson(runtimeService.getVariable(pi.getId(), "result2")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result"))
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result2"))
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
 
         Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", true);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables2);
-        assertNull(runtimeService.getVariable(pi2.getId(), "result"));
-        assertThatJson(runtimeService.getVariable(pi.getId(), "result2")).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
-
+        assertThat(runtimeService.getVariable(pi2.getId(), "result")).isNull();
+        assertThatJson(runtimeService.getVariable(pi.getId(), "result2"))
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
                     .activityId("getHttpTask")
                     .singleResult();
-            assertActivityInstancesAreSame(skipActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+            assertActivityInstancesAreSame(skipActivityInstance,
+                    runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance.getId()).singleResult());
 
-            assertNotNull(skipActivityInstance);
+            assertThat(skipActivityInstance).isNotNull();
         }
     }
 
-    private void assertEquals(final String processInstanceId, final Map<String, Object> vars) {
+    private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
             if (key.contains("Headers")) {
                 assertTextPresent((String) vars.get(key), (String) runtimeService.getVariable(processInstanceId, key));
             } else {
-                assertEquals(vars.get(key), runtimeService.getVariable(processInstanceId, key));
+                assertThat(runtimeService.getVariable(processInstanceId, key)).isEqualTo(vars.get(key));
             }
         }
     }
@@ -544,7 +521,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
                 .processInstanceId(processInstance.getId())
                 .activityId("wait")
                 .singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         runtimeService.trigger(execution.getId());
         assertProcessEnded(processInstance.getId());
     }
