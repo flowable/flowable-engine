@@ -88,36 +88,36 @@ class MockSupportWithFlowableJupiterTest {
     @Deployment
     @NoOpServiceTasks
     void testNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport) {
-        assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isEqualTo(0);
+        assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isZero();
         processEngine.getRuntimeService().startProcessInstanceByKey("mockSupportTest");
         assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isEqualTo(5);
 
         assertThat(mockSupport.getExecutedNoOpServiceTaskDelegateClassNames())
-            .containsExactly(
-                "com.yourcompany.delegate1",
-                "com.yourcompany.delegate2",
-                "com.yourcompany.delegate3",
-                "com.yourcompany.delegate4",
-                "com.yourcompany.delegate5"
-            );
+                .containsExactly(
+                        "com.yourcompany.delegate1",
+                        "com.yourcompany.delegate2",
+                        "com.yourcompany.delegate3",
+                        "com.yourcompany.delegate4",
+                        "com.yourcompany.delegate5"
+                );
     }
 
     @Test
     @Deployment(resources = { "org/flowable/standalone/testing/MockSupportWithFlowableJupiterTest.testNoOpServiceTasksAnnotation.bpmn20.xml" })
     @NoOpServiceTasks(ids = { "serviceTask1", "serviceTask3", "serviceTask5" }, classNames = { "com.yourcompany.delegate2", "com.yourcompany.delegate4" })
     void testNoOpServiceTasksWithIdsAnnotation(FlowableMockSupport mockSupport) {
-        assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isEqualTo(0);
+        assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isZero();
         processEngine.getRuntimeService().startProcessInstanceByKey("mockSupportTest");
         assertThat(mockSupport.getNrOfNoOpServiceTaskExecutions()).isEqualTo(5);
 
         assertThat(mockSupport.getExecutedNoOpServiceTaskDelegateClassNames())
-            .containsExactly(
-                "com.yourcompany.delegate1",
-                "com.yourcompany.delegate2",
-                "com.yourcompany.delegate3",
-                "com.yourcompany.delegate4",
-                "com.yourcompany.delegate5"
-            );
+                .containsExactly(
+                        "com.yourcompany.delegate1",
+                        "com.yourcompany.delegate2",
+                        "com.yourcompany.delegate3",
+                        "com.yourcompany.delegate4",
+                        "com.yourcompany.delegate5"
+                );
     }
 
 }
