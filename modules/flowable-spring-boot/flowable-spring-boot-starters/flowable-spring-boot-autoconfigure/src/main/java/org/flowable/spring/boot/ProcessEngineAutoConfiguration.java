@@ -200,6 +200,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setMailServerHost(mailProperties.getHost());
         conf.setMailServerPort(mailProperties.getPort());
+        conf.setMailServerSSLPort(mailProperties.getSSLPort());
         conf.setMailServerUsername(mailProperties.getUsername());
         conf.setMailServerPassword(mailProperties.getPassword());
         conf.setMailServerDefaultFrom(mailProperties.getDefaultFrom());

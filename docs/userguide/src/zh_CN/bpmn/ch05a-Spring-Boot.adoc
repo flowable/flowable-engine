@@ -773,6 +773,7 @@ flowable.mail.server.default-from=flowable@localhost # 发送邮件时使用的�
 flowable.mail.server.host=localhost # 邮件服务器。
 flowable.mail.server.password= # 邮件服务器的登录密码。
 flowable.mail.server.port=1025 # 邮件服务器的端口号。
+flowable.mail.server.ssl-port=1465 # SSL邮件服务器的端口号。
 flowable.mail.server.use-ssl=false # 是否使用SSL/TLS加密SMTP传输连接（即SMTPS/POPS)。
 flowable.mail.server.use-tls=false # 使用或禁用STARTTLS加密。
 flowable.mail.server.username= # 邮件服务器的登录用户名。如果为空，则不需要登录。
@@ -832,6 +833,11 @@ management.endpoint.flowable.enabled=true # 是否启用flowable端点。
 |flowable.mail-server-port
 |1025
 |邮件服务器的端口号。
+
+|flowable.mail.server.ssl-port
+|flowable.mail-server-ssl-port
+|1465
+|SSL邮件服务器的端口号。
 
 |flowable.mail.server.use-ssl
 |flowable.mail-server-use-ssl
