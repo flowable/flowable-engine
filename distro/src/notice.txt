@@ -111,7 +111,7 @@ commons-codec                   commons-codec               1.14            Apac
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
 commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
 commons-collections             commons-collections         3.2.2           The Apache Software License, Version 2.0
-commons-io                      commons-io                  2.6             The Apache Software License, Version 2.0
+commons-io                      commons-io                  2.7             The Apache Software License, Version 2.0
 commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
 commons-validator               commons-validator           1.4.0           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
