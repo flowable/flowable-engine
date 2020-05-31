@@ -230,7 +230,6 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failStatusCodes"))
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("HTTP400");
-        assertThat(process).as("Process instance was not started.").isNull();
     }
 
     @Test
