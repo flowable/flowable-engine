@@ -21,7 +21,10 @@ import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.CmmnDelegateHelper;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnElement;
@@ -219,6 +222,42 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(variable).isEqualTo(99L);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testStoreTransientVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        Object transientResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "transientResult");
+        Object persistentResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "persistentResult");
+
+        assertThat(transientResult).isNull();
+        assertThat(persistentResult).isEqualTo("Result is: test");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCmmnTriggerableActivityBehavior() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        // The service task here acts like a wait state.
+        // When the case instance is started, it will wait and be in state ACTIVE.
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+
+        // When triggered, the plan item will complete
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId()).trigger();
+
+        assertCaseInstanceEnded(caseInstance);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult().getState())
+            .isEqualTo(PlanItemInstanceState.COMPLETED);
+
+    }
+
     public static class TestJavaDelegate01 implements PlanItemJavaDelegate {
 
         public static CmmnModel cmmnModel;
@@ -243,6 +282,20 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
     }
 
+    public static class TestJavaDelegate03 implements CmmnTriggerableActivityBehavior {
+
+        @Override
+        public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
+            // Do nothing, wait state
+        }
+
+        @Override
+        public void trigger(DelegatePlanItemInstance planItemInstance) {
+            CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
+        }
+
+    }
+
     public static class TestLifecycleListener01 implements PlanItemInstanceLifecycleListener {
 
         @Override
@@ -261,20 +314,6 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
             planItemInstance.setVariable("listenerVar", delegateField.getValue(planItemInstance));
         }
 
-    }
-
-    @Test
-    @CmmnDeployment
-    public void testStoreTransientVariable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("myCase")
-                .start();
-
-        Object transientResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "transientResult");
-        Object persistentResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "persistentResult");
-
-        assertThat(transientResult).isNull();
-        assertThat(persistentResult).isEqualTo("Result is: test");
     }
 
 }

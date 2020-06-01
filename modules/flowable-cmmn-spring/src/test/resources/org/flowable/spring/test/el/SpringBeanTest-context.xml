@@ -32,4 +32,7 @@
     
     <bean id="customBean" class="org.flowable.spring.test.el.CustomBean" />
 
+    <bean id="testTriggerableDelegate01" class="org.flowable.spring.test.el.SpringPlanItemJavaDelegateExpressionTest$TestJavaDelegate01"/>
+    <bean id="testTriggerableDelegate02" class="org.flowable.spring.test.el.SpringPlanItemJavaDelegateExpressionTest$TestJavaDelegate02"/>
+
 </beans>
