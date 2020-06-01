@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +170,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testRequestTimeout() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasCauseInstanceOf(IOException.class);
+                .getCause().isInstanceOfAny(SocketTimeoutException.class, SocketException.class);
     }
 
     @Test
