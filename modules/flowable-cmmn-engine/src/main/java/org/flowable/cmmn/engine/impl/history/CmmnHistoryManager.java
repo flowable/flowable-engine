@@ -67,6 +67,8 @@ public interface CmmnHistoryManager {
 
     void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity);
+
     void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity);
 
     void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity);
