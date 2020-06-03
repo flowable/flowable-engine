@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.debugger;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.agenda.DebugContinueProcessOperation;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgenda;
 import org.flowable.engine.impl.test.JobTestHelper;
@@ -21,9 +23,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * This class tests {@link DebugContinueProcessOperation}, {@link ProcessDebugger} and {@link DebugFlowableEngineAgenda}
@@ -48,7 +47,7 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         assertProcessActivityId("The execution must stop on the user task node before it's execution.", oneTaskProcess, "theTask");
         triggerBreakPoint();
 
-        assertEquals("User task has to be created.", 1, this.taskService.createTaskQuery().count());
+        assertThat(this.taskService.createTaskQuery().count()).as("User task has to be created.").isEqualTo(1);
         assertProcessActivityId("The execution is still on the user task.", oneTaskProcess, "theTask");
         String taskId = this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult().getId();
         this.taskService.complete(taskId);
@@ -56,7 +55,7 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         assertProcessActivityId("The execution must stop on the end event.", oneTaskProcess, "theEnd");
         triggerBreakPoint();
 
-        assertThat("No process instance is running.", this.runtimeService.createExecutionQuery().count(), is(0L));
+        assertThat(this.runtimeService.createExecutionQuery().count()).as("No process instance is running.").isZero();
     }
 
     @Test
@@ -69,23 +68,23 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
 
         assertProcessActivityId("The execution must stop on the user task node before it's execution.", oneTaskProcess, "theTask");
         Job job = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.moveSuspendedJobToExecutableJob(job.getId());
         JobTestHelper.waitForJobExecutorToProcessAllJobs(this.processEngineConfiguration, this.managementService, 10000, 500);
         Job updatedJob = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
-        assertNotNull("Triggering breakpoint and failure must reassign breakpoint to suspended jobs again", updatedJob);
+        assertThat(updatedJob).as("Triggering breakpoint and failure must reassign breakpoint to suspended jobs again").isNotNull();
     }
 
     protected void triggerBreakPoint() {
         Job job = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         Job activatedJob = managementService.moveSuspendedJobToExecutableJob(job.getId());
         managementService.executeJob(activatedJob.getId());
     }
 
     protected void assertProcessActivityId(String message, ProcessInstance process, String activityId) {
-        assertThat(message, this.runtimeService.createExecutionQuery().parentId(process.getId()).singleResult().getActivityId(),
-                is(activityId));
+        assertThat(this.runtimeService.createExecutionQuery().parentId(process.getId()).singleResult().getActivityId()).as(message)
+                .isEqualTo(activityId);
     }
 
 }
