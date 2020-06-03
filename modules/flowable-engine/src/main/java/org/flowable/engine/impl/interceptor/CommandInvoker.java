@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.interceptor;
 
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -31,13 +32,15 @@ public class CommandInvoker extends AbstractCommandInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandInvoker.class);
 
+    protected AgendaOperationRunner agendaOperationRunner;
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         final CommandContext commandContext = Context.getCommandContext();
         
         FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        if (commandContext.isReused() && !agenda.isEmpty()) {
+        if (commandContext.isReused() && !agenda.isEmpty()) { // there is already an agenda loop being executed
             return (T) command.execute(commandContext);
             
         } else {
@@ -85,7 +88,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                     LOGGER.debug("Executing operation {}", operation.getClass());
                 }
 
-                runnable.run();
+                agendaOperationRunner.executeOperation(operation);
 
             }
 
@@ -104,4 +107,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
         throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
     }
 
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+    public void setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
 }

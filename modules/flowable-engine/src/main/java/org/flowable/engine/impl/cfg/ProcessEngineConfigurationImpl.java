@@ -90,6 +90,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
@@ -307,8 +308,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
-import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.common.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
@@ -1112,7 +1111,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (enableVerboseExecutionTreeLogging) {
                 commandInvoker = new LoggingExecutionTreeCommandInvoker();
             } else {
-                commandInvoker = new CommandInvoker();
+                CommandInvoker commandInvoker = new CommandInvoker();
+
+                if (agendaOperationRunner != null) {
+                    commandInvoker.setAgendaOperationRunner(agendaOperationRunner);
+                }
+
+                this.commandInvoker = commandInvoker;
             }
         }
     }
