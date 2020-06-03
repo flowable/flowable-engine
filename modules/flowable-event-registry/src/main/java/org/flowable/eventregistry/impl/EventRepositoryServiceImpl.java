@@ -205,18 +205,18 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public EventModelBuilder createEventModelBuilder() {
-        return new EventModelBuilderImpl(this);
+        return new EventModelBuilderImpl(this, eventRegistryEngineConfiguration.getEventJsonConverter());
     }
     
     
     @Override
     public InboundChannelModelBuilder createInboundChannelModelBuilder() {
-        return new InboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService());
+        return new InboundChannelDefinitionBuilderImpl(this, eventRegistryEngineConfiguration.getChannelJsonConverter());
     }
 
     @Override
     public OutboundChannelModelBuilder createOutboundChannelModelBuilder() {
-        return new OutboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService());
+        return new OutboundChannelDefinitionBuilderImpl(this, eventRegistryEngineConfiguration.getChannelJsonConverter());
     }
 
     public void registerEventModel(EventModel eventModel) {
