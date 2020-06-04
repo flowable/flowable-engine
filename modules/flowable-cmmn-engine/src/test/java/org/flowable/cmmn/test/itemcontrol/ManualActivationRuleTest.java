@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -248,7 +249,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.disablePlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only disable a plan item instance which is in state ENABLED");
     }
     
@@ -263,7 +264,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.enablePlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only enable a plan item instance which is in state AVAILABLE or DISABLED");
     }
     
@@ -278,7 +279,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only enable a plan item instance which is in state ENABLED");
     }
 
@@ -404,7 +405,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         // Manually complete the stage should throw an exception
         assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId()))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
     }
     
 }

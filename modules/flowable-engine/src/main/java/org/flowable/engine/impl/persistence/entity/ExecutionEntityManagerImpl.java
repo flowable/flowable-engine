@@ -517,7 +517,7 @@ public class ExecutionEntityManagerImpl
             deleteExecutionAndRelatedData(childExecutionEntity, deleteReason, deleteHistory);
         }
 
-        deleteExecutionAndRelatedData(execution, deleteReason, deleteHistory);
+        deleteExecutionAndRelatedData(execution, deleteReason, deleteHistory, true, null);
 
         if (deleteHistory) {
             getHistoryManager().recordProcessInstanceDeleted(execution.getId(), execution.getProcessDefinitionId(), execution.getTenantId());
@@ -539,7 +539,7 @@ public class ExecutionEntityManagerImpl
         deleteRelatedDataForExecution(executionEntity, deleteReason);
         delete(executionEntity);
 
-        if (cancel) {
+        if (cancel && !executionEntity.isProcessInstanceType()) {
             dispatchActivityCancelled(executionEntity, cancelActivity != null ? cancelActivity : executionEntity.getCurrentFlowElement());
         }
         
@@ -724,21 +724,25 @@ public class ExecutionEntityManagerImpl
     }
 
     protected void dispatchActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
-        CommandContextUtil.getProcessEngineConfiguration()
-                .getEventDispatcher()
-                .dispatchEvent(
-                        FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
-                                execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                                execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+        FlowableEventDispatcher eventDispatcher =  CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+              eventDispatcher.dispatchEvent(
+                FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
+                    execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
+                    execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+        }
+
+
     }
 
     protected void dispatchMultiInstanceActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
-        CommandContextUtil.getProcessEngineConfiguration()
-                .getEventDispatcher()
-                .dispatchEvent(
-                        FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
-                                execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                                execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+        FlowableEventDispatcher eventDispatcher =  CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(
+                FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
+                    execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
+                    execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+        }
     }
 
     protected String getActivityType(FlowNode flowNode) {

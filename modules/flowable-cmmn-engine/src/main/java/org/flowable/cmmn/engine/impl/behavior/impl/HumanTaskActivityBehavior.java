@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -385,7 +386,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
-            throw new FlowableException("Can only trigger a human task plan item that is in the ACTIVE state");
+            throw new FlowableIllegalStateException("Can only trigger a human task plan item that is in the ACTIVE state");
         }
 
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);

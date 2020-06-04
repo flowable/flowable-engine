@@ -13,13 +13,16 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.junit.Test;
 
@@ -39,6 +42,30 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
                 .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidTrigger() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).trigger())
+            .isInstanceOf(FlowableIllegalStateException.class);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidTriggerEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
+        assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventListenerPlanItemInstance.getId()).trigger())
+            .isInstanceOf(FlowableIllegalStateException.class);
     }
 
     @Test
@@ -127,6 +154,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidEnable() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).enable())
+            .isInstanceOf(FlowableIllegalStateException.class);
     }
 
     @Test
@@ -241,6 +279,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.DISABLED);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidDisable() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).disable())
+            .isInstanceOf(FlowableIllegalStateException.class);
     }
 
     @Test

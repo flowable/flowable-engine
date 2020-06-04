@@ -35,8 +35,7 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
          * needs to be triggered.
          */
         
-        if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())
-                || CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
+        if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
             
             CommandContext commandContext = CommandContextUtil.getCommandContext();
             PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
@@ -45,6 +44,7 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
             if (planItemInstanceEntity != null) {
                 CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
             }
+
         }
     }
 
