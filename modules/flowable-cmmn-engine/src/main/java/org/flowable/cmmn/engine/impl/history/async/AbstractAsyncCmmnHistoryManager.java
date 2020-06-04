@@ -191,6 +191,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
 
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME, planItemInstanceEntity.getLastAvailableTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UNAVAILABLE_TIME, planItemInstanceEntity.getLastUnavailableTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME, planItemInstanceEntity.getLastEnabledTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME, planItemInstanceEntity.getLastDisabledTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME, planItemInstanceEntity.getLastStartedTime());

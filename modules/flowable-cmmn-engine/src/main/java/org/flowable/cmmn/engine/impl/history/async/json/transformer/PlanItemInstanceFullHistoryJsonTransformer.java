@@ -71,6 +71,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
         super.copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
 
         historicPlanItemInstanceEntity.setLastAvailableTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME));
+        historicPlanItemInstanceEntity.setLastAvailableTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_UNAVAILABLE_TIME));
         historicPlanItemInstanceEntity.setLastEnabledTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME));
         historicPlanItemInstanceEntity.setLastDisabledTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME));
         historicPlanItemInstanceEntity.setLastStartedTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME));

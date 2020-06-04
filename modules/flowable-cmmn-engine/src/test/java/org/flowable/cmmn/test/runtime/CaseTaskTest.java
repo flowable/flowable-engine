@@ -462,6 +462,9 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(4);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
 
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().list())
+            .extracting(HistoricCaseInstance::getState)
+            .containsOnly(PlanItemInstanceState.TERMINATED);
     }
 
     @Test
