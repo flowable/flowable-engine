@@ -30,6 +30,7 @@ import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelModelBuilder {
 
     protected EventRepositoryService eventRepository;
+    protected ChannelJsonConverter channelJsonConverter;
 
     protected OutboundChannelModel channelDefinition;
     protected String deploymentName;
@@ -39,8 +40,9 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
     protected String deploymentTenantId;
     protected String key;
 
-    public OutboundChannelDefinitionBuilderImpl(EventRepositoryService eventRepository) {
+    public OutboundChannelDefinitionBuilderImpl(EventRepositoryService eventRepository, ChannelJsonConverter channelJsonConverter) {
         this.eventRepository = eventRepository;
+        this.channelJsonConverter = channelJsonConverter;
     }
 
     @Override
@@ -124,7 +126,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
         EventDeployment eventDeployment = eventRepository.createDeployment()
             .name(deploymentName)
-            .addChannelDefinition(resourceName, new ChannelJsonConverter().convertToJson(channelModel))
+            .addChannelDefinition(resourceName, channelJsonConverter.convertToJson(channelModel))
             .category(category)
             .parentDeploymentId(parentDeploymentId)
             .tenantId(deploymentTenantId)

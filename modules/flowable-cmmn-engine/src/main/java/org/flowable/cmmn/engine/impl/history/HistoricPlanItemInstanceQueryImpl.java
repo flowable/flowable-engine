@@ -49,6 +49,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date createdAfter;
     protected Date lastAvailableBefore;
     protected Date lastAvailableAfter;
+    protected Date lastUnavailableBefore;
+    protected Date lastUnavailableAfter;
     protected Date lastEnabledBefore;
     protected Date lastEnabledAfter;
     protected Date lastDisabledBefore;
@@ -286,6 +288,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery lastAvailableAfter(Date lastAvailableAfter) {
         this.lastAvailableAfter = lastAvailableAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastUnavailableAfter(Date unavailableAfter) {
+        this.lastUnavailableAfter = unavailableAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastUnavailableBefore(Date unavailableBefore) {
+        this.lastUnavailableBefore = unavailableBefore;
         return this;
     }
 
@@ -532,6 +546,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public Date getLastAvailableAfter() {
         return lastAvailableAfter;
+    }
+    public Date getLastUnavailableBefore() {
+        return lastUnavailableBefore;
+    }
+    public Date getLastUnavailableAfter() {
+        return lastUnavailableAfter;
     }
     public Date getLastEnabledBefore() {
         return lastEnabledBefore;

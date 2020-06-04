@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -115,7 +115,7 @@ public class JsonTest extends PluggableFlowableTestCase {
                             + "}");
         }
     }
-    
+
     @Test
     @Deployment
     public void testCreateJsonArrayDuringExecution() {
@@ -123,37 +123,39 @@ public class JsonTest extends PluggableFlowableTestCase {
 
             @Override
             public void execute(DelegateExecution execution) {
-            	ArrayNode testArrayNode = objectMapper.createArrayNode();
-            	testArrayNode.addObject();
-            	execution.setVariable("jsonArrayTest", testArrayNode);
+                ArrayNode testArrayNode = objectMapper.createArrayNode();
+                testArrayNode.addObject();
+                execution.setVariable("jsonArrayTest", testArrayNode);
                 execution.setVariable("${jsonArrayTest[0].name}", "test");
-                
+
                 execution.setVariable("jsonObjectTest", objectMapper.createObjectNode());
                 execution.setVariable("${jsonObjectTest.name}", "anotherTest");
             }
         };
-        
+
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("createJsonArray")
                 .transientVariable("jsonBean", javaDelegate)
                 .start();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-        	List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery()
-        	        .processInstanceId(processInstance.getId())
-        	        .orderByVariableName()
-        	        .asc()
-        	        .list();
-        	assertThat(varInstances).hasSize(2);
-        	HistoricVariableInstance varInstance = varInstances.get(0);
-        	assertThatJson(varInstance.getValue()).isEqualTo("[{"
-                    + "  name: 'test'"
-                    + "}]");
-        	
-        	varInstance = varInstances.get(1);
-            assertThatJson(varInstance.getValue()).isEqualTo("{"
-                    + "  name: 'anotherTest'"
-                    + "}");
+            List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .orderByVariableName()
+                    .asc()
+                    .list();
+            assertThat(varInstances).hasSize(2);
+            HistoricVariableInstance varInstance = varInstances.get(0);
+            assertThatJson(varInstance.getValue())
+                    .isEqualTo("[{"
+                            + "  name: 'test'"
+                            + "}]");
+
+            varInstance = varInstances.get(1);
+            assertThatJson(varInstance.getValue())
+                    .isEqualTo("{"
+                            + "  name: 'anotherTest'"
+                            + "}");
         }
     }
 
@@ -220,51 +222,51 @@ public class JsonTest extends PluggableFlowableTestCase {
             @Override
             public void execute(DelegateExecution execution) {
                 execution.getVariable("customer", ObjectNode.class)
-                    .putObject("address")
-                    .put("street", "Sesame Street");
+                        .putObject("address")
+                        .put("street", "Sesame Street");
             }
         };
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("updateJsonValue")
-            .variable("customer", customer)
-            .transientVariable("jsonBean", javaDelegate)
-            .start();
+                .processDefinitionKey("updateJsonValue")
+                .variable("customer", customer)
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
 
         assertThatJson(customer)
-            .isEqualTo("{"
-                + "  name: 'Kermit',"
-                + "  address: {"
-                + "    street: 'Sesame Street'"
-                + "  }"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
 
         VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
         JsonNode customerVar = (JsonNode) customerVarInstance.getValue();
         assertThatJson(customerVar)
-            .isEqualTo("{"
-                + "  name: 'Kermit',"
-                + "  address: {"
-                + "    street: 'Sesame Street'"
-                + "  }"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .variableName("customer")
-                .singleResult();
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
             assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
             customerVar = (JsonNode) customerHistoricVarInstance.getValue();
             assertThatJson(customerVar)
-                .isEqualTo("{"
-                    + "  name: 'Kermit',"
-                    + "  address: {"
-                    + "    street: 'Sesame Street'"
-                    + "  }"
-                    + "}");
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
         }
     }
 
@@ -274,26 +276,31 @@ public class JsonTest extends PluggableFlowableTestCase {
         // Set customer.street to 'Sesame Street'
         ObjectNode customer = objectMapper.createObjectNode();
         customer.put("street", "Sesame Street");
-        JavaDelegate javaDelegate = execution -> {};
+        JavaDelegate javaDelegate = execution -> {
+        };
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("updateJsonValue")
-            .variable("customer", customer)
-            .transientVariable("jsonBean", javaDelegate)
-            .start();
+                .processDefinitionKey("updateJsonValue")
+                .variable("customer", customer)
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
 
         VariableInstance customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
 
         Object customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
-        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street");
+        assertThatJson(customerActual)
+                .inPath("street")
+                .isEqualTo("Sesame Street");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .variableName("customer")
                     .singleResult();
-            assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street");
+            assertThatJson(customerHistoricVariableInstance.getValue())
+                    .inPath("street")
+                    .isEqualTo("Sesame Street");
             assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
         }
 
@@ -305,7 +312,9 @@ public class JsonTest extends PluggableFlowableTestCase {
         customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
-        assertThatJson(customerActual).inPath("street").isEqualTo(randomLongValue);
+        assertThatJson(customerActual)
+                .inPath("street")
+                .isEqualTo(randomLongValue);
         assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNotNull();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -313,7 +322,9 @@ public class JsonTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .variableName("customer")
                     .singleResult();
-            assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo(randomLongValue);
+            assertThatJson(customerHistoricVariableInstance.getValue())
+                    .inPath("street")
+                    .isEqualTo(randomLongValue);
             assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNotNull();
         }
 
@@ -324,14 +335,18 @@ public class JsonTest extends PluggableFlowableTestCase {
         customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
-        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street 2");
+        assertThatJson(customerActual)
+                .inPath("street")
+                .isEqualTo("Sesame Street 2");
         assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .variableName("customer").singleResult();
-            assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street 2");
+            assertThatJson(customerHistoricVariableInstance.getValue())
+                    .inPath("street")
+                    .isEqualTo("Sesame Street 2");
             assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
         }
     }
@@ -347,51 +362,51 @@ public class JsonTest extends PluggableFlowableTestCase {
             @Override
             public void execute(DelegateExecution execution) {
                 execution.getVariable("customer", ObjectNode.class)
-                    .putObject("address")
-                    .put("street", randomLongStreetName);
+                        .putObject("address")
+                        .put("street", randomLongStreetName);
             }
         };
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("updateJsonValue")
-            .variable("customer", customer)
-            .transientVariable("jsonBean", javaDelegate)
-            .start();
+                .processDefinitionKey("updateJsonValue")
+                .variable("customer", customer)
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
 
         assertThatJson(customer)
-            .isEqualTo("{"
-                + "  name: 'Kermit',"
-                + "  address: {"
-                + "    street: '" + randomLongStreetName + "'"
-                + "  }"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: '" + randomLongStreetName + "'"
+                        + "  }"
+                        + "}");
 
         VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
         JsonNode customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerVarInstance.getValue());
         assertThatJson(customerVar)
-            .isEqualTo("{"
-                + "  name: 'Kermit',"
-                + "  address: {"
-                + "    street: '" + randomLongStreetName + "'"
-                + "  }"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: '" + randomLongStreetName + "'"
+                        + "  }"
+                        + "}");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .variableName("customer")
-                .singleResult();
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
             assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
             customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerHistoricVarInstance.getValue());
             assertThatJson(customerVar)
-                .isEqualTo("{"
-                    + "  name: 'Kermit',"
-                    + "  address: {"
-                    + "    street: '" + randomLongStreetName + "'"
-                    + "  }"
-                    + "}");
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: '" + randomLongStreetName + "'"
+                            + "  }"
+                            + "}");
         }
     }
 
@@ -403,47 +418,47 @@ public class JsonTest extends PluggableFlowableTestCase {
         String randomLongStreetName = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
         customer.put("name", "Kermit");
         customer.putObject("address")
-            .put("address", randomLongStreetName);
+                .put("address", randomLongStreetName);
         JavaDelegate javaDelegate = new JavaDelegate() {
 
             @Override
             public void execute(DelegateExecution execution) {
                 execution.getVariable("customer", ObjectNode.class)
-                    .remove("address");
+                        .remove("address");
             }
         };
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("updateJsonValue")
-            .variable("customer", customer)
-            .transientVariable("jsonBean", javaDelegate)
-            .start();
+                .processDefinitionKey("updateJsonValue")
+                .variable("customer", customer)
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
 
         assertThatJson(customer)
-            .isEqualTo("{"
-                + "  name: 'Kermit'"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit'"
+                        + "}");
 
         VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
         assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
         JsonNode customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerVarInstance.getValue());
         assertThatJson(customerVar)
-            .isEqualTo("{"
-                + "  name: 'Kermit'"
-                + "}");
+                .isEqualTo("{"
+                        + "  name: 'Kermit'"
+                        + "}");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .variableName("customer")
-                .singleResult();
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
             assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
             customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerHistoricVarInstance.getValue());
             assertThatJson(customerVar)
-                .isEqualTo("{"
-                    + "  name: 'Kermit'"
-                    + "}");
+                    .isEqualTo("{"
+                            + "  name: 'Kermit'"
+                            + "}");
         }
     }
 
@@ -459,8 +474,9 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been parsed as expected
         ObjectNode value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertNotNull(value);
-        assertEquals("myValue", value.get("var").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("{ var: 'myValue' }");
 
         ObjectNode var2Node = objectMapper.createObjectNode();
         var2Node.put("var", "myValue");
@@ -469,12 +485,15 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been updated as expected
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertNotNull(value);
-        assertEquals("myValue", value.get("var").asText());
-        assertEquals("myOtherValue", value.get("var2").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("{ "
+                        + "   var: 'myValue',"
+                        + "   var2: 'myOtherValue'"
+                        + "}");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         ObjectNode var3Node = objectMapper.createObjectNode();
         var3Node.put("var", "myValue");
         var3Node.put("var2", "myOtherValue");
@@ -485,56 +504,62 @@ public class JsonTest extends PluggableFlowableTestCase {
         vars.put(BIG_JSON_OBJ, createBigJsonObject());
         taskService.complete(task.getId(), vars);
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertNotNull(value);
-        assertEquals("myValue", value.get("var").asText());
-        assertEquals("myOtherValue", value.get("var2").asText());
-        assertEquals("myThirdValue", value.get("var3").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("{ "
+                        + "   var: 'myValue',"
+                        + "   var2: 'myOtherValue',"
+                        + "   var3: 'myThirdValue'"
+                        + "}");
 
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ);
-        assertNotNull(value);
-        assertEquals(createBigJsonObject().toString(), value.toString());
+        assertThat(value).isNotNull();
+        assertThat(value.toString()).isEqualTo(createBigJsonObject().toString());
 
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), BIG_JSON_OBJ);
-        assertNotNull(variableInstance);
-        assertEquals(createBigJsonObject().toString(), variableInstance.getValue().toString());
+        assertThat(variableInstance).isNotNull();
+        assertThat(variableInstance.getValue().toString()).isEqualTo(createBigJsonObject().toString());
 
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getProcessInstanceId()).orderByVariableName().asc().list();
-            assertEquals(2, historicVariableInstances.size());
+            assertThat(historicVariableInstances).hasSize(2);
 
-            assertEquals(BIG_JSON_OBJ, historicVariableInstances.get(0).getVariableName());
+            assertThat(historicVariableInstances.get(0).getVariableName()).isEqualTo(BIG_JSON_OBJ);
             value = (ObjectNode) historicVariableInstances.get(0).getValue();
-            assertNotNull(value);
-            assertEquals(createBigJsonObject().toString(), value.toString());
+            assertThat(value).isNotNull();
+            assertThat(value.toString()).isEqualTo(createBigJsonObject().toString());
 
-            assertEquals(MY_JSON_OBJ, historicVariableInstances.get(1).getVariableName());
+            assertThat(historicVariableInstances.get(1).getVariableName()).isEqualTo(MY_JSON_OBJ);
             value = (ObjectNode) historicVariableInstances.get(1).getValue();
-            assertNotNull(value);
-            assertEquals("myValue", value.get("var").asText());
-            assertEquals("myOtherValue", value.get("var2").asText());
-            assertEquals("myThirdValue", value.get("var3").asText());
+            assertThat(value).isNotNull();
+            assertThatJson(value)
+                    .isEqualTo("{ "
+                            + "   var: 'myValue',"
+                            + "   var2: 'myOtherValue',"
+                            + "   var3: 'myThirdValue'"
+                            + "}");
 
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .variableName(BIG_JSON_OBJ)
                     .singleResult();
 
-            assertNotNull(historicVariableInstance);
-            assertEquals(createBigJsonObject().toString(), historicVariableInstance.getValue().toString());
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue().toString()).isEqualTo(createBigJsonObject().toString());
         }
 
         // It should be possible do remove a json variable
         runtimeService.removeVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertNull(runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ));
+        assertThat(runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ)).isNull();
 
         // It should be possible do remove a longJson variable
         runtimeService.removeVariable(processInstance.getId(), BIG_JSON_OBJ);
-        assertNull(runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ));
+        assertThat(runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ)).isNull();
     }
 
     @Test
@@ -549,11 +574,14 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been parsed as expected
         ObjectNode value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "myJsonObj");
-        assertNotNull(value);
-        assertEquals("myValue", value.get("var").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("{ "
+                        + "   var: 'myValue'"
+                        + "}");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         ObjectNode var3Node = objectMapper.createObjectNode();
         var3Node.put("var", "myValue");
         var3Node.put("var2", "myOtherValue");
@@ -563,14 +591,17 @@ public class JsonTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId(), vars);
 
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "myJsonObj");
-        assertNotNull(value);
-        assertEquals("myValue", value.get("var").asText());
-        assertEquals("myOtherValue", value.get("var2").asText());
-        assertEquals("myThirdValue", value.get("var3").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("{ "
+                        + "   var: 'myValue',"
+                        + "   var2: 'myOtherValue',"
+                        + "   var3: 'myThirdValue'"
+                        + "}");
 
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
     }
 
     @Test
@@ -587,8 +618,11 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been parsed as expected
         ArrayNode value = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "myJsonArr");
-        assertNotNull(value);
-        assertEquals("myValue", value.get(0).get("var").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("[ { "
+                        + "   var: 'myValue'"
+                        + "} ]");
 
         ArrayNode varArray2 = objectMapper.createArrayNode();
         varNode = objectMapper.createObjectNode();
@@ -601,12 +635,16 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been updated as expected
         value = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "myJsonArr");
-        assertNotNull(value);
-        assertEquals("myValue", value.get(0).get("var").asText());
-        assertEquals("myOtherValue", value.get(1).get("var").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("[ { "
+                        + "   var: 'myValue'"
+                        + "}, {"
+                        + "   var: 'myOtherValue'"
+                        + "} ]");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         ArrayNode varArray3 = objectMapper.createArrayNode();
         varNode = objectMapper.createObjectNode();
         varNode.put("var", "myValue");
@@ -621,26 +659,36 @@ public class JsonTest extends PluggableFlowableTestCase {
         vars.put("myJsonArr", varArray3);
         taskService.complete(task.getId(), vars);
         value = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "myJsonArr");
-        assertNotNull(value);
-        assertEquals("myValue", value.get(0).get("var").asText());
-        assertEquals("myOtherValue", value.get(1).get("var").asText());
-        assertEquals("myThirdValue", value.get(2).get("var").asText());
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("[ { "
+                        + "   var: 'myValue'"
+                        + "}, {"
+                        + "   var: 'myOtherValue'"
+                        + "}, {"
+                        + "   var: 'myThirdValue'"
+                        + "} ]");
 
         task = taskService.createTaskQuery().active().singleResult();
-        assertNotNull(task);
-        assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getProcessInstanceId()).singleResult();
             value = (ArrayNode) historicVariableInstance.getValue();
-            assertNotNull(value);
-            assertEquals("myValue", value.get(0).get("var").asText());
-            assertEquals("myOtherValue", value.get(1).get("var").asText());
-            assertEquals("myThirdValue", value.get(2).get("var").asText());
+            assertThat(value).isNotNull();
+            assertThatJson(value)
+                    .isEqualTo("[ { "
+                            + "   var: 'myValue'"
+                            + "}, {"
+                            + "   var: 'myOtherValue'"
+                            + "}, {"
+                            + "   var: 'myThirdValue'"
+                            + "} ]");
         }
     }
-    
+
     @Test
     @Deployment
     public void testJsonArrayAccessByIndex() {
@@ -656,7 +704,10 @@ public class JsonTest extends PluggableFlowableTestCase {
         // Check JSON has been parsed as expected
         ArrayNode value = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "myJsonArr");
         assertThat(value).isNotNull();
-        assertThat(value.get(0).get("var").asText()).isEqualTo("myValue");
+        assertThatJson(value)
+                .isEqualTo("[ { "
+                        + "   var: 'myValue'"
+                        + "} ]");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
         assertThat(task).isNotNull();
@@ -672,7 +723,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
     }
-    
+
     @Test
     @Deployment
     public void testJsonNumber() {
@@ -685,14 +736,14 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been parsed as expected
         ObjectNode value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertEquals(10, value.get("numVar").asInt());
+        assertThat(value.get("numVar").asInt()).isEqualTo(10);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId(), vars);
-        
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
-        
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
+
         vars = new HashMap<>();
 
         varNode = objectMapper.createObjectNode();
@@ -702,25 +753,25 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         // Check JSON has been parsed as expected
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
-        assertEquals(40, value.get("numVar").asInt());
+        assertThat(value.get("numVar").asInt()).isEqualTo(40);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId(), vars);
-        
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("userTaskFailure", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskFailure");
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void testSetNestedJsonNodeValue() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customer", objectMapper.createObjectNode())
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode())
+                .start();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-            .isEqualTo("{}");
+                .isEqualTo("{}");
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
             expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
@@ -728,19 +779,19 @@ public class JsonTest extends PluggableFlowableTestCase {
         });
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-            .isEqualTo("{"
-                + "  address: {"
-                + "    street: 'Sesame Street'"
-                + "  }"
-                + "}");
+                .isEqualTo("{"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
-                .isEqualTo("{"
-                    + "  address: {"
-                    + "    street: 'Sesame Street'"
-                    + "  }"
-                    + "}");
+                    .isEqualTo("{"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
         }
     }
 
@@ -756,7 +807,8 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .isEqualTo("{}");
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
-            expression.setValue(Date.from(Instant.parse("2020-02-16T14:24:45.583Z")), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            expression.setValue(Date.from(Instant.parse("2020-02-16T14:24:45.583Z")),
+                    CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
             return null;
         });
 
@@ -777,15 +829,17 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .variable("customer", objectMapper.createObjectNode())
                 .start();
 
-        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer")).isEqualTo("{}");
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{}");
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
                     .isEqualTo("{}");
         }
-        
+
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
-            expression.setValue(Instant.parse("2020-02-16T14:24:45.583Z"), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            expression.setValue(Instant.parse("2020-02-16T14:24:45.583Z"),
+                    CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
             return null;
         });
 
@@ -802,20 +856,22 @@ public class JsonTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void testGetNestedJsonNodeValue() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customer", objectMapper.createObjectNode())
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode())
+                .start();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-            .isEqualTo("{}");
+                .isEqualTo("{}");
 
-        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+        Object value = managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+        });
+
+        assertThat(value).isNull();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-            .isEqualTo("{}");
+                .isEqualTo("{}");
     }
 
     @Test
@@ -825,12 +881,12 @@ public class JsonTest extends PluggableFlowableTestCase {
         customers.addObject();
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customers", customers)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customers", customers)
+                .start();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{}]");
+                .isEqualTo("[{}]");
 
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
@@ -839,13 +895,13 @@ public class JsonTest extends PluggableFlowableTestCase {
         });
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("["
-                + "  {"
-                + "    address: {"
-                + "      street: 'Sesame Street'"
-                + "    }"
-                + "  }"
-                + "]");
+                .isEqualTo("["
+                        + "  {"
+                        + "    address: {"
+                        + "      street: 'Sesame Street'"
+                        + "    }"
+                        + "  }"
+                        + "]");
     }
 
     @Test
@@ -853,31 +909,33 @@ public class JsonTest extends PluggableFlowableTestCase {
     void testGetArrayNestedJsonNodeValue() {
         ArrayNode customers = objectMapper.createArrayNode();
         customers.addObject()
-            .put("name", "Kermit the Frog");
+                .put("name", "Kermit the Frog");
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customers", customers)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customers", customers)
+                .start();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("["
-                + "  {"
-                + "    name: 'Kermit the Frog'"
-                + "  }"
-                + "]");
+                .isEqualTo("["
+                        + "  {"
+                        + "    name: 'Kermit the Frog'"
+                        + "  }"
+                        + "]");
 
-        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+        Object value = managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+        });
+
+        assertThat(value).isNull();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("["
-                + "  {"
-                + "    name: 'Kermit the Frog'"
-                + "  }"
-                + "]");
+                .isEqualTo("["
+                        + "  {"
+                        + "    name: 'Kermit the Frog'"
+                        + "  }"
+                        + "]");
     }
 
     @Test
@@ -885,17 +943,17 @@ public class JsonTest extends PluggableFlowableTestCase {
     void testSetNestedArrayNestedJsonNodeValue() {
         ArrayNode customers = objectMapper.createArrayNode();
         customers.addObject()
-            .putArray("addresses")
-            .addObject();
+                .putArray("addresses")
+                .addObject();
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customers", customers)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customers", customers)
+                .start();
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{"
-                + "  addresses: [{}]"
-                + "}]");
+                .isEqualTo("[{"
+                        + "  addresses: [{}]"
+                        + "}]");
 
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].addresses[0].street}");
@@ -904,11 +962,11 @@ public class JsonTest extends PluggableFlowableTestCase {
         });
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{"
-                + "  addresses: [{"
-                + "    street: 'Sesame Street'"
-                + "  }]"
-                + "}]");
+                .isEqualTo("[{"
+                        + "  addresses: [{"
+                        + "    street: 'Sesame Street'"
+                        + "  }]"
+                        + "}]");
     }
 
     @Test
@@ -918,21 +976,21 @@ public class JsonTest extends PluggableFlowableTestCase {
         customers.addObject();
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customers", customers)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customers", customers)
+                .start();
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{}]");
+                .isEqualTo("[{}]");
 
         assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].addresses[0].street}");
             expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
             return null;
         }))
-        .hasCauseInstanceOf(PropertyNotFoundException.class);
+                .hasCauseInstanceOf(PropertyNotFoundException.class);
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{}]");
+                .isEqualTo("[{}]");
     }
 
     @Test
@@ -942,12 +1000,12 @@ public class JsonTest extends PluggableFlowableTestCase {
         customers.add("Initial value");
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("customers", customers)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customers", customers)
+                .start();
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("['Initial value']");
+                .isEqualTo("['Initial value']");
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
             expression.setValue("Flowable", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
@@ -955,7 +1013,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         });
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("['Flowable']");
+                .isEqualTo("['Flowable']");
 
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
@@ -963,22 +1021,22 @@ public class JsonTest extends PluggableFlowableTestCase {
             return customers;
         });
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[10]");
+                .isEqualTo("[10]");
 
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
             ObjectNode value = objectMapper.createObjectNode();
             value.putObject("address")
-                .put("street", "Sesame Street");
+                    .put("street", "Sesame Street");
             expression.setValue(value, CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
             return customers;
         });
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
-            .isEqualTo("[{"
-                + "  address: {"
-                + "    street: 'Sesame Street'"
-                + "  }"
-                + "}]");
+                .isEqualTo("[{"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}]");
     }
 
     protected ObjectNode createBigJsonObject() {

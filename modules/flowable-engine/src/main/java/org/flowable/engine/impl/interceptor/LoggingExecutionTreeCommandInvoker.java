@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.interceptor;
 
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.engine.debug.ExecutionTreeUtil;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.slf4j.Logger;
@@ -23,6 +24,10 @@ import org.slf4j.LoggerFactory;
 public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExecutionTreeCommandInvoker.class);
+
+    public LoggingExecutionTreeCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        super(agendaOperationRunner);
+    }
 
     @Override
     public void executeOperation(Runnable runnable) {

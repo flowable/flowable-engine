@@ -13,6 +13,7 @@
 
 package org.flowable.standalone.el;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -36,11 +37,12 @@ public class ExpressionBeanAccessTest extends ResourceFlowableTestCase {
         // Exposed bean returns 'I'm exposed' when to-string is called in first
         // service-task
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionBeanAccess");
-        assertEquals("I'm exposed", runtimeService.getVariable(pi.getId(), "exposedBeanResult"));
+        assertThat(runtimeService.getVariable(pi.getId(), "exposedBeanResult")).isEqualTo("I'm exposed");
 
         // After signaling, an expression tries to use a bean that is present in
         // the configuration but is not added to the beans-list
-        assertThatThrownBy(() -> runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getId()))
+        assertThatThrownBy(
+                () -> runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getId()))
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasRootCauseMessage("Cannot resolve identifier 'notExposedBean'");
     }

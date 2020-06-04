@@ -28,18 +28,6 @@ public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePl
     }
     
     @Override
-    public void run() {
-        String oldState = planItemInstanceEntity.getState();
-        String newState = getNewState();
-        planItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
-
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
-        internalExecute();
-    }
-    
-    @Override
     protected String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }

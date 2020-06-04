@@ -203,7 +203,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
 
         assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance1.getId()))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+                .hasMessage("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
 
         // Completing the one task should mark the stage as completeable 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

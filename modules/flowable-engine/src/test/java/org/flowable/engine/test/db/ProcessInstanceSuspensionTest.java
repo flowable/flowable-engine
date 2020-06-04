@@ -132,7 +132,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(null, new Page(0, 1));
+                return jobServiceConfiguration.getTimerJobEntityManager().findJobsToExecute(null, new Page(0, 1));
             }
 
         });
@@ -146,7 +146,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(null, new Page(0, 1));
+                return jobServiceConfiguration.getTimerJobEntityManager().findJobsToExecute(null, new Page(0, 1));
             }
         });
 
@@ -170,7 +170,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
                 JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
-                return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(null, new Page(0, 1));
+                return jobServiceConfiguration.getTimerJobEntityManager().findJobsToExecute(null, new Page(0, 1));
             }
 
         });

@@ -675,7 +675,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
                 List<String> enabledCategories = CommandContextUtil.getJobServiceConfiguration().getEnabledJobCategories();
                 AsyncExecutor asyncExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncExecutor();
                 List<TimerJobEntity> timerJobs = CommandContextUtil.getJobServiceConfiguration().getTimerJobEntityManager()
-                        .findTimerJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+                        .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
                 return timerJobs.size();
             }
         });

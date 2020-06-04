@@ -171,6 +171,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceUnavailable(planItemInstanceEntity);
+        }
+    }
+
+    @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordPlanItemInstanceEnabled(planItemInstanceEntity);

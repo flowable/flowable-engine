@@ -29,7 +29,7 @@ public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEn
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new CdiCommandInvoker();
+            commandInvoker = new CdiCommandInvoker(agendaOperationRunner);
         }
     }
 

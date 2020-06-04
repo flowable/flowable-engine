@@ -17,6 +17,7 @@ import java.util.Set;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -32,6 +33,12 @@ import org.slf4j.LoggerFactory;
 public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(CmmnCommandInvoker.class);
+
+    protected AgendaOperationRunner agendaOperationRunner;
+
+    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -62,7 +69,8 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing agenda operation {}", runnable);
             }
-            runnable.run();
+
+            agendaOperationRunner.executeOperation(runnable);
 
             // If the operation caused changes, a new evaluation needs to be planned,
             // as the operations could have changed the state and/or variables.
@@ -104,5 +112,13 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     public void setNext(CommandInterceptor next) {
         throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
     }
-    
+
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+
+    public void setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
+
 }

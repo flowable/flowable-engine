@@ -48,6 +48,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Date createdAfter;
     protected Date lastAvailableBefore;
     protected Date lastAvailableAfter;
+    protected Date lastUnavailableBefore;
+    protected Date lastUnavailableAfter;
     protected Date lastEnabledBefore;
     protected Date lastEnabledAfter;
     protected Date lastDisabledBefore;
@@ -274,6 +276,24 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             throw new FlowableIllegalArgumentException("availableAfter is null");
         }
         this.lastAvailableAfter = availableAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastUnavailableBefore(Date unavailableBefore) {
+        if (unavailableBefore == null) {
+            throw new FlowableIllegalArgumentException("unavailableBefore is null");
+        }
+        this.lastUnavailableBefore = unavailableBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastUnavailableAfter(Date unavailableAfter) {
+        if (unavailableAfter == null) {
+            throw new FlowableIllegalArgumentException("unavailableAfter is null");
+        }
+        this.lastUnavailableAfter = unavailableAfter;
         return this;
     }
 
@@ -695,6 +715,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public Date getLastAvailableAfter() {
         return lastAvailableAfter;
+    }
+    public Date getLastUnavailableBefore() {
+        return lastUnavailableBefore;
+    }
+    public Date getLastUnavailableAfter() {
+        return lastUnavailableAfter;
     }
     public Date getLastEnabledBefore() {
         return lastEnabledBefore;

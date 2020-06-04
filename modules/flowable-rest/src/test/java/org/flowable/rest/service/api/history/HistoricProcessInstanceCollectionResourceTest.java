@@ -166,14 +166,17 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertThat(dataNode).hasSize(1);
-        JsonNode valueNode = dataNode.get(0);
-        assertThat(valueNode.get("id").asText()).isEqualTo(processInstanceId);
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("[{"
+                        + "  id: '" + processInstanceId + "'"
+                        + "}]");
 
         // Check expected variables
+        JsonNode valueNode = dataNode.get(0);
         assertThat(valueNode.get("variables")).hasSize(expectedVariables.size());
 
-        for(JsonNode node: valueNode.get("variables")) {
+        for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
             String variableName = variableNode.get("name").textValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);

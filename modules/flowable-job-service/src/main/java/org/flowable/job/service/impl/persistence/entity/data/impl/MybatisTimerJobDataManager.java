@@ -80,7 +80,28 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page) {
+    public List<TimerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
+        params.put("now", now);
+        if (enabledCategories != null && enabledCategories.size() > 0) {
+            params.put("enabledCategories", enabledCategories);
+        }
+        return getDbSqlSession().selectList("selectExpiredTimerJobs", params, page);
+    }
+
+    @Override
+    public void resetExpiredJob(String jobId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("id", jobId);
+        params.put("now", jobServiceConfiguration.getClock().getCurrentTime());
+        getDbSqlSession().update("resetExpiredTimerJob", params);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<TimerJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>(2);
         String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
         params.put("jobExecutionScope", jobExecutionScope);

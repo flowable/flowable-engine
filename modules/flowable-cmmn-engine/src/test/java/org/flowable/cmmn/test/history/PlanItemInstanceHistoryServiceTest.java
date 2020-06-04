@@ -515,6 +515,64 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testQueryByUnavailableState() {
+        Date startTime = new Date();
+        setClockTo(startTime);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableCondition").start();
+
+        PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
+        assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(taskA.getId());
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult().getId());
+
+        eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
+        assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceId(eventListenerPlanItemInstance.getId()).singleResult().getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceState(PlanItemInstanceState.UNAVAILABLE).list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).containsExactly("myEventListener");
+
+        Date afterStartTime = new Date(startTime.getTime() + 10000L);
+        setClockTo(afterStartTime);
+
+        // UnavailableAfter
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceLastUnavailableAfter(startTime).list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).containsExactly("myEventListener");
+
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().lastUnavailableAfter(startTime).list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).containsExactly("myEventListener");
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceLastUnavailableAfter(afterStartTime).list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).isEmpty();
+
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().lastUnavailableAfter(afterStartTime).list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).isEmpty();
+
+        // UnavailableBefore
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceLastUnavailableBefore(afterStartTime).list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).containsExactly("myEventListener");
+
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().lastUnavailableBefore(afterStartTime).list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).containsExactly("myEventListener");
+
+        Date beforeStartTime = new Date(startTime.getTime() - 10000);
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceLastUnavailableBefore(beforeStartTime).list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).isEmpty();
+
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().lastUnavailableBefore(beforeStartTime).list();
+        assertThat(historicPlanItemInstances).extracting(HistoricPlanItemInstance::getName).isEmpty();
+    }
+
     private List<String> getIdsOfNonWaitingPlanItemInstances(List<PlanItemInstance> currentPlanItems) {
         return currentPlanItems.stream()
                 .filter(p -> !PlanItemInstanceState.AVAILABLE.equals(p.getState()))

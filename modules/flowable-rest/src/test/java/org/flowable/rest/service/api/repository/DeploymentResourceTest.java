@@ -74,13 +74,13 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                             + "deploymentTime: '${json-unit.any-string}',"
                             + "tenantId: ''"
                             + "}");
-            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1);
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
             assertThat(resources)
                     .containsExactly("oneTaskProcess.bpmn20.xml");
-            assertThat(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -133,13 +133,13 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                             + "deploymentTime: '${json-unit.any-string}',"
                             + "tenantId: ''"
                             + "}");
-            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1);
 
             // Check if both resources are deployed and process is actually
             // deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
             assertThat(resources).hasSize(2);
-            assertThat(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1);
         } finally {
             // Always cleanup any created deployments, even if the test failed
             List<Deployment> deployments = repositoryService.createDeploymentQuery().list();

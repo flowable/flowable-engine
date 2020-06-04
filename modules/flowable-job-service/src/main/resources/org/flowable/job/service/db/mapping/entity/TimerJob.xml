@@ -168,6 +168,30 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
+    <select id="selectExpiredTimerJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        from ${prefix}ACT_RU_TIMER_JOB RES
+        <where>
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+            </if>
+            and LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP}
+
+            <if test="parameter.enabledCategories">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
     <!-- TIMER INSERT -->
 
     <insert id="insertTimerJob" parameterType="org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl">
@@ -469,6 +493,12 @@
             where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
             ) AS tempTask
         )
+    </update>
+
+    <update id="resetExpiredTimerJob" parameterType="map">
+        update ${prefix}ACT_RU_TIMER_JOB
+        set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null, CREATE_TIME_ = #{now, jdbcType=TIMESTAMP}
+        where ID_ = #{id,jdbcType=VARCHAR}
     </update>
 
 </mapper>

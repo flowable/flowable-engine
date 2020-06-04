@@ -202,6 +202,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.testTaskListenersOnDelete.bpmn20.xml" })
     public void testTaskListenersOnDeleteByComplete() {
         TaskDeleteListener.clear();
+        TaskSimpleCompleteListener.clear();
         runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
@@ -232,6 +233,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.testTaskListenersOnDelete.bpmn20.xml" })
     public void testTaskListenersOnDeleteByDeleteProcessInstance() {
         TaskDeleteListener.clear();
+        TaskSimpleCompleteListener.clear();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();

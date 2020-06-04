@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class TimerJobEntityManagerImpl
-    extends AbstractJobServiceEngineEntityManager<TimerJobEntity, TimerJobDataManager>
+    extends JobInfoEntityManagerImpl<TimerJobEntity, TimerJobDataManager>
     implements TimerJobEntityManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
@@ -63,11 +63,6 @@ public class TimerJobEntityManagerImpl
     @Override
     public TimerJobEntity findJobByCorrelationId(String correlationId) {
         return dataManager.findJobByCorrelationId(correlationId);
-    }
-
-    @Override
-    public List<TimerJobEntity> findTimerJobsToExecute(List<String> enabledCategories, Page page) {
-        return dataManager.findTimerJobsToExecute(enabledCategories, page);
     }
 
     @Override

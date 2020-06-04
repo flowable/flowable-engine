@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.impl.logger;
 
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 
@@ -22,7 +23,8 @@ public class LoggingCommandInvoker extends CommandInvoker {
 
     protected ProcessExecutionLogger processExecutionLogger;
 
-    public LoggingCommandInvoker(ProcessExecutionLogger processExecutionLogger) {
+    public LoggingCommandInvoker(AgendaOperationRunner agendaOperationRunner, ProcessExecutionLogger processExecutionLogger) {
+        super(agendaOperationRunner);
         this.processExecutionLogger = processExecutionLogger;
     }
 

@@ -843,6 +843,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -916,6 +917,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -971,6 +973,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1161,6 +1164,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1222,6 +1226,7 @@
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1269,6 +1274,7 @@
                                 <exclude>**/ProcessInstanceMigration*Test.java</exclude>
                                 <exclude>**/CacheTaskTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx3g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
