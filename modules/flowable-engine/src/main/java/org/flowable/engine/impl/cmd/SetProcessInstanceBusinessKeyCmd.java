@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.cmd;
 
+import static org.flowable.engine.impl.util.CommandContextUtil.getProcessEngineConfiguration;
+
 import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -54,6 +56,12 @@ public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializ
         ExecutionEntityManager executionManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity processInstance = executionManager.findById(processInstanceId);
         if (processInstance == null) {
+            if (getProcessEngineConfiguration(commandContext).isFlowable5CompatibilityEnabled()) {
+                getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().updateBusinessKey(processInstanceId,
+                        businessKey);
+                return null;
+            }
+            
             throw new FlowableObjectNotFoundException("No process instance found for id = '" + processInstanceId + "'.", ProcessInstance.class);
         } else if (!processInstance.isProcessInstanceType()) {
             throw new FlowableIllegalArgumentException("A process instance id is required, but the provided id " + "'" + processInstanceId + "' " + "points to a child execution of process instance " + "'"
