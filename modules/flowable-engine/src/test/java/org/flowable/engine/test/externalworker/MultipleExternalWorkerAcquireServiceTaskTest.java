@@ -15,7 +15,6 @@ package org.flowable.engine.test.externalworker;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -24,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -156,6 +154,10 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
 
         protected CountDownLatch workLatch;
         protected CountDownLatch waitLatch;
+
+        public CustomWaitCommandInvoker() {
+            super(Runnable::run);
+        }
 
         @Override
         public <T> T execute(CommandConfig config, Command<T> command) {

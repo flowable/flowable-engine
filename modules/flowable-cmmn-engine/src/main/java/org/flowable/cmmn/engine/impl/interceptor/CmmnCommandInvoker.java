@@ -36,6 +36,10 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
     protected AgendaOperationRunner agendaOperationRunner;
 
+    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> T execute(final CommandConfig config, final Command<T> command) {

@@ -26,7 +26,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.DefaultInternalJobManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -36,7 +35,6 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
-import org.flowable.job.service.impl.cmd.MoveTimerJobsToExecutableJobsCmd;
 import org.flowable.job.service.impl.cmd.UnlockTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -154,6 +152,10 @@ class AcquireTimerJobsMoveFailsTest extends JobExecutorTestCase {
 
         protected CountDownLatch acquireJobLatch;
         protected CountDownLatch unlockJobLatch;
+
+        public CustomWaitCommandInvoker() {
+            super(Runnable::run);
+        }
 
         @Override
         public <T> T execute(CommandConfig config, Command<T> command) {

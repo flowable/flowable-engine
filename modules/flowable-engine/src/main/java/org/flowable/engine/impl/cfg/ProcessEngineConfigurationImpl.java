@@ -1109,15 +1109,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             if (enableVerboseExecutionTreeLogging) {
-                commandInvoker = new LoggingExecutionTreeCommandInvoker();
+                this.commandInvoker = new LoggingExecutionTreeCommandInvoker(agendaOperationRunner);
+
             } else {
-                CommandInvoker commandInvoker = new CommandInvoker();
-
-                if (agendaOperationRunner != null) {
-                    commandInvoker.setAgendaOperationRunner(agendaOperationRunner);
-                }
-
-                this.commandInvoker = commandInvoker;
+                this.commandInvoker = new CommandInvoker(agendaOperationRunner);
             }
         }
     }

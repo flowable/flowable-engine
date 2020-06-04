@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
@@ -114,6 +113,10 @@ class AcquireTimerJobsMultiNodeTest extends JobExecutorTestCase {
 
         protected CountDownLatch workLatch;
         protected CountDownLatch waitLatch;
+
+        public CustomWaitCommandInvoker() {
+            super(Runnable::run);
+        }
 
         @Override
         public <T> T execute(CommandConfig config, Command<T> command) {

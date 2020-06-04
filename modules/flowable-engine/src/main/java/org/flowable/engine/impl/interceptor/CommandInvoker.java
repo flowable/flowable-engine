@@ -34,6 +34,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
 
     protected AgendaOperationRunner agendaOperationRunner;
 
+    public CommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T execute(final CommandConfig config, final Command<T> command) {
