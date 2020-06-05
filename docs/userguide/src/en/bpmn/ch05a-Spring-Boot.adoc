@@ -771,6 +771,7 @@ flowable.mail.server.force-to= # The force to address(es) that would be used whe
 flowable.mail.server.host=localhost # The host of the mail server.
 flowable.mail.server.password= # The password for the mail server authentication.
 flowable.mail.server.port=1025 # The port of the mail server.
+flowable.mail.server.ssl-port=1465 # The SSL port of the mail server.
 flowable.mail.server.use-ssl=false # Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).
 flowable.mail.server.use-tls=false # Set or disable the STARTTLS encryption.
 flowable.mail.server.username= # The username that needs to be used for the mail server authentication. If empty no authentication would be used.
@@ -829,6 +830,11 @@ management.endpoint.flowable.enabled=true # Whether to enable the flowable endpo
 |flowable.mail-server-port
 |1025
 |The port of the mail server.
+
+|flowable.mail.server.ssl-port
+|flowable.mail-server-ssl-port
+|1465
+|The SSL port of the mail server.
 
 |flowable.mail.server.use-ssl
 |flowable.mail-server-use-ssl

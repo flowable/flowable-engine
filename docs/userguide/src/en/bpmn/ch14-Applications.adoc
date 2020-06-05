@@ -360,6 +360,11 @@ As such, if you have a custom implementation of the 'org.flowable.ldap.LDAPIdent
 |1025
 |The port of the mail server.
 
+|flowable.mail.server.ssl-port
+|email.ssl-port
+|1465
+|The SSL port of the mail server.
+
 |flowable.mail.server.use-ssl
 |email.use-ssl
 |false
