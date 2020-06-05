@@ -12,6 +12,8 @@
  */
 package org.flowable.http.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.runtime.ProcessInstance;
@@ -33,7 +35,7 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 2000L);
 
         assertProcessEnded(procId);
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
     @Test
@@ -41,13 +43,12 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
     public void testFailedJobRetryTimeCycle() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncFailedJobRetryTimeCycle");
 
-        List<Job> jobs = managementService.createJobQuery()
-                .processInstanceId(processInstance.getId()).list();
-        assertEquals(1, jobs.size());
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(1);
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 3000L);
 
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
 }
