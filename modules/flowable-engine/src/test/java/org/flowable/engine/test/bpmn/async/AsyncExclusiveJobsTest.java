@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -50,7 +52,7 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
             } else {
                 endTimeDifference = endTimeA - endTimeB;
             }
-            assertTrue(endTimeDifference > 6000); // > 6000 -> jobs were executed in parallel
+            assertThat(endTimeDifference).isGreaterThan(6000); // > 6000 -> jobs were executed in parallel
         }
 
     }
