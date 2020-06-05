@@ -13,7 +13,6 @@
 package org.flowable.cmmn.rest.service.api.repository;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.List;
@@ -146,12 +145,12 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
                     + "?sort=deployTime&order=asc&start=1&size=1"), HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            dataNode = responseNode.get("data");
-            assertThat(dataNode).hasSize(1);
-            assertThat(dataNode.get(0).get("id").textValue()).isEqualTo(secondDeployment.getId());
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
+                            + " data: [ {"
+                            + "           id: '" + secondDeployment.getId() + "'"
+                            + "       } ],"
                             + " total: 2,"
                             + " start: 1,"
                             + " size: 1"

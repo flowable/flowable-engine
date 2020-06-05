@@ -56,17 +56,17 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'id': '" + caseDefinition.getId() + "',"
-                        + " 'key': '" + caseDefinition.getKey() + "',"
-                        + " 'category': '" + caseDefinition.getCategory() + "',"
-                        + " 'version': " + caseDefinition.getVersion() + ","
-                        + " 'description': '" + caseDefinition.getDescription() + "',"
-                        + " 'name': '" + caseDefinition.getName() + "',"
-                        + " 'diagramResource': null,"
-                        + " 'deploymentId': '" + caseDefinition.getDeploymentId() + "',"
-                        + " 'deploymentUrl': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " id: '" + caseDefinition.getId() + "',"
+                        + " key: '" + caseDefinition.getKey() + "',"
+                        + " category: '" + caseDefinition.getCategory() + "',"
+                        + " version: " + caseDefinition.getVersion() + ","
+                        + " description: '" + caseDefinition.getDescription() + "',"
+                        + " name: '" + caseDefinition.getName() + "',"
+                        + " diagramResource: null,"
+                        + " deploymentId: '" + caseDefinition.getDeploymentId() + "',"
+                        + " deploymentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()) + "',"
-                        + " 'url': '" + httpGet.getURI().toString() + "'"
+                        + " url: '" + httpGet.getURI().toString() + "'"
                         + "}");
 
         assertThat(responseNode.get("graphicalNotationDefined").booleanValue()).isFalse();
@@ -93,28 +93,24 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'id': '" + caseDefinition.getId() + "',"
-                        + " 'key': '" + caseDefinition.getKey() + "',"
-                        + " 'category': '" + caseDefinition.getCategory() + "',"
-                        + " 'version': " + caseDefinition.getVersion() + ","
-                        + " 'description': null,"
-                        + " 'name': '" + caseDefinition.getName() + "',"
-                        + " 'deploymentId': '" + caseDefinition.getDeploymentId() + "',"
-                        + " 'deploymentUrl': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        + " id: '" + caseDefinition.getId() + "',"
+                        + " key: '" + caseDefinition.getKey() + "',"
+                        + " category: '" + caseDefinition.getCategory() + "',"
+                        + " version: " + caseDefinition.getVersion() + ","
+                        + " description: null,"
+                        + " name: '" + caseDefinition.getName() + "',"
+                        + " deploymentId: '" + caseDefinition.getDeploymentId() + "',"
+                        + " graphicalNotationDefined: true,"
+                        + " deploymentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()) + "',"
-                        + " 'url': '" + httpGet.getURI().toString() + "'"
+                        + " url: '" + httpGet.getURI().toString() + "',"
+                        + " resource: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())
+                        + "',"
+                        + " diagramResource: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(),
+                                caseDefinition.getDiagramResourceName()) + "'"
                         + "}");
-
-        assertThat(responseNode.get("graphicalNotationDefined").booleanValue()).isTrue();
-
-        // Check URL's
-        assertThat(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls
-                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())))
-                .isTrue();
-        assertThat(URLDecoder.decode(responseNode.get("diagramResource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(),
-                        caseDefinition.getDiagramResourceName()))).isTrue();
     }
 
     /**
@@ -138,7 +134,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertThat(content).isNotNull();
-        assertThat(content.contains("This is a test documentation")).isTrue();
+        assertThat(content).contains("This is a test documentation");
     }
 
     /**
