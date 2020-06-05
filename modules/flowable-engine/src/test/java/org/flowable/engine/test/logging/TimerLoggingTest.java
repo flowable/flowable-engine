@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.engine.test.logging;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
@@ -26,117 +28,119 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TimerLoggingTest extends ResourceFlowableTestCase {
-    
+
     public TimerLoggingTest() {
         super("org/flowable/engine/test/logging/logging.test.flowable.cfg.xml");
     }
-    
+
     @Test
-    @Deployment(resources="org/flowable/engine/test/logging/userTaskWithTimer.bpmn20.xml")
+    @Deployment(resources = "org/flowable/engine/test/logging/userTaskWithTimer.bpmn20.xml")
     public void testBoundaryTimerEvent() {
         FlowableLoggingListener.clear();
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTaskWithTimer").latestVersion().singleResult();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTaskWithTimer").latestVersion()
+                .singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskWithTimer");
         Execution execution = runtimeService.createExecutionQuery().activityId("userTask1").processInstanceId(processInstance.getId()).singleResult();
-        Execution timerExecution = runtimeService.createExecutionQuery().activityId("timerBoundaryEvent").processInstanceId(processInstance.getId()).singleResult();
-            
-        assertEquals(7, FlowableLoggingListener.TEST_LOGGING_NODES.size());
-        
+        Execution timerExecution = runtimeService.createExecutionQuery().activityId("timerBoundaryEvent").processInstanceId(processInstance.getId())
+                .singleResult();
+
+        assertThat(FlowableLoggingListener.TEST_LOGGING_NODES).hasSize(7);
+
         ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
-        assertEquals(LoggingSessionConstants.TYPE_PROCESS_STARTED, loggingNode.get("type").asText());
-        assertEquals("Started process instance with id " + processInstance.getId(), loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertNotNull(loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_PROCESS_STARTED);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("Started process instance with id " + processInstance.getId());
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isNotNull();
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(1);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(1);
-        assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
-        assertEquals("In StartEvent, executing NoneStartEventActivityBehavior", loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertNotNull(loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals("theStart", loggingNode.get("elementId").asText());
-        assertFalse(loggingNode.has("elementName"));
-        assertEquals("StartEvent", loggingNode.get("elementType").asText());
-        assertEquals("NoneStartEventActivityBehavior", loggingNode.get("activityBehavior").asText());
-        assertEquals(2, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("In StartEvent, executing NoneStartEventActivityBehavior");
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isNotNull();
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("elementId").asText()).isEqualTo("theStart");
+        assertThat(loggingNode.has("elementName")).isFalse();
+        assertThat(loggingNode.get("elementType").asText()).isEqualTo("StartEvent");
+        assertThat(loggingNode.get("activityBehavior").asText()).isEqualTo("NoneStartEventActivityBehavior");
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(2);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(2);
-        assertEquals(LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE, loggingNode.get("type").asText());
-        assertEquals("Sequence flow will be taken for flow1, theStart --> userTask1", loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals("flow1", loggingNode.get("elementId").asText());
-        assertFalse(loggingNode.has("elementName"));
-        assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
-        assertEquals("theStart", loggingNode.get("sourceRef").asText());
-        assertEquals("userTask1", loggingNode.get("targetRef").asText());
-        assertEquals(3, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("Sequence flow will be taken for flow1, theStart --> userTask1");
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isEqualTo(execution.getId());
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("elementId").asText()).isEqualTo("flow1");
+        assertThat(loggingNode.has("elementName")).isFalse();
+        assertThat(loggingNode.get("elementType").asText()).isEqualTo("SequenceFlow");
+        assertThat(loggingNode.get("sourceRef").asText()).isEqualTo("theStart");
+        assertThat(loggingNode.get("targetRef").asText()).isEqualTo("userTask1");
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(3);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(3);
-        assertEquals(LoggingSessionConstants.TYPE_BOUNDARY_TIMER_EVENT_CREATE, loggingNode.get("type").asText());
-        assertEquals("Creating boundary event (TimerEventDefinition) for execution id " + timerExecution.getId(), loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertEquals(timerExecution.getId(), loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals("timerBoundaryEvent", loggingNode.get("elementId").asText());
-        assertEquals("BoundaryEvent", loggingNode.get("elementType").asText());
-        assertEquals("TimerEventDefinition", loggingNode.get("elementSubType").asText());
-        assertEquals(4, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_BOUNDARY_TIMER_EVENT_CREATE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("Creating boundary event (TimerEventDefinition) for execution id " + timerExecution.getId());
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isEqualTo(timerExecution.getId());
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("elementId").asText()).isEqualTo("timerBoundaryEvent");
+        assertThat(loggingNode.get("elementType").asText()).isEqualTo("BoundaryEvent");
+        assertThat(loggingNode.get("elementSubType").asText()).isEqualTo("TimerEventDefinition");
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(4);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(4);
-        assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
-        assertEquals("In UserTask, executing UserTaskActivityBehavior", loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals("userTask1", loggingNode.get("elementId").asText());
-        assertEquals("User task 1", loggingNode.get("elementName").asText());
-        assertEquals("UserTask", loggingNode.get("elementType").asText());
-        assertEquals("UserTaskActivityBehavior", loggingNode.get("activityBehavior").asText());
-        assertEquals(5, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("In UserTask, executing UserTaskActivityBehavior");
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isEqualTo(execution.getId());
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("elementId").asText()).isEqualTo("userTask1");
+        assertThat(loggingNode.get("elementName").asText()).isEqualTo("User task 1");
+        assertThat(loggingNode.get("elementType").asText()).isEqualTo("UserTask");
+        assertThat(loggingNode.get("activityBehavior").asText()).isEqualTo("UserTaskActivityBehavior");
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(5);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(5);
-        assertEquals(LoggingSessionConstants.TYPE_USER_TASK_CREATE, loggingNode.get("type").asText());
-        assertEquals("User task 'User task 1' created", loggingNode.get("message").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals("userTask1", loggingNode.get("elementId").asText());
-        assertEquals("UserTask", loggingNode.get("elementType").asText());
-        assertEquals("User task 1", loggingNode.get("elementName").asText());
-        assertNotNull(loggingNode.get("taskId").asText());
-        assertEquals("User task 1", loggingNode.get("taskName").asText());
-        assertEquals(60, loggingNode.get("taskPriority").asInt());
-        assertNotNull(loggingNode.get("taskDueDate").asText());
-        assertEquals(6, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_USER_TASK_CREATE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("User task 'User task 1' created");
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("subScopeId").asText()).isEqualTo(execution.getId());
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("elementId").asText()).isEqualTo("userTask1");
+        assertThat(loggingNode.get("elementType").asText()).isEqualTo("UserTask");
+        assertThat(loggingNode.get("elementName").asText()).isEqualTo("User task 1");
+        assertThat(loggingNode.get("taskId").asText()).isNotNull();
+        assertThat(loggingNode.get("taskName").asText()).isEqualTo("User task 1");
+        assertThat(loggingNode.get("taskPriority").asInt()).isEqualTo(60);
+        assertThat(loggingNode.get("taskDueDate").asText()).isNotNull();
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(6);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(6);
-        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
-        assertEquals("Closed command context for bpmn engine", loggingNode.get("message").asText());
-        assertEquals("bpmn", loggingNode.get("engineType").asText());
-        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
-        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
-        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
-        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
-        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
-        assertEquals(7, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
-        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
-        
+        assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE);
+        assertThat(loggingNode.get("message").asText()).isEqualTo("Closed command context for bpmn engine");
+        assertThat(loggingNode.get("engineType").asText()).isEqualTo("bpmn");
+        assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
+        assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
+        assertThat(loggingNode.get("scopeDefinitionKey").asText()).isEqualTo(processDefinition.getKey());
+        assertThat(loggingNode.get("scopeDefinitionName").asText()).isEqualTo(processDefinition.getName());
+        assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(7);
+        assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();
+
         FlowableLoggingListener.clear();
     }
 }

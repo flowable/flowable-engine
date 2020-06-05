@@ -54,28 +54,17 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             assertThat(responseNode.isArray()).isTrue();
             assertThat(responseNode).hasSize(2);
 
-            // Since resources can be returned in any arbitrary order, find the
-            // right one to check
-            JsonNode txtNode = null;
-            for (int i = 0; i < responseNode.size(); i++) {
-                if ("test.txt".equals(responseNode.get(i).get("id").textValue())) {
-                    txtNode = responseNode.get(i);
-                    break;
-                }
-            }
-
             // Check URL's for the resource
-            assertThat(txtNode).isNotNull();
-            assertThatJson(txtNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " 'url': '" + SERVER_URL_PREFIX + CmmnRestUrls
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("[ {"
+                            + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
-                            + " 'contentUrl': '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            + " contentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
-                            + " 'mediaType': null,"
-                            + " 'type': 'resource'"
-                            + "}");
+                            + " mediaType: null,"
+                            + " type: 'resource'"
+                            + "} ]");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

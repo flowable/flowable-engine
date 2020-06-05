@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionExecutor;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,8 @@ public class DefaultEventRegistryDataChangeDetectorShutdownTest {
                 .createEventRegistryEngineConfigurationFromResource("flowableChangeDetector.eventregistry.cfg.xml");
         EventRegistryEngine eventRegistryEngine = configuration.buildEventRegistryEngine();
         assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager()).isNotNull();
-        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration()
+                .getEventRegistryChangeDetectionExecutor();
         assertThat(eventRegistryChangeDetectionExecutor).isNotNull();
         assertThat(eventRegistryChangeDetectionExecutor).isInstanceOf(DefaultEventRegistryChangeDetectionExecutor.class);
 

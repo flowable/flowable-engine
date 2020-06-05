@@ -11,6 +11,8 @@
  */
 package org.flowable.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +70,11 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
                     .includeVariables()
                     .singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(1, events.size());
+            assertThat(events).hasSize(1);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableInstance);
-                assertEquals(LARGE_STRING_VALUE, ((HistoricVariableInstanceEntity) event).getValue());
+                assertThat(event).isInstanceOf(HistoricVariableInstance.class);
+                assertThat(((HistoricVariableInstanceEntity) event).getValue()).isEqualTo(LARGE_STRING_VALUE);
             }
         }
     }
@@ -83,17 +85,17 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstanceId).variableName("var").singleResult();
-            assertEquals(LARGE_STRING_VALUE, historicVariableInstance.getValue());
+            assertThat(historicVariableInstance.getValue()).isEqualTo(LARGE_STRING_VALUE);
 
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariableUpdates()
                     .singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(1, events.size());
+            assertThat(events).hasSize(1);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableUpdate);
-                assertEquals(LARGE_STRING_VALUE, ((HistoricDetailVariableInstanceUpdateEntity) event).getValue());
+                assertThat(event).isInstanceOf(HistoricVariableUpdate.class);
+                assertThat(((HistoricDetailVariableInstanceUpdateEntity) event).getValue()).isEqualTo(LARGE_STRING_VALUE);
             }
         }
     }

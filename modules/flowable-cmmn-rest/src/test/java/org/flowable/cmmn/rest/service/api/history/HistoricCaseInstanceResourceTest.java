@@ -69,12 +69,12 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + " 'id': '" + caseInstance.getId() + "',"
-                        + " 'businessKey': 'myBusinessKey',"
-                        + " 'referenceId': 'testReferenceId',"
-                        + " 'referenceType': 'testReferenceType',"
-                        + " 'callbackId': 'testCallbackId',"
-                        + " 'callbackType': 'testCallbackType'"
+                        + " id: '" + caseInstance.getId() + "',"
+                        + " businessKey: 'myBusinessKey',"
+                        + " referenceId: 'testReferenceId',"
+                        + " referenceType: 'testReferenceType',"
+                        + " callbackId: 'testCallbackId',"
+                        + " callbackType: 'testCallbackType'"
                         + "}");
 
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

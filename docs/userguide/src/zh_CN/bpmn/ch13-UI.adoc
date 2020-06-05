@@ -345,6 +345,11 @@ java -Dloader.path=/location/to/your/driverfolder -jar flowable-idm.war
 |1025
 |邮件服务器的端口号。
 
+|flowable.mail.server.ssl-port
+|email.ssl-port
+|1465
+|SSL邮件服务器的端口号。
+
 |flowable.mail.server.use-ssl
 |email.use-ssl
 |false
