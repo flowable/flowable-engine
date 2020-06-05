@@ -45,11 +45,11 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
     public void testProcessInstanceAndExecutionIdInCache() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
 
-        assertNotNull(ServiceCacheTask.processInstanceId);
-        assertEquals(processInstance.getId(), ServiceCacheTask.processInstanceId);
-        assertNotNull(ServiceCacheTask.executionId);
-        assertNotNull(ServiceCacheTask.historicProcessInstanceId);
-        assertEquals(processInstance.getId(), ServiceCacheTask.historicProcessInstanceId);
+        assertThat(ServiceCacheTask.processInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.processInstanceId).isEqualTo(processInstance.getId());
+        assertThat(ServiceCacheTask.executionId).isNotNull();
+        assertThat(ServiceCacheTask.historicProcessInstanceId).isNotNull();
+        assertThat(ServiceCacheTask.historicProcessInstanceId).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -57,12 +57,12 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
     public void testTaskInCache() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
-        assertNotNull(TestCacheTaskListener.TASK_ID);
-        assertEquals(task.getId(), TestCacheTaskListener.TASK_ID);
-        assertNotNull(TestCacheTaskListener.HISTORIC_TASK_ID);
-        assertEquals(task.getId(), TestCacheTaskListener.HISTORIC_TASK_ID);
+        assertThat(TestCacheTaskListener.TASK_ID).isNotNull();
+        assertThat(TestCacheTaskListener.TASK_ID).isEqualTo(task.getId());
+        assertThat(TestCacheTaskListener.HISTORIC_TASK_ID).isNotNull();
+        assertThat(TestCacheTaskListener.HISTORIC_TASK_ID).isEqualTo(task.getId());
     }
 
     @Test
