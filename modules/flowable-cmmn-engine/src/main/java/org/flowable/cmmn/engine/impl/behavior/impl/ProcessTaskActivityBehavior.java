@@ -31,6 +31,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -127,10 +128,10 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
-            throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
+            throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
         }
         if (planItemInstance.getReferenceId() == null) {
-            throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
+            throw new FlowableIllegalStateException("Cannot trigger process task plan item instance : no reference id set");
         }
         if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"

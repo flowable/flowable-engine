@@ -160,8 +160,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                 }
 
             } else {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SKIP_TASK, "Skipped service task " + execution.getCurrentActivityId() +
-                        " with skip expression " + skipExpressionText, execution);
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SKIP_TASK, "Skipped service task " + execution.getCurrentActivityId() +
+                            " with skip expression " + skipExpressionText, execution);
+                }
                 leave(execution);
             }
         } catch (Exception exc) {

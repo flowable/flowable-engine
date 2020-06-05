@@ -52,6 +52,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -168,6 +169,8 @@ public abstract class AbstractEngineConfiguration {
     protected CommandConfig schemaCommandConfig;
     protected CommandContextFactory commandContextFactory;
     protected CommandInterceptor commandInvoker;
+
+    protected AgendaOperationRunner agendaOperationRunner = Runnable::run;
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
@@ -1320,6 +1323,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setCommandInvoker(CommandInterceptor commandInvoker) {
         this.commandInvoker = commandInvoker;
+        return this;
+    }
+
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+
+    public AbstractEngineConfiguration setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
         return this;
     }
 

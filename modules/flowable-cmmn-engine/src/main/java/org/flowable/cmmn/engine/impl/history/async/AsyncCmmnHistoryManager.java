@@ -265,6 +265,11 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity) {
+        recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastUnavailableTime());
+    }
+
+    @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
         recordPlanItemInstanceFull(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime());
     }

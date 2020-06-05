@@ -57,6 +57,8 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceCreatedAfter(Date createdAfter);
     PlanItemInstanceQuery planItemInstanceLastAvailableBefore(Date availableBefore);
     PlanItemInstanceQuery planItemInstanceLastAvailableAfter(Date availableAfter);
+    PlanItemInstanceQuery planItemInstanceLastUnavailableBefore(Date unavailableBefore);
+    PlanItemInstanceQuery planItemInstanceLastUnavailableAfter(Date unavailableAfter);
     PlanItemInstanceQuery planItemInstanceLastEnabledBefore(Date enabledBefore);
     PlanItemInstanceQuery planItemInstanceLastEnabledAfter(Date enabledAfter);
     PlanItemInstanceQuery planItemInstanceLastDisabledBefore(Date disabledBefore);

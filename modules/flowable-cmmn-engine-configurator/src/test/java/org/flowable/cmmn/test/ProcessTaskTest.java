@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -450,6 +451,33 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
             historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(oneTaskProcessId).singleResult();
             assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+
+    @Test
+    @CmmnDeployment
+    public void testNestedCallActivityTerminate() {
+        Deployment deployment = processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneCallActivityProcess.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+            String caseInstanceId = caseInstance.getId();
+
+            cmmnRuntimeService.terminateCaseInstance(caseInstanceId);
+            HistoricPlanItemInstance processHistoricPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+            assertThat(processHistoricPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);

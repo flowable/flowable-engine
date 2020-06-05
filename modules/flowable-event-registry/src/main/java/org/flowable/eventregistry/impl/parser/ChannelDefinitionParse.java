@@ -67,7 +67,7 @@ public class ChannelDefinitionParse {
 
     public ChannelDefinitionParse execute(EventRegistryEngineConfiguration eventEngineConfig) {
         String encoding = eventEngineConfig.getXmlEncoding();
-        ChannelJsonConverter converter = new ChannelJsonConverter();
+        ChannelJsonConverter converter = eventEngineConfig.getChannelJsonConverter();
 
         try (InputStreamReader in = newInputStreamReaderForSource(encoding)) {
             String channelJson = IOUtils.toString(in);

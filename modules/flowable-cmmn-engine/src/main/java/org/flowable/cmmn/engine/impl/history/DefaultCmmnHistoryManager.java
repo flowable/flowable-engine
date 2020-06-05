@@ -285,6 +285,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity) {
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastUnavailableTime(),
+            h -> h.setLastUnavailableTime(planItemInstanceEntity.getLastUnavailableTime()));
+    }
+
+    @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
         recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
             h -> h.setLastEnabledTime(planItemInstanceEntity.getLastEnabledTime()));

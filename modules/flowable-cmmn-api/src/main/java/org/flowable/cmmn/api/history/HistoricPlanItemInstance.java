@@ -46,6 +46,8 @@ public interface HistoricPlanItemInstance {
 
     Date getLastAvailableTime();
 
+    Date getLastUnavailableTime();
+
     Date getLastEnabledTime();
 
     Date getLastDisabledTime();

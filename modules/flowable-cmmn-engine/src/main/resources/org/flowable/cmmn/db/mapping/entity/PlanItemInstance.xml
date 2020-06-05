@@ -6,7 +6,7 @@
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-              NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+              NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
               LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
               START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, EXTRA_VALUE_, IS_COUNT_ENABLED_, 
               VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
@@ -25,6 +25,7 @@
             #{state ,jdbcType=VARCHAR},
             #{createTime ,jdbcType=TIMESTAMP},
             #{lastAvailableTime ,jdbcType=TIMESTAMP},
+            #{lastUnavailableTime ,jdbcType=TIMESTAMP},
             #{lastEnabledTime ,jdbcType=TIMESTAMP},
             #{lastDisabledTime ,jdbcType=TIMESTAMP},
             #{lastStartedTime ,jdbcType=TIMESTAMP},
@@ -50,7 +51,7 @@
 
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-                                                     NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+                                                     NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
                                                      ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                      EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
@@ -71,6 +72,7 @@
             #{planItemInstance.state ,jdbcType=VARCHAR},
             #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
+            #{planItemInstance.lastUnavailableTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
@@ -99,7 +101,7 @@
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
-                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                       LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
                                                       START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                       EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
@@ -118,6 +120,7 @@
                 #{planItemInstance.state ,jdbcType=VARCHAR},
                 #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
+                #{planItemInstance.lastUnavailableTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
@@ -182,6 +185,9 @@
         </if>
         <if test="originalPersistentState.lastAvailableTime != lastAvailableTime">
             LAST_AVAILABLE_TIME_ = #{lastAvailableTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.lastUnavailableTime != lastUnavailableTime">
+            LAST_UNAVAILABLE_TIME_ = #{lastUnavailableTime, jdbcType=TIMESTAMP},
         </if>
         <if test="originalPersistentState.lastEnabledTime != lastEnabledTime">
             LAST_ENABLED_TIME_ = #{lastEnabledTime, jdbcType=TIMESTAMP},
@@ -281,6 +287,7 @@
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="lastAvailableTime" column="LAST_AVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="lastUnavailableTime" column="LAST_UNAVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="lastEnabledTime" column="LAST_ENABLED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="lastDisabledTime" column="LAST_DISABLED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="lastStartedTime" column="LAST_STARTED_TIME_" jdbcType="TIMESTAMP"/>
@@ -396,6 +403,12 @@
         </if>
         <if test="lastAvailableAfter != null">
             and RES.LAST_AVAILABLE_TIME_ &gt;= #{lastAvailableAfter}
+        </if>
+        <if test="lastUnavailableBefore != null">
+            and RES.LAST_UNAVAILABLE_TIME_ &lt;= #{lastUnavailableBefore}
+        </if>
+        <if test="lastUnavailableAfter != null">
+            and RES.LAST_UNAVAILABLE_TIME_ &gt;= #{lastUnavailableAfter}
         </if>
         <if test="lastEnabledBefore != null">
             and RES.LAST_ENABLED_TIME_ &lt;= #{lastEnabledBefore}

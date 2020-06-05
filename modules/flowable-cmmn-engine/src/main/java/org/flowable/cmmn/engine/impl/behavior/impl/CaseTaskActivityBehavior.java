@@ -34,6 +34,7 @@ import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -130,13 +131,13 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
-            throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
+            throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
         }
         if (planItemInstance.getReferenceId() == null) {
-            throw new FlowableException("Cannot trigger case task plan item instance : no reference id set");
+            throw new FlowableIllegalStateException("Cannot trigger case task plan item instance : no reference id set");
         }
         if (!ReferenceTypes.PLAN_ITEM_CHILD_CASE.equals(planItemInstance.getReferenceType())) {
-            throw new FlowableException("Cannot trigger case task plan item instance : reference type '"
+            throw new FlowableIllegalStateException("Cannot trigger case task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
