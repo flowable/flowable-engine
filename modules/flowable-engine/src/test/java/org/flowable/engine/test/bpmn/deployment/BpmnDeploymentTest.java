@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.bpmn.deployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
@@ -50,28 +51,28 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
+        assertThat(deploymentResources).hasSize(1);
         String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources.get(0)).isEqualTo(bpmnResourceName);
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertEquals(bpmnResourceName, processDefinition.getResourceName());
-        assertNull(processDefinition.getDiagramResourceName());
-        assertFalse(processDefinition.hasStartFormKey());
+        assertThat(processDefinition.getResourceName()).isEqualTo(bpmnResourceName);
+        assertThat(processDefinition.getDiagramResourceName()).isNull();
+        assertThat(processDefinition.hasStartFormKey()).isFalse();
 
         ProcessDefinition readOnlyProcessDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processDefinition.getId());
-        assertNull(readOnlyProcessDefinition.getDiagramResourceName());
+        assertThat(readOnlyProcessDefinition.getDiagramResourceName()).isNull();
 
         // verify content
         InputStream deploymentInputStream = repositoryService.getResourceAsStream(deploymentId, bpmnResourceName);
         String contentFromDeployment = readInputStreamToString(deploymentInputStream);
-        assertTrue(contentFromDeployment.length() > 0);
-        assertTrue(contentFromDeployment.contains("process id=\"emptyProcess\""));
+        assertThat(contentFromDeployment.length()).isGreaterThan(0);
+        assertThat(contentFromDeployment.contains("process id=\"emptyProcess\"")).isTrue();
 
         InputStream fileInputStream = ReflectUtil.getResourceAsStream(
                 "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml");
         String contentFromFile = readInputStreamToString(fileInputStream);
-        assertEquals(contentFromFile, contentFromDeployment);
+        assertThat(contentFromDeployment).isEqualTo(contentFromFile);
     }
 
     private String readInputStreamToString(InputStream inputStream) {
@@ -81,63 +82,55 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
 
     @Test
     public void testViolateBPMNIdMaximumLength() {
-        try {
-            repositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/engine/test/bpmn/deployment/definitionWithLongTargetNamespace.bpmn20.xml")
-                    .deploy();
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG, e.getMessage());
-        }
+        assertThatThrownBy(() ->
+                repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/bpmn/deployment/definitionWithLongTargetNamespace.bpmn20.xml")
+                        .deploy())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG);
 
         // Verify that nothing is deployed
-        assertEquals(0, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
     public void testViolateProcessDefinitionIdMaximumLength() {
-        try {
-            repositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/engine/test/bpmn/deployment/processWithLongId.bpmn20.xml")
-                    .deploy();
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent(Problems.PROCESS_DEFINITION_ID_TOO_LONG, e.getMessage());
-        }
+        assertThatThrownBy(() ->
+                repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/bpmn/deployment/processWithLongId.bpmn20.xml")
+                        .deploy())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining(Problems.PROCESS_DEFINITION_ID_TOO_LONG);
 
         // Verify that nothing is deployed
-        assertEquals(0, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
     public void testViolateProcessDefinitionNameAndDescriptionMaximumLength() {
-        try {
-            repositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/engine/test/bpmn/deployment/processWithLongNameAndDescription.bpmn20.xml")
-                    .deploy();
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent(Problems.PROCESS_DEFINITION_NAME_TOO_LONG, e.getMessage());
-            assertTextPresent(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, e.getMessage());
-        }
+        assertThatThrownBy(() ->
+                repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/bpmn/deployment/processWithLongNameAndDescription.bpmn20.xml")
+                        .deploy())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining(Problems.PROCESS_DEFINITION_NAME_TOO_LONG)
+                .hasMessageContaining(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG);
 
         // Verify that nothing is deployed
-        assertEquals(0, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
     public void testViolateDefinitionTargetNamespaceMaximumLength() {
-        try {
-            repositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.definitionWithLongTargetNamespace.bpmn20.xml")
-                    .deploy();
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG, e.getMessage());
-        }
+        assertThatThrownBy(() ->
+                repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.definitionWithLongTargetNamespace.bpmn20.xml")
+                        .deploy())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG);
 
         // Verify that nothing is deployed
-        assertEquals(0, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -149,12 +142,12 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
         List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
-        assertEquals(1, deploymentList.size());
+        assertThat(deploymentList).hasSize(1);
 
         repositoryService.deleteDeployment(deploymentId);
     }
@@ -168,16 +161,16 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
 
         List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().orderByDeploymentTime().desc().list();
-        assertEquals(2, deploymentList.size());
+        assertThat(deploymentList).hasSize(2);
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentList.get(0).getId());
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
         deploymentList = repositoryService.createDeploymentQuery().list();
-        assertEquals(2, deploymentList.size());
+        assertThat(deploymentList).hasSize(2);
 
         for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
             repositoryService.deleteDeployment(deployment.getId());
@@ -190,7 +183,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         String bpmnResourceName2 = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService2.bpmn20.xml";
         assertThatThrownBy(() -> repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).addClasspathResource(bpmnResourceName2).name("duplicateAtTheSameTime").deploy());
         // Verify that nothing is deployed
-        assertEquals(0, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -202,13 +195,13 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml";
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
         List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
-        assertEquals(2, deploymentList.size());
+        assertThat(deploymentList).hasSize(2);
 
         for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
             repositoryService.deleteDeployment(deployment.getId());
@@ -222,14 +215,14 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
         String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testStartFormKey.bpmn20.xml";
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertEquals(bpmnResourceName, processDefinition.getResourceName());
-        assertNull(processDefinition.getDiagramResourceName());
-        assertTrue(processDefinition.hasStartFormKey());
+        assertThat(processDefinition.getResourceName()).isEqualTo(bpmnResourceName);
+        assertThat(processDefinition.getDiagramResourceName()).isNull();
+        assertThat(processDefinition.hasStartFormKey()).isTrue();
     }
 
     @Test
@@ -250,14 +243,14 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
                 }
             });
 
-            assertNotNull(processDefinition);
+            assertThat(processDefinition).isNotNull();
             BpmnModel processModel = repositoryService.getBpmnModel(processDefinition.getId());
-            assertEquals(14, processModel.getMainProcess().getFlowElements().size());
-            assertEquals(7, processModel.getMainProcess().findFlowElementsOfType(SequenceFlow.class).size());
+            assertThat(processModel.getMainProcess().getFlowElements()).hasSize(14);
+            assertThat(processModel.getMainProcess().findFlowElementsOfType(SequenceFlow.class)).hasSize(7);
 
             // Check that no diagram has been created
             List<String> resourceNames = repositoryService.getDeploymentResourceNames(processDefinition.getDeploymentId());
-            assertEquals(1, resourceNames.size());
+            assertThat(resourceNames).hasSize(1);
 
             repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
         } finally {
@@ -271,19 +264,20 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
     public void testProcessDiagramResource(@DeploymentId String deploymentIdFromDeploymentAnnotation) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
-        assertEquals("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml", processDefinition.getResourceName());
+        assertThat(processDefinition.getResourceName()).isEqualTo("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml");
         BpmnModel processModel = repositoryService.getBpmnModel(processDefinition.getId());
         List<StartEvent> startEvents = processModel.getMainProcess().findFlowElementsOfType(StartEvent.class);
-        assertEquals(1, startEvents.size());
-        assertEquals("someFormKey", startEvents.get(0).getFormKey());
+        assertThat(startEvents)
+                .extracting(StartEvent::getFormKey)
+                .containsExactly("someFormKey");
 
         String diagramResourceName = processDefinition.getDiagramResourceName();
-        assertEquals("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg", diagramResourceName);
+        assertThat(diagramResourceName).isEqualTo("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg");
 
         InputStream diagramStream = repositoryService.getResourceAsStream(deploymentIdFromDeploymentAnnotation,
                 "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg");
         byte[] diagramBytes = IoUtil.readInputStream(diagramStream, "diagram stream");
-        assertEquals(33343, diagramBytes.length);
+        assertThat(diagramBytes.length).isEqualTo(33343);
     }
 
     @Test
@@ -296,9 +290,9 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         ProcessDefinition processB = repositoryService.createProcessDefinitionQuery().processDefinitionKey("b").singleResult();
         ProcessDefinition processC = repositoryService.createProcessDefinitionQuery().processDefinitionKey("c").singleResult();
 
-        assertEquals("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.a.jpg", processA.getDiagramResourceName());
-        assertEquals("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.b.jpg", processB.getDiagramResourceName());
-        assertEquals("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.c.jpg", processC.getDiagramResourceName());
+        assertThat(processA.getDiagramResourceName()).isEqualTo("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.a.jpg");
+        assertThat(processB.getDiagramResourceName()).isEqualTo("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.b.jpg");
+        assertThat(processC.getDiagramResourceName()).isEqualTo("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.c.jpg");
     }
 
     @Test
@@ -306,7 +300,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
     public void testProcessDefinitionDescription() {
         String id = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         ProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(id);
-        assertEquals("This is really good process documentation!", processDefinition.getDescription());
+        assertThat(processDefinition.getDescription()).isEqualTo("This is really good process documentation!");
     }
 
     @Test
@@ -318,14 +312,13 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertEquals(1, deploymentResources.size());
-        assertEquals(bpmnResourceName, deploymentResources.get(0));
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").tenantId("Tenant_B").deploy();
         List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
-        // Now, we should have two deployment for same process file, one for
-        // each tenant
-        assertEquals(2, deploymentList.size());
+        // Now, we should have two deployment for same process file, one for each tenant
+        assertThat(deploymentList).hasSize(2);
 
         for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
             repositoryService.deleteDeployment(deployment.getId());
@@ -335,18 +328,14 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
     @Test
     public void testV5Deployment() {
         String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-        try {
-            repositoryService.createDeployment()
-                    .addClasspathResource(bpmnResourceName)
-                    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-                    .name("v5")
-                    .deploy();
-
-            fail("Expected deployment exception because v5 compatibility handler is not enabled");
-
-        } catch (FlowableException e) {
-            // expected
-        }
+        assertThatThrownBy(() ->
+                repositoryService.createDeployment()
+                        .addClasspathResource(bpmnResourceName)
+                        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                        .name("v5")
+                        .deploy())
+                .isExactlyInstanceOf(FlowableException.class)
+                .as("Expected deployment exception because v5 compatibility handler is not enabled");
     }
 
 }
