@@ -20,7 +20,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.db.EntityToTableMap;
-import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 public class GetTableNameCmd implements Command<String>, Serializable {
 
