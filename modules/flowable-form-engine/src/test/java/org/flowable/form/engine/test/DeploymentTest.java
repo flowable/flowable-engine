@@ -13,7 +13,6 @@
 package org.flowable.form.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
-import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.junit.jupiter.api.Test;

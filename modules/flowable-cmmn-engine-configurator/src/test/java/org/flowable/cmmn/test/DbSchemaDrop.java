@@ -19,7 +19,6 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.form.engine.FormEngineConfiguration;
 
 /**
  * @author Filip Hrisafov
