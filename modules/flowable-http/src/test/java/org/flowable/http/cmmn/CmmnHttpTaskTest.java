@@ -79,11 +79,11 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, String> names = new HashMap<>();
+        names.put("firstName", "John");
+        names.put("lastName", "Doe");
         assertThat(variables)
-                .containsExactly(
-                        entry("firstName", "John"),
-                        entry("lastName", "Doe")
-                );
+                .containsExactlyInAnyOrderEntriesOf(names);
     }
 
     @Test
