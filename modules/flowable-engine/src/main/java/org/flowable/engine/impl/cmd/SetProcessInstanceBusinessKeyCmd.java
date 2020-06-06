@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import static org.flowable.engine.impl.util.CommandContextUtil.getProcessEngineConfiguration;
 
 import java.io.Serializable;
 
@@ -56,8 +55,8 @@ public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializ
         ExecutionEntityManager executionManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity processInstance = executionManager.findById(processInstanceId);
         if (processInstance == null) {
-            if (getProcessEngineConfiguration(commandContext).isFlowable5CompatibilityEnabled()) {
-                getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().updateBusinessKey(processInstanceId,
+            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isFlowable5CompatibilityEnabled()) {
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().updateBusinessKey(processInstanceId,
                         businessKey);
                 return null;
             }
