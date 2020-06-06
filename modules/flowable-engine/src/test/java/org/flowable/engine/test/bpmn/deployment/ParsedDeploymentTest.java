@@ -81,22 +81,22 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinitionEntity> processDefinitions = parsedDeployment.getAllProcessDefinitions();
 
-        assertThat(parsedDeployment.getDeployment()).isSameAs(entity);
+        assertThat(parsedDeployment.getDeployment()).isEqualTo(entity);
         assertThat(processDefinitions).hasSize(4);
 
         ProcessDefinitionEntity id1 = getProcessDefinitionEntityFromList(processDefinitions, ID1_ID);
         ProcessDefinitionEntity id2 = getProcessDefinitionEntityFromList(processDefinitions, ID2_ID);
         assertThat(parsedDeployment.getBpmnParseForProcessDefinition(id1))
-                .isSameAs(parsedDeployment.getBpmnParseForProcessDefinition(id2));
-        assertThat(parsedDeployment.getBpmnModelForProcessDefinition(id1)).isSameAs(parsedDeployment.getBpmnParseForProcessDefinition(id1).getBpmnModel());
-        assertThat(parsedDeployment.getProcessModelForProcessDefinition(id1)).isSameAs(parsedDeployment.getBpmnParseForProcessDefinition(id1).getBpmnModel().getProcessById(id1.getKey()));
+                .isEqualTo(parsedDeployment.getBpmnParseForProcessDefinition(id2));
+        assertThat(parsedDeployment.getBpmnModelForProcessDefinition(id1)).isEqualTo(parsedDeployment.getBpmnParseForProcessDefinition(id1).getBpmnModel());
+        assertThat(parsedDeployment.getProcessModelForProcessDefinition(id1)).isEqualTo(parsedDeployment.getBpmnParseForProcessDefinition(id1).getBpmnModel().getProcessById(id1.getKey()));
         assertThat(parsedDeployment.getResourceForProcessDefinition(id1).getName()).isEqualTo(IDR_XML_NAME);
         assertThat(parsedDeployment.getResourceForProcessDefinition(id2).getName()).isEqualTo(IDR_XML_NAME);
 
         ProcessDefinitionEntity en1 = getProcessDefinitionEntityFromList(processDefinitions, EN1_ID);
         ProcessDefinitionEntity en2 = getProcessDefinitionEntityFromList(processDefinitions, EN2_ID);
         assertThat(parsedDeployment.getBpmnParseForProcessDefinition(en1))
-                .isSameAs(parsedDeployment.getBpmnParseForProcessDefinition(en2));
+                .isEqualTo(parsedDeployment.getBpmnParseForProcessDefinition(en2));
         assertThat(parsedDeployment.getBpmnParseForProcessDefinition(en1)).isNotEqualTo(parsedDeployment.getBpmnParseForProcessDefinition(id2));
         assertThat(parsedDeployment.getResourceForProcessDefinition(en1).getName()).isEqualTo(EN_XML_NAME);
         assertThat(parsedDeployment.getResourceForProcessDefinition(en2).getName()).isEqualTo(EN_XML_NAME);
