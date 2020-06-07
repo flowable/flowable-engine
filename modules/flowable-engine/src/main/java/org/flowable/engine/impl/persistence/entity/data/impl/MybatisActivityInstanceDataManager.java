@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,14 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
         params.put("executionId", executionId);
         params.put("activityId", activityId);
         return getList("selectActivityInstanceExecutionIdAndActivityId", params, activityInstanceMatcher, true);
+    }
+    
+    @Override
+    public List<ActivityInstanceEntity> findActivityInstancesByProcessInstanceId(String processInstanceId, boolean includeDeleted) {
+        List<ActivityInstanceEntity> activityInstances = getList(getDbSqlSession(), "selectActivityInstancesByProcessInstanceId", processInstanceId, 
+                activitiesByProcessInstanceIdMatcher, true, includeDeleted);
+        Collections.sort(activityInstances, Comparator.comparing(ActivityInstanceEntity::getStartTime));
+        return activityInstances;
     }
 
     @Override

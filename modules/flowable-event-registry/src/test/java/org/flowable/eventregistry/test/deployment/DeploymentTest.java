@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,27 +64,29 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
     @Test
     @ChannelDeploymentAnnotation(resources = {
-        "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
-        "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPointerTenant.channel",
-        "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
-        }
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPointerTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
+    }
     )
     public void deployChannelsWithTenantDetection() {
         InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
         assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
-            .isInstanceOf(InboundEventStaticTenantDetector.class);
+                .isInstanceOf(InboundEventStaticTenantDetector.class);
 
         InboundChannelModel channel2 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel2");
-        DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2.getInboundEventProcessingPipeline();
+        DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2
+                .getInboundEventProcessingPipeline();
         assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPointerBasedInboundEventTenantDetector.class);
-        assertThat(((JsonPointerBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPointerExpression()).isEqualTo("/tenantId");
+        assertThat(((JsonPointerBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPointerExpression())
+                .isEqualTo("/tenantId");
 
         InboundChannelModel channel3 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel3");
         inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();
         assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(XpathBasedInboundEventTenantDetector.class);
-        assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression()).isEqualTo("/data/tenantId");
+        assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression())
+                .isEqualTo("/data/tenantId");
     }
-
 
     @Test
     @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleEvent.event")
@@ -162,7 +164,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         repositoryService.deleteDeployment(redeployment.getId());
     }
-    
+
     @Test
     @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleChannel.channel")
     public void redeploySingleChannelDefinition() {
@@ -183,7 +185,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
                     assertThat(channel.getDestination()).isEqualTo("testQueue");
                     assertThat(channel.getDeserializerType()).isEqualTo("json");
-                assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent");
+                    assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent");
                 });
 
         EventDeployment redeployment = repositoryService.createDeployment()
@@ -207,7 +209,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
                     assertThat(channel.getDeserializerType()).isEqualTo("json");
                     assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent2");
-            });
+                });
 
         repositoryService.deleteDeployment(redeployment.getId());
     }
@@ -221,7 +223,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
                 .extracting(EventDefinition::getName)
                 .containsExactly("My event", "My order event");
     }
-    
+
     @Test
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/test/deployment/simpleChannel.channel",
             "org/flowable/eventregistry/test/deployment/orderChannel.channel" })
@@ -237,7 +239,8 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = eventEngineConfiguration.getChannelDefinitionCache();
 
         repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel").deploy();
-        ChannelDefinition channelDefinition1 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion().singleResult();
+        ChannelDefinition channelDefinition1 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion()
+                .singleResult();
         assertThat(channelDefinition1.getName()).isEqualTo("My channel");
 
         assertThat(channelDefinitionCache.size()).isEqualTo(1);
@@ -245,7 +248,8 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel").deploy();
 
-        ChannelDefinition channelDefinition2 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion().singleResult();
+        ChannelDefinition channelDefinition2 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion()
+                .singleResult();
         assertThat(channelDefinition2.getName()).isEqualTo("My channel2");
 
         assertThat(channelDefinitionCache.size()).isEqualTo(1);
@@ -255,18 +259,18 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         repositoryService.deleteDeployment(channelDefinition1.getDeploymentId());
         repositoryService.deleteDeployment(channelDefinition2.getDeploymentId());
     }
-    
+
     @Test
     public void deploySingleEventDefinitionWithParentDeploymentId() {
         EventDeployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleEvent.event")
                 .parentDeploymentId("someDeploymentId")
                 .deploy();
-        
+
         EventDeployment newDeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleEvent2.event")
                 .deploy();
-        
+
         try {
             EventDefinition definition = repositoryService.createEventDefinitionQuery().deploymentId(deployment.getId()).singleResult();
             assertThat(definition).isNotNull();
@@ -293,18 +297,18 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             repositoryService.deleteDeployment(newDeployment.getId());
         }
     }
-    
+
     @Test
     public void deploySingleChannelDefinitionWithParentDeploymentId() {
         EventDeployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel")
                 .parentDeploymentId("someDeploymentId")
                 .deploy();
-        
+
         EventDeployment newDeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
                 .deploy();
-        
+
         try {
             ChannelDefinition definition = repositoryService.createChannelDefinitionQuery().deploymentId(deployment.getId()).singleResult();
             assertThat(definition).isNotNull();
@@ -340,9 +344,9 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         // This test validates that they still can be deployed.
 
         EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery()
-            .eventDefinitionKey("myOrderEvent")
-            .latestVersion()
-            .singleResult();
+                .eventDefinitionKey("myOrderEvent")
+                .latestVersion()
+                .singleResult();
         assertThat(eventDefinition).isNotNull();
     }
 }

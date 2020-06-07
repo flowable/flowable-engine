@@ -113,6 +113,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
+    String FIELD_LAST_UNAVAILABLE_TIME = "lastUnavailableTime";
     String FIELD_LAST_DISABLED_TIME = "lastDisabledTime";
     String FIELD_LAST_ENABLED_TIME = "lastEnabledTime";
     String FIELD_LAST_STARTED_TIME = "lastStartedTime";

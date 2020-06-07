@@ -98,16 +98,13 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testMethodExpressions() {
-        // Process contains 2 service tasks. one containing a method with no
-        // params, the other
-        // contains a method with 2 params. When the process completes without
-        // exception,
-        // test passed.
+        // Process contains 2 service tasks. One containing a method with no params, the other
+        // contains a method with 2 params. When the process completes without exception, test passed.
         Map<String, Object> vars = new HashMap<>();
         vars.put("aString", "abcdefgh");
         runtimeService.startProcessInstanceByKey("methodExpressionProcess", vars);
 
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count()).isZero();
     }
 
     @Test
@@ -120,8 +117,8 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
         // Check of the testMethod has been called with the current execution
         String value = (String) runtimeService.getVariable(processInstance.getId(), "testVar");
-        assertNotNull(value);
-        assertEquals("myValue", value);
+        assertThat(value).isNotNull();
+        assertThat(value).isEqualTo("myValue");
     }
 
     @Test
@@ -135,8 +132,8 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
             // Check if the variable that has been set in service-task is the
             // authenticated user
             String value = (String) runtimeService.getVariable(processInstance.getId(), "theUser");
-            assertNotNull(value);
-            assertEquals("frederik", value);
+            assertThat(value).isNotNull();
+            assertThat(value).isEqualTo("frederik");
         } finally {
             // Cleanup
             Authentication.setAuthenticatedUserId(null);

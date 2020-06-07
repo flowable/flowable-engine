@@ -111,7 +111,7 @@ commons-codec                   commons-codec               1.14            Apac
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
 commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
 commons-collections             commons-collections         3.2.2           The Apache Software License, Version 2.0
-commons-io                      commons-io                  2.6             The Apache Software License, Version 2.0
+commons-io                      commons-io                  2.7             The Apache Software License, Version 2.0
 commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
 commons-validator               commons-validator           1.4.0           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
@@ -129,8 +129,8 @@ org.apache.httpcomponents       httpclient                  4.5.12          Apac
 org.apache.httpcomponents       httpcore                    4.4.13          Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.12          Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy                      2.5.10          The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy-jsr223               2.5.10          The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy                      2.5.12          The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy-jsr223               2.5.12          The Apache Software License, Version 2.0
 org.liquibase                   liquibase-core              3.8.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.3           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.4           The Apache Software License, Version 2.0

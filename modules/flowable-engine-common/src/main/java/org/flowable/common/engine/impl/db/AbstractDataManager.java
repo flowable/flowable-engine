@@ -142,9 +142,16 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return getList(getDbSqlSession(), dbQueryName, parameter, cachedEntityMatcher, checkCache);
     }
     
-    @SuppressWarnings("unchecked")
+    
     protected List<EntityImpl> getList(DbSqlSession dbSqlSession, String dbQueryName, Object parameter,
             CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache) {
+        
+        return getList(dbSqlSession, dbQueryName, parameter, cachedEntityMatcher, checkCache, false);
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected List<EntityImpl> getList(DbSqlSession dbSqlSession, String dbQueryName, Object parameter,
+            CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache, boolean includeDeleted) {
 
         Collection<EntityImpl> result = dbSqlSession.selectList(dbQueryName, parameter);
 
@@ -192,7 +199,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         }
 
         // Remove entries which are already deleted
-        if (result.size() > 0) {
+        if (!includeDeleted && result.size() > 0) {
             Iterator<EntityImpl> resultIterator = result.iterator();
             while (resultIterator.hasNext()) {
                 if (dbSqlSession.isEntityToBeDeleted(resultIterator.next())) {
