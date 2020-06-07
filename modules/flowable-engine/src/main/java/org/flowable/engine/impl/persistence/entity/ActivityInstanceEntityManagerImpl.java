@@ -58,6 +58,11 @@ public class ActivityInstanceEntityManagerImpl
     public List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
         return dataManager.findActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
     }
+    
+    @Override
+    public List<ActivityInstanceEntity> findActivityInstancesByProcessInstanceId(String processInstanceId, boolean includeDeleted) {
+        return dataManager.findActivityInstancesByProcessInstanceId(processInstanceId, includeDeleted);
+    }
 
     @Override
     public ActivityInstanceEntity findActivityInstanceByTaskId(String taskId) {

@@ -31,6 +31,8 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
 
     List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
 
+    List<ActivityInstanceEntity> findActivityInstancesByProcessInstanceId(String processInstanceId, boolean includeDeleted);
+    
     ActivityInstanceEntity findActivityInstanceByTaskId(String taskId);
 
     long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
