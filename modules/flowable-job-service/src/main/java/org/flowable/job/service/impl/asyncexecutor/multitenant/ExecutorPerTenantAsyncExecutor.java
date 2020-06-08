@@ -13,9 +13,9 @@
 
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
@@ -40,7 +40,7 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     protected TenantInfoHolder tenantInfoHolder;
     protected TenantAwareAsyncExecutorFactory tenantAwareAyncExecutorFactory;
 
-    protected Map<String, AsyncExecutor> tenantExecutors = new HashMap<>();
+    protected Map<String, AsyncExecutor> tenantExecutors = new ConcurrentHashMap<>();
 
     protected JobServiceConfiguration jobServiceConfiguration;
     protected boolean active;
