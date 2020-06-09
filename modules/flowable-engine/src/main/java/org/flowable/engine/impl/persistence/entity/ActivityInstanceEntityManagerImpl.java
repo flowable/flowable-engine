@@ -343,6 +343,8 @@ public class ActivityInstanceEntityManagerImpl
         }
         Date now = getClock().getCurrentTime();
         activityInstanceEntity.setStartTime(now);
+        
+        activityInstanceEntity.setTransactionOrder(getTransactionOrderFromCache(processInstanceId));
 
         if (execution.getTenantId() != null) {
             activityInstanceEntity.setTenantId(execution.getTenantId());
@@ -365,6 +367,23 @@ public class ActivityInstanceEntityManagerImpl
         }
 
         return null;
+    }
+    
+    protected int getTransactionOrderFromCache(String processInstanceId) {
+        int transactionOrder = 1;
+        List<ActivityInstanceEntity> cachedActivityInstances = getEntityCache().findInCache(ActivityInstanceEntity.class);
+        for (ActivityInstanceEntity cachedActivityInstance : cachedActivityInstances) {
+            if (processInstanceId.equals(cachedActivityInstance.getProcessInstanceId())) {
+                
+                if (cachedActivityInstance.isInserted() && cachedActivityInstance.getTransactionOrder() != null && 
+                        cachedActivityInstance.getTransactionOrder() >= transactionOrder) {
+                    
+                    transactionOrder = cachedActivityInstance.getTransactionOrder() + 1;
+                }
+            }
+        }
+
+        return transactionOrder;
     }
 
     protected String parseActivityType(FlowElement element) {
@@ -399,6 +418,7 @@ public class ActivityInstanceEntityManagerImpl
         activityInstanceEntity.setAssignee(historicActivityInstance.getAssignee());
         activityInstanceEntity.setStartTime(historicActivityInstance.getStartTime());
         activityInstanceEntity.setEndTime(historicActivityInstance.getEndTime());
+        activityInstanceEntity.setTransactionOrder(historicActivityInstance.getTransactionOrder());
         activityInstanceEntity.setDeleteReason(historicActivityInstance.getDeleteReason());
         activityInstanceEntity.setDurationInMillis(historicActivityInstance.getDurationInMillis());
         activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());

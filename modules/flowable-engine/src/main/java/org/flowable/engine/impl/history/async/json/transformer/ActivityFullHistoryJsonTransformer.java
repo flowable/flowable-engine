@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 import java.util.Collections;
@@ -56,6 +57,7 @@ public class ActivityFullHistoryJsonTransformer extends AbstractHistoryJsonTrans
         historicActivityInstanceEntity.setActivityType(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_TYPE));
         historicActivityInstanceEntity.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
         historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+        historicActivityInstanceEntity.setTransactionOrder(getIntegerFromJson(historicalData, HistoryJsonConstants.TRANSACTION_ORDER));
         
         Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
         historicActivityInstanceEntity.setEndTime(endTime);

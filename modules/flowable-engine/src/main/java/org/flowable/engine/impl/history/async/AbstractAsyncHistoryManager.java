@@ -169,10 +169,9 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, activityInstance.getProcessInstanceId());
         putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, activityInstance.getExecutionId());
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityInstance.getActivityId());
-
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, activityInstance.getActivityName());
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, activityInstance.getActivityType());
-
+        putIfNotNull(data, HistoryJsonConstants.TRANSACTION_ORDER, activityInstance.getTransactionOrder());
         putIfNotNull(data, HistoryJsonConstants.TENANT_ID, activityInstance.getTenantId());
     }
 

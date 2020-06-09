@@ -142,11 +142,12 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             assertThat(historicTaskInstance.getProcessInstanceId()).isNotNull();
             assertThat(historicTaskInstance.getProcessDefinitionId()).isNotNull();
             assertThat(historicTaskInstance.getTaskDefinitionKey()).isNotNull();
-            assertThat(historicTaskInstance.getStartTime()).isNotNull();
+            assertThat(historicTaskInstance.getCreateTime()).isNotNull();
             assertThat(historicTaskInstance.getEndTime()).isNotNull();
             assertThat(historicTaskInstance.getDurationInMillis()).isNotNull();
 
-            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstanceId)
                     .list();
             assertThat(historicActivityInstances).hasSize(5);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
@@ -161,6 +162,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 assertThat(historicActivityInstance.getDurationInMillis()).isNotNull();
                 assertThat(historicActivityInstance.getStartTime()).isNotNull();
                 assertThat(historicActivityInstance.getEndTime()).isNotNull();
+                assertThat(historicActivityInstance.getTransactionOrder()).isNotNull();
             }
 
             for (String activityId : Arrays.asList("start", "theTask", "theEnd")) {

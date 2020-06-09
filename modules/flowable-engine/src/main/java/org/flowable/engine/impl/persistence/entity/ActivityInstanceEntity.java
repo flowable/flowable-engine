@@ -51,6 +51,8 @@ public interface ActivityInstanceEntity extends ActivityInstance, Entity, HasRev
     void setEndTime(Date endTime);
 
     void setDurationInMillis(Long durationInMillis);
+    
+    void setTransactionOrder(Integer transactionOrder);
 
     @Override
     String getDeleteReason();
