@@ -538,6 +538,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         historicActivityInstanceEntity.setEndTime(activityInstance.getEndTime());
         historicActivityInstanceEntity.setDeleteReason(activityInstance.getDeleteReason());
         historicActivityInstanceEntity.setDurationInMillis(activityInstance.getDurationInMillis());
+        historicActivityInstanceEntity.setTransactionOrder(activityInstance.getTransactionOrder());
         historicActivityInstanceEntity.setTenantId(activityInstance.getTenantId());
 
 

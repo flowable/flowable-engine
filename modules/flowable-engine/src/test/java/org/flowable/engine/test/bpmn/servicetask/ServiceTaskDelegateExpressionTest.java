@@ -26,6 +26,7 @@ import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase {
@@ -66,14 +67,17 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 assertThat(activityInstanceMap.containsKey("theStart")).isTrue();
                 assertThat(activityInstanceMap.get("theStart").size()).isEqualTo(1);
                 assertThat(activityInstanceMap.get("theStart").get(0).getEndTime()).isNotNull();
+                assertThat(activityInstanceMap.get("theStart").get(0).getTransactionOrder()).isEqualTo(1);
                 
                 assertThat(activityInstanceMap.containsKey("service1")).isTrue();
                 assertThat(activityInstanceMap.get("service1").size()).isEqualTo(1);
                 assertThat(activityInstanceMap.get("service1").get(0).getEndTime()).isNotNull();
+                assertThat(activityInstanceMap.get("service1").get(0).getTransactionOrder()).isEqualTo(3);
                 
                 assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
                 assertThat(activityInstanceMap.get("usertask1").size()).isEqualTo(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNull();
+                assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
                 
                 return processId;
             }
@@ -83,7 +87,34 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
         assertThat(runtimeService.getVariables(processId))
                 .containsOnly(entry("executed", true));
 
-        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+        Task task = taskService.createTaskQuery().processInstanceId(processId).singleResult();
+        assertThat(task).isNotNull();
+        
+        managementService.executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                taskService.complete(task.getId());
+                
+                ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
+                
+                List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
+                assertThat(activityInstances.size()).isEqualTo(7);
+                Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
+                assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
+                assertThat(activityInstanceMap.get("usertask1").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNotNull();
+                assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
+                
+                assertThat(activityInstanceMap.containsKey("theEnd")).isTrue();
+                assertThat(activityInstanceMap.get("theEnd").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("theEnd").get(0).getEndTime()).isNotNull();
+                assertThat(activityInstanceMap.get("theEnd").get(0).getTransactionOrder()).isEqualTo(2);
+                
+                return null;
+            }
+            
+        });
     }
     
     @Test
@@ -103,18 +134,31 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
                 assertThat(activityInstances.size()).isEqualTo(5);
-                Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
-                assertThat(activityInstanceMap.containsKey("theStart")).isTrue();
-                assertThat(activityInstanceMap.get("theStart").size()).isEqualTo(1);
-                assertThat(activityInstanceMap.get("theStart").get(0).getEndTime()).isNotNull();
                 
-                assertThat(activityInstanceMap.containsKey("service1")).isTrue();
-                assertThat(activityInstanceMap.get("service1").size()).isEqualTo(1);
-                assertThat(activityInstanceMap.get("service1").get(0).getEndTime()).isNotNull();
+                ActivityInstanceEntity activityInstance = activityInstances.get(0);
+                assertThat(activityInstance.getActivityId()).isEqualTo("theStart");
+                assertThat(activityInstance.getEndTime()).isNotNull();
+                assertThat(activityInstance.getTransactionOrder()).isEqualTo(1);
                 
-                assertThat(activityInstanceMap.containsKey("theEnd")).isTrue();
-                assertThat(activityInstanceMap.get("theEnd").size()).isEqualTo(1);
-                assertThat(activityInstanceMap.get("theEnd").get(0).getEndTime()).isNotNull();
+                activityInstance = activityInstances.get(1);
+                assertThat(activityInstance.getActivityType()).isEqualTo("sequenceFlow");
+                assertThat(activityInstance.getActivityId()).isEqualTo("_flow_theStart__service1");
+                assertThat(activityInstance.getTransactionOrder()).isEqualTo(2);
+                
+                activityInstance = activityInstances.get(2);
+                assertThat(activityInstance.getActivityId()).isEqualTo("service1");
+                assertThat(activityInstance.getEndTime()).isNotNull();
+                assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
+                
+                activityInstance = activityInstances.get(3);
+                assertThat(activityInstance.getActivityType()).isEqualTo("sequenceFlow");
+                assertThat(activityInstance.getActivityId()).isEqualTo("_flow_service1__theEnd");
+                assertThat(activityInstance.getTransactionOrder()).isEqualTo(4);
+                
+                activityInstance = activityInstances.get(4);
+                assertThat(activityInstance.getActivityId()).isEqualTo("theEnd");
+                assertThat(activityInstance.getEndTime()).isNotNull();
+                assertThat(activityInstance.getTransactionOrder()).isEqualTo(5);
                 
                 return processId;
             }

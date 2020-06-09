@@ -139,6 +139,8 @@ public interface HistoryJsonConstants {
     String ACTIVITY_NAME = "activityName";
 
     String ACTIVITY_TYPE = "activityType";
+    
+    String TRANSACTION_ORDER = "transactionOrder";
 
     String SUPER_PROCESS_INSTANCE_ID = "superProcessInstanceId";
 

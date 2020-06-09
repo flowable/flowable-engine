@@ -132,6 +132,7 @@ create table ACT_RU_ACTINST (
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
+    TRANSACTION_ORDER_ int,
     DELETE_REASON_ nvarchar(4000),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
@@ -333,7 +334,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.1.4', 1);
+values ('schema.version', '6.5.1.5', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.1.4)', 1);
+values ('schema.history', 'create(6.5.1.5)', 1);

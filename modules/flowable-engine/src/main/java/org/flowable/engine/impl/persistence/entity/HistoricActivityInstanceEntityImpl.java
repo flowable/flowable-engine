@@ -28,6 +28,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     private static final long serialVersionUID = 1L;
 
+    protected Integer transactionOrder;
     protected String activityId;
     protected String activityName;
     protected String activityType;
@@ -46,6 +47,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
         persistentState.put("durationInMillis", durationInMillis);
+        persistentState.put("transactionOrder", transactionOrder);
         persistentState.put("deleteReason", deleteReason);
         persistentState.put("executionId", executionId);
         persistentState.put("taskId", taskId);
@@ -58,6 +60,16 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
+    public Integer getTransactionOrder() {
+        return transactionOrder;
+    }
+
+    @Override
+    public void setTransactionOrder(Integer transactionOrder) {
+        this.transactionOrder = transactionOrder;
+    }
+    
     @Override
     public String getActivityId() {
         return activityId;

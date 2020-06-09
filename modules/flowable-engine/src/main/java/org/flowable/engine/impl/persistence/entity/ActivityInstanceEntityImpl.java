@@ -34,6 +34,7 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
     protected Date startTime;
     protected Date endTime;
     protected Long durationInMillis;
+    protected Integer transactionOrder;
     protected String deleteReason;
 
     protected String activityId;
@@ -53,6 +54,7 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
+        persistentState.put("transactionOrder", transactionOrder);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
         persistentState.put("executionId", executionId);
@@ -125,6 +127,16 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
     @Override
     public void setDurationInMillis(Long durationInMillis) {
         this.durationInMillis = durationInMillis;
+    }
+    
+    @Override
+    public Integer getTransactionOrder() {
+        return transactionOrder;
+    }
+
+    @Override
+    public void setTransactionOrder(Integer transactionOrder) {
+        this.transactionOrder = transactionOrder;
     }
 
     @Override

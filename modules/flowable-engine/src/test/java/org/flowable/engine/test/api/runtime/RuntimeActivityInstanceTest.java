@@ -56,13 +56,15 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(activityInstance.getStartTime()).isNotNull();
         assertThat(activityInstance.getEndTime()).isNotNull();
         assertThat(activityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
+        assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
         }
 
-        this.runtimeService
-                .trigger(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId());
+        String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId();
+        this.runtimeService.trigger(executionId);
+        
         assertThat(runtimeService.createActivityInstanceQuery().activityId("noop").count()).isZero();
     }
 
@@ -82,9 +84,11 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(activityInstance.getProcessDefinitionId()).isNotNull();
         assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(activityInstance.getStartTime()).isNotNull();
+        assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
         }
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(processInstance.getId()).singleResult();
