@@ -56,6 +56,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -168,9 +169,15 @@ public abstract class AbstractDynamicStateManager {
                     }
                 }
 
-                //Create a move container for each execution group (executionList)
-                Stream.concat(activitiesExecutionsByMultiInstanceParentId.values().stream(), Stream.of(activitiesExecutionsNotInMultiInstanceParent))
+                // see https://github.com/flowable/flowable-engine/issues/2259
+                // now it works and pass all tests here
+                // i dont known if this will cause any other problems
+
+                Map<String, List<ExecutionEntity>> executionsByParent = Stream.concat(activitiesExecutionsByMultiInstanceParentId.values().stream(), Stream.of(activitiesExecutionsNotInMultiInstanceParent))
                     .filter(executions -> executions != null && !executions.isEmpty())
+                                                                   .flatMap(Collection::stream)
+                                                                   .collect(Collectors.groupingBy(DelegateExecution::getParentId));
+                executionsByParent.values()
                     .forEach(executions -> moveExecutionEntityContainerList.add(createMoveExecutionEntityContainer(activityContainer, executions, commandContext)));
             }
         }

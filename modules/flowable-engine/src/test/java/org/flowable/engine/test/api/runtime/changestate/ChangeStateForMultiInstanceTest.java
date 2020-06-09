@@ -13,18 +13,9 @@
 
 package org.flowable.engine.test.api.runtime.changestate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.assertj.core.api.Condition;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.Execution;
@@ -34,6 +25,12 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Frederik Heremans
@@ -58,8 +55,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceSequential.bpmn20.xml")
     public void testSetCurrentActivityToSequentialMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sequentialMultiInstance")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions)
@@ -71,9 +68,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
                 .containsExactly("beforeMultiInstance");
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("beforeMultiInstance", "seqTasks")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("beforeMultiInstance", "seqTasks")
+                      .changeState();
 
         //First in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -144,8 +141,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceSequential.bpmn20.xml")
     public void testSetCurrentActivityOfSequentialMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sequentialMultiInstance")
-                .variable("nrOfLoops", 5)
-                .start();
+                                                        .variable("nrOfLoops", 5)
+                                                        .start();
 
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
 
@@ -166,9 +163,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("seqTasks", "nextTask")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("seqTasks", "nextTask")
+                      .changeState();
 
         seqExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(seqExecutions).hasSize(1);
@@ -184,8 +181,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceSequential.bpmn20.xml")
     public void testSetCurrentParentExecutionOfSequentialMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sequentialMultiInstance")
-                .variable("nrOfLoops", 5)
-                .start();
+                                                        .variable("nrOfLoops", 5)
+                                                        .start();
 
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
 
@@ -208,8 +205,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //move the parent execution - otherwise the parent multi instance execution remains, although active==false.
         String parentExecutionId = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult().getParentId();
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionToActivityId(parentExecutionId, "nextTask")
-                .changeState();
+                      .moveExecutionToActivityId(parentExecutionId, "nextTask")
+                      .changeState();
 
         seqExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(seqExecutions).hasSize(1);
@@ -225,8 +222,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel.bpmn20.xml")
     public void testSetCurrentActivityToParallelMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions)
@@ -238,9 +235,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
                 .containsExactly("beforeMultiInstance");
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("beforeMultiInstance", "parallelTasks")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("beforeMultiInstance", "parallelTasks")
+                      .changeState();
 
         //First in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -315,8 +312,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel.bpmn20.xml")
     public void testSetCurrentActivityOfParallelMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
 
@@ -333,9 +330,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(activeParallelTasks).hasSize(2);
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("parallelTasks", "nextTask")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("parallelTasks", "nextTask")
+                      .changeState();
 
         parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(parallelExecutions).hasSize(1);
@@ -347,11 +344,60 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel-lzh.bpmn20.xml")
+    public void testSetCurrentActivityOfParallelLzhMultiInstanceTask() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
+        String parallelTasks = "parallelTasks";
+
+        completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
+
+        List<Execution> parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(parallelExecutions).hasSize(6);
+        List<Task> activeParallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
+        assertThat(activeParallelTasks).hasSize(5);
+
+
+        List<String> moveExecutionIds =
+                parallelExecutions.stream()
+                                  .filter(execution -> !execution.getActivityId().equals(parallelTasks) || ((ExecutionEntityImpl) execution).isMultiInstanceRoot())
+                                  .map(Execution::getId)
+                                  .collect(Collectors.toList());
+
+
+        runtimeService.createChangeActivityStateBuilder()
+                      .processInstanceId(processInstance.getId())
+                      .moveExecutionsToSingleActivityId(moveExecutionIds,
+                              "beforeMultiInstance")
+                      .changeState();
+
+        parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // fail here
+        assertThat(parallelExecutions).hasSize(1);
+
+        completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
+
+
+        runtimeService.createChangeActivityStateBuilder()
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdsToSingleActivityId(Arrays.asList(parallelTasks, "branchTask", "branchTask2"),
+                              "beforeMultiInstance")
+                      .changeState();
+
+        parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // fail here
+        assertThat(parallelExecutions).hasSize(1);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeMultiInstance");
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel.bpmn20.xml")
     public void testSetCurrentParentExecutionOfParallelMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
 
@@ -370,8 +416,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Fetch the parent execution of the multi instance task execution
         String parentExecutionId = runtimeService.createExecutionQuery().executionId(activeParallelTasks.get(0).getExecutionId()).singleResult().getParentId();
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionToActivityId(parentExecutionId, "nextTask")
-                .changeState();
+                      .moveExecutionToActivityId(parentExecutionId, "nextTask")
+                      .changeState();
 
         parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(parallelExecutions).hasSize(1);
@@ -386,8 +432,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentExecutionWithinMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         //One of the child executions is the parent of the multiInstance "loop"
         long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -399,8 +445,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move one of the executions within the multiInstance subProcess
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionToActivityId(subTask1Executions.get(0).getId(), "subTask2")
-                .changeState();
+                      .moveExecutionToActivityId(subTask1Executions.get(0).getId(), "subTask2")
+                      .changeState();
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(executionsCount).isEqualTo(7);
@@ -458,8 +504,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentActivityWithinMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         //One of the child executions is the parent of the multiInstance "loop"
         long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -471,9 +517,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move one of the executions within the multiInstance subProcess
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("subTask1", "subTask2")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("subTask1", "subTask2")
+                      .changeState();
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(executionsCount).isEqualTo(7);
@@ -532,10 +578,10 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move one of the executions within of the nested multiInstance subProcesses
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionToActivityId(nestedSubTask1Executions.get(0).getId(), "nestedSubTask2")
-                .moveExecutionToActivityId(nestedSubTask1Executions.get(3).getId(), "nestedSubTask2")
-                .moveExecutionToActivityId(nestedSubTask1Executions.get(6).getId(), "nestedSubTask2")
-                .changeState();
+                      .moveExecutionToActivityId(nestedSubTask1Executions.get(0).getId(), "nestedSubTask2")
+                      .moveExecutionToActivityId(nestedSubTask1Executions.get(3).getId(), "nestedSubTask2")
+                      .moveExecutionToActivityId(nestedSubTask1Executions.get(6).getId(), "nestedSubTask2")
+                      .changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(25);
@@ -656,9 +702,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Moving the nestedSubTask1 activity should move all its executions
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("nestedSubTask1", "nestedSubTask2")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("nestedSubTask1", "nestedSubTask2")
+                      .changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(25);
@@ -703,8 +749,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentMultiInstanceSubProcessParentExecutionWithinProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         //One of the child executions is the parent of the multiInstance "loop"
         long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -729,17 +775,17 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move the parallelSubProcess via the parentExecution Ids
         String ParallelSubProcessParentExecutionId = runtimeService.createExecutionQuery()
-                .processInstanceId(processInstance.getId())
-                .activityId("parallelSubProcess")
-                .list()
-                .stream()
-                .findFirst()
-                .map(Execution::getParentId)
-                .get();
+                                                                   .processInstanceId(processInstance.getId())
+                                                                   .activityId("parallelSubProcess")
+                                                                   .list()
+                                                                   .stream()
+                                                                   .findFirst()
+                                                                   .map(Execution::getParentId)
+                                                                   .get();
 
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionToActivityId(ParallelSubProcessParentExecutionId, "lastTask")
-                .changeState();
+                      .moveExecutionToActivityId(ParallelSubProcessParentExecutionId, "lastTask")
+                      .changeState();
 
         //There's no multiInstance anymore
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -756,8 +802,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentMultiInstanceSubProcessParentActivityWithinProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
-                .variable("nrOfLoops", 3)
-                .start();
+                                                        .variable("nrOfLoops", 3)
+                                                        .start();
 
         //One of the child executions is the parent of the multiInstance "loop"
         long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -782,9 +828,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move the parallelSubProcess
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("parallelSubProcess", "lastTask")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("parallelSubProcess", "lastTask")
+                      .changeState();
 
         //There's no multiInstance anymore
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -861,17 +907,17 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move each nested multiInstance parent
         Stream<String> parallelNestedSubProcessesParentIds = runtimeService.createExecutionQuery()
-                .processInstanceId(processInstance.getId())
-                .activityId("parallelNestedSubProcess")
-                .list()
-                .stream()
-                .map(Execution::getParentId)
-                .distinct();
+                                                                           .processInstanceId(processInstance.getId())
+                                                                           .activityId("parallelNestedSubProcess")
+                                                                           .list()
+                                                                           .stream()
+                                                                           .map(Execution::getParentId)
+                                                                           .distinct();
 
         parallelNestedSubProcessesParentIds.forEach(parentId -> {
             runtimeService.createChangeActivityStateBuilder()
-                    .moveExecutionToActivityId(parentId, "subTask2")
-                    .changeState();
+                          .moveExecutionToActivityId(parentId, "subTask2")
+                          .changeState();
         });
 
         //Nested subProcesses have completed, only outer subProcess remain
@@ -961,9 +1007,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move the activity nested multiInstance parent
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("parallelNestedSubProcess", "subTask2")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdTo("parallelNestedSubProcess", "subTask2")
+                      .changeState();
 
         //Nested subProcesses have completed, only outer subProcess remain
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -989,7 +1035,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml"})
     public void testSetCurrentActivitiesUsingParallelGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
 
@@ -1005,9 +1051,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move a task before the fork within the multiInstance subProcess
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveSingleActivityIdToActivityIds("preForkTask", Arrays.asList("forkTask1", "forkTask2"))
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveSingleActivityIdToActivityIds("preForkTask", Arrays.asList("forkTask1", "forkTask2"))
+                      .changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(10);
@@ -1027,9 +1073,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move the parallel gateway task forward
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdsToSingleActivityId(Arrays.asList("forkTask1", "forkTask2"), "parallelJoin")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdsToSingleActivityId(Arrays.asList("forkTask1", "forkTask2"), "parallelJoin")
+                      .changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(7);
@@ -1068,7 +1114,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml"})
     public void testSetCurrentExecutionsUsingParallelGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
 
@@ -1084,8 +1130,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move a task before the fork within the multiInstance subProcess
         preForkTaskExecutions.forEach(e -> runtimeService.createChangeActivityStateBuilder()
-                .moveSingleExecutionToActivityIds(e.getId(), Arrays.asList("forkTask1", "forkTask2"))
-                .changeState());
+                                                         .moveSingleExecutionToActivityIds(e.getId(), Arrays.asList("forkTask1", "forkTask2"))
+                                                         .changeState());
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(10);
@@ -1105,10 +1151,10 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move the parallel gateway task forward
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionsToSingleActivityId(
-                        Stream.concat(forkTask1Executions.stream().map(Execution::getId), forkTask2Executions.stream().map(Execution::getId))
-                                .collect(Collectors.toList()), "postForkTask")
-                .changeState();
+                      .moveExecutionsToSingleActivityId(
+                              Stream.concat(forkTask1Executions.stream().map(Execution::getId), forkTask2Executions.stream().map(Execution::getId))
+                                    .collect(Collectors.toList()), "postForkTask")
+                      .changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(7);
@@ -1147,7 +1193,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml"})
     public void testCompleteSetCurrentActivitiesUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
 
@@ -1171,9 +1217,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Move all activities
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdsToSingleActivityId(Arrays.asList("taskInclusive1", "taskInclusive2", "taskInclusive3"), "inclusiveJoin")
-                .changeState();
+                      .processInstanceId(processInstance.getId())
+                      .moveActivityIdsToSingleActivityId(Arrays.asList("taskInclusive1", "taskInclusive2", "taskInclusive3"), "inclusiveJoin")
+                      .changeState();
 
         //Still 3 subProcesses running, all of them past the gateway fork/join
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1203,7 +1249,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml"})
     public void testCompleteSetCurrentExecutionsUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
 
@@ -1249,18 +1295,18 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Move the executions of the gateway that still contains 3 tasks in execution
         Stream<Execution> tempStream = Stream.concat(classifiedExecutions.get("taskInclusive1").stream(), classifiedExecutions.get("taskInclusive2").stream());
         Map<String, List<Execution>> taskExecutionsByParent = Stream.concat(tempStream, classifiedExecutions.get("taskInclusive3").stream())
-                .collect(Collectors.groupingBy(Execution::getParentId));
+                                                                    .collect(Collectors.groupingBy(Execution::getParentId));
 
         List<String> ids = taskExecutionsByParent.values().stream()
-                .filter(l -> l.size() == 3)
-                .findFirst().orElseGet(ArrayList::new)
-                .stream().map(Execution::getId)
-                .collect(Collectors.toList());
+                                                 .filter(l -> l.size() == 3)
+                                                 .findFirst().orElseGet(ArrayList::new)
+                                                 .stream().map(Execution::getId)
+                                                 .collect(Collectors.toList());
 
         //Move into the synchronizing gateway
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
-                .changeState();
+                      .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+                      .changeState();
 
         //There'll be still 3 subProcesses running, 2 with "gateways" still in execution, one with task3 & task1 & join, one with task3, task2 and join
         // the 3rd subProcess should be past the gateway fork/join
@@ -1289,8 +1335,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         ids = classifiedExecutions.get("taskInclusive1").stream().map(Execution::getId).collect(Collectors.toList());
         //Move into the synchronizing gateway
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
-                .changeState();
+                      .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+                      .changeState();
 
         //Complete remaining task3, the next inline test needs the task to be completed too
         for (Task t : tasks) {
@@ -1320,8 +1366,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         ids = classifiedExecutions.get("taskInclusive2").stream().map(Execution::getId).collect(Collectors.toList());
         //Move into the synchronizing gateway
         runtimeService.createChangeActivityStateBuilder()
-                .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
-                .changeState();
+                      .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+                      .changeState();
 
         //Still 3 subProcesses running, all of them past the gateway fork/join
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
