@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.flowable.ui.common.tenant.TenantProvider;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 
 /**
  * @author Tijs Rademakers
@@ -76,6 +78,9 @@ public class FlowableProcessInstanceService {
 
     @Autowired
     protected UserCache userCache;
+
+    @Autowired
+    protected TenantProvider tenantProvider;
 
     public ProcessInstanceRepresentation getProcessInstance(String processInstanceId, HttpServletResponse response) {
 
@@ -129,8 +134,11 @@ public class FlowableProcessInstanceService {
             throw new NotPermittedException("User is not listed as potential starter for process definition with id: " + processDefinition.getId());
         }
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(),
-                startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionId(startRequest.getProcessDefinitionId()).outcome(startRequest.getOutcome())
+                .startFormVariables(startRequest.getValues()).name(startRequest.getName())
+                .tenantId(tenantProvider.getTenantId());
+        ProcessInstance processInstance = processInstanceBuilder.start();
 
         User user = null;
         if (processInstance.getStartUserId() != null) {

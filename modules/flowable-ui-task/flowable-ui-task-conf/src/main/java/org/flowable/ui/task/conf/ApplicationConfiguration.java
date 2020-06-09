@@ -33,7 +33,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "org.flowable.ui.common.repository",
         "org.flowable.ui.common.service",
         "org.flowable.ui.common.filter",
-        "org.flowable.ui.common.security" })
+        "org.flowable.ui.common.security",
+        "org.flowable.ui.common.tenant"})
 @EnableScheduling
 @EnableAsync
 public class ApplicationConfiguration {
