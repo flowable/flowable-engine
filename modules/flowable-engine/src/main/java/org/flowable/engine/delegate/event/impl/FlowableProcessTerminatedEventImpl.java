@@ -14,6 +14,7 @@ package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -32,9 +33,10 @@ public class FlowableProcessTerminatedEventImpl extends FlowableEntityEventImpl 
             throw new FlowableException("Execution '"+ execution +"' is not a processInstance");
         }
         
-        this.executionId = execution.getId();
-        this.processInstanceId = execution.getProcessInstanceId();
-        this.processDefinitionId = execution.getProcessDefinitionId();
+        this.subScopeId = execution.getId();
+        this.scopeId = execution.getProcessInstanceId();
+        this.scopeDefinitionId = execution.getProcessDefinitionId();
+        this.scopeType = ScopeTypes.BPMN;
         this.cause = cause;
     }
 

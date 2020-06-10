@@ -37,9 +37,7 @@ public class CountingTaskUtil {
             eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
 
             eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED,
-                            variableInstance.getName(), null, variableInstance.getType(), variableInstance.getTaskId(),
-                            variableInstance.getExecutionId(), variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
-                            variableInstance.getScopeId(), variableInstance.getScopeType()));
+                            variableInstance, null, variableInstance.getType()));
         }
     }
 

@@ -27,8 +27,6 @@ public class FlowableVariableEventImpl extends FlowableProcessEventImpl implemen
     protected Object variableValue;
     protected VariableType variableType;
     protected String taskId;
-    protected String scopeId;
-    protected String scopeType;
 
     public FlowableVariableEventImpl(FlowableEngineEventType type) {
         super(type);
@@ -70,21 +68,4 @@ public class FlowableVariableEventImpl extends FlowableProcessEventImpl implemen
         this.taskId = taskId;
     }
 
-    @Override
-    public String getScopeId() {
-        return scopeId;
-    }
-
-    public void setScopeId(String scopeId) {
-        this.scopeId = scopeId;
-    }
-
-    @Override
-    public String getScopeType() {
-        return scopeType;
-    }
-
-    public void setScopeType(String scopeType) {
-        this.scopeType = scopeType;
-    }
 }
