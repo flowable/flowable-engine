@@ -42,67 +42,67 @@ public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
     }
 
     @Override
-    public TaskCompletionBuilder setVariables(Map<String, Object> variables) {
+    public TaskCompletionBuilder variables(Map<String, Object> variables) {
         this.scopedVariableContainer.setVariables(variables);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setVariablesLocal(Map<String, Object> variablesLocal) {
+    public TaskCompletionBuilder variablesLocal(Map<String, Object> variablesLocal) {
         this.scopedVariableContainer.setLocalVariables(variablesLocal);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setTransientVariables(Map<String, Object> transientVariables) {
+    public TaskCompletionBuilder transientVariables(Map<String, Object> transientVariables) {
         this.scopedVariableContainer.setTransientVariables(transientVariables);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setTransientVariablesLocal(Map<String, Object> transientVariablesLocal) {
+    public TaskCompletionBuilder transientVariablesLocal(Map<String, Object> transientVariablesLocal) {
         this.scopedVariableContainer.setTransientLocalVariables(transientVariablesLocal);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setVariable(String variableName, Object variableValue) {
+    public TaskCompletionBuilder variable(String variableName, Object variableValue) {
         this.scopedVariableContainer.setVariable(variableName, variableValue);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setVariableLocal(String variableName, Object variableValue) {
+    public TaskCompletionBuilder variableLocal(String variableName, Object variableValue) {
         this.scopedVariableContainer.setVariableLocal(variableName, variableValue);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setTransientVariable(String variableName, Object variableValue) {
+    public TaskCompletionBuilder transientVariable(String variableName, Object variableValue) {
         this.scopedVariableContainer.setTransientVariable(variableName, variableValue);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setTransientVariableLocal(String variableName, Object variableValue) {
+    public TaskCompletionBuilder transientVariableLocal(String variableName, Object variableValue) {
         this.scopedVariableContainer.setTransientVariableLocal(variableName, variableValue);
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setTaskId(String id) {
+    public TaskCompletionBuilder taskId(String id) {
         this.taskId = id;
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setFormDefinitionId(String formDefinitionId) {
+    public TaskCompletionBuilder formDefinitionId(String formDefinitionId) {
         this.formDefinitionId = formDefinitionId;
         return this;
     }
 
     @Override
-    public TaskCompletionBuilder setOutcome(String outcome) {
+    public TaskCompletionBuilder outcome(String outcome) {
         this.outcome = outcome;
         return this;
     }

@@ -19,25 +19,30 @@ import java.util.Map;
  */
 public interface TaskCompletionBuilder {
 
-    TaskCompletionBuilder setVariables(Map<String, Object> variables);
 
-    TaskCompletionBuilder setVariablesLocal(Map<String, Object> variablesLocal);
+    TaskCompletionBuilder variables(Map<String, Object> variables);
 
-    TaskCompletionBuilder setTransientVariables(Map<String, Object> transientVariables);
+    /**
+     * Sets a local variable before the transition is executed.
+     * The variable will be stored locally on the plan item instance.
+     */
+    TaskCompletionBuilder variablesLocal(Map<String, Object> variablesLocal);
 
-    TaskCompletionBuilder setTransientVariablesLocal(Map<String, Object> transientVariablesLocal);
+    TaskCompletionBuilder transientVariables(Map<String, Object> transientVariables);
 
-    TaskCompletionBuilder setVariable(String variableName, Object variableValue);
+    TaskCompletionBuilder transientVariablesLocal(Map<String, Object> transientVariablesLocal);
 
-    TaskCompletionBuilder setVariableLocal(String variableName, Object variableValue);
+    TaskCompletionBuilder variable(String variableName, Object variableValue);
 
-    TaskCompletionBuilder setTransientVariable(String variableName, Object variableValue);
+    TaskCompletionBuilder variableLocal(String variableName, Object variableValue);
 
-    TaskCompletionBuilder setTransientVariableLocal(String variableName, Object variableValue);
+    TaskCompletionBuilder transientVariable(String variableName, Object variableValue);
 
-    TaskCompletionBuilder setTaskId(String id);
-    TaskCompletionBuilder setFormDefinitionId(String formDefinitionId);
-    TaskCompletionBuilder setOutcome(String outcome);
+    TaskCompletionBuilder transientVariableLocal(String variableName, Object variableValue);
+
+    TaskCompletionBuilder taskId(String id);
+    TaskCompletionBuilder formDefinitionId(String formDefinitionId);
+    TaskCompletionBuilder outcome(String outcome);
 
     /**
      * Completes the task

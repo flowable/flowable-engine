@@ -207,9 +207,9 @@ public class TaskResource extends TaskBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                    taskCompletionBuilder.setVariableLocal(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.variableLocal(var.getName(), actualVariableValue);
                 } else {
-                    taskCompletionBuilder.setVariable(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.variable(var.getName(), actualVariableValue);
                 }
             }
         }
@@ -222,18 +222,18 @@ public class TaskResource extends TaskBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                    taskCompletionBuilder.setTransientVariableLocal(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.transientVariableLocal(var.getName(), actualVariableValue);
                 } else {
-                    taskCompletionBuilder.setTransientVariable(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.transientVariable(var.getName(), actualVariableValue);
                 }
             }
 
         }
 
         taskCompletionBuilder
-                .setTaskId(task.getId())
-                .setFormDefinitionId(actionRequest.getFormDefinitionId())
-                .setOutcome(actionRequest.getOutcome())
+                .taskId(task.getId())
+                .formDefinitionId(actionRequest.getFormDefinitionId())
+                .outcome(actionRequest.getOutcome())
                 .complete();
     }
 
