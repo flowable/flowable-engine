@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
@@ -48,12 +49,12 @@ public class ProcessEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/management/engine", produces = "application/json")
-    public ProcessEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessManagementInfo();
         }
         
-        ProcessEngineInfoResponse response = new ProcessEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             EngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());

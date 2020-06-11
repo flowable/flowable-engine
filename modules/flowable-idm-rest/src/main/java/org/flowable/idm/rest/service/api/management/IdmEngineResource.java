@@ -14,6 +14,7 @@ package org.flowable.idm.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
@@ -42,12 +43,12 @@ public class IdmEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/idm-management/engine", produces = "application/json")
-    public IdmEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessIdmManagementInfo();
         }
         
-        IdmEngineInfoResponse response = new IdmEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             IdmEngine idmEngine = IdmEngines.getDefaultIdmEngine();

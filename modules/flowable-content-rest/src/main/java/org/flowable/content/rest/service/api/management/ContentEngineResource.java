@@ -14,6 +14,7 @@ package org.flowable.content.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.content.rest.ContentRestApiInterceptor;
@@ -42,12 +43,12 @@ public class ContentEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/content-management/engine", produces = "application/json")
-    public ContentEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessContentManagementInfo();
         }
         
-        ContentEngineInfoResponse response = new ContentEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             ContentEngine contentEngine = ContentEngines.getDefaultContentEngine();

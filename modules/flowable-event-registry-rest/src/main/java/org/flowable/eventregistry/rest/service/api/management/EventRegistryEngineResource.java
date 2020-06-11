@@ -13,6 +13,7 @@
 
 package org.flowable.eventregistry.rest.service.api.management;
 
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestApiInterceptor;
@@ -41,13 +42,13 @@ public class EventRegistryEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/event-registry-management/engine", produces = "application/json")
-    public EventRegistryEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessManagementInfo();
         }
         
         EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getDefaultEventRegistryEngine();
-        EventRegistryEngineInfoResponse response = new EventRegistryEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
         response.setName(eventRegistryEngine.getName());
         response.setVersion(EventRegistryEngine.VERSION);
         return response;
