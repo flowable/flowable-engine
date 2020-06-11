@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.ScopedVariableContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.form.FormHandlerHelper;
@@ -22,7 +23,6 @@ import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -68,7 +68,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, new ScopedVariableContainerHelper(),  commandContext);
+                TaskHelper.completeTask(task, new ScopedVariableContainerImpl(),  commandContext);
             }
         }
 

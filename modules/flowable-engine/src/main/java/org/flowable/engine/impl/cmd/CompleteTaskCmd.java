@@ -14,10 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.ScopedVariableContainer;
+import org.flowable.common.engine.api.variable.ScopedVariableContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -27,22 +28,22 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
-    protected ScopedVariableContainerHelper scopedVariableContainerHelper;
+    protected ScopedVariableContainer scopedVariableContainer;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected boolean localScope;
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
         super(taskId);
-        this.scopedVariableContainerHelper = new ScopedVariableContainerHelper();
+        this.scopedVariableContainer = new ScopedVariableContainerImpl();
         this.variables = variables;
 
         if (this.variables != null) {
-            scopedVariableContainerHelper.setVariables(this.variables);
+            scopedVariableContainer.setVariables(this.variables);
         }
 
         if (this.transientVariables != null) {
-            scopedVariableContainerHelper.setTransientVariables(this.transientVariables);
+            scopedVariableContainer.setTransientVariables(this.transientVariables);
         }
     }
 
@@ -56,11 +57,12 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
     }
 
-    public CompleteTaskCmd(String taskId, ScopedVariableContainerHelper scopedVariableContainerHelper) {
+    public CompleteTaskCmd(String taskId, ScopedVariableContainer scopedVariableContainer) {
         super(taskId);
-        this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
-        this.variables = scopedVariableContainerHelper.getAllVariables();
-        this.scopedVariableContainerHelper = scopedVariableContainerHelper;
+        this.scopedVariableContainer = scopedVariableContainer;
+
+        this.localScope = scopedVariableContainer.hasLocalVariables();
+        this.variables = scopedVariableContainer.getAllVariables();
     }
 
     @Override
@@ -79,7 +81,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        TaskHelper.completeTask(task, this.scopedVariableContainerHelper, commandContext);
+        TaskHelper.completeTask(task, this.scopedVariableContainer, commandContext);
         return null;
     }
 

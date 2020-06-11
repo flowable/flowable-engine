@@ -16,11 +16,12 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.ScopedVariableContainer;
+import org.flowable.common.engine.api.variable.ScopedVariableContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -34,7 +35,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
-    protected ScopedVariableContainerHelper scopedVariableContainerHelper;
+    protected ScopedVariableContainer scopedVariableContainer;
     protected String formDefinitionId;
     protected String outcome;
     protected Map<String, Object> variables;
@@ -43,17 +44,17 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);
-        this.scopedVariableContainerHelper = new ScopedVariableContainerHelper();
+        this.scopedVariableContainer = new ScopedVariableContainerImpl();
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.variables = variables;
 
         if (this.variables != null) {
-            this.scopedVariableContainerHelper.setVariables(this.variables);
+            this.scopedVariableContainer.setVariables(this.variables);
         }
 
         if (this.transientVariables != null) {
-            this.scopedVariableContainerHelper.setTransientVariables(this.transientVariables);
+            this.scopedVariableContainer.setTransientVariables(this.transientVariables);
         }
     }
 
@@ -68,19 +69,21 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                                    Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
-        scopedVariableContainerHelper.setTransientVariables(transientVariables);
+        scopedVariableContainer.setTransientVariables(transientVariables);
         this.transientVariables = transientVariables;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-                                                      ScopedVariableContainerHelper scopedVariableContainerHelper) {
+                                                      ScopedVariableContainer scopedVariableContainer) {
         super(taskId);
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
-        this.variables = scopedVariableContainerHelper.getAllVariables();
-        this.transientVariables = scopedVariableContainerHelper.getAllTransientVariables();
-        this.localScope = scopedVariableContainerHelper.hasVariablesLocal();
-        this.scopedVariableContainerHelper = scopedVariableContainerHelper;
+        this.scopedVariableContainer = scopedVariableContainer;
+
+
+        this.variables = scopedVariableContainer.getAllVariables();
+        this.transientVariables = scopedVariableContainer.getAllTransientVariables();
+        this.localScope = scopedVariableContainer.hasLocalVariables();
     }
 
     @Override
@@ -116,7 +119,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
         }
-        TaskHelper.completeTask(task, this.scopedVariableContainerHelper, commandContext);
+        TaskHelper.completeTask(task, this.scopedVariableContainer, commandContext);
 
 
         return null;

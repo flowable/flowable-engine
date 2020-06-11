@@ -20,52 +20,166 @@ import java.util.Map;
  * @author Ievgenii Bespal
  */
 public interface ScopedVariableContainer {
-    /**
-     * Checks whether or not the defined variables is transient.
-     *
-     * @return whether or not the defined variables is transient.
-     */
-    boolean isTransient();
 
     /**
      * Checks whether or not there is a variable defined with the given name.
      *
      * @param variableName
      *          name of variable.
-     * @param isVariableLocal
-     *          define scope of variable.
      * @return the variable or null if the variable is undefined.
      */
-    Object getVariable(String variableName, boolean isVariableLocal);
+    Object getVariable(String variableName);
+
+    /**
+     * Checks whether or not there is a local variable defined with the given name.
+     *
+     * @param localVariableName
+     *          name of local variable.
+     * @return the variable or null if the variable is undefined.
+     */
+    Object getVariableLocal(String localVariableName);
+
+    /**
+     * Checks whether or not there is a transient variable defined with the given name.
+     *
+     * @param transientVariableName
+     *          name of variable.
+     * @return the variable or null if the transient variable is undefined.
+     */
+    Object getTransientVariable(String transientVariableName);
+
+    /**
+     * Checks whether or not there is a transient local variable defined with the given name.
+     *
+     * @param transientLocalVariableName
+     *          name of local variable.
+     * @return the variable or null if the transient variable is undefined.
+     */
+    Object getTransientLocalVariable(String transientLocalVariableName);
 
     /**
      * Get all variables.
      *
-     * @param isVariablesLocal
-     *          define scope of variables.
      * @return the variable instances or an empty map if no such variables are found.
      */
-    Map<String, Object> getVariables(boolean isVariablesLocal);
+    Map<String, Object> getVariables();
+
+    /**
+     * Get all local variables.
+     *
+     * @return the local variable instances or an empty map if no such local variables are found.
+     */
+    Map<String, Object> getVariablesLocal();
+
+    /**
+     * Get all transient variables.
+     *
+     * @return the variable instances or an empty map if no such transient variables are found.
+     */
+    Map<String, Object> getTransientVariables();
+
+    /**
+     * Get all transient local variables.
+     *
+     * @return the local variable instances or an empty map if no such transient local variables are found.
+     */
+    Map<String, Object> getTransientLocalVariables();
+
+    /**
+     * Get all variables including local.
+     *
+     * @return the variable instances or an empty map if no such variables are found.
+     */
+    Map<String, Object> getAllVariables();
+
+    /**
+     * Get all transient variables including local.
+     *
+     * @return the variable instances or an empty map if no such transient variables are found.
+     */
+    Map<String, Object> getAllTransientVariables();
+
+    /**
+     * Checks whether or not the list is empty.
+     *
+     * @return whether or not the list is empty.
+     */
+    boolean hasVariables();
+
+    /**
+     * Checks whether or not the container has local variables.
+     *
+     * @return whether or not the container has local variables.
+     */
+    boolean hasLocalVariables();
+
+    /**
+     * Checks whether or not the container has transient variables.
+     *
+     * @return whether or not the container has transient variables.
+     */
+    boolean hasTransientVariables();
+
+    /**
+     * Checks whether or not the container has transient local variables.
+     *
+     * @return whether or not the container has transient local variables.
+     */
+    boolean hasTransientLocalVariables();
+
+    /**
+     * Checks whether or not the list is empty.
+     *
+     * @return whether or not the list is empty.
+     */
+    boolean hasAnyVariables();
+
+
+    /**
+     * Checks whether or not the list is empty.
+     *
+     * @return whether or not the list is empty.
+     */
+    boolean hasAnyTransientVariables();
 
     /**
      * Checks whether or not the task has a variable defined with the given name.
      *
      * @param variableName
      *          name of variable.
-     * @param isVariableLocal
+     * @return whether or not exists the defined variable.
+     */
+    boolean hasVariable(String variableName);
+
+    /**
+     * Checks whether or not the task has a local variable defined with the given name.
+     *
+     * @param localVariableName
+     *          name of variable.
      *          define scope of variable.
      * @return whether or not exists the defined variable.
      */
-    boolean hasVariable(String variableName, boolean isVariableLocal);
+    boolean hasVariableLocal(String localVariableName);
 
     /**
-     * Checks whether or not the list is empty.
+     * Checks whether or not the task has a transient variable defined with the given name.
      *
-     * @param isVariablesLocal
-     *          define scope of variables.
-     * @return whether or not the list is empty.
+     * @param transientVariableName
+     *          name of variable.
+     * @return whether or not exists the defined transient variable.
      */
-    boolean hasVariables(boolean isVariablesLocal);
+    boolean hasTransientVariable(String transientVariableName);
+
+    /**
+     * Checks whether or not the task has a transient local variable defined with the given name.
+     *
+     * @param transientLocalVariableName
+     *          name of variable.
+     *          define scope of variable.
+     * @return whether or not exists the defined transient local variable.
+     */
+    boolean hasTransientLocalVariable(String transientLocalVariableName);
+
 
     /**
      * Set variable. If the variable is not already existing, it will be created.
@@ -74,18 +188,68 @@ public interface ScopedVariableContainer {
      *          name of variable.
      * @param variableValue
      *          value of variable.
-     * @param isVariableLocal
-     *          define scope of variable.
      */
-    void setVariable(String variableName, Object variableValue, boolean isVariableLocal);
+    void setVariable(String variableName, Object variableValue);
+
+    /**
+     * Set local variable. If the local variable is not already existing, it will be created.
+     *
+     * @param variableName
+     *          name of variable.
+     * @param variableValue
+     *          value of variable.
+     */
+    void setVariableLocal(String variableName, Object variableValue);
+
+    /**
+     * Set transient variable. If the transient variable is not already existing, it will be created.
+     *
+     * @param variableName
+     *          name of variable.
+     * @param variableValue
+     *          value of variable.
+     */
+    void setTransientVariable(String variableName, Object variableValue);
+
+    /**
+     * Set transient local variable. If the transient local variable is not already existing, it will be created.
+     *
+     * @param variableName
+     *          name of variable.
+     * @param variableValue
+     *          value of variable.
+     */
+    void setTransientVariableLocal(String variableName, Object variableValue);
 
     /**
      * Set variables. If the variables is not already existing, it will be created.
      *
      * @param variables
      *          variables.
-     * @param isVariableLocal
-     *          define scope of variable.
      */
-    void setVariables(Map<String, Object> variables, boolean isVariableLocal);
+    void setVariables(Map<String, Object> variables);
+
+    /**
+     * Set local variables. If the local variables is not already existing, it will be created.
+     *
+     * @param localVariables
+     *          local variables.
+     */
+    void setLocalVariables(Map<String, Object> localVariables);
+
+    /**
+     * Set transient variables. If the transient variables is not already existing, it will be created.
+     *
+     * @param transientVariables
+     *          transient variables.
+     */
+    void setTransientVariables(Map<String, Object> transientVariables);
+
+    /**
+     * Set transient local variables. If the transient local variables is not already existing, it will be created.
+     *
+     * @param transientLocalVariables
+     *          transient local variables.
+     */
+    void setTransientLocalVariables(Map<String, Object> transientLocalVariables);
 }

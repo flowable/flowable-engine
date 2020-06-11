@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.NativeQuery;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
@@ -61,6 +61,13 @@ public interface TaskService {
      * @return task builder
      */
     TaskBuilder createTaskBuilder();
+
+    /**
+     * Create a completion builder for the task
+     *
+     * @return task completion builder
+     */
+    TaskCompletionBuilder createTaskCompletionBuilder();
     
     /**
      * Saves the given task to the persistent data store. If the task is already present in the persistent store, it is updated. After a new task has been saved, the task instance passed into this
@@ -247,18 +254,6 @@ public interface TaskService {
 
     /**
      * Called when the task is successfully executed, and the required task parameters are given by the end-user.
-     *
-     * @param taskId
-     *            the id of the task to complete, cannot be null.
-     * @param scopedVariableContainerHelper
-     *            task wrapper with variables and transient variables.
-     * @throws FlowableObjectNotFoundException
-     *             when no task exists with the given id.
-     */
-    void complete(String taskId, ScopedVariableContainerHelper scopedVariableContainerHelper);
-
-    /**
-     * Called when the task is successfully executed, and the required task parameters are given by the end-user.
      * 
      * @param taskId
      *            the id of the task to complete, cannot be null.
@@ -305,23 +300,6 @@ public interface TaskService {
      */
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
                               Map<String, Object> variables, Map<String, Object> transientVariables);
-
-    /**
-     * Called when the task is successfully executed, and the task form has been submitted.
-     *
-     * @param taskId
-     *            the id of the task to complete, cannot be null.
-     * @param formDefinitionId
-     *            the id of the form definition that is filled-in to complete the task, cannot be null.
-     * @param outcome
-     *            the outcome of the completed form, can be null.
-     * @param scopedVariableContainerHelper
-     *            task wrapper with variables and transient variables.
-     * @throws FlowableObjectNotFoundException
-     *             when no task exists with the given id.
-     */
-    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
-                              ScopedVariableContainerHelper scopedVariableContainerHelper);
 
     /**
      * Called when the task is successfully executed, and the task form has been submitted.

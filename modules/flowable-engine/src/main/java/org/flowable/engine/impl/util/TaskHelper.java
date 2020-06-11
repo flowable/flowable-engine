@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.ScopedVariableContainer;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -59,7 +60,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TaskHelper {
 
-    public static void completeTask(TaskEntity taskEntity, ScopedVariableContainerHelper scopedVariableContainerHelper,
+    public static void completeTask(TaskEntity taskEntity, ScopedVariableContainer scopedVariableContainer,
                                     CommandContext commandContext) {
         // Task complete logic
 
@@ -69,35 +70,35 @@ public class TaskHelper {
             throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
         }
 
-        if (scopedVariableContainerHelper.hasAnyVariables()){
-            variables = scopedVariableContainerHelper.getAllVariables();
+        if (scopedVariableContainer.hasAnyVariables()){
+            variables = scopedVariableContainer.getAllVariables();
         }
 
-        if (scopedVariableContainerHelper.hasAnyVariables()) {
-            if (scopedVariableContainerHelper.hasVariablesLocal() || scopedVariableContainerHelper.hasVariables()) {
-                if (scopedVariableContainerHelper.hasVariablesLocal()) {
-                    taskEntity.setVariablesLocal(scopedVariableContainerHelper.getVariablesLocal());
+        if (scopedVariableContainer.hasAnyVariables()) {
+            if (scopedVariableContainer.hasLocalVariables() || scopedVariableContainer.hasVariables()) {
+                if (scopedVariableContainer.hasLocalVariables()) {
+                    taskEntity.setVariablesLocal(scopedVariableContainer.getVariablesLocal());
                 }
 
-                if (scopedVariableContainerHelper.hasVariables()) {
-                    taskEntity.setVariables(scopedVariableContainerHelper.getVariables());
+                if (scopedVariableContainer.hasVariables()) {
+                    taskEntity.setVariables(scopedVariableContainer.getVariables());
                 }
             } else if (taskEntity.getExecutionId() != null){
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
 
                 if (execution != null) {
-                    execution.setVariables(scopedVariableContainerHelper.getAllVariables());
+                    execution.setVariables(scopedVariableContainer.getAllVariables());
                 }
             }
         }
 
-        if (scopedVariableContainerHelper.hasAnyTransientVariables()) {
-            if (scopedVariableContainerHelper.hasTransientVariablesLocal()) {
-                taskEntity.setTransientVariablesLocal(scopedVariableContainerHelper.getTransientVariablesLocal());
+        if (scopedVariableContainer.hasAnyTransientVariables()) {
+            if (scopedVariableContainer.hasTransientLocalVariables()) {
+                taskEntity.setTransientVariablesLocal(scopedVariableContainer.getTransientLocalVariables());
             }
 
-            if (scopedVariableContainerHelper.hasTransientVariables()) {
-                taskEntity.setTransientVariables(scopedVariableContainerHelper.getTransientVariables());
+            if (scopedVariableContainer.hasTransientVariables()) {
+                taskEntity.setTransientVariables(scopedVariableContainer.getTransientVariables());
             }
         }
 
@@ -112,9 +113,9 @@ public class TaskHelper {
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            if (scopedVariableContainerHelper.hasAnyVariables()) {
+            if (scopedVariableContainer.hasAnyVariables()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
-                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, scopedVariableContainerHelper.hasVariablesLocal()));
+                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, scopedVariableContainer.hasLocalVariables()));
             } else {
                 eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));

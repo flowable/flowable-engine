@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
@@ -225,11 +225,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
-    public void complete(String taskId, ScopedVariableContainerHelper scopedVariableContainerHelper) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, scopedVariableContainerHelper));
-    }
-
-    @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
     }
@@ -245,12 +240,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
             Map<String, Object> variables, boolean localScope) {
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
-    }
-
-    @Override
-    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
-                                     ScopedVariableContainerHelper scopedVariableContainerHelper) {
-        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, scopedVariableContainerHelper));
     }
 
     @Override
@@ -587,5 +576,10 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public TaskBuilder createTaskBuilder() {
         return new TaskBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public TaskCompletionBuilder createTaskCompletionBuilder() {
+        return new TaskCompletionBuilderImpl(commandExecutor);
     }
 }

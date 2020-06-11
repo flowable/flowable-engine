@@ -26,8 +26,8 @@ import org.flowable.form.model.SimpleFormModel;
 import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
 import org.flowable.rest.service.api.FormModelResponse;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.engine.impl.util.ScopedVariableContainerHelper;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -197,7 +197,7 @@ public class TaskResource extends TaskBaseResource {
     }
 
     protected void completeTask(Task task, TaskActionRequest actionRequest) {
-        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
 
         if (actionRequest.getVariables() != null) {
             for (RestVariable var : actionRequest.getVariables()) {
@@ -207,9 +207,9 @@ public class TaskResource extends TaskBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                    scopedVariableContainerHelper.setVariableLocal(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.setVariableLocal(var.getName(), actualVariableValue);
                 } else {
-                    scopedVariableContainerHelper.setVariable(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.setVariable(var.getName(), actualVariableValue);
                 }
             }
         }
@@ -222,20 +222,19 @@ public class TaskResource extends TaskBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
-                    scopedVariableContainerHelper.setTransientVariableLocal(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.setTransientVariableLocal(var.getName(), actualVariableValue);
                 } else {
-                    scopedVariableContainerHelper.setTransientVariable(var.getName(), actualVariableValue);
+                    taskCompletionBuilder.setTransientVariable(var.getName(), actualVariableValue);
                 }
             }
 
         }
 
-        if (actionRequest.getFormDefinitionId() != null) {
-            taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(),
-                        scopedVariableContainerHelper);
-        } else {
-            taskService.complete(task.getId(), scopedVariableContainerHelper);
-        }
+        taskCompletionBuilder
+                .setTaskId(task.getId())
+                .setFormDefinitionId(actionRequest.getFormDefinitionId())
+                .setOutcome(actionRequest.getOutcome())
+                .complete();
     }
 
     protected void resolveTask(Task task, TaskActionRequest actionRequest) {
