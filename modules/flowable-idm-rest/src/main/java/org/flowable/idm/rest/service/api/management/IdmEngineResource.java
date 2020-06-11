@@ -65,7 +65,7 @@ public class IdmEngineResource {
             throw new FlowableException("Error retrieving idm engine info", e);
         }
 
-        response.setVersion(IdmEngine.VERSION);
+        response.setVersion(IdmEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

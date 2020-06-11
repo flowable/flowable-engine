@@ -50,7 +50,7 @@ public class EventRegistryEngineResource {
         EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getDefaultEventRegistryEngine();
         EngineInfoResponse response = new EngineInfoResponse();
         response.setName(eventRegistryEngine.getName());
-        response.setVersion(EventRegistryEngine.VERSION);
+        response.setVersion(EventRegistryEngine.class.getPackage().getImplementationVersion());
         return response;
     }
 }

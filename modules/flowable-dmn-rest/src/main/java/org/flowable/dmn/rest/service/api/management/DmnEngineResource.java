@@ -64,7 +64,7 @@ public class DmnEngineResource {
             throw new FlowableException("Error retrieving DMN engine info", e);
         }
 
-        response.setVersion(DmnEngine.VERSION);
+        response.setVersion(DmnEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

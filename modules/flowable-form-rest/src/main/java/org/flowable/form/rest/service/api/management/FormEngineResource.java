@@ -65,7 +65,7 @@ public class FormEngineResource {
             throw new FlowableException("Error retrieving form engine info", e);
         }
 
-        response.setVersion(FormEngine.VERSION);
+        response.setVersion(FormEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

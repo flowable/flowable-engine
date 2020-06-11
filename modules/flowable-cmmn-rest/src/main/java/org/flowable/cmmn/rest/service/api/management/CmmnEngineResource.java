@@ -50,7 +50,7 @@ public class CmmnEngineResource {
         CmmnEngine cmmnEngine = CmmnEngines.getDefaultCmmnEngine();
         EngineInfoResponse response = new EngineInfoResponse();
         response.setName(cmmnEngine.getName());
-        response.setVersion(CmmnEngine.VERSION);
+        response.setVersion(CmmnEngine.class.getPackage().getImplementationVersion());
         return response;
     }
 }

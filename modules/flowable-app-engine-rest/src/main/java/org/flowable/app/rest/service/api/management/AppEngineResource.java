@@ -66,7 +66,7 @@ public class AppEngineResource {
             throw new FlowableException("Error retrieving app engine info", e);
         }
 
-        response.setVersion(AppEngine.VERSION);
+        response.setVersion(AppEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

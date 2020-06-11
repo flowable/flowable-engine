@@ -66,7 +66,7 @@ public class ContentEngineResource {
             throw new FlowableException("Error retrieving content engine info", e);
         }
 
-        response.setVersion(ContentEngine.VERSION);
+        response.setVersion(ContentEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

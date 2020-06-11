@@ -70,7 +70,7 @@ public class ProcessEngineResource {
             throw new FlowableException("Error retrieving process info", e);
         }
 
-        response.setVersion(ProcessEngine.VERSION);
+        response.setVersion(ProcessEngine.class.getPackage().getImplementationVersion());
         return response;
     }
 }
