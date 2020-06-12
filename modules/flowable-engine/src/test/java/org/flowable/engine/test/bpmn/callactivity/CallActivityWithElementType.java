@@ -101,13 +101,13 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
             // process instance
             TaskQuery taskQuery = taskService.createTaskQuery();
             Task taskBeforeSubProcess = taskQuery.singleResult();
-            assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+            assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
 
             // Completing the task continues the process which leads to calling the
             // subprocess
             taskService.complete(taskBeforeSubProcess.getId());
             Task taskInSubProcess = taskQuery.singleResult();
-            assertEquals("Task in subprocess", taskInSubProcess.getName());
+            assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
         } finally {
             repositoryService.deleteDeployment(deploymentId, true);
         }
