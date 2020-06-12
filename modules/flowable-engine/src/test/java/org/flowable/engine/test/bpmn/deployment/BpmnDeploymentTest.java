@@ -51,9 +51,9 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
 
         // verify bpmn file name
-        assertThat(deploymentResources).hasSize(1);
         String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-        assertThat(deploymentResources.get(0)).isEqualTo(bpmnResourceName);
+        assertThat(deploymentResources)
+                .containsExactly(bpmnResourceName);
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         assertThat(processDefinition.getResourceName()).isEqualTo(bpmnResourceName);
@@ -67,7 +67,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         InputStream deploymentInputStream = repositoryService.getResourceAsStream(deploymentId, bpmnResourceName);
         String contentFromDeployment = readInputStreamToString(deploymentInputStream);
         assertThat(contentFromDeployment.length()).isGreaterThan(0);
-        assertThat(contentFromDeployment.contains("process id=\"emptyProcess\"")).isTrue();
+        assertThat(contentFromDeployment).contains("process id=\"emptyProcess\"");
 
         InputStream fileInputStream = ReflectUtil.getResourceAsStream(
                 "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml");
