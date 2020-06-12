@@ -226,8 +226,8 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         repositoryService.deleteDeployment(deploymentId2, true);
         assertEventSubscriptionsCount(1); // the latest is now the one with the signal
         runtimeService.signalEventReceived("myStartSignal");
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId(),
-                runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId())
+                .isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId());
         cleanup(deploymentId1, deploymentId3);
     }
 
@@ -239,8 +239,8 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         repositoryService.deleteDeployment(deploymentId1, true);
         assertEventSubscriptionsCount(1); // the latest is now the one with the signal
         runtimeService.signalEventReceived("myStartSignal");
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId(),
-                runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId())
+                .isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId());
         cleanup(deploymentId2, deploymentId3);
     }
 
@@ -253,8 +253,8 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         repositoryService.deleteDeployment(deploymentId3, true);
         assertEventSubscriptionsCount(1); // the latest is now the one with the signal
         runtimeService.signalEventReceived("myStartSignal");
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId(),
-                runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId())
+                .isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId());
         cleanup(deploymentId1);
     }
 
@@ -268,8 +268,8 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         repositoryService.deleteDeployment(deploymentId2, true);
         assertEventSubscriptionsCount(1); // the first is now the one with the signal
         runtimeService.signalEventReceived("myStartSignal");
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId(),
-                runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getProcessDefinitionId())
+                .isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId());
         cleanup(deploymentId1);
     }
 
