@@ -66,6 +66,15 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
+            executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+        }
+    }
+
+    protected void executeOperation(CommandContext commandContext, boolean isStoreCaseInstanceIdOfNoOperation, Runnable runnable) {
+
+        if (runnable instanceof CmmnOperation) {
+            CmmnOperation operation = (CmmnOperation) runnable;
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing agenda operation {}", runnable);
             }
@@ -74,17 +83,17 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
             // If the operation caused changes, a new evaluation needs to be planned,
             // as the operations could have changed the state and/or variables.
-            if (runnable instanceof CmmnOperation) {
-                CmmnOperation operation = (CmmnOperation) runnable;
-                if (isStoreCaseInstanceIdOfNoOperation || !operation.isNoop()) {
+            if (isStoreCaseInstanceIdOfNoOperation || !operation.isNoop()) {
 
-                    String caseInstanceId = operation.getCaseInstanceId();
-                    if (caseInstanceId != null) {
-                        CommandContextUtil.addInvolvedCaseInstanceId(commandContext, caseInstanceId);
-                    }
-
+                String caseInstanceId = operation.getCaseInstanceId();
+                if (caseInstanceId != null) {
+                    CommandContextUtil.addInvolvedCaseInstanceId(commandContext, caseInstanceId);
                 }
+
             }
+
+        } else {
+            runnable.run();
 
         }
     }

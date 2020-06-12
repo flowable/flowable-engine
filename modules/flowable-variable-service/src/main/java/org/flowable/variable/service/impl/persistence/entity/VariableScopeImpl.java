@@ -878,10 +878,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         // Dispatch event, if needed
         if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value,
-                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
-                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
-                                            variableInstance.getScopeId(), variableInstance.getScopeType()));
+                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance, value,
+                                            variableInstance.getType()));
         }
         
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {
@@ -920,10 +918,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
         if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value,
-                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
-                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
-                                            variableInstance.getScopeId(), variableInstance.getScopeType()));
+                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableInstance, value,
+                                            variableInstance.getType()));
         }
         
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {

@@ -30,6 +30,7 @@ public class FlowableProcessEventImpl extends FlowableEngineEventImpl implements
 
     @Override
     public DelegateExecution getExecution() {
+        String executionId = getExecutionId();
         if (executionId != null) {
             CommandContext commandContext = CommandContextUtil.getCommandContext();
             if (commandContext != null) {

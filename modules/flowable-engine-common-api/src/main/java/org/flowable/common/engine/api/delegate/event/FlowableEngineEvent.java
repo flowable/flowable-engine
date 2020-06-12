@@ -28,4 +28,24 @@ public interface FlowableEngineEvent extends FlowableEvent {
      * @return the id of the process definition this event is associated with. Returns null, if the event was not dispatched from within an active execution.
      */
     String getProcessDefinitionId();
+
+    /**
+     * The scope type of the entity associated with this event.
+     */
+    String getScopeType();
+
+    /**
+     * The scope id of the entity associated with this event.
+     */
+    String getScopeId();
+
+    /**
+     * The sub scope id of the entity associated with this event.
+     */
+    String getSubScopeId();
+
+    /**
+     * The scope definition id of the entity associated with this event.
+     */
+    String getScopeDefinitionId();
 }

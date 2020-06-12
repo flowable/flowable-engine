@@ -27,6 +27,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * @author Frederik Heremans
  */
@@ -47,6 +49,7 @@ public class ExecutionActiveActivitiesCollectionResourceTest extends BaseSpringR
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();
         assertThatJson(responseNode)
+                .when(Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("["
                         + "'waitState', 'anotherWaitState'"
                         + "]");

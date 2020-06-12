@@ -13,6 +13,7 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.api.types.VariableType;
 
@@ -86,5 +87,15 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Flow
 
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return ScopeTypes.BPMN.equals(scopeType) ? executionId : null;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return ScopeTypes.BPMN.equals(scopeType) ? processDefinitionId : null;
     }
 }

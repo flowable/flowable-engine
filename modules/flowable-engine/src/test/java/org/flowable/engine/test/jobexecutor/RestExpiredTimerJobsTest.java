@@ -25,7 +25,6 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.FindExpiredJobsCmd;
 import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;

@@ -74,8 +74,9 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     }
 
     protected void executeOperations(final CommandContext commandContext) {
-        while (!CommandContextUtil.getAgenda(commandContext).isEmpty()) {
-            Runnable runnable = CommandContextUtil.getAgenda(commandContext).getNextOperation();
+        FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+        while (!agenda.isEmpty()) {
+            Runnable runnable = agenda.getNextOperation();
             executeOperation(runnable);
         }
     }
