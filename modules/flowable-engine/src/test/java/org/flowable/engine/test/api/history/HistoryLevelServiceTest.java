@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,7 +44,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         // Complete the task and check if the size is count 1
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -59,10 +60,10 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
-        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
-        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
-        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
@@ -94,33 +95,24 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
-        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
 
-        boolean hasProcessVariable = false;
-        boolean hasTaskVariable = false;
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-        for (HistoricVariableInstance historicVariableInstance : variables) {
-            if ("var1".equals(historicVariableInstance.getVariableName())) {
-                hasProcessVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isNull();
+        assertThat(variables)
+                .extracting(
+                        HistoricVariableInstance::getVariableName,
+                        HistoricVariableInstance::getValue,
+                        HistoricVariableInstance::getProcessInstanceId,
+                        HistoricVariableInstance::getTaskId)
+                .containsOnly(
+                        tuple("var1", "test", processInstance.getProcessInstanceId(), null),
+                        tuple("localVar1", "test2", processInstance.getProcessInstanceId(), task.getId())
+                );
 
-            } else if ("localVar1".equals(historicVariableInstance.getVariableName())) {
-                hasTaskVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test2");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isEqualTo(task.getId());
-            }
-        }
-
-        assertThat(hasProcessVariable).isTrue();
-        assertThat(hasTaskVariable).isTrue();
-
-        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
@@ -165,28 +157,19 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
 
-        boolean hasProcessVariable = false;
-        boolean hasTaskVariable = false;
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-        for (HistoricVariableInstance historicVariableInstance : variables) {
-            if ("var1".equals(historicVariableInstance.getVariableName())) {
-                hasProcessVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isNull();
+        assertThat(variables)
+                .extracting(
+                        HistoricVariableInstance::getVariableName,
+                        HistoricVariableInstance::getValue,
+                        HistoricVariableInstance::getProcessInstanceId,
+                        HistoricVariableInstance::getTaskId)
+                .containsOnly(
+                        tuple("var1", "test", processInstance.getProcessInstanceId(), null),
+                        tuple("localVar1", "test2", processInstance.getProcessInstanceId(), task.getId())
+                );
 
-            } else if ("localVar1".equals(historicVariableInstance.getVariableName())) {
-                hasTaskVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test2");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isEqualTo(task.getId());
-            }
-        }
-
-        assertThat(hasProcessVariable).isTrue();
-        assertThat(hasTaskVariable).isTrue();
-
-        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
@@ -231,26 +214,17 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
 
-        boolean hasProcessVariable = false;
-        boolean hasTaskVariable = false;
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-        for (HistoricVariableInstance historicVariableInstance : variables) {
-            if ("var1".equals(historicVariableInstance.getVariableName())) {
-                hasProcessVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isNull();
-
-            } else if ("localVar1".equals(historicVariableInstance.getVariableName())) {
-                hasTaskVariable = true;
-                assertThat(historicVariableInstance.getValue()).isEqualTo("test2");
-                assertThat(historicVariableInstance.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
-                assertThat(historicVariableInstance.getTaskId()).isEqualTo(task.getId());
-            }
-        }
-
-        assertThat(hasProcessVariable).isTrue();
-        assertThat(hasTaskVariable).isTrue();
+        assertThat(variables)
+                .extracting(
+                        HistoricVariableInstance::getVariableName,
+                        HistoricVariableInstance::getValue,
+                        HistoricVariableInstance::getProcessInstanceId,
+                        HistoricVariableInstance::getTaskId)
+                .containsOnly(
+                        tuple("var1", "test", processInstance.getProcessInstanceId(), null),
+                        tuple("localVar1", "test2", processInstance.getProcessInstanceId(), task.getId())
+                );
 
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
     }
