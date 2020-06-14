@@ -50,13 +50,17 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
             CollectionUtil.singletonMap("boundaryMessage", "actualBoundaryMessage"));
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("T1");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("T1");
 
         runtimeService.messageEventReceived(
             "actualBoundaryMessage",
             runtimeService.createEventSubscriptionQuery().eventName("actualBoundaryMessage").singleResult().getExecutionId());
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("T2");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("T2");
     }
 
     @Test
@@ -74,13 +78,16 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
         assertThat(executionId).isNotNull();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("User task");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("User task");
 
         runtimeService.messageEventReceived("actualMessageValue", executionId);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("T1");
-
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("T1");
     }
 
     protected void assertMesageEventSubscriptions(String ... names) {
