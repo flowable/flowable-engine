@@ -39,8 +39,8 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
         assertThat(activeActivityIds).isNotNull();
-        assertThat(activeActivityIds)
-                .containsOnly("messageCatch");
+        assertThat(activeActivityIds).hasSize(1);
+        assertThat(activeActivityIds.contains("messageCatch")).isTrue();
 
         String messageName = "newInvoiceMessage";
         Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).singleResult();
@@ -72,8 +72,8 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
         assertThat(activeActivityIds).isNotNull();
-        assertThat(activeActivityIds)
-                .containsOnly("messageCatch");
+        assertThat(activeActivityIds).hasSize(1);
+        assertThat(activeActivityIds.contains("messageCatch")).isTrue();
 
         String messageName = "testMessage";
         Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).singleResult();
@@ -94,8 +94,9 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
         assertThat(activeActivityIds).isNotNull();
-        assertThat(activeActivityIds)
-                .containsOnly("messageCatch1", "messageCatch2");
+        assertThat(activeActivityIds).hasSize(2);
+        assertThat(activeActivityIds.contains("messageCatch1")).isTrue();
+        assertThat(activeActivityIds.contains("messageCatch2")).isTrue();
 
         String messageName = "newInvoiceMessage";
         List<Execution> executions = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).list();
@@ -132,9 +133,9 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
         assertThat(managementService.createJobQuery().messages().count()).isEqualTo(1);
 
         waitForJobExecutorToProcessAllJobs(8000L, 200L);
-        assertThat(createEventSubscriptionQuery().count()).isZero();
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
-        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(managementService.createJobQuery().count()).isEqualTo(0);
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
