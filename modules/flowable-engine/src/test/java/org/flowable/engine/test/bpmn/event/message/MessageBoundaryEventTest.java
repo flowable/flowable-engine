@@ -73,7 +73,6 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
         taskService.complete(userTask.getId());
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
-
     }
 
     @Test
@@ -382,7 +381,6 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         taskService.complete(userTask.getId());
 
         // and we are done
-
     }
 
     @Test
@@ -442,7 +440,6 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterSubProcess");
         taskService.complete(userTask.getId());
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
-
     }
 
     @Test
@@ -487,7 +484,6 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         taskService.complete(userTask.getId());
 
         // and we are done
-
     }
 
     @Test
