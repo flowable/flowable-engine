@@ -54,7 +54,7 @@ public class BpmnDeploymentHelper {
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keySet.contains(processDefinition.getKey())) {
                 throw new FlowableException(
-                        "The deployment contains process definitions with the same key (process id attribute), this is not allowed");
+                        "The deployment contains process definitions with the same key '" + processDefinition.getKey() + "' (process id attribute), this is not allowed");
             }
             keySet.add(processDefinition.getKey());
         }
