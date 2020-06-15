@@ -115,7 +115,7 @@ class AcquireTimerJobsMultiNodeTest extends JobExecutorTestCase {
         protected CountDownLatch waitLatch;
 
         public CustomWaitCommandInvoker() {
-            super(Runnable::run);
+            super((commandContext, runnable) -> runnable.run());
         }
 
         @Override
