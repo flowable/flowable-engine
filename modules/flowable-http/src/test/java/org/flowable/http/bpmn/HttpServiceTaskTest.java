@@ -24,6 +24,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -37,9 +38,14 @@ import org.flowable.http.bpmn.HttpServiceTaskTestServer.HttpServiceTaskTestServl
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Harsha Teja Kanna
@@ -505,6 +511,52 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
             assertThat(skipActivityInstance).isNotNull();
         }
+    }
+
+    @Deployment
+    @MethodSource("parametersForGetWithVariableParameters")
+    @ParameterizedTest(name = "GET Request with ''{0}'' should be received as ''{1}''")
+    public void testGetWithVariableParameters(String requestParam, String expectedRequestParam) {
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testGetWithVariableParameters")
+                .variable("requestParam", requestParam)
+                .start()
+                .getId();
+        HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(procId)
+                .variableName("test")
+                .singleResult();
+        assertThat(variable).isNotNull();
+        assertThatJson(variable.getValue())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  args: {"
+                        + "    requestParam: [ '" + expectedRequestParam + "' ]"
+                        + "  }"
+                        + "}");
+        assertProcessEnded(procId);
+    }
+
+    static Stream<Arguments> parametersForGetWithVariableParameters() {
+        return Stream.of(
+                Arguments.arguments("Test+ Plus", "Test+ Plus"),
+                Arguments.arguments("Test%2B Plus Encoded", "Test+ Plus Encoded"),
+                Arguments.arguments("Test Space", "Test Space"),
+                Arguments.arguments("Test%20Space%20Encoded", "Test Space Encoded"),
+                Arguments.arguments("Test%25Percent Encoded", "Test%Percent Encoded"),
+                Arguments.arguments("Test%23Hash Encoded", "Test#Hash Encoded"),
+                Arguments.arguments("Test%26Ampersand Encoded", "Test&Ampersand Encoded"),
+                Arguments.arguments("Test=Equals", "Test=Equals"),
+                Arguments.arguments("Test%3DEquals Encoded", "Test=Equals Encoded"),
+                Arguments.arguments("Test?QMark", "Test?QMark"),
+                Arguments.arguments("Test%3FQMark Encoded", "Test?QMark Encoded"),
+                Arguments.arguments("Test@At", "Test@At"),
+                Arguments.arguments("Test%40At Encoded", "Test@At Encoded"),
+                Arguments.arguments("Test/Slash", "Test/Slash"),
+                Arguments.arguments("Test%2FSlash Encoded", "Test/Slash Encoded"),
+                Arguments.arguments("Test:Colon", "Test:Colon"),
+                Arguments.arguments("Test%3AColon Encoded", "Test:Colon Encoded")
+        );
     }
 
     private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
