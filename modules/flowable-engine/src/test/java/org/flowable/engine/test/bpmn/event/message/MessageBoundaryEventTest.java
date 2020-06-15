@@ -78,14 +78,10 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
     @Test
     public void testDoubleBoundaryMessageEventSameMessageId() {
-        // deployment fails when two boundary message events have the same
-        // messageId
-        try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml").deploy();
-            fail("Deployment should fail because Flowable cannot handle two boundary message events with same messageId.");
-        } catch (Exception e) {
-            assertThat(repositoryService.createDeploymentQuery().count()).isZero();
-        }
+        // deployment fails when two boundary message events have the same messageId
+        assertThatThrownBy(() -> repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml").deploy())
+                .as("Deployment should fail because Flowable cannot handle two boundary message events with same messageId.")
+                .isInstanceOf(Exception.class);
     }
 
     @Test
@@ -105,7 +101,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
         assertThat(execution2).isNotNull();
 
-        assertThat(execution1.getId().equals(execution2.getId())).isFalse();
+        assertThat(execution1.getId()).isNotEqualTo(execution2.getId());
 
         // /////////////////////////////////////////////////////////////////////////////////
         // 1. first message received cancels the task and the execution and both subscriptions
@@ -156,7 +152,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
         Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
         // both executions are not the same
-        assertThat(execution1.getId().equals(execution2.getId())).isFalse();
+        assertThat(execution1.getId()).isNotEqualTo(execution2.getId());
 
         // /////////////////////////////////////////////////////////////////////////////////
         // 1. first message received cancels all tasks and the executions and
@@ -190,7 +186,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
         execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
         // executions are not the same
-        assertThat(execution1.getId().equals(execution2.getId())).isFalse();
+        assertThat(execution1.getId()).isNotEqualTo(execution2.getId());
 
         List<org.flowable.task.api.Task> userTasks = taskService.createTaskQuery().list();
         assertThat(userTasks).isNotNull();
