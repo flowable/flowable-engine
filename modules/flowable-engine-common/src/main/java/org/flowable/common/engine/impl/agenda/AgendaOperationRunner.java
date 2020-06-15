@@ -12,12 +12,14 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+
 /**
  * @author Joram Barrez
  */
 @FunctionalInterface
 public interface AgendaOperationRunner {
 
-    void executeOperation(Runnable runnable);
+    void executeOperation(CommandContext commandContext, Runnable runnable);
 
 }

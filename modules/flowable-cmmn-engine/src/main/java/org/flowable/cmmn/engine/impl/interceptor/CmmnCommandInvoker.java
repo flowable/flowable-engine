@@ -79,7 +79,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
                 logger.debug("Executing agenda operation {}", runnable);
             }
 
-            agendaOperationRunner.executeOperation(runnable);
+            agendaOperationRunner.executeOperation(commandContext, runnable);
 
             // If the operation caused changes, a new evaluation needs to be planned,
             // as the operations could have changed the state and/or variables.

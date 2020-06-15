@@ -77,11 +77,11 @@ public class CommandInvoker extends AbstractCommandInterceptor {
         FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            executeOperation(runnable);
+            executeOperation(commandContext, runnable);
         }
     }
 
-    public void executeOperation(Runnable runnable) {
+    public void executeOperation(CommandContext commandContext, Runnable runnable) {
         if (runnable instanceof AbstractOperation) {
             AbstractOperation operation = (AbstractOperation) runnable;
 
@@ -93,7 +93,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                     LOGGER.debug("Executing operation {}", operation.getClass());
                 }
 
-                agendaOperationRunner.executeOperation(operation);
+                agendaOperationRunner.executeOperation(commandContext, operation);
 
             }
 

@@ -170,7 +170,7 @@ public abstract class AbstractEngineConfiguration {
     protected CommandContextFactory commandContextFactory;
     protected CommandInterceptor commandInvoker;
 
-    protected AgendaOperationRunner agendaOperationRunner = Runnable::run;
+    protected AgendaOperationRunner agendaOperationRunner = (commandContext, runnable) -> runnable.run();
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
