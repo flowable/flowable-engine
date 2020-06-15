@@ -31,6 +31,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Joram Barrez
@@ -56,15 +57,17 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+            Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
         
         return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant,
-                parentDeploymentId, inParametersMap, businessKey);
+                parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
     }
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+            Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
         
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
@@ -98,6 +101,10 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
         if (stageInstanceId != null) {
             processInstanceBuilder.stageInstanceId(stageInstanceId);
+        }
+
+        if (variableFormInfo != null) {
+            processInstanceBuilder.formVariables(variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         ProcessInstance processInstance = processInstanceBuilder.start();

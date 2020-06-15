@@ -36,6 +36,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -159,8 +160,9 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
-    public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables) {
-        addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, variables));
+    public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId,
+            ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo) {
+        addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, childTaskVariableInfo));
     }
     
     @Override

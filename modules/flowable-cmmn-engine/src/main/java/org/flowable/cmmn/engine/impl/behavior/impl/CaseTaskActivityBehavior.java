@@ -37,7 +37,9 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     }
 
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, ChildTaskActivityBehavior.VariableInfo variableInfo) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
 
@@ -95,8 +97,26 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         Map<String, Object> finalVariableMap = new HashMap<>();
         handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, cmmnEngineConfiguration.getExpressionManager());
 
-        if (variables != null && !variables.isEmpty()) {
-            finalVariableMap.putAll(variables);
+        // Needed for the form field handler later
+        Map<String, Object> variablesFromFormSubmission = null;
+
+        if (variableInfo != null) {
+
+            if (variableInfo.formInfo != null) {
+                FormService formService = CommandContextUtil.getFormService(commandContext);
+                if (formService == null) {
+                    throw new FlowableIllegalStateException("Form engine is not initialized");
+                }
+
+                variablesFromFormSubmission = formService
+                        .getVariablesFromFormSubmission(variableInfo.formInfo, variableInfo.formVariables, variableInfo.formOutcome);
+
+                finalVariableMap.putAll(variablesFromFormSubmission);
+            }
+
+            if (variableInfo.variables != null && !variableInfo.variables.isEmpty()) {
+                finalVariableMap.putAll(variableInfo.variables);
+            }
         }
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
@@ -122,6 +142,13 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         // Bidirectional storing of reference to avoid queries later on
         planItemInstanceEntity.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
+
+        if (variablesFromFormSubmission != null && !variablesFromFormSubmission.isEmpty()) {
+            // The variablesFromFormSubmission can only be non null if there was formInfo
+            cmmnEngineConfiguration.getFormFieldHandler()
+                    .handleFormFieldsOnSubmit(variableInfo.formInfo, null, null, caseInstanceEntity.getId(), ScopeTypes.CMMN,
+                            variablesFromFormSubmission, caseInstanceEntity.getTenantId());
+        }
 
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstanceEntity);

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
 
 /**
  * Helper for starting new ProcessInstance.
@@ -142,6 +143,12 @@ public interface ProcessInstanceBuilder {
      * Allows to set an outcome for a start form.
      */
     ProcessInstanceBuilder outcome(String outcome);
+
+    /**
+     * Start the process instance with the given form variables from the given {@code formInfo}.
+     * This is different than {@link #startFormVariables(Map)} and it can be used in addition to that.
+     */
+    ProcessInstanceBuilder formVariables(Map<String, Object> formVariables, FormInfo formInfo, String formOutcome);
 
     /**
      * Use default tenant as a fallback in the case when process definition was not found by key and tenant id

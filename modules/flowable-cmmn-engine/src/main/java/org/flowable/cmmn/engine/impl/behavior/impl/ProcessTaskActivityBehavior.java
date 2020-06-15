@@ -36,6 +36,7 @@ import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     }
 
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, ChildTaskActivityBehavior.VariableInfo variableInfo) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
@@ -86,8 +87,17 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         Map<String, Object> inParametersMap = new HashMap<>();
         handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, cmmnEngineConfiguration.getExpressionManager());
 
-        if (variables != null && !variables.isEmpty()) {
-            inParametersMap.putAll(variables);
+        FormInfo variableFormInfo = null;
+        Map<String, Object> variableFormVariables = null;
+        String variableFormOutcome = null;
+        if (variableInfo != null) {
+            variableFormInfo = variableInfo.formInfo;
+            variableFormVariables = variableInfo.formVariables;
+            variableFormOutcome = variableInfo.formOutcome;
+
+            if (variableInfo.variables != null && !variableInfo.variables.isEmpty()) {
+                inParametersMap.putAll(variableInfo.variables);
+            }
         }
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
@@ -114,10 +124,10 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         if (blocking) {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         } else {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         if (!blocking) {

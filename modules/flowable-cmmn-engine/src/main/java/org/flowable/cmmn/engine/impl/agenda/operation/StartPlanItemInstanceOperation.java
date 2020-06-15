@@ -31,7 +31,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
 
     protected String entryCriterionId;
-    protected Map<String, Object> variables;
+    protected ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo;
     protected MigrationContext migrationContext;
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
@@ -40,10 +40,10 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     }
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
-                    String entryCriterionId, Map<String, Object> variables) {
+                    String entryCriterionId, ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo) {
         
         this(commandContext, planItemInstanceEntity, entryCriterionId);
-        this.variables = variables;
+        this.childTaskVariableInfo = childTaskVariableInfo;
     }
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
@@ -80,7 +80,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
             ((CmmnActivityWithMigrationContextBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, migrationContext);
             
         } else if (activityBehavior instanceof ChildTaskActivityBehavior) {
-            ((ChildTaskActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, variables);
+            ((ChildTaskActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, childTaskVariableInfo);
             
         } else if (activityBehavior instanceof CoreCmmnActivityBehavior) {
             ((CoreCmmnActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity);

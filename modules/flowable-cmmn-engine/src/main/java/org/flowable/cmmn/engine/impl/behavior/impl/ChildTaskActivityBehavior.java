@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
         execute(commandContext, planItemInstanceEntity, null);
     }
 
-    public abstract void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables);
+    public abstract void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, VariableInfo variableInfo);
 
     protected boolean evaluateIsBlocking(DelegatePlanItemInstance planItemInstance) {
         boolean blocking = isBlocking;
@@ -147,4 +148,54 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
      */
     public abstract void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade);
 
+    public static class VariableInfo {
+
+        protected Map<String, Object> variables;
+        protected Map<String, Object> formVariables;
+        protected String formOutcome;
+        protected FormInfo formInfo;
+
+        public VariableInfo(Map<String, Object> variables) {
+            this.variables = variables;
+        }
+
+        public VariableInfo(Map<String, Object> variables, Map<String, Object> formVariables, String formOutcome, FormInfo formInfo) {
+            this(variables);
+            this.formVariables = formVariables;
+            this.formOutcome = formOutcome;
+            this.formInfo = formInfo;
+        }
+
+        public Map<String, Object> getVariables() {
+            return variables;
+        }
+
+        public void setVariables(Map<String, Object> variables) {
+            this.variables = variables;
+        }
+
+        public Map<String, Object> getFormVariables() {
+            return formVariables;
+        }
+
+        public void setFormVariables(Map<String, Object> formVariables) {
+            this.formVariables = formVariables;
+        }
+
+        public String getFormOutcome() {
+            return formOutcome;
+        }
+
+        public void setFormOutcome(String formOutcome) {
+            this.formOutcome = formOutcome;
+        }
+
+        public FormInfo getFormInfo() {
+            return formInfo;
+        }
+
+        public void setFormInfo(FormInfo formInfo) {
+            this.formInfo = formInfo;
+        }
+    }
 }

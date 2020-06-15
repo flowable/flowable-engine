@@ -14,6 +14,8 @@ package org.flowable.cmmn.api.runtime;
 
 import java.util.Map;
 
+import org.flowable.form.api.FormInfo;
+
 /**
  * A builder that allows to execute a transition for a plan item instance from one state to another,
  * optionally passing variables before the transition.
@@ -32,6 +34,11 @@ public interface PlanItemInstanceTransitionBuilder {
      * See {@link #variable(String, Object)}.
      */
     PlanItemInstanceTransitionBuilder variables(Map<String, Object> variables);
+
+    /**
+     * The form variables that should be set before the transition is executed.
+     */
+    PlanItemInstanceTransitionBuilder formVariables(Map<String, Object> variables, FormInfo formInfo, String outcome);
 
     /**
      * Sets a local variable before the transition is executed.
@@ -67,6 +74,13 @@ public interface PlanItemInstanceTransitionBuilder {
      * See {@link #childTaskVariable(String, Object)}.
      */
     PlanItemInstanceTransitionBuilder childTaskVariables(Map<String, Object> childTaskVariables);
+
+    /**
+     * The form variables that should be used when creating a new 'child entity'.
+     *
+     * @see #childTaskVariable(String, Object)
+     */
+    PlanItemInstanceTransitionBuilder childTaskFormVariables(Map<String, Object> variables, FormInfo formInfo, String outcome);
 
     /**
      * Completes the plan item instance, which needs to be a stage instance.
