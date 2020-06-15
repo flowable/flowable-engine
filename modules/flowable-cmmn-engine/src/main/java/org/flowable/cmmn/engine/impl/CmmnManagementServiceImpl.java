@@ -24,6 +24,8 @@ import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
@@ -215,6 +217,23 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
         return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
+    }
+    
+    public <T> T executeCommand(Command<T> command) {
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(command);
+    }
+
+    public <T> T executeCommand(CommandConfig config, Command<T> command) {
+        if (config == null) {
+            throw new FlowableIllegalArgumentException("The config is null");
+        }
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(config, command);
     }
 
 }
