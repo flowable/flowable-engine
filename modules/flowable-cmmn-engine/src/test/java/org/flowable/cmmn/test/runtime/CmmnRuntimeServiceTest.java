@@ -15,16 +15,26 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.junit.Test;
 
 /**
@@ -49,11 +59,32 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
     public void createCaseInstanceWithoutCallBacks() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .start();
+        CmmnManagementServiceImpl cmmnManagementServiceImpl = (CmmnManagementServiceImpl) cmmnManagementService;
+        List<PlanItemInstanceEntity> planItemInstances = cmmnManagementServiceImpl.executeCommand(new Command<List<PlanItemInstanceEntity>>() {
+            
+            @Override
+            public List<PlanItemInstanceEntity> execute(CommandContext commandContext) {
+                CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("oneTaskCase")
+                        .start();
+                
+                EntityCache entityCache = CommandContextUtil.getEntityCache();
+                List<PlanItemInstanceEntity> cachedPlanItemInstances = entityCache.findInCache(PlanItemInstanceEntity.class);
+                List<PlanItemInstanceEntity> scopedPlanItemInstances = null;
+                if (cachedPlanItemInstances != null && !cachedPlanItemInstances.isEmpty()) {
+                    scopedPlanItemInstances = cachedPlanItemInstances.stream().filter(planItemInstance ->
+                            Objects.equals(caseInstance.getId(), planItemInstance.getCaseInstanceId())).collect(Collectors.toList());
+                }
+                
+                return scopedPlanItemInstances;
+            }
+        });
+        
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        assertThat(planItemInstances.get(0).getPlanItemDefinitionId()).isEqualTo("theTask");
 
         // default values for callbacks are null
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(planItemInstances.get(0).getCaseInstanceId()).singleResult();
         assertThat(caseInstance.getCallbackType()).isNull();
         assertThat(caseInstance.getCallbackId()).isNull();
     }

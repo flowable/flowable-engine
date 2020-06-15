@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                 .isEqualTo(2);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(1).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(2).count()).isEqualTo(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(3).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(3).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(1).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(2).list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(3).list()).isEmpty();
@@ -75,7 +76,8 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                     .variableValueEquals("test", 123).processDefinitionVersion(1).singleResult();
             assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(1);
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertThat(variableMap.get("test")).isEqualTo(123);
+            assertThat(variableMap)
+                    .containsOnly(entry("test", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", 456).processDefinitionVersion(1).singleResult();
@@ -85,7 +87,8 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                     .variableValueEquals("anothertest", 456).processDefinitionVersion(2).singleResult();
             assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(2);
             variableMap = processInstance.getProcessVariables();
-            assertThat(variableMap.get("anothertest")).isEqualTo(456);
+            assertThat(variableMap)
+                    .containsOnly(entry("anothertest", 456));
         }
     }
 
@@ -95,8 +98,8 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                 .isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(2).count())
                 .isEqualTo(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(1).count()).isEqualTo(0);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(2).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(1).count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(2).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(1).list())
                 .hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(2).list())
@@ -112,7 +115,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(2).processDefinitionId("undefined").endOr().count())
                 .isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(3).processDefinitionId("undefined").endOr().count())
-                .isEqualTo(0);
+                .isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(1).processDefinitionId("undefined").endOr().list())
                 .hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(2).processDefinitionId("undefined").endOr().list())
@@ -126,13 +129,15 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                     .or().variableValueEquals("test", "invalid").processDefinitionVersion(1).endOr().singleResult();
             assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(1);
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertThat(variableMap.get("test")).isEqualTo(123);
+            assertThat(variableMap)
+                    .containsOnly(entry("test", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").processDefinitionVersion(2).endOr().singleResult();
             assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(2);
             variableMap = processInstance.getProcessVariables();
-            assertThat(variableMap.get("anothertest")).isEqualTo(456);
+            assertThat(variableMap)
+                    .containsOnly(entry("anothertest", 456));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", "invalid").processDefinitionVersion(3).singleResult();

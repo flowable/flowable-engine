@@ -40,7 +40,7 @@ public class HistoryServiceDisableTaskLogTest extends CustomConfigurationFlowabl
     @AfterEach
     public void deleteTasks() {
         if (task != null) {
-            assertThat(historyService.createHistoricTaskLogEntryQuery().count()).isEqualTo(0l);
+            assertThat(historyService.createHistoricTaskLogEntryQuery().count()).isZero();
             taskService.deleteTask(task.getId(), true);
         }
     }

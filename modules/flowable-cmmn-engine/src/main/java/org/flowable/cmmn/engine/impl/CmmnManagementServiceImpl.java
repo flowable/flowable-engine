@@ -24,6 +24,8 @@ import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
@@ -52,6 +54,7 @@ import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
@@ -110,6 +113,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
         return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries));
+    }
+
+    @Override
+    public Job moveSuspendedJobToExecutableJob(String jobId) {
+        return commandExecutor.execute(new MoveSuspendedJobToExecutableJobCmd(jobId));
     }
 
     @Override
@@ -215,6 +223,23 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
         return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
+    }
+    
+    public <T> T executeCommand(Command<T> command) {
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(command);
+    }
+
+    public <T> T executeCommand(CommandConfig config, Command<T> command) {
+        if (config == null) {
+            throw new FlowableIllegalArgumentException("The config is null");
+        }
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(config, command);
     }
 
 }

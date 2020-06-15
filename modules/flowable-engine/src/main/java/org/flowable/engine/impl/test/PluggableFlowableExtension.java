@@ -84,7 +84,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
                 boolean matches = debug ? (commandInterceptor instanceof CommandInvoker) : (commandInterceptor instanceof LoggingExecutionTreeCommandInvoker);
                 if (matches) {
 
-                    CommandInterceptor commandInvoker = debug ? newLoggingExecutionTreeCommandInvoker() : new CommandInvoker(Runnable::run);
+                    CommandInterceptor commandInvoker = debug ? newLoggingExecutionTreeCommandInvoker() : new CommandInvoker((commandContext, runnable) -> runnable.run());
                     if (previousCommandInterceptor != null) {
                         previousCommandInterceptor.setNext(commandInvoker);
                     } else {
@@ -109,8 +109,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     }
 
     protected CommandInvoker newLoggingExecutionTreeCommandInvoker() {
-        LoggingExecutionTreeCommandInvoker loggingExecutionTreeCommandInvoker = new LoggingExecutionTreeCommandInvoker(Runnable::run);
-        loggingExecutionTreeCommandInvoker.setAgendaOperationRunner(Runnable::run);
+        LoggingExecutionTreeCommandInvoker loggingExecutionTreeCommandInvoker = new LoggingExecutionTreeCommandInvoker((commandContext, runnable) -> runnable.run());
         return loggingExecutionTreeCommandInvoker;
     }
 }

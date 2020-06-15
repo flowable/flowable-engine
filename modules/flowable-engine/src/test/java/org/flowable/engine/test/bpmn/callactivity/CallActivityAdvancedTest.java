@@ -175,8 +175,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             for (HistoricTaskInstance task : childHistoricTasks) {
                 taskIds.add(task.getId());
             }
-            assertThat(taskIds.contains(taskBeforeSubProcess.getId())).isTrue();
-            assertThat(taskIds.contains(taskInSubProcess.getId())).isTrue();
+            assertThat(taskIds).contains(taskBeforeSubProcess.getId());
+            assertThat(taskIds).contains(taskInSubProcess.getId());
         }
         
         childTask = taskService.createTaskQuery().processInstanceIdWithChildren(execution.getProcessInstanceId()).singleResult();
@@ -210,7 +210,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             for (HistoricActivityInstance act : subProcesshistoricInstances) {
                 expectedActivities.remove(act.getActivityId());
             }
-            assertThat(expectedActivities.isEmpty()).as("Not all expected activities were found in the history").isTrue();
+            assertThat(expectedActivities).as("Not all expected activities were found in the history").isEmpty();
 
             List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
 
@@ -222,7 +222,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             for (HistoricActivityInstance act : historicInstances) {
                 expectedActivities.remove(act.getActivityId());
             }
-            assertThat(expectedActivities.isEmpty()).as("Not all expected activities were found in the history").isTrue();
+            assertThat(expectedActivities).as("Not all expected activities were found in the history").isEmpty();
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 List<HistoricEntityLink> historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(processInstance.getId());
@@ -306,14 +306,9 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
                                 .processInstanceIdWithChildren(processInstance.getId())
                                 .list();
-                assertThat(childHistoricTasks).hasSize(3);
-                List<String> taskIds = new ArrayList<>();
-                for (HistoricTaskInstance task : childHistoricTasks) {
-                    taskIds.add(task.getId());
-                }
-                assertThat(taskIds.contains(taskBeforeSubProcess.getId())).isTrue();
-                assertThat(taskIds.contains(taskInSubProcess.getId())).isTrue();
-                assertThat(taskIds.contains(taskAfterSubProcess.getId())).isTrue();
+                assertThat(childHistoricTasks)
+                        .extracting(HistoricTaskInstance::getId)
+                        .containsExactlyInAnyOrder(taskBeforeSubProcess.getId(), taskInSubProcess.getId(), taskAfterSubProcess.getId());
 
                 HistoricTaskInstance childHistoricTask = historyService.createHistoricTaskInstanceQuery()
                                 .processInstanceIdWithChildren(execution.getProcessInstanceId())
@@ -657,13 +652,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // The two tasks in the parallel subprocess should be active
         TaskQuery taskQuery = taskService.createTaskQuery().orderByTaskName().asc();
         List<Task> tasks = taskQuery.list();
-        assertThat(tasks).hasSize(2);
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task A", "Task B");
 
         Task taskA = tasks.get(0);
         Task taskB = tasks.get(1);
-        assertThat(taskA.getName()).isEqualTo("Task A");
-        assertThat(taskB.getName()).isEqualTo("Task B");
-
         // Completing the first task should not end the subprocess
         taskService.complete(taskA.getId());
         assertThat(taskQuery.list()).hasSize(1);
@@ -753,7 +747,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(pi2.getId()).singleResult()
-                    .getDeleteReason().startsWith(DeleteReason.BOUNDARY_EVENT_INTERRUPTING)).isTrue();
+                    .getDeleteReason()).startsWith(DeleteReason.BOUNDARY_EVENT_INTERRUPTING);
             assertHistoricTasksDeleteReason(pi2, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "Task in subprocess");
             assertHistoricActivitiesDeleteReason(pi1, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "callSubProcess");
             assertHistoricActivitiesDeleteReason(pi2, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "task");
