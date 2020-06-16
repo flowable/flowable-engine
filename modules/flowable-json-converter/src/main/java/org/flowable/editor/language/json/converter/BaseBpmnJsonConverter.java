@@ -68,6 +68,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -77,7 +81,10 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseBpmnJsonConverter.class);
 
+    public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/bpmn";
     public static final String NAMESPACE = "http://flowable.org/modeler";
+    public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
+    public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected ActivityProcessor processor;
@@ -474,7 +481,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         formPropertiesNode.set("formProperties", propertiesArrayNode);
         propertiesNode.set(PROPERTY_FORM_PROPERTIES, formPropertiesNode);
     }
-    
+
     protected void addEventOutParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
         if (CollectionUtils.isEmpty(eventParameterElements)) {
             return;
@@ -494,7 +501,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         valueNode.set("outParameters", arrayNode);
         propertiesNode.set(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, valueNode);
     }
-    
+
     protected void addEventOutIOParameters(List<IOParameter> eventParameters, ObjectNode propertiesNode) {
         if (CollectionUtils.isEmpty(eventParameters)) {
             return;
@@ -509,7 +516,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME, parameter.getSource());
             }
-            
+
             itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE, parameter.getAttributeValue(null, "sourceType"));
             itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME, parameter.getTarget());
 
@@ -519,7 +526,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         valueNode.set("outParameters", arrayNode);
         propertiesNode.set(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, valueNode);
     }
-    
+
     protected void addEventInParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
         if (CollectionUtils.isEmpty(eventParameterElements)) {
             return;
@@ -539,7 +546,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         valueNode.set("inParameters", arrayNode);
         propertiesNode.set(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, valueNode);
     }
-    
+
     protected void addEventInIOParameters(List<IOParameter> eventParameters, ObjectNode propertiesNode) {
         if (CollectionUtils.isEmpty(eventParameters)) {
             return;
@@ -554,7 +561,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME, parameter.getSource());
             }
-            
+
             itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME, parameter.getTarget());
             itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE, parameter.getAttributeValue(null, "targetType"));
 
@@ -564,7 +571,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         valueNode.set("inParameters", arrayNode);
         propertiesNode.set(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, valueNode);
     }
-    
+
     protected void addEventCorrelationParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
         if (CollectionUtils.isEmpty(eventParameterElements)) {
             return;
@@ -680,6 +687,63 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
                 if (StringUtils.isNotEmpty(compensateEventDefinition.getActivityRef())) {
                     propertiesNode.put(PROPERTY_COMPENSATION_ACTIVITY_REF, compensateEventDefinition.getActivityRef());
+                }
+            }
+        }
+    }
+
+    protected void addLocalizationProperties(UserTask userTask, ObjectNode propertiesNode) {
+        List<ExtensionElement> localizationElements = userTask.getExtensionElements().get("localization");
+        if (localizationElements != null) {
+            ObjectNode localizationNode = objectMapper.createObjectNode();
+            ObjectNode nameNode = localizationNode.putObject("name");
+            ObjectNode descriptionNode = localizationNode.putObject("description");
+            for (ExtensionElement localizationElement : localizationElements) {
+                if (FLOWABLE_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix()) ||
+                        ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+                    String locale = localizationElement.getAttributeValue(null, "locale");
+                    String name = localizationElement.getAttributeValue(null, "name");
+                    String documentation = null;
+                    List<ExtensionElement> documentationElements = localizationElement.getChildElements().get("documentation");
+                    if (documentationElements != null) {
+                        for (ExtensionElement documentationElement : documentationElements) {
+                            documentation = StringUtils.trimToNull(documentationElement.getElementText());
+                            break;
+                        }
+                    }
+                    if (StringUtils.isNotBlank(name)) {
+                        nameNode.put(locale, name.trim());
+                    }
+                    if (StringUtils.isNotBlank(documentation)) {
+                        descriptionNode.put(locale, documentation.trim());
+                    }
+                }
+            }
+            if (nameNode.fieldNames().hasNext() || descriptionNode.fieldNames().hasNext()) {
+                propertiesNode.set(PROPERTY_LOCALIZATION, localizationNode);
+            }
+        }
+    }
+
+    protected void addLocalizationExtensionElement(JsonNode objectNode, BaseElement element) {
+        JsonNode localizationNode = getProperty(PROPERTY_LOCALIZATION, objectNode);
+        if (localizationNode != null) {
+            localizationNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(localizationNode);
+            final JsonNode nameNode = localizationNode.get("name");
+            Iterator<Map.Entry<String, JsonNode>> fields;
+            if (nameNode != null) {
+                fields = nameNode.fields();
+                while (fields.hasNext()) {
+                    final Map.Entry<String, JsonNode> entry = fields.next();
+                    setLocalizedName(entry.getKey(), entry.getValue().textValue(), element);
+                }
+            }
+            final JsonNode descriptionNode = localizationNode.get("description");
+            if (descriptionNode != null) {
+                fields = descriptionNode.fields();
+                while (fields.hasNext()) {
+                    final Map.Entry<String, JsonNode> entry = fields.next();
+                    setLocalizedDescription(entry.getKey(), entry.getValue().textValue(), element);
                 }
             }
         }
@@ -811,7 +875,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
                     String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
                     String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
-                    
+
                     addExtensionAttribute("source", eventName, extensionElement);
                     addExtensionAttribute("sourceType", eventType, extensionElement);
                     addExtensionAttribute("target", variableName, extensionElement);
@@ -819,7 +883,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             }
         }
     }
-    
+
     protected void convertJsonToOutIOParameters(JsonNode objectNode, SendEventServiceTask task) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
@@ -829,26 +893,26 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).isNull()) {
                     IOParameter parameterObject = new IOParameter();
-                    
+
                     String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
                     String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
                     String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
-                    
+
                     parameterObject.setSource(eventName);
                     parameterObject.addAttribute(createExtensionAttribute("sourceType", eventType));
-                    
+
                     if ((variableName.contains("${") || variableName.contains("#{")) && variableName.contains("}")) {
                         parameterObject.setTargetExpression(variableName);
                     } else {
                         parameterObject.setTarget(variableName);
                     }
-                    
+
                     task.getEventOutParameters().add(parameterObject);
                 }
             }
         }
     }
-    
+
     protected void convertJsonToInParameters(JsonNode objectNode, Event event) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
@@ -861,7 +925,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
                     String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
                     String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
-                    
+
                     addExtensionAttribute("source", variableName, extensionElement);
                     addExtensionAttribute("target", eventName, extensionElement);
                     addExtensionAttribute("targetType", eventType, extensionElement);
@@ -869,7 +933,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             }
         }
     }
-    
+
     protected void convertJsonToInIOParameters(JsonNode objectNode, SendEventServiceTask task) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
@@ -879,26 +943,26 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).isNull()) {
                     IOParameter parameterObject = new IOParameter();
-                    
+
                     String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
                     if ((variableName.contains("${") || variableName.contains("#{")) && variableName.contains("}")) {
                         parameterObject.setSourceExpression(variableName);
                     } else {
                         parameterObject.setSource(variableName);
                     }
-                    
+
                     String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
                     String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
-                    
+
                     parameterObject.setTarget(eventName);
                     parameterObject.addAttribute(createExtensionAttribute("targetType", eventType));
-                    
+
                     task.getEventInParameters().add(parameterObject);
                 }
             }
         }
     }
-    
+
     protected void convertJsonToCorrelationParameters(JsonNode objectNode, String correlationPropertyName, FlowElement flowElement) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
@@ -911,7 +975,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     String name = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).asText();
                     String type = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE).asText();
                     String value = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE).asText();
-                    
+
                     addExtensionAttribute("name", name, extensionElement);
                     addExtensionAttribute("type", type, extensionElement);
                     addExtensionAttribute("value", value, extensionElement);
@@ -919,7 +983,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             }
         }
     }
-    
+
     protected void convertJsonToConditionalDefinition(JsonNode objectNode, Event event) {
         String condition = getPropertyValueAsString(PROPERTY_CONDITIONAL_EVENT_CONDITION, objectNode);
         ConditionalEventDefinition eventDefinition = new ConditionalEventDefinition();
@@ -1039,7 +1103,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         }
         return resultString;
     }
-    
+
     protected ExtensionElement addFlowableExtensionElement(String name, FlowElement flowElement) {
         ExtensionElement extensionElement = new ExtensionElement();
         extensionElement.setName(name);
@@ -1048,26 +1112,89 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         flowElement.addExtensionElement(extensionElement);
         return extensionElement;
     }
-    
+
     protected ExtensionElement addFlowableExtensionElementWithValue(String name, String value, FlowElement flowElement) {
         ExtensionElement extensionElement = null;
         if (StringUtils.isNotEmpty(value)) {
             extensionElement = addFlowableExtensionElement(name, flowElement);
             extensionElement.setElementText(value);
         }
-        
+
         return extensionElement;
     }
-    
+
     public void addExtensionAttribute(String name, String value, ExtensionElement extensionElement) {
         ExtensionAttribute attribute = new ExtensionAttribute(name);
         attribute.setValue(value);
         extensionElement.addAttribute(attribute);
     }
-    
+
     public ExtensionAttribute createExtensionAttribute(String name, String value) {
         ExtensionAttribute attribute = new ExtensionAttribute(name);
         attribute.setValue(value);
         return attribute;
+    }
+
+    protected void setLocalizedName(String locale, String name, BaseElement element) {
+        upsertLocalizationExtensionElement(locale, name, null, element);
+    }
+
+    protected void setLocalizedDescription(String locale, String description, BaseElement element) {
+        upsertLocalizationExtensionElement(locale, null, description, element);
+    }
+
+    protected void upsertLocalizationExtensionElement(String locale, String name, String description, BaseElement element) {
+        final List<ExtensionElement> localizations = element.getExtensionElements().get("localization");
+        ExtensionElement localization = null;
+        ExtensionAttribute localeAttr = null;
+        ExtensionAttribute nameAttr = null;
+        if (localizations != null) {
+            for (ExtensionElement extensionElement : localizations) {
+                if (locale.equals(extensionElement.getAttributeValue(null, "locale")) &&
+                        extensionElement.getAttributeValue(null, "name") != null) {
+                    localization = extensionElement;
+                    localeAttr = extensionElement.getAttributes().get("locale").get(0);
+                    nameAttr = extensionElement.getAttributes().get("name").get(0);
+                    break;
+                }
+            }
+        }
+        if (localization == null) {
+            localization = new ExtensionElement();
+            localization.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            localization.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+            localization.setName("localization");
+            element.addExtensionElement(localization);
+            localeAttr = new ExtensionAttribute("locale");
+            nameAttr = new ExtensionAttribute("name");
+            localization.addAttribute(localeAttr);
+            localization.addAttribute(nameAttr);
+        }
+        if (name == null) {
+            name = localization.getAttributeValue(null, "name");
+        }
+        ExtensionElement documentationElement = null;
+        if (description == null) {
+            List<ExtensionElement> documentationElements = localization.getChildElements().get("documentation");
+            if (documentationElements != null) {
+                for (ExtensionElement docElement : documentationElements) {
+                    documentationElement = docElement;
+                    description = StringUtils.trimToNull(docElement.getElementText());
+                    break;
+                }
+            }
+        }
+        if (StringUtils.isNotBlank(description)) {
+            if (documentationElement == null) {
+                documentationElement = new ExtensionElement();
+                documentationElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+                documentationElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+                documentationElement.setName("documentation");
+                documentationElement.setElementText(description.trim());
+                localization.addChildElement(documentationElement);
+            }
+        }
+        localeAttr.setValue(locale);
+        nameAttr.setValue(name);
     }
 }
