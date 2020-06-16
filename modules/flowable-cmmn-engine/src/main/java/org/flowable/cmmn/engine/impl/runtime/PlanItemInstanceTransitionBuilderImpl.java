@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Joram Barrez
@@ -34,9 +35,15 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
 
     protected String planItemInstanceId;
     protected Map<String, Object> variables;
+    protected Map<String, Object> formVariables;
+    protected String formOutcome;
+    protected FormInfo formInfo;
     protected Map<String, Object> localVariables;
     protected Map<String, Object> transientVariables;
     protected Map<String, Object> childTaskVariables;
+    protected Map<String, Object> childTaskFormVariables;
+    protected String childTaskFormOutcome;
+    protected FormInfo childTaskFormInfo;
 
     public PlanItemInstanceTransitionBuilderImpl(CommandExecutor commandExecutor, String planItemInstanceId) {
         this.commandExecutor = commandExecutor;
@@ -60,6 +67,25 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
         if (variables != null) {
             this.variables.putAll(variables);
         }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceTransitionBuilder formVariables(Map<String, Object> variables, FormInfo formInfo, String outcome) {
+        if (formInfo == null) {
+            throw new FlowableIllegalArgumentException("formInfo is null");
+        }
+
+        if (this.formVariables == null) {
+            this.formVariables = new HashMap<>();
+        }
+
+        if (variables != null) {
+            this.formVariables.putAll(variables);
+        }
+
+        this.formOutcome = outcome;
+        this.formInfo = formInfo;
         return this;
     }
 
@@ -124,49 +150,72 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
     }
 
     @Override
+    public PlanItemInstanceTransitionBuilder childTaskFormVariables(Map<String, Object> variables, FormInfo formInfo, String outcome) {
+        if (formInfo == null) {
+            throw new FlowableIllegalArgumentException("formInfo is null");
+        }
+
+        if (this.childTaskFormVariables == null) {
+            this.childTaskFormVariables = new HashMap<>();
+        }
+
+        if (variables != null) {
+            this.childTaskFormVariables.putAll(variables);
+        }
+
+        this.childTaskFormOutcome = outcome;
+        this.childTaskFormInfo = formInfo;
+        return this;
+    }
+
+    @Override
     public void trigger() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables));
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void enable() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables));
+        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void disable() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables));
+        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void start() {
-        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables, childTaskVariables));
+        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, childTaskVariables, childTaskFormVariables, childTaskFormOutcome, childTaskFormInfo));
     }
 
     @Override
     public void terminate() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables));
+        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void completeStage() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables, false));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, false));
     }
 
     @Override
     public void forceCompleteStage() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, localVariables, transientVariables, true));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, true));
     }
 
     protected void validateChildTaskVariablesNotSet() {
         if (childTaskVariables != null) {
             throw new FlowableIllegalArgumentException("Child task variables can only be set when starting a plan item instance");
+        }
+
+        if (childTaskFormInfo != null) {
+            throw new FlowableIllegalArgumentException("Child form variables can only be set when starting a plan item instance");
         }
     }
 }

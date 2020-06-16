@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
+import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
@@ -138,9 +139,10 @@ public abstract class AbstractCmmnDynamicStateManager {
                 
             } else if (caseInstanceChangeState.getChildInstanceTaskVariables().containsKey(planItemDefinitionMapping.getPlanItemDefinitionId()) && 
                             (planItem.getPlanItemDefinition() instanceof ProcessTask || planItem.getPlanItemDefinition() instanceof CaseTask)) {
-                
-                agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null, caseInstanceChangeState.getChildInstanceTaskVariables().get(
-                        planItemDefinitionMapping.getPlanItemDefinitionId()));
+
+                agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null,
+                        new ChildTaskActivityBehavior.VariableInfo(
+                                caseInstanceChangeState.getChildInstanceTaskVariables().get(planItemDefinitionMapping.getPlanItemDefinitionId())));
                 
             } else {
                 agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null);

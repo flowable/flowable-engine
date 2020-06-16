@@ -1,0 +1,20 @@
+{
+    "name": "Simple Form",
+    "key": "simpleIntForm",
+    "version": 0,
+    "fields": [
+        {
+            "fieldType": "FormField",
+            "id": "intVar",
+            "name": "Label",
+            "type": "integer",
+            "value": null,
+            "required": false,
+            "readOnly": false,
+            "overrideId": true,
+            "placeholder": null,
+            "layout": null
+        }
+    ],
+    "outcomes": []
+}

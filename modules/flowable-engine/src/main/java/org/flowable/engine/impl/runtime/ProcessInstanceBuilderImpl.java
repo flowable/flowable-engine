@@ -15,9 +15,11 @@ package org.flowable.engine.impl.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Bassam Al-Sarori
@@ -45,6 +47,9 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected Map<String, Object> transientVariables;
     protected Map<String, Object> startFormVariables;
     protected String outcome;
+    protected Map<String, Object> extraFormVariables;
+    protected FormInfo extraFormInfo;
+    protected String extraFormOutcome;
     protected boolean fallbackToDefaultTenant;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
@@ -202,6 +207,26 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     }
 
     @Override
+    public ProcessInstanceBuilder formVariables(Map<String, Object> formVariables, FormInfo formInfo, String formOutcome) {
+        if (formInfo == null) {
+            throw new FlowableIllegalArgumentException("formInfo is null");
+        }
+
+        if (this.extraFormVariables == null) {
+            this.extraFormVariables = new HashMap<>();
+        }
+
+        if (formVariables != null) {
+            this.extraFormVariables.putAll(formVariables);
+        }
+
+        this.extraFormInfo = formInfo;
+        this.extraFormOutcome = formOutcome;
+        return this;
+    }
+
+
+    @Override
     public ProcessInstanceBuilder fallbackToDefaultTenant() {
         this.fallbackToDefaultTenant = true;
         return this;
@@ -286,6 +311,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     }
     public String getOutcome() {
         return outcome;
+    }
+
+    public Map<String, Object> getExtraFormVariables() {
+        return extraFormVariables;
+    }
+
+    public FormInfo getExtraFormInfo() {
+        return extraFormInfo;
+    }
+
+    public String getExtraFormOutcome() {
+        return extraFormOutcome;
     }
 
     public boolean isFallbackToDefaultTenant() {

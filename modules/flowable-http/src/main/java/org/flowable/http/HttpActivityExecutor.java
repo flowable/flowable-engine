@@ -18,10 +18,9 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -62,6 +61,10 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 public class HttpActivityExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityExecutor.class);
+    private static final Pattern PLUS_CHARACTER_PATTERN = Pattern.compile("\\+");
+    private static final String ENCODED_PLUS_CHARACTER = "%2B";
+    private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
+    private static final String ENCODED_SPACE_CHARACTER = "%20";
 
     // Validation constants
     public static final String HTTP_TASK_REQUEST_METHOD_REQUIRED = "requestMethod is required";
@@ -222,7 +225,7 @@ public class HttpActivityExecutor {
         }
 
         try {
-            URI uri = ensureUrlIsEncodedAndConvertToUri(new URL(requestInfo.getUrl()));
+            URI uri = createUri(requestInfo.getUrl());
             switch (requestInfo.getMethod()) {
                 case "GET": {
                     request = new HttpGet(uri);
@@ -356,23 +359,9 @@ public class HttpActivityExecutor {
         }
     }
 
-    protected URI ensureUrlIsEncodedAndConvertToUri(URL url) throws URISyntaxException {
-        String decodedPath = decode(url.getPath());
-        String decodedQuery = decode(url.getQuery());
-        String decodedRef = decode(url.getRef());
-
-        return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), decodedPath, decodedQuery, decodedRef);
-    }
-
-    protected String decode(String string) {
-        if (string == null) {
-            return null;
-        }
-        try {
-            return URLDecoder.decode(string, "UTF-8");
-        } catch (UnsupportedEncodingException unsupportedEncodingException) {
-            throw new IllegalStateException("JVM does not support UTF-8 encoding.", unsupportedEncodingException);
-        }
+    protected URI createUri(String url) throws URISyntaxException {
+        String uri = SPACE_CHARACTER_PATTERN.matcher(url).replaceAll(ENCODED_SPACE_CHARACTER);
+        return new URI(PLUS_CHARACTER_PATTERN.matcher(uri).replaceAll(ENCODED_PLUS_CHARACTER));
     }
 
 }
