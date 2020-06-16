@@ -548,7 +548,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
                 .processInstanceId(procId)
                 .variableName("test")
                 .singleResult();
-        assertThat(variable).isNotNull();
+        assertNotNull(variable);
         assertThatJson(variable.getValue())
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
