@@ -4,6 +4,19 @@
   "description": "DMN DRD editor",
   "propertyPackages": [
     {
+      "name": "drd_idpackage",
+      "properties": [
+        {
+          "id": "drd_id",
+          "type": "String",
+          "title": "DRD identifier",
+          "value": "drdModel",
+          "description": "Unique identifier of the DRD.",
+          "popular": true
+        }
+      ]
+    },
+    {
       "name": "overrideidpackage",
       "properties": [
         {
@@ -27,6 +40,19 @@
           "description": "The descriptive name of the DRD element.",
           "popular": true,
           "refToView": "text_name"
+        }
+      ]
+    },
+    {
+      "name": "documentationpackage",
+      "properties": [
+        {
+          "id": "documentation",
+          "type": "Text",
+          "title": "Documentation",
+          "value": "",
+          "description": "Documentation of the DRD element.",
+          "popular": true
         }
       ]
     },
@@ -58,8 +84,9 @@
       "mayBeRoot": true,
       "hide": true,
       "propertyPackages": [
-        "overrideidpackage",
-        "namepackage"
+        "drd_idpackage",
+        "namepackage",
+        "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": []
@@ -77,6 +104,7 @@
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
+        "documentationpackage",
         "decisionreferencepackage"
       ],
       "hiddenPropertyPackages": [],
@@ -84,7 +112,6 @@
         "information_requirement_start",
         "information_requirement_end",
         "knowledge_requirement_start",
-        "StartEventsMorph",
         "all"
       ]
     },
@@ -100,7 +127,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -119,7 +147,8 @@
       ],
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -137,11 +166,12 @@
       "groups": [
         "DMN.STENCILS.GROUPS.DIAGRAM"
       ],
-      "mayBeRoot" : true,
-      "hide" : true,
+      "mayBeRoot": true,
+      "hide": true,
       "propertyPackages": [
         "overrideidpackage",
-        "namepackage"
+        "namepackage",
+        "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -162,11 +192,9 @@
       "groups": [
         "DMN.STENCILS.GROUPS.DIAGRAM"
       ],
-      "mayBeRoot" : true,
-      "hide" : true,
+      "mayBeRoot": true,
+      "hide": true,
       "propertyPackages": [
-        "overrideidpackage",
-        "namepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -182,11 +210,9 @@
       "groups": [
         "DMN.STENCILS.GROUPS.DIAGRAM"
       ],
-      "mayBeRoot" : true,
-      "hide" : true,
+      "mayBeRoot": true,
+      "hide": true,
       "propertyPackages": [
-        "overrideidpackage",
-        "namepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -406,7 +432,7 @@
           "information_requirement_end",
           "knowledge_requirement_start",
           "knowledge_requirement_end",
-          "DecisionTable"
+          "Decision"
         ]
       },
       {
@@ -416,7 +442,7 @@
           "information_requirement_end",
           "knowledge_requirement_start",
           "knowledge_requirement_end",
-          "DecisionTable"
+          "Decision"
         ]
       }
     ],
