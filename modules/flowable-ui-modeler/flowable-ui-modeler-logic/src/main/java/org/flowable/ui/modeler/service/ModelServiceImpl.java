@@ -272,8 +272,17 @@ public class ModelServiceImpl implements ModelService {
             stencilSetNode.put("namespace", "http://b3mn.org/stencilset/dmn1.2#");
             editorNode.set("stencilset", stencilSetNode);
 
+            ObjectNode propertiesNode = objectMapper.createObjectNode();
+            propertiesNode.put("drd_id", "DMNDiagram_" + model.getKey());
+            propertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                propertiesNode.put("documentation", model.getDescription());
+            }
+            editorNode.set("properties", propertiesNode);
+
             ArrayNode childShapeArray = objectMapper.createArrayNode();
             editorNode.set("childShapes", childShapeArray);
+
             ObjectNode childNode = objectMapper.createObjectNode();
             childShapeArray.add(childNode);
             ObjectNode boundsNode = objectMapper.createObjectNode();
@@ -297,6 +306,14 @@ public class ModelServiceImpl implements ModelService {
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "ExpandedDecisionService");
+
+            ObjectNode decisionServicePropertiesNode = objectMapper.createObjectNode();
+            childNode.set("properties", decisionServicePropertiesNode);
+            decisionServicePropertiesNode.put("overrideid", model.getKey());
+            decisionServicePropertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                decisionServicePropertiesNode.put("documentation", model.getDescription());
+            }
 
             ObjectNode outgoingDecisionsShape = objectMapper.createObjectNode();
             childShapes.add(outgoingDecisionsShape);
@@ -804,6 +821,11 @@ public class ModelServiceImpl implements ModelService {
                 modelRepository.save(model);
                 handleAppModelProcessRelations(model, jsonNode);
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DRD) {
+                // Thumbnail
+                byte[] thumbnail = modelImageService.generateDrdThumbnailImage(model, jsonNode);
+                if (thumbnail != null) {
+                    model.setThumbnail(thumbnail);
+                }
 
                 modelRepository.save(model);
                 handleDrdModelDecisionTableRelations(model, jsonNode);
