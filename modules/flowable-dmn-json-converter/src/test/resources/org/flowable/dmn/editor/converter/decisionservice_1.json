@@ -11,9 +11,8 @@
     }
   },
   "properties": {
-    "overrideid": "drd1",
     "name": "Decision Service 1",
-    "process_id": "decisionService1"
+    "drd_id": "drd1"
   },
   "childShapes": [
     {

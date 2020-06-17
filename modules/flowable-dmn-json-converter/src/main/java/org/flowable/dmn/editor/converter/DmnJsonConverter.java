@@ -70,20 +70,24 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    public DmnDefinition convertToDmn(JsonNode modelNode, String modelId, int modelVersion, Date lastUpdated) {
-        return convertToDmn(modelNode, modelId, Collections.EMPTY_MAP);
+    public DmnDefinition convertToDmn(JsonNode modelNode) {
+        return convertToDmn(modelNode, null, Collections.EMPTY_MAP);
     }
 
     public DmnDefinition convertToDmn(JsonNode modelNode, String modelId) {
         return convertToDmn(modelNode, modelId, Collections.EMPTY_MAP);
+    }
 
+    public DmnDefinition convertToDmn(JsonNode modelNode, String modelId, int modelVersion, Date lastUpdated) {
+        return convertToDmn(modelNode, modelId, Collections.EMPTY_MAP);
     }
 
     public DmnDefinition convertToDmn(JsonNode modelNode, String modelId, Map<String, String> decisionEditorJsonMap) {
         DmnDefinition definition = new DmnDefinition();
 
-        definition.setId("definition_" + modelId);
-        definition.setName(DmnJsonConverterUtil.getPropertyValueAsString("name", modelNode));
+        if (modelId != null) {
+            definition.setId("definition_" + modelId);
+        }
         definition.setNamespace(MODEL_NAMESPACE);
         definition.setTypeLanguage(URI_JSON);
 
@@ -529,7 +533,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         DmnDiDiagram diagram = new DmnDiDiagram();
         diagram.setName(DmnJsonConverterUtil.getValueAsString("name", objectNode));
-        diagram.setId(DmnJsonConverterUtil.getElementId(objectNode));
+        diagram.setId(DmnJsonConverterUtil.getPropertyValueAsString(DmnStencilConstants.PROPERTY_DRD_ID, objectNode));
         diagram.setGraphicInfo(graphicInfo);
 
         definition.addDiDiagram(diagram);

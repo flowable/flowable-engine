@@ -673,7 +673,7 @@ public class DmnJsonConverterTest {
     @Test
     public void testConvertDRDtoJson() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
-        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
 

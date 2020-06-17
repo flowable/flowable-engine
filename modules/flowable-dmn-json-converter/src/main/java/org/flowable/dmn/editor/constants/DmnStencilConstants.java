@@ -26,6 +26,7 @@ public interface DmnStencilConstants {
 
     // stencil properties
     final String PROPERTY_OVERRIDE_ID = "overrideid";
+    final String PROPERTY_DRD_ID = "drd_id";
     final String PROPERTY_NAME = "name";
     final String PROPERTY_DOCUMENTATION = "documentation";
 
