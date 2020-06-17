@@ -35,7 +35,7 @@ spec:
             port: 9988
             httpHeaders:
             - name: Authorization
-              value: Basic YWRtaW46dGVzdA==
+              value: Basic: {{-  printf "%s:%s" .Values.admin.admin.username .Values.admin.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 5
         livenessProbe:
@@ -44,7 +44,7 @@ spec:
             port: 9988
             httpHeaders:
             - name: Authorization
-              value: Basic YWRtaW46dGVzdA==
+              value: Basic: {{-  printf "%s:%s" .Values.admin.admin.username .Values.admin.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 10
           failureThreshold: 10
@@ -116,8 +116,8 @@ data:
   FLOWABLE_COMMON_APP_IDM-URL: http://{{ .Values.idm.service.name }}:8080
   FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.host.external }}/{{ .Values.idm.ingressPath }}/
   FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.host.external }}/{{ .Values.admin.ingressPath }}/
-  FLOWABLE_COMMON_APP_IDM-ADMIN_USER: admin
-  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: test
+  FLOWABLE_COMMON_APP_IDM-ADMIN_USER: {{ .Values.idm.admin.username }}
+  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: {{ .Values.idm.admin.password }}
   {{- if .Values.task.enabled }}
   FLOWABLE_ADMIN_APP_SERVER-CONFIG_PROCESS_SERVER-ADDRESS: http://{{ .Values.task.service.name }}
   FLOWABLE_ADMIN_APP_SERVER-CONFIG_PROCESS_PORT: "9999"

@@ -14,6 +14,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
@@ -39,7 +40,9 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
     @Override
     public void execute(DelegateExecution execution) {
         // end date should be ignored for intermediate timer events.
-        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, (ExecutionEntity) execution, TriggerTimerEventJobHandler.TYPE,
+        FlowElement currentFlowElement = execution.getCurrentFlowElement();
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, currentFlowElement,
+                false, (ExecutionEntity) execution, TriggerTimerEventJobHandler.TYPE,
                 TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), null, timerEventDefinition.getCalendarName()));
 
         if (timerJob != null) {

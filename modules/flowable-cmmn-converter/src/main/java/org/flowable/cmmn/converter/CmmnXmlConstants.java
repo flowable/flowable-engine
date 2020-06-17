@@ -104,6 +104,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
+    String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
+
+    String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
 
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
@@ -111,9 +114,12 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DISPLAY_ORDER = "displayOrder";
     String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
+    String ATTRIBUTE_MILESTONE_VARIABLE = "milestoneVariable";
+
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
+    String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
     String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";

@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.persistence;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
+import org.flowable.cmmn.engine.impl.db.EntityToTableMap;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -33,11 +32,11 @@ import org.w3c.dom.NodeList;
  * @author Joram Barrez
  */
 public class EntitiesTest {
-    
+
     @Test
     public void verifyMappedEntitiesExist() {
         Set<String> mappedResources = getMappedResources();
-        assertTrue(mappedResources.size() > 0);
+        assertThat(mappedResources.size()).isPositive();
         for (String mappedResource : mappedResources) {
             getAndAssertEntityInterfaceClass(mappedResource);
             getAndAssertEntityImplClass(mappedResource);
@@ -48,39 +47,42 @@ public class EntitiesTest {
     public void verifyEntitiesInEntityDependencyOrder() {
         Set<String> mappedResources = getMappedResources();
         for (String mappedResource : mappedResources) {
-            assertTrue("No insert entry in EntityDependencyOrder for " + mappedResource, EntityDependencyOrder.INSERT_ORDER.contains(getAndAssertEntityImplClass(mappedResource)));
-            assertTrue("No delete entry in EntityDependencyOrder for " + mappedResource, EntityDependencyOrder.DELETE_ORDER.contains(getAndAssertEntityImplClass(mappedResource)));
+            assertThat(EntityDependencyOrder.INSERT_ORDER.contains(getAndAssertEntityImplClass(mappedResource)))
+                    .as("No insert entry in EntityDependencyOrder for " + mappedResource).isTrue();
+            assertThat(EntityDependencyOrder.DELETE_ORDER.contains(getAndAssertEntityImplClass(mappedResource)))
+                    .as("No delete entry in EntityDependencyOrder for " + mappedResource).isTrue();
         }
     }
-    
+
     @Test
     public void verifyEntitiesInTableDataManager() {
         Set<String> mappedResources = getMappedResources();
         for (String mappedResource : mappedResources) {
-            assertTrue("No entry in TableDataManagerImpl for " + mappedResource, TableDataManagerImpl.entityToTableNameMap.containsKey(getAndAssertEntityInterfaceClass(mappedResource)));
+            assertThat(EntityToTableMap.entityToTableNameMap.containsKey(getAndAssertEntityInterfaceClass(mappedResource)))
+                    .as("No entry in TableDataManagerImpl for " + mappedResource).isTrue();
         }
     }
-    
+
     protected Class getAndAssertEntityInterfaceClass(String mappedResource) {
         try {
             Class c = Class.forName("org.flowable.cmmn.engine.impl.persistence.entity." + mappedResource + "Entity");
-            assertNotNull(c);
+            assertThat(c).isNotNull();
             return c;
         } catch (Exception e) {
             throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
         }
     }
-    
+
     protected Class getAndAssertEntityImplClass(String mappedResource) {
         try {
             Class c = Class.forName("org.flowable.cmmn.engine.impl.persistence.entity." + mappedResource + "EntityImpl");
-            assertNotNull(c);
+            assertThat(c).isNotNull();
             return c;
         } catch (Exception e) {
             throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
         }
     }
-    
+
     private Set<String> getMappedResources() {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -102,10 +104,10 @@ public class EntitiesTest {
                     resources.add(resource);
                 }
             }
-            
+
             resources.remove("TableData"); // not an entity
-            
-            assertTrue(resources.size() > 0);
+
+            assertThat(resources.size()).isPositive();
             return resources;
         } catch (Exception e) {
             throw new RuntimeException(e);

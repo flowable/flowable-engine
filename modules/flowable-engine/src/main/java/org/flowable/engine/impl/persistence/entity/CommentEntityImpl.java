@@ -65,11 +65,10 @@ public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implem
         for (String part : messageParts) {
             if (part != null) {
                 stringBuilder.append(part.replace(MESSAGE_PARTS_MARKER, " | "));
-                stringBuilder.append(MESSAGE_PARTS_MARKER);
             } else {
                 stringBuilder.append("null");
-                stringBuilder.append(MESSAGE_PARTS_MARKER);
             }
+            stringBuilder.append(MESSAGE_PARTS_MARKER);
         }
         for (int i = 0; i < MESSAGE_PARTS_MARKER.length(); i++) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);

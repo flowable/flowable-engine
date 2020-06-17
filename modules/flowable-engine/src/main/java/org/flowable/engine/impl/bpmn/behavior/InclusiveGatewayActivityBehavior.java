@@ -14,6 +14,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -50,15 +51,15 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
         // executions leave the gateway.
 
         execution.inactivate();
-        executeInclusiveGatewayLogic((ExecutionEntity) execution);
+        executeInclusiveGatewayLogic((ExecutionEntity) execution, false);
     }
 
     @Override
     public void executeInactive(ExecutionEntity executionEntity) {
-        executeInclusiveGatewayLogic(executionEntity);
+        executeInclusiveGatewayLogic(executionEntity, true);
     }
 
-    protected void executeInclusiveGatewayLogic(ExecutionEntity execution) {
+    protected void executeInclusiveGatewayLogic(ExecutionEntity execution, boolean inactiveCheck) {
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
@@ -85,7 +86,9 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
         }
 
         // Is needed to set the endTime for all historic activity joins
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
+        if (!inactiveCheck || !oneExecutionCanReachGatewayInstance) {
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
+        }
 
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
         if (!oneExecutionCanReachGatewayInstance) {
@@ -97,7 +100,11 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
                 .findInactiveExecutionsByActivityIdAndProcessInstanceId(execution.getCurrentActivityId(), execution.getProcessInstanceId());
             for (ExecutionEntity executionEntityInGateway : executionsInGateway) {
                 if (!executionEntityInGateway.getId().equals(execution.getId()) && executionEntityInGateway.getParentId().equals(execution.getParentId())) {
-                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntityInGateway, null);
+
+                    if (!Objects.equals(executionEntityInGateway.getActivityId(), execution.getActivityId())) {
+                        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntityInGateway, null);
+                    }
+
                     executionEntityManager.deleteExecutionAndRelatedData(executionEntityInGateway, null, false);
                 }
             }

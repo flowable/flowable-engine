@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -38,26 +38,26 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("stageWithRepetitionAndMaxInstanceCount").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
 
         // start Stage A which should start Task A as well
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageA", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
 
         // complete Task A which terminates Stage A and starts Stage B
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("enableStageA", false)
-            .variable("enableStageB", true)
-            .trigger();
+                .variable("enableStageA", false)
+                .variable("enableStageB", true)
+                .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
@@ -66,7 +66,7 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
@@ -78,7 +78,7 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("stageWithRepetitionAndMaxInstanceCount").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
 
@@ -86,7 +86,7 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageA", true);
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageB", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
@@ -96,7 +96,7 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
@@ -105,7 +105,7 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Stage B", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);

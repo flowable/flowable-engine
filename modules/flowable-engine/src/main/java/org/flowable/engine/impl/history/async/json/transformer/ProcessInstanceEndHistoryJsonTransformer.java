@@ -55,9 +55,7 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             if (startTime != null && endTime != null) {
                 historicProcessInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
             }
-    
-            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-        
+
         } else {
             historicProcessInstance = historicProcessInstanceEntityManager.create();
             historicProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
@@ -95,9 +93,9 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             }
             
             historicProcessInstanceEntityManager.update(historicProcessInstance, false);
-    
-            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+
         }
+        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
     }
     
 }

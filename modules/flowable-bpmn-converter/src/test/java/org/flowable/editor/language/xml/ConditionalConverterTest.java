@@ -12,8 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
@@ -38,12 +37,12 @@ public class ConditionalConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getFlowElement("conditionalCatch");
-        assertTrue(flowElement instanceof IntermediateCatchEvent);
+        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
         
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertEquals(1, catchEvent.getEventDefinitions().size());
+        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
         ConditionalEventDefinition event = (ConditionalEventDefinition) catchEvent.getEventDefinitions().get(0);
-        assertEquals("${testVar == 'test'}", event.getConditionExpression());
+        assertThat(event.getConditionExpression()).isEqualTo("${testVar == 'test'}");
     }
 
     @Override

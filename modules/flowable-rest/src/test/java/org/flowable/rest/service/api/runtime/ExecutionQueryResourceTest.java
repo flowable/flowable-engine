@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 
@@ -47,10 +47,10 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
         Execution parentExecution = runtimeService.startProcessInstanceByKey("processOne", processVariables);
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
-        assertNotNull(subProcessExecution);
+        assertThat(subProcessExecution).isNotNull();
 
         Execution childExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
 
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_QUERY);
 

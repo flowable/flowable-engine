@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.bpmn.exceptions.XMLException;
 import org.junit.Test;
@@ -21,22 +21,14 @@ public class EmptyModelTest extends AbstractConverterTest {
 
     @Test
     public void convertXMLToModel() throws Exception {
-        try {
-            readXMLFile();
-            fail("Expected xml exception");
-        } catch (XMLException e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> readXMLFile())
+                .isExactlyInstanceOf(XMLException.class);
     }
 
     @Test
     public void convertModelToXML() throws Exception {
-        try {
-            readXMLFile();
-            fail("Expected xml exception");
-        } catch (XMLException e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> readXMLFile())
+                .isExactlyInstanceOf(XMLException.class);
     }
 
     @Override

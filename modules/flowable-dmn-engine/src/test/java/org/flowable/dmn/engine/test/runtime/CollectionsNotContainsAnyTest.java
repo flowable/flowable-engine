@@ -12,19 +12,20 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionService;
+import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.DmnDeployment;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Yvo Swillens
@@ -53,19 +54,19 @@ public class CollectionsNotContainsAnyTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertTrue(result.getRuleExecutions().get(1).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(5).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(6).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(7).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(8).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(9).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(10).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions().get(1).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(2).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(5).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(6).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(7).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(8).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(9).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(10).isValid()).isTrue();
     }
 
     @Test
@@ -87,12 +88,12 @@ public class CollectionsNotContainsAnyTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertFalse(result.getRuleExecutions().get(3).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(4).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions().get(3).isValid()).isFalse();
+        assertThat(result.getRuleExecutions().get(4).isValid()).isFalse();
     }
 }

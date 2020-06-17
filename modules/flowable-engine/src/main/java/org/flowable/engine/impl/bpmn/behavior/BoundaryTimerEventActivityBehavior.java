@@ -45,8 +45,9 @@ public class BoundaryTimerEventActivityBehavior extends BoundaryEventActivityBeh
             throw new FlowableException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
         }
 
-        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
-                TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, execution.getCurrentFlowElement(),
+                interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE, TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), 
+                        timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
         if (timerJob != null) {
             CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
         }

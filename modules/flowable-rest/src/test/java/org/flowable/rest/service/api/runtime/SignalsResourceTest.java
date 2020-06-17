@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.List;
@@ -35,6 +35,9 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -59,7 +62,8 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
             // Check if process is started as a result of the signal without tenant ID set
-            assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceWithoutTenantId().processDefinitionKey("processWithSignalStart1").count());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceWithoutTenantId().processDefinitionKey("processWithSignalStart1").count())
+                    .isEqualTo(1);
 
             // Signal with tenant
             requestNode.put("tenantId", "my tenant");
@@ -67,7 +71,8 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
             // Check if process is started as a result of the signal, in the right tenant
-            assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceTenantId("my tenant").processDefinitionKey("processWithSignalStart1").count());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId("my tenant").processDefinitionKey("processWithSignalStart1").count())
+                    .isEqualTo(1);
 
             // Signal with tenant AND variables
             ArrayNode vars = requestNode.putArray("variables");
@@ -79,7 +84,8 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
             // Check if process is started as a result of the signal, in the right tenant and with var set
-            assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceTenantId("my tenant").processDefinitionKey("processWithSignalStart1").variableValueEquals("testVar", "test").count());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId("my tenant").processDefinitionKey("processWithSignalStart1")
+                    .variableValueEquals("testVar", "test").count()).isEqualTo(1);
 
             // Signal without tenant AND variables
             requestNode.remove("tenantId");
@@ -88,7 +94,8 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
             // Check if process is started as a result of the signal, without tenant and with var set
-            assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceWithoutTenantId().processDefinitionKey("processWithSignalStart1").variableValueEquals("testVar", "test").count());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceWithoutTenantId().processDefinitionKey("processWithSignalStart1")
+                    .variableValueEquals("testVar", "test").count()).isEqualTo(1);
 
         } finally {
             // Clean up tenant-specific deployment
@@ -117,7 +124,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_ACCEPTED));
 
             // Check if job is queued as a result of the signal without tenant ID set
-            assertEquals(1, managementService.createJobQuery().jobWithoutTenantId().count());
+            assertThat(managementService.createJobQuery().jobWithoutTenantId().count()).isEqualTo(1);
 
             // Signal with tenant
             requestNode.put("tenantId", "my tenant");
@@ -125,7 +132,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpPost, HttpStatus.SC_ACCEPTED));
 
             // Check if job is queued as a result of the signal, in the right tenant
-            assertEquals(1, managementService.createJobQuery().jobTenantId("my tenant").count());
+            assertThat(managementService.createJobQuery().jobTenantId("my tenant").count()).isEqualTo(1);
 
             // Signal with variables and async, should fail as it's not supported
             ArrayNode vars = requestNode.putArray("variables");
@@ -200,14 +207,17 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-
-        assertEquals(eventSubscription.getId(), responseNode.get("id").textValue());
-        assertEquals(eventSubscription.getEventType(), responseNode.get("eventType").textValue());
-        assertEquals(eventSubscription.getEventName(), responseNode.get("eventName").textValue());
-        assertEquals(eventSubscription.getActivityId(), responseNode.get("activityId").textValue());
-        assertEquals(eventSubscription.getProcessDefinitionId(), responseNode.get("processDefinitionId").textValue());
-        assertEquals(eventSubscription.getCreated(), getDateFromISOString(responseNode.get("created").textValue()));
-        assertEquals("", responseNode.get("tenantId").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + eventSubscription.getId() + "',"
+                        + "eventType: '" + eventSubscription.getEventType() + "',"
+                        + "eventName: '" + eventSubscription.getEventName() + "',"
+                        + "activityId: '" + eventSubscription.getActivityId() + "',"
+                        + "processDefinitionId: '" + eventSubscription.getProcessDefinitionId() + "',"
+                        + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
+                        + "tenantId: ''"
+                        + "}");
     }
 }

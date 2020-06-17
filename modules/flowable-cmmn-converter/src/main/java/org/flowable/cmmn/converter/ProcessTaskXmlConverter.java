@@ -49,6 +49,11 @@ public class ProcessTaskXmlConverter extends TaskXmlConverter {
             processTask.setFallbackToDefaultTenant(Boolean.parseBoolean(fallbackToDefaultTenantValue));
         }
 
+        String sameDeploymentValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if (sameDeploymentValue != null) {
+            processTask.setSameDeployment(Boolean.parseBoolean(sameDeploymentValue));
+        }
+
         String idVariableName = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ID_VARIABLE_NAME);
         if (StringUtils.isNotEmpty(idVariableName)) {
             processTask.setProcessInstanceIdVariableName(idVariableName);

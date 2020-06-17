@@ -21,12 +21,14 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Joram Barrez
  */
+@EventConfigurationResource("flowableChangeDetector.eventregistry.cfg.xml")
 public class DefaultEventRegistryDataChangeDetectorTest extends AbstractFlowableEventTest {
 
     @Test
     public void testExecutorServiceAndRunnableCreated() {
         assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager()).isNotNull();
-        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration()
+                .getEventRegistryChangeDetectionExecutor();
         assertThat(eventRegistryChangeDetectionExecutor).isNotNull();
         assertThat(eventRegistryChangeDetectionExecutor).isInstanceOf(DefaultEventRegistryChangeDetectionExecutor.class);
 

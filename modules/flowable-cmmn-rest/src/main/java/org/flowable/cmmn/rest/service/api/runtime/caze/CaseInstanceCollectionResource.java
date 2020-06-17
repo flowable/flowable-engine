@@ -196,6 +196,9 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             if (request.getCaseDefinitionKey() != null) {
                 caseInstanceBuilder.caseDefinitionKey(request.getCaseDefinitionKey());
             }
+            if (request.getName() != null) {
+                caseInstanceBuilder.name(request.getName());
+            }
             if (request.getBusinessKey() != null) {
                 caseInstanceBuilder.businessKey(request.getBusinessKey());
             }

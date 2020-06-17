@@ -55,6 +55,14 @@ public class HistoricTaskInstanceResponse {
     protected String caseInstanceUrl;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
+    protected String scopeDefinitionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String propagatedStageInstanceId;
+    protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
 
     public String getId() {
         return id;
@@ -251,4 +259,69 @@ public class HistoricTaskInstanceResponse {
     public void setCaseDefinitionUrl(String caseDefinitionUrl) {
         this.caseDefinitionUrl = caseDefinitionUrl;
     }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
 }

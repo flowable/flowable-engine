@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -37,6 +38,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String category;
+    protected String jobType;
+    
     protected String elementId;
     protected String elementName;
     
@@ -44,6 +48,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
 
     protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
@@ -55,13 +60,12 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
-    protected JobByteArrayRef customValuesByteArrayRef;
+    protected ByteArrayRef customValuesByteArrayRef;
 
-    protected JobByteArrayRef exceptionByteArrayRef;
+    protected ByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
 
     protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
-    protected String jobType;
 
     @Override
     public Object getPersistentState() {
@@ -72,14 +76,17 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
         persistentState.put("processDefinitionId", processDefinitionId);
+        persistentState.put("category", category);
+        persistentState.put("jobType", jobType);
         persistentState.put("elementId", elementId);
         persistentState.put("elementName", elementName);
-        
+        persistentState.put("correlationId", correlationId);
+
         if (customValuesByteArrayRef != null) {
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
 
-        if (exceptionByteArrayRef != null) {
+        if (exceptionByteArrayRef != null && exceptionByteArrayRef.getId() != null) {
             persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
 
@@ -219,6 +226,36 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    @Override
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+    
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public String getJobType() {
+        return jobType;
+    }
+
+    @Override
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+    
+    @Override
     public String getRepeat() {
         return repeat;
     }
@@ -269,7 +306,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
-    public JobByteArrayRef getCustomValuesByteArrayRef() {
+    public ByteArrayRef getCustomValuesByteArrayRef() {
         return customValuesByteArrayRef;
     }
 
@@ -281,19 +318,9 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     @Override
     public void setCustomValues(String customValues) {
         if(customValuesByteArrayRef == null) {
-            customValuesByteArrayRef = new JobByteArrayRef();
+            customValuesByteArrayRef = new ByteArrayRef();
         }
         customValuesByteArrayRef.setValue("jobCustomValues", customValues);
-    }
-
-    @Override
-    public String getJobType() {
-        return jobType;
-    }
-
-    @Override
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     @Override
@@ -314,7 +341,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
-            exceptionByteArrayRef = new JobByteArrayRef();
+            exceptionByteArrayRef = new ByteArrayRef();
         }
 
         exceptionByteArrayRef.setValue("stacktrace", exception);
@@ -331,11 +358,11 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
-    public JobByteArrayRef getExceptionByteArrayRef() {
+    public ByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }
 
-    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+    private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }

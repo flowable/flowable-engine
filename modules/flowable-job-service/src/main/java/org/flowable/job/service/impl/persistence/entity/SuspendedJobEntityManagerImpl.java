@@ -34,6 +34,11 @@ public class SuspendedJobEntityManagerImpl
     }
 
     @Override
+    public SuspendedJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
+    }
+
+    @Override
     public List<SuspendedJobEntity> findJobsByExecutionId(String id) {
         return dataManager.findJobsByExecutionId(id);
     }
@@ -65,6 +70,9 @@ public class SuspendedJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
     }
 

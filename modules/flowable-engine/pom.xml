@@ -312,7 +312,7 @@
                         <exclude>${exclude.tests2}</exclude>
                         <exclude>${exclude.tests3}</exclude>
                     </excludes>
-                    <argLine>${argLine} -Xmx3g</argLine>
+                    <argLine>${argLine} -Xmx4g</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -417,26 +417,6 @@
             <properties>
                 <skipTests>true</skipTests>
             </properties>
-        </profile>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>cleanDb</id>
@@ -863,6 +843,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -936,6 +917,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -991,6 +973,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1181,6 +1164,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1242,6 +1226,7 @@
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1286,7 +1271,10 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/ProcessInstanceMigration*Test.java</exclude>
+                                <exclude>**/CacheTaskTest.java</exclude>
                             </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

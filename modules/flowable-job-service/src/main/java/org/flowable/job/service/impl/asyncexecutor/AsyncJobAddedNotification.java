@@ -53,5 +53,14 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
     @Override
     public void closeFailure(CommandContext commandContext) {
     }
+    
+    @Override
+    public Integer order() {
+        return 10;
+    }
 
+    @Override
+    public boolean multipleAllowed() {
+        return true;
+    }
 }

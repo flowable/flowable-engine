@@ -12,11 +12,7 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +47,8 @@ public class HitPolicyAnyTest {
                 .variables(inputVariables)
                 .executeWithSingleResult();
 
-        assertEquals(10D, result.get("outputVariable1"));
-        assertEquals("result1", result.get("outputVariable2"));
+        assertThat(result.get("outputVariable1")).isEqualTo(10D);
+        assertThat(result.get("outputVariable2")).isEqualTo("result1");
     }
 
     @Test
@@ -69,10 +65,10 @@ public class HitPolicyAnyTest {
                 .variables(inputVariables)
                 .executeWithAuditTrail();
 
-        assertEquals(0, result.getDecisionResult().size());
-        assertTrue(result.isFailed());
-        assertNull(result.getValidationMessage());
-        assertNotNull(result.getExceptionMessage());
+        assertThat(result.getDecisionResult()).isEmpty();
+        assertThat(result.isFailed()).isTrue();
+        assertThat(result.getValidationMessage()).isNull();
+        assertThat(result.getExceptionMessage()).isNotNull();
     }
 
     @Test
@@ -89,16 +85,16 @@ public class HitPolicyAnyTest {
                 .variables(inputVariables)
                 .executeWithAuditTrail();
 
-        assertEquals(0, result.getDecisionResult().size());
-        assertTrue(result.isFailed());
+        assertThat(result.getDecisionResult()).isEmpty();
+        assertThat(result.isFailed()).isTrue();
 
-        assertNotNull(result.getExceptionMessage());
-        assertNotNull(result.getRuleExecutions().get(1).getExceptionMessage());
-        assertNotNull(result.getRuleExecutions().get(3).getExceptionMessage());
+        assertThat(result.getExceptionMessage()).isNotNull();
+        assertThat(result.getRuleExecutions().get(1).getExceptionMessage()).isNotNull();
+        assertThat(result.getRuleExecutions().get(3).getExceptionMessage()).isNotNull();
 
-        assertNull(result.getValidationMessage());
-        assertNull(result.getRuleExecutions().get(1).getValidationMessage());
-        assertNull(result.getRuleExecutions().get(3).getValidationMessage());
+        assertThat(result.getValidationMessage()).isNull();
+        assertThat(result.getRuleExecutions().get(1).getValidationMessage()).isNull();
+        assertThat(result.getRuleExecutions().get(3).getValidationMessage()).isNull();
     }
 
     @Test
@@ -118,18 +114,18 @@ public class HitPolicyAnyTest {
                 .executeWithAuditTrail();
 
         Map<String, Object> outputMap = result.getDecisionResult().iterator().next();
-        assertEquals(2, outputMap.keySet().size());
-        assertEquals(10D, outputMap.get("outputVariable1"));
-        assertEquals("result2", outputMap.get("outputVariable2"));
-        assertFalse(result.isFailed());
+        assertThat(outputMap.keySet()).hasSize(2);
+        assertThat(outputMap.get("outputVariable1")).isEqualTo(10D);
+        assertThat(outputMap.get("outputVariable2")).isEqualTo("result2");
+        assertThat(result.isFailed()).isFalse();
 
-        assertNull(result.getExceptionMessage());
-        assertNull(result.getRuleExecutions().get(1).getExceptionMessage());
-        assertNull(result.getRuleExecutions().get(3).getExceptionMessage());
+        assertThat(result.getExceptionMessage()).isNull();
+        assertThat(result.getRuleExecutions().get(1).getExceptionMessage()).isNull();
+        assertThat(result.getRuleExecutions().get(3).getExceptionMessage()).isNull();
 
-        assertNotNull(result.getValidationMessage());
-        assertNotNull(result.getRuleExecutions().get(1).getValidationMessage());
-        assertNotNull(result.getRuleExecutions().get(3).getValidationMessage());
+        assertThat(result.getValidationMessage()).isNotNull();
+        assertThat(result.getRuleExecutions().get(1).getValidationMessage()).isNotNull();
+        assertThat(result.getRuleExecutions().get(3).getValidationMessage()).isNotNull();
 
         // re enable strict mode
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);

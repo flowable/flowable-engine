@@ -1,24 +1,26 @@
 ---
 swagger: "2.0"
 info:
-  description: "# flowable / flow??b(??)l /\n\n- a compact and highly efficient workflow\
-    \ and Business Process Management (BPM) platform for developers, system admins\
-    \ and business users.\n- a lightning fast, tried and tested BPMN 2 process engine\
-    \ written in Java. It is Apache 2.0 licensed open source, with a committed community.\n\
-    - can run embedded in a Java application, or as a service on a server, a cluster,\
-    \ and in the cloud. It integrates perfectly with Spring. With a rich Java and\
-    \ REST API, it is the ideal engine for orchestrating human or system activities."
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
   version: "v1"
-  title: "Flowable Process REST API"
+  title: "Flowable REST API"
   contact:
     name: "Flowable"
     url: "http://www.flowable.org/"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:8080"
 basePath: "/flowable-rest/service"
 tags:
+- name: "Batch parts"
+- name: "Batches"
 - name: "Database tables"
 - name: "Deployment"
 - name: "Engine"
@@ -26,22 +28,23 @@ tags:
 - name: "Executions"
 - name: "Forms"
 - name: "Groups"
+- name: "Historic Task Log Entries"
 - name: "History"
 - name: "History Process"
 - name: "History Task"
 - name: "Jobs"
 - name: "Models"
 - name: "Process Definitions"
-- name: "Process Instances"
 - name: "Process Instance Identity Links"
 - name: "Process Instance Variables"
+- name: "Process Instances"
 - name: "Query"
 - name: "Runtime"
-- name: "Tasks"
 - name: "Task Attachments"
 - name: "Task Comments"
 - name: "Task Identity Links"
 - name: "Task Variables"
+- name: "Tasks"
 - name: "Users"
 schemes:
 - "http"
@@ -284,6 +287,22 @@ paths:
         description: "An id of the historic process instance."
         required: false
         type: "string"
+      - name: "processInstanceName"
+        in: "query"
+        description: "A name of the historic process instance."
+        required: false
+        type: "string"
+      - name: "processInstanceNameLike"
+        in: "query"
+        description: "A name of the historic process instance used in a like query."
+        required: false
+        type: "string"
+      - name: "processInstanceNameLikeIgnoreCase"
+        in: "query"
+        description: "A name of the historic process instance used in a like query\
+          \ ignoring case."
+        required: false
+        type: "string"
       - name: "processDefinitionKey"
         in: "query"
         description: "The process definition key of the historic process instance."
@@ -294,9 +313,34 @@ paths:
         description: "The process definition id of the historic process instance."
         required: false
         type: "string"
+      - name: "processDefinitionName"
+        in: "query"
+        description: "The process definition name of the historic process instance."
+        required: false
+        type: "string"
+      - name: "processDefinitionCategory"
+        in: "query"
+        description: "The process definition category of the historic process instance."
+        required: false
+        type: "string"
+      - name: "processDefinitionVersion"
+        in: "query"
+        description: "The process definition version of the historic process instance."
+        required: false
+        type: "string"
+      - name: "deploymentId"
+        in: "query"
+        description: "The deployment id of the historic process instance."
+        required: false
+        type: "string"
       - name: "businessKey"
         in: "query"
         description: "The business key of the historic process instance."
+        required: false
+        type: "string"
+      - name: "businessKeyLike"
+        in: "query"
+        description: "Only return instances with a businessKey like this key."
         required: false
         type: "string"
       - name: "involvedUser"
@@ -359,6 +403,16 @@ paths:
           \ be returned as well."
         required: false
         type: "boolean"
+      - name: "callbackId"
+        in: "query"
+        description: "Only return instances with the given callbackId."
+        required: false
+        type: "string"
+      - name: "callbackType"
+        in: "query"
+        description: "Only return instances with the given callbackType."
+        required: false
+        type: "string"
       - name: "tenantId"
         in: "query"
         description: "Only return instances with the given tenantId."
@@ -514,8 +568,8 @@ paths:
             $ref: "#/definitions/CommentResponse"
         404:
           description: "Indicates the requested historic process instance was not\
-            \ found or the historic process instance does not have a comment with the\
-            \ given ID."
+            \ found or the historic process instance does not have a comment with\
+            \ the given ID."
       security:
       - basicAuth: []
     delete:
@@ -539,8 +593,8 @@ paths:
             \ and the comment is deleted. Response body is left empty intentionally."
         404:
           description: "Indicates the requested historic process instance was not\
-            \ found or the historic process instance does not have a comment with the\
-            \ given ID."
+            \ found or the historic process instance does not have a comment with\
+            \ the given ID."
       security:
       - basicAuth: []
   /history/historic-process-instances/{processInstanceId}/identitylinks:
@@ -625,6 +679,12 @@ paths:
         description: "The process instance id of the historic task instance."
         required: false
         type: "string"
+      - name: "processInstanceIdWithChildren"
+        in: "query"
+        description: "Selects the historic task instances for the process instance\
+          \ and its children."
+        required: false
+        type: "string"
       - name: "processDefinitionKey"
         in: "query"
         description: "The process definition key of the historic task instance."
@@ -669,6 +729,11 @@ paths:
         required: false
         type: "string"
       - name: "taskDefinitionKey"
+        in: "query"
+        description: "The task definition key for tasks part of a process"
+        required: false
+        type: "string"
+      - name: "taskDefinitionKeys"
         in: "query"
         description: "The task definition key for tasks part of a process"
         required: false
@@ -839,6 +904,21 @@ paths:
           \ should be returned as well."
         required: false
         type: "boolean"
+      - name: "scopeDefinitionId"
+        in: "query"
+        description: "Only return historic task instances with the given scopeDefinitionId."
+        required: false
+        type: "string"
+      - name: "scopeId"
+        in: "query"
+        description: "Only return historic task instances with the given scopeId."
+        required: false
+        type: "string"
+      - name: "scopeType"
+        in: "query"
+        description: "Only return historic task instances with the given scopeType."
+        required: false
+        type: "string"
       - name: "tenantId"
         in: "query"
         description: "Only return historic task instances with the given tenantId."
@@ -907,6 +987,29 @@ paths:
           description: "Indicates that the historic task instance could not be found."
       security:
       - basicAuth: []
+  /history/historic-task-instances/{taskId}/form:
+    get:
+      tags:
+      - "History Task"
+      summary: "Get a historic task instance form"
+      description: ""
+      operationId: "getHistoricTaskForm"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the task form is returned"
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the requested task was not found."
+      security:
+      - basicAuth: []
   /history/historic-task-instances/{taskId}/identitylinks:
     get:
       tags:
@@ -971,6 +1074,98 @@ paths:
             \ process instance does not have a variable with the given name or the\
             \ variable does not have a binary stream available. Status message provides\
             \ additional information."
+      security:
+      - basicAuth: []
+  /history/historic-task-log-entries:
+    get:
+      tags:
+      - "History Task"
+      summary: "List historic task log entries"
+      description: ""
+      operationId: "getHistoricTaskLogEntries"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "query"
+        description: "An id of the historic task instance."
+        required: false
+        type: "string"
+      - name: "type"
+        in: "query"
+        description: "The type of the log entry."
+        required: false
+        type: "string"
+      - name: "userId"
+        in: "query"
+        description: "The user who produced the task change."
+        required: false
+        type: "string"
+      - name: "processInstanceId"
+        in: "query"
+        description: "The process instance id of the historic task log entry."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "The process definition id of the historic task log entry."
+        required: false
+        type: "string"
+      - name: "scopeId"
+        in: "query"
+        description: "Only return historic task log entries with the given scopeId."
+        required: false
+        type: "string"
+      - name: "scopeDefinitionId"
+        in: "query"
+        description: "Only return historic task log entries with the given scopeDefinitionId."
+        required: false
+        type: "string"
+      - name: "subScopeId"
+        in: "query"
+        description: "Only return historic task log entries with the given subScopeId"
+        required: false
+        type: "string"
+      - name: "scopeType"
+        in: "query"
+        description: "Only return historic task log entries with the given scopeType."
+        required: false
+        type: "string"
+      - name: "from"
+        in: "query"
+        description: "Return task log entries starting from a date."
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "to"
+        in: "query"
+        description: "Return task log entries up to a date."
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return historic task log entries with the given tenantId."
+        required: false
+        type: "string"
+      - name: "fromLogNumber"
+        in: "query"
+        description: "Return task log entries starting from a log number"
+        required: false
+        type: "string"
+      - name: "toLogNumber"
+        in: "query"
+        description: "Return task log entries up to specific a log number"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates that historic task log entries could be queried."
+          schema:
+            $ref: "#/definitions/DataResponseHistoricTaskLogEntryResponse"
+        404:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
       security:
       - basicAuth: []
   /history/historic-variable-instances:
@@ -1294,6 +1489,11 @@ paths:
         description: "Only return users with the given lastname"
         required: false
         type: "string"
+      - name: "displayName"
+        in: "query"
+        description: "Only return users with the given displayName"
+        required: false
+        type: "string"
       - name: "email"
         in: "query"
         description: "Only return users with the given email"
@@ -1301,13 +1501,19 @@ paths:
         type: "string"
       - name: "firstNameLike"
         in: "query"
-        description: "Only return users with a firstname like the given value. Use\
+        description: "Only return userswith a firstname like the given value. Use\
           \ % as wildcard-character."
         required: false
         type: "string"
       - name: "lastNameLike"
         in: "query"
         description: "Only return users with a lastname like the given value. Use\
+          \ % as wildcard-character."
+        required: false
+        type: "string"
+      - name: "displayNameLike"
+        in: "query"
+        description: "Only return users with a displayName like the given value. Use\
           \ % as wildcard-character."
         required: false
         type: "string"
@@ -1320,6 +1526,11 @@ paths:
       - name: "memberOfGroup"
         in: "query"
         description: "Only return users which are a member of the given group."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return users which are a members of the given tenant."
         required: false
         type: "string"
       - name: "potentialStarter"
@@ -1338,6 +1549,7 @@ paths:
         - "firstName"
         - "lastname"
         - "email"
+        - "displayName"
       responses:
         200:
           description: "Indicates the group exists and is returned."
@@ -1450,7 +1662,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "List user's info"
+      summary: "List user’s info"
       description: ""
       operationId: "listUserInfo"
       produces:
@@ -1475,7 +1687,7 @@ paths:
     post:
       tags:
       - "Users"
-      summary: "Create a new user's info entry"
+      summary: "Create a new user’s info entry"
       description: ""
       operationId: "createUserInfo"
       produces:
@@ -1511,7 +1723,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "Get a user's info"
+      summary: "Get a user’s info"
       description: ""
       operationId: "getUserInfo"
       produces:
@@ -1532,15 +1744,15 @@ paths:
           schema:
             $ref: "#/definitions/UserInfoResponse"
         404:
-          description: "Indicates the requested user was not found or the user does not\
-            have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does\
+            \ ot have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
     put:
       tags:
       - "Users"
-      summary: "Update a user's info"
+      summary: "Update a user’s info"
       description: ""
       operationId: "updateUserInfo"
       produces:
@@ -1567,15 +1779,15 @@ paths:
         400:
           description: "Indicates the value was missing from the request body."
         404:
-          description: "Indicates the requested user was not found or the user does not\
-            have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does\
+            \ not have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
     delete:
       tags:
       - "Users"
-      summary: "Delete a user's info"
+      summary: "Delete a user’s info"
       description: ""
       operationId: "deleteUserInfo"
       parameters:
@@ -1592,8 +1804,8 @@ paths:
           description: "Indicates the user was found and the info for the given key\
             \ has been deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested user was not found or the user does not\
-            have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does\
+            \ not have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -1601,9 +1813,9 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "Get a user's picture"
+      summary: "Get a user’s picture"
       description: "The response body contains the raw picture data, representing\
-        \ the user's picture. The Content-type of the response corresponds to the\
+        \ the user’s picture. The Content-type of the response corresponds to the\
         \ mimeType that was set when creating the picture."
       operationId: "getUserPicture"
       parameters:
@@ -1629,7 +1841,7 @@ paths:
     put:
       tags:
       - "Users"
-      summary: "Updating a user's picture"
+      summary: "Updating a user’s picture"
       description: "The request should be of type multipart/form-data. There should\
         \ be a single file-part included with the binary value of the picture. On\
         \ top of that, the following additional form-fields can be present:\n\nmimeType:\
@@ -1654,6 +1866,237 @@ paths:
             \ The response-body is left empty intentionally."
         404:
           description: "Indicates the requested user was not found."
+      security:
+      - basicAuth: []
+  /management/batch-parts/{batchPartId}:
+    get:
+      tags:
+      - "Batch parts"
+      summary: "Get a single batch part"
+      description: ""
+      operationId: "getBatchPart"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "batchPartId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the batch part exists and is returned."
+          schema:
+            $ref: "#/definitions/BatchPartResponse"
+        404:
+          description: "Indicates the requested batch part does not exist."
+      security:
+      - basicAuth: []
+  /management/batch-parts/{batchPartId}/batch-part-document:
+    get:
+      tags:
+      - "Batches"
+      summary: "Get the batch part document"
+      description: ""
+      operationId: "getBatchPartDocument"
+      parameters:
+      - name: "batchPartId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the requested batch part was found and the batch\
+            \ part document has been returned. The response contains the raw batch\
+            \ part document and always has a Content-type of application/json."
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the requested batch part was not found or the job\
+            \ does not have a batch part document. Status-description contains additional\
+            \ information about the error."
+      security:
+      - basicAuth: []
+  /management/batches:
+    get:
+      tags:
+      - "Batches"
+      summary: "List batches"
+      description: ""
+      operationId: "listBatches"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return batch with the given id"
+        required: false
+        type: "string"
+      - name: "batchType"
+        in: "query"
+        description: "Only return batches for the given type"
+        required: false
+        type: "string"
+      - name: "searchKey"
+        in: "query"
+        description: "Only return batches for the given search key"
+        required: false
+        type: "string"
+      - name: "searchKey2"
+        in: "query"
+        description: "Only return batches for the given search key2"
+        required: false
+        type: "string"
+      - name: "createTimeBefore"
+        in: "query"
+        description: "Only return batches created before the given date"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "createTimeAfter"
+        in: "query"
+        description: "Only batches batches created after the given date"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "completeTimeBefore"
+        in: "query"
+        description: "Only return batches completed before the given date"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "completeTimeAfter"
+        in: "query"
+        description: "Only batches batches completed after the given date"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "status"
+        in: "query"
+        description: "Only return batches for the given status"
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return batches for the given tenant id"
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return batches like given search key"
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns batches without a tenantId set. If false,\
+          \ the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Indicates the requested batches were returned."
+          schema:
+            $ref: "#/definitions/DataResponseBatchResponse"
+        400:
+          description: "Indicates an illegal value has been used in a url query parameter.\
+            \ Status description contains additional details about the error."
+      security:
+      - basicAuth: []
+  /management/batches/{batchId}:
+    get:
+      tags:
+      - "Batches"
+      summary: "Get a single batch"
+      description: ""
+      operationId: "getBatch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "batchId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the batch exists and is returned."
+          schema:
+            $ref: "#/definitions/BatchResponse"
+        404:
+          description: "Indicates the requested batch does not exist."
+      security:
+      - basicAuth: []
+    delete:
+      tags:
+      - "Batches"
+      summary: "Delete a batch"
+      description: ""
+      operationId: "deleteBatch"
+      parameters:
+      - name: "batchId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the batch was found and has been deleted. Response-body\
+            \ is intentionally empty."
+        404:
+          description: "Indicates the requested batch was not found."
+      security:
+      - basicAuth: []
+  /management/batches/{batchId}/batch-document:
+    get:
+      tags:
+      - "Batches"
+      summary: "Get the batch document"
+      description: ""
+      operationId: "getBatchDocument"
+      parameters:
+      - name: "batchId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the requested batch was found and the batch document\
+            \ has been returned. The response contains the raw batch document and\
+            \ always has a Content-type of application/json."
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the requested batch was not found or the job does\
+            \ not have a batch document. Status-description contains additional information\
+            \ about the error."
+      security:
+      - basicAuth: []
+  /management/batches/{batchId}/batch-parts:
+    get:
+      tags:
+      - "Batches"
+      summary: "List batch parts"
+      description: ""
+      operationId: "listBatchesPart"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "batchId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "status"
+        in: "query"
+        description: "Only return batch parts for the given status"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the requested batch parts were returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BatchPartResponse"
+        400:
+          description: "Indicates an illegal value has been used in a url query parameter.\
+            \ Status description contains additional details about the error."
       security:
       - basicAuth: []
   /management/deadletter-jobs:
@@ -1686,6 +2129,22 @@ paths:
         description: "Only return jobs with the given process definition id"
         required: false
         type: "string"
+      - name: "elementId"
+        in: "query"
+        description: "Only return jobs with the given element id"
+        required: false
+        type: "string"
+      - name: "elementName"
+        in: "query"
+        description: "Only return jobs with the given element name"
+        required: false
+        type: "string"
+      - name: "executable"
+        in: "query"
+        description: "If true, only return jobs which are executable. If false, this\
+          \ parameter is ignored."
+        required: false
+        type: "boolean"
       - name: "timersOnly"
         in: "query"
         description: "If true, only return jobs which are timers. If false, this parameter\
@@ -1864,8 +2323,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job does not\
-            have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does\
+            \ not have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -1914,6 +2373,16 @@ paths:
       - name: "processDefinitionId"
         in: "query"
         description: "Only return jobs with the given process definition id"
+        required: false
+        type: "string"
+      - name: "elementId"
+        in: "query"
+        description: "Only return jobs with the given element id"
+        required: false
+        type: "string"
+      - name: "elementName"
+        in: "query"
+        description: "Only return jobs with the given element name"
         required: false
         type: "string"
       - name: "timersOnly"
@@ -2094,8 +2563,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job does not\
-            have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does\
+            \ not have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -2148,6 +2617,22 @@ paths:
         description: "Only return jobs with the given process definition id"
         required: false
         type: "string"
+      - name: "elementId"
+        in: "query"
+        description: "Only return jobs with the given element id"
+        required: false
+        type: "string"
+      - name: "elementName"
+        in: "query"
+        description: "Only return jobs with the given element name"
+        required: false
+        type: "string"
+      - name: "executable"
+        in: "query"
+        description: "If true, only return jobs which are executable. If false, this\
+          \ parameter is ignored."
+        required: false
+        type: "boolean"
       - name: "timersOnly"
         in: "query"
         description: "If true, only return jobs which are timers. If false, this parameter\
@@ -2298,8 +2783,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job does not\
-            have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does\
+            \ not have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -2406,7 +2891,7 @@ paths:
         200:
           description: "Indicates the table exists and the table row data is returned"
           schema:
-            $ref: "#/definitions/DataResponse"
+            $ref: "#/definitions/DataResponseListMapStringObject"
         404:
           description: "Indicates the requested table does not exist."
       security:
@@ -2441,6 +2926,22 @@ paths:
         description: "Only return jobs with the given process definition id"
         required: false
         type: "string"
+      - name: "elementId"
+        in: "query"
+        description: "Only return jobs with the given element id"
+        required: false
+        type: "string"
+      - name: "elementName"
+        in: "query"
+        description: "Only return jobs with the given element name"
+        required: false
+        type: "string"
+      - name: "executable"
+        in: "query"
+        description: "If true, only return jobs which are executable. If false, this\
+          \ parameter is ignored."
+        required: false
+        type: "boolean"
       - name: "timersOnly"
         in: "query"
         description: "If true, only return jobs which are timers. If false, this parameter\
@@ -2619,9 +3120,262 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job does not\
-            have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does\
+            \ not have an exception stacktrace. Status-description contains additional\
             \ information about the error."
+      security:
+      - basicAuth: []
+  /query/executions:
+    post:
+      tags:
+      - "Executions"
+      - "Query"
+      summary: "Query executions"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List executions URL query. On top of these, it’s possible to\
+        \ provide an array of variables and processInstanceVariables to include in\
+        \ the query, with their format described here.\n\nThe general paging and sorting\
+        \ query-parameters can be used for this URL."
+      operationId: "queryExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned."
+          schema:
+            $ref: "#/definitions/DataResponseExecutionResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-activity-instances:
+    post:
+      tags:
+      - "History"
+      - "Query"
+      summary: "Query for historic activity instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic task instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri’s that\
+        \ are too long."
+      operationId: "queryActivityInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricActivityInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the activities are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricActivityInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information"
+      security:
+      - basicAuth: []
+  /query/historic-detail:
+    post:
+      tags:
+      - "History"
+      - "Query"
+      summary: "Query for historic details"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri’s that\
+        \ are too long."
+      operationId: "queryHistoricDetail"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricDetailQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the historic details\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricDetailResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-process-instances:
+    post:
+      tags:
+      - "History Process"
+      - "Query"
+      summary: "Query for historic process instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri’s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The variables property is a JSON-array containing objects with\
+        \ the format as described here."
+      operationId: "queryHistoricProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricProcessInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-task-instances:
+    post:
+      tags:
+      - "History Task"
+      - "Query"
+      summary: "Query for historic task instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic task instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri’s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The taskVariables and processVariables properties are JSON-arrays\
+        \ containing objects with the format as described here."
+      operationId: "queryHistoricTaskInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricTaskInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricTaskInstanceResponse"
+        404:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-variable-instances:
+    post:
+      tags:
+      - "History"
+      - "Query"
+      summary: "Query for historic variable instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri’s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The variables property is a JSON-array containing objects with\
+        \ the format as described here."
+      operationId: "queryVariableInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricVariableInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricVariableInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/process-instances:
+    post:
+      tags:
+      - "Process Instances"
+      - "Query"
+      summary: "Query process instances"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List process instances URL query. On top of these, it’s possible\
+        \ to provide an array of variables to include in the query, with their format\
+        \ described here.\n\nThe general paging and sorting query-parameters can be\
+        \ used for this URL."
+      operationId: "queryProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseProcessInstanceResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/tasks:
+    post:
+      tags:
+      - "Tasks"
+      - "Query"
+      summary: "Query for tasks"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of tasks (except for candidateGroupIn\
+        \ which is only available in this POST task query REST service), but passed\
+        \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
+        \ querying and preventing errors with request-uri’s that are too long. On\
+        \ top of that, the query allows for filtering based on task and process variables.\
+        \ The taskVariables and processInstanceVariables are both JSON-arrays containing\
+        \ objects with the format as described here."
+      operationId: "queryTasks"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned."
+          schema:
+            $ref: "#/definitions/DataResponseTaskResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ delegationState has an invalid value (other than pending and resolved).\
+            \ The status-message contains additional information."
       security:
       - basicAuth: []
   /repository/deployments:
@@ -2651,7 +3405,18 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return deployments which don?t have the given category."
+        description: "Only return deployments which do not have the given category."
+        required: false
+        type: "string"
+      - name: "parentDeploymentId"
+        in: "query"
+        description: "Only return deployments with the given parent deployment id."
+        required: false
+        type: "string"
+      - name: "parentDeploymentIdLike"
+        in: "query"
+        description: "Only return deployments with a parent deployment id like the\
+          \ given value."
         required: false
         type: "string"
       - name: "tenantId"
@@ -2901,7 +3666,7 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return models which don?t have the given category."
+        description: "Only return models which do not have the given category."
         required: false
         type: "string"
       - name: "name"
@@ -3085,7 +3850,7 @@ paths:
       tags:
       - "Models"
       summary: "Get the editor source for a model"
-      description: "Response body contains the model?s raw editor source. The response?\
+      description: "Response body contains the model’s raw editor source. The response’\
         s content-type is set to application/octet-stream, regardless of the content\
         \ of the source."
       operationId: "getModelBytes"
@@ -3110,7 +3875,7 @@ paths:
       tags:
       - "Models"
       summary: "Set the editor source for a model"
-      description: "Response body contains the model?s raw editor source. The response?\
+      description: "Response body contains the model’s raw editor source. The response’\
         s content-type is set to application/octet-stream, regardless of the content\
         \ of the source."
       operationId: "setModelSource"
@@ -3137,7 +3902,7 @@ paths:
       tags:
       - "Models"
       summary: "Get the extra editor source for a model"
-      description: "Response body contains the model?s raw editor source. The response?\
+      description: "Response body contains the model’s raw editor source. The response’\
         s content-type is set to application/octet-stream, regardless of the content\
         \ of the source."
       operationId: "getExtraEditorSource"
@@ -3162,7 +3927,7 @@ paths:
       tags:
       - "Models"
       summary: "Set the extra editor source for a model"
-      description: "Response body contains the model?s raw editor source. The response?\
+      description: "Response body contains the model’s raw editor source. The response’\
         s content-type is set to application/octet-stream, regardless of the content\
         \ of the source."
       operationId: "setExtraEditorSource"
@@ -3244,7 +4009,8 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return process definitions which don?t have the given category."
+        description: "Only return process definitions which do not have the given\
+          \ category."
         required: false
         type: "string"
       - name: "deploymentId"
@@ -3354,6 +4120,33 @@ paths:
             \ or active."
       security:
       - basicAuth: []
+  /repository/process-definitions/{processDefinitionId}/batch-migrate:
+    post:
+      tags:
+      - "Process Definitions"
+      summary: "Batch migrate all instances of process definition"
+      description: ""
+      operationId: "batchMigrateInstancesOfProcessDefinition"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "Indicates process instances were found and batch migration\
+            \ was started."
+        404:
+          description: "Indicates the requested process definition was not found."
+      security:
+      - basicAuth: []
   /repository/process-definitions/{processDefinitionId}/decision-tables:
     get:
       tags:
@@ -3401,7 +4194,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/FormDefinition"
+              $ref: "#/definitions/FormDefinitionResponse"
         404:
           description: "Indicates the requested process definition was not found."
       security:
@@ -3436,7 +4229,7 @@ paths:
       tags:
       - "Process Definitions"
       summary: "Add a candidate starter to a process definition"
-      description: "It's possible to add either a user or a group."
+      description: "It is possible to add either a user or a group."
       operationId: "createIdentityLink"
       produces:
       - "application/json"
@@ -3534,6 +4327,8 @@ paths:
       summary: "Get a process definition image"
       description: ""
       operationId: "getModelResource"
+      produces:
+      - "image/png"
       parameters:
       - name: "processDefinitionId"
         in: "path"
@@ -3548,6 +4343,32 @@ paths:
             items:
               type: "string"
               format: "byte"
+        404:
+          description: "Indicates the requested process definition was not found."
+      security:
+      - basicAuth: []
+  /repository/process-definitions/{processDefinitionId}/migrate:
+    post:
+      tags:
+      - "Process Definitions"
+      summary: "Migrate all instances of process definition"
+      description: ""
+      operationId: "migrateInstancesOfProcessDefinition"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "Indicates process instances were found and migration was executed."
         404:
           description: "Indicates the requested process definition was not found."
       security:
@@ -3603,6 +4424,30 @@ paths:
             \ The status-description contains additional information."
       security:
       - basicAuth: []
+  /repository/process-definitions/{processDefinitionId}/start-form:
+    get:
+      tags:
+      - "Process Definitions"
+      summary: "Get a process definition start form"
+      description: ""
+      operationId: "getProcessDefinitionStartForm"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the process definition\
+            \ form is returned"
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the requested process definition was not found."
+      security:
+      - basicAuth: []
   /runtime/event-subscriptions:
     get:
       tags:
@@ -3647,6 +4492,18 @@ paths:
       - name: "processDefinitionId"
         in: "query"
         description: "Only return event subscriptions with the given process definition\
+          \ id"
+        required: false
+        type: "string"
+      - name: "scopeId"
+        in: "query"
+        description: "Only return event subscriptions part of a scope with the given\
+          \ id"
+        required: false
+        type: "string"
+      - name: "scopeDefinitionId"
+        in: "query"
+        description: "Only return event subscriptions with the given scope definition\
           \ id"
         required: false
         type: "string"
@@ -3910,6 +4767,32 @@ paths:
           description: "Indicates the execution was not found."
       security:
       - basicAuth: []
+  /runtime/executions/{executionId}/change-state:
+    post:
+      tags:
+      - "Executions"
+      summary: "Change the state of an execution"
+      description: ""
+      operationId: "changeExecutionActivityState"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionChangeActivityStateRequest"
+      responses:
+        200:
+          description: "Indicates the execution was found and the action is performed."
+        404:
+          description: "Indicates the execution was not found."
+      security:
+      - basicAuth: []
   /runtime/executions/{executionId}/variables:
     get:
       tags:
@@ -3943,10 +4826,15 @@ paths:
       tags:
       - "Executions"
       summary: "Create variables on an execution"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (array of RestVariable) or by passing a multipart/form-data Object.\nAny number of variables can be passed into the request body array.\nNB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (array\
+        \ of RestVariable) or by passing a multipart/form-data Object.\nAny number\
+        \ of variables can be passed into the request body array.\nNB: Swagger V2\
+        \ specification does not support this use case that is why this endpoint might\
+        \ be buggy/incomplete if used with other tools."
       operationId: "createExecutionVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -3959,7 +4847,30 @@ paths:
         description: "Update a task variable"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ExecutionVariableCollectionResource"
+      - name: "name"
+        in: "formData"
+        description: "Required name of the variable"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        description: "Type of variable that is updated. If omitted, reverts to raw\
+          \ JSON-value type (string, boolean, integer or double)"
+        required: false
+        type: "string"
+        x-example: "integer"
+      - name: "scope"
+        in: "formData"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable.."
+        required: false
+        type: "string"
+        x-example: "local"
       responses:
         200:
           description: "successful operation"
@@ -3982,10 +4893,15 @@ paths:
       tags:
       - "Executions"
       summary: "Update variables on an execution"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body of RestVariable) or by passing a multipart/form-data Object.\n Any number of variables can be passed into the request body array.\n NB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (array\
+        \ of RestVariable) or by passing a multipart/form-data Object.\nAny number\
+        \ of variables can be passed into the request body array.\nNB: Swagger V2\
+        \ specification does not support this use case that is why this endpoint might\
+        \ be buggy/incomplete if used with other tools."
       operationId: "createOrUpdateExecutionVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -3998,7 +4914,30 @@ paths:
         description: "Update a task variable"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ExecutionVariableCollectionResource"
+      - name: "name"
+        in: "formData"
+        description: "Required name of the variable"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        description: "Type of variable that is updated. If omitted, reverts to raw\
+          \ JSON-value type (string, boolean, integer or double)"
+        required: false
+        type: "string"
+        x-example: "integer"
+      - name: "scope"
+        in: "formData"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable.."
+        required: false
+        type: "string"
+        x-example: "local"
       responses:
         200:
           description: "successful operation"
@@ -4068,8 +5007,8 @@ paths:
         404:
           description: "Indicates the requested execution was not found or the execution\
             \ does not have a variable with the given name in the requested scope\
-            \ (in case scope-query parameter was omitted, variable does not exist in\
-            \ local and global scope). Status description contains additional information\
+            \ (in case scope-query parameter was omitted, variable does not exist\
+            \ in local and global scope). Status description contains additional information\
             \ about the error."
       security:
       - basicAuth: []
@@ -4077,10 +5016,14 @@ paths:
       tags:
       - "Executions"
       summary: "Update a variable on an execution"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\nNB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable)\
+        \ or by passing a multipart/form-data Object.\nNB: Swagger V2 specification\
+        \ does not support this use case that is why this endpoint might be buggy/incomplete\
+        \ if used with other tools."
       operationId: "updateExecutionVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -4097,7 +5040,26 @@ paths:
         description: "Update a variable on an execution"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ExecutionVariableResource"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "intProcVar"
+      - name: "type"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "integer"
+      - name: "scope"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "global"
       responses:
         200:
           description: "Indicates both the process instance and variable were found\
@@ -4189,6 +5151,21 @@ paths:
         description: "Only return models with the given version."
         required: false
         type: "string"
+      - name: "name"
+        in: "query"
+        description: "Only return models with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return models like the given name."
+        required: false
+        type: "string"
+      - name: "nameLikeIgnoreCase"
+        in: "query"
+        description: "Only return models like the given name ignoring case."
+        required: false
+        type: "string"
       - name: "processDefinitionKey"
         in: "query"
         description: "Only return process instances with the given process definition\
@@ -4201,11 +5178,52 @@ paths:
           \ id."
         required: false
         type: "string"
+      - name: "processDefinitionCategory"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ category."
+        required: false
+        type: "string"
+      - name: "processDefinitionVersion"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ version."
+        required: false
+        type: "integer"
+      - name: "processDefinitionEngineVersion"
+        in: "query"
+        description: "Only return process instances with the given process definition\
+          \ engine version."
+        required: false
+        type: "string"
       - name: "businessKey"
         in: "query"
         description: "Only return process instances with the given businessKey."
         required: false
         type: "string"
+      - name: "businessKeyLike"
+        in: "query"
+        description: "Only return process instances with the businessKey like the\
+          \ given key."
+        required: false
+        type: "string"
+      - name: "startedBy"
+        in: "query"
+        description: "Only return process instances started by the given user."
+        required: false
+        type: "string"
+      - name: "startedBefore"
+        in: "query"
+        description: "Only return process instances started before the given date."
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "startedAfter"
+        in: "query"
+        description: "Only return process instances started after the given date."
+        required: false
+        type: "string"
+        format: "date-time"
       - name: "involvedUser"
         in: "query"
         description: "Only return process instances in which the given user is involved."
@@ -4239,6 +5257,16 @@ paths:
         description: "Indication to include process variables in the result."
         required: false
         type: "boolean"
+      - name: "callbackId"
+        in: "query"
+        description: "Only return process instances with the given callbackId."
+        required: false
+        type: "string"
+      - name: "callbackType"
+        in: "query"
+        description: "Only return process instances with the given callbackType."
+        required: false
+        type: "string"
       - name: "tenantId"
         in: "query"
         description: "Only return process instances with the given tenantId."
@@ -4408,7 +5436,7 @@ paths:
         name: "body"
         required: false
         schema:
-          $ref: "#/definitions/ProcessInstanceChangeActivityStateRequest"
+          $ref: "#/definitions/ExecutionChangeActivityStateRequest"
       responses:
         200:
           description: "Indicates the process instance was found and change state\
@@ -4449,13 +5477,38 @@ paths:
           description: "Indicates the requested process instance was not found."
       security:
       - basicAuth: []
+  /runtime/process-instances/{processInstanceId}/evaluate-conditions:
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Evaluate the conditions of a process instance"
+      description: ""
+      operationId: "evaluateConditions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and the evaluation\
+            \ of the conditions was executed."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the requested process instance action cannot be\
+            \ executed since the process-instance is already activated/suspended."
+      security:
+      - basicAuth: []
   /runtime/process-instances/{processInstanceId}/identitylinks:
     get:
       tags:
       - "Process Instance Identity Links"
       summary: "Get involved people for process instance"
       description: "Note that the groupId in Response Body will always be null, as\
-        \ it?s only possible to involve users with a process-instance."
+        \ it’s only possible to involve users with a process-instance."
       operationId: "listProcessInstanceIdentityLinks"
       produces:
       - "application/json"
@@ -4480,7 +5533,7 @@ paths:
       - "Process Instance Identity Links"
       summary: "Add an involved user to a process instance"
       description: "Note that the groupId in Response Body will always be null, as\
-        \ it?s only possible to involve users with a process-instance."
+        \ it’s only possible to involve users with a process-instance."
       operationId: "createProcessInstanceIdentityLinks"
       produces:
       - "application/json"
@@ -4571,13 +5624,73 @@ paths:
             \ information about the error."
       security:
       - basicAuth: []
+  /runtime/process-instances/{processInstanceId}/inject:
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Inject activity in a process instance"
+      description: ""
+      operationId: "injectActivityInProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/InjectActivityRequest"
+      responses:
+        200:
+          description: "Indicates the process instance was updated and the activity\
+            \ injection was executed."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the requested process instance action cannot be\
+            \ executed since the process-instance is already activated/suspended."
+      security:
+      - basicAuth: []
+  /runtime/process-instances/{processInstanceId}/migrate:
+    post:
+      tags:
+      - "Process Instances"
+      summary: "Migrate process instance"
+      description: ""
+      operationId: "migrateProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "processInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "Indicates the process instance was found and migration was\
+            \ executed."
+        404:
+          description: "Indicates the requested process instance was not found."
+        409:
+          description: "Indicates the requested process instance action cannot be\
+            \ executed since the process-instance is already activated/suspended."
+      security:
+      - basicAuth: []
   /runtime/process-instances/{processInstanceId}/variables:
     get:
       tags:
       - "Process Instance Variables"
       summary: "List variables for a process instance"
       description: "In case the variable is a binary variable or serializable, the\
-        \ valueUrl points to an URL to fetch the raw value. If it?s a plain variable,\
+        \ valueUrl points to an URL to fetch the raw value. If it’s a plain variable,\
         \ the value is present in the response. Note that only local scoped variables\
         \ are returned, as there is no global scope for process-instance variables."
       operationId: "listProcessInstanceVariables"
@@ -4608,10 +5721,18 @@ paths:
       tags:
       - "Process Instance Variables"
       summary: "Create variables or new binary variable on a process instance"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n Any number of variables can be passed into the request body array.\nNote that scope is ignored, only local variables can be set in a process instance.\n NB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable\
+        \ or an array of RestVariable) or by passing a multipart/form-data Object.\n\
+        Nonexistent variables are created on the process-instance and existing ones\
+        \ are overridden without any error.\nAny number of variables can be passed\
+        \ into the request body array.\nNote that scope is ignored, only local variables\
+        \ can be set in a process instance.\nNB: Swagger V2 specification does not\
+        \ support this use case that is why this endpoint might be buggy/incomplete\
+        \ if used with other tools."
       operationId: "createProcessInstanceVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -4624,7 +5745,21 @@ paths:
         description: "Create a variable on a process instance"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ProcessInstanceVariableCollectionResource"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "integer"
       responses:
         200:
           description: "successful operation"
@@ -4653,10 +5788,13 @@ paths:
         Nonexistent variables are created on the process-instance and existing ones\
         \ are overridden without any error.\nAny number of variables can be passed\
         \ into the request body array.\nNote that scope is ignored, only local variables\
-        \ can be set in a process instance.\nNB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+        \ can be set in a process instance.\nNB: Swagger V2 specification does not\
+        \ support this use case that is why this endpoint might be buggy/incomplete\
+        \ if used with other tools."
       operationId: "createOrUpdateProcessVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -4669,7 +5807,21 @@ paths:
         description: "Create a variable on a process instance"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ProcessInstanceVariableCollectionResource"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "integer"
       responses:
         200:
           description: "successful operation"
@@ -4746,10 +5898,16 @@ paths:
       tags:
       - "Process Instance Variables"
       summary: "Update a single variable on a process instance"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\nNonexistent variables are created on the process-instance and existing ones are overridden without any error.\n Note that scope is ignored, only local variables can be set in a process instance.\n NB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable)\
+        \ or by passing a multipart/form-data Object.\nNonexistent variables are created\
+        \ on the process-instance and existing ones are overridden without any error.\n\
+        Note that scope is ignored, only local variables can be set in a process instance.\n\
+        NB: Swagger V2 specification does not support this use case that is why this\
+        \ endpoint might be buggy/incomplete if used with other tools."
       operationId: "updateProcessInstanceVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -4766,7 +5924,21 @@ paths:
         description: "Create a variable on a process instance"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/ProcessInstanceVariableResource"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      - name: "name"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        required: false
+        type: "string"
+        x-example: "integer"
       responses:
         200:
           description: "successful operation"
@@ -4838,9 +6010,9 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have a variable with the given name (in the given scope). Status message\
-            \ provides additional information."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have a variable with the given name (in the given scope). Status\
+            \ message provides additional information."
       security:
       - basicAuth: []
   /runtime/signals:
@@ -4975,10 +6147,21 @@ paths:
           \ value."
         required: false
         type: "string"
+      - name: "taskDefinitionKeys"
+        in: "query"
+        description: "Only return tasks with the given task definition ids."
+        required: false
+        type: "string"
       - name: "processInstanceId"
         in: "query"
         description: "Only return tasks which are part of the process instance with\
           \ the given id."
+        required: false
+        type: "string"
+      - name: "processInstanceIdWithChildren"
+        in: "query"
+        description: "Only return tasks which are part of the process instance and\
+          \ its children with the given id."
         required: false
         type: "string"
       - name: "processInstanceBusinessKey"
@@ -5067,7 +6250,7 @@ paths:
         format: "date-time"
       - name: "withoutDueDate"
         in: "query"
-        description: "Only return tasks which don?t have a due date. The property\
+        description: "Only return tasks which do not have a due date. The property\
           \ is ignored if the value is false."
         required: false
         type: "boolean"
@@ -5093,6 +6276,21 @@ paths:
         description: "Indication to include process variables in the result."
         required: false
         type: "boolean"
+      - name: "scopeDefinitionId"
+        in: "query"
+        description: "Only return tasks with the given scopeDefinitionId."
+        required: false
+        type: "string"
+      - name: "scopeId"
+        in: "query"
+        description: "Only return tasks with the given scopeId."
+        required: false
+        type: "string"
+      - name: "scopeType"
+        in: "query"
+        description: "Only return tasks with the given scopeType."
+        required: false
+        type: "string"
       - name: "tenantId"
         in: "query"
         description: "Only return tasks with the given tenantId."
@@ -5154,40 +6352,6 @@ paths:
             $ref: "#/definitions/TaskResponse"
         201:
           description: "Indicates request was successful and the tasks are returned"
-        400:
-          description: "Indicates a parameter was passed in the wrong format or that\
-            \ delegationState has an invalid value (other than pending and resolved).\
-            \ The status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/tasks:
-    post:
-      tags:
-      - "Query"
-      - "Tasks"
-      summary: "Query for tasks"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of tasks (except for candidateGroupIn\
-        \ which is only available in this POST task query REST service), but passed\
-        \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
-        \ querying and preventing errors with request-uri?s that are too long. On\
-        \ top of that, the query allows for filtering based on task and process variables.\
-        \ The taskVariables and processInstanceVariables are both JSON-arrays containing\
-        \ objects with the format as described here."
-      operationId: "queryTasks"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/TaskQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned."
-          schema:
-            $ref: "#/definitions/DataResponseTaskResponse"
         400:
           description: "Indicates a parameter was passed in the wrong format or that\
             \ delegationState has an invalid value (other than pending and resolved).\
@@ -5308,7 +6472,7 @@ paths:
           description: "Indicates the task was found and has been deleted. Response-body\
             \ is intentionally empty."
         403:
-          description: "Indicates the requested task cannot be deleted because it?\
+          description: "Indicates the requested task cannot be deleted because it’\
             s part of a workflow."
         404:
           description: "Indicates the requested task was not found."
@@ -5344,9 +6508,14 @@ paths:
       - "Task Attachments"
       summary: "Create a new attachment on a task, containing a link to an external\
         \ resource or an attached file"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (AttachmentRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\nNB: The JSON approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (AttachmentRequest)\
+        \ to link an external resource or by passing a multipart/form-data Object\
+        \ to attach a file.\nNB: Swagger V2 specification does not support this use\
+        \ case that is why this endpoint might be buggy/incomplete if used with other\
+        \ tools."
       operationId: "createAttachment"
       consumes:
+      - "application/json"
       - "multipart/form-data"
       produces:
       - "application/json"
@@ -5355,6 +6524,12 @@ paths:
         in: "path"
         required: true
         type: "string"
+      - in: "body"
+        name: "body"
+        description: "create an attachment containing a link to an external resource"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskAttachmentCollectionResource"
       - name: "file"
         in: "formData"
         description: "Attachment file"
@@ -5417,8 +6592,8 @@ paths:
           schema:
             $ref: "#/definitions/AttachmentResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks does not\
-            have a attachment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does\
+            \ not have a attachment with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5441,8 +6616,8 @@ paths:
           description: "Indicates the task and attachment were found and the attachment\
             \ is deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested task was not found or the tasks does not\
-            have a attachment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does\
+            \ not have a attachment with the given ID."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/attachments/{attachmentId}/content:
@@ -5473,9 +6648,9 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have an attachment with the given id or the attachment does not have\
-            \ a binary stream available. Status message provides additional information."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have an attachment with the given id or the attachment does not\
+            \ have a binary stream available. Status message provides additional information."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/comments:
@@ -5559,8 +6734,8 @@ paths:
           schema:
             $ref: "#/definitions/CommentResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks does not\
-            have a comment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does\
+            \ not have a comment with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5583,8 +6758,8 @@ paths:
           description: "Indicates the task and comment were found and the comment\
             \ is deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested task was not found or the tasks does not\
-            have a comment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does\
+            \ not have a comment with the given ID."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/events:
@@ -5636,8 +6811,8 @@ paths:
           schema:
             $ref: "#/definitions/EventResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks does not\
-            have an event with the given ID."
+          description: "Indicates the requested task was not found or the tasks does\
+            \ not have an event with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5659,8 +6834,31 @@ paths:
         204:
           description: "Indicates the task was found and the events are returned."
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have the requested event."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have the requested event."
+      security:
+      - basicAuth: []
+  /runtime/tasks/{taskId}/form:
+    get:
+      tags:
+      - "Tasks"
+      summary: "Get a task form"
+      description: ""
+      operationId: "getTaskForm"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates request was successful and the task form is returned"
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the requested task was not found."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/identitylinks:
@@ -5693,7 +6891,7 @@ paths:
       tags:
       - "Task Identity Links"
       summary: "Create an identity link on a task"
-      description: "It's possible to add either a user or a group."
+      description: "It is possible to add either a user or a group."
       operationId: "createTaskInstanceIdentityLinks"
       produces:
       - "application/json"
@@ -5715,9 +6913,9 @@ paths:
         201:
           description: "Indicates the task was found and the identity link was created."
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have the requested identityLink. The status contains additional information\
-            \ about this error."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have the requested identityLink. The status contains additional\
+            \ information about this error."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/identitylinks/{family}:
@@ -5725,7 +6923,7 @@ paths:
       tags:
       - "Task Identity Links"
       summary: "List identity links for a task for either groups or users"
-      description: "Returns only identity links targetting either users or groups.\
+      description: "Returns only identity links targeting either users or groups.\
         \ Response body and status-codes are exactly the same as when getting the\
         \ full list of identity links for a task."
       operationId: "listIdentityLinksForFamily"
@@ -5784,9 +6982,9 @@ paths:
           schema:
             $ref: "#/definitions/RestIdentityLink"
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have the requested identityLink. The status contains additional information\
-            \ about this error."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have the requested identityLink. The status contains additional\
+            \ information about this error."
       security:
       - basicAuth: []
     delete:
@@ -5817,9 +7015,9 @@ paths:
           description: "Indicates the task and identity link were found and the link\
             \ has been deleted. Response-body is intentionally empty."
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have the requested identityLink. The status contains additional information\
-            \ about this error."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have the requested identityLink. The status contains additional\
+            \ information about this error."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/subtasks:
@@ -5865,7 +7063,7 @@ paths:
         in: "query"
         description: "Scope of variable to be returned. When local, only task-local\
           \ variable value is returned. When global, only variable value from the\
-          \ task?s parent execution-hierarchy are returned. When the parameter is\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
           \ omitted, a local variable will be returned if it exists, otherwise a global\
           \ variable."
         required: false
@@ -5887,10 +7085,17 @@ paths:
       - "Tasks"
       - "Task Variables"
       summary: "Create new variables on a task"
-      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n It's possible to create simple (non-binary) variable or list of variables or new binary variable \nAny number of variables can be passed into the request body array.\nNB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+      description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable\
+        \ or an Array of RestVariable) or by passing a multipart/form-data Object.\n\
+        It is possible to create simple (non-binary) variable or list of variables\
+        \ or new binary variable \nAny number of variables can be passed into the\
+        \ request body array.\nNB: Swagger V2 specification does not support this\
+        \ use case that is why this endpoint might be buggy/incomplete if used with\
+        \ other tools."
       operationId: "createTaskVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -5903,7 +7108,26 @@ paths:
         description: "Create a variable on a task"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/TaskVariableCollectionResource"
+      - name: "name"
+        in: "formData"
+        description: "Required name of the variable"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        description: "Type of variable that is created. If omitted, reverts to raw\
+          \ JSON-value type (string, boolean, integer or double)"
+        required: false
+        type: "string"
+        x-example: "integer"
+      - name: "scope"
+        in: "formData"
+        description: "Scope of variable that is created. If omitted, local is assumed."
+        required: false
+        type: "string"
+        x-example: "local"
       responses:
         200:
           description: "successful operation"
@@ -5930,7 +7154,7 @@ paths:
       - basicAuth: []
     delete:
       tags:
-      - "Task Variables"
+      - "Tasks"
       summary: "Delete all local variables on a task"
       description: ""
       operationId: "deleteAllLocalTaskVariables"
@@ -5969,7 +7193,7 @@ paths:
         in: "query"
         description: "Scope of variable to be returned. When local, only task-local\
           \ variable value is returned. When global, only variable value from the\
-          \ task?s parent execution-hierarchy are returned. When the parameter is\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
           \ omitted, a local variable will be returned if it exists, otherwise a global\
           \ variable."
         required: false
@@ -5981,9 +7205,9 @@ paths:
           schema:
             $ref: "#/definitions/RestVariable"
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have a variable with the given name (in the given scope). Status message\
-            \ provides additional information."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have a variable with the given name (in the given scope). Status\
+            \ message provides additional information."
       security:
       - basicAuth: []
     put:
@@ -5991,12 +7215,15 @@ paths:
       - "Task Variables"
       summary: "Update an existing variable on a task"
       description: "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable)\
-        \ or by passing a multipart/form-data Object.\nIt's possible to update simple\
+        \ or by passing a multipart/form-data Object.\nIt is possible to update simple\
         \ (non-binary) variable or  binary variable \nAny number of variables can\
-        \ be passed into the request body array.\nNB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+        \ be passed into the request body array.\nNB: Swagger V2 specification does\
+        \ not support this use case that is why this endpoint might be buggy/incomplete\
+        \ if used with other tools."
       operationId: "updateTaskInstanceVariable"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -6013,7 +7240,30 @@ paths:
         description: "Update a task variable"
         required: false
         schema:
-          $ref: "#/definitions/RestVariable"
+          $ref: "#/definitions/TaskVariableResource"
+      - name: "name"
+        in: "formData"
+        description: "Required name of the variable"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "type"
+        in: "formData"
+        description: "Type of variable that is updated. If omitted, reverts to raw\
+          \ JSON-value type (string, boolean, integer or double)"
+        required: false
+        type: "string"
+        x-example: "integer"
+      - name: "scope"
+        in: "formData"
+        description: "Scope of variable to be returned. When local, only task-local\
+          \ variable value is returned. When global, only variable value from the\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
+          \ omitted, a local variable will be returned if it exists, otherwise a global\
+          \ variable.."
+        required: false
+        type: "string"
+        x-example: "local"
       responses:
         200:
           description: "Indicates the variables was updated and the result is returned."
@@ -6025,8 +7275,8 @@ paths:
             \ a process associated) with scope global. Status message provides additional\
             \ information."
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have a variable with the given name in the given scope. Status message\
+          description: "Indicates the requested task was not found or the task does\
+            \ not have a variable with the given name in the given scope. Status message\
             \ contains additional information about the error."
         415:
           description: "Indicates the serializable data contains an object for which\
@@ -6053,7 +7303,7 @@ paths:
         in: "query"
         description: "Scope of variable to be returned. When local, only task-local\
           \ variable value is returned. When global, only variable value from the\
-          \ task?s parent execution-hierarchy are returned. When the parameter is\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
           \ omitted, a local variable will be returned if it exists, otherwise a global\
           \ variable."
         required: false
@@ -6063,8 +7313,8 @@ paths:
           description: "Indicates the task variable was found and has been deleted.\
             \ Response-body is intentionally empty."
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have a variable with the given name. Status message contains additional\
+          description: "Indicates the requested task was not found or the task does\
+            \ not have a variable with the given name. Status message contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -6078,7 +7328,7 @@ paths:
         \ to application/octet-stream, regardless of the content of the variable or\
         \ the request accept-type header. In case of serializable, application/x-java-serialized-object\
         \ is used as content-type."
-      operationId: "geTaskVariableData"
+      operationId: "getTaskVariableData"
       produces:
       - "application/json"
       parameters:
@@ -6094,7 +7344,7 @@ paths:
         in: "query"
         description: "Scope of variable to be returned. When local, only task-local\
           \ variable value is returned. When global, only variable value from the\
-          \ task?s parent execution-hierarchy are returned. When the parameter is\
+          \ task’s parent execution-hierarchy are returned. When the parameter is\
           \ omitted, a local variable will be returned if it exists, otherwise a global\
           \ variable."
         required: false
@@ -6109,228 +7359,9 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task does not\
-            have a variable with the given name (in the given scope). Status message\
-            \ provides additional information."
-      security:
-      - basicAuth: []
-  /query/executions:
-    post:
-      tags:
-      - "Executions"
-      - "Query"
-      summary: "Query executions"
-      description: "The request body can contain all possible filters that can be\
-        \ used in the List executions URL query. On top of these, it?s possible to\
-        \ provide an array of variables and processInstanceVariables to include in\
-        \ the query, with their format described here.\n\nThe general paging and sorting\
-        \ query-parameters can be used for this URL."
-      operationId: "queryExecutions"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/ExecutionQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the executions are returned."
-          schema:
-            $ref: "#/definitions/DataResponseExecutionResponse"
-        404:
-          description: "Indicates a parameter was passed in the wrong format . The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-activity-instances:
-    post:
-      tags:
-      - "Query"
-      - "History"
-      summary: "Query for historic activity instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic task instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long."
-      operationId: "queryActivityInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricActivityInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the activities are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricActivityInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information"
-      security:
-      - basicAuth: []
-  /query/historic-detail:
-    post:
-      tags:
-      - "Query"
-      - "History"
-      summary: "Query for historic details"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long."
-      operationId: "queryHistoricDetail"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricDetailQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the historic details\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricDetailResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-process-instances:
-    post:
-      tags:
-      - "Query"
-      - "History Process"
-      summary: "Query for historic process instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The variables property is a JSON-array containing objects with\
-        \ the format as described here."
-      operationId: "queryHistoricProcessInstance"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricProcessInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the process instances\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricProcessInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-task-instances:
-    post:
-      tags:
-      - "Query"
-      - "History Task"
-      summary: "Query for historic task instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic task instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The taskVariables and processVariables properties are JSON-arrays\
-        \ containing objects with the format as described here."
-      operationId: "queryHistoricTaskInstance"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricTaskInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricTaskInstanceResponse"
-        404:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-variable-instances:
-    post:
-      tags:
-      - "Query"
-      - "History"
-      summary: "Query for historic variable instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The variables property is a JSON-array containing objects with\
-        \ the format as described here."
-      operationId: "queryVariableInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricVariableInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricVariableInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/process-instances:
-    post:
-      tags:
-      - "Query"
-      - "Process Instances"
-      summary: "Query process instances"
-      description: "The request body can contain all possible filters that can be\
-        \ used in the List process instances URL query. On top of these, it?s possible\
-        \ to provide an array of variables to include in the query, with their format\
-        \ described here.\n\nThe general paging and sorting query-parameters can be\
-        \ used for this URL."
-      operationId: "queryProcessInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/ProcessInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the process-instances\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseProcessInstanceResponse"
-        400:
-          description: "Indicates a parameter was passed in the wrong format . The\
-            \ status-message contains additional information."
+          description: "Indicates the requested task was not found or the task does\
+            \ not have a variable with the given name (in the given scope). Status\
+            \ message provides additional information."
       security:
       - basicAuth: []
 securityDefinitions:
@@ -6416,6 +7447,85 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/ExtensionAttribute"
+  BatchPartResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "8"
+      url:
+        type: "string"
+        example: "http://localhost:8182/management/batch-parts/8"
+      batchId:
+        type: "string"
+        example: "4"
+      batchUrl:
+        type: "string"
+        example: "http://localhost:8182/management/batch/4"
+      batchType:
+        type: "string"
+        example: "processMigration"
+      searchKey:
+        type: "string"
+        example: "1:22:MP"
+      searchKey2:
+        type: "string"
+        example: "1:24:MP"
+      scopeId:
+        type: "string"
+        example: "1"
+      subScopeId:
+        type: "string"
+        example: "2"
+      scopeType:
+        type: "string"
+        example: "bpmn"
+      createTime:
+        type: "string"
+        format: "date-time"
+        example: "2020-06-03T22:05:05.474+0000"
+      completeTime:
+        type: "string"
+        format: "date-time"
+        example: "2020-06-03T22:05:05.474+0000"
+      status:
+        type: "string"
+        example: "completed"
+      tenantId:
+        type: "string"
+        example: "null"
+  BatchResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "8"
+      url:
+        type: "string"
+        example: "http://localhost:8182/management/batches/8"
+      batchType:
+        type: "string"
+        example: "processMigration"
+      searchKey:
+        type: "string"
+        example: "1:22:MP"
+      searchKey2:
+        type: "string"
+        example: "1:24:MP"
+      createTime:
+        type: "string"
+        format: "date-time"
+        example: "2020-06-03T22:05:05.474+0000"
+      completeTime:
+        type: "string"
+        format: "date-time"
+        example: "2020-06-03T22:05:05.474+0000"
+      status:
+        type: "string"
+        example: "completed"
+      tenantId:
+        type: "string"
+        example: "null"
   BpmnModel:
     type: "object"
     properties:
@@ -6493,6 +7603,10 @@ definitions:
         type: "object"
         additionalProperties:
           $ref: "#/definitions/MessageFlow"
+      escalations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Escalation"
       itemDefinitions:
         type: "object"
         additionalProperties:
@@ -6547,6 +7661,26 @@ definitions:
         type: "array"
         items:
           type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseBatchResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/BatchResponse"
       total:
         type: "integer"
         format: "int64"
@@ -6720,6 +7854,26 @@ definitions:
       size:
         type: "integer"
         format: "int32"
+  DataResponseHistoricTaskLogEntryResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/HistoricTaskLogEntryResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
   DataResponseHistoricVariableInstanceResponse:
     type: "object"
     properties:
@@ -6747,6 +7901,30 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/JobResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseListMapStringObject:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          type: "array"
+          items:
+            type: "object"
+            additionalProperties:
+              type: "object"
       total:
         type: "integer"
         format: "int64"
@@ -6918,6 +8096,30 @@ definitions:
         type: "string"
       itemSubjectRef:
         type: "string"
+  DecisionTableResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      category:
+        type: "string"
+      name:
+        type: "string"
+      key:
+        type: "string"
+      description:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int32"
+      resourceName:
+        type: "string"
+      deploymentId:
+        type: "string"
+      tenantId:
+        type: "string"
+      url:
+        type: "string"
   DeploymentResourceResponse:
     type: "object"
     properties:
@@ -6962,36 +8164,40 @@ definitions:
       category:
         type: "string"
         example: "examples"
+      parentDeploymentId:
+        type: "string"
+        example: "12"
       url:
         type: "string"
         example: "http://localhost:8081/flowable-rest/service/repository/deployments/10"
       tenantId:
         type: "string"
-  DecisionTableResponse:
+  Escalation:
     type: "object"
     properties:
       id:
         type: "string"
-      category:
-        type: "string"
-      name:
-        type: "string"
-      key:
-        type: "string"
-      description:
-        type: "string"
-      version:
+      xmlRowNumber:
         type: "integer"
         format: "int32"
-      resourceName:
+      xmlColumnNumber:
+        type: "integer"
+        format: "int32"
+      extensionElements:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ExtensionElement"
+      attributes:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ExtensionAttribute"
+      name:
         type: "string"
-      deploymentId:
-        type: "string"
-      parentDeploymentId:
-        type: "string"
-      tenantId:
-        type: "string"
-      url:
+      escalationCode:
         type: "string"
   EventListener:
     type: "object"
@@ -7023,6 +8229,8 @@ definitions:
       implementation:
         type: "string"
       entityType:
+        type: "string"
+      onTransaction:
         type: "string"
   EventResponse:
     type: "object"
@@ -7071,6 +8279,14 @@ definitions:
         type: "string"
       processDefinitionUrl:
         type: "string"
+      scopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      subScopeId:
+        type: "string"
+      scopeDefinitionId:
+        type: "string"
       created:
         type: "string"
         format: "date-time"
@@ -7104,6 +8320,19 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+  ExecutionChangeActivityStateRequest:
+    type: "object"
+    properties:
+      cancelActivityIds:
+        type: "array"
+        description: "activityIds to be canceled"
+        items:
+          type: "string"
+      startActivityIds:
+        type: "array"
+        description: "activityIds to be started"
+        items:
+          type: "string"
   ExecutionQueryRequest:
     type: "object"
     properties:
@@ -7184,6 +8413,10 @@ definitions:
       tenantId:
         type: "string"
         example: "null"
+  ExecutionVariableCollectionResource:
+    type: "object"
+  ExecutionVariableResource:
+    type: "object"
   ExtensionAttribute:
     type: "object"
     properties:
@@ -7356,16 +8589,18 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestFormProperty"
-  FormDefinition:
+  FormDefinitionResponse:
     type: "object"
     properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      category:
+        type: "string"
       name:
         type: "string"
       key:
-        type: "string"
-      id:
-        type: "string"
-      parentDeploymentId:
         type: "string"
       description:
         type: "string"
@@ -7374,11 +8609,9 @@ definitions:
         format: "int32"
       resourceName:
         type: "string"
-      category:
+      deploymentId:
         type: "string"
       tenantId:
-        type: "string"
-      deploymentId:
         type: "string"
   GraphicInfo:
     type: "object"
@@ -7643,12 +8876,41 @@ definitions:
         type: "array"
         items:
           type: "string"
+      processInstanceName:
+        type: "string"
+      processInstanceNameLike:
+        type: "string"
+      processInstanceNameLikeIgnoreCase:
+        type: "string"
       processBusinessKey:
+        type: "string"
+      processBusinessKeyLike:
         type: "string"
       processDefinitionId:
         type: "string"
       processDefinitionKey:
         type: "string"
+      processDefinitionKeyIn:
+        type: "array"
+        items:
+          type: "string"
+      processDefinitionKeyNotIn:
+        type: "array"
+        items:
+          type: "string"
+      processDefinitionName:
+        type: "string"
+      processDefinitionVersion:
+        type: "integer"
+        format: "int32"
+      processDefinitionCategory:
+        type: "string"
+      deploymentId:
+        type: "string"
+      deploymentIdIn:
+        type: "array"
+        items:
+          type: "string"
       superProcessInstanceId:
         type: "string"
       excludeSubprocesses:
@@ -7677,6 +8939,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/QueryVariable"
+      callbackId:
+        type: "string"
+      callbackType:
+        type: "string"
       tenantId:
         type: "string"
       tenantIdLike:
@@ -7692,6 +8958,9 @@ definitions:
       url:
         type: "string"
         example: "http://localhost:8182/history/historic-process-instances/5"
+      name:
+        type: "string"
+        example: "myProcessInstanceName"
       businessKey:
         type: "string"
         example: "myKey"
@@ -7701,6 +8970,12 @@ definitions:
       processDefinitionUrl:
         type: "string"
         example: "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4"
+      processDefinitionName:
+        type: "string"
+        example: "A process definition name"
+      processDefinitionDescription:
+        type: "string"
+        example: "A process definition description"
       startTime:
         type: "string"
         format: "date-time"
@@ -7732,9 +9007,21 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+      callbackId:
+        type: "string"
+        example: "3"
+      callbackType:
+        type: "string"
+        example: "cmmn"
+      referenceId:
+        type: "string"
+        example: "123"
+      referenceType:
+        type: "string"
+        example: "event-to-bpmn-2.0-process"
       tenantId:
         type: "string"
-        example: "null"
+        example: "someTenantId"
   HistoricTaskInstanceQueryRequest:
     type: "object"
     properties:
@@ -7751,6 +9038,8 @@ definitions:
       taskId:
         type: "string"
       processInstanceId:
+        type: "string"
+      processInstanceIdWithChildren:
         type: "string"
       processBusinessKey:
         type: "string"
@@ -7780,6 +9069,10 @@ definitions:
         type: "string"
       taskDefinitionKeyLike:
         type: "string"
+      taskDefinitionKeys:
+        type: "array"
+        items:
+          type: "string"
       taskCategory:
         type: "string"
       taskDeleteReason:
@@ -7852,11 +9145,19 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/QueryVariable"
+      scopeDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      scopeType:
+        type: "string"
       tenantId:
         type: "string"
       tenantIdLike:
         type: "string"
       withoutTenantId:
+        type: "boolean"
+      withoutDeleteReason:
         type: "boolean"
       taskCandidateGroup:
         type: "string"
@@ -7918,9 +9219,52 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+      scopeDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      subScopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      propagatedStageInstanceId:
+        type: "string"
       tenantId:
         type: "string"
       category:
+        type: "string"
+  HistoricTaskLogEntryResponse:
+    type: "object"
+    properties:
+      logNumber:
+        type: "integer"
+        format: "int64"
+      type:
+        type: "string"
+      taskId:
+        type: "string"
+      timeStamp:
+        type: "string"
+        format: "date-time"
+      userId:
+        type: "string"
+      data:
+        type: "string"
+      executionId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      scopeDefinitionId:
+        type: "string"
+      subScopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      tenantId:
         type: "string"
   HistoricVariableInstanceQueryRequest:
     type: "object"
@@ -8026,6 +9370,23 @@ definitions:
         type: "string"
       namespace:
         type: "string"
+  InjectActivityRequest:
+    type: "object"
+    properties:
+      injectionType:
+        type: "string"
+      id:
+        type: "string"
+      name:
+        type: "string"
+      assignee:
+        type: "string"
+      taskId:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      joinParallelActivitiesOnComplete:
+        type: "boolean"
   Interface:
     type: "object"
     properties:
@@ -8111,6 +9472,12 @@ definitions:
       executionUrl:
         type: "string"
         example: "http://localhost:8182/runtime/executions/7"
+      elementId:
+        type: "string"
+        example: "timer"
+      elementName:
+        type: "string"
+        example: "Timer task"
       retries:
         type: "integer"
         format: "int32"
@@ -8432,6 +9799,8 @@ definitions:
           $ref: "#/definitions/FlowElement"
       initialFlowElement:
         $ref: "#/definitions/FlowElement"
+      enableEagerExecutionTreeFetching:
+        type: "boolean"
       artifacts:
         type: "array"
         items:
@@ -8532,15 +9901,6 @@ definitions:
         type: "string"
         example: "activate"
         description: "Action to perform: Either activate or suspend"
-  ProcessInstanceChangeActivityStateRequest:
-    type: "object"
-    properties:
-      cancelActivityId:
-        type: "string"
-        description: "activityId to be canceled"
-      startActivityId:
-        type: "string"
-        description: "activityId to be started"
   ProcessInstanceCreateRequest:
     type: "object"
     properties:
@@ -8553,6 +9913,9 @@ definitions:
       message:
         type: "string"
         example: "newOrderMessage"
+      name:
+        type: "string"
+        example: "myProcessInstanceName"
       businessKey:
         type: "string"
         example: "myBusinessKey"
@@ -8564,9 +9927,18 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+      startFormVariables:
+        type: "array"
+        items:
+          $ref: "#/definitions/RestVariable"
+      outcome:
+        type: "string"
       tenantId:
         type: "string"
         example: "tenant1"
+      overrideDefinitionTenantId:
+        type: "string"
+        example: "overrideTenant1"
       returnVariables:
         type: "boolean"
     description: "Only one of processDefinitionId, processDefinitionKey or message\
@@ -8586,12 +9958,50 @@ definitions:
         type: "string"
       processInstanceId:
         type: "string"
+      processInstanceIds:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      processInstanceName:
+        type: "string"
+      processInstanceNameLike:
+        type: "string"
+      processInstanceNameLikeIgnoreCase:
+        type: "string"
       processBusinessKey:
+        type: "string"
+      processBusinessKeyLike:
         type: "string"
       processDefinitionId:
         type: "string"
+      processDefinitionIds:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
       processDefinitionKey:
         type: "string"
+      processDefinitionKeys:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      processDefinitionName:
+        type: "string"
+      processDefinitionCategory:
+        type: "string"
+      processDefinitionVersion:
+        type: "integer"
+        format: "int32"
+      processDefinitionEngineVersion:
+        type: "string"
+      deploymentId:
+        type: "string"
+      deploymentIdIn:
+        type: "array"
+        items:
+          type: "string"
       superProcessInstanceId:
         type: "string"
       subProcessInstanceId:
@@ -8600,6 +10010,14 @@ definitions:
         type: "boolean"
       involvedUser:
         type: "string"
+      startedBy:
+        type: "string"
+      startedBefore:
+        type: "string"
+        format: "date-time"
+      startedAfter:
+        type: "string"
+        format: "date-time"
       suspended:
         type: "boolean"
       includeProcessVariables:
@@ -8608,6 +10026,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/QueryVariable"
+      callbackId:
+        type: "string"
+      callbackType:
+        type: "string"
       tenantId:
         type: "string"
       tenantIdLike:
@@ -8623,6 +10045,9 @@ definitions:
       url:
         type: "string"
         example: "http://localhost:8182/repository/process-definitions/processOne%3A1%3A4"
+      name:
+        type: "string"
+        example: "myProcessInstanceName"
       businessKey:
         type: "string"
         example: "myBusinessKey"
@@ -8636,18 +10061,46 @@ definitions:
       processDefinitionUrl:
         type: "string"
         example: "http://localhost:8182/repository/process-definitions/processOne%3A1%3A4"
+      processDefinitionName:
+        type: "string"
+        example: "A process definition name"
+      processDefinitionDescription:
+        type: "string"
+        example: "A process definition description"
       activityId:
         type: "string"
         example: "processTask"
+      startUserId:
+        type: "string"
+        example: "johnDoe"
+      startTime:
+        type: "string"
+        example: "2018-04-17T10:17:43.902+0000"
       variables:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+      callbackId:
+        type: "string"
+        example: "3"
+      callbackType:
+        type: "string"
+        example: "cmmn"
+      referenceId:
+        type: "string"
+        example: "123"
+      referenceType:
+        type: "string"
+        example: "event-to-bpmn-2.0-process"
       tenantId:
         type: "string"
-        example: "null"
+        example: "someTenantId"
       completed:
         type: "boolean"
+  ProcessInstanceVariableCollectionResource:
+    type: "object"
+  ProcessInstanceVariableResource:
+    type: "object"
   QueryVariable:
     type: "object"
     properties:
@@ -8655,23 +10108,21 @@ definitions:
         type: "string"
       operation:
         type: "string"
+        enum:
+        - "equals"
+        - "notEquals"
+        - "equalsIgnoreCase"
+        - "notEqualsIgnoreCase"
+        - "like"
+        - "likeIgnoreCase"
+        - "greaterThan"
+        - "greaterThanOrEquals"
+        - "lessThan"
+        - "lessThanOrEquals"
       value:
         type: "object"
       type:
         type: "string"
-      variableOperation:
-        type: "string"
-        enum:
-        - "EQUALS"
-        - "NOT_EQUALS"
-        - "EQUALS_IGNORE_CASE"
-        - "NOT_EQUALS_IGNORE_CASE"
-        - "LIKE"
-        - "LIKE_IGNORE_CASE"
-        - "GREATER_THAN"
-        - "GREATER_THAN_OR_EQUALS"
-        - "LESS_THAN"
-        - "LESS_THAN_OR_EQUALS"
   Resource:
     type: "object"
     properties:
@@ -8757,27 +10208,20 @@ definitions:
       name:
         type: "string"
         example: "myVariable"
-        title: "Name of the variable"
+        description: "Name of the variable"
       type:
         type: "string"
         example: "string"
-        title: "Type of the variable."
-        description: "When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done."
+        description: "Type of the variable."
       value:
         type: "object"
         example: "test"
-        title: "Value of the variable."
-        description: "When writing a variable and value is omitted, null will be used as value."
+        description: "Value of the variable."
       valueUrl:
         type: "string"
         example: "http://...."
-        title: "Url value to the binary"
-        description: "When reading a variable of type binary or serializable, this attribute will point to the URL where the raw binary data can be fetched from."
       scope:
-        title: "scope of the variable."
         type: "string"
-        example: "global"
-        description: "If local, the variable is explicitly defined on the resource it’s requested from. When global, the variable is defined on the parent (or any parent in the parent-tree) of the resource it’s requested from. When writing a variable and the scope is omitted, global is assumed."
   Signal:
     type: "object"
     properties:
@@ -8883,6 +10327,14 @@ definitions:
         example: "userWhoClaims/userToDelegateTo"
         description: "If action is claim or delegate, you can use this parameter to\
           \ set the assignee associated "
+      formDefinitionId:
+        type: "string"
+        example: "12345"
+        description: "Required when completing a task with a form"
+      outcome:
+        type: "string"
+        example: "accepted/rejected"
+        description: "Optional outcome value when completing a task with a form"
       variables:
         type: "array"
         description: "If action is complete, you can use this parameter to set variables "
@@ -8894,6 +10346,8 @@ definitions:
           \ variables "
         items:
           $ref: "#/definitions/RestVariable"
+  TaskAttachmentCollectionResource:
+    type: "object"
   TaskQueryRequest:
     type: "object"
     properties:
@@ -8948,6 +10402,8 @@ definitions:
         type: "string"
       processInstanceId:
         type: "string"
+      processInstanceIdWithChildren:
+        type: "string"
       processInstanceBusinessKey:
         type: "string"
       processInstanceBusinessKeyLike:
@@ -8979,6 +10435,10 @@ definitions:
         type: "string"
       taskDefinitionKeyLike:
         type: "string"
+      taskDefinitionKeys:
+        type: "array"
+        items:
+          type: "string"
       dueDate:
         type: "string"
         format: "date-time"
@@ -8996,6 +10456,12 @@ definitions:
         type: "boolean"
       includeProcessVariables:
         type: "boolean"
+      scopeDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      scopeType:
+        type: "string"
       tenantId:
         type: "string"
       tenantIdLike:
@@ -9092,23 +10558,41 @@ definitions:
       createTime:
         type: "string"
         format: "date-time"
-        example: "2013-04-17T10:17:43.902+0000"
+        example: "2018-04-17T10:17:43.902+0000"
       dueDate:
         type: "string"
         format: "date-time"
-        example: "2013-04-17T10:17:43.902+0000"
+        example: "2018-04-17T10:17:43.902+0000"
       priority:
         type: "integer"
         format: "int32"
         example: 50
       suspended:
         type: "boolean"
+      claimTime:
+        type: "string"
+        example: "2018-04-17T10:17:43.902+0000"
       taskDefinitionKey:
         type: "string"
         example: "theTask"
+      scopeDefinitionId:
+        type: "string"
+        example: "12"
+      scopeId:
+        type: "string"
+        example: "14"
+      subScopeId:
+        type: "string"
+        example: "15"
+      scopeType:
+        type: "string"
+        example: "cmmn"
+      propagatedStageInstanceId:
+        type: "string"
+        example: "16"
       tenantId:
         type: "string"
-        example: "null"
+        example: "someTenantId"
       category:
         type: "string"
         example: "ExampleCategory"
@@ -9142,6 +10626,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
+  TaskVariableCollectionResource:
+    type: "object"
+  TaskVariableResource:
+    type: "object"
   UserInfoRequest:
     type: "object"
     properties:
@@ -9175,12 +10663,18 @@ definitions:
       lastName:
         type: "string"
         example: "Smith"
+      displayName:
+        type: "string"
+        example: "Fred Smith"
       url:
         type: "string"
         example: "http://localhost:8182/identity/users/testuser"
       email:
         type: "string"
         example: "no-reply@flowable.org"
+      tenantId:
+        type: "string"
+        example: "companyTenantId"
       pictureUrl:
         type: "string"
         example: "http://localhost:8182/identity/users/testuser/picture"
@@ -9198,12 +10692,18 @@ definitions:
       lastName:
         type: "string"
         example: "Smith"
+      displayName:
+        type: "string"
+        example: "Fred Smith"
       url:
         type: "string"
         example: "http://localhost:8182/identity/users/testuser"
       email:
         type: "string"
         example: "no-reply@flowable.org"
+      tenantId:
+        type: "string"
+        example: "companyTenantId"
       pictureUrl:
         type: "string"
         example: "http://localhost:8182/identity/users/testuser/picture"
@@ -9246,22 +10746,3 @@ definitions:
         type: "object"
       type:
         type: "string"
-  AttachmentRequest:
-    type: "object"
-    properties:
-      name:
-        description: "Name of the attachment"
-        type: "string"
-        example: "SimpleAttachment.doc"
-      description:
-        description: "Description of the attachment"
-        type: "string"
-        example: "This a simple attachment description"
-      type:
-        description: "Type of the attachment"
-        type: "string"
-        example: "mySimpleType"
-      externalUrl:
-        description: "External url pointing to the binary"
-        type: "string"
-        example: "http://www.flowable.org"

@@ -29,6 +29,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_HTTP = "HttpTask";
     String STENCIL_TASK_MAIL = "MailTask";
     String STENCIL_TASK_SEND_EVENT = "SendEventTask";
+    String STENCIL_TASK_EXTERNAL_WORKER = "ExternalWorkerTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
     String STENCIL_TASK_SCRIPT = "ScriptTask";
@@ -125,6 +126,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
     String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    String PROPERTY_SERVICETASK_STORE_RESULT_AS_TRANSIENT = "servicetaskstoreresultvariabletransient";
 
     String PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT = "scriptformat";
     String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";
@@ -147,6 +149,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
+    String PROPERTY_SAME_DEPLOYMENT = "samedeployment";
     String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
     String PROPERTY_ID_VARIABLE_NAME = "idvariablename";
 
@@ -195,6 +198,8 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_EVENT_TYPE = "eventType";
     
+    String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
+
     String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
     String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
     String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
@@ -221,5 +226,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_REGISTRY_CORRELATIONNAME = "name";
     String PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE = "type";
     String PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE = "value";
+
+    String PROPERTY_MILESTONE_VARIABLE = "milestonevariable";
 
 }

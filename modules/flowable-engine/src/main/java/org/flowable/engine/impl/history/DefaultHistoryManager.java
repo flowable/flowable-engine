@@ -423,6 +423,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
             historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
             historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
+            historicEntityLinkEntity.setRootScopeId(entityLink.getRootScopeId());
+            historicEntityLinkEntity.setRootScopeType(entityLink.getRootScopeType());
             historicEntityLinkEntity.setHierarchyType(entityLink.getHierarchyType());
             historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
         }
@@ -536,6 +538,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         historicActivityInstanceEntity.setEndTime(activityInstance.getEndTime());
         historicActivityInstanceEntity.setDeleteReason(activityInstance.getDeleteReason());
         historicActivityInstanceEntity.setDurationInMillis(activityInstance.getDurationInMillis());
+        historicActivityInstanceEntity.setTransactionOrder(activityInstance.getTransactionOrder());
         historicActivityInstanceEntity.setTenantId(activityInstance.getTenantId());
 
 

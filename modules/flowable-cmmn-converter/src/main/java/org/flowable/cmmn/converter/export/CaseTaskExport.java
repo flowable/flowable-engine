@@ -37,6 +37,9 @@ public class CaseTaskExport extends AbstractChildTaskExport<CaseTask> {
         if (caseTask.getFallbackToDefaultTenant() != null) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant().toString());
         }
+        if (caseTask.isSameDeployment()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SAME_DEPLOYMENT, "true");
+        }
         if (StringUtils.isNotEmpty(caseTask.getCaseInstanceIdVariableName())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ID_VARIABLE_NAME, caseTask.getCaseInstanceIdVariableName());
         }

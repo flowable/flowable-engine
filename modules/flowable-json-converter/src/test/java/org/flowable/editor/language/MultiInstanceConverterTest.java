@@ -12,12 +12,11 @@
  */
 package org.flowable.editor.language;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class MultiInstanceConverterTest extends AbstractConverterTest {
 
@@ -41,12 +40,12 @@ public class MultiInstanceConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Activity activity = (Activity) model.getFlowElement("multi-instance");
-        assertTrue(activity.getLoopCharacteristics().isSequential());
-        assertEquals("3", activity.getLoopCharacteristics().getLoopCardinality());
-        assertEquals("instanceVar", activity.getLoopCharacteristics().getElementVariable());
-        assertEquals("collection", activity.getLoopCharacteristics().getInputDataItem());
-        assertEquals("index", activity.getLoopCharacteristics().getElementIndexVariable());
-        assertEquals("completionCondition", activity.getLoopCharacteristics().getCompletionCondition());
+        assertThat(activity.getLoopCharacteristics().isSequential()).isTrue();
+        assertThat(activity.getLoopCharacteristics().getLoopCardinality()).isEqualTo("3");
+        assertThat(activity.getLoopCharacteristics().getElementVariable()).isEqualTo("instanceVar");
+        assertThat(activity.getLoopCharacteristics().getInputDataItem()).isEqualTo("collection");
+        assertThat(activity.getLoopCharacteristics().getElementIndexVariable()).isEqualTo("index");
+        assertThat(activity.getLoopCharacteristics().getCompletionCondition()).isEqualTo("completionCondition");
     }
 
 }

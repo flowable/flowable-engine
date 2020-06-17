@@ -64,7 +64,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         AsyncExecutor tenantExecutor = null;
 
         if (tenantAwareAyncExecutorFactory == null) {
-            tenantExecutor = new DefaultAsyncJobExecutor();
+            DefaultAsyncJobExecutor defaultAsyncJobExecutor = new DefaultAsyncJobExecutor();
+            defaultAsyncJobExecutor.setTenantId(tenantId);
+            tenantExecutor = defaultAsyncJobExecutor;
         } else {
             tenantExecutor = tenantAwareAyncExecutorFactory.createAsyncExecutor(tenantId);
         }
@@ -168,7 +170,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
 
     protected void shutdownTenantExecutor(String tenantId) {
         LOGGER.info("Shutting down async executor for tenant {}", tenantId);
+        tenantInfoHolder.setCurrentTenantId(tenantId);
         tenantExecutors.get(tenantId).shutdown();
+        tenantInfoHolder.clearCurrentTenantId();
     }
 
     @Override

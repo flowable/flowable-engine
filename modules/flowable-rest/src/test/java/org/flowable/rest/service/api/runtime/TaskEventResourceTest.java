@@ -13,9 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.List;
@@ -31,6 +30,9 @@ import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -52,11 +54,11 @@ public class TaskEventResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertTrue(responseNode.isArray());
+            assertThat(responseNode).isNotNull();
+            assertThat(responseNode.isArray()).isTrue();
 
             // 2 events expected: assigned event and involvement event.
-            assertEquals(2, responseNode.size());
+            assertThat(responseNode).hasSize(2);
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -87,13 +89,17 @@ public class TaskEventResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals(event.getId(), responseNode.get("id").textValue());
-            assertEquals(event.getAction(), responseNode.get("action").textValue());
-            assertEquals(event.getUserId(), responseNode.get("userId").textValue());
-            assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_EVENT, task.getId(), event.getId())));
-            assertTrue(responseNode.get("taskUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-            assertEquals(now.getTime(), getDateFromISOString(responseNode.get("time").textValue()));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id: '" + event.getId() + "',"
+                            + "action: '" + event.getAction() + "',"
+                            + "userId: " + event.getUserId() + ","
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_EVENT, task.getId(), event.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "time: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -141,14 +147,14 @@ public class TaskEventResourceTest extends BaseSpringRestTestCase {
             taskService.addUserIdentityLink(task.getId(), "gonzo", "someType");
 
             List<Event> events = taskService.getTaskEvents(task.getId());
-            assertEquals(2, events.size());
+            assertThat(events).hasSize(2);
             for (Event event : events) {
                 HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_EVENT, task.getId(), event.getId()));
                 closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
             }
 
             events = taskService.getTaskEvents(task.getId());
-            assertEquals(0, events.size());
+            assertThat(events).isEmpty();
 
         } finally {
             // Clean adhoc-tasks even if test fails

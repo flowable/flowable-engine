@@ -35,6 +35,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.TablePageQueryImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.event.EventLogEntry;
@@ -54,25 +55,35 @@ import org.flowable.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
+import org.flowable.engine.impl.externalworker.ExternalWorkerCompletionBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteExternalWorkerJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
+import org.flowable.job.service.impl.cmd.GetJobByCorrelationIdCmd;
 import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
@@ -172,6 +183,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     public void deleteDeadLetterJob(String jobId) {
         commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
     }
+
+    @Override
+    public void deleteExternalWorkerJob(String jobId) {
+        commandExecutor.execute(new DeleteExternalWorkerJobCmd(jobId));
+    }
     
     @Override
     public void deleteHistoryJob(String jobId) {
@@ -219,6 +235,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     }
 
     @Override
+    public ExternalWorkerJobQuery createExternalWorkerJobQuery() {
+        return new ExternalWorkerJobQueryImpl(commandExecutor);
+    }
+
+    @Override
     public TimerJobQuery createTimerJobQuery() {
         return new TimerJobQueryImpl(commandExecutor);
     }
@@ -236,6 +257,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public Job findJobByCorrelationId(String jobCorrelationId) {
+        return commandExecutor.execute(new GetJobByCorrelationIdCmd(jobCorrelationId));
     }
 
     @Override
@@ -258,6 +284,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
         return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
     }
     
+    @Override
+    public String getExternalWorkerJobErrorDetails(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.EXTERNAL_WORKER));
+    }
+
     @Override
     public void handleHistoryCleanupTimerJob() {
         commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
@@ -375,6 +406,21 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void deleteEventLogEntry(long logNr) {
         commandExecutor.execute(new DeleteEventLogEntry(logNr));
+    }
+
+    @Override
+    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
+    }
+
+    @Override
+    public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
 
 }

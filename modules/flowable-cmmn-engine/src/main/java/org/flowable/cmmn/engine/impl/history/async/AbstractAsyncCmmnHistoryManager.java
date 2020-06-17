@@ -133,6 +133,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_ID, entityLink.getReferenceScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_ID, entityLink.getRootScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ROOT_SCOPE_TYPE, entityLink.getRootScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_HIERARCHY_TYPE, entityLink.getHierarchyType());
     }
 
@@ -189,6 +191,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
 
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME, planItemInstanceEntity.getLastAvailableTime());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UNAVAILABLE_TIME, planItemInstanceEntity.getLastUnavailableTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_ENABLED_TIME, planItemInstanceEntity.getLastEnabledTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_DISABLED_TIME, planItemInstanceEntity.getLastDisabledTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_STARTED_TIME, planItemInstanceEntity.getLastStartedTime());

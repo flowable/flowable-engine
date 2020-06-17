@@ -13,6 +13,7 @@
 package org.flowable.variable.service.impl.persistence.entity;
 
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
@@ -26,7 +27,7 @@ public interface VariableInstanceEntity extends VariableInstance, Entity, HasRev
 
     void forceUpdate();
 
-    VariableByteArrayRef getByteArrayRef();
+    ByteArrayRef getByteArrayRef();
 
     VariableType getType();
 

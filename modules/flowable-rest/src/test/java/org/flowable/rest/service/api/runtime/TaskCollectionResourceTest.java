@@ -13,7 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -34,15 +35,16 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to the Task collection resource.
- * 
+ *
  * @author Frederik Heremans
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
@@ -82,16 +84,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             // Check if task is created with right arguments
             Task task = taskService.createTaskQuery().taskId(createdTaskId).singleResult();
-            assertEquals("New task name", task.getName());
-            assertEquals("New task description", task.getDescription());
-            assertEquals("assignee", task.getAssignee());
-            assertEquals("owner", task.getOwner());
-            assertEquals(20, task.getPriority());
-            assertEquals(DelegationState.RESOLVED, task.getDelegationState());
-            assertEquals(dateFormat.parse(dueDateString), task.getDueDate());
-            assertEquals(parentTask.getId(), task.getParentTaskId());
-            assertEquals("testKey", task.getFormKey());
-            assertEquals("test", task.getTenantId());
+            assertThat(task.getName()).isEqualTo("New task name");
+            assertThat(task.getDescription()).isEqualTo("New task description");
+            assertThat(task.getAssignee()).isEqualTo("assignee");
+            assertThat(task.getOwner()).isEqualTo("owner");
+            assertThat(task.getPriority()).isEqualTo(20);
+            assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
+            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
+            assertThat(task.getFormKey()).isEqualTo("testKey");
+            assertThat(task.getTenantId()).isEqualTo("test");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -237,17 +239,36 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=kermit";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
             
             // Candidate user with group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Involved user filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            // Claim task
+            taskService.claim(processTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales&ignoreAssignee=true";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting&ignoreAssignee";
+            assertEmptyResultsPresentInDataResponse(url);
 
             // Process instance filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceId=" + processInstance.getId();
@@ -350,60 +371,61 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Active filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?active=true";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
-            
+
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true";
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
             // Check status and size
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            Assert.assertEquals(2, dataNode.size());
-            
+            assertThat(dataNode).hasSize(2);
+
             Map<String, JsonNode> taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
                 taskNodeMap.put(taskNode.get("id").asText(), taskNode);
             }
-            
-            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+
+            assertThat(taskNodeMap).containsKey(processTask.getId());
+
             JsonNode processTaskNode = taskNodeMap.get(processTask.getId());
-            JsonNode variablesNode = processTaskNode.get("variables");
-            assertEquals(1, variablesNode.size());
-            JsonNode variableNode = variablesNode.get(0);
-            assertEquals("localVariable", variableNode.get("name").asText());
-            assertEquals("local", variableNode.get("scope").asText());
-            assertEquals("localtest", variableNode.get("value").asText());
-            
+            assertThatJson(processTaskNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "variables: [ {"
+                            + "name: 'localVariable',"
+                            + "value: 'localtest',"
+                            + "scope: 'local'"
+                            + "} ]"
+                            + "}");
+
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true&includeProcessVariables=true";
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
             // Check status and size
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            Assert.assertEquals(2, dataNode.size());
-            
+            assertThat(dataNode).hasSize(2);
+
             taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
                 taskNodeMap.put(taskNode.get("id").asText(), taskNode);
             }
-            
-            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+
+            assertThat(taskNodeMap).containsKey(processTask.getId());
             processTaskNode = taskNodeMap.get(processTask.getId());
-            variablesNode = processTaskNode.get("variables");
-            assertEquals(2, variablesNode.size());
-            Map<String, JsonNode> variableMap = new HashMap<>();
-            for (JsonNode variableResponseNode : variablesNode) {
-                variableMap.put(variableResponseNode.get("name").asText(), variableResponseNode);
-            }
-            
-            variableNode = variableMap.get("localVariable");
-            assertEquals("localVariable", variableNode.get("name").asText());
-            assertEquals("local", variableNode.get("scope").asText());
-            assertEquals("localtest", variableNode.get("value").asText());
-            
-            variableNode = variableMap.get("variable");
-            assertEquals("variable", variableNode.get("name").asText());
-            assertEquals("global", variableNode.get("scope").asText());
-            assertEquals("globaltest", variableNode.get("value").asText());
+            assertThatJson(processTaskNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                    .isEqualTo("{"
+                            + "variables: [ {"
+                            + "    name: 'variable',"
+                            + "    value: 'globaltest',"
+                            + "    scope: 'global'"
+                            + "  }, {"
+                            + "    name: 'localVariable',"
+                            + "    value: 'localtest',"
+                            + "    scope: 'local'"
+                            + "  } ]"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails

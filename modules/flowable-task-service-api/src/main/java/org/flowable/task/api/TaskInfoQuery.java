@@ -217,7 +217,28 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given case definition.
      */
     T caseDefinitionId(String caseDefinitionId);
-    
+
+    /**
+     * Only select tasks which are part of a case instance which has the given case definition key.
+     */
+    T caseDefinitionKey(String caseDefinitionKey);
+
+    /**
+     * Only select tasks which are part of a case instance which has a case definition key like the given value. The syntax that should be used is the same as in SQL, eg. %test%.
+     */
+    T caseDefinitionKeyLike(String caseDefinitionKeyLike);
+
+    /**
+     * Only select tasks which are part of a case instance which has a case definition key like the given value. The syntax that should be used is the same as in SQL, eg. %test%.
+     *
+     * This method, unlike the {@link #caseDefinitionKeyLike(String)} method will not take in account the upper/lower case: both the input parameter as the column value are lowercased when the
+     * query is executed.
+     */
+    T caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase);
+
+    /** Only select tasks that have a case definition for which the key is present in the given list **/
+    T caseDefinitionKeyIn(Collection<String> caseDefinitionKeys);
+
     /**
      * Only select tasks for the given plan item instance. 
      */
@@ -752,5 +773,10 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Order by due date (needs to be followed by {@link #asc()} or {@link #desc()}). If any of the tasks have null for the due date, these will be last in the result.
      */
     T orderByDueDateNullsLast();
+
+    /**
+     * Order by category (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    T orderByCategory();
 
 }

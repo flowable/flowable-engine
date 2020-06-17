@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -24,9 +24,11 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * Test for all REST-operations related to the Deployment collection.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase {
@@ -37,21 +39,28 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
     public void testGetCaseDefinitions() throws Exception {
 
         try {
-            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").deploy();
+            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").deploy();
 
-            CaseDefinition firstOneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").deploymentId(firstDeployment.getId()).singleResult();
-            
-            CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+            CaseDefinition firstOneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase")
+                    .deploymentId(firstDeployment.getId()).singleResult();
+
+            CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
                     .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/simpleCase.cmmn").deploy();
-            
-            CmmnDeployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn")
-                            .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn").deploy();
 
-            CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").deploymentId(secondDeployment.getId()).singleResult();
-            
-            CaseDefinition simpleCaseDef = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("simpleCase").deploymentId(secondDeployment.getId()).singleResult();
-            
-            CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage").deploymentId(thirdDeployment.getId()).singleResult();
+            CmmnDeployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn").deploy();
+
+            CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase")
+                    .deploymentId(secondDeployment.getId()).singleResult();
+
+            CaseDefinition simpleCaseDef = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("simpleCase").deploymentId(secondDeployment.getId())
+                    .singleResult();
+
+            CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage")
+                    .deploymentId(thirdDeployment.getId()).singleResult();
             repositoryService.setCaseDefinitionCategory(repeatingStageCase.getId(), "testCategory");
 
             // Test parameterless call
@@ -68,9 +77,9 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
                 String key = caseDefinitionJson.get("key").asText();
                 JsonNode graphicalNotationNode = caseDefinitionJson.get("graphicalNotationDefined");
                 if (key.equals("testRepeatingStage")) {
-                    assertTrue(graphicalNotationNode.asBoolean());
+                    assertThat(graphicalNotationNode.asBoolean()).isTrue();
                 } else {
-                    assertFalse(graphicalNotationNode.asBoolean());
+                    assertThat(graphicalNotationNode.asBoolean()).isFalse();
                 }
 
             }
@@ -122,7 +131,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             assertResultsPresentInDataResponse(url, oneTaskCase.getId(), simpleCaseDef.getId(), repeatingStageCase.getId());
             url = baseUrl + "?latest=false";
             assertResultsPresentInDataResponse(baseUrl, firstOneTaskCase.getId(), oneTaskCase.getId(), simpleCaseDef.getId(), repeatingStageCase.getId());
-            
+
             // Test startableByUser
             url = baseUrl + "?startableByUser=kermit";
             assertResultsPresentInDataResponse(url, repeatingStageCase.getId());

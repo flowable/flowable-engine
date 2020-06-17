@@ -23,7 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
  */
 public class FlowableVersions {
     
-    public static final String CURRENT_VERSION = "6.5.1.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    public static final String CURRENT_VERSION = "6.5.1.5"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
     
     public static final List<FlowableVersion> FLOWABLE_VERSIONS = new ArrayList<>();
     
@@ -109,6 +109,11 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.4"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.5"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.6"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.1.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.1.1"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.1.2"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.1.3"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.1.4"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(CURRENT_VERSION));

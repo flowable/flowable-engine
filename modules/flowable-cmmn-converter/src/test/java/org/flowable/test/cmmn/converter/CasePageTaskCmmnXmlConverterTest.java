@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -32,9 +31,9 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/case-page-task.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -47,66 +46,64 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
-        
+        assertThat(cmmnModel).isNotNull();
+
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("casePageCase", caze.getId());
-        
-        Stage planModel = caze.getPlanModel();
-        
+        assertThat(cmmnModel.getCases())
+                .extracting(Case::getId)
+                .containsExactly("casePageCase");
+
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(2, planItemDefinitions.size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(CasePageTask.class, false).size());
-        
+        assertThat(planItemDefinitions).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(CasePageTask.class, false)).hasSize(2);
+
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(2, planItems.size());
-        
-        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
-        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
-        assertEquals(0, planItemTaskA.getEntryCriteria().size());
-        assertTrue(planItemDefinition instanceof CasePageTask);
+        assertThat(planItems).hasSize(2);
 
-        CasePageTask taskA = (CasePageTask) planItemDefinition;
-        assertEquals(CasePageTask.TYPE, taskA.getType());
-        assertEquals("A", taskA.getName());
-        assertEquals("testKey", taskA.getFormKey());
-        assertEquals("Label 1", taskA.getLabel());
-        assertEquals("Icon 1", taskA.getIcon());
-        assertEquals("johndoe", taskA.getAssignee());
-        assertEquals("janedoe", taskA.getOwner());
-        assertEquals(2, taskA.getCandidateUsers().size());
-        assertEquals("johndoe", taskA.getCandidateUsers().get(0));
-        assertEquals("janedoe", taskA.getCandidateUsers().get(1));
-        assertEquals(2, taskA.getCandidateGroups().size());
-        assertEquals("sales", taskA.getCandidateGroups().get(0));
-        assertEquals("management", taskA.getCandidateGroups().get(1));
-        assertNotNull(planItemTaskA.getItemControl());
-        assertNotNull(planItemTaskA.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.IGNORE, planItemTaskA.getItemControl().getParentCompletionRule().getType());
+        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+        assertThat(planItemTaskA.getItemControl()).isNotNull();
+        assertThat(planItemTaskA.getItemControl().getParentCompletionRule()).isNotNull();
+        assertThat(planItemTaskA.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
+
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(CasePageTask.class, taskA -> {
+                    assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+                    assertThat(taskA.getType()).isEqualTo(CasePageTask.TYPE);
+                    assertThat(taskA.getName()).isEqualTo("A");
+                    assertThat(taskA.getFormKey()).isEqualTo("testKey");
+                    assertThat(taskA.getLabel()).isEqualTo("Label 1");
+                    assertThat(taskA.getIcon()).isEqualTo("Icon 1");
+                    assertThat(taskA.getAssignee()).isEqualTo("johndoe");
+                    assertThat(taskA.getOwner()).isEqualTo("janedoe");
+                    assertThat(taskA.getCandidateUsers()).containsExactly("johndoe", "janedoe");
+                    assertThat(taskA.getCandidateGroups()).containsExactly("sales", "management");
+                });
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
-        assertEquals(1, planItemTaskB.getEntryCriteria().size());
-        assertTrue(planItemDefinition instanceof CasePageTask);
-        CasePageTask taskB = (CasePageTask) planItemDefinition;
-        assertEquals(CasePageTask.TYPE, taskB.getType());
-        assertEquals("B", taskB.getName());
-        assertNotNull(planItemTaskB.getItemControl());
-        assertNotNull(planItemTaskB.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.IGNORE, planItemTaskB.getItemControl().getParentCompletionRule().getType());
-        
-        assertEquals(1, taskB.getExtensionElements().size());
-        List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
-        assertEquals(1, extensionElements.size());
-        ExtensionElement extensionElement = extensionElements.get(0);
-        assertEquals("index", extensionElement.getName());
-        assertEquals("0", extensionElement.getElementText());
+        assertThat(planItemTaskB.getEntryCriteria()).hasSize(1);
+        assertThat(planItemTaskB.getItemControl()).isNotNull();
+        assertThat(planItemTaskB.getItemControl().getParentCompletionRule()).isNotNull();
+        assertThat(planItemTaskB.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(CasePageTask.class, taskB -> {
+                    assertThat(taskB.getType()).isEqualTo(CasePageTask.TYPE);
+                    assertThat(taskB.getName()).isEqualTo("B");
+                    assertThat(taskB.getExtensionElements()).hasSize(1);
+                    List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
+                    assertThat(extensionElements).hasSize(1);
+                    assertThat(extensionElements)
+                            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                            .containsExactly(tuple("index", "0"));
+                });
     }
 
 }

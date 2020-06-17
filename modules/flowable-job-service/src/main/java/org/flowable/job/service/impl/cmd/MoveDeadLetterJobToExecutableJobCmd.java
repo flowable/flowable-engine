@@ -17,9 +17,9 @@ import java.io.Serializable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  */
-public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, Serializable {
+public class MoveDeadLetterJobToExecutableJobCmd implements Command<Job>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
     }
 
     @Override
-    public JobEntity execute(CommandContext commandContext) {
+    public Job execute(CommandContext commandContext) {
 
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("jobId and job is null");

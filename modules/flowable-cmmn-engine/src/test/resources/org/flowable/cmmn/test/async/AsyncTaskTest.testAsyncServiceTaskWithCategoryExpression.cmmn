@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:flowable="http://flowable.org/cmmn" 
+	xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+	xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+	xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
+	targetNamespace="http://www.flowable.org/casedef">
+  <case id="testAsyncServiceTask" name="testAsyncServiceTask" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="Task before service task" definitionRef="humanTask1"></planItem>
+      <planItem id="planItem2" name="Async service task" definitionRef="asyncServiceTask">
+        <entryCriterion id="sid-7CB7354C-BF7C-405B-828B-655C4940EB44" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <planItem id="planItem3" name="Task after service task" definitionRef="humanTask2">
+        <entryCriterion id="sid-6B62EEF5-7FB3-4F0E-B066-641487BF91D6" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="humanTask1" name="Task before service task"></humanTask>
+      <task id="asyncServiceTask" name="Async service task" isBlocking="false" flowable:async="true" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate">
+      	<extensionElements>
+      		<flowable:jobCategory>${categoryValue}</flowable:jobCategory>
+      	</extensionElements>
+      </task>
+      <humanTask id="humanTask2" name="Task after service task"></humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

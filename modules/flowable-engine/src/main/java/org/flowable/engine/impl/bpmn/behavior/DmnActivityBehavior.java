@@ -48,6 +48,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
     protected static final String EXPRESSION_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    protected static final String EXPRESSION_DECISION_TABLE_SAME_DEPLOYMENT = "sameDeployment";
 
     protected Task task;
 
@@ -94,14 +95,10 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             throw new FlowableIllegalArgumentException("decisionTableReferenceKey expression resolves to an empty value: " + decisionTableKeyValue);
         }
 
-        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
-        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
-
         DmnDecisionService ruleService = CommandContextUtil.getDmnRuleService();
 
         ExecuteDecisionBuilder executeDecisionBuilder = ruleService.createExecuteDecisionBuilder()
             .decisionKey(finaldecisionTableKeyValue)
-            .parentDeploymentId(deployment.getParentDeploymentId())
             .instanceId(execution.getProcessInstanceId())
             .executionId(execution.getId())
             .activityId(task.getId())
@@ -109,11 +106,12 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             .tenantId(execution.getTenantId());
 
         applyFallbackToDefaultTenant(execution, executeDecisionBuilder);
+        applyParentDeployment(execution, executeDecisionBuilder, processEngineConfiguration);
 
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision with key " + finaldecisionTableKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
@@ -129,14 +127,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
             if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorString != null) {
                 if ("true".equalsIgnoreCase(throwErrorString)) {
-                    throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+                    throw new FlowableException("DMN decision with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
                     
                 } else if (!"false".equalsIgnoreCase(throwErrorString)) {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
                     if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
-                        throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+                        throw new FlowableException("DMN decision with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
                     }
                 }
             }
@@ -147,8 +145,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                             finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
             
         } else {
-            setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, 
-                            execution, processEngineConfiguration.getObjectMapper());
+            boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
+            setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue,
+                            execution, processEngineConfiguration.getObjectMapper(), multipleResults);
         }
 
         leave(execution);
@@ -164,14 +163,35 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
     }
 
-    protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-        if (executionResult == null || executionResult.isEmpty()) {
+    protected void applyParentDeployment(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        FieldExtension sameDeploymentFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_SAME_DEPLOYMENT);
+        String parentDeploymentId;
+        if (sameDeploymentFieldExtension != null) {
+            if (Boolean.parseBoolean(sameDeploymentFieldExtension.getStringValue())) {
+                parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+            } else {
+                // If same deployment has not been requested then don't pass parentDeploymentId
+                parentDeploymentId = null;
+            }
+        } else {
+            // backwards compatibility (always apply parent deployment id)
+            parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+
+        }
+        executeDecisionBuilder.parentDeploymentId(parentDeploymentId);
+    }
+
+    protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
             return;
         }
 
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
-        if (executionResult.size() > 1) {
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
             ArrayNode ruleResultNode = objectMapper.createArrayNode();
 
             for (Map<String, Object> ruleResult : executionResult) {

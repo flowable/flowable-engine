@@ -251,6 +251,12 @@
             "DESCRIPTION" : "Sets the service task to be triggerable"
           }
         },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Store result variable transiently",
+            "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
+          }
+        },
         "SCRIPTFORMATPACKAGE" : {
           "SCRIPTFORMAT" : {
             "TITLE" : "Script format",
@@ -861,6 +867,12 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer expression"
           }
         },
+        "EXTERNALWORKERJOBPACKAGE": {
+          "TOPIC": {
+            "TITLE": "Job topic",
+            "DESCRIPTION": "The job topic that the external worker will query jobs on"
+          }
+        },
         "ISTRANSACTIONPACKAGE" : {
           "ISTRANSACTION" : {
             "TITLE" : "Is a transaction sub process",
@@ -1025,6 +1037,10 @@
         "SENDEVENTTASK" : {
           "TITLE" : "Send event task",
           "DESCRIPTION" : "An task that sends an event to the event registry"
+        },
+        "EXTERNALWORKERTASK" : {
+          "TITLE" : "External Worker task",
+          "DESCRIPTION" : "An task that creates a job which can be executed by an external worker"
         },
         "SHELLTASK" : {
           "TITLE" : "Shell task",
@@ -1567,6 +1583,12 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer value"
           }
         },
+        "EXTERNALWORKERJOBPACKAGE": {
+          "TOPIC": {
+            "TITLE": "Job topic",
+            "DESCRIPTION": "The job topic that the external worker will query jobs on"
+          }
+        },
         "CASETASKCASEREFERENCEPACKAGE": {
           "CASETASKCASEREFERENCE": {
             "TITLE": "Case reference",
@@ -1593,6 +1615,18 @@
         },
         "PROCESSTASKOUTPARAMETERSPACKAGE": {
           "PROCESSTASKOUTPARAMETERS": {
+            "TITLE": "Out parameters",
+            "DESCRIPTION": "Definition of the output parameters"
+          }
+        },
+        "CASETASKINPARAMETERSPACKAGE": {
+          "CASETASKINPARAMETERS": {
+            "TITLE": "In parameters",
+            "DESCRIPTION": "Definition of the input parameters"
+          }
+        },
+        "CASETASKOUTPARAMETERSPACKAGE": {
+          "CASETASKOUTPARAMETERS": {
             "TITLE": "Out parameters",
             "DESCRIPTION": "Definition of the output parameters"
           }
@@ -1715,6 +1749,12 @@
             "DESCRIPTION": "Indicates if this stage should be considered for the stage overview"
           }
         },
+        "MILESTONEVARIABLEPACKAGE" : {
+          "MILESTONEVARIABLE": {
+            "TITLE": "Milestone variable",
+            "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+          }
+        },
         "SCRIPTFORMATPACKAGE": {
           "SCRIPTFORMAT": {
             "TITLE": "Script format",
@@ -1737,6 +1777,12 @@
           "AVAILABLECONDITION": {
             "TITLE": "Available condition",
             "DESCRIPTION": "An optional condition expression on an event listener to indicate to determine when it becomes available."
+          }
+        },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Store result variable transiently",
+            "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
           }
         }
       },
@@ -1792,6 +1838,10 @@
         "SENDEVENTTASK" : {
           "TITLE" : "Send event task",
           "DESCRIPTION" : "A send event task"
+        },
+        "EXTERNALWORKERTASK" : {
+          "TITLE" : "External Worker task",
+          "DESCRIPTION" : "An task that creates a job which can be executed by an external worker"
         },
         "MILESTONE" : {
           "TITLE" : "Milestone",

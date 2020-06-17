@@ -32,8 +32,12 @@ public class ChildProcessInstanceStateChangeCallback implements RuntimeInstanceS
     
     @Override
     public void stateChanged(CallbackData callbackData) {
-        if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState()) || "cancelled".equals(callbackData.getNewState())) {
+        if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
             cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(callbackData.getCallbackId());
+
+        } else if ("cancelled".equals(callbackData.getNewState())) {
+            cmmnEngineConfiguration.getCmmnRuntimeService().terminatePlanItemInstance(callbackData.getCallbackId());
+
         }
     }
     

@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -57,6 +59,7 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
+    protected CmmnMigrationService cmmnMigrationService;
 
     protected String deploymentId;
 
@@ -333,6 +336,10 @@ public abstract class AbstractFlowableCmmnTestCase {
     
     protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
         CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+    }
+
+    protected void waitForJobExecutorOnCondition(Callable<Boolean> predicate) {
+        CmmnJobTestHelper.waitForJobExecutorOnCondition(cmmnEngineConfiguration, 20000L, 200L, predicate);
     }
 
 }

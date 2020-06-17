@@ -125,11 +125,11 @@ public class CmmnDeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeploymentEntity.class);
         }
         
+        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
+        
         for (CaseDefinition caseDefinition : new CaseDefinitionQueryImpl().deploymentId(deploymentId).list()) {
             caseDefinitionCache.remove(caseDefinition.getId());
         }
-        
-        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
     }
 
     public List<EngineDeployer> getDeployers() {

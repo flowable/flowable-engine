@@ -240,26 +240,6 @@
   </dependencies>
 
   <profiles>
-    <profile>
-      <id>distro</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
      <profile>
         <id>java8+</id>
         <activation>
@@ -289,7 +269,7 @@
       <repository>
           <id>mulesoft-releases</id>
           <name>MuleSoft Releases Repository</name>
-          <url>http://repository.mulesoft.org/releases/</url>
+          <url>https://repository.mulesoft.org/releases/</url>
           <layout>default</layout>
       </repository>
   </repositories>

@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.event;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 
 /**
  * Base class for all {@link FlowableEngineEvent} implementations.
@@ -22,25 +23,34 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
  */
 public class FlowableEngineEventImpl extends FlowableEventImpl implements FlowableEngineEvent {
 
-    protected String executionId;
-    protected String processInstanceId;
-    protected String processDefinitionId;
+    protected String scopeType;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeDefinitionId;
 
     /**
      * Creates a new event implementation, not part of an execution context.
      */
     public FlowableEngineEventImpl(FlowableEngineEventType type) {
-        this(type, null, null, null);
+        super(type);
     }
 
     /**
      * Creates a new event implementation, part of an execution context.
      */
     public FlowableEngineEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
+        this(type, ScopeTypes.BPMN, processInstanceId, executionId, processDefinitionId);
+    }
+
+    /**
+     * Creates a new event implementation, part of an execution context.
+     */
+    public FlowableEngineEventImpl(FlowableEngineEventType type, String scopeType, String scopeId, String subScopeId, String scopeDefinitionId) {
         super(type);
-        this.executionId = executionId;
-        this.processInstanceId = processInstanceId;
-        this.processDefinitionId = processDefinitionId;
+        this.scopeType = scopeType;
+        this.scopeId = scopeId;
+        this.subScopeId = subScopeId;
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override
@@ -54,28 +64,67 @@ public class FlowableEngineEventImpl extends FlowableEventImpl implements Flowab
 
     @Override
     public String getExecutionId() {
-        return executionId;
+        return ScopeTypes.BPMN.equals(scopeType) ? subScopeId : null;
     }
 
     public void setExecutionId(String executionId) {
-        this.executionId = executionId;
+        setScopeType(ScopeTypes.BPMN);
+        setSubScopeId(executionId);
     }
 
     @Override
     public String getProcessDefinitionId() {
-        return processDefinitionId;
+        return ScopeTypes.BPMN.equals(scopeType) ? scopeDefinitionId : null;
     }
 
     public void setProcessDefinitionId(String processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+        setScopeType(ScopeTypes.BPMN);
+        setScopeDefinitionId(processDefinitionId);
     }
 
     @Override
     public String getProcessInstanceId() {
-        return processInstanceId;
+        return ScopeTypes.BPMN.equals(scopeType) ? scopeId : null;
     }
 
     public void setProcessInstanceId(String processInstanceId) {
-        this.processInstanceId = processInstanceId;
+        setScopeType(ScopeTypes.BPMN);
+        setScopeId(processInstanceId);
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 }

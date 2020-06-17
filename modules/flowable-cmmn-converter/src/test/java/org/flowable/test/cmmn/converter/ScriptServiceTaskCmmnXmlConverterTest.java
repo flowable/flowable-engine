@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,10 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -50,45 +48,54 @@ public class ScriptServiceTaskCmmnXmlConverterTest extends AbstractConverterTest
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
 
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("scriptCase", caze.getId());
-        assertEquals("test", caze.getInitiatorVariableName());
+        assertThat(cmmnModel.getCases())
+                .extracting(Case::getId, Case::getInitiatorVariableName)
+                .containsExactly(tuple("scriptCase", "test"));
 
         // Plan model
-        Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myScriptPlanModel", planModel.getId());
-        assertEquals("My Script CasePlanModel", planModel.getName());
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+        assertThat(planModel)
+                .extracting(Stage::getId, Stage::getName)
+                .containsExactly("myScriptPlanModel", "My Script CasePlanModel");
 
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(1, planItemDefinitions.size());
-        assertEquals(1, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
+        assertThat(planItemDefinitions).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(2);
 
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(1, planItems.size());
+        assertThat(planItems).hasSize(2);
 
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
-        assertEquals(0, planItemTaskA.getEntryCriteria().size());
-        assertTrue(planItemDefinition instanceof ScriptServiceTask);
-        ScriptServiceTask scriptTask = (ScriptServiceTask) planItemDefinition;
-        assertEquals(ScriptServiceTask.SCRIPT_TASK, scriptTask.getType());
-        assertEquals("javascript", scriptTask.getScriptFormat());
-        assertEquals("scriptResult", scriptTask.getResultVariableName());
-        assertFalse(scriptTask.isAutoStoreVariables());
-        assertTrue(scriptTask.isBlocking());
-        assertFalse(scriptTask.isAsync());
-        
-        assertEquals(1, scriptTask.getFieldExtensions().size());
-        FieldExtension fieldExtension = scriptTask.getFieldExtensions().get(0);
-        assertEquals("script", fieldExtension.getFieldName());
-        assertEquals("var a = 5;", fieldExtension.getStringValue());
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.getScriptFormat()).isEqualTo("javascript");
+                    assertThat(scriptTask.getResultVariableName()).isEqualTo("scriptResult");
+                    assertThat(scriptTask.isAutoStoreVariables()).isFalse();
+                    assertThat(scriptTask.isBlocking()).isTrue();
+                    assertThat(scriptTask.isAsync()).isFalse();
+
+                    assertThat(scriptTask.getFieldExtensions())
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+                            .containsExactly(tuple("script", "var a = 5;"));
+                });
+
+        PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
+        planItemDefinition = planItemTaskB.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
+                    assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
+                    assertThat(scriptServiceTask.getScript()).isEqualTo("var b = 5;");
+                    assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+                });
     }
 
 }

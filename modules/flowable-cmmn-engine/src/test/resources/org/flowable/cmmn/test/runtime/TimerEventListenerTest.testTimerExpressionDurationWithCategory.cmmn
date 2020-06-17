@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testTimerExpression" name="testTimerExpression" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" definitionRef="timerListener"></planItem>
+      <planItem id="planItem2" name="A" definitionRef="task">
+        <entryCriterion id="sid-D752F3E8-D736-4A1C-9C65-FF012CBB47AA" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="timerListener" name="Timer listener">
+        <extensionElements>
+        	<flowable:jobCategory>myCategory</flowable:jobCategory>
+        </extensionElements>
+        <timerExpression><![CDATA[PT1H]]></timerExpression>
+      </timerEventListener>
+      <humanTask id="task" name="A"></humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

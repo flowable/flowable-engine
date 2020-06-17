@@ -702,6 +702,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.mail.server.host=localhost # The host of the mail server.
     flowable.mail.server.password= # The password for the mail server authentication.
     flowable.mail.server.port=1025 # The port of the mail server.
+    flowable.mail.server.ssl-port=1465 # The SSL port of the mail server.
     flowable.mail.server.use-ssl=false # Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).
     flowable.mail.server.use-tls=false # Set or disable the STARTTLS encryption.
     flowable.mail.server.username= # The username that needs to be used for the mail server authentication. If empty no authentication would be used.
@@ -774,25 +775,31 @@ Here is a list of configuration properties that the Flowable Spring Boot support
 <td><p>The port of the mail server.</p></td>
 </tr>
 <tr class="even">
+<td><p>flowable.mail.server.ssl-port</p></td>
+<td><p>flowable.mail-server-ssl-port</p></td>
+<td><p>1465</p></td>
+<td><p>The SSL port of the mail server.</p></td>
+</tr>
+<tr class="odd">
 <td><p>flowable.mail.server.use-ssl</p></td>
 <td><p>flowable.mail-server-use-ssl</p></td>
 <td><p>false</p></td>
 <td><p>Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p>flowable.mail.server.use-tls</p></td>
 <td><p>flowable.mail-server-use-tls</p></td>
 <td><p>false</p></td>
 <td><p>Set or disable the STARTTLS encryption.</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p>flowable.mail.server.username</p></td>
 <td><p>flowable.mail-server-user-name</p></td>
 <td><p>-</p></td>
 <td><p>The username that needs to be used for the mail server authentication.
 If empty no authentication would be used.</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p>flowable.process.definition-cache-limit</p></td>
 <td><p>flowable.process-definitions.cache.max</p></td>
 <td><p>-1</p></td>

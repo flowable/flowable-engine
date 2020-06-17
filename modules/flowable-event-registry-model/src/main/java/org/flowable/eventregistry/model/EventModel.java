@@ -12,21 +12,25 @@
  */
 package org.flowable.eventregistry.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventModel {
 
     protected String key;
     protected String name;
-    protected Collection<String> inboundChannelKeys = new ArrayList<>();
-    protected Collection<String> outboundChannelKeys = new ArrayList<>();
-    protected Collection<EventCorrelationParameter> correlationParameters = new ArrayList<>();
-    protected Collection<EventPayload> payload = new ArrayList<>();
+    protected Map<String, EventPayload> payload = new LinkedHashMap<>();
 
     public String getKey() {
         return key;
@@ -44,44 +48,46 @@ public class EventModel {
         this.name = name;
     }
 
-    public Collection<String> getInboundChannelKeys() {
-        return inboundChannelKeys;
-    }
-    
-    public void addInboundChannelKey(String inboundChannelKey) {
-        this.inboundChannelKeys.add(inboundChannelKey);
-    }
-
-    public void setInboundChannelKeys(Collection<String> inboundChannelKeys) {
-        this.inboundChannelKeys = inboundChannelKeys;
+    @JsonIgnore
+    public Collection<EventPayload> getCorrelationParameters() {
+        return payload.values()
+                .stream()
+                .filter(EventPayload::isCorrelationParameter)
+                .collect(Collectors.toList());
     }
 
-    public Collection<String> getOutboundChannelKeys() {
-        return outboundChannelKeys;
-    }
-    
-    public void addOutboundChannelKey(String outboundChannelKey) {
-        this.outboundChannelKeys.add(outboundChannelKey);
+    public EventPayload getPayload(String name) {
+        return payload.get(name);
     }
 
-    public void setOutboundChannelKeys(Collection<String> outboundChannelKeys) {
-        this.outboundChannelKeys = outboundChannelKeys;
-    }
-
-    public Collection<EventCorrelationParameter> getCorrelationParameters() {
-        return correlationParameters;
-    }
-
-    public void setCorrelationParameters(Collection<EventCorrelationParameter> correlationParameters) {
-        this.correlationParameters = correlationParameters;
-    }
-
+    @JsonGetter
     public Collection<EventPayload> getPayload() {
-        return payload;
+        return payload.values();
     }
 
+    @JsonSetter
     public void setPayload(Collection<EventPayload> payload) {
-        this.payload = payload;
+        for (EventPayload eventPayload : payload) {
+            this.payload.put(eventPayload.getName(), eventPayload);
+        }
+    }
+
+    public void addPayload(String name, String type) {
+        EventPayload eventPayload = payload.get(name);
+        if (eventPayload != null) {
+            eventPayload.setType(type);
+        } else {
+            payload.put(name, new EventPayload(name, type));
+        }
+    }
+
+    public void addCorrelation(String name, String type) {
+        EventPayload eventPayload = payload.get(name);
+        if (eventPayload != null) {
+            eventPayload.setCorrelationParameter(true);
+        } else {
+            payload.put(name, EventPayload.correlation(name, type));
+        }
     }
 
 }

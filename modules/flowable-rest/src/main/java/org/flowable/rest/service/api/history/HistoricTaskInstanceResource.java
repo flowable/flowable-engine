@@ -84,7 +84,7 @@ public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResour
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
-    @ApiOperation(value = "Get a historic task instance form", tags = { "History Task" })
+    @ApiOperation(value = "Get a historic task instance form", tags = { "History Task" }, nickname = "getHistoricTaskForm")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")

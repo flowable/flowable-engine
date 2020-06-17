@@ -1,0 +1,855 @@
+{
+    "bounds": {
+        "lowerRight": {
+            "x": 1200,
+            "y": 1050
+        },
+        "upperLeft": {
+            "x": 0,
+            "y": 0
+        }
+    },
+    "properties": {
+        "process_id": "eventProcess",
+        "name": "Event process",
+        "documentation": "",
+        "process_author": "",
+        "process_version": "",
+        "process_namespace": "http:\/\/www.flowable.org\/processdef",
+        "process_historylevel": "",
+        "isexecutable": true,
+        "dataproperties": "",
+        "executionlisteners": "",
+        "eventlisteners": "",
+        "signaldefinitions": "",
+        "messagedefinitions": "",
+        "escalationdefinitions": "",
+        "process_potentialstarteruser": "",
+        "process_potentialstartergroup": "",
+        "iseagerexecutionfetch": "false"
+    },
+    "childShapes": [
+        {
+            "resourceId": "sid-A8437164-6973-4C0C-A766-3CE9EAFF65AB",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "executionlisteners": "",
+                "eventkey": "myEvent",
+                "eventname": "My event name",
+                "eventoutparameters": {
+                    "outParameters": [
+                        {
+                            "eventName": "customerId",
+                            "eventType": "string",
+                            "variableName": "customerVar",
+                            "$$hashKey": "uiGrid-0009"
+                        },
+                        {
+                            "eventName": "productNumber",
+                            "eventType": "string",
+                            "variableName": "productNO",
+                            "$$hashKey": "uiGrid-000F"
+                        }
+                    ]
+                },
+                "eventcorrelationparameters": null,
+                "channelkey": "testChannel",
+                "channelname": "My test channel",
+                "channeltype": "jms",
+                "channeldestination": "testQueue",
+                "keydetectionfixedvalue": "myEvent",
+                "keydetectionjsonfield": "",
+                "keydetectionjsonpointer": "",
+                "interrupting": true,
+                "keydetectionjsonpath": "",
+                "eventpayload": {
+                    "eventPayload": [
+                        {
+                            "name": "customerId",
+                            "type": "string",
+                            "$$hashKey": "uiGrid-0009"
+                        },
+                        {
+                            "name": "productNumber",
+                            "type": "string",
+                            "$$hashKey": "uiGrid-000F"
+                        }
+                    ]
+                },
+                "correlationparameters": {
+                    "correlationParameters": [
+                        {
+                            "name": "customerId",
+                            "type": "string",
+                            "$$hashKey": "uiGrid-001D"
+                        }
+                    ]
+                }
+            },
+            "stencil": {
+                "id": "StartEventRegistryEvent"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-F84F3651-EBBE-4705-B652-38D2B6025A53"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 120.5,
+                    "y": 165
+                },
+                "upperLeft": {
+                    "x": 90,
+                    "y": 135
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-FAA642C8-A5ED-448D-87EB-60E17E2CA5C0",
+            "properties": {
+                "overrideid": "",
+                "name": "First task",
+                "documentation": "",
+                "asynchronousdefinition": "false",
+                "exclusivedefinition": "false",
+                "executionlisteners": "",
+                "multiinstance_type": "None",
+                "multiinstance_cardinality": "",
+                "multiinstance_collection": "",
+                "multiinstance_variable": "",
+                "multiinstance_condition": "",
+                "isforcompensation": "false",
+                "usertaskassignment": {
+                    "assignment": {
+                        "type": "idm",
+                        "idm": {
+                            "type": "user",
+                            "assignee": {
+                                "id": "admin",
+                                "firstName": "Test",
+                                "lastName": "Administrator",
+                                "email": "admin@flowable.org",
+                                "fullName": "Test Administrator",
+                                "tenantId": null,
+                                "groups": [],
+                                "privileges": [],
+                                "$$hashKey": "object:1154"
+                            }
+                        }
+                    }
+                },
+                "formkeydefinition": "",
+                "formreference": "",
+                "formfieldvalidation": true,
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "formproperties": "",
+                "tasklisteners": "",
+                "skipexpression": "",
+                "categorydefinition": ""
+            },
+            "stencil": {
+                "id": "UserTask"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-5DB44557-4329-48B4-966E-0D6D41188C10"
+                },
+                {
+                    "resourceId": "sid-163916E1-E481-425A-909E-98F0E8AAE088"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 265.5,
+                    "y": 190
+                },
+                "upperLeft": {
+                    "x": 165.5,
+                    "y": 110
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-F84F3651-EBBE-4705-B652-38D2B6025A53",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-FAA642C8-A5ED-448D-87EB-60E17E2CA5C0"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 164.65625,
+                    "y": 150
+                },
+                "upperLeft": {
+                    "x": 121.109375,
+                    "y": 150
+                }
+            },
+            "dockers": [
+                {
+                    "x": 15.5,
+                    "y": 15
+                },
+                {
+                    "x": 50,
+                    "y": 40
+                }
+            ],
+            "target": {
+                "resourceId": "sid-FAA642C8-A5ED-448D-87EB-60E17E2CA5C0"
+            }
+        },
+        {
+            "resourceId": "sid-FB8B31E3-D736-4BD5-8949-3274C25955F4",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "executionlisteners": ""
+            },
+            "stencil": {
+                "id": "EndNoneEvent"
+            },
+            "childShapes": [],
+            "outgoing": [],
+            "bounds": {
+                "lowerRight": {
+                    "x": 943,
+                    "y": 164
+                },
+                "upperLeft": {
+                    "x": 915,
+                    "y": 136
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-5DB44557-4329-48B4-966E-0D6D41188C10",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "messageref": "",
+                "cancelactivity": true,
+                "eventkey": "boundaryEvent",
+                "eventname": "Boundary event",
+                "eventoutparameters": {
+                    "outParameters": [
+                        {
+                            "eventName": "customerName",
+                            "eventType": "string",
+                            "variableName": "customerName",
+                            "$$hashKey": "uiGrid-002N"
+                        },
+                        {
+                            "eventName": "customerId",
+                            "eventType": "string",
+                            "variableName": "customerVar",
+                            "$$hashKey": "uiGrid-002V"
+                        }
+                    ]
+                },
+                "eventcorrelationparameters": {
+                    "correlationParameters": [
+                        {
+                            "name": "customerId",
+                            "type": "string",
+                            "value": "${customerVar}",
+                            "$$hashKey": "uiGrid-001R"
+                        }
+                    ]
+                },
+                "channelkey": "boundaryChannel",
+                "channelname": "Boundary channel",
+                "channeltype": "jms",
+                "channeldestination": "boundaryQueue",
+                "keydetectionfixedvalue": "boundaryEvent",
+                "keydetectionjsonfield": "",
+                "keydetectionjsonpointer": "",
+                "keydetectionjsonpath": ""
+            },
+            "stencil": {
+                "id": "BoundaryEventRegistryEvent"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-CCDE9097-5CAD-4C50-9E10-F80ECDBE0F35"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 231.04402985792,
+                    "y": 205.25820948623
+                },
+                "upperLeft": {
+                    "x": 201.04402985792,
+                    "y": 175.25820948623
+                }
+            },
+            "dockers": [
+                {
+                    "x": 50.5,
+                    "y": 77
+                }
+            ]
+        },
+        {
+            "resourceId": "sid-A79A5673-2C66-47CA-9F59-911AE4CCA5C7",
+            "properties": {
+                "overrideid": "",
+                "name": "Boundary task",
+                "documentation": "",
+                "asynchronousdefinition": "false",
+                "exclusivedefinition": "false",
+                "executionlisteners": "",
+                "multiinstance_type": "None",
+                "multiinstance_cardinality": "",
+                "multiinstance_collection": "",
+                "multiinstance_variable": "",
+                "multiinstance_condition": "",
+                "isforcompensation": "false",
+                "usertaskassignment": {
+                    "assignment": {
+                        "type": "idm",
+                        "idm": {
+                            "type": "user",
+                            "assignee": {
+                                "id": "admin",
+                                "firstName": "Test",
+                                "lastName": "Administrator",
+                                "email": "admin@flowable.org",
+                                "fullName": "Test Administrator",
+                                "tenantId": null,
+                                "groups": [],
+                                "privileges": [],
+                                "$$hashKey": "object:3681"
+                            }
+                        }
+                    }
+                },
+                "formkeydefinition": "",
+                "formreference": "",
+                "formfieldvalidation": true,
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "formproperties": "",
+                "tasklisteners": "",
+                "skipexpression": "",
+                "categorydefinition": ""
+            },
+            "stencil": {
+                "id": "UserTask"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-02478F6C-D6FB-4191-91AD-FD818F274AFA"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 378,
+                    "y": 309
+                },
+                "upperLeft": {
+                    "x": 278,
+                    "y": 229
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-CCDE9097-5CAD-4C50-9E10-F80ECDBE0F35",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-A79A5673-2C66-47CA-9F59-911AE4CCA5C7"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 277.14460704611,
+                    "y": 269
+                },
+                "upperLeft": {
+                    "x": 216.04402985792,
+                    "y": 206.02229520756
+                }
+            },
+            "dockers": [
+                {
+                    "x": 15,
+                    "y": 15
+                },
+                {
+                    "x": 216.04402985792,
+                    "y": 269
+                },
+                {
+                    "x": 50,
+                    "y": 40
+                }
+            ],
+            "target": {
+                "resourceId": "sid-A79A5673-2C66-47CA-9F59-911AE4CCA5C7"
+            }
+        },
+        {
+            "resourceId": "sid-13581318-BAA1-498F-BA6E-BE3307074561",
+            "properties": {
+                "overrideid": "",
+                "name": "Send event",
+                "documentation": "",
+                "asynchronousdefinition": "false",
+                "exclusivedefinition": "false",
+                "servicetasktriggerable": true,
+                "executionlisteners": "",
+                "eventkey": "sendEvent",
+                "eventname": "Send event",
+                "eventinparameters": {
+                    "inParameters": [
+                        {
+                            "variableName": "${customerName}",
+                            "eventName": "name",
+                            "eventType": "string",
+                            "$$hashKey": "uiGrid-0065"
+                        }
+                    ]
+                },
+                "channelkey": "sendChannel",
+                "channelname": "Send channel",
+                "channeltype": "jms",
+                "channeldestination": "sendQueue",
+                "triggereventkey": "triggerEvent",
+                "triggereventname": "Trigger event",
+                "triggerchannelkey": "triggerChannel",
+                "triggerchannelname": "Trigger channel",
+                "triggerchanneltype": "jms",
+                "triggerchanneldestination": "triggerQueue",
+                "eventoutparameters": {
+                    "outParameters": [
+                        {
+                            "eventName": "productName",
+                            "eventType": "string",
+                            "variableName": "product",
+                            "$$hashKey": "uiGrid-0037"
+                        },
+                        {
+                            "eventName": "amount",
+                            "eventType": "integer",
+                            "variableName": "productAmount",
+                            "$$hashKey": "uiGrid-0039"
+                        },
+                        {
+                            "eventName": "customerId",
+                            "eventType": "string",
+                            "variableName": "customerVar",
+                            "$$hashKey": "uiGrid-003L"
+                        }
+                    ]
+                },
+                "eventcorrelationparameters": {
+                    "correlationParameters": [
+                        {
+                            "name": "customerId",
+                            "type": "string",
+                            "value": "${customerVar}",
+                            "$$hashKey": "uiGrid-003Z"
+                        }
+                    ]
+                },
+                "keydetectionfixedvalue": "triggerEvent",
+                "keydetectionjsonfield": "",
+                "keydetectionjsonpointer": "",
+                "keydetectionjsonpath": ""
+            },
+            "stencil": {
+                "id": "SendEventTask"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-E0BC9A55-6CDC-4B71-A11F-C057EFE6009B"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 610,
+                    "y": 190
+                },
+                "upperLeft": {
+                    "x": 510,
+                    "y": 110
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-9456944E-8A9B-48E2-8940-40C8A2FE11E8",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "asynchronousdefinition": "false",
+                "exclusivedefinition": "false",
+                "sequencefloworder": ""
+            },
+            "stencil": {
+                "id": "ExclusiveGateway"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-411DE91A-8090-4727-A34D-12C1B6CFB20C"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 452,
+                    "y": 170
+                },
+                "upperLeft": {
+                    "x": 412,
+                    "y": 130
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-02478F6C-D6FB-4191-91AD-FD818F274AFA",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-9456944E-8A9B-48E2-8940-40C8A2FE11E8"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 432,
+                    "y": 269
+                },
+                "upperLeft": {
+                    "x": 378.5625,
+                    "y": 169.59375
+                }
+            },
+            "dockers": [
+                {
+                    "x": 50,
+                    "y": 40
+                },
+                {
+                    "x": 432,
+                    "y": 269
+                },
+                {
+                    "x": 20,
+                    "y": 20
+                }
+            ],
+            "target": {
+                "resourceId": "sid-9456944E-8A9B-48E2-8940-40C8A2FE11E8"
+            }
+        },
+        {
+            "resourceId": "sid-163916E1-E481-425A-909E-98F0E8AAE088",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-9456944E-8A9B-48E2-8940-40C8A2FE11E8"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 412.39453125,
+                    "y": 150
+                },
+                "upperLeft": {
+                    "x": 265.55078125,
+                    "y": 150
+                }
+            },
+            "dockers": [
+                {
+                    "x": 50,
+                    "y": 40
+                },
+                {
+                    "x": 20,
+                    "y": 20
+                }
+            ],
+            "target": {
+                "resourceId": "sid-9456944E-8A9B-48E2-8940-40C8A2FE11E8"
+            }
+        },
+        {
+            "resourceId": "sid-411DE91A-8090-4727-A34D-12C1B6CFB20C",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-13581318-BAA1-498F-BA6E-BE3307074561"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 509.19532018926,
+                    "y": 150.42185971153
+                },
+                "upperLeft": {
+                    "x": 452.42577356074,
+                    "y": 150.19923403847
+                }
+            },
+            "dockers": [
+                {
+                    "x": 20.5,
+                    "y": 20.5
+                },
+                {
+                    "x": 50,
+                    "y": 40
+                }
+            ],
+            "target": {
+                "resourceId": "sid-13581318-BAA1-498F-BA6E-BE3307074561"
+            }
+        },
+        {
+            "resourceId": "sid-63A9D539-E2B6-4CC4-A514-89C5C89A4D18",
+            "properties": {
+                "overrideid": "",
+                "name": "After task",
+                "documentation": "",
+                "asynchronousdefinition": "false",
+                "exclusivedefinition": "false",
+                "executionlisteners": "",
+                "multiinstance_type": "None",
+                "multiinstance_cardinality": "",
+                "multiinstance_collection": "",
+                "multiinstance_variable": "",
+                "multiinstance_condition": "",
+                "isforcompensation": "false",
+                "usertaskassignment": {
+                    "assignment": {
+                        "type": "idm",
+                        "idm": {
+                            "type": "user",
+                            "assignee": {
+                                "id": "admin",
+                                "firstName": "Test",
+                                "lastName": "Administrator",
+                                "email": "admin@flowable.org",
+                                "fullName": "Test Administrator",
+                                "tenantId": null,
+                                "groups": [],
+                                "privileges": [],
+                                "$$hashKey": "object:7920"
+                            }
+                        }
+                    }
+                },
+                "formkeydefinition": "",
+                "formreference": {
+                    "id": "ddc8ff07-31ff-11ea-978e-acde48001122",
+                    "name": "After task form",
+                    "key": "afterTaskForm"
+                },
+                "formfieldvalidation": true,
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "formproperties": "",
+                "tasklisteners": "",
+                "skipexpression": "",
+                "categorydefinition": ""
+            },
+            "stencil": {
+                "id": "UserTask"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-C05CBE7F-4C5C-43FE-BEBC-36C855A18749"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 817,
+                    "y": 190
+                },
+                "upperLeft": {
+                    "x": 717,
+                    "y": 110
+                }
+            },
+            "dockers": []
+        },
+        {
+            "resourceId": "sid-E0BC9A55-6CDC-4B71-A11F-C057EFE6009B",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-63A9D539-E2B6-4CC4-A514-89C5C89A4D18"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 716.67578125,
+                    "y": 150
+                },
+                "upperLeft": {
+                    "x": 610.32421875,
+                    "y": 150
+                }
+            },
+            "dockers": [
+                {
+                    "x": 50,
+                    "y": 40
+                },
+                {
+                    "x": 50,
+                    "y": 40
+                }
+            ],
+            "target": {
+                "resourceId": "sid-63A9D539-E2B6-4CC4-A514-89C5C89A4D18"
+            }
+        },
+        {
+            "resourceId": "sid-C05CBE7F-4C5C-43FE-BEBC-36C855A18749",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "conditionsequenceflow": "",
+                "executionlisteners": "",
+                "defaultflow": "false",
+                "skipexpression": ""
+            },
+            "stencil": {
+                "id": "SequenceFlow"
+            },
+            "childShapes": [],
+            "outgoing": [
+                {
+                    "resourceId": "sid-FB8B31E3-D736-4BD5-8949-3274C25955F4"
+                }
+            ],
+            "bounds": {
+                "lowerRight": {
+                    "x": 914.078125,
+                    "y": 150
+                },
+                "upperLeft": {
+                    "x": 817.359375,
+                    "y": 150
+                }
+            },
+            "dockers": [
+                {
+                    "x": 50,
+                    "y": 40
+                },
+                {
+                    "x": 14,
+                    "y": 14
+                }
+            ],
+            "target": {
+                "resourceId": "sid-FB8B31E3-D736-4BD5-8949-3274C25955F4"
+            }
+        }
+    ],
+    "stencil": {
+        "id": "BPMNDiagram"
+    },
+    "stencilset": {
+        "namespace": "http:\/\/b3mn.org\/stencilset\/bpmn2.0#",
+        "url": "..\/editor\/stencilsets\/bpmn2.0\/bpmn2.0.json"
+    }
+}

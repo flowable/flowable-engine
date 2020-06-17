@@ -44,8 +44,13 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     
     protected void deleteCaseInstance() {
         updateChildPlanItemInstancesState();
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
         
+        String newState = getNewState();
+        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
+                caseInstanceEntity, caseInstanceEntity.getState(), newState);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordCaseInstanceEnd(caseInstanceEntity, newState, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
+
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
             String loggingType = null;
             if (CaseInstanceState.TERMINATED.equals(getNewState())) {
@@ -55,12 +60,8 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
             }
             CmmnLoggingSessionUtil.addLoggingData(loggingType, "Completed case instance with id " + caseInstanceEntity.getId(), caseInstanceEntity);
         }
-        
-        String newState = getNewState();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
-                caseInstanceEntity, caseInstanceEntity.getState(), newState);
-        CommandContextUtil.getCmmnHistoryManager(commandContext)
-            .recordCaseInstanceEnd(caseInstanceEntity, newState, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
+
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
     }
 
     protected void updateChildPlanItemInstancesState() {

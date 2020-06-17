@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.impl.runtime;
 
+import java.util.Objects;
+
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.model.EventPayload;
 
@@ -55,6 +57,23 @@ public class EventPayloadInstanceImpl implements EventPayloadInstance {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EventPayloadInstanceImpl that = (EventPayloadInstanceImpl) o;
+        return Objects.equals(eventPayloadDefinition, that.eventPayloadDefinition) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventPayloadDefinition, value);
     }
 
 }

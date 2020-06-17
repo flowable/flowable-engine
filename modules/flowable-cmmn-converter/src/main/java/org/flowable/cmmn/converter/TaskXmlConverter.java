@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -64,6 +65,8 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
             } else if (Objects.equals(type, CasePageTask.TYPE)) {
                 task = convertToCasePageTask(xtr);
 
+            } else if (Objects.equals(type, ExternalWorkerServiceTask.TYPE)) {
+                task = convertToExternalWorkerServiceTask(xtr);
             } else if (Objects.equals(type, SendEventServiceTask.SEND_EVENT)) {
               task = convertToSendEventTask(xtr);
 
@@ -103,6 +106,9 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         serviceTask.setResultVariableName(
             xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
 
+        serviceTask.setStoreResultVariableAsTransient(
+            Boolean.parseBoolean(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_STORE_RESULT_AS_TRANSIENT)));
+
         return serviceTask;
     }
 
@@ -126,7 +132,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         if (formKey != null) {
             casePageTask.setFormKey(formKey);
         }
-        
+
+        String sameDeploymentAttribute = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if ("false".equalsIgnoreCase(sameDeploymentAttribute)) {
+            casePageTask.setSameDeployment(false);
+        }
+
         String label = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_LABEL);
         if (label != null) {
             casePageTask.setLabel(label);
@@ -183,6 +194,17 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         }
 
         return scriptTask;
+    }
+
+    protected Task convertToExternalWorkerServiceTask(XMLStreamReader xtr) {
+        ExternalWorkerServiceTask externalWorkerTask = new ExternalWorkerServiceTask();
+
+        String topic = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXTERNAL_WORKER_TOPIC);
+        if (topic != null) {
+            externalWorkerTask.setTopic(topic);
+        }
+
+        return externalWorkerTask;
     }
 
     protected Task convertToSendEventTask(XMLStreamReader xmlStreamReader) {

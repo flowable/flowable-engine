@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ExitSentryConditionWithSentryCombinationTest extends FlowableCmmnTe
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSentry-test").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "stage 1", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "start", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "fireMe1", AVAILABLE);
@@ -45,7 +45,7 @@ public class ExitSentryConditionWithSentryCombinationTest extends FlowableCmmnTe
 
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "start", AVAILABLE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "stage 1", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "fireMe1", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Complete Stage 1", AVAILABLE);
@@ -56,7 +56,7 @@ public class ExitSentryConditionWithSentryCombinationTest extends FlowableCmmnTe
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         // the Milestone becomes orphaned as it can never be activated anymore as stage 1 is terminated
-        assertEquals(1, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(1);
         assertPlanItemInstanceState(planItemInstances, "Milestone", AVAILABLE);
     }
 }

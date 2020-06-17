@@ -39,9 +39,11 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
             .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
             .singleResult();
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceId(eventListenerPlanItemInstance.getId()).singleResult().getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
 
         // The event listener query should not return them as they are unavailable
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).isEmpty();
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).stateUnavailable().list()).hasSize(1);
 
         // After case instance start human task A should be active, human taskA B should be enabled
@@ -61,6 +63,8 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
             .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
             .singleResult();
         assertThat(userEventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceId(userEventListenerPlanItemInstance.getId()).singleResult().getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         // Completing the user event listener should terminate the case
         UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
@@ -113,7 +117,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
     public void testAvailableConditionDismisses() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableCondition").start();
 
-        // The plan item instance for the event listener should have been created in the unavailabe state, as the condition is not true.
+        // The plan item instance for the event listener should have been created in the unavailable state, as the condition is not true.
         PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
@@ -132,23 +136,51 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
         eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceId(eventListenerPlanItemInstance.getId()).singleResult().getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         // By starting task B now however, the available condition is now false and the event listener is now unavailable again
         cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult().getId());
         eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceId(eventListenerPlanItemInstance.getId()).singleResult().getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
 
-        // Completing b completes the stage
+        // Completing b makes the stage completable, which makes the event listener available again
         eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
         assertThat(eventListenerPlanItemInstance.getEndedTime()).isNull();
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("B").singleResult().getId());
 
+        eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
+        assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(eventListenerPlanItemInstance.getEndedTime()).isNull();
+
+        // Completing the event listener instance, completes the stage
+        cmmnRuntimeService.completeGenericEventListenerInstance(eventListenerPlanItemInstance.getId());
         eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).includeEnded().singleResult();
         assertThat(eventListenerPlanItemInstance.getEndedTime()).isNotNull();
 
         Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(taskC.getName()).isEqualTo("C");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageCompletionDependingOnAvailableEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testStageCompleteWithAvailableEventListener")
+            .start();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().count()).isEqualTo(0);
+
+        // Completing the task should make the available condition (cmmn:isStageCompletable()) true and make the eventlistener available)
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().count()).isEqualTo(1);
+        assertCaseInstanceNotEnded(caseInstance);
+
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+        assertCaseInstanceEnded(caseInstance);
     }
 
 }

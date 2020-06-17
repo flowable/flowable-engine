@@ -13,12 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static java.util.stream.Collectors.toMap;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -30,7 +25,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -57,7 +51,7 @@ import org.junit.rules.ExpectedException;
  * @author Joram Barrez
  */
 public class VariablesTest extends FlowableCmmnTestCase {
-    
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -70,35 +64,35 @@ public class VariablesTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertTrue(variablesFromGet.containsKey("stringVar"));
-        assertEquals("Hello World", variablesFromGet.get("stringVar"));
-        assertTrue(variablesFromGet.containsKey("intVar"));
-        assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
-        
-        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
-        assertTrue(variableInstancesFromGet.containsKey("stringVar"));
-        VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
-        assertEquals("Hello World", variableInstance.getValue());
-        assertEquals("string", variableInstance.getTypeName());
-        assertTrue(variableInstancesFromGet.containsKey("intVar"));
-        variableInstance = variableInstancesFromGet.get("intVar");
-        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
-        assertEquals("integer", variableInstance.getTypeName());
+        assertThat(variablesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(variablesFromGet.get("stringVar")).isEqualTo("Hello World");
+        assertThat(variablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
 
-        assertEquals("Hello World", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertEquals(42, ((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist"));
-        
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertThat(variableInstancesFromGet.containsKey("stringVar")).isTrue();
+        VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
+        assertThat(variableInstance.getValue()).isEqualTo("Hello World");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
+        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
+        variableInstance = variableInstancesFromGet.get("intVar");
+        assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(42);
+        assertThat(variableInstance.getTypeName()).isEqualTo("integer");
+
+        assertThat((String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("Hello World");
+        assertThat(((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue()).isEqualTo(42);
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist")).isNull();
+
         variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "stringVar");
-        assertEquals("Hello World", variableInstance.getValue());
-        assertEquals("string", variableInstance.getTypeName());
+        assertThat(variableInstance.getValue()).isEqualTo("Hello World");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
         variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "intVar");
-        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
-        assertEquals("integer", variableInstance.getTypeName());
+        assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(42);
+        assertThat(variableInstance.getTypeName()).isEqualTo("integer");
         variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "doesNotExist");
-        assertNull(variableInstance);
+        assertThat(variableInstance).isNull();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testGetLocalVariables() {
@@ -106,42 +100,43 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("stringVar", "Hello World");
         variables.put("intVar", 42);
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
-        
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("nestedTask").caseInstanceId(caseInstance.getId()).singleResult();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("nestedTask")
+                .caseInstanceId(caseInstance.getId()).singleResult();
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "stringVar", "Changed value");
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "intVar", 21);
-        
+
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertTrue(variablesFromGet.containsKey("stringVar"));
-        assertEquals("Hello World", variablesFromGet.get("stringVar"));
-        assertTrue(variablesFromGet.containsKey("intVar"));
-        assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
-        
+        assertThat(variablesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(variablesFromGet.get("stringVar")).isEqualTo("Hello World");
+        assertThat(variablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
+
         Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
-        assertTrue(variableInstancesFromGet.containsKey("stringVar"));
+        assertThat(variableInstancesFromGet.containsKey("stringVar")).isTrue();
         VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
-        assertEquals("Hello World", variableInstance.getValue());
-        assertEquals("string", variableInstance.getTypeName());
-        assertTrue(variableInstancesFromGet.containsKey("intVar"));
+        assertThat(variableInstance.getValue()).isEqualTo("Hello World");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
+        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
         variableInstance = variableInstancesFromGet.get("intVar");
-        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
-        assertEquals("integer", variableInstance.getTypeName());
+        assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(42);
+        assertThat(variableInstance.getTypeName()).isEqualTo("integer");
 
         Map<String, Object> localVariablesFromGet = cmmnRuntimeService.getLocalVariables(planItemInstance.getId());
-        assertTrue(localVariablesFromGet.containsKey("stringVar"));
-        assertEquals("Changed value", localVariablesFromGet.get("stringVar"));
-        assertTrue(localVariablesFromGet.containsKey("intVar"));
-        assertEquals(21, ((Integer) localVariablesFromGet.get("intVar")).intValue());
-        
+        assertThat(localVariablesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(localVariablesFromGet.get("stringVar")).isEqualTo("Changed value");
+        assertThat(localVariablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(((Integer) localVariablesFromGet.get("intVar")).intValue()).isEqualTo(21);
+
         Map<String, VariableInstance> localVariableInstancesFromGet = cmmnRuntimeService.getLocalVariableInstances(planItemInstance.getId());
-        assertTrue(localVariableInstancesFromGet.containsKey("stringVar"));
+        assertThat(localVariableInstancesFromGet.containsKey("stringVar")).isTrue();
         variableInstance = localVariableInstancesFromGet.get("stringVar");
-        assertEquals("Changed value", variableInstance.getValue());
-        assertEquals("string", variableInstance.getTypeName());
-        assertTrue(variableInstancesFromGet.containsKey("intVar"));
+        assertThat(variableInstance.getValue()).isEqualTo("Changed value");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
+        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
         variableInstance = localVariableInstancesFromGet.get("intVar");
-        assertEquals(21, ((Integer) variableInstance.getValue()).intValue());
-        assertEquals("integer", variableInstance.getTypeName());
+        assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(21);
+        assertThat(variableInstance.getTypeName()).isEqualTo("integer");
     }
 
     @Test
@@ -153,9 +148,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("intVar", 42);
         cmmnRuntimeService.setVariables(caseInstance.getId(), variables);
 
-        assertEquals("Hello World", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertEquals(42, ((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist"));
+        assertThat((String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("Hello World");
+        assertThat(((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue()).isEqualTo(42);
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist")).isNull();
     }
 
     @Test
@@ -165,37 +160,37 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("stringVar", "Hello World");
         variables.put("intVar", 42);
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
-        assertEquals(2, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).hasSize(2);
 
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
-        assertEquals(1, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "StringVar"));
-        assertNotNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).hasSize(1);
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "StringVar")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).isNotNull();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testSerializableVariable() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("myVariable", new MyVariable("Hello World"));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
-        
+
         MyVariable myVariable = (MyVariable) cmmnRuntimeService.getVariable(caseInstance.getId(), "myVariable");
-        assertEquals("Hello World", myVariable.value);
-        
+        assertThat(myVariable.value).isEqualTo("Hello World");
+
         cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
 
             @Override
             public Void execute(CommandContext commandContext) {
                 VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "myVariable");
                 MyVariable myVariable = (MyVariable) variableInstance.getValue();
-                assertEquals("Hello World", myVariable.value);
-                
+                assertThat(myVariable.value).isEqualTo("Hello World");
+
                 return null;
             }
         });
     }
-    
+
     @Test
     @CmmnDeployment
     public void testResolveMilestoneNameAsExpression() {
@@ -207,9 +202,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Milestone Hello from test and delegate", historicMilestoneInstance.getName());
+        assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
     }
-    
+
     @Test
     @CmmnDeployment
     public void testHistoricVariables() {
@@ -218,46 +213,47 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("intVar", 123);
         variables.put("doubleVar", 123.123);
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
-        
+
         // verify variables
-        assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("test");
         HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult();
-        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
-        assertEquals("test", historicVariableInstance.getValue());
-        assertNull(historicVariableInstance.getSubScopeId());
-        
-        assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
+        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).isEqualTo(123);
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
-        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
-        assertEquals(123, historicVariableInstance.getValue());
-        assertNull(historicVariableInstance.getSubScopeId());
-        
-        assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
+        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(historicVariableInstance.getValue()).isEqualTo(123);
+        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar")).isEqualTo(123.123);
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
-        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
-        assertEquals(123.123, historicVariableInstance.getValue());
-        assertNull(historicVariableInstance.getSubScopeId());
-        
+        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(historicVariableInstance.getValue()).isEqualTo(123.123);
+        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
         // Update variables
         Map<String, Object> newVariables = new HashMap<>();
         newVariables.put("stringVar", "newValue");
-        newVariables.put("otherStringVar", "test number 2");        
+        newVariables.put("otherStringVar", "test number 2");
         cmmnRuntimeService.setVariables(caseInstance.getId(), newVariables);
-        
-        assertEquals("newValue", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertEquals("newValue", cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult().getValue());
-        assertEquals("test number 2", cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult().getValue());
-        
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("newValue");
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult().getValue()).isEqualTo("newValue");
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult().getValue())
+                .isEqualTo("test number 2");
+
         // Delete variables
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult());
-        assertNotNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult());
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult()).isNull();
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult()).isNotNull();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTransientVariables() {
@@ -265,16 +261,16 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("transientStartVar", "Hello from test");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase").transientVariables(variables).start();
-        
+
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Milestone Hello from test and delegate", historicMilestoneInstance.getName());
-        
+        assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
+
         // Variables should not be persisted
-        assertEquals(0, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
-        assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testBlockingExpressionBasedOnVariable() {
@@ -284,31 +280,32 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .variable("nameVar", "First Task")
                 .variable("blockB", true)
                 .start();
-        
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceStateActive()
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("B", planItemInstances.get(0).getName());
-        assertEquals("First Task", planItemInstances.get(1).getName());
-        
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances.get(0).getName()).isEqualTo("B");
+        assertThat(planItemInstances.get(1).getName()).isEqualTo("First Task");
+
         // Non-blocking
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testBlockingExpression")
                 .variable("nameVar", "Second Task")
                 .variable("blockB", false)
                 .start();
-        
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceStateActive()
                 .list();
-        assertEquals(1, planItemInstances.size());
-        assertEquals("Second Task", planItemInstances.get(0).getName());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Second Task");
     }
-    
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testSetVariableOnRootCase() {
@@ -323,7 +320,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate")).isEqualTo("newValue");
     }
 
     @Test
@@ -358,8 +355,8 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat("resolving variable name expressions does not make sense when it is set locally",
-                updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"))
+                .as("resolving variable name expressions does not make sense when it is set locally").isEqualTo("newValue");
     }
 
     @Test
@@ -379,7 +376,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(subCaseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate")).isEqualTo("newValue");
     }
 
     @Test
@@ -389,7 +386,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .variable("varToUpdate", "initialValue")
                 .caseDefinitionKey("oneHumanTaskCase")
                 .start();
-        Map<String, Object> variables = Stream.of( new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
+        Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
                 toMap(Pair::getKey, Pair::getValue)
         );
         cmmnRuntimeService.setVariables(caseInstance.getId(), variables);
@@ -398,7 +395,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
+        assertThat(updatedCaseInstance.getCaseVariables()).isEqualTo(variables);
     }
 
     @Test
@@ -445,25 +442,25 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(subCaseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
+        assertThat(updatedCaseInstance.getCaseVariables()).isEqualTo(variables);
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testIncludeVariablesWithSerializableVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneHumanTaskCase")
-            .variable("myVar", new CustomTestVariable("test", 123))
-            .start();
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", new CustomTestVariable("test", 123))
+                .start();
 
         CaseInstance caseInstanceWithVariables = cmmnRuntimeService.createCaseInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .includeCaseVariables()
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
 
         CustomTestVariable customTestVariable = (CustomTestVariable) caseInstanceWithVariables.getCaseVariables().get("myVar");
-        assertEquals("test", customTestVariable.someValue);
-        assertEquals(123, customTestVariable.someInt);
+        assertThat(customTestVariable.someValue).isEqualTo("test");
+        assertThat(customTestVariable.someInt).isEqualTo(123);
     }
 
     @Test
@@ -473,59 +470,59 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
         CustomAccessCaseType customVar = new CustomAccessCaseType();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneHumanTaskCase")
-            .variable("customVar", customVar)
-            .start();
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("customVar", customVar)
+                .start();
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isNull();
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isNull();
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
 
         customVar = (CustomAccessCaseType) cmmnRuntimeService.getVariable(caseInstance.getId(), "customVar");
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isNull();
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isNull();
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
     }
 
     @Test
@@ -534,67 +531,67 @@ public class VariablesTest extends FlowableCmmnTestCase {
         addVariableTypeIfNotExists(CustomAccessCaseInstanceVariableType.INSTANCE);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneHumanTaskCase")
-            .start();
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
 
         Task task = cmmnTaskService.createTaskQuery()
-            .caseInstanceId(caseInstance.getId())
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
 
-        Assertions.assertThat(task).isNotNull();
+        assertThat(task).isNotNull();
 
         CustomAccessCaseType customVar = new CustomAccessCaseType();
         cmmnTaskService.setVariableLocal(task.getId(), "customTaskVar", customVar);
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isEqualTo(task.getId());
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isEqualTo(task.getId());
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isEqualTo(task.getSubScopeId());
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isEqualTo(task.getSubScopeId());
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
 
         customVar = (CustomAccessCaseType) cmmnTaskService.getVariableLocal(task.getId(), "customTaskVar");
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isEqualTo(task.getId());
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isEqualTo(task.getId());
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isEqualTo(task.getSubScopeId());
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isEqualTo(task.getSubScopeId());
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
     }
 
     @Test
@@ -603,67 +600,67 @@ public class VariablesTest extends FlowableCmmnTestCase {
         addVariableTypeIfNotExists(CustomAccessCaseInstanceVariableType.INSTANCE);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneHumanTaskCase")
-            .start();
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .planItemDefinitionId("theTask")
-            .singleResult();
+                .planItemDefinitionId("theTask")
+                .singleResult();
 
-        Assertions.assertThat(planItemInstance).isNotNull();
+        assertThat(planItemInstance).isNotNull();
 
         CustomAccessCaseType customVar = new CustomAccessCaseType();
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "customPlanItemVar", customVar);
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isNull();
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isEqualTo(planItemInstance.getId());
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isEqualTo(planItemInstance.getId());
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
 
         customVar = (CustomAccessCaseType) cmmnRuntimeService.getLocalVariable(planItemInstance.getId(), "customPlanItemVar");
 
-        Assertions.assertThat(customVar.getProcessInstanceId())
-            .as("custom var process instance id")
-            .isNull();
+        assertThat(customVar.getProcessInstanceId())
+                .as("custom var process instance id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getExecutionId())
-            .as("custom var execution id")
-            .isNull();
+        assertThat(customVar.getExecutionId())
+                .as("custom var execution id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getTaskId())
-            .as("custom var task id")
-            .isNull();
+        assertThat(customVar.getTaskId())
+                .as("custom var task id")
+                .isNull();
 
-        Assertions.assertThat(customVar.getScopeId())
-            .as("custom var scope id")
-            .isEqualTo(caseInstance.getId());
+        assertThat(customVar.getScopeId())
+                .as("custom var scope id")
+                .isEqualTo(caseInstance.getId());
 
-        Assertions.assertThat(customVar.getSubScopeId())
-            .as("custom var sub scope id")
-            .isEqualTo(planItemInstance.getId());
+        assertThat(customVar.getSubScopeId())
+                .as("custom var sub scope id")
+                .isEqualTo(planItemInstance.getId());
 
-        Assertions.assertThat(customVar.getScopeType())
-            .as("custom var scope type")
-            .isEqualTo(ScopeTypes.CMMN);
+        assertThat(customVar.getScopeType())
+                .as("custom var scope type")
+                .isEqualTo(ScopeTypes.CMMN);
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {
@@ -765,13 +762,13 @@ public class VariablesTest extends FlowableCmmnTestCase {
             customValue.setScopeType(valueFields.getScopeType());
 
             String textValue = new StringJoiner(",")
-                .add(customValue.getProcessInstanceId())
-                .add(customValue.getExecutionId())
-                .add(customValue.getTaskId())
-                .add(customValue.getScopeId())
-                .add(customValue.getSubScopeId())
-                .add(customValue.getScopeType())
-                .toString();
+                    .add(customValue.getProcessInstanceId())
+                    .add(customValue.getExecutionId())
+                    .add(customValue.getTaskId())
+                    .add(customValue.getScopeId())
+                    .add(customValue.getSubScopeId())
+                    .add(customValue.getScopeType())
+                    .toString();
             valueFields.setTextValue(textValue);
         }
 
@@ -798,21 +795,22 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
             return null;
         }
+
         protected String getValue(String value) {
             return "null".equals(value) ? null : value;
         }
     }
 
     public static class MyVariable implements Serializable {
-        
+
         private static final long serialVersionUID = 1L;
-        
+
         private String value;
-        
+
         public MyVariable(String value) {
             this.value = value;
         }
-        
+
     }
 
     public static class SetVariableDelegate implements PlanItemJavaDelegate {
@@ -824,15 +822,15 @@ public class VariablesTest extends FlowableCmmnTestCase {
         }
 
     }
-    
+
     public static class SetTransientVariableDelegate implements PlanItemJavaDelegate {
-        
+
         @Override
         public void execute(DelegatePlanItemInstance planItemInstance) {
             String variableValue = (String) planItemInstance.getVariable("transientStartVar");
             planItemInstance.setTransientVariable("transientVar", variableValue + " and delegate");
         }
-        
+
     }
 
     public static class CustomTestVariable implements Serializable {

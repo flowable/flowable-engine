@@ -12,9 +12,7 @@
  */
 package org.flowable.app.engine.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -51,13 +49,13 @@ public class CaseDefinitionCategoryTest extends FlowableAppTestCase {
     @Test
     public void testUpdateCategory() {
         AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertNull(appDefinition.getCategory());
+        assertThat(appDefinition.getCategory()).isNull();
         
         appRepositoryService.setAppDefinitionCategory(appDefinition.getId(), "testCategory");
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("testCategory", appDefinition.getCategory());
+        assertThat(appDefinition.getCategory()).isEqualTo("testCategory");
         
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).appDefinitionCategory("testCategory").singleResult();
-        assertNotNull(appDefinition);
+        assertThat(appDefinition).isNotNull();
     }
 }

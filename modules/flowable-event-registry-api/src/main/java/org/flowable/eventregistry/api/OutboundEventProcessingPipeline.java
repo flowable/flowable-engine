@@ -17,8 +17,8 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 /**
  * @author Joram Barrez
  */
-public interface OutboundEventProcessingPipeline {
+public interface OutboundEventProcessingPipeline<T> {
 
-    String run(EventInstance eventInstance);
+    T run(EventInstance eventInstance);
 
 }

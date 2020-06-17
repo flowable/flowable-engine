@@ -15,11 +15,11 @@ package org.flowable.eventregistry.impl.consumer;
 import java.util.Collection;
 import java.util.Objects;
 
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 
 /**
  * A representation of a correlation key, including the
- * {@link org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance} instances
+ * {@link org.flowable.eventregistry.api.runtime.EventPayloadInstance} instances
  * that were used to get to the key value.
  *
  * @author Joram Barrez
@@ -27,9 +27,9 @@ import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 public class CorrelationKey {
 
     protected String value;
-    protected Collection<EventCorrelationParameterInstance> parameterInstances;
+    protected Collection<EventPayloadInstance> parameterInstances;
 
-    public CorrelationKey(String value, Collection<EventCorrelationParameterInstance> parameterInstances) {
+    public CorrelationKey(String value, Collection<EventPayloadInstance> parameterInstances) {
         this.value = value;
         this.parameterInstances = parameterInstances;
     }
@@ -40,10 +40,10 @@ public class CorrelationKey {
     public void setValue(String value) {
         this.value = value;
     }
-    public Collection<EventCorrelationParameterInstance> getParameterInstances() {
+    public Collection<EventPayloadInstance> getParameterInstances() {
         return parameterInstances;
     }
-    public void setParameterInstances(Collection<EventCorrelationParameterInstance> parameterInstances) {
+    public void setParameterInstances(Collection<EventPayloadInstance> parameterInstances) {
         this.parameterInstances = parameterInstances;
     }
 

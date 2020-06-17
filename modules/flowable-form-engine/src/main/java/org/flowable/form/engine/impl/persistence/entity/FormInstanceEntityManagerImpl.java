@@ -46,6 +46,9 @@ public class FormInstanceEntityManagerImpl
     @Override
     public void deleteFormInstancesByFormDefinitionId(String formDefinitionId) {
         dataManager.deleteFormInstancesByFormDefinitionId(formDefinitionId);
+        // The form instance values are persisted as bytes in the Form Resource with a name having form-<formDefinitionId>
+        // Have a look at FormInstanceEntityImpl#setFormValueBytes
+        getResourceEntityManager().deleteResourcesByName("form-" + formDefinitionId);
     }
     
     @Override
@@ -58,4 +61,7 @@ public class FormInstanceEntityManagerImpl
         dataManager.deleteFormInstancesByScopeDefinitionId(scopeDefinitionId);
     }
 
+    protected FormResourceEntityManager getResourceEntityManager() {
+        return engineConfiguration.getResourceEntityManager();
+    }
 }

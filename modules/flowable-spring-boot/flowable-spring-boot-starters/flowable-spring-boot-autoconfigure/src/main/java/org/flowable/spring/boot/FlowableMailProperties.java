@@ -33,6 +33,11 @@ public class FlowableMailProperties {
     private int port = 1025;
 
     /**
+     * The SSL port of the mail server.
+     */
+    private int sslPort = 1465;
+
+    /**
      * The username that needs to be used for the mail server authentication.
      * If empty no authentication would be used.
      */
@@ -79,6 +84,14 @@ public class FlowableMailProperties {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public int getSSLPort() {
+        return sslPort;
+    }
+
+    public void setSSLPort(int sslPort) {
+        this.sslPort = sslPort;
     }
 
     public String getUsername() {

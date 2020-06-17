@@ -66,7 +66,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @EnsureCleanDb(excludeTables = {
     "ACT_GE_PROPERTY",
-    "ACT_ID_PROPERTY"
+    "ACT_ID_PROPERTY",
+    "FLW_EV_DATABASECHANGELOGLOCK",
+    "FLW_EV_DATABASECHANGELOG"
 })
 public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
@@ -231,6 +233,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         assertTrue(Objects.equals(historicActInst.getActivityType(), activityInstance.getActivityType()));
         assertTrue(Objects.equals(historicActInst.getProcessInstanceId(), activityInstance.getProcessInstanceId()));
         assertTrue(Objects.equals(historicActInst.getAssignee(), activityInstance.getAssignee()));
+        assertTrue(Objects.equals(historicActInst.getTransactionOrder(), activityInstance.getTransactionOrder()));
         assertTrue(Objects.equals(historicActInst.getDurationInMillis(), activityInstance.getDurationInMillis()));
         assertTrue(Objects.equals(historicActInst.getTenantId(), activityInstance.getTenantId()));
         assertTrue(Objects.equals(historicActInst.getDeleteReason(), activityInstance.getDeleteReason()));

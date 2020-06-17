@@ -60,6 +60,7 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
+    String TYPE_UPDATE_CASE_DEFINITION_CASCADE = "cmmn-update-case-definition-cascade";
     String TYPE_HISTORIC_USER_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
     String TYPE_HISTORIC_USER_TASK_LOG_DELETE = "cmmn-historic-user-task-log-delete";
 
@@ -112,6 +113,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
+    String FIELD_LAST_UNAVAILABLE_TIME = "lastUnavailableTime";
     String FIELD_LAST_DISABLED_TIME = "lastDisabledTime";
     String FIELD_LAST_ENABLED_TIME = "lastEnabledTime";
     String FIELD_LAST_STARTED_TIME = "lastStartedTime";
@@ -139,6 +141,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_REF_SCOPE_ID = "refScopeId";
     String FIELD_REF_SCOPE_DEFINITION_ID = "refScopeDefinitionId";
     String FIELD_REF_SCOPE_TYPE = "refScopeType";
+    String FIELD_ROOT_SCOPE_ID = "rootScopeId";
+    String FIELD_ROOT_SCOPE_TYPE = "rootScopeType";
     String FIELD_HIERARCHY_TYPE = "hierarchyType";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";

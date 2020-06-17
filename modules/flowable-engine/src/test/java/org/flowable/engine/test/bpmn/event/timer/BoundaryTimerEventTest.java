@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,10 +29,12 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -330,14 +333,23 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testBoundaryTimerEvent() throws Exception {
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
         Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
         processEngineConfiguration.getClock().setCurrentTime(currentTime);
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("patient", "kermit");
-        runtimeService.startProcessInstanceByKey("process1", vars);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1", vars);
+        
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(4, activityInstances.size());
+        List<String> activityInstanceIds = new ArrayList<>();
+        for (ActivityInstance activityInstance : activityInstances) {
+            activityInstanceIds.add(activityInstance.getActivityId());
+        }
+        assertTrue(activityInstanceIds.contains("startEvent"));
+        assertTrue(activityInstanceIds.contains("first_task"));
+        assertTrue(activityInstanceIds.contains("boundaryTimerEvent"));
 
         // just wait for 2 seconds to run any job if it's the case
         try {
@@ -393,6 +405,18 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("Second Task", tasks.get(0).getName());
+        
+        activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, activityInstances.size());
+        Map<String, ActivityInstance> activityInstanceMap = new HashMap<>();
+        for (ActivityInstance activityInstance : activityInstances) {
+            activityInstanceMap.put(activityInstance.getActivityId(), activityInstance);
+        }
+        assertNotNull(activityInstanceMap.get("startEvent").getEndTime());
+        assertNotNull(activityInstanceMap.get("first_task").getEndTime());
+        assertNotNull(activityInstanceMap.get("boundaryTimerEvent").getEndTime());
+        assertNull(activityInstanceMap.get("second_task").getEndTime());
+        
         jobList = managementService.createJobQuery().list();
         assertEquals(0, jobList.size());
         jobList = managementService.createTimerJobQuery().list();
@@ -503,6 +527,140 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("Task 3", tasks.get(0).getName());
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(timerJob);
+    }
+    
+    @Test
+    @Deployment
+    public void testBoundaryTimerEventWithCategory() throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("myVar", "yes");
+        runtimeService.startProcessInstanceByKey("timerProcess", vars);
+
+        // there should be a userTask waiting for user input
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        
+        List<Job> jobList = managementService.createTimerJobQuery().list();
+        assertEquals(1, jobList.size());
+        assertEquals("myCategory", jobList.get(0).getCategory());
+
+        // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
+        long afterTenMinutes = 12L * 60L * 1000L;
+        currentTime = new Date(currentTime.getTime() + afterTenMinutes);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
+
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("Second Task", tasks.get(0).getName());
+        
+        assertEquals(0, managementService.createJobQuery().list().size());
+        assertEquals(0, managementService.createTimerJobQuery().list().size());
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testBoundaryTimerEventWithCategory.bpmn20.xml")
+    public void testBoundaryTimerEventWithCategoryEnabledConfigurationSet() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("wrongValue");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+            Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+            processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+            runtimeService.startProcessInstanceByKey("timerProcess");
+    
+            // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
+            long afterTenMinutes = 12L * 60L * 1000L;
+            currentTime = new Date(currentTime.getTime() + afterTenMinutes);
+            processEngineConfiguration.getClock().setCurrentTime(currentTime);
+    
+            try {
+                waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
+                fail("job should still be there");
+            } catch (Exception e) {
+                // expected
+            }
+            
+            assertEquals(1, managementService.createTimerJobQuery().list().size());
+    
+            Task task = taskService.createTaskQuery().singleResult();
+            assertEquals("First Task", task.getName());
+            
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
+            
+            task = taskService.createTaskQuery().singleResult();
+            assertEquals("Second Task", task.getName());
+            
+            assertEquals(0, managementService.createJobQuery().list().size());
+            assertEquals(0, managementService.createTimerJobQuery().list().size());
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testBoundaryTimerEventWithCategoryExpression() throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("myVar", "yes");
+        vars.put("categoryValue", "testValue");
+        runtimeService.startProcessInstanceByKey("timerProcess", vars);
+        
+        List<Job> jobList = managementService.createTimerJobQuery().list();
+        assertEquals(1, jobList.size());
+        assertEquals("testValue", jobList.get(0).getCategory());
+
+        // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
+        long afterTenMinutes = 12L * 60L * 1000L;
+        currentTime = new Date(currentTime.getTime() + afterTenMinutes);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("Second Task", tasks.get(0).getName());
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testBoundaryTimerEventWithCategoryExpression.bpmn20.xml")
+    public void testBoundaryTimerEventWithCategoryExpressionEnabledConfigurationSet() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("testValue");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+            Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+            processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+            Map<String, Object> vars = new HashMap<>();
+            vars.put("categoryValue", "testValue");
+            runtimeService.startProcessInstanceByKey("timerProcess", vars);
+    
+            // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
+            long afterTenMinutes = 12L * 60L * 1000L;
+            currentTime = new Date(currentTime.getTime() + afterTenMinutes);
+            processEngineConfiguration.getClock().setCurrentTime(currentTime);
+    
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
+            
+            Task task = taskService.createTaskQuery().singleResult();
+            assertEquals("Second Task", task.getName());
+            
+            assertEquals(0, managementService.createJobQuery().list().size());
+            assertEquals(0, managementService.createTimerJobQuery().list().size());
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
     }
 
     @Test

@@ -35,6 +35,7 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
@@ -52,6 +53,7 @@
         #{assignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
+        #{transactionOrder ,jdbcType=INTEGER},
         #{durationInMillis ,jdbcType=BIGINT},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR}
@@ -73,6 +75,7 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
@@ -91,6 +94,7 @@
           #{activityInstance.assignee ,jdbcType=VARCHAR},
           #{activityInstance.startTime, jdbcType=TIMESTAMP},
           #{activityInstance.endTime, jdbcType=TIMESTAMP},
+          #{activityInstance.transactionOrder, jdbcType=INTEGER},
           #{activityInstance.durationInMillis ,jdbcType=BIGINT},
           #{activityInstance.deleteReason ,jdbcType=VARCHAR},
           #{activityInstance.tenantId, jdbcType=VARCHAR})
@@ -114,6 +118,7 @@
           ASSIGNEE_,
           START_TIME_,
           END_TIME_,
+          TRANSACTION_ORDER_,
           DURATION_,
           DELETE_REASON_,
           TENANT_ID_
@@ -131,6 +136,7 @@
             #{activityInstance.assignee ,jdbcType=VARCHAR},
             #{activityInstance.startTime, jdbcType=TIMESTAMP},
             #{activityInstance.endTime, jdbcType=TIMESTAMP},
+            #{activityInstance.transactionOrder, jdbcType=INTEGER},
             #{activityInstance.durationInMillis ,jdbcType=BIGINT},
             #{activityInstance.deleteReason ,jdbcType=VARCHAR},
             #{activityInstance.tenantId, jdbcType=VARCHAR})
@@ -158,6 +164,9 @@
         </if>
         <if test="originalPersistentState.endTime != endTime">
             END_TIME_ = #{endTime, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.transactionOrder != transactionOrder">
+        	TRANSACTION_ORDER_ = #{transactionOrder, jdbcType=INTEGER}, 
         </if>
         <if test="originalPersistentState.durationInMillis != durationInMillis">
             DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
@@ -205,6 +214,7 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -298,9 +308,20 @@
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
 
-   <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+  <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
     select * from ${prefix}ACT_RU_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
+  </select>
+  
+  <select id="selectActivityInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where PROC_INST_ID_ = #{parameter}
+  </select>
+
+  <select id="selectActivityInstanceByTaskId" parameterType="string" resultMap="ActivityInstanceResultMap">
+    select *
+    from ${prefix}ACT_RU_ACTINST RES
+    where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
   </select>
   
 </mapper>

@@ -138,7 +138,7 @@ Following history levels can be configured:
 
 ## Async History configuration
 
-\[Experimental\] Async History has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.
+Async History has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.
 
     <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
       <property name="asyncHistoryEnabled" value="true" />

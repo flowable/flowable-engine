@@ -30,8 +30,8 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -70,17 +70,17 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
      * Generates all possible correlation keys for the given correlation parameters.
      * The first element in the list will only have used one parameter. The last element in the list has included all parameters.
      */
-    protected Collection<CorrelationKey> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+    protected Collection<CorrelationKey> generateCorrelationKeys(Collection<EventPayloadInstance> correlationParameterInstances) {
 
         if (correlationParameterInstances.isEmpty()) {
             return Collections.emptySet();
         }
 
-        List<EventCorrelationParameterInstance> list = new ArrayList<>(correlationParameterInstances);
+        List<EventPayloadInstance> list = new ArrayList<>(correlationParameterInstances);
         Collection<CorrelationKey> correlationKeys = new HashSet<>();
         for (int i = 1; i <= list.size(); i++) {
             for (int j = 0; j <= list.size() - i; j++) {
-                List<EventCorrelationParameterInstance> parameterSubList = list.subList(j, j + i);
+                List<EventPayloadInstance> parameterSubList = list.subList(j, j + i);
                 String correlationKey = generateCorrelationKey(parameterSubList);
                 correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
             }
@@ -89,9 +89,9 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         return correlationKeys;
     }
 
-    protected String generateCorrelationKey(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+    protected String generateCorrelationKey(Collection<EventPayloadInstance> correlationParameterInstances) {
         Map<String, Object> data = new HashMap<>();
-        for (EventCorrelationParameterInstance correlationParameterInstance : correlationParameterInstances) {
+        for (EventPayloadInstance correlationParameterInstance : correlationParameterInstances) {
             data.put(correlationParameterInstance.getDefinitionName(), correlationParameterInstance.getValue());
         }
 
@@ -118,7 +118,7 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         return commandExecutor.execute(commandContext -> {
 
             EventSubscriptionQuery eventSubscriptionQuery = createEventSubscriptionQuery()
-                .eventType(eventInstance.getEventModel().getKey())
+                .eventType(eventInstance.getEventKey())
                 .scopeType(scopeType);
 
             if (!correlationKeys.isEmpty()) {
@@ -142,7 +142,7 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
                 if (eventRegistryConfiguration.isFallbackToDefaultTenant()) {
                     String defaultTenant = eventRegistryConfiguration.getDefaultTenantProvider()
-                        .getDefaultTenant(eventInstance.getTenantId(), scopeType, eventInstance.getEventModel().getKey());
+                        .getDefaultTenant(eventInstance.getTenantId(), scopeType, eventInstance.getEventKey());
 
                     if (AbstractEngineConfiguration.NO_TENANT_ID.equals(defaultTenant)) {
                         eventSubscriptionQuery.or()

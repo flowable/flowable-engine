@@ -14,7 +14,9 @@
 package org.flowable.engine.impl.cfg;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,10 +40,12 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -49,7 +53,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultInternalJobManager implements InternalJobManager {
+public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -58,7 +62,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
     
     @Override
-    public VariableScope resolveVariableScope(Job job) {
+    protected VariableScope resolveVariableScopeInternal(Job job) {
         if (job.getExecutionId() != null) {
             return getExecutionEntityManager().findById(job.getExecutionId());
         }
@@ -66,7 +70,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public boolean handleJobInsert(Job job) {
+    protected boolean handleJobInsertInternal(Job job) {
         // add link to execution
         if (job.getExecutionId() != null) {
             ExecutionEntity execution = getExecutionEntityManager().findById(job.getExecutionId());
@@ -101,6 +105,8 @@ public class DefaultInternalJobManager implements InternalJobManager {
                             countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
                         } else if (job instanceof DeadLetterJobEntity) {
                             countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
+                        } else if (job instanceof ExternalWorkerJobEntity) {
+                            countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() + 1);
                         }
                     }
                 }
@@ -117,7 +123,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void handleJobDelete(Job job) {
+    protected void handleJobDeleteInternal(Job job) {
         if (job.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(job.getExecutionId());
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
@@ -135,17 +141,35 @@ public class DefaultInternalJobManager implements InternalJobManager {
                 
                 } else if (job instanceof DeadLetterJobEntity) {
                     countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() - 1);
+                } else if (job instanceof ExternalWorkerJobEntity) {
+                    countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() - 1);
                 }
             }
         }
     }
 
     @Override
-    public void lockJobScope(Job job) {
+    protected void lockJobScopeInternal(Job job) {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
-            executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId());
+            String lockOwner;
+            Date lockExpirationTime;
+
+            if (job instanceof JobInfoEntity) {
+                lockOwner = ((JobInfoEntity) job).getLockOwner();
+                lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
+            } else {
+                int lockMillis = processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
+                GregorianCalendar lockCal = new GregorianCalendar();
+                lockCal.setTime(processEngineConfiguration.getClock().getCurrentTime());
+                lockCal.add(Calendar.MILLISECOND, lockMillis);
+
+                lockOwner = processEngineConfiguration.getAsyncExecutor().getLockOwner();
+                lockExpirationTime = lockCal.getTime();
+            }
+
+            executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId(), lockOwner, lockExpirationTime);
         }
         
         if (processEngineConfiguration.isLoggingSessionEnabled()) {
@@ -156,13 +180,13 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void clearJobScopeLock(Job job) {
+    protected void clearJobScopeLockInternal(Job job) {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getProcessInstanceId());
         if (execution != null) {
             executionEntityManager.clearProcessInstanceLockTime(execution.getId());
         }
-        
+
         if (processEngineConfiguration.isLoggingSessionEnabled()) {
             ExecutionEntity localExecution = executionEntityManager.findById(job.getExecutionId());
             FlowElement flowElement = localExecution.getCurrentFlowElement();
@@ -172,7 +196,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
 
     @Override
-    public void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope) {
+    protected void preTimerJobDeleteInternal(JobEntity jobEntity, VariableScope variableScope) {
         String activityId = jobEntity.getJobHandlerConfiguration();
 
         if (jobEntity.getJobHandlerType().equalsIgnoreCase(TimerStartEventJobHandler.TYPE) ||
@@ -219,7 +243,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
     }
     
     @Override
-    public void preRepeatedTimerSchedule(TimerJobEntity ti, VariableScope variableScope) {
+    protected void preRepeatedTimerScheduleInternal(TimerJobEntity ti, VariableScope variableScope) {
         // Nothing to do
     }
 

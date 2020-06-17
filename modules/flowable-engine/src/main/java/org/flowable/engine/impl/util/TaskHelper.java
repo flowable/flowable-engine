@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -48,7 +49,6 @@ import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -195,8 +195,7 @@ public class TaskHelper {
             }
 
             if (addEntityLinks) {
-                EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
-                EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
             }
 
         }
@@ -345,7 +344,7 @@ public class TaskHelper {
                 || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getVariableCount() > 0)) {
             
             Map<String, VariableInstanceEntity> taskVariables = task.getVariableInstanceEntities();
-            ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+            List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
             for (VariableInstanceEntity variableInstanceEntity : taskVariables.values()) {
                 if (fireEvents) {
                     eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstanceEntity));
@@ -355,7 +354,7 @@ public class TaskHelper {
                 }
             }
             
-            for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+            for (ByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
                 CommandContextUtil.getByteArrayEntityManager(commandContext).deleteByteArrayById(variableByteArrayRef.getId());
             }
             

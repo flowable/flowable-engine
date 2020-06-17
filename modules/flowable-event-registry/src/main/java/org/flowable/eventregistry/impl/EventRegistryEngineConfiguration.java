@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -67,14 +68,14 @@ import org.flowable.eventregistry.impl.persistence.entity.data.ChannelDefinition
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventResourceDataManager;
-import org.flowable.eventregistry.impl.persistence.entity.data.TableDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisChannelDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
-import org.flowable.eventregistry.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.eventregistry.impl.pipeline.DelegateExpressionInboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.DelegateExpressionOutboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventChannelAdapter;
+import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
@@ -111,7 +112,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventDefinitionEntityManager eventDefinitionEntityManager;
     protected ChannelDefinitionEntityManager channelDefinitionEntityManager;
     protected EventResourceEntityManager resourceEntityManager;
-    protected TableDataManager tableDataManager;
 
     protected ExpressionManager expressionManager;
 
@@ -143,6 +143,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventRegistry eventRegistry;
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
+    protected OutboundEventProcessor systemOutboundEventProcessor;
 
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
@@ -237,6 +238,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initEventRegistry();
         initInboundEventProcessor();
         initOutboundEventProcessor();
+        initSystemOutboundEventProcessor();
         initChannelDefinitionProcessors();
         initDeployers();
         initClock();
@@ -292,9 +294,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new EventResourceEntityManagerImpl(this, resourceDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
         }
     }
 
@@ -501,6 +500,16 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
     }
 
+    public void initSystemOutboundEventProcessor() {
+        if (this.systemOutboundEventProcessor == null) {
+            this.systemOutboundEventProcessor = new SystemOutboundEventProcessor<>(
+                    new InMemoryOutboundEventChannelAdapter(eventRegistry),
+                    new InMemoryOutboundEventProcessingPipeline()
+            );
+        }
+        this.eventRegistry.setSystemOutboundEventProcessor(systemOutboundEventProcessor);
+    }
+
     public void initChannelDefinitionProcessors() {
         channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this));
         channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this));
@@ -613,6 +622,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor) {
         this.outboundEventProcessor = outboundEventProcessor;
+        return this;
+    }
+
+    public OutboundEventProcessor getSystemOutboundEventProcessor() {
+        return systemOutboundEventProcessor;
+    }
+
+    public EventRegistryEngineConfiguration setSystemOutboundEventProcessor(OutboundEventProcessor systemOutboundEventProcessor) {
+        this.systemOutboundEventProcessor = systemOutboundEventProcessor;
         return this;
     }
 
@@ -763,10 +781,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public EventRegistryEngineConfiguration setResourceEntityManager(EventResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public EventRegistryEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

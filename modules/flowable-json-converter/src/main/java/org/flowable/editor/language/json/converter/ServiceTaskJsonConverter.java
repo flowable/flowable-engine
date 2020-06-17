@@ -104,6 +104,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                         BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
                     );
                 }
+                if (PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT,
+                        BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
+                    );
+                }
             }
 
         } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
@@ -137,6 +142,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_SHELLTASK_ERROR_REDIRECT, "errorRedirect", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_SHELLTASK_OUTPUT_VARIABLE, "outputVariable", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_SHELLTASK_WAIT, "wait", serviceTask, propertiesNode);
+            
         } else {
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
@@ -157,7 +163,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             if (serviceTask.isUseLocalScopeForResultVariable()) {
                 propertiesNode.put(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, serviceTask.isUseLocalScopeForResultVariable());
             }
-            
+
+            if (serviceTask.isStoreResultVariableAsTransient()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, serviceTask.isStoreResultVariableAsTransient());
+            }
+
             if (StringUtils.isNotEmpty(serviceTask.getFailedJobRetryTimeCycleValue())) {
             	propertiesNode.put(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, serviceTask.getFailedJobRetryTimeCycleValue());
             }
@@ -194,7 +204,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, elementNode)) {
             task.setUseLocalScopeForResultVariable(true);
         }
-        
+
+        if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, elementNode)) {
+            task.setStoreResultVariableAsTransient(true);
+        }
+
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode))) {
             task.setFailedJobRetryTimeCycleValue(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode));
         }

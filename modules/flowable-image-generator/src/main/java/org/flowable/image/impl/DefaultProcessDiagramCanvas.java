@@ -116,6 +116,7 @@ public class DefaultProcessDiagramCanvas {
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage RECEIVETASK_IMAGE;
     protected static BufferedImage SENDTASK_IMAGE;
+    protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage MANUALTASK_IMAGE;
     protected static BufferedImage BUSINESS_RULE_TASK_IMAGE;
     protected static BufferedImage SHELL_TASK_IMAGE;
@@ -227,6 +228,7 @@ public class DefaultProcessDiagramCanvas {
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             RECEIVETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/receiveTask.png", customClassLoader));
             SENDTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/sendTask.png", customClassLoader));
+            CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             MANUALTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/manualTask.png", customClassLoader));
             BUSINESS_RULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/businessRuleTask.png", customClassLoader));
             SHELL_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/shellTask.png", customClassLoader));
@@ -263,22 +265,12 @@ public class DefaultProcessDiagramCanvas {
             throw new FlowableImageException("ProcessDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(processDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating process image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
@@ -924,6 +916,10 @@ public class DefaultProcessDiagramCanvas {
     
     public void drawSendEventServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SENDTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawCaseServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(CASETASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawBusinessRuleTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

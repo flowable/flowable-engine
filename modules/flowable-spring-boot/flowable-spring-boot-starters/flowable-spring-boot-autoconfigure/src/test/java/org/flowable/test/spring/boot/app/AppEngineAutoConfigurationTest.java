@@ -101,12 +101,62 @@ public class AppEngineAutoConfigurationTest {
 
                 deleteDeployments(appEngine);
 
+                assertThat(engineConfiguration.getEngineConfigurations())
+                        .containsOnlyKeys(
+                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                                EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                                EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG
+                        );
+
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
                     .getBean(CustomUserEngineConfigurerConfiguration.class)
                     .satisfies(configuration -> {
                         assertThat(configuration.getInvokedConfigurations())
                             .containsExactly(
                                 SpringIdmEngineConfiguration.class,
+                                SpringAppEngineConfiguration.class
+                            );
+                    });
+            });
+    }
+
+    @Test
+    public void standaloneAppEngineWithDisabledIdmAndEventRegistryEngines() {
+        contextRunner
+            .withPropertyValues(
+                    "flowable.eventregistry.enabled=false",
+                    "flowable.idm.enabled=false"
+            )
+            .run(context -> {
+                AppEngine appEngine = context.getBean(AppEngine.class);
+                assertThat(appEngine).as("App engine").isNotNull();
+
+                assertAllServicesPresent(context, appEngine);
+                assertAutoDeployment(context);
+
+                SpringAppEngineConfiguration engineConfiguration = (SpringAppEngineConfiguration) appEngine.getAppEngineConfiguration();
+                Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                        assertThat(strategy.getLockName()).isNull();
+                    });
+
+                deleteDeployments(appEngine);
+
+                assertThat(engineConfiguration.getEngineConfigurations())
+                        .containsOnlyKeys(
+                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG
+                        );
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
                                 SpringAppEngineConfiguration.class
                             );
                     });
@@ -204,7 +254,7 @@ public class AppEngineAutoConfigurationTest {
             ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
 
         ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        ProcessEngineConfiguration processEngineConfiguration =processEngine.getProcessEngineConfiguration();
+        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         assertThat(processEngineConfiguration).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
         assertThat(processEngine).as("Process engine").isNotNull();
 
@@ -215,6 +265,22 @@ public class AppEngineAutoConfigurationTest {
             ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().startProcessInstanceByKey("vacationRequest");
             Task task = processEngineConfiguration.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();
+
+            assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
+                    .containsOnlyKeys(
+                            EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                    );
+
+            assertThat(processConfiguration.getEngineConfigurations())
+                    .containsOnlyKeys(
+                            EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                    );
 
             deleteDeployments(appEngine);
             deleteDeployments(processEngine);
@@ -229,6 +295,61 @@ public class AppEngineAutoConfigurationTest {
                             SpringAppEngineConfiguration.class
                         );
                 });
+        });
+    }
+
+    @Test
+    public void appEngineWithBasicDataSourceAndProcessEngineAndDisabledEventRegistryEngine() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.eventregistry.enabled=false",
+                        "flowable.idm.enabled=false"
+                )
+                .withConfiguration(AutoConfigurations.of(
+                        ProcessEngineServicesAutoConfiguration.class,
+                        ProcessEngineAutoConfiguration.class
+                )).run(context -> {
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            assertThat(appEngine).as("App engine").isNotNull();
+            ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
+
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+            assertThat(processEngineConfiguration).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
+            assertThat(processEngine).as("Process engine").isNotNull();
+
+            assertAllServicesPresent(context, appEngine);
+            assertAutoDeployment(context);
+
+            processEngineConfiguration.getIdentityService().setAuthenticatedUserId("test");
+            ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().startProcessInstanceByKey("vacationRequest");
+            Task task = processEngineConfiguration.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
+                    .containsOnlyKeys(
+                            EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                    );
+
+            assertThat(processConfiguration.getEngineConfigurations())
+                    .containsOnlyKeys(
+                            EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                    );
+
+            deleteDeployments(appEngine);
+            deleteDeployments(processEngine);
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                                .containsExactly(
+                                        SpringProcessEngineConfiguration.class,
+                                        SpringAppEngineConfiguration.class
+                                );
+                    });
         });
     }
 

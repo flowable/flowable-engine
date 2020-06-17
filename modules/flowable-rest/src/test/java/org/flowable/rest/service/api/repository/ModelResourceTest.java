@@ -13,10 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 
@@ -34,6 +32,9 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -68,24 +69,25 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("Model name", responseNode.get("name").textValue());
-            assertEquals("Model key", responseNode.get("key").textValue());
-            assertEquals("Model category", responseNode.get("category").textValue());
-            assertEquals(2, responseNode.get("version").intValue());
-            assertEquals("Model metainfo", responseNode.get("metaInfo").textValue());
-            assertEquals(deploymentId, responseNode.get("deploymentId").textValue());
-            assertEquals(model.getId(), responseNode.get("id").textValue());
-            assertEquals("myTenant", responseNode.get("tenantId").textValue());
-
-            assertEquals(now.getTime().getTime(), getDateFromISOString(responseNode.get("createTime").textValue()).getTime());
-            assertEquals(now.getTime().getTime(), getDateFromISOString(responseNode.get("lastUpdateTime").textValue()).getTime());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId())));
-            assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
-
-            assertTrue(responseNode.get("sourceUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, model.getId())));
-            assertTrue(responseNode.get("sourceExtraUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, model.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "name: 'Model name',"
+                            + "key: 'Model key',"
+                            + "category: 'Model category',"
+                            + "version: 2,"
+                            + "metaInfo: 'Model metainfo',"
+                            + "deploymentId: '" + deploymentId + "',"
+                            + "id: '" + model.getId() + "',"
+                            + "tenantId: 'myTenant',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
+                            + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                            + "sourceUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, model.getId()) + "',"
+                            + "sourceExtraUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, model.getId())
+                            + "',"
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(now.getTime())) + ","
+                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "}");
 
         } finally {
             try {
@@ -122,7 +124,7 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             // Check if the model is really gone
-            assertNull(repositoryService.createModelQuery().modelId(model.getId()).singleResult());
+            assertThat(repositoryService.createModelQuery().modelId(model.getId()).singleResult()).isNull();
 
             model = null;
         } finally {
@@ -181,21 +183,23 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("Updated name", responseNode.get("name").textValue());
-            assertEquals("Updated key", responseNode.get("key").textValue());
-            assertEquals("Updated category", responseNode.get("category").textValue());
-            assertEquals(3, responseNode.get("version").intValue());
-            assertEquals("Updated metainfo", responseNode.get("metaInfo").textValue());
-            assertEquals(deploymentId, responseNode.get("deploymentId").textValue());
-            assertEquals(model.getId(), responseNode.get("id").textValue());
-            assertEquals("myTenant", responseNode.get("tenantId").textValue());
-
-            assertEquals(createTime.getTime().getTime(), getDateFromISOString(responseNode.get("createTime").textValue()).getTime());
-            assertEquals(updateTime.getTime().getTime(), getDateFromISOString(responseNode.get("lastUpdateTime").textValue()).getTime());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId())));
-            assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "name: 'Updated name',"
+                            + "key: 'Updated key',"
+                            + "category: 'Updated category',"
+                            + "version: 3,"
+                            + "metaInfo: 'Updated metainfo',"
+                            + "deploymentId: '" + deploymentId + "',"
+                            + "id: '" + model.getId() + "',"
+                            + "tenantId: 'myTenant',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
+                            + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
+                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(updateTime.getTime()))
+                            + "}");
 
         } finally {
             try {
@@ -243,28 +247,30 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertNull(responseNode.get("name").textValue());
-            assertNull(responseNode.get("key").textValue());
-            assertNull(responseNode.get("category").textValue());
-            assertNull(responseNode.get("version").textValue());
-            assertNull(responseNode.get("metaInfo").textValue());
-            assertNull(responseNode.get("deploymentId").textValue());
-            assertNull(responseNode.get("tenantId").textValue());
-            assertEquals(model.getId(), responseNode.get("id").textValue());
-
-            assertEquals(createTime.getTime().getTime(), getDateFromISOString(responseNode.get("createTime").textValue()).getTime());
-            assertEquals(updateTime.getTime().getTime(), getDateFromISOString(responseNode.get("lastUpdateTime").textValue()).getTime());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "name: null,"
+                            + "key: null,"
+                            + "category: null,"
+                            + "version: null,"
+                            + "metaInfo: null,"
+                            + "deploymentId: null,"
+                            + "id: '" + model.getId() + "',"
+                            + "tenantId: null,"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
+                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(updateTime.getTime()))
+                            + "}");
 
             model = repositoryService.getModel(model.getId());
-            assertNull(model.getName());
-            assertNull(model.getKey());
-            assertNull(model.getCategory());
-            assertNull(model.getMetaInfo());
-            assertNull(model.getDeploymentId());
-            assertEquals("", model.getTenantId());
+            assertThat(model.getName()).isNull();
+            assertThat(model.getKey()).isNull();
+            assertThat(model.getCategory()).isNull();
+            assertThat(model.getMetaInfo()).isNull();
+            assertThat(model.getDeploymentId()).isNull();
+            assertThat(model.getTenantId()).isEqualTo("");
 
         } finally {
             try {
@@ -302,20 +308,22 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("Model name", responseNode.get("name").textValue());
-            assertEquals("Model key", responseNode.get("key").textValue());
-            assertEquals("Model category", responseNode.get("category").textValue());
-            assertEquals(2, responseNode.get("version").intValue());
-            assertEquals("Model metainfo", responseNode.get("metaInfo").textValue());
-            assertEquals(deploymentId, responseNode.get("deploymentId").textValue());
-            assertEquals(model.getId(), responseNode.get("id").textValue());
-
-            assertEquals(now.getTime().getTime(), getDateFromISOString(responseNode.get("createTime").textValue()).getTime());
-            assertEquals(now.getTime().getTime(), getDateFromISOString(responseNode.get("lastUpdateTime").textValue()).getTime());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId())));
-            assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "name: 'Model name',"
+                            + "key: 'Model key',"
+                            + "category: 'Model category',"
+                            + "version: 2,"
+                            + "metaInfo: 'Model metainfo',"
+                            + "deploymentId: '" + deploymentId + "',"
+                            + "id: '" + model.getId() + "',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
+                            + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(now.getTime())) + ","
+                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "}");
 
         } finally {
             try {

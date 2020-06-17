@@ -31,6 +31,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -126,6 +127,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setLockTime(Date lockTime);
 
+    String getLockOwner();
+
+    void setLockOwner(String lockOwner);
+
     void forceUpdate();
     
     String getStartActivityId();
@@ -153,4 +158,6 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     FlowElement getOriginatingCurrentFlowElement();
     
     void setOriginatingCurrentFlowElement(FlowElement flowElement);
+
+    List<VariableInstanceEntity> getQueryVariables();
 }

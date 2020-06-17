@@ -74,8 +74,6 @@ public class OutputEntryParser extends BaseChildElementParser {
         outputContainer.setOutputClause(outputClause);
         outputContainer.setOutputEntry(outputEntry);
 
-        if (outputEntry.getText() != null) {
-            rule.addOutputEntry(outputContainer);
-        }
+        rule.addOutputEntry(outputContainer);
     }
 }

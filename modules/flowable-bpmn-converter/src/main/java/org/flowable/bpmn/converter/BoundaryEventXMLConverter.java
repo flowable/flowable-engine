@@ -12,10 +12,15 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -27,6 +32,13 @@ import org.flowable.bpmn.model.EventDefinition;
  * @author Tijs Rademakers
  */
 public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
+    
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+
+    public BoundaryEventXMLConverter() {
+        InParameterParser inParameterParser = new InParameterParser();
+        childParserMap.put(inParameterParser.getElementName(), inParameterParser);
+    }
 
     @Override
     public Class<? extends BaseElement> getBpmnElementType() {
@@ -49,7 +61,7 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
             }
         }
         boundaryEvent.setAttachedToRefId(xtr.getAttributeValue(null, ATTRIBUTE_BOUNDARY_ATTACHEDTOREF));
-        parseChildElements(getXMLElementName(), boundaryEvent, model, xtr);
+        parseChildElements(getXMLElementName(), boundaryEvent, childParserMap, model, xtr);
 
         // Explicitly set cancel activity to false for error boundary events
         if (boundaryEvent.getEventDefinitions().size() == 1) {

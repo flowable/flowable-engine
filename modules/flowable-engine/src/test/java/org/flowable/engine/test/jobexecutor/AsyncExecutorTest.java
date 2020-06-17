@@ -22,6 +22,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
@@ -109,7 +110,7 @@ public class AsyncExecutorTest {
 
             // Create second engine, with async executor enabled. Same time as
             // the first engine to start, then add 301 seconds
-            secondProcessEngine = createProcessEngine(true, now);
+            secondProcessEngine = createProcessEngine(true, null, now);
             addSecondsToCurrentTime(secondProcessEngine, 361);
             waitForAllJobsBeingExecuted(secondProcessEngine);
 
@@ -160,9 +161,7 @@ public class AsyncExecutorTest {
 
             // Clean up
             cleanup(processEngine);
-
         }
-
     }
 
     @Test
@@ -211,16 +210,60 @@ public class AsyncExecutorTest {
             cleanup(processEngine);
         }
     }
+    
+    @Test
+    public void testAsyncFailingScriptWithCategory() {
+        ProcessEngine processEngine = null;
+
+        try {
+
+            // Deploy
+            processEngine = createProcessEngine(true, "myCategory", null);
+            processEngine.getProcessEngineConfiguration().getClock().reset();
+            deploy(processEngine, "AsyncExecutorTest.testAsyncFailingScriptWithCategory.bpmn20.xml");
+
+            // There is a back off mechanism for the retry, so need a bit of time. But to be sure, we make the wait time small
+            processEngine.getProcessEngineConfiguration().setAsyncFailedJobWaitTime(1);
+            processEngine.getProcessEngineConfiguration().setDefaultFailedJobWaitTime(1);
+
+            // Start process instance. Wait for all jobs to be done.
+            processEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
+
+            final ProcessEngine processEngineCopy = processEngine;
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    long timerJobCount = processEngineCopy.getManagementService().createTimerJobQuery().count();
+                    if (timerJobCount == 0) {
+                        return processEngineCopy.getManagementService().createJobQuery().count() == 0;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+            // Verify if all is as expected
+            Assert.assertEquals(0, processEngine.getTaskService().createTaskQuery().taskName("Task after script").count());
+            Assert.assertEquals(0, processEngine.getManagementService().createJobQuery().count());
+            Assert.assertEquals(1, processEngine.getManagementService().createDeadLetterJobQuery().count());
+            Job job = processEngine.getManagementService().createDeadLetterJobQuery().singleResult();
+            Assert.assertEquals("myCategory", job.getCategory());
+
+        } finally {
+            // Clean up
+            cleanup(processEngine);
+        }
+    }
 
     // Helpers ////////////////////////////////////////////////////////
 
     private ProcessEngine createProcessEngine(boolean enableAsyncExecutor) {
-        return createProcessEngine(enableAsyncExecutor, null);
+        return createProcessEngine(enableAsyncExecutor, null, null);
     }
 
-    private ProcessEngine createProcessEngine(boolean enableAsyncExecutor, Date time) {
+    private ProcessEngine createProcessEngine(boolean enableAsyncExecutor, String enabledJobCategory, Date time) {
         ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-        processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-AsyncExecutorTest;DB_CLOSE_DELAY=1000");
+        processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-AsyncExecutorTest;DB_CLOSE_DELAY=1000");
         processEngineConfiguration.setDatabaseSchemaUpdate("true");
 
         if (enableAsyncExecutor) {
@@ -230,6 +273,10 @@ public class AsyncExecutorTest {
             countingAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(50); // To avoid waiting too long when a retry happens
             countingAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(50);
             processEngineConfiguration.setAsyncExecutor(countingAsyncExecutor);
+        }
+        
+        if (enabledJobCategory != null) {
+            processEngineConfiguration.addEnabledJobCategory(enabledJobCategory);
         }
 
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();

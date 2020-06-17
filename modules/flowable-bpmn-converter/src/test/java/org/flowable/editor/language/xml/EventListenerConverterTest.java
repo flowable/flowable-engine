@@ -12,9 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
@@ -42,57 +41,27 @@ public class EventListenerConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
-        assertNotNull(process);
-        assertNotNull(process.getEventListeners());
-        assertEquals(8, process.getEventListeners().size());
-
-        // Listener with class
-        EventListener listener = process.getEventListeners().get(0);
-        assertEquals("ENTITY_CREATE", listener.getEvents());
-        assertEquals("org.activiti.test.MyListener", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-
-        // Listener with class, but no specific event (== all events)
-        listener = process.getEventListeners().get(1);
-        assertNull(listener.getEvents());
-        assertEquals("org.activiti.test.AllEventTypesListener", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-
-        // Listener with delegate expression
-        listener = process.getEventListeners().get(2);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("${myListener}", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
-
-        // Listener that throws a signal-event
-        listener = process.getEventListeners().get(3);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theSignal", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT, listener.getImplementationType());
-
-        // Listener that throws a global signal-event
-        listener = process.getEventListeners().get(4);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theSignal", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT, listener.getImplementationType());
-
-        // Listener that throws a message-event
-        listener = process.getEventListeners().get(5);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theMessage", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT, listener.getImplementationType());
-
-        // Listener that throws an error-event
-        listener = process.getEventListeners().get(6);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("123", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, listener.getImplementationType());
-
-        // Listener restricted to a specific entity
-        listener = process.getEventListeners().get(7);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("123", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, listener.getImplementationType());
-        assertEquals("job", listener.getEntityType());
+        assertThat(process).isNotNull();
+        assertThat(process.getEventListeners()).isNotNull();
+        assertThat(process.getEventListeners())
+                .extracting(EventListener::getEvents, EventListener::getImplementation, EventListener::getImplementationType, EventListener::getEntityType)
+                .containsExactly(
+                        // Listener with class
+                        tuple("ENTITY_CREATE", "org.activiti.test.MyListener", ImplementationType.IMPLEMENTATION_TYPE_CLASS, null),
+                        // Listener with class, but no specific event (== all events)
+                        tuple(null, "org.activiti.test.AllEventTypesListener", ImplementationType.IMPLEMENTATION_TYPE_CLASS, null),
+                        // Listener with delegate expression
+                        tuple("ENTITY_DELETE", "${myListener}", ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, null),
+                        // Listener that throws a signal-event
+                        tuple("ENTITY_DELETE", "theSignal", ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT, null),
+                        // Listener that throws a global signal-event
+                        tuple("ENTITY_DELETE", "theSignal", ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT, null),
+                        // Listener that throws a message-event
+                        tuple("ENTITY_DELETE", "theMessage", ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT, null),
+                        // Listener that throws an error-event
+                        tuple("ENTITY_DELETE", "123", ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, null),
+                        // Listener restricted to a specific entity
+                        tuple("ENTITY_DELETE", "123", ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, "job")
+                );
     }
 }

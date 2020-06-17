@@ -69,8 +69,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         FlowElement currentFlowElement = getCurrentFlowElement(execution);
 
         // Compensation check
-        if ((currentFlowElement instanceof Activity)
-                && ((Activity) currentFlowElement).isForCompensation()) {
+        if ((currentFlowElement instanceof Activity) && ((Activity) currentFlowElement).isForCompensation()) {
 
             /*
              * If the current flow element is part of a compensation, we don't always want to follow the regular rules of leaving an activity. More specifically, if there are no outgoing sequenceflow,
@@ -316,6 +315,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 for (BoundaryEvent event : activity.getBoundaryEvents()) {
                     if (CollectionUtil.isNotEmpty(event.getEventDefinitions()) &&
                             event.getEventDefinitions().get(0) instanceof CancelEventDefinition) {
+                        
                         notToDeleteEvents.add(event.getId());
                     }
                 }

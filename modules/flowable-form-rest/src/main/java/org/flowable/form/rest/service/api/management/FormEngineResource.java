@@ -14,6 +14,7 @@ package org.flowable.form.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngines;
 import org.flowable.form.rest.FormRestApiInterceptor;
@@ -42,12 +43,12 @@ public class FormEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/form-management/engine", produces = "application/json")
-    public FormEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessFormManagementInfo();
         }
         
-        FormEngineInfoResponse response = new FormEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             FormEngine formEngine = FormEngines.getDefaultFormEngine();
@@ -64,7 +65,7 @@ public class FormEngineResource {
             throw new FlowableException("Error retrieving form engine info", e);
         }
 
-        response.setVersion(FormEngine.VERSION);
+        response.setVersion(FormEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

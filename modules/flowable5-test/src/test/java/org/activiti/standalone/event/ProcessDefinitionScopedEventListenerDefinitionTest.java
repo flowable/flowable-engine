@@ -18,6 +18,7 @@ import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.test.api.event.StaticTestFlowableEventListener;
 import org.activiti.engine.test.api.event.TestFlowableEventListener;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
@@ -120,7 +121,8 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
             fail("Exception expected");
 
         } catch (FlowableException ae) {
-            assertEquals("Invalid event-type: invalid", ae.getCause().getMessage());
+            assertTrue(ae instanceof FlowableIllegalArgumentException);
+            assertEquals("Invalid event-type: invalid", ae.getMessage());
         } finally {
             if (deployment != null) {
                 repositoryService.deleteDeployment(deployment.getId(), true);

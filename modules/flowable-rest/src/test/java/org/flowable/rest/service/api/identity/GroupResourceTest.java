@@ -13,10 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,6 +29,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -48,20 +48,25 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
             testGroup.setType("Test type");
             identityService.saveGroup(testGroup);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup")), HttpStatus.SC_OK);
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup")), HttpStatus.SC_OK);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertEquals("Test group", responseNode.get("name").textValue());
-            assertEquals("Test type", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: 'Test group',"
+                            + " type: 'Test type',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId()) + "'"
+                            + "}");
 
             Group createdGroup = identityService.createGroupQuery().groupId("testgroup").singleResult();
-            assertNotNull(createdGroup);
-            assertEquals("Test group", createdGroup.getName());
-            assertEquals("Test type", createdGroup.getType());
+            assertThat(createdGroup).isNotNull();
+            assertThat(createdGroup.getName()).isEqualTo("Test group");
+            assertThat(createdGroup.getType()).isEqualTo("Test type");
 
         } finally {
             try {
@@ -94,7 +99,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
 
             closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup")), HttpStatus.SC_NO_CONTENT));
 
-            assertNull(identityService.createGroupQuery().groupId("testgroup").singleResult());
+            assertThat(identityService.createGroupQuery().groupId("testgroup").singleResult()).isNull();
 
         } finally {
             try {
@@ -135,16 +140,20 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertEquals("Updated group", responseNode.get("name").textValue());
-            assertEquals("Updated type", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: 'Updated group',"
+                            + " type: 'Updated type',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId()) + "'"
+                            + "}");
 
             Group createdGroup = identityService.createGroupQuery().groupId("testgroup").singleResult();
-            assertNotNull(createdGroup);
-            assertEquals("Updated group", createdGroup.getName());
-            assertEquals("Updated type", createdGroup.getType());
+            assertThat(createdGroup).isNotNull();
+            assertThat(createdGroup.getName()).isEqualTo("Updated group");
+            assertThat(createdGroup.getType()).isEqualTo("Updated type");
 
         } finally {
             try {
@@ -175,16 +184,20 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertEquals("Test group", responseNode.get("name").textValue());
-            assertEquals("Test type", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: 'Test group',"
+                            + " type: 'Test type',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId()) + "'"
+                            + "}");
 
             Group createdGroup = identityService.createGroupQuery().groupId("testgroup").singleResult();
-            assertNotNull(createdGroup);
-            assertEquals("Test group", createdGroup.getName());
-            assertEquals("Test type", createdGroup.getType());
+            assertThat(createdGroup).isNotNull();
+            assertThat(createdGroup.getName()).isEqualTo("Test group");
+            assertThat(createdGroup.getType()).isEqualTo("Test type");
 
         } finally {
             try {
@@ -216,16 +229,20 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertNull(responseNode.get("name").textValue());
-            assertNull(responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId())));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: null,"
+                            + " type: null,"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, testGroup.getId()) + "'"
+                            + "}");
 
             Group createdGroup = identityService.createGroupQuery().groupId("testgroup").singleResult();
-            assertNotNull(createdGroup);
-            assertNull(createdGroup.getName());
-            assertNull(createdGroup.getType());
+            assertThat(createdGroup).isNotNull();
+            assertThat(createdGroup.getName()).isNull();
+            assertThat(createdGroup.getType()).isNull();
 
         } finally {
             try {

@@ -56,4 +56,13 @@ public class TraceableVariablesCommandContextCloseListener implements CommandCon
 
     }
 
+    @Override
+    public Integer order() {
+        return 1;
+    }
+    
+    @Override
+    public boolean multipleAllowed() {
+        return true;
+    }
 }

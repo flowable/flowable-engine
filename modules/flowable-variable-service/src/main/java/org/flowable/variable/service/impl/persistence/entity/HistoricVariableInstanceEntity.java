@@ -16,6 +16,7 @@ package org.flowable.variable.service.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.types.ValueFields;
@@ -49,6 +50,6 @@ public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVar
     
     void setScopeType(String scopeType);
 
-    VariableByteArrayRef getByteArrayRef();
+    ByteArrayRef getByteArrayRef();
 
 }

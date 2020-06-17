@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,8 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class MilestoneCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/milestone.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -41,31 +41,23 @@ public class MilestoneCmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<Milestone> milestones = planModel.findPlanItemDefinitionsOfType(Milestone.class, false);
-        
-        assertEquals(1, milestones.size());
-        Milestone milestone = milestones.get(0);
-        
-        assertEquals("Milestone 1", milestone.getName());
-        assertEquals(Integer.valueOf(5), milestone.getDisplayOrder());
-        assertEquals("false", milestone.getIncludeInStageOverview());
-        
+        assertThat(milestones)
+                .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
+                .containsExactly(tuple("Milestone 1", 5, "false"));
+
         Stage nestedStage = planModel.findPlanItemDefinitionsOfType(Stage.class, false).get(0);
-        assertNotNull(nestedStage);
-        assertEquals("Nested Stage", nestedStage.getName());
-        
-        assertEquals(1, nestedStage.getPlanItems().size());
+        assertThat(nestedStage).isNotNull();
+        assertThat(nestedStage.getName()).isEqualTo("Nested Stage");
+
+        assertThat(nestedStage.getPlanItems()).hasSize(1);
         milestones = nestedStage.findPlanItemDefinitionsOfType(Milestone.class, false);
-        
-        assertEquals(1, milestones.size());
-        milestone = milestones.get(0);
-        
-        assertEquals("Milestone 2", milestone.getName());
-        assertEquals(Integer.valueOf(3), milestone.getDisplayOrder());
-        assertEquals("true", milestone.getIncludeInStageOverview());
+        assertThat(milestones)
+                .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
+                .containsExactly(tuple("Milestone 2", 3, "true"));
     }
 
 }

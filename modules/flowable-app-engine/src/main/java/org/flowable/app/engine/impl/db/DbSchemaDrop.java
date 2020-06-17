@@ -48,7 +48,7 @@ public class DbSchemaDrop {
             });
             
         } catch (IOException e) {
-            LOGGER.error("Could not create CMMN engine", e);
+            LOGGER.error("Could not create App engine", e);
         }
     }
 }

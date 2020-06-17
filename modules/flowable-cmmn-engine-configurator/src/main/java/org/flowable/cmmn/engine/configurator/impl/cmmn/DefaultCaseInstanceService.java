@@ -50,11 +50,16 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey, String executionId, 
-                    String tenantId, boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap) {
+    public String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
+            String executionId,
+            String tenantId, boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap) {
         
         CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();
         caseInstanceBuilder.caseDefinitionKey(caseDefinitionKey);
+
+        if (parentDeploymentId != null) {
+            caseInstanceBuilder.caseDefinitionParentDeploymentId(parentDeploymentId);
+        }
         
         if (predefinedCaseInstanceId != null) {
             caseInstanceBuilder.predefinedCaseInstanceId(predefinedCaseInstanceId);

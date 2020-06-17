@@ -241,6 +241,12 @@
           "DESCRIPTION" : "将服务任务设置为可触发的"
         }
       },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
+        }
+      },
       "SCRIPTFORMATPACKAGE" : {
         "SCRIPTFORMAT" : {
           "TITLE" : "脚本格式",
@@ -763,6 +769,81 @@
           "DESCRIPTION" : "升级的定义"
         }
       },
+
+      "EVENTREGISTRYPACKAGE" : {
+        "EVENTKEY" : {
+          "TITLE" : "事件key",
+          "DESCRIPTION" : "事件key定义"
+        },
+        "EVENTNAME" : {
+          "TITLE" : "事件名称",
+          "DESCRIPTION" : "事件名称定义"
+        },
+        "EVENTINPARAMETERS" : {
+          "TITLE" : "事件载体映射",
+          "DESCRIPTION" : "将流程变量映射到事件有效载体的属性"
+        },
+        "EVENTOUTPARAMETERS" : {
+          "TITLE" : "从事件有效载体映射到流程",
+          "DESCRIPTION" : "将事件有效载体的属性映射到流程变量"
+        },
+        "EVENTCORRELATIONPARAMETERS" : {
+          "TITLE" : "相关参数",
+          "DESCRIPTION" : "相关参数定义"
+        },
+        "CHANNELKEY" : {
+          "TITLE" : "通道key",
+          "DESCRIPTION" : "通道key定义"
+        },
+        "CHANNELNAME" : {
+          "TITLE" : "通道名称",
+          "DESCRIPTION" : "通道名称定义"
+        },
+        "CHANNELTYPE" : {
+          "TITLE" : "通道类型",
+          "DESCRIPTION" : "通道类型定义"
+        },
+        "CHANNELDESTINATION" : {
+          "TITLE" : "通道目的地",
+          "DESCRIPTION" : "通道目的地定义"
+        },
+        "TRIGGEREVENTKEY" : {
+          "TITLE" : "触发事件key",
+          "DESCRIPTION" : "触发事件key定义"
+        },
+        "TRIGGEREVENTNAME" : {
+          "TITLE" : "触发事件名称",
+          "DESCRIPTION" : "触发事件名称定义"
+        },
+        "TRIGGERCHANNELKEY" : {
+          "TITLE" : "触发管道key",
+          "DESCRIPTION" : "触发管道key定义"
+        },
+        "TRIGGERCHANNELNAME" : {
+          "TITLE" : "触发管道名称",
+          "DESCRIPTION" : "触发管道名称"
+        },
+        "TRIGGERCHANNELTYPE" : {
+          "TITLE" : "触发通道类型",
+          "DESCRIPTION" : "触发通道类型定义"
+        },
+        "TRIGGERCHANNELDESTINATION" : {
+          "TITLE" : "触发通道目的地",
+          "DESCRIPTION" : "触发通道目的地定义"
+        },
+        "KEYDETECTIONFIXEDVALUE" : {
+          "TITLE" : "事件key固定值",
+          "DESCRIPTION" : "事件key固定值定义"
+        },
+        "KEYDETECTIONJSONFIELD" : {
+          "TITLE" : "事件key json 字段",
+          "DESCRIPTION" : "事件key json 字段"
+        },
+        "KEYDETECTIONJSONPOINTER" : {
+          "TITLE" : "事件key json 指针",
+          "DESCRIPTION" : "事件key json 指针"
+        }
+      },
       "ISTRANSACTIONPACKAGE" : {
         "ISTRANSACTION" : {
           "TITLE" : "是事务子流程",
@@ -872,6 +953,11 @@
         "TITLE" : "升级开始事件",
         "DESCRIPTION" : "捕获抛出的BPMN升级的启动事件"
       },
+      "STARTEVENTREGISTRYEVENT" : {
+        "TITLE" : "注册开始事件",
+        "DESCRIPTION" : "注册开始事件"
+      },
+
       "USERTASK" : {
         "TITLE" : "用户任务",
         "DESCRIPTION" : "分配给特定人的任务"
@@ -928,6 +1014,11 @@
         "TITLE" : "子流程",
         "DESCRIPTION" : "子流程范围"
       },
+      "SENDEVENTTASK" : {
+        "TITLE" : "事件发送任务",
+        "DESCRIPTION" : "事件发送任务"
+      },
+
       "COLLAPSEDSUBPROCESS" : {
         "TITLE" : "折叠子流程",
         "DESCRIPTION" : "子流程范围"
@@ -983,6 +1074,10 @@
       "BOUNDARYCANCELEVENT" : {
         "TITLE" : "边界取消事件",
         "DESCRIPTION" : "一个边界取消事件"
+      },
+      "BOUNDARYEVENTREGISTRYEVENT" : {
+        "TITLE" : "边界注册事件",
+        "DESCRIPTION" : "边界注册事件"
       },
       "BOUNDARYCOMPENSATIONEVENT" : {
         "TITLE" : "边界补偿事件",
@@ -1535,6 +1630,12 @@
           "DESCRIPTION": "指示是否应为阶段概述考虑此阶段"
         }
       },
+      "MILESTONEVARIABLEPACKAGE" : {
+        "MILESTONEVARIABLE": {
+          "TITLE": "Milestone variable",
+          "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+        }
+      },
       "SCRIPTFORMATPACKAGE": {
         "SCRIPTFORMAT": {
           "TITLE": "脚本格式",
@@ -1557,6 +1658,12 @@
         "AVAILABLECONDITION": {
           "TITLE": "可用条件",
           "DESCRIPTION": "事件监听器上的可选条件表达式，用于指示何时可用。"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
         }
       }
     },

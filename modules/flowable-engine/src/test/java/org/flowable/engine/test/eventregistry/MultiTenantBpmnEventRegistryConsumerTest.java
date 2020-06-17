@@ -104,7 +104,6 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedChannel")
             .resourceName("sharedChannel.channel")
-            .deploymentTenantId(TENANT_A)
             .channelAdapter("${testInboundChannelAdapter2}")
             .jsonDeserializer()
             .fixedEventKey("sameKey")
@@ -152,7 +151,6 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
 
     private void deployEventDefinition(ChannelModel channelModel, String key, String tenantId, String ... optionalExtraPayload) {
         EventModelBuilder eventModelBuilder = getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey(channelModel.getKey())
             .key(key)
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -305,8 +303,8 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         // Both the process model and the event definition are part of the default tenant
         deployProcessModel("startProcessInstanceDefaultTenant.bpmn20.xml", null);
 
-        assertThat(runtimeService.createEventSubscriptionQuery().singleResult())
-            .extracting(EventSubscription::getTenantId).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
+        String tenantId = runtimeService.createEventSubscriptionQuery().singleResult().getTenantId();
+        assertThat(tenantId).isNullOrEmpty();
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(0L);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);

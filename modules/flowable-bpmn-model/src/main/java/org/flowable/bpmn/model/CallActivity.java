@@ -122,6 +122,22 @@ public class CallActivity extends Activity {
     public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
+    
+    public void setCalledElementType(String calledElementType) {
+        this.calledElementType = calledElementType;
+    }
+
+    public String getCalledElementType() {
+        return calledElementType;
+    }
+
+    public String getProcessInstanceIdVariableName() {
+        return processInstanceIdVariableName;
+    }
+
+    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
+        this.processInstanceIdVariableName = processInstanceIdVariableName;
+    }
 
     @Override
     public CallActivity clone() {
@@ -155,22 +171,6 @@ public class CallActivity extends Activity {
                 outParameters.add(parameter.clone());
             }
         }
-    }
-
-    public void setCalledElementType(String calledElementType) {
-        this.calledElementType = calledElementType;
-    }
-
-    public String getCalledElementType() {
-        return calledElementType;
-    }
-
-    public String getProcessInstanceIdVariableName() {
-        return processInstanceIdVariableName;
-    }
-
-    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
-        this.processInstanceIdVariableName = processInstanceIdVariableName;
     }
 
 }

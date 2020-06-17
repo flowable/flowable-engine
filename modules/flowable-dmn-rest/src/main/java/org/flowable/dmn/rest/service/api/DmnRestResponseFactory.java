@@ -68,7 +68,7 @@ public class DmnRestResponseFactory {
 
     public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecision> decisionTables) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DecisionTableResponse> responseList = new ArrayList<>();
+        List<DecisionTableResponse> responseList = new ArrayList<>(decisionTables.size());
         for (DmnDecision instance : decisionTables) {
             responseList.add(createDecisionTableResponse(instance, urlBuilder));
         }
@@ -77,7 +77,7 @@ public class DmnRestResponseFactory {
 
     public List<DmnDeploymentResponse> createDmnDeploymentResponseList(List<DmnDeployment> deployments) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DmnDeploymentResponse> responseList = new ArrayList<>();
+        List<DmnDeploymentResponse> responseList = new ArrayList<>(deployments.size());
         for (DmnDeployment instance : deployments) {
             responseList.add(createDmnDeploymentResponse(instance, urlBuilder));
         }
@@ -105,7 +105,7 @@ public class DmnRestResponseFactory {
 
         if (executionResults != null && !executionResults.isEmpty()) {
             for (Map<String, Object> executionResult : executionResults) {
-                List<EngineRestVariable> ruleResults = new ArrayList<>();
+                List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
                 for (String name : executionResult.keySet()) {
                     ruleResults.add(createRestVariable(name, executionResult.get(name), false));
                 }
@@ -134,7 +134,7 @@ public class DmnRestResponseFactory {
     
     public List<HistoricDecisionExecutionResponse> createHistoricDecisionExecutionResponseList(List<DmnHistoricDecisionExecution> historicDecisionExecutions) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<HistoricDecisionExecutionResponse> responseList = new ArrayList<>();
+        List<HistoricDecisionExecutionResponse> responseList = new ArrayList<>(historicDecisionExecutions.size());
         for (DmnHistoricDecisionExecution execution : historicDecisionExecutions) {
             responseList.add(createHistoryDecisionExecutionResponse(execution, urlBuilder));
         }

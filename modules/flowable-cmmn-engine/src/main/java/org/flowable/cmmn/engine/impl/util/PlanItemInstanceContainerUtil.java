@@ -25,6 +25,7 @@ import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_IF_AVAILABLE_O
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
@@ -87,7 +88,7 @@ public class PlanItemInstanceContainerUtil {
 
                     // if the plan item is active and not to be ignored, we can directly stop to look any further as it prevents the parent from being completed
                     if (ACTIVE_STATES.contains(planItemInstance.getState())) {
-                        return new CompletionEvaluationResult(false, false);
+                        return new CompletionEvaluationResult(false, false, planItemInstance);
                     }
 
                     // if the plan item is required and not yet in an end state or active, we need to check the special parent completion rule to determine
@@ -102,12 +103,12 @@ public class PlanItemInstanceContainerUtil {
                             }
                             if (!alreadyCompleted) {
                                 // was never completed before and is required, evaluation can stop here as we found required work still to be done
-                                return new CompletionEvaluationResult(false, false);
+                                return new CompletionEvaluationResult(false, false, planItemInstance);
                             }
                             // we don't ignore it for completion, but if it was completed before, the parent is still completable (depends then on its autocompletion)
                             shouldBeCompleted = shouldBeCompleted && containerIsAutocomplete;
                         } else {
-                            return new CompletionEvaluationResult(false, false);
+                            return new CompletionEvaluationResult(false, false, planItemInstance);
                         }
                     }
 
@@ -151,14 +152,14 @@ public class PlanItemInstanceContainerUtil {
                         CompletionEvaluationResult childPlanItemInstanceCompletionEvaluationResult =
                             shouldPlanItemContainerComplete(commandContext, planItemInstance, null, childContainerIsAutocomplete);
                         if (!childPlanItemInstanceCompletionEvaluationResult.isCompletable) {
-                            return new CompletionEvaluationResult(false, false);
+                            return childPlanItemInstanceCompletionEvaluationResult;
                         }
                         shouldBeCompleted = shouldBeCompleted && childPlanItemInstanceCompletionEvaluationResult.shouldBeCompleted;
                     }
                 }
             }
         }
-        return new CompletionEvaluationResult(true, shouldBeCompleted);
+        return new CompletionEvaluationResult(true, shouldBeCompleted, null);
     }
 
     /**
@@ -194,7 +195,7 @@ public class PlanItemInstanceContainerUtil {
             .findByCaseInstanceIdAndPlanItemId(planItemInstance.getCaseInstanceId(), planItemInstance.getPlanItem().getId());
         if (planItemInstances != null && planItemInstances.size() > 0) {
             for (PlanItemInstanceEntity item : planItemInstances) {
-                if (COMPLETED.equals(item.getState())) {
+                if (Objects.equals(planItemInstance.getStageInstanceId(), item.getStageInstanceId()) && COMPLETED.equals(item.getState())) {
                     return true;
                 }
             }

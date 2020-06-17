@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
@@ -45,8 +46,8 @@ import org.flowable.job.service.impl.history.async.TriggerAsyncHistoryExecutorTr
 import org.flowable.job.service.impl.persistence.entity.AbstractJobEntity;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayRef;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -96,6 +97,14 @@ public class DefaultJobManager implements JobManager {
     protected void triggerExecutorIfNeeded(JobEntity jobEntity) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
         if (isAsyncExecutorActive()) {
+            if (StringUtils.isNotEmpty(jobEntity.getCategory())) {
+                if (jobServiceConfiguration.getEnabledJobCategories() != null && 
+                        !jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                    
+                    return;
+                }
+            }
+            
             hintAsyncExecutor(jobEntity);
         }
     }
@@ -139,6 +148,24 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
+    public JobEntity moveExternalWorkerJobToExecutableJob(ExternalWorkerJobEntity externalWorkerJob) {
+        if (externalWorkerJob == null) {
+            throw new FlowableException("Empty external worker job can not be scheduled");
+        }
+
+        JobEntity executableJob = createExecutableJobFromOtherJob(externalWorkerJob);
+        // This job should now become a regular async job
+        fillDefaultAsyncJobInfo(executableJob, executableJob.isExclusive());
+        boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
+        if (insertSuccessful) {
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(externalWorkerJob);
+            triggerExecutorIfNeeded(executableJob);
+            return executableJob;
+        }
+        return null;
+    }
+
+    @Override
     public TimerJobEntity moveJobToTimerJob(AbstractRuntimeJobEntity job) {
         TimerJobEntity timerJob = createTimerJobFromOtherJob(job);
         boolean insertSuccessful = jobServiceConfiguration.getTimerJobEntityManager().insertTimerJobEntity(timerJob);
@@ -163,6 +190,8 @@ public class DefaultJobManager implements JobManager {
 
         } else if (job instanceof JobEntity) {
             jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+        } else if (job instanceof ExternalWorkerJobEntity) {
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete((ExternalWorkerJobEntity) job);
         }
 
         return suspendedJob;
@@ -174,6 +203,10 @@ public class DefaultJobManager implements JobManager {
         if (Job.JOB_TYPE_TIMER.equals(job.getJobType())) {
             activatedJob = createTimerJobFromOtherJob(job);
             jobServiceConfiguration.getTimerJobEntityManager().insert((TimerJobEntity) activatedJob);
+
+        } else if (Job.JOB_TYPE_EXTERNAL_WORKER.equals(job.getJobType())) {
+            activatedJob = createExternalWorkerJobFromOtherJob(job);
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert((ExternalWorkerJobEntity) activatedJob);
 
         } else {
             activatedJob = createExecutableJobFromOtherJob(job);
@@ -195,25 +228,38 @@ public class DefaultJobManager implements JobManager {
 
         } else if (job instanceof JobEntity) {
             jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+        } else if (job instanceof ExternalWorkerJobEntity) {
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete((ExternalWorkerJobEntity) job);
         }
 
         return deadLetterJob;
     }
 
     @Override
-    public JobEntity moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries) {
+    public Job moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries) {
         if (deadLetterJobEntity == null) {
             throw new FlowableIllegalArgumentException("Null job provided");
         }
 
-        JobEntity executableJob = createExecutableJobFromOtherJob(deadLetterJobEntity);
-        executableJob.setRetries(retries);
-        boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
-        if (insertSuccessful) {
-            jobServiceConfiguration.getDeadLetterJobEntityManager().delete(deadLetterJobEntity);
-            triggerExecutorIfNeeded(executableJob);
-            return executableJob;
+        if (Job.JOB_TYPE_EXTERNAL_WORKER.equals(deadLetterJobEntity.getJobType())) {
+            ExternalWorkerJobEntity externalWorkerJob = createExternalWorkerJobFromOtherJob(deadLetterJobEntity);
+            externalWorkerJob.setRetries(retries);
+            boolean insertSuccessful = jobServiceConfiguration.getExternalWorkerJobEntityManager().insertExternalWorkerJobEntity(externalWorkerJob);
+            if (insertSuccessful) {
+                jobServiceConfiguration.getDeadLetterJobEntityManager().delete(deadLetterJobEntity);
+                return externalWorkerJob;
+            }
+        } else {
+            JobEntity executableJob = createExecutableJobFromOtherJob(deadLetterJobEntity);
+            executableJob.setRetries(retries);
+            boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
+            if (insertSuccessful) {
+                jobServiceConfiguration.getDeadLetterJobEntityManager().delete(deadLetterJobEntity);
+                triggerExecutorIfNeeded(executableJob);
+                return executableJob;
+            }
         }
+
         return null;
     }
 
@@ -270,6 +316,18 @@ public class DefaultJobManager implements JobManager {
             // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
             // as the chance of failure will be high.
 
+        } else if (job instanceof ExternalWorkerJobEntity) {
+            ExternalWorkerJobEntity jobEntity = (ExternalWorkerJobEntity) job;
+
+            ExternalWorkerJobEntity newJobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().create();
+            copyJobInfo(newJobEntity, jobEntity);
+            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setLockExpirationTime(null);
+            newJobEntity.setLockOwner(null);
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
+        } else if (job instanceof TimerJobEntity) {
+            jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
         } else {
             if (job != null) {
                 // It could be a v5 job, so simply unlock it.
@@ -534,6 +592,15 @@ public class DefaultJobManager implements JobManager {
 
     protected void internalCreateLockedAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
+        
+        if (StringUtils.isNotEmpty(jobEntity.getCategory())) {
+            if (jobServiceConfiguration.getEnabledJobCategories() != null && 
+                    !jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                
+                return;
+            }
+        }
+        
         setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
     }
 
@@ -590,6 +657,13 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
+    public ExternalWorkerJobEntity createExternalWorkerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+        ExternalWorkerJobEntity externalWorkerJob = jobServiceConfiguration.getExternalWorkerJobEntityManager().create();
+        copyJobInfo(externalWorkerJob, otherJob);
+        return externalWorkerJob;
+    }
+
+    @Override
     public AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
         copyToJob.setDuedate(copyFromJob.getDuedate());
         copyToJob.setEndDate(copyFromJob.getEndDate());
@@ -599,6 +673,7 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         copyToJob.setCustomValues(copyFromJob.getCustomValues());
         copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
+        copyToJob.setCategory(copyFromJob.getCategory());
         copyToJob.setJobType(copyFromJob.getJobType());
         copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
         copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
@@ -616,6 +691,12 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setRevision(copyFromJob.getRevision());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
+        if (copyFromJob.getCorrelationId() != null) {
+            copyToJob.setCorrelationId(copyFromJob.getCorrelationId());
+        } else {
+            copyToJob.setCorrelationId(jobServiceConfiguration.getIdGenerator().getNextId());
+        }
+
         return copyToJob;
     }
 
@@ -623,15 +704,15 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setId(copyFromJob.getId());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
-            JobByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
+            ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
             copyToJob.setAdvancedJobHandlerConfigurationByteArrayRef(configurationByteArrayRefCopy);
         }
         if (copyFromJob.getExceptionByteArrayRef() != null) {
-            JobByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
+            ByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
             copyToJob.setExceptionByteArrayRef(exceptionByteArrayRefCopy);
         }
         if (copyFromJob.getCustomValuesByteArrayRef() != null) {
-            JobByteArrayRef customValuesByteArrayRefCopy = copyFromJob.getCustomValuesByteArrayRef().copy();
+            ByteArrayRef customValuesByteArrayRefCopy = copyFromJob.getCustomValuesByteArrayRef().copy();
             copyToJob.setCustomValuesByteArrayRef(customValuesByteArrayRefCopy);
         }
         copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());

@@ -19,9 +19,10 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -29,7 +30,8 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery, QueryCacheValues {
+public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery,
+        CacheAwareQuery<PlanItemInstanceEntity> {
     
     protected String caseDefinitionId;
     protected String derivedCaseDefinitionId;
@@ -46,6 +48,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Date createdAfter;
     protected Date lastAvailableBefore;
     protected Date lastAvailableAfter;
+    protected Date lastUnavailableBefore;
+    protected Date lastUnavailableAfter;
     protected Date lastEnabledBefore;
     protected Date lastEnabledAfter;
     protected Date lastDisabledBefore;
@@ -272,6 +276,24 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             throw new FlowableIllegalArgumentException("availableAfter is null");
         }
         this.lastAvailableAfter = availableAfter;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastUnavailableBefore(Date unavailableBefore) {
+        if (unavailableBefore == null) {
+            throw new FlowableIllegalArgumentException("unavailableBefore is null");
+        }
+        this.lastUnavailableBefore = unavailableBefore;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceLastUnavailableAfter(Date unavailableAfter) {
+        if (unavailableAfter == null) {
+            throw new FlowableIllegalArgumentException("unavailableAfter is null");
+        }
+        this.lastUnavailableAfter = unavailableAfter;
         return this;
     }
 
@@ -693,6 +715,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public Date getLastAvailableAfter() {
         return lastAvailableAfter;
+    }
+    public Date getLastUnavailableBefore() {
+        return lastUnavailableBefore;
+    }
+    public Date getLastUnavailableAfter() {
+        return lastUnavailableAfter;
     }
     public Date getLastEnabledBefore() {
         return lastEnabledBefore;

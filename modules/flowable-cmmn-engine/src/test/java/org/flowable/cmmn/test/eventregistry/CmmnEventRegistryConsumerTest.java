@@ -51,33 +51,31 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
-            .key("myEvent")
-            .resourceName("myEvent.event")
-            .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .correlationParameter("orderId", EventPayloadTypes.STRING)
-            .payload("payload1", EventPayloadTypes.STRING)
-            .payload("payload2", EventPayloadTypes.INTEGER)
-            .deploy();
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .correlationParameter("customerId", EventPayloadTypes.STRING)
+                .correlationParameter("orderId", EventPayloadTypes.STRING)
+                .payload("payload1", EventPayloadTypes.STRING)
+                .payload("payload2", EventPayloadTypes.INTEGER)
+                .deploy();
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+                .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
         getEventRepositoryService().createInboundChannelModelBuilder()
-            .key("test-channel")
-            .resourceName("test.channel")
-            .channelAdapter("${inboundEventChannelAdapter}")
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("type")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("test-channel")
+                .resourceName("test.channel")
+                .channelAdapter("${inboundEventChannelAdapter}")
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("type")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         return inboundEventChannelAdapter;
     }
-
 
     @After
     public void unregisterEventDefinition() {
@@ -104,13 +102,13 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
     @CmmnDeployment
     public void testGenericEventListenerWithCorrelation() {
         CaseInstance kermitCase = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("singleCorrelationCase")
-            .variable("customerIdVar", "kermit")
-            .start();
+                .caseDefinitionKey("singleCorrelationCase")
+                .variable("customerIdVar", "kermit")
+                .start();
         CaseInstance gonzoCase = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("singleCorrelationCase")
-            .variable("customerIdVar", "gonzo")
-            .start();
+                .caseDefinitionKey("singleCorrelationCase")
+                .variable("customerIdVar", "gonzo")
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(kermitCase.getId()).list()).hasSize(1);
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(gonzoCase.getId()).list()).hasSize(1);
 
@@ -129,42 +127,42 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerNoCorrelation.cmmn",
-        "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithCorrelation.cmmn",
-        "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithOrderCorrelation.cmmn",
-        "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithTwoCorrelations.cmmn"
+            "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerNoCorrelation.cmmn",
+            "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithCorrelation.cmmn",
+            "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithOrderCorrelation.cmmn",
+            "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testGenericEventListenerWithTwoCorrelations.cmmn"
     })
     public void testGenericEventListenerWithMultipleCorrelations() {
         CaseInstance noCorrelationCase = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("myCase")
-            .start();
+                .caseDefinitionKey("myCase")
+                .start();
         CaseInstance kermitOrder1Case = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("twoCorrelationsCase")
-            .variable("customerIdVar", "kermit")
-            .variable("orderIdVar", "order1")
-            .start();
+                .caseDefinitionKey("twoCorrelationsCase")
+                .variable("customerIdVar", "kermit")
+                .variable("orderIdVar", "order1")
+                .start();
         CaseInstance kermitOrder2Case = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("twoCorrelationsCase")
-            .variable("customerIdVar", "kermit")
-            .variable("orderIdVar", "order2")
-            .start();
+                .caseDefinitionKey("twoCorrelationsCase")
+                .variable("customerIdVar", "kermit")
+                .variable("orderIdVar", "order2")
+                .start();
         CaseInstance gonzoOrder1Case = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("twoCorrelationsCase")
-            .variable("customerIdVar", "gonzo")
-            .variable("orderIdVar", "order1")
-            .start();
+                .caseDefinitionKey("twoCorrelationsCase")
+                .variable("customerIdVar", "gonzo")
+                .variable("orderIdVar", "order1")
+                .start();
         CaseInstance gonzoCase = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("singleCorrelationCase")
-            .variable("customerIdVar", "gonzo")
-            .start();
+                .caseDefinitionKey("singleCorrelationCase")
+                .variable("customerIdVar", "gonzo")
+                .start();
         CaseInstance order1Case = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("orderCorrelationCase")
-            .variable("orderIdVar", "order1")
-            .start();
+                .caseDefinitionKey("orderCorrelationCase")
+                .variable("orderIdVar", "order1")
+                .start();
         CaseInstance order2Case = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("orderCorrelationCase")
-            .variable("orderIdVar", "order2")
-            .start();
+                .caseDefinitionKey("orderCorrelationCase")
+                .variable("orderIdVar", "order2")
+                .start();
 
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(noCorrelationCase.getId()).list()).hasSize(1);
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(kermitOrder1Case.getId()).list()).hasSize(1);
@@ -236,13 +234,13 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         assertThat(caseDefinition).isNotNull();
 
         EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery()
-            .scopeDefinitionId(caseDefinition.getId())
-            .scopeType(ScopeTypes.CMMN)
-            .singleResult();
+                .scopeDefinitionId(caseDefinition.getId())
+                .scopeType(ScopeTypes.CMMN)
+                .singleResult();
         assertThat(eventSubscription).isNotNull();
         assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty();
 
         for (int i = 1; i <= 5; i++) {
             inboundEventChannelAdapter.triggerTestEvent();
@@ -257,16 +255,16 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         assertThat(caseDefinition).isNotNull();
 
         EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery()
-            .scopeDefinitionId(caseDefinition.getId())
-            .scopeType(ScopeTypes.CMMN)
-            .singleResult();
+                .scopeDefinitionId(caseDefinition.getId())
+                .scopeType(ScopeTypes.CMMN)
+                .singleResult();
         assertThat(eventSubscription).isNotNull();
         assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty();
 
         inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0); // shouldn't trigger, correlation doesn't match
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty(); // shouldn't trigger, correlation doesn't match
 
         for (int i = 1; i <= 3; i++) {
             inboundEventChannelAdapter.triggerTestEvent("testCustomer");
@@ -278,16 +276,16 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
     @CmmnDeployment
     public void testGenericEventListenerWithPayload() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testCaseEventWithPayload")
-            .start();
+                .caseDefinitionKey("testCaseEventWithPayload")
+                .start();
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
         inboundEventChannelAdapter.triggerTestEvent("payloadCustomer");
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
-            .containsOnly(
-                entry("customerIdVar", "payloadCustomer"),
-                entry("payload1", "Hello World")
-            );
+                .containsOnly(
+                        entry("customerIdVar", "payloadCustomer"),
+                        entry("payload1", "Hello World")
+                );
     }
 
     @Test
@@ -302,10 +300,10 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
-            .containsOnly(
-                entry("customerIdVar", "payloadStartCustomer"),
-                entry("anotherVarName", "Hello World")
-            );
+                .containsOnly(
+                        entry("customerIdVar", "payloadStartCustomer"),
+                        entry("anotherVarName", "Hello World")
+                );
     }
 
     @Test

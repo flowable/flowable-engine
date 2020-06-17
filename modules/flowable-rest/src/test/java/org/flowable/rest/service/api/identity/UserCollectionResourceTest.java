@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.assertj.core.api.Assertions;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -33,6 +31,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -51,22 +51,22 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             user1.setFirstName("Fred");
             user1.setLastName("McDonald");
             user1.setDisplayName("Fred McDonald");
-            user1.setEmail("no-reply@activiti.org");
+            user1.setEmail("no-reply@flowable.org");
             identityService.saveUser(user1);
             savedUsers.add(user1);
 
             User user2 = identityService.newUser("anotherUser");
             user2.setFirstName("Tijs");
             user2.setLastName("Barrez");
-            user2.setEmail("no-reply@alfresco.org");
+            user2.setEmail("no-reply@flowable.com");
             identityService.saveUser(user2);
             savedUsers.add(user2);
 
             User user3 = identityService.createUserQuery().userId("kermit").singleResult();
-            assertNotNull(user3);
-            
+            assertThat(user3).isNotNull();
+
             User user4 = identityService.createUserQuery().userId("aSalesUser").singleResult();
-            assertNotNull(user4);
+            assertThat(user4).isNotNull();
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION);
@@ -89,7 +89,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on email
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?email=no-reply@activiti.org";
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?email=no-reply@flowable.org";
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on firstNameLike
@@ -105,7 +105,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on emailLike
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?emailLike=" + encode("no-reply@activiti.org%");
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?emailLike=" + encode("no-reply@flowable.org%");
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on memberOfGroup
@@ -132,28 +132,32 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("lastName", "Heremans");
             requestNode.put("displayName", "Frederik Heremans");
             requestNode.put("password", "test");
-            requestNode.put("email", "no-reply@activiti.org");
+            requestNode.put("email", "no-reply@flowable.org");
 
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION, "testuser"));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testuser", responseNode.get("id").textValue());
-            assertEquals("Frederik", responseNode.get("firstName").textValue());
-            assertEquals("Heremans", responseNode.get("lastName").textValue());
-            assertEquals("Frederik Heremans", responseNode.get("displayName").textValue());
-            assertEquals("no-reply@activiti.org", responseNode.get("email").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "testuser")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id: 'testuser',"
+                            + "firstName: 'Frederik',"
+                            + "lastName: 'Heremans',"
+                            + "displayName: 'Frederik Heremans',"
+                            + "email: 'no-reply@flowable.org',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "testuser") + "'"
+                            + "}");
 
             User createdUser = identityService.createUserQuery().userId("testuser").singleResult();
-            assertNotNull(createdUser);
-            Assertions.assertThat(createdUser.getFirstName()).isEqualTo("Frederik");
-            Assertions.assertThat(createdUser.getLastName()).isEqualTo("Heremans");
-            Assertions.assertThat(createdUser.getDisplayName()).isEqualTo("Frederik Heremans");
-            Assertions.assertThat(createdUser.getPassword()).isEqualTo("test");
-            Assertions.assertThat(createdUser.getEmail()).isEqualTo("no-reply@activiti.org");
+            assertThat(createdUser).isNotNull();
+            assertThat(createdUser.getFirstName()).isEqualTo("Frederik");
+            assertThat(createdUser.getLastName()).isEqualTo("Heremans");
+            assertThat(createdUser.getDisplayName()).isEqualTo("Frederik Heremans");
+            assertThat(createdUser.getPassword()).isEqualTo("test");
+            assertThat(createdUser.getEmail()).isEqualTo("no-reply@flowable.org");
         } finally {
             try {
                 identityService.deleteUser("testuser");
@@ -169,7 +173,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("firstName", "Frederik");
         requestNode.put("lastName", "Heremans");
-        requestNode.put("email", "no-reply@activiti.org");
+        requestNode.put("email", "no-reply@flowable.org");
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION, "unexisting"));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -181,7 +185,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         requestNode.put("id", "kermit");
         requestNode.put("firstName", "Frederik");
         requestNode.put("lastName", "Heremans");
-        requestNode.put("email", "no-reply@activiti.org");
+        requestNode.put("email", "no-reply@flowable.org");
 
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CONFLICT));

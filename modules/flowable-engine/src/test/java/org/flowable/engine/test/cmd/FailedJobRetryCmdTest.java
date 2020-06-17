@@ -36,7 +36,10 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
         Job job = fetchJob(pi.getProcessInstanceId());
         assertNotNull(job);
+        assertNotNull(job.getCorrelationId());
         assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
+
+        String correlationId = job.getCorrelationId();
 
         assertEquals(4, job.getRetries());
 
@@ -47,6 +50,7 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
         job = refreshJob(job.getId());
         assertEquals(3, job.getRetries());
+        assertEquals(correlationId, job.getCorrelationId());
         stillOneJobWithExceptionAndRetriesLeft();
 
         execution = refreshExecutionEntity(execution.getId());
@@ -56,6 +60,7 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
         job = refreshJob(job.getId());
         assertEquals(2, job.getRetries());
+        assertEquals(correlationId, job.getCorrelationId());
         stillOneJobWithExceptionAndRetriesLeft();
 
         execution = refreshExecutionEntity(execution.getId());
@@ -64,6 +69,7 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
         waitForExecutedJobWithRetriesLeft(1);
 
         job = refreshJob(job.getId());
+        assertEquals(correlationId, job.getCorrelationId());
         assertEquals(1, job.getRetries());
         stillOneJobWithExceptionAndRetriesLeft();
 
@@ -74,6 +80,7 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
         job = managementService.createDeadLetterJobQuery().jobId(job.getId()).singleResult();
         assertEquals(0, job.getRetries());
+        assertEquals(correlationId, job.getCorrelationId());
         assertEquals(1, managementService.createDeadLetterJobQuery().withException().count());
         assertEquals(0, managementService.createJobQuery().count());
         assertEquals(0, managementService.createTimerJobQuery().count());

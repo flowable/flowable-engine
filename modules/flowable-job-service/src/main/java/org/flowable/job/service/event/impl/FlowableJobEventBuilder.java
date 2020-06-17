@@ -65,9 +65,17 @@ public class FlowableJobEventBuilder {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {
-                event.setExecutionId(((Job) persistedObject).getExecutionId());
-                event.setProcessInstanceId(((Job) persistedObject).getProcessInstanceId());
-                event.setProcessDefinitionId(((Job) persistedObject).getProcessDefinitionId());   
+                Job jobObject = (Job) persistedObject;
+                if (jobObject.getScopeType() == null) {
+                    event.setExecutionId(jobObject.getExecutionId());
+                    event.setProcessInstanceId(jobObject.getProcessInstanceId());
+                    event.setProcessDefinitionId(jobObject.getProcessDefinitionId());
+                } else {
+                    event.setScopeType(jobObject.getScopeType());
+                    event.setScopeId(jobObject.getScopeId());
+                    event.setSubScopeId(jobObject.getSubScopeId());
+                    event.setScopeDefinitionId(jobObject.getScopeDefinitionId());
+                }
             }
         }
     }

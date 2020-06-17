@@ -21,7 +21,8 @@ public class MailServerInfo {
     protected String mailServerDefaultFrom;
     protected String mailServerForceTo;
     protected String mailServerHost;
-    protected int mailServerPort;
+    protected int mailServerPort = 25;
+    protected int mailServerSSLPort = 465;
     protected String mailServerUsername;
     protected String mailServerPassword;
     protected boolean mailServerUseSSL;
@@ -57,6 +58,14 @@ public class MailServerInfo {
 
     public void setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+    }
+
+    public int getMailServerSSLPort() {
+        return mailServerSSLPort;
+    }
+
+    public void setMailServerSSLPort(int mailServerSSLPort) {
+        this.mailServerSSLPort = mailServerSSLPort;
     }
 
     public String getMailServerUsername() {

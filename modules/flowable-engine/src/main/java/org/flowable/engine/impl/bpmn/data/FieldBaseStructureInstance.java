@@ -12,8 +12,17 @@
  */
 package org.flowable.engine.impl.bpmn.data;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.flowable.engine.impl.util.CommandContextUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 
 /**
  * An instance of {@link FieldBaseStructureDefinition}
@@ -47,16 +56,40 @@ public class FieldBaseStructureInstance implements StructureInstance {
         return this.structureDefinition.getFieldNameAt(index);
     }
 
+    public Class<?> getFieldTypeAt(int index) {
+        return this.structureDefinition.getFieldTypeAt(index);
+    }
+
     @Override
     public Object[] toArray() {
         int fieldSize = this.getFieldSize();
         Object[] arguments = new Object[fieldSize];
         for (int i = 0; i < fieldSize; i++) {
-            String fieldName = this.getFieldNameAt(i);
-            Object argument = this.getFieldValue(fieldName);
+            Object argument = this.getFieldValue(i);
             arguments[i] = argument;
         }
         return arguments;
+    }
+
+    private Object getFieldValue(int index) {
+        final String fieldName = this.getFieldNameAt(index);
+        final Object fieldValueObject = this.getFieldValue(fieldName);
+        if (fieldValueObject instanceof ArrayNode) {
+            // The field is a Json Array
+            final ArrayNode fieldArrayNodeValueObject = (ArrayNode) fieldValueObject;
+
+            final Class<?> fieldParameterType = this.structureDefinition.getFieldParameterTypeAt(index);
+            final ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+            final Object value = objectMapper.convertValue(fieldValueObject,
+                    Array.newInstance(fieldParameterType, fieldArrayNodeValueObject.size()).getClass());
+
+            return Arrays.asList((Object[]) value);
+        } else if (fieldValueObject instanceof ValueNode || fieldValueObject instanceof ObjectNode) {
+            final ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+            return objectMapper.convertValue(fieldValueObject, this.getFieldTypeAt(index));
+        } else {
+            return fieldValueObject;
+        }
     }
 
     @Override

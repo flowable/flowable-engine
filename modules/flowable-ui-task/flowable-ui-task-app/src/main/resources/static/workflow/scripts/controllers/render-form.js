@@ -740,7 +740,7 @@ angular.module('flowableApp')
                             postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
                         } else if ((field.type === 'people' || field.type === 'functional-group') && field.value) {
-                            postData.values[field.id] = field.value.id;
+                            postData.values[field.id] = field.value;
                         } else {
                             postData.values[field.id] = field.value;
                         }

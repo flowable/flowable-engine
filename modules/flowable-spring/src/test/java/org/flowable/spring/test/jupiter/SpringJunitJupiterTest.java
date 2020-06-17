@@ -67,8 +67,7 @@ public class SpringJunitJupiterTest {
 
     @AfterEach
     public void closeProcessEngine() {
-        // Required, since all the other tests seem to do a specific drop on the
-        // end
+        // Required, since all the other tests seem to do a specific drop on the end
         processEngine.close();
     }
 
@@ -83,21 +82,21 @@ public class SpringJunitJupiterTest {
         assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         assertThat(flowableTestHelper.getDeploymentIdFromDeploymentAnnotation())
-            .isEqualTo(deploymentId)
-            .isNotNull();
+                .isEqualTo(deploymentId)
+                .isNotNull();
         assertThat(flowableTestHelper.getProcessEngine())
-            .as("Spring injected process engine")
-            .isSameAs(processEngine)
-            .as("Extension injected process engine")
-            .isSameAs(extensionProcessEngine);
+                .as("Spring injected process engine")
+                .isSameAs(processEngine)
+                .as("Extension injected process engine")
+                .isSameAs(extensionProcessEngine);
 
         assertThat(flowableTestHelper.getMockSupport()).as("mockSupport").isNotNull();
 
         ProcessDefinition deployedProcessDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
         assertThat(deployedProcessDefinition).isNotNull();
         assertThat(deployedProcessDefinition.getId())
-            .as("Deployed ProcessDefinition")
-            .isEqualTo(task.getProcessDefinitionId());
+                .as("Deployed ProcessDefinition")
+                .isEqualTo(task.getProcessDefinitionId());
     }
 
     @Configuration(proxyBeanMethods = false)

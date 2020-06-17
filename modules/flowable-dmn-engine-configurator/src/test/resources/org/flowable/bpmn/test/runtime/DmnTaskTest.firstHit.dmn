@@ -1,0 +1,36 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_DMN_MODEL-826de8bf-8b94-4386-83f8-a9fb0da4514b" name="First Hit" namespace="http://www.flowable.org/dmn">
+  <decision id="DecisionTable" name="First Hit">
+    <decisionTable id="decisionTable_DMN_MODEL-826de8bf-8b94-4386-83f8-a9fb0da4514b" hitPolicy="FIRST">
+      <input label="Test Input">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>testInput</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" label="Test Output" name="testOutput" typeRef="number"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[== "first"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA[1]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[== "second"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA[2]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[== "third"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA[3]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

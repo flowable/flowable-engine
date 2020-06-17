@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +38,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -47,12 +47,12 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // complete Task A by providing the collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         // as we didn't enable Task B yet, no instances must have been created
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -62,7 +62,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -71,19 +71,19 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now let's complete all Tasks B -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemInstanceName("Task B")
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceName("Task B")
+                .planItemInstanceStateActive()
+                .orderByCreateTime().asc()
+                .list();
 
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -95,7 +95,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -103,7 +103,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // enable the condition on Task B upfront -> nothing yet to happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskB", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -112,12 +112,12 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // complete Task A by providing the collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -126,19 +126,19 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now let's complete all Tasks B -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemInstanceName("Task B")
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceName("Task B")
+                .planItemInstanceStateActive()
+                .orderByCreateTime().asc()
+                .list();
 
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -150,7 +150,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -162,12 +162,12 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // complete Task A by providing the collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -177,17 +177,17 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // complete all active tasks
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         taskOutputList = Arrays.asList("E", "F");
 
         // complete Task A again by providing a different collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -198,7 +198,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         completeAllPlanItems(caseInstance.getId(), "Task B", 2);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -210,7 +210,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -222,12 +222,12 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // complete Task A by providing the collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -237,17 +237,17 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // only complete two active Task B
         completePlanItemsWithItemValues(caseInstance.getId(), "Task B", 4, "A", "B");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
 
         taskOutputList = Arrays.asList("E", "F");
 
         // complete Task A again by providing a different collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-            .variable("taskOutputList", taskOutputList)
-            .trigger();
+                .variable("taskOutputList", taskOutputList)
+                .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -258,7 +258,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -270,7 +270,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -278,7 +278,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // enable task C upfront (nothing must happen yet)
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskC", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -290,7 +290,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now we need to have 4 instances of Task C with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
@@ -300,7 +300,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // if we change the collection variable, nothing else must happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
@@ -308,26 +308,26 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // even if we remove the variable completely, nothing else must happen
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "myCollection");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
 
         // now let's complete all Tasks C -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemInstanceName("Task C")
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceName("Task C")
+                .planItemInstanceStateActive()
+                .orderByCreateTime().asc()
+                .list();
 
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");
@@ -339,7 +339,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -350,7 +350,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", myCollection);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -360,7 +360,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now we need to have 4 instances of Task C with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
@@ -370,7 +370,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // if we change the collection variable, nothing else must happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
@@ -378,26 +378,26 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // even if we remove the variable completely, nothing else must happen
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "myCollection");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
 
         // now let's complete all Tasks C -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemInstanceName("Task C")
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceName("Task C")
+                .planItemInstanceStateActive()
+                .orderByCreateTime().asc()
+                .list();
 
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");

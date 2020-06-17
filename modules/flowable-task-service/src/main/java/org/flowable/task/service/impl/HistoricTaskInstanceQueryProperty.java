@@ -46,6 +46,7 @@ public class HistoricTaskInstanceQueryProperty implements QueryProperty {
     public static final HistoricTaskInstanceQueryProperty SCOPE_DEFINITION_ID = new HistoricTaskInstanceQueryProperty("RES.SCOPE_DEFINITION_ID_");
     public static final HistoricTaskInstanceQueryProperty SCOPE_ID = new HistoricTaskInstanceQueryProperty("RES.SCOPE_ID_");
     public static final HistoricTaskInstanceQueryProperty SCOPE_TYPE = new HistoricTaskInstanceQueryProperty("RES.SCOPE_TYPE_");
+    public static final HistoricTaskInstanceQueryProperty CATEGORY = new HistoricTaskInstanceQueryProperty("RES.CATEGORY_");
 
     public static final HistoricTaskInstanceQueryProperty INCLUDED_VARIABLE_TIME = new HistoricTaskInstanceQueryProperty("VAR.LAST_UPDATED_TIME_");
 

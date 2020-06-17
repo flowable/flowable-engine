@@ -64,6 +64,11 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
         String formValidation = BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_FORM_FIELD_VALIDATION, xtr);
         startEvent.setValidateFormFields(formValidation);
 
+        String sameDeploymentAttribute = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr);
+        if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(sameDeploymentAttribute)) {
+            startEvent.setSameDeployment(false);
+        }
+
         parseChildElements(getXMLElementName(), startEvent, model, xtr);
 
         return startEvent;
@@ -75,6 +80,11 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
         writeQualifiedAttribute(ATTRIBUTE_EVENT_START_INITIATOR, startEvent.getInitiator(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, startEvent.getFormKey(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION, startEvent.getValidateFormFields(), xtw);
+
+        if (!startEvent.isSameDeployment()) {
+            // default value is true
+            writeQualifiedAttribute(ATTRIBUTE_SAME_DEPLOYMENT, "false", xtw);
+        }
 
         if (startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) {
             writeDefaultAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);

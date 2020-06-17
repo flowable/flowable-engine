@@ -1,0 +1,99 @@
+{
+   "GENERAL": {
+        "MAIN-TITLE": "Flowable",
+        "ERROR": {
+            "GENERIC": "Lo sentimos, ha ocurrido un error...",
+            "UNKNOWN": "Lo sentimos, ha ocurrido un error mientras se ejecutaba la operación solicitada",
+            "BAD_REQUEST": "Un error ha ocurrido mientras se ejecutaba la operación solicitada",
+            "NOT_FOUND": "El recurso que está intentando acceder no existe",
+            "UNAUTHORIZED": "Debe iniciar esión para ejecutar la operación solicitada.",
+            "FORBIDDEN": "Usted no tiene permitido ejecutar la operación solicitada",
+            "INTERNAL_SERVER_ERROR": "Lo sentimos, ha ocurrido un error inesperado mientras se ejecutaba la operación solicitada."
+        },
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "HELP": "Ayuda",
+            "EDIT-PROFILE": "Editar perfil",
+            "SAVE": "Guardar",
+            "CANCEL": "Cancelar",
+            "CLOSE": "Cerrar",
+            "DEPLOY": "Desplegar",
+            "ABOUT": "Acerca de Flowable"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Inicio de sesión",
+        "USERNAME": "Usuario",
+        "USERNAME-PLACEHOLDER": "Ingrese su usuario",
+        "PASSWORD": "Contraseña",
+        "PASSWORD-PLACEHOLDER": "Ingrese su contraseña",
+        "INVALID-CREDENTIALS": "Credenciales inválidas",
+        "ACTION": {
+            "CONFIRM": "Iniciar sesión"
+        }
+    },
+    "ACCOUNT": {
+        "ACTIVATE": {
+          "TITLE": "Activar cuenta",
+          "ACTIVATING-MESSAGE": "Prepárate {{userFullName}}! Estamos activando tu cuenta...",
+          "SUCCESS-MESSAGE": "Tu cuenta ha sido activada. Por favor inicia sesión abajo para comenzar a diseñar y ejecutar procesos",
+          "FAILURE-MESSAGE": "Tu cuenta no puede activarse. Puede que ya esté activa o que el enlace de activación haya expirado."
+        },
+
+        "RESET-PASSWORD-REQUEST": {
+          "MESSAGE": "¿Olvidaste tu contraseña? Ingresa tu dirección de email abajo para recibir un email para restablecer la contraseña.",
+          "TITLE": "Restablecer contraseña",
+          "EMAIL": "Dirección de email",
+          "EMAIL-PLACEHOLDER": "Ingresa tu email",
+          "SECURITY-SECTION": "Control de seguridad",
+          "CONFIRM": "Restablecer contraseña",
+          "SUCCESS-MESSAGE": "Enseguida recibirás un email con un enlace para restablecer la contraseña.",
+          "ERROR": {
+              "UNEXISTING-USER": "No existe un usuario con la dirección de email ingresada."
+          }
+        },
+
+        "RESET-PASSWORD": {
+          "TITLE": "Restablecer contraseña",
+          "PASSWORD": "Contraseña",
+          "PASSWORD-CONFIRM": "Confirmar contraseña",
+          "PASSWORD-PLACEHOLDER": "Ingresar una nueva contraseña",
+          "PASSWORD-CONFIRM-PLACEHOLDER": "Confirmar la nueva contraseña",
+          "CONFIRM": "Establecer contraseña",
+          "LOADING": "Restableciendo contraseña...",
+          "SUCCESS-MESSAGE": "Tu nueva contraseña se ha establecido.",
+          "LOGIN": "Iniciar sesión ahora",
+          "FAILURE-MESSAGE": "Tu contraseña no se puede restablecer. El enlace para restablecer la contraseña es inválido o ha expirado."
+        }
+    },
+    "APP": {
+        "KICKSTART": {
+            "TITLE": "Inicio",
+            "DESCRIPTION": "Crea modelos de procesos, formularios y definición de aplicaciones, luego comparte tus modelos y definiciones con otras personas."
+        },
+        "TASKS": {
+            "TITLE": "Tareas",
+            "DESCRIPTION": "Accede a tu lista de tareas completa y trabaja en cualquier tarea asignada a ti en cualquier app de procesos. También inicia nuevos procesos y tareas."
+        },
+        "IDENTITY-MANAGEMENT": {
+            "TITLE": "Gestión de identidad",
+            "TITLE-TENANT-ADMIN": "Gestión de identidad",
+            "DESCRIPTION": "Gestiona tu perfil: cambia tu imagen, nombre y otras configuraciones. Como administrador, gestiona usuarios y grupos.",
+            "DESCRIPTION-TENANT-ADMIN": "Gestiona los usuarios y grupos en tu organización."
+        },
+        "CUSTOM-APP" : {
+            "TITLE-TASKS": "tareas",
+            "TITLE-PROCESSES": "procesos"
+        },
+        "POPUP" : {
+            "ADD-APP-TITLE": "Añadir aplicación a página de inicio",
+            "ADD-APP-SUMMARY": "Añade una aplicación a tu página de inicio"
+        },
+        "ACTION": {
+            "DELETE": "Eliminar aplicación"
+        },
+        "MESSAGE": {
+            "DELETED": "La aplicación se eliminó con éxito"
+        }
+    }
+}

@@ -12,11 +12,7 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -47,9 +43,9 @@ public class HitPolicyPriorityTest {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
-        
-        assertEquals(1, result.keySet().size());
-        assertEquals("OUTPUT2", result.get("outputVariable1"));
+
+        assertThat(result.keySet()).hasSize(1);
+        assertThat(result.get("outputVariable1")).isEqualTo("OUTPUT2");
     }
 
     @Test
@@ -63,10 +59,10 @@ public class HitPolicyPriorityTest {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
-        
-        assertEquals(2, result.keySet().size());
-        assertEquals("REFER", result.get("outputVariable1"));
-        assertEquals("LEVEL 2", result.get("outputVariable2"));
+
+        assertThat(result.keySet()).hasSize(2);
+        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
+        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 2");
     }
 
     @Test
@@ -80,10 +76,10 @@ public class HitPolicyPriorityTest {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
-        
-        assertEquals(2, result.keySet().size());
-        assertEquals("REFER", result.get("outputVariable1"));
-        assertEquals("LEVEL 1", result.get("outputVariable2"));
+
+        assertThat(result.keySet()).hasSize(2);
+        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
+        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 1");
     }
 
     @Test
@@ -98,9 +94,9 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertEquals(2, result.keySet().size());
-        assertEquals("REFER", result.get("outputVariable1"));
-        assertEquals("LEVEL 2", result.get("outputVariable2"));
+        assertThat(result.keySet()).hasSize(2);
+        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
+        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 2");
     }
 
     @Test
@@ -114,11 +110,11 @@ public class HitPolicyPriorityTest {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithAuditTrail();
-        
-        assertEquals(0, result.getDecisionResult().size());
-        assertTrue(result.isFailed());
-        assertNotNull(result.getExceptionMessage());
-        assertNull(result.getValidationMessage());
+
+        assertThat(result.getDecisionResult()).isEmpty();
+        assertThat(result.isFailed()).isTrue();
+        assertThat(result.getExceptionMessage()).isNotNull();
+        assertThat(result.getValidationMessage()).isNull();
     }
 
     @Test
@@ -134,15 +130,15 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithAuditTrail();
 
-        assertEquals(1, result.getDecisionResult().size());
+        assertThat(result.getDecisionResult()).hasSize(1);
         Map<String, Object> outputMap = result.getDecisionResult().iterator().next();
-        assertEquals(2, outputMap.keySet().size());
-        assertEquals("ACCEPT", outputMap.get("outputVariable1"));
-        assertEquals("NONE", outputMap.get("outputVariable2"));
+        assertThat(outputMap.keySet()).hasSize(2);
+        assertThat(outputMap.get("outputVariable1")).isEqualTo("ACCEPT");
+        assertThat(outputMap.get("outputVariable2")).isEqualTo("NONE");
 
-        assertFalse(result.isFailed());
-        assertNull(result.getExceptionMessage());
-        assertNotNull(result.getValidationMessage());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getExceptionMessage()).isNull();
+        assertThat(result.getValidationMessage()).isNotNull();
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }
@@ -159,8 +155,8 @@ public class HitPolicyPriorityTest {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
-        
-        assertEquals(1, result.keySet().size());
-        assertEquals(20D, result.get("outputVariable1"));
+
+        assertThat(result.keySet()).hasSize(1);
+        assertThat(result.get("outputVariable1")).isEqualTo(20D);
     }
 }

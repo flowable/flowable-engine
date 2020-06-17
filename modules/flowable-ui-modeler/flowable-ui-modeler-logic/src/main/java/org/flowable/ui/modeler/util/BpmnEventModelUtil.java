@@ -14,6 +14,7 @@ package org.flowable.ui.modeler.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,6 @@ import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
-import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -89,13 +89,10 @@ public class BpmnEventModelUtil {
                 
                 if (flowElement instanceof SendEventServiceTask) {
                     SendEventServiceTask task = (SendEventServiceTask) flowElement;
-                    eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
-                    String channelKey = getElementValue("channelKey", flowElement);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addOutboundChannelKey(channelKey);
-                    }
-                    
+
                     if (task.isTriggerable() && StringUtils.isNotEmpty(task.getTriggerEventType())) {
+                        eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
+
                         EventModel triggerEventModel = new EventModel();
                         String triggerEventName = getElementValue("triggerEventName", flowElement);
                         triggerEventModel.setKey(task.getTriggerEventType());
@@ -104,26 +101,19 @@ public class BpmnEventModelUtil {
                         } else {
                             triggerEventModel.setName(task.getTriggerEventType());
                         }
-                        
-                        triggerEventModel.setPayload(getOutIOParameterEventPayload(task.getEventOutParameters()));
-                        triggerEventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("triggerEventCorrelationParameter")));
-                        
-                        String triggerChannelKey = getElementValue("triggerChannelKey", flowElement);
-                        if (StringUtils.isNotEmpty(triggerChannelKey)) {
-                            triggerEventModel.addInboundChannelKey(triggerChannelKey);
-                        }
+
+                        Map<String, EventPayload> payload = getOutIOParameterEventPayload(task.getEventOutParameters());
+                        fillEventCorrelationParameters(payload, flowElement.getExtensionElements().get("triggerEventCorrelationParameter"));
+                        triggerEventModel.setPayload(payload.values());
                         
                         eventModelMap.put(task.getTriggerEventType(), triggerEventModel);
                     }
                     
                 } else {
-                    eventModel.setPayload(getOutParameterEventPayload(flowElement.getExtensionElements().get("eventOutParameter")));
-                    eventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("eventCorrelationParameter")));
-                    
-                    String channelKey = getElementValue("channelKey", flowElement);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addInboundChannelKey(channelKey);
-                    }
+                    Map<String, EventPayload> payload = getOutParameterEventPayload(flowElement.getExtensionElements().get("eventOutParameter"));
+                    fillEventCorrelationParameters(payload, flowElement.getExtensionElements().get("eventCorrelationParameter"));
+                    eventModel.setPayload(payload.values());
+
                 }
                 
                 eventModelMap.put(eventKey, eventModel);
@@ -224,8 +214,8 @@ public class BpmnEventModelUtil {
         channelModelMap.put(channelKey, channelModel);
     }
     
-    protected static List<EventPayload> getOutParameterEventPayload(List<ExtensionElement> parameterList) {
-        List<EventPayload> eventPayloadList = new ArrayList<>();
+    protected static Map<String, EventPayload> getOutParameterEventPayload(List<ExtensionElement> parameterList) {
+        Map<String, EventPayload> eventPayload = new LinkedHashMap<>();
         if (parameterList != null && parameterList.size() > 0) {
             for (ExtensionElement parameterElement : parameterList) {
                 String name = parameterElement.getAttributeValue(null, "source");
@@ -234,15 +224,15 @@ public class BpmnEventModelUtil {
                     type = "string";
                 }
                 
-                eventPayloadList.add(new EventPayload(name, type));
+                eventPayload.put(name, new EventPayload(name, type));
             }
         }
         
-        return eventPayloadList;
+        return eventPayload;
     }
-    
-    protected static List<EventPayload> getOutIOParameterEventPayload(List<IOParameter> parameterList) {
-        List<EventPayload> eventPayloadList = new ArrayList<>();
+
+    protected static Map<String, EventPayload> getOutIOParameterEventPayload(List<IOParameter> parameterList) {
+        Map<String, EventPayload> eventPayload = new LinkedHashMap<>();
         if (parameterList != null && parameterList.size() > 0) {
             for (IOParameter parameter : parameterList) {
                 String name = parameter.getSource();
@@ -251,11 +241,11 @@ public class BpmnEventModelUtil {
                     type = "string";
                 }
                 
-                eventPayloadList.add(new EventPayload(name, type));
+                eventPayload.put(name, new EventPayload(name, type));
             }
         }
         
-        return eventPayloadList;
+        return eventPayload;
     }
     
     protected static List<EventPayload> getInIOParameterEventPayload(List<IOParameter> parameterList) {
@@ -275,8 +265,7 @@ public class BpmnEventModelUtil {
         return eventPayloadList;
     }
     
-    protected static List<EventCorrelationParameter> getEventCorrelationParameters(List<ExtensionElement> parameterList) {
-        List<EventCorrelationParameter> correlationParameterList = new ArrayList<>();
+    protected static void fillEventCorrelationParameters(Map<String, EventPayload> currentPayload, List<ExtensionElement> parameterList) {
         if (parameterList != null && parameterList.size() > 0) {
             for (ExtensionElement parameterElement : parameterList) {
                 String name = parameterElement.getAttributeValue(null, "name");
@@ -284,12 +273,16 @@ public class BpmnEventModelUtil {
                 if (StringUtils.isEmpty(type)) {
                     type = "string";
                 }
-                
-                correlationParameterList.add(new EventCorrelationParameter(name, type));
+
+                EventPayload eventPayload = currentPayload.get(name);
+
+                if (eventPayload != null) {
+                    eventPayload.setCorrelationParameter(true);
+                } else {
+                    currentPayload.put(name, EventPayload.correlation(name, type));
+                }
             }
         }
-        
-        return correlationParameterList;
     }
     
     protected static String getElementValue(String name, FlowElement elementObject) {

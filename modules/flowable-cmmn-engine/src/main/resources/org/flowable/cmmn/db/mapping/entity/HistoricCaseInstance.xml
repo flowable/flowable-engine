@@ -145,6 +145,11 @@
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+
+        <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
+        <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="VARCHAR" />
+        <result property="caseDefinitionVersion" column="CaseDefinitionVersion" jdbcType="INTEGER" />
+        <result property="caseDefinitionDeploymentId" column="CaseDefinitionDeploymentId" jdbcType="VARCHAR" />
     </resultMap>
 
     <resultMap id="historicCaseInstanceResultMapWithVariables"
@@ -172,15 +177,23 @@
     </resultMap>
 
     <select id="selectHistoricCaseInstance" parameterType="string" resultMap="historicCaseInstanceResultMap">
-        select * from ${prefix}ACT_CMMN_HI_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
+        select RES.* ,
+            CASE_DEF.KEY_ as CaseDefinitionKey,
+            CASE_DEF.NAME_ as CaseDefinitionName,
+            CASE_DEF.VERSION_ as CaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
+        from ${prefix}ACT_CMMN_HI_CASE_INST RES
+        left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        where RES.ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
     <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
-          , CASE_DEF.KEY_ as CaseDefinitionKey, CASE_DEF.ID_ as CaseDefinitionId, CASE_DEF.NAME_ as CaseDefinitionName, CASE_DEF.VERSION_ as CaseDefinitionVersion, CASE_DEF.DEPLOYMENT_ID_ as DeploymentId
-        </if>
+        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>,
+            CASE_DEF.KEY_ as CaseDefinitionKey,
+            CASE_DEF.NAME_ as CaseDefinitionName,
+            CASE_DEF.VERSION_ as CaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
         <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
         ${orderBy}
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
@@ -204,6 +217,10 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
             select distinct RES.*,
+            CASE_DEF.KEY_ as CaseDefinitionKey,
+            CASE_DEF.NAME_ as CaseDefinitionName,
+            CASE_DEF.VERSION_ as CaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId,
             VAR.ID_ as VAR_ID_,
             VAR.NAME_ as VAR_NAME_,
             VAR.VAR_TYPE_ as VAR_TYPE_,
@@ -239,6 +256,10 @@
             TEMPRES_REFERENCE_ID_ as REFERENCE_ID_,
             TEMPRES_REFERENCE_TYPE_ as REFERENCE_TYPE,
             TEMPRES_TENANT_ID_ as TENANT_ID_,
+            TEMPCaseDefinitionKey as CaseDefinitionKey,
+            TEMPCaseDefinitionName as CaseDefinitionName,
+            TEMPCaseDefinitionVersion as CaseDefinitionVersion,
+            TEMPCaseDefinitionDeploymentId as CaseDefinitionDeploymentId,
             TEMPVAR_ID_ as VAR_ID_,
             TEMPVAR_NAME_ as VAR_NAME_,
             TEMPVAR_TYPE_ as VAR_TYPE_,
@@ -271,6 +292,10 @@
             RES.REFERENCE_ID_ as TEMPRES_REFERENCE_ID_,
             RES.REFERENCE_TYPE_ as TEMPRES_REFERENCE_TYPE_,
             RES.TENANT_ID_ as TEMPRES_TENANT_ID_,
+            CASE_DEF.KEY_ as TEMPCaseDefinitionKey,
+            CASE_DEF.NAME_ as TEMPCaseDefinitionName,
+            CASE_DEF.VERSION_ as TEMPCaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as TEMPCaseDefinitionDeploymentId,
             VAR.ID_ as TEMPVAR_ID_,
             VAR.NAME_ as TEMPVAR_NAME_,
             VAR.VAR_TYPE_ as TEMPVAR_TYPE_,
@@ -292,9 +317,7 @@
 
     <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
-            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
-        </if>
+        left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <if test="includeCaseVariables">
             left outer join ${prefix}ACT_HI_VARINST VAR ON VAR.PROC_INST_ID_ is null and
             RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_ = 'cmmn' and VAR.SUB_SCOPE_ID_ is null
@@ -304,9 +327,7 @@
 
     <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
-            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
-        </if>
+        left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <include refid="commonSelectHistoricCaseInstancesByQueryCriteriaSql"/>
     </sql>
     
@@ -635,8 +656,11 @@
             and (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
         </if>
         <if test="involvedUser != null">
-            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-            #{involvedUser})
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
+        </if>
+        <if test="involvedUserIdentityLink != null">
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
         </if>
         <if test="involvedGroups != null">
             and EXISTS(
@@ -645,6 +669,10 @@
                     #{involvedGroup}
                 </foreach>
             )
+        </if>
+        <if test="involvedGroupIdentityLink != null">
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
         </if>
     </sql>
     
@@ -717,6 +745,10 @@
             or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
             #{orQueryObject.involvedUser})
         </if>
+        <if test="orQueryObject.involvedUserIdentityLink != null">
+            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+        </if>
         <if test="orQueryObject.involvedGroups != null">
             or EXISTS(
             select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -724,6 +756,10 @@
                 #{involvedGroup}
             </foreach>
             )
+        </if>
+        <if test="orQueryObject.involvedGroupIdentityLink != null">
+            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
         </if>
     </sql>
 

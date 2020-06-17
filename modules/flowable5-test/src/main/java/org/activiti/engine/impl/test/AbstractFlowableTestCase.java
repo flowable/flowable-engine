@@ -61,6 +61,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_ID_PROPERTY");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("FLW_EV_DATABASECHANGELOG");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("FLW_EV_DATABASECHANGELOGLOCK");
     }
 
     protected ProcessEngine processEngine;

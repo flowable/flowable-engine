@@ -78,7 +78,8 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_19 = "org/flowable/dmn/editor/converter/decisiontable_collections_collection_compare.json";
     private static final String JSON_RESOURCE_20 = "org/flowable/dmn/editor/converter/decisiontable_complex_output_expression.json";
     private static final String JSON_RESOURCE_21 = "org/flowable/dmn/editor/converter/decisiontable_forceDMN11.json";
-    private static final String JSON_RESOURCE_22 = "org/flowable/dmn/editor/converter/decisionservice_1.json";
+    private static final String JSON_RESOURCE_22 = "org/flowable/dmn/editor/converter/decisiontable_empty_outcomes.json";
+    private static final String JSON_RESOURCE_23 = "org/flowable/dmn/editor/converter/decisionservice_1.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -617,7 +618,7 @@ public class DmnJsonConverterTest {
 
     @Test
     public void testConvertDecisionServiceJsonToDMN() {
-        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_23);
         String testDecJsonResource1 = readJsonToString(JSON_RESOURCE_1);
         String testDecJsonResource2 = readJsonToString(JSON_RESOURCE_5);
         String testDecJsonResource3 = readJsonToString(JSON_RESOURCE_7);
@@ -650,7 +651,7 @@ public class DmnJsonConverterTest {
 
     @Test
     public void testConvertDecisionServiceJsonToDMNNoDecisionTableMap() {
-        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_23);
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc");
 
@@ -672,7 +673,7 @@ public class DmnJsonConverterTest {
 
     @Test
     public void testConvertDRDtoJson() {
-        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_23);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
@@ -704,23 +705,31 @@ public class DmnJsonConverterTest {
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt());
 
         // first output decision
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt());
 
         // second output decision
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt());
 
         // encapsulated decisions sections
@@ -734,23 +743,31 @@ public class DmnJsonConverterTest {
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt());
 
         // first encapsulated decision
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("lowerRight").get("y").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(0).get("bounds").get("upperLeft").get("y").asInt());
 
         // second encapsulated decision
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("lowerRight").get("y").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("x").asInt());
-        assertEquals(testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt(),
+        assertEquals(
+            testJsonResource.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt(),
             modelerJson.get("childShapes").get(0).get("childShapes").get(1).get("childShapes").get(1).get("bounds").get("upperLeft").get("y").asInt());
 
         // first information requirement
@@ -771,9 +788,17 @@ public class DmnJsonConverterTest {
             modelerJson.get("childShapes").get(1).get("dockers").get(0).get("x").asInt(), 1);
         assertEquals(testJsonResource.get("childShapes").get(1).get("dockers").get(1).get("y").asInt(),
             modelerJson.get("childShapes").get(1).get("dockers").get(0).get("y").asInt(), 1);
+    }
 
-        System.out.println(modelerJson);
+    @Test
+    public void testConvertJsonToDMNEmptyOutcomes() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_22);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
+
+        assertEquals(2, decisionTable.getRules().get(0).getOutputEntries().size());
+        assertEquals(2, decisionTable.getRules().get(1).getOutputEntries().size());
     }
 
     /* Helper methods */

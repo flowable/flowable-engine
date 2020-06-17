@@ -43,11 +43,11 @@ class InstantVariableTest extends PluggableFlowableTestCase {
         Instant oneYearLater = nowInstant.plus(365, ChronoUnit.DAYS);
         Instant oneYearLaterWithoutNanos = oneYearLater.truncatedTo(ChronoUnit.MILLIS);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .variable("nowInstant", nowInstant)
-            .variable("oneYearBefore", oneYearBefore)
-            .variable("oneYearLater", oneYearLater)
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .variable("nowInstant", nowInstant)
+                .variable("oneYearBefore", oneYearBefore)
+                .variable("oneYearLater", oneYearLater)
+                .start();
 
         VariableInstance nowInstantVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "nowInstant");
         assertThat(nowInstantVariableInstance.getTypeName()).isEqualTo(InstantType.TYPE_NAME);
@@ -62,19 +62,19 @@ class InstantVariableTest extends PluggableFlowableTestCase {
         assertThat(oneYearLaterVariableInstance.getValue()).isEqualTo(oneYearLaterWithoutNanos);
 
         assertThat(runtimeService.getVariables(processInstance.getId()))
-            .containsOnly(
-                entry("nowInstant", nowInstantWithoutNanos),
-                entry("oneYearBefore", oneYearBeforeWithoutNanos),
-                entry("oneYearLater", oneYearLaterWithoutNanos)
-            );
+                .containsOnly(
+                        entry("nowInstant", nowInstantWithoutNanos),
+                        entry("oneYearBefore", oneYearBeforeWithoutNanos),
+                        entry("oneYearLater", oneYearLaterWithoutNanos)
+                );
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void testGetInstantVariableFromTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey("oneTaskProcess")
-            .start();
+                .processDefinitionKey("oneTaskProcess")
+                .start();
 
         Map<String, Object> variables = new HashMap<>();
         Instant nowInstant = Instant.now();
@@ -95,9 +95,9 @@ class InstantVariableTest extends PluggableFlowableTestCase {
         assertThat(oneYearLaterVariableInstance.getValue()).isEqualTo(oneYearLaterWithoutNanos);
 
         assertThat(taskService.getVariables(task.getId()))
-            .containsOnly(
-                entry("nowInstant", nowInstantWithoutNanos),
-                entry("oneYearLater", oneYearLaterWithoutNanos)
-            );
+                .containsOnly(
+                        entry("nowInstant", nowInstantWithoutNanos),
+                        entry("oneYearLater", oneYearLaterWithoutNanos)
+                );
     }
 }

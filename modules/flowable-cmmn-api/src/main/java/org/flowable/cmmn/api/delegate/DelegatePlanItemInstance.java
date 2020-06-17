@@ -14,7 +14,9 @@ package org.flowable.cmmn.api.delegate;
 
 import java.util.Date;
 
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -38,6 +40,7 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setStartTime(Date startTime);
     void setCreateTime(Date createTime);
     void setLastAvailableTime(Date availableTime);
+    void setLastUnavailableTime(Date availableTime);
     void setLastEnabledTime(Date enabledTime);
     void setLastDisabledTime(Date disabledTime);
     void setLastStartedTime(Date startedTime);
@@ -56,6 +59,10 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setFormKey(String formKey);
     void setExtraValue(String extraValue);
     void setTenantId(String tenantId);
+
+    PlanItemInstanceLifecycleListener getCurrentLifecycleListener();
+    FlowableListener getCurrentFlowableListener();
+    void setCurrentLifecycleListener(PlanItemInstanceLifecycleListener lifecycleListener, FlowableListener flowableListener);
 
     PlanItem getPlanItem();
 

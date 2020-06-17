@@ -12,15 +12,10 @@
  */
 package org.flowable.http.cmmn;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
-import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +25,6 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
-import org.hamcrest.core.AnyOf;
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,12 +40,10 @@ public class CmmnHttpTaskTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-
     @Before
     public void setUp() throws Exception {
-       HttpServiceTaskTestServer.setUp();
+        HttpServiceTaskTestServer.setUp();
     }
-
 
     @Test
     @CmmnDeployment(
@@ -63,7 +53,7 @@ public class CmmnHttpTaskTest {
     public void testDecisionServiceTask() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
     }
 
     @Test
@@ -71,7 +61,7 @@ public class CmmnHttpTaskTest {
     public void testGetWithVariableName() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "test"), containsString("John"));
+        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "test")).contains("John");
 
     }
 
@@ -80,8 +70,7 @@ public class CmmnHttpTaskTest {
     public void testGetWithoutVariableName() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "httpGetResponseBody"),
-                containsString("John"));
+        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "httpGetResponseBody")).contains("John");
     }
 
     @Test
@@ -90,20 +79,11 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertEquals(2, variables.size());
-        String firstName = null;
-        String lastName = null;
-
-        for (Map.Entry<String,Object> variable : variables.entrySet()) {
-            if ("firstName".equals(variable.getKey())) {
-                firstName = (String) variable.getValue();
-            } else if ("lastName".equals(variable.getKey())) {
-                lastName = (String) variable.getValue();
-            }
-        }
-
-        assertEquals("John", firstName);
-        assertEquals("Doe", lastName);
+        Map<String, String> names = new HashMap<>();
+        names.put("firstName", "John");
+        names.put("lastName", "Doe");
+        assertThat(variables)
+                .containsExactlyInAnyOrderEntriesOf(names);
     }
 
     @Test
@@ -111,73 +91,67 @@ public class CmmnHttpTaskTest {
     public void testGetWithRequestHandler() {
         CaseInstance caseInstance = createCaseInstance();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertEquals(1, variables.size());
-        assertThat((String) variables.get("httpGetResponseBody"), containsString("John"));
+        assertThat(variables).hasSize(1);
+        assertThat((String) variables.get("httpGetResponseBody")).contains("John");
     }
 
     @Test
     @CmmnDeployment
     public void testHttpsSelfSigned() {
-        Assert.assertThat( createCaseInstance(), is(notNullValue()));
+        assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
     @CmmnDeployment
     public void testConnectTimeout() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(IOException.class));
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("IO exception occurred");
     }
 
     @Test
     @CmmnDeployment
     public void testRequestTimeout() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectCause(AnyOf.anyOf(
-                IsInstanceOf.<Throwable>instanceOf(SocketTimeoutException.class),
-                IsInstanceOf.<Throwable>instanceOf(IOException.class)));
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("IO exception occurred")
+                .hasCauseInstanceOf(SocketTimeoutException.class);
     }
 
     @Test
     @CmmnDeployment
     public void testDisallowRedirects() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("HTTP302");
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP302");
     }
 
     @Test
     @CmmnDeployment
     public void testFailStatusCodes() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("HTTP400");
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP400");
     }
 
     @Test
     @CmmnDeployment
     public void testHandleStatusCodes() {
-        Assert.assertThat(createCaseInstance(), is(notNullValue()));
+        assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
     @CmmnDeployment
     public void testIgnoreException() {
-        Assert.assertThat(createCaseInstance(), is(notNullValue()));
+        assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
     @CmmnDeployment
     public void testMapException() {
         //exception mapping is not implemented yet in Cmmn
-        this.expectedException.expect(RuntimeException.class);
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -185,18 +159,17 @@ public class CmmnHttpTaskTest {
     public void testHttpGet3XX() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpGetResponseStatusCode"), is( 302));
+        assertThat(variables.get("httpGetResponseStatusCode")).isEqualTo(302);
     }
 
     @Test
     @CmmnDeployment
     public void testHttpGet4XX() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("HTTP404");
-
-        createCaseInstance();
+        assertThatThrownBy(() -> createCaseInstance())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("HTTP404");
     }
 
     @Test
@@ -204,17 +177,19 @@ public class CmmnHttpTaskTest {
     public void testHttpGet5XX() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("get500RequestMethod"), is("GET"));
-        assertThat(variables.get("get500RequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat(variables.get("get500RequestHeaders"), is("Accept: application/json"));
-        assertThat(variables.get("get500RequestTimeout"), is(5000));
-        assertThat(variables.get("get500HandleStatusCodes"), is("4XX, 5XX"));
-        assertThat(variables.get("get500SaveRequestVariables"), is(true));
-
-        assertThat(variables.get("get500ResponseStatusCode"), is(500));
-        assertThat(variables.get("get500ResponseReason"), is("Server Error"));
+        assertThat(variables)
+                .contains(
+                        entry("get500RequestMethod", "GET"),
+                        entry("get500RequestUrl", "https://localhost:9799/api?code=500"),
+                        entry("get500RequestHeaders", "Accept: application/json"),
+                        entry("get500RequestTimeout", 5000),
+                        entry("get500HandleStatusCodes", "4XX, 5XX"),
+                        entry("get500SaveRequestVariables", true),
+                        entry("get500ResponseStatusCode", 500),
+                        entry("get500ResponseReason", "Server Error")
+                );
     }
 
     @Test
@@ -222,16 +197,18 @@ public class CmmnHttpTaskTest {
     public void testHttpPost2XX() throws Exception {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpPostRequestMethod"), is("POST"));
-        assertThat(variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=201"));
-        assertThat(variables.get("httpPostRequestHeaders"), is("Content-Type: application/json"));
-        assertThat(variables.get("httpPostRequestBody"), is("{\"test\":\"sample\",\"result\":true}"));
-
-        assertThat(variables.get("httpPostResponseStatusCode"), is(201));
-        assertThat(variables.get("httpPostResponseReason"), is("Created"));
-        assertThat((String) variables.get("httpPostResponseBody"), containsString("\"body\":\"{\\\"test\\\":\\\"sample\\\",\\\"result\\\":true}\""));
+        assertThat(variables)
+                .contains(
+                        entry("httpPostRequestMethod", "POST"),
+                        entry("httpPostRequestUrl", "https://localhost:9799/api?code=201"),
+                        entry("httpPostRequestHeaders", "Content-Type: application/json"),
+                        entry("httpPostRequestBody", "{\"test\":\"sample\",\"result\":true}"),
+                        entry("httpPostResponseStatusCode", 201),
+                        entry("httpPostResponseReason", "Created")
+                );
+        assertThat((String) variables.get("httpPostResponseBody")).contains("\"body\":\"{\\\"test\\\":\\\"sample\\\",\\\"result\\\":true}\"");
     }
 
     @Test
@@ -239,9 +216,12 @@ public class CmmnHttpTaskTest {
     public void testHttpPost3XX() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpPostResponseStatusCode"), is(302));
+        assertThat(variables)
+                .contains(
+                        entry("httpPostResponseStatusCode", 302)
+                );
     }
 
     @Test
@@ -249,10 +229,13 @@ public class CmmnHttpTaskTest {
     public void testHttpDelete4XX() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpDeleteResponseStatusCode"), is(400));
-        assertThat(variables.get("httpDeleteResponseReason"), is("Bad Request"));
+        assertThat(variables)
+                .contains(
+                        entry("httpDeleteResponseStatusCode", 400),
+                        entry("httpDeleteResponseReason", "Bad Request")
+                );
     }
 
     @Test
@@ -263,26 +246,32 @@ public class CmmnHttpTaskTest {
                 .variable("prefix", "httpPost")
                 .start();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpPostRequestMethod"), is("PUT"));
-        assertThat(variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat(variables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
-        assertThat(variables.get("httpPostRequestBody"), is("test"));
-
-        assertThat(variables.get("httpPostResponseStatusCode"), is(500));
-        assertThat(variables.get("httpPostResponseReason"), is("Server Error"));
+        assertThat(variables)
+                .contains(
+                        entry("httpPostRequestMethod", "PUT"),
+                        entry("httpPostRequestUrl", "https://localhost:9799/api?code=500"),
+                        entry("httpPostRequestHeaders",
+                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"),
+                        entry("httpPostRequestBody", "test"),
+                        entry("httpPostResponseStatusCode", 500),
+                        entry("httpPostResponseReason", "Server Error")
+                );
 
         Map<String, String> headerMap = HttpServiceTaskTestServer.HttpServiceTaskTestServlet.headerMap;
-        assertEquals("text/plain", headerMap.get("Content-Type"));
-        assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
-        assertEquals("localhost:7000", headerMap.get("Host"));
-        assertNull(headerMap.get("Test"));
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
+                        entry("Host", "localhost:7000"),
+                        entry("Test", null)
+                );
     }
 
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/http/cmmn/CmmnHttpTaskTest.testExpressions.cmmn"}
+            resources = { "org/flowable/http/cmmn/CmmnHttpTaskTest.testExpressions.cmmn" }
     )
     public void testExpressions() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -302,21 +291,27 @@ public class CmmnHttpTaskTest {
                 .variables(variables)
                 .start();
 
-        assertThat(caseInstance, is(notNullValue()));
+        assertThat(caseInstance).isNotNull();
         Map<String, Object> outputVariables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(outputVariables.get("httpPostRequestMethod"), is("PUT"));
-        assertThat(outputVariables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat(outputVariables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
-        assertThat(outputVariables.get("httpPostRequestBody"), is("test"));
-
-        assertThat(outputVariables.get("httpPostResponseStatusCode"), is(500));
-        assertThat(outputVariables.get("httpPostResponseReason"), is("Server Error"));
+        assertThat(outputVariables)
+                .contains(
+                        entry("httpPostRequestMethod", "PUT"),
+                        entry("httpPostRequestUrl", "https://localhost:9799/api?code=500"),
+                        entry("httpPostRequestHeaders",
+                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"),
+                        entry("httpPostRequestBody", "test"),
+                        entry("httpPostResponseStatusCode", 500),
+                        entry("httpPostResponseReason", "Server Error")
+                );
 
         Map<String, String> headerMap = HttpServiceTaskTestServer.HttpServiceTaskTestServlet.headerMap;
-        assertEquals("text/plain", headerMap.get("Content-Type"));
-        assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
-        assertEquals("localhost:7000", headerMap.get("Host"));
-        assertNull(headerMap.get("Test"));
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
+                        entry("Host", "localhost:7000"),
+                        entry("Test", null)
+                );
     }
 
     protected CaseInstance createCaseInstance() {

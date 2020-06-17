@@ -57,8 +57,21 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         ObjectNode flowNode = CmmnJsonConverterUtil.createChildShape(association.getId(), STENCIL_ASSOCIATION, 172, 212, 128, 212);
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
-        dockNode.put(EDITOR_BOUNDS_X, model.getGraphicInfo(association.getSourceRef()).getWidth() / 2.0);
-        dockNode.put(EDITOR_BOUNDS_Y, model.getGraphicInfo(association.getSourceRef()).getHeight() / 2.0);
+        
+        GraphicInfo sourceGraphicInfo = model.getGraphicInfo(association.getSourceRef());
+        if (sourceGraphicInfo == null) {
+            PlanItem sourcePlanItem = model.findPlanItemByPlanItemDefinitionId(association.getSourceRef());
+            if (sourcePlanItem != null) {
+                sourceGraphicInfo = model.getGraphicInfo(sourcePlanItem.getId());
+            }
+        }
+        
+        if (sourceGraphicInfo == null) {
+            return;
+        }
+        
+        dockNode.put(EDITOR_BOUNDS_X, sourceGraphicInfo.getWidth() / 2.0);
+        dockNode.put(EDITOR_BOUNDS_Y, sourceGraphicInfo.getHeight() / 2.0);
         dockersArrayNode.add(dockNode);
 
         List<GraphicInfo> graphicInfoList = model.getFlowLocationGraphicInfo(association.getId());
@@ -72,16 +85,22 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
             }
         }
 
+        String targetElementId = association.getTargetRef();
         PlanItem planItem = model.findPlanItem(association.getTargetRef());
         if (planItem == null) {
             Criterion criterion = model.getCriterion(association.getTargetRef());
             if (criterion == null) {
-                // Invalid reference, ignoring
-                return;
+                PlanItem targetPlanItem = model.findPlanItemByPlanItemDefinitionId(association.getTargetRef());
+                if (targetPlanItem == null) {
+                    // Invalid reference, ignoring
+                    return;
+                } else {
+                    targetElementId = targetPlanItem.getId();
+                }
             }
         }
-
-        GraphicInfo targetGraphicInfo = model.getGraphicInfo(association.getTargetRef());
+        
+        GraphicInfo targetGraphicInfo = model.getGraphicInfo(targetElementId);
         GraphicInfo flowGraphicInfo = graphicInfoList.get(graphicInfoList.size() - 1);
 
         double diffTopY = Math.abs(flowGraphicInfo.getY() - targetGraphicInfo.getY());
@@ -108,9 +127,9 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         dockersArrayNode.add(dockNode);
         flowNode.set("dockers", dockersArrayNode);
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
-        outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getTargetRef()));
+        outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(targetElementId));
         flowNode.set("outgoing", outgoingArrayNode);
-        flowNode.set("target", CmmnJsonConverterUtil.createResourceNode(association.getTargetRef()));
+        flowNode.set("target", CmmnJsonConverterUtil.createResourceNode(targetElementId));
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         propertiesNode.put(PROPERTY_OVERRIDE_ID, association.getId());

@@ -38,8 +38,10 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
     @Override
     public AcquiredTimerJobEntities execute(CommandContext commandContext) {
         AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
+        
+        List<String> enabledCategories = asyncExecutor.getJobServiceConfiguration().getEnabledJobCategories();
         List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext)
-                .findTimerJobsToExecute(new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+                .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
         
         for (TimerJobEntity job : timerJobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());

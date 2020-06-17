@@ -85,6 +85,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         HttpTaskJsonConverter.fillTypes(convertersToCmmnMap);
         MailTaskJsonConverter.fillTypes(convertersToCmmnMap);
         SendEventTaskJsonConverter.fillTypes(convertersToCmmnMap);
+        ExternalWorkerServiceTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         GenericEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
@@ -118,6 +119,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
+        DI_RECTANGLES.add(STENCIL_TASK_EXTERNAL_WORKER);
         DI_RECTANGLES.add(STENCIL_TASK_CASE);
         DI_RECTANGLES.add(STENCIL_TASK_PROCESS);
         DI_RECTANGLES.add(STENCIL_MILESTONE);
@@ -331,7 +333,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModel cmmnModel = new CmmnModel();
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
-
         cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overriden later with actual value
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
@@ -427,7 +428,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 if (resourceNode != null) {
                     planModelExitCriteriaRefs.add(resourceNode.asText());
                     CriterionJsonConverter criterionJsonConverter = new CriterionJsonConverter();
-                    criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
+                    Criterion exitCriterion = (Criterion) criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
+                    exitCriterion.setAttachedToRefId(planModelStage.getId());
                 }
             }
         }
@@ -608,6 +610,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     hasEntryCriteriaElement.addEntryCriterion(criterion);
                 } else if (criterion.isExitCriterion()) {
                     hasExitCriteriaElement.addExitCriterion(criterion);
+                    if (planItemDefinition instanceof Stage) {
+                        Stage planItemDefinitionStage = (Stage) planItemDefinition;
+                        if (!planItemDefinitionStage.getExitCriteria().contains(criterion)) {
+                            planItemDefinitionStage.addExitCriterion(criterion);
+                        }
+                    }
                 }
             }
 

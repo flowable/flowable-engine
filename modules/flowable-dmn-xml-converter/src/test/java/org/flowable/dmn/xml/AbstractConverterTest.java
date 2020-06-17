@@ -35,7 +35,6 @@ public abstract class AbstractConverterTest {
 
     protected DmnDefinition exportAndReadXMLFile(DmnDefinition definition) throws Exception {
         byte[] xml = new DmnXMLConverter().convertToXML(definition);
-        System.out.println("xml " + new String(xml, StandardCharsets.UTF_8));
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);

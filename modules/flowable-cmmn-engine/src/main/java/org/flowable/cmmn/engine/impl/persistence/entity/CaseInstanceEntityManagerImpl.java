@@ -14,11 +14,10 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -33,17 +32,21 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityMa
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
@@ -87,14 +90,32 @@ public class CaseInstanceEntityManagerImpl
         CaseInstanceEntity caseInstanceEntity = dataManager.findById(caseInstanceId);
 
         // Variables
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
-        
+        // variables can have byte array refs, so fetch them and delete the byte array refs if needed
+        List<VariableInstanceEntity> variableInstances = getVariableInstanceEntityManager()
+                .createInternalVariableInstanceQuery()
+                .scopeId(caseInstanceEntity.getId())
+                .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                .list();
+        boolean deleteVariableInstances = !variableInstances.isEmpty();
+
+        for (VariableInstanceEntity variableInstance : variableInstances) {
+            if (variableInstance.getByteArrayRef() != null && variableInstance.getByteArrayRef().getId() != null) {
+                variableInstance.getByteArrayRef().delete();
+            }
+        }
+
+        if (deleteVariableInstances) {
+            getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
+        }
+
         // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
-        // Entity links
-        if (engineConfiguration.isEnableEntityLinks()) {
-            getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        // Entity links are deleted by a root instance only.
+        // (A callback id is always set when the case instance is a child case for a parent case/process instance)
+        // Can't simply check for callBackId being null however, as other usages of callbackType still need to be cleaned up
+        if (engineConfiguration.isEnableEntityLinks() && isRootCaseInstance(caseInstanceEntity)) {
+            getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
         }
         
         // Tasks
@@ -159,8 +180,23 @@ public class CaseInstanceEntityManagerImpl
             deadLetterJobEntityManager.delete(deadLetterJob.getId());
         }
 
+        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+        List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(new ExternalWorkerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        for (ExternalWorkerJob externalWorkerJob : externalWorkerJobs) {
+            externalWorkerJobEntityManager.delete(externalWorkerJob.getId());
+            getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(externalWorkerJob.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);
+        }
+
         // Actual case instance
         delete(caseInstanceEntity);
+    }
+
+    protected boolean isRootCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        // A case instance is a root case instance when it doesn't have a callback or,
+        // it is not a child of case or process instance
+        return caseInstanceEntity.getCallbackId() == null ||
+            (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())
+                && !CallbackTypes.EXECUTION_CHILD_CASE.equals(caseInstanceEntity.getCallbackType()));
     }
 
     protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,
@@ -182,21 +218,20 @@ public class CaseInstanceEntityManagerImpl
     }
 
     @Override
-    public void updateLockTime(String caseInstanceId) {
+    public void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime) {
         Date expirationTime = getClock().getCurrentTime();
-        int lockMillis = engineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
 
-        GregorianCalendar lockCal = new GregorianCalendar();
-        lockCal.setTime(expirationTime);
-        lockCal.add(Calendar.MILLISECOND, lockMillis);
-        Date lockDate = lockCal.getTime();
-
-        dataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
+        dataManager.updateLockTime(caseInstanceId, lockTime, lockOwner, expirationTime);
     }
 
     @Override
     public void clearLockTime(String caseInstanceId) {
         dataManager.clearLockTime(caseInstanceId);
+    }
+
+    @Override
+    public void clearAllLockTimes(String lockOwner) {
+        dataManager.clearAllLockTimes(lockOwner);
     }
 
     @Override

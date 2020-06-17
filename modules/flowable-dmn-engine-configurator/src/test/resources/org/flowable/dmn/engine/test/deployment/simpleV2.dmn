@@ -1,0 +1,28 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
+  <decision id="decision1" name="Full Decision">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input>
+        <inputExpression id="inputExpression1" typeRef="number">
+          <text>inputVariable1</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Output 1" name="outputVariable1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry1">
+          <text>== 1</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1">
+          <text>'result1V2'</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry3">
+          <text><![CDATA[> 2]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry2">
+          <text>'result2V2'</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

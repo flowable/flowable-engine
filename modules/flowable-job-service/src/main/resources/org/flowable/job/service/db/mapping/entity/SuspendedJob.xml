@@ -7,6 +7,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
         <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -18,6 +19,7 @@
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
         <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+        <result property="correlationId" column="CORRELATION_ID_" jdbcType="VARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -42,6 +44,12 @@
         select * from ${prefix}ACT_RU_SUSPENDED_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
+    <select id="selectSuspendedJobByCorrelationId" parameterType="string" resultMap="jobResultMap">
+        select *
+        from ${prefix}ACT_RU_SUSPENDED_JOB
+        where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectSuspendedJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from
@@ -61,6 +69,7 @@
         insert into ${prefix}ACT_RU_SUSPENDED_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -72,6 +81,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -84,6 +94,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=VARCHAR},
         #{exclusive, jdbcType=BOOLEAN},
         #{executionId, jdbcType=VARCHAR},
@@ -95,6 +106,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{correlationId, jdbcType=VARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{exceptionMessage, jdbcType=VARCHAR},
@@ -112,6 +124,7 @@
         INSERT INTO ${prefix}ACT_RU_SUSPENDED_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         EXCLUSIVE_,
         EXECUTION_ID_,
@@ -123,6 +136,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -136,6 +150,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -147,6 +162,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -166,6 +182,7 @@
             INTO ${prefix}ACT_RU_SUSPENDED_JOB (
             ID_,
             REV_,
+            CATEGORY_,
             TYPE_,
             EXCLUSIVE_,
             EXECUTION_ID_,
@@ -177,6 +194,7 @@
             SUB_SCOPE_ID_, 
             SCOPE_TYPE_, 
             SCOPE_DEFINITION_ID_,
+            CORRELATION_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
@@ -189,6 +207,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.exclusive, jdbcType=BOOLEAN},
             #{job.executionId, jdbcType=VARCHAR},
@@ -200,6 +219,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -245,6 +265,12 @@
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
             </if>
+            <if test="category != null">
+                and RES.CATEGORY_ = #{category}
+            </if>
+            <if test="categoryLike != null">
+                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+            </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId}
             </if>
@@ -262,7 +288,10 @@
             </if>
             <if test="scopeDefinitionId != null">
                 and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
-            </if>                
+            </if>
+            <if test="correlationId != null">
+                and RES.CORRELATION_ID_ = #{correlationId}
+            </if>
             <if test="retriesLeft">
                 and RES.RETRIES_ &gt; 0
             </if>
@@ -274,6 +303,9 @@
             </if>
             <if test="onlyMessages">
                 and RES.TYPE_ = 'message'
+            </if>
+            <if test="onlyExternalWorkers">
+                and RES.TYPE_ = 'externalWorker'
             </if>
             <if test="duedateHigherThan != null">
                 and RES.DUEDATE_ &gt; #{duedateHigherThan}
@@ -347,11 +379,17 @@
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.category != category">
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.elementId != elementId">
                 ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.elementName != elementName">
                 ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.correlationId != correlationId">
+                CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},

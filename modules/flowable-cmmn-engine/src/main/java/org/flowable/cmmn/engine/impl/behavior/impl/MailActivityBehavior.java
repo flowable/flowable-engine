@@ -311,6 +311,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
                 email.setHostName(host);
 
                 email.setSmtpPort(mailServerInfo.getMailServerPort());
+                email.setSslSmtpPort(Integer.toString(mailServerInfo.getMailServerSSLPort()));
 
                 email.setSSLOnConnect(mailServerInfo.isMailServerUseSSL());
                 email.setStartTLSEnabled(mailServerInfo.isMailServerUseTLS());
@@ -339,6 +340,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
 
                 int port = engineConfiguration.getMailServerPort();
                 email.setSmtpPort(port);
+                email.setSslSmtpPort(Integer.toString(engineConfiguration.getMailServerSSLPort()));
 
                 email.setSSLOnConnect(engineConfiguration.getMailServerUseSSL());
                 email.setStartTLSEnabled(engineConfiguration.getMailServerUseTLS());

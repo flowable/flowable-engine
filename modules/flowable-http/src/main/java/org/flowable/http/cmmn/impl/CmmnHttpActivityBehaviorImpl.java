@@ -98,7 +98,11 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
     protected HttpActivityExecutor httpActivityExecutor;
 
     public CmmnHttpActivityBehaviorImpl() {
-        org.flowable.cmmn.engine.HttpClientConfig config = CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig();
+        this.httpActivityExecutor = createHttpActivityExecutor();
+    }
+
+    protected HttpActivityExecutor createHttpActivityExecutor() {
+        HttpClientConfig config = CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig();
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings
@@ -131,7 +135,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
             httpClientBuilder.useSystemProperties();
         }
 
-        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new NopErrorPropagator(), 
+        return new HttpActivityExecutor(httpClientBuilder, new NopErrorPropagator(),
                 CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper());
     }
 

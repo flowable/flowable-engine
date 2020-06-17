@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
@@ -32,7 +33,7 @@ import org.flowable.task.service.delegate.TaskListener;
 /**
  * @author Joram Barrez
  */
-public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, PlanItemInstanceLifecycleListener, CaseInstanceLifecycleListener {
+public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskListener, PlanItemInstanceLifecycleListener, CaseInstanceLifecycleListener {
 
     protected String sourceState;
     protected String targetState;
@@ -53,12 +54,29 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
         activityBehaviorInstance.execute(planItemInstance);
     }
 
+    @Override
+    public void trigger(DelegatePlanItemInstance planItemInstance) {
+        if (activityBehaviorInstance == null) {
+            activityBehaviorInstance = getCmmnActivityBehavior(className);
+        }
+
+        if (!(activityBehaviorInstance instanceof CmmnTriggerableActivityBehavior)) {
+            throw new FlowableIllegalArgumentException(className + " does not implement the "
+                + CmmnTriggerableActivityBehavior.class + " interface");
+        }
+
+        ((CmmnTriggerableActivityBehavior) activityBehaviorInstance).trigger(planItemInstance);
+    }
+
     protected CmmnActivityBehavior getCmmnActivityBehavior(String className) {
         Object instance = instantiate(className);
         applyFieldExtensions(fieldExtensions, instance, false);
 
         if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
+
+        } else if (instance instanceof CmmnTriggerableActivityBehavior) {
+            return (CmmnTriggerableActivityBehavior) instance;
 
         } else if (instance instanceof CmmnActivityBehavior) {
             return (CmmnActivityBehavior) instance;

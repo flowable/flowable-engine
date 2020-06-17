@@ -36,6 +36,11 @@ public class CasePageTaskExport extends AbstractPlanItemDefinitionExport<CasePag
         if (StringUtils.isNotEmpty(casePageTask.getFormKey())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, casePageTask.getFormKey());
         }
+
+        if (!casePageTask.isSameDeployment()) {
+            // default is true
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SAME_DEPLOYMENT, "false");
+        }
         
         if (StringUtils.isNotEmpty(casePageTask.getLabel())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_LABEL, casePageTask.getLabel());

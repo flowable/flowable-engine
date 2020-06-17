@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
@@ -99,6 +102,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         // Create one message
         messageId = commandExecutor.execute(new Command<String>() {
+
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = CommandContextUtil.getJobService(commandContext).createJob();
@@ -136,18 +140,15 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         TimerJobQuery query = managementService.createTimerJobQuery().processInstanceId("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            managementService.createJobQuery().processInstanceId(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().processInstanceId(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByExecutionId() {
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstanceIdOne).singleResult();
         TimerJobQuery query = managementService.createTimerJobQuery().executionId(job.getExecutionId());
-        assertEquals(query.singleResult().getId(), job.getId());
+        assertThat(job.getId()).isEqualTo(query.singleResult().getId());
         verifyQueryResults(query, 1);
     }
 
@@ -159,37 +160,32 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         TimerJobQuery timerQuery = managementService.createTimerJobQuery().executionId("invalid");
         verifyQueryResults(timerQuery, 0);
 
-        try {
-            managementService.createJobQuery().executionId(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().executionId(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            managementService.createTimerJobQuery().executionId(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().executionId(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
-    
+
     @Test
     public void testQueryByElementId() {
         TimerJobQuery query = managementService.createTimerJobQuery().elementId("escalationTimer");
         verifyQueryResults(query, 3);
     }
-    
+
     @Test
     public void testQueryByInvalidElementId() {
         TimerJobQuery query = managementService.createTimerJobQuery().elementId("unknown");
         verifyQueryResults(query, 0);
     }
-    
+
     @Test
     public void testQueryByElementName() {
         TimerJobQuery query = managementService.createTimerJobQuery().elementName("Escalation");
         verifyQueryResults(query, 3);
     }
-    
+
+    @Test
     public void testQueryByInvalidElementName() {
         TimerJobQuery query = managementService.createTimerJobQuery().elementName("unknown");
         verifyQueryResults(query, 0);
@@ -206,11 +202,31 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 CommandContextUtil.getJobService(commandContext).updateJob(job);
                 return null;
             }
-            
+
         });
-        
+
         Job handlerTypeJob = managementService.createJobQuery().handlerType("test").singleResult();
-        assertNotNull(handlerTypeJob);
+        assertThat(handlerTypeJob).isNotNull();
+    }
+
+    @Test
+    public void testQueryByCorrelationId() {
+        Job messageJob = managementService.createJobQuery().jobId(messageId).singleResult();
+        assertThat(messageJob).isNotNull();
+
+        Job job = managementService.createJobQuery().correlationId(messageJob.getCorrelationId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getId()).isEqualTo(messageId);
+        assertThat(job.getCorrelationId()).isEqualTo(messageJob.getCorrelationId());
+        assertThat(managementService.createJobQuery().correlationId(job.getCorrelationId()).list()).hasSize(1);
+        assertThat(managementService.createJobQuery().correlationId(job.getCorrelationId()).count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testByInvalidCorrelationId() {
+        assertThat(managementService.createJobQuery().correlationId("invalid").singleResult()).isNull();
+        assertThat(managementService.createJobQuery().correlationId("invalid").list()).isEmpty();
+        assertThat(managementService.createJobQuery().correlationId("invalid").count()).isEqualTo(0);
     }
 
     @Test
@@ -221,17 +237,11 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         TimerJobQuery timerQuery = managementService.createTimerJobQuery().executionId("invalid");
         verifyQueryResults(timerQuery, 0);
 
-        try {
-            managementService.createJobQuery().executionId(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().executionId(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            managementService.createTimerJobQuery().executionId(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().executionId(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -253,7 +263,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByExecutable() {
-        processEngineConfiguration.getClock().setCurrentTime(new Date(timerThreeFireTime.getTime() + ONE_SECOND)); // all obs should be executable at t3 + 1hour.1second
+        processEngineConfiguration.getClock()
+                .setCurrentTime(new Date(timerThreeFireTime.getTime() + ONE_SECOND)); // all obs should be executable at t3 + 1hour.1second
         JobQuery query = managementService.createJobQuery();
         verifyQueryResults(query, 1);
 
@@ -297,12 +308,9 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testInvalidOnlyTimersUsage() {
-        try {
-            managementService.createJobQuery().timers().messages().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-            assertTextPresent("Cannot combine onlyTimers() with onlyMessages() in the same query", e.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().timers().messages().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Cannot combine onlyTimers() with onlyMessages() in the same query");
     }
 
     @Test
@@ -385,12 +393,9 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByExceptionMessageNull() {
-        try {
-            managementService.createJobQuery().exceptionMessage(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Provided exception message is null", e.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().exceptionMessage(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Provided exception message is null");
     }
 
     @Test
@@ -400,10 +405,10 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         Job job = managementService.createJobQuery().jobId(jobEntity.getId()).singleResult();
 
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         List<Job> list = managementService.createJobQuery().withException().list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         deleteJobInDatabase();
 
@@ -411,10 +416,10 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         job = managementService.createJobQuery().jobId(jobEntity.getId()).singleResult();
 
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         list = managementService.createJobQuery().withException().list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         deleteJobInDatabase();
 
@@ -425,30 +430,30 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQuerySorting() {
         // asc
-        assertEquals(1, managementService.createJobQuery().orderByJobId().asc().count());
-        assertEquals(1, managementService.createJobQuery().orderByJobDuedate().asc().count());
-        assertEquals(1, managementService.createJobQuery().orderByExecutionId().asc().count());
-        assertEquals(1, managementService.createJobQuery().orderByProcessInstanceId().asc().count());
-        assertEquals(1, managementService.createJobQuery().orderByJobRetries().asc().count());
+        assertThat(managementService.createJobQuery().orderByJobId().asc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobDuedate().asc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByExecutionId().asc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByProcessInstanceId().asc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobRetries().asc().count()).isEqualTo(1);
 
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobId().asc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobDuedate().asc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByExecutionId().asc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByProcessInstanceId().asc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobRetries().asc().count());
+        assertThat(managementService.createTimerJobQuery().orderByJobId().asc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobDuedate().asc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByExecutionId().asc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByProcessInstanceId().asc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobRetries().asc().count()).isEqualTo(3);
 
         // desc
-        assertEquals(1, managementService.createJobQuery().orderByJobId().desc().count());
-        assertEquals(1, managementService.createJobQuery().orderByJobDuedate().desc().count());
-        assertEquals(1, managementService.createJobQuery().orderByExecutionId().desc().count());
-        assertEquals(1, managementService.createJobQuery().orderByProcessInstanceId().desc().count());
-        assertEquals(1, managementService.createJobQuery().orderByJobRetries().desc().count());
+        assertThat(managementService.createJobQuery().orderByJobId().desc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobDuedate().desc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByExecutionId().desc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByProcessInstanceId().desc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobRetries().desc().count()).isEqualTo(1);
 
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobId().desc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobDuedate().desc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByExecutionId().desc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByProcessInstanceId().desc().count());
-        assertEquals(3, managementService.createTimerJobQuery().orderByJobRetries().desc().count());
+        assertThat(managementService.createTimerJobQuery().orderByJobId().desc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobDuedate().desc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByExecutionId().desc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByProcessInstanceId().desc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobRetries().desc().count()).isEqualTo(3);
 
         // sorting on multiple fields
         setRetries(processInstanceIdTwo, 2);
@@ -457,32 +462,27 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         TimerJobQuery query = managementService.createTimerJobQuery().timers().executable().orderByJobRetries().asc().orderByJobDuedate().desc();
 
         List<Job> jobs = query.list();
-        assertEquals(3, jobs.size());
-
-        assertEquals(2, jobs.get(0).getRetries());
-        assertEquals(3, jobs.get(1).getRetries());
-        assertEquals(3, jobs.get(2).getRetries());
-
-        assertEquals(processInstanceIdTwo, jobs.get(0).getProcessInstanceId());
-        assertEquals(processInstanceIdThree, jobs.get(1).getProcessInstanceId());
-        assertEquals(processInstanceIdOne, jobs.get(2).getProcessInstanceId());
+        assertThat(jobs)
+                .extracting(Job::getRetries)
+                .containsExactly(2, 3, 3);
+        assertThat(jobs)
+                .extracting(Job::getProcessInstanceId)
+                .containsExactly(
+                        processInstanceIdTwo,
+                        processInstanceIdThree,
+                        processInstanceIdOne
+                );
     }
 
     @Test
     public void testQueryInvalidSortingUsage() {
-        try {
-            managementService.createJobQuery().orderByJobId().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-            assertTextPresent("call asc() or desc() after using orderByXX()", e.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().orderByJobId().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Invalid query: call asc() or desc() after using orderByXX()");
 
-        try {
-            managementService.createJobQuery().asc();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-            assertTextPresent("You should call any of the orderBy methods first before specifying a direction", e.getMessage());
-        }
+        assertThatThrownBy(() -> managementService.createJobQuery().asc())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("You should call any of the orderBy methods first before specifying a direction");
     }
 
     // helper ////////////////////////////////////////////////////////////
@@ -500,16 +500,14 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         // timer event which we will execute manual for testing purposes.
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertNotNull("No job found for process instance", timerJob);
+        assertThat(timerJob).as("No job found for process instance").isNotNull();
 
-        try {
+        assertThatThrownBy(() -> {
             managementService.moveTimerToExecutableJob(timerJob.getId());
             managementService.executeJob(timerJob.getId());
-            fail("RuntimeException from within the script task expected");
-
-        } catch (RuntimeException re) {
-            assertTextPresent(EXCEPTION_MESSAGE, re.getMessage());
-        }
+        })
+                .isInstanceOf(FlowableException.class)
+                .hasMessage(EXCEPTION_MESSAGE);
 
         return processInstance;
     }
@@ -518,57 +516,52 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 1);
 
         Job failedJob = query.singleResult();
-        assertNotNull(failedJob);
-        assertEquals(processInstance.getId(), failedJob.getProcessInstanceId());
-        assertNotNull(failedJob.getExceptionMessage());
+        assertThat(failedJob).isNotNull();
+        assertThat(failedJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(failedJob.getExceptionMessage()).isNotNull();
         assertTextPresent(EXCEPTION_MESSAGE, failedJob.getExceptionMessage());
     }
 
     private void verifyQueryResults(JobQuery query, int countExpected) {
-        assertEquals(countExpected, query.list().size());
-        assertEquals(countExpected, query.count());
+        assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {
-            assertNotNull(query.singleResult());
+            assertThat(query.singleResult()).isNotNull();
         } else if (countExpected > 1) {
             verifySingleResultFails(query);
         } else if (countExpected == 0) {
-            assertNull(query.singleResult());
+            assertThat(query.singleResult()).isNull();
         }
     }
 
     private void verifySingleResultFails(JobQuery query) {
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isExactlyInstanceOf(FlowableException.class);
     }
 
     private void verifyQueryResults(TimerJobQuery query, int countExpected) {
-        assertEquals(countExpected, query.list().size());
-        assertEquals(countExpected, query.count());
+        assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {
-            assertNotNull(query.singleResult());
+            assertThat(query.singleResult()).isNotNull();
         } else if (countExpected > 1) {
             verifySingleResultFails(query);
         } else if (countExpected == 0) {
-            assertNull(query.singleResult());
+            assertThat(query.singleResult()).isNull();
         }
     }
 
     private void verifySingleResultFails(TimerJobQuery query) {
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isExactlyInstanceOf(FlowableException.class);
     }
 
     private void createJobWithoutExceptionMsg() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+
             @Override
             public Void execute(CommandContext commandContext) {
                 jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
@@ -583,7 +576,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
                 CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
 
-                assertNotNull(jobEntity.getId());
+                assertThat(jobEntity.getId()).isNotNull();
 
                 return null;
 
@@ -595,6 +588,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     private void createJobWithoutExceptionStacktrace() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+
             @Override
             public Void execute(CommandContext commandContext) {
                 jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
@@ -606,7 +600,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
                 CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
 
-                assertNotNull(jobEntity.getId());
+                assertThat(jobEntity.getId()).isNotNull();
 
                 return null;
 
@@ -618,6 +612,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     private void deleteJobInDatabase() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+
             @Override
             public Void execute(CommandContext commandContext) {
 

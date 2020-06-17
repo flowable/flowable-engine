@@ -55,6 +55,7 @@ public interface StencilConstants {
     final String STENCIL_TASK_MULE = "MuleTask";
     final String STENCIL_TASK_HTTP = "HttpTask";
     final String STENCIL_TASK_SEND_EVENT = "SendEventTask";
+    final String STENCIL_TASK_EXTERNAL_WORKER = "ExternalWorkerTask";
     final String STENCIL_TASK_SHELL = "ShellTask";
     final String STENCIL_TASK_DECISION = "DecisionTask";
 
@@ -206,7 +207,8 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_TRIGGERABLE = "servicetasktriggerable";
     final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskuselocalscopeforresultvariable";
     final String PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE = "servicetaskfailedjobretrytimecycle";
-    
+    final String PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE = "servicetaskstoreresultvariabletransient";
+
     final String PROPERTY_FORM_PROPERTIES = "formproperties";
     final String PROPERTY_FORM_ID = "id";
     final String PROPERTY_FORM_NAME = "name";
@@ -300,6 +302,8 @@ public interface StencilConstants {
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
+    final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT = "decisiontasksamedeployment";
+    final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY = "sameDeployment";
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
@@ -333,6 +337,8 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
     
+    final String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
+
     final String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
     final String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
     final String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";

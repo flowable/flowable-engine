@@ -14,11 +14,12 @@ package org.flowable.batch.service.impl.persistence.entity;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface BatchEntity extends Batch, Entity, HasRevision {
     
-    BatchByteArrayRef getBatchDocRefId();
+    ByteArrayRef getBatchDocRefId();
     
     void setBatchType(String batchType);
 

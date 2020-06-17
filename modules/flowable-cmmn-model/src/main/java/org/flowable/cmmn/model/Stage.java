@@ -27,6 +27,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected boolean autoComplete; 
     protected String autoCompleteCondition;
     protected String formKey; // For the start form of the plan model. Null otherwise
+    protected boolean sameDeployment = true;
     protected String validateFormFields;
     protected Integer displayOrder;
     protected String includeInStageOverview;
@@ -135,6 +136,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public String getValidateFormFields() {

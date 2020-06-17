@@ -13,58 +13,11 @@
 
 package org.flowable.entitylink.api;
 
-import java.util.Date;
-
 /**
  * An entity link is used to associate an entity with another entity.
  * 
  * @author Tijs Rademakers
  */
-public interface EntityLink {
-
-    /**
-     * Returns the type of link. See for the native supported types.
-     */
-    String getLinkType();
-
-    /**
-     * Returns the scope id of the originating entity
-     */
-    String getScopeId();
-    
-    /**
-     * The scope type associated with the originating entity
-     */
-    String getScopeType();
-    
-    /**
-     * A scope definition id for the originating entity
-     */
-    String getScopeDefinitionId();
-    
-    /**
-     * Returns the scope id of the referenced entity
-     */
-    String getReferenceScopeId();
-    
-    /**
-     * The scope type associated with the referenced entity
-     */
-    String getReferenceScopeType();
-    
-    /**
-     * A scope definition id for the referenced entity
-     */
-    String getReferenceScopeDefinitionId();
-
-    /**
-     * Returns the hierarchy type for the entity link e.g. root, parent or empty
-     */
-    String getHierarchyType();
-    
-    /**
-     * The create time for the entity link
-     */
-    Date getCreateTime();
+public interface EntityLink extends EntityLinkInfo {
 
 }

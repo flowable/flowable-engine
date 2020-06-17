@@ -12,17 +12,18 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -45,13 +46,13 @@ public class CalculationsTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("dmnWithExpressionAndDecimals")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("dmnWithExpressionAndDecimals")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertEquals(2, result.getRuleExecutions().size());
-        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions()).hasSize(2);
+        assertThat(result.getRuleExecutions().get(2).isValid()).isTrue();
     }
 
     @Test
@@ -67,13 +68,13 @@ public class CalculationsTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("dmnWithExpressionAndDecimals")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("dmnWithExpressionAndDecimals")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertEquals(2, result.getRuleExecutions().size());
-        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions()).hasSize(2);
+        assertThat(result.getRuleExecutions().get(2).isValid()).isTrue();
     }
 
 
@@ -96,15 +97,15 @@ public class CalculationsTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult());
-        Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(1).getResult());
-        Assert.assertEquals(inputDouble2, result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult());
-        Assert.assertEquals(10L, result.getRuleExecutions().get(2).getConclusionResults().get(1).getResult());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult()).isEqualTo(1D);
+        assertThat(result.getRuleExecutions().get(1).getConclusionResults().get(1).getResult()).isEqualTo(1D);
+        assertThat(result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult()).isEqualTo(inputDouble2);
+        assertThat(result.getRuleExecutions().get(2).getConclusionResults().get(1).getResult()).isEqualTo(10L);
     }
 
     @Test
@@ -119,11 +120,11 @@ public class CalculationsTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertEquals(10D, result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult());
-        Assert.assertEquals(20D, result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult());
+        assertThat(result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult()).isEqualTo(10D);
+        assertThat(result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult()).isEqualTo(20D);
     }
 }

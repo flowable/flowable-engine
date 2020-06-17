@@ -123,15 +123,26 @@
     <update id="updateCaseInstanceLockTime" parameterType="java.util.Map">
         update ${prefix}ACT_CMMN_RU_CASE_INST
         set
-          LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+          LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+          LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
         where ID_ = #{id}
           and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
     </update>
 
     <update id="clearCaseInstanceLockTime" parameterType="java.util.Map">
         update ${prefix}ACT_CMMN_RU_CASE_INST
-        set LOCK_TIME_ = null
+        set
+            LOCK_TIME_ = null,
+            LOCK_OWNER_ = null
         where ID_ = #{id}
+    </update>
+
+    <update id="clearAllCaseInstanceLockTimes" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST
+        set
+            LOCK_TIME_ = null,
+            LOCK_OWNER_ = null
+        where LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
     </update>
 
     <delete id="deleteCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
@@ -153,11 +164,25 @@
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+        <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+        <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+
+        <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
+        <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="VARCHAR" />
+        <result property="caseDefinitionVersion" column="CaseDefinitionVersion" jdbcType="INTEGER" />
+        <result property="caseDefinitionDeploymentId" column="CaseDefinitionDeploymentId" jdbcType="VARCHAR" />
     </resultMap>
 
     <select id="selectCaseInstance" parameterType="string" resultMap="caseInstanceResultMap">
-        select * from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
+        select RES.*,
+        CASE_DEF.KEY_ as CaseDefinitionKey,
+        CASE_DEF.NAME_ as CaseDefinitionName,
+        CASE_DEF.VERSION_ as CaseDefinitionVersion,
+        CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
+        from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        where RES.ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
     <resultMap id="caseInstanceResultMapWithVariables" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl" extends="caseInstanceResultMap">
@@ -221,8 +246,13 @@
         P.IS_COUNT_ENABLED_ as PI_IS_COUNT_ENABLED_,
         P.VAR_COUNT_ as PI_VAR_COUNT_,
         P.SENTRY_PART_INST_COUNT_ as PI_SENTRY_PART_INST_COUNT_,
-        P.TENANT_ID_ as PI_TENANT_ID_
+        P.TENANT_ID_ as PI_TENANT_ID_,
+        CASE_DEF.KEY_ as CaseDefinitionKey,
+        CASE_DEF.NAME_ as CaseDefinitionName,
+        CASE_DEF.VERSION_ as CaseDefinitionVersion,
+        CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
         from ${prefix}ACT_CMMN_RU_CASE_INST C
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on C.CASE_DEF_ID_ = CASE_DEF.ID_
         left join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_ and P.ENDED_TIME_ is null
         <where>
             <if test="caseInstanceId != null">
@@ -236,8 +266,11 @@
 
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, CASE_DEF.KEY_ as CaseDefinitionKey, CASE_DEF.ID_ as
-        CaseDefinitionId, CASE_DEF.NAME_ as CaseDefinitionName, CASE_DEF.VERSION_ as CaseDefinitionVersion, CASE_DEF.DEPLOYMENT_ID_ as DeploymentId
+        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>,
+            CASE_DEF.KEY_ as CaseDefinitionKey,
+            CASE_DEF.NAME_ as CaseDefinitionName,
+            CASE_DEF.VERSION_ as CaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
         inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
@@ -265,7 +298,11 @@
     <sql id="selectCaseInstancesWithVariablesByQueryCriteriaColumns">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
-            select distinct RES.*
+            select distinct RES.*,
+                CASE_DEF.KEY_ as CaseDefinitionKey,
+                CASE_DEF.NAME_ as CaseDefinitionName,
+                CASE_DEF.VERSION_ as CaseDefinitionVersion,
+                CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
             <if test="includeCaseVariables">,
                 VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
                 VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
@@ -292,6 +329,10 @@
             TEMPRES_REFERENCE_TYPE_ as REFERENCE_TYPE_,
             TEMPRES_IS_COMPLETEABLE_ as IS_COMPLETEABLE_,
             TEMPRES_TENANT_ID_ as TENANT_ID_,
+            TEMPCaseDefinitionKey as CaseDefinitionKey,
+            TEMPCaseDefinitionName as CaseDefinitionName,
+            TEMPCaseDefinitionVersion as CaseDefinitionVersion,
+            TEMPCaseDefinitionDeploymentId as CaseDefinitionDeploymentId,
             <if test="includeCaseVariables">
                 TEMPVAR_ID_ as VAR_ID_,
                 TEMPVAR_NAME_ as VAR_NAME_,
@@ -321,7 +362,11 @@
             RES.REFERENCE_ID_ as TEMPRES_REFERENCE_ID_,
             RES.REFERENCE_TYPE_ as TEMPRES_REFERENCE_TYPE_,
             RES.IS_COMPLETEABLE_ as TEMPRES_IS_COMPLETEABLE_,
-            RES.TENANT_ID_ as TEMPRES_TENANT_ID_
+            RES.TENANT_ID_ as TEMPRES_TENANT_ID_,
+            CASE_DEF.KEY_ as TEMPCaseDefinitionKey,
+            CASE_DEF.NAME_ as TEMPCaseDefinitionName,
+            CASE_DEF.VERSION_ as TEMPCaseDefinitionVersion,
+            CASE_DEF.DEPLOYMENT_ID_ as TEMPCaseDefinitionDeploymentId
             <if test="includeCaseVariables">,
                 VAR.ID_ as TEMPVAR_ID_,
                 VAR.NAME_ as TEMPVAR_NAME_,
@@ -380,7 +425,7 @@
                 </foreach>
             </if>
             <if test="caseDefinitionId != null">
-                RES.CASE_DEF_ID_ = #{caseDefinitionId}
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
                 and CASE_DEF.KEY_ = #{caseDefinitionKey}
@@ -448,6 +493,10 @@
             <if test="involvedUser != null">
                 and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
             </if>
+            <if test="involvedUserIdentityLink != null">
+            	and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            	I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
+        	</if>
             <if test="involvedGroups != null">
                 and EXISTS(
                 select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -456,6 +505,10 @@
                 </foreach>
                 )
             </if>
+            <if test="involvedGroupIdentityLink != null">
+	            and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+	            I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
+	        </if>
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
                 <choose>
                     <when test="queryVariableValue.operator.equals('EXISTS')">
@@ -527,7 +580,7 @@
                 </choose>
             </foreach>
 
-        <!-- or queries -->
+        	<!-- or queries -->
             <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
                 and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
@@ -611,6 +664,10 @@
                         or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
                         #{orQueryObject.involvedUser})
                     </if>
+                    <if test="orQueryObject.involvedUserIdentityLink != null">
+			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+			            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+			        </if>
                     <if test="orQueryObject.involvedGroups != null">
                         or EXISTS(
                         select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -619,7 +676,10 @@
                         </foreach>
                         )
                     </if>
-
+					<if test="orQueryObject.involvedGroupIdentityLink != null">
+			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+			            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
+			        </if>
                     <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
                         or
                         <trim prefix="(" prefixOverrides="AND" suffix=")">

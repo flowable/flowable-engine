@@ -52,6 +52,10 @@
     delete from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{id}
   </delete>
   
+  <delete id="deleteFormResourcesByName" parameterType="string">
+    delete from ${prefix}ACT_FO_FORM_RESOURCE where NAME_ = #{name}
+  </delete>
+
   <!-- RESOURCE RESULTMAP -->
 
   <resultMap id="formResourceResultMap" type="org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl">

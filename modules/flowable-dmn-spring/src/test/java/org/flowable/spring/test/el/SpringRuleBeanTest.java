@@ -13,6 +13,8 @@
 
 package org.flowable.spring.test.el;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeployment;
@@ -51,20 +53,20 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
     public void testSimpleRuleBean() {
         createAppContext(CTX_PATH);
         repositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/el/springbean.dmn").deploy();
-        
+
         Map<String, Object> outputVariables = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey("springDecision")
-                        .variable("input1", "John Doe")
-                        .executeWithSingleResult();
-        
-        assertEquals("test1", outputVariables.get("output1"));
-        
+                .decisionKey("springDecision")
+                .variable("input1", "John Doe")
+                .executeWithSingleResult();
+
+        assertThat(outputVariables.get("output1")).isEqualTo("test1");
+
         outputVariables = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey("springDecision")
-                        .variable("input1", "test")
-                        .executeWithSingleResult();
-        
-        assertEquals("test2", outputVariables.get("output1"));
+                .decisionKey("springDecision")
+                .variable("input1", "test")
+                .executeWithSingleResult();
+
+        assertThat(outputVariables.get("output1")).isEqualTo("test2");
     }
 
     // --Helper methods

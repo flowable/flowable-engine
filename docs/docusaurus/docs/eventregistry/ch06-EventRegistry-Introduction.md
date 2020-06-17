@@ -22,9 +22,6 @@ An example of an Event definition is the following JSON definition:
     {
       "key": "myEvent",
       "name": "My event",
-      "inboundChannelKeys": [
-          "test-channel"
-      ],
       "correlationParameters": [
           {
             "name": "customerId",

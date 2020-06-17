@@ -14,7 +14,7 @@
 package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotEquals;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,64 +80,67 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testSimpleMigrationWithActivityAutoMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
         processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertEquals(processDefinitions.get(0).getId(), version1ProcessDef.getId());
-        assertEquals(processDefinitions.get(1).getId(), version2ProcessDef.getId());
+        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
+        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .validateMigration(processInstance.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .validateMigration(processInstance.getId());
 
-        assertEquals(true, validationResult.isMigrationValid());
+        assertThat(validationResult.isMigrationValid()).isEqualTo(true);
 
         // Migrate process
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId());
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey()); //AutoMapped by Id
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id")); //AutoMapped by Id
 
         //The first process version only had one activity, there should be a second activity in the process now
         taskService.complete(tasks.get(0).getId());
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("userTask2Id");
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -154,39 +157,43 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
 
         //Migrate process
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "intermediateTask"))
-            .migrate(processInstanceToMigrate.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "intermediateTask"))
+                .migrate(processInstanceToMigrate.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         for (Execution execution : executions) {
-            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
         }
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
-        assertEquals("intermediateTask", task.getTaskDefinitionKey());
-        assertEquals(beforeMigrationTask.getId(), task.getId());
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getId)
+                .containsExactly(version2ProcessDef.getId(), "intermediateTask", beforeMigrationTask.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
 
-            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(2, historicTaskInstances.size());
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicTaskInstances).hasSize(2);
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+                assertThat(historicTaskInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
 
-            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(5, historicActivityInstances.size());
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicActivityInstances).hasSize(5);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+                assertThat(historicActivityInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
         }
 
@@ -212,7 +219,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process.bpmn20.xml");
 
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
         ObjectNode migrationNode = objectMapper.createObjectNode();
@@ -227,24 +235,27 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processMigrationService.migrateProcessInstance(processInstanceToMigrate.getId(), migrationDocument);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
-        assertEquals("intermediateTask", task.getTaskDefinitionKey());
-        assertEquals(beforeMigrationTask.getId(), task.getId());
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getId)
+                .containsExactly(version2ProcessDef.getId(), "intermediateTask", beforeMigrationTask.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
 
-            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(2, historicTaskInstances.size());
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicTaskInstances).hasSize(2);
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+                assertThat(historicTaskInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
 
-            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(5, historicActivityInstances.size());
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicActivityInstances).hasSize(5);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+                assertThat(historicActivityInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
         }
 
@@ -268,46 +279,51 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
 
         List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-        assertEquals(2, parallelTasks.size());
+        assertThat(parallelTasks).hasSize(2);
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks-and-before.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks-and-before.bpmn20.xml");
 
         List<String> fromActivityIds = new ArrayList<>();
         fromActivityIds.add("parallelTask1");
         fromActivityIds.add("parallelTask2");
         //Migrate process
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(fromActivityIds, "beforeTask"))
-            .migrate(processInstanceToMigrate.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(fromActivityIds, "beforeTask"))
+                .migrate(processInstanceToMigrate.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         for (Execution execution : executions) {
-            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
         }
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
-        assertEquals("beforeTask", task.getTaskDefinitionKey());
-        assertNotEquals(parallelTasks.get(0).getId(), task.getId());
-        assertNotEquals(parallelTasks.get(1).getId(), task.getId());
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(version2ProcessDef.getId(), "beforeTask");
+        assertThat(parallelTasks.get(0).getId()).isNotEqualTo(task.getId());
+        assertThat(parallelTasks.get(1).getId()).isNotEqualTo(task.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
 
-            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(4, historicTaskInstances.size());
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicTaskInstances).hasSize(4);
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+                assertThat(historicTaskInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
 
-            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(10, historicActivityInstances.size());
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicActivityInstances).hasSize(10);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+                assertThat(historicActivityInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
         }
 
@@ -341,47 +357,53 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Task lastTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-with-sub-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/three-tasks-with-sub-process.bpmn20.xml");
 
         //Migrate process
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(
-                ActivityMigrationMapping.createMappingFor("userTask2Id", "subScriptTask")
-                    .withLocalVariable("subprocessVariable", "passedValue"))
-            .migrate(processInstanceToMigrate.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(
+                        ActivityMigrationMapping.createMappingFor("userTask2Id", "subScriptTask")
+                                .withLocalVariable("subprocessVariable", "passedValue"))
+                .migrate(processInstanceToMigrate.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-        assertEquals(3, executions.size()); //includes root execution
+        assertThat(executions).hasSize(3); //includes root execution
         for (Execution execution : executions) {
-            assertEquals(version2ProcessDef.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
         }
 
         Execution execution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
-        assertEquals("passedValue", runtimeService.getVariable(execution.getId(), "subprocessVariable"));
-        assertFalse(runtimeService.hasVariable(execution.getProcessInstanceId(), "subprocessVariable"));
-        assertEquals("hello", runtimeService.getVariable(execution.getId(), "anotherVar"));
-        assertFalse(runtimeService.hasVariable(execution.getProcessInstanceId(), "anotherVar"));
+        assertThat(runtimeService.getVariable(execution.getId(), "subprocessVariable")).isEqualTo("passedValue");
+        assertThat(runtimeService.hasVariable(execution.getProcessInstanceId(), "subprocessVariable")).isFalse();
+        assertThat(runtimeService.getVariable(execution.getId(), "anotherVar")).isEqualTo("hello");
+
+        assertThat(runtimeService.hasVariable(execution.getProcessInstanceId(), "anotherVar")).isFalse();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        assertEquals(version2ProcessDef.getId(), task.getProcessDefinitionId());
-        assertEquals("subTask", task.getTaskDefinitionKey());
-        assertNotEquals(lastTask.getId(), task.getId());
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(version2ProcessDef.getId(), "subTask");
+        assertThat(lastTask.getId()).isNotEqualTo(task.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-            assertEquals(version2ProcessDef.getId(), historicProcessInstance.getProcessDefinitionId());
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
 
-            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(3, historicTaskInstances.size());
+            List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicTaskInstances).hasSize(3);
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                assertEquals(version2ProcessDef.getId(), historicTaskInstance.getProcessDefinitionId());
+                assertThat(historicTaskInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
 
-            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceToMigrate.getId()).list();
-            assertEquals(9, historicActivityInstances.size());
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstanceToMigrate.getId()).list();
+            assertThat(historicActivityInstances).hasSize(9);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                assertEquals(version2ProcessDef.getId(), historicActivityInstance.getProcessDefinitionId());
+                assertThat(historicActivityInstance.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
             }
         }
 
@@ -399,52 +421,55 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     public void testSimpleMigrationWithExplicitActivityMapping1() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                .deploy();
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
         Deployment twoActivitiesProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                .deploy();
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
 
         ProcessDefinition version1ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 1).findFirst().get();
-        assertEquals(oneActivityProcessDeployment.getId(), version1ProcessDef.getDeploymentId());
+        assertThat(version1ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeployment.getId());
         ProcessDefinition version2ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 2).findFirst().get();
-        assertEquals(twoActivitiesProcessDeployment.getId(), version2ProcessDef.getDeploymentId());
+        assertThat(version2ProcessDef.getDeploymentId()).isEqualTo(twoActivitiesProcessDeployment.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("userTask1Id");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"))
-            .validateMigration(processInstance.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"))
+                .validateMigration(processInstance.getId());
 
-        assertTrue(validationResult.isMigrationValid());
+        assertThat(validationResult.isMigrationValid()).isTrue();
 
         //Migrate process - moving the current execution explicitly
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"));
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -452,22 +477,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id"));
 
         //This new process definition has two activities
         taskService.complete(tasks.get(0).getId());
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
+
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -476,61 +502,62 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     public void testSimpleMigrationWithExplicitActivityMapping2() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                .deploy();
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
         Deployment twoActivitiesProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                .deploy();
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
 
         ProcessDefinition version1ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 1).findFirst().get();
-        assertEquals(oneActivityProcessDeployment.getId(), version1ProcessDef.getDeploymentId());
+        assertThat(version1ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeployment.getId());
         ProcessDefinition version2ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 2).findFirst().get();
-        assertEquals(twoActivitiesProcessDeployment.getId(), version2ProcessDef.getDeploymentId());
+        assertThat(version2ProcessDef.getDeploymentId()).isEqualTo(twoActivitiesProcessDeployment.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask3Id"))
-            .validateMigration(processInstance.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask3Id"))
+                .validateMigration(processInstance.getId());
 
         assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
         assertThat(processInstanceMigrationValidationResult.getValidationMessages())
-            .isEqualTo(Collections.singletonList("Invalid mapping for 'userTask1Id' to 'userTask3Id', cannot be found in the process definition with id 'MP'"));
+                .isEqualTo(Collections
+                        .singletonList("Invalid mapping for 'userTask1Id' to 'userTask3Id', cannot be found in the process definition with id 'MP'"));
 
         processInstanceMigrationValidationResult = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"))
-            .validateMigration(processInstance.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"))
+                .validateMigration(processInstance.getId());
 
         assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
 
         //Migrate process - moving the current execution explicitly
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"));
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -538,15 +565,15 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
 
         //This new process definition has two activities, but we have mapped to the last activity explicitly
         taskService.complete(tasks.get(0).getId());
@@ -558,52 +585,52 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     public void testSimpleMigrationWithExplicitActivityMapping3() {
         //Deploy first version of the process
         Deployment twoActivitiesProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                .deploy();
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
-            .name("My Process Deployment")
-            .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
-            .deploy();
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                .deploy();
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
 
         ProcessDefinition version1ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 1).findFirst().get();
-        assertEquals(twoActivitiesProcessDeployment.getId(), version1ProcessDef.getDeploymentId());
+        assertThat(version1ProcessDef.getDeploymentId()).isEqualTo(twoActivitiesProcessDeployment.getId());
         ProcessDefinition version2ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 2).findFirst().get();
-        assertEquals(oneActivityProcessDeployment.getId(), version2ProcessDef.getDeploymentId());
+        assertThat(version2ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeployment.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         //We want to migrate from the next activity
         taskService.complete(tasks.get(0).getId());
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
-        assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask2Id"));
 
         //Migrate process - moving the current execution explicitly
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "userTask1Id"));
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask2Id", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -611,15 +638,15 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).hasSize(2); //includes root execution
         executions.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id"));
 
         //This new process version only have one activity
         taskService.complete(tasks.get(0).getId());
@@ -631,33 +658,35 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
         processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertEquals(processDefinitions.get(0).getId(), version1ProcessDef.getId());
-        assertEquals(processDefinitions.get(1).getId(), version2ProcessDef.getId());
+        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
+        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
 
         List<Execution> executionsBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionsBefore.size()); //includes root execution
+        assertThat(executionsBefore).hasSize(2); //includes root execution
         executionsBefore.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasksBefore = taskService.createTaskQuery().list();
-        assertEquals(1, tasksBefore.size());
-        assertEquals(version1ProcessDef.getId(), tasksBefore.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasksBefore.get(0).getTaskDefinitionKey());
+        assertThat(tasksBefore)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         List<HistoricActivityInstance> historicActivityInstancesBefore = null;
         List<HistoricTaskInstance> historicTaskInstancesBefore = null;
@@ -671,7 +700,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Migrate process
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId());
+                .migrateToProcessDefinition(version2ProcessDef.getId());
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -679,38 +708,41 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executionsAfter.size()); //includes root execution
+        assertThat(executionsAfter).hasSize(2); //includes root execution
         executionsAfter.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         List<Task> tasksAfter = taskService.createTaskQuery().list();
-        assertEquals(1, tasksAfter.size());
-        assertEquals(version2ProcessDef.getId(), tasksAfter.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasksAfter.get(0).getTaskDefinitionKey()); //AutoMapped by Id
+        assertThat(tasksAfter)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id")); //AutoMapped by Id
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> historicActivityInstancesAfter = historyService.createHistoricActivityInstanceQuery().orderByExecutionId().asc().list();
-            assertEquals(historicActivityInstancesBefore.size(), historicActivityInstancesAfter.size());
+            List<HistoricActivityInstance> historicActivityInstancesAfter = historyService.createHistoricActivityInstanceQuery().orderByExecutionId().asc()
+                    .list();
+            assertThat(historicActivityInstancesAfter).hasSize(historicActivityInstancesBefore.size());
             assertThat(historicActivityInstancesBefore)
-                .usingElementComparatorIgnoringFields("revision", "processDefinitionId")
-                .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
+                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId")
+                    .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 List<HistoricTaskInstance> historicTaskInstancesAfter = historyService.createHistoricTaskInstanceQuery().orderByExecutionId().asc().list();
 
-                assertEquals(historicTaskInstancesBefore.size(), historicTaskInstancesAfter.size());
+                assertThat(historicTaskInstancesAfter).hasSize(historicTaskInstancesBefore.size());
                 assertThat(historicTaskInstancesBefore)
-                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "originalPersistentState", "lastUpdateTime")
-                    .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
+                        .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "originalPersistentState", "lastUpdateTime")
+                        .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
             }
         }
 
         //The first process version only had one activity, there should be a second activity in the process now
         taskService.complete(tasksAfter.get(0).getId());
         tasksAfter = taskService.createTaskQuery().list();
-        assertEquals(1, tasksAfter.size());
-        assertEquals("userTask2Id", tasksAfter.get(0).getTaskDefinitionKey());
+        assertThat(tasksAfter)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("userTask2Id");
+
         taskService.complete(tasksAfter.get(0).getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -720,34 +752,38 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the process
-        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey("MP")
-            .list();
+                .processDefinitionKey("MP")
+                .list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
         processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertEquals(processDefinitions.get(0).getId(), version1ProcessDef.getId());
-        assertEquals(processDefinitions.get(1).getId(), version2ProcessDef.getId());
+        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
+        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
 
         List<Execution> executionsBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionsBefore.size()); //includes root execution
+        assertThat(executionsBefore).hasSize(2); //includes root execution
         executionsBefore.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version1ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
 
         List<Task> tasksBefore = taskService.createTaskQuery().list();
-        assertEquals(1, tasksBefore.size());
-        assertEquals(version1ProcessDef.getId(), tasksBefore.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasksBefore.get(0).getTaskDefinitionKey());
-        assertThat(tasksBefore).extracting(Task::getAssignee).containsNull();
+        assertThat(tasksBefore)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
+        assertThat(tasksBefore)
+                .extracting(Task::getAssignee)
+                .containsNull();
 
         List<HistoricActivityInstance> historicActivityInstancesBefore = null;
         List<HistoricTaskInstance> historicTaskInstancesBefore = null;
@@ -761,8 +797,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Migrate process
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id").withNewAssignee("kermit"));
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id").withNewAssignee("kermit"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -770,71 +806,79 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executionsAfter.size()); //includes root execution
+        assertThat(executionsAfter).hasSize(2); //includes root execution
         executionsAfter.stream()
-            .map(e -> (ExecutionEntity) e)
-            .forEach(e -> assertEquals(version2ProcessDef.getId(), e.getProcessDefinitionId()));
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
 
         List<Task> tasksAfter = taskService.createTaskQuery().list();
-        assertEquals(1, tasksAfter.size());
-        assertEquals(version2ProcessDef.getId(), tasksAfter.get(0).getProcessDefinitionId());
-        assertEquals("userTask1Id", tasksAfter.get(0).getTaskDefinitionKey()); //AutoMapped by Id
-        assertThat(tasksAfter).extracting(Task::getAssignee).containsOnly("kermit");
+        assertThat(tasksAfter)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getAssignee)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id", "kermit")); //AutoMapped by Id
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            List<HistoricActivityInstance> historicActivityInstancesAfter = historyService.createHistoricActivityInstanceQuery().orderByExecutionId().asc().list();
-            assertEquals(historicActivityInstancesBefore.size(), historicActivityInstancesAfter.size());
+            List<HistoricActivityInstance> historicActivityInstancesAfter = historyService.createHistoricActivityInstanceQuery().orderByExecutionId().asc()
+                    .list();
+            assertThat(historicActivityInstancesAfter).hasSize(historicActivityInstancesBefore.size());
             assertThat(historicActivityInstancesBefore)
-                .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState")
-                .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
+                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState")
+                    .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 List<HistoricTaskInstance> historicTaskInstancesAfter = historyService.createHistoricTaskInstanceQuery().orderByExecutionId().asc().list();
 
-                assertEquals(historicTaskInstancesBefore.size(), historicTaskInstancesAfter.size());
+                assertThat(historicTaskInstancesAfter).hasSize(historicTaskInstancesBefore.size());
                 assertThat(historicTaskInstancesBefore)
-                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState", "lastUpdateTime")
-                    .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
+                        .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState", "lastUpdateTime")
+                        .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
             }
         }
 
         //The first process version only had one activity, there should be a second activity in the process now
         taskService.complete(tasksAfter.get(0).getId());
         tasksAfter = taskService.createTaskQuery().list();
-        assertEquals(1, tasksAfter.size());
-        assertEquals("userTask2Id", tasksAfter.get(0).getTaskDefinitionKey());
+        assertThat(tasksAfter)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
+
         taskService.complete(tasksAfter.get(0).getId());
         assertProcessEnded(processInstance.getId());
     }
 
     @Test
     public void testSimpleMigrationWithinSimpleSubProcess() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
 
         //Start an instance of a process with one task inside a subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm and move inside the subProcess
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         //Should be only one task
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
         completeTask(task);
 
-        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsBeforeMigration.size()); //Includes subProcess
-        assertThat(executionsBeforeMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");
+        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsBeforeMigration)  //Includes subProcess
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefTwoTasks.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideSimpleSubProcess2"));
+                .migrateToProcessDefinition(procDefTwoTasks.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideSimpleSubProcess2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -842,10 +886,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm and move inside the subProcess
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2"); //includes subProcess
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTasks.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefTwoTasks, processInstance, "subProcess", "SimpleSubProcess", "SimpleSubProcess");
@@ -868,16 +916,20 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testSimpleMigrationWithinSimpleSubProcess2() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefTwoTasks.getId());
 
         //Confirm and move inside the subProcess
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTasks.getId());
 
         //Move to the second task inside the SubProcess
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -889,14 +941,16 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess2");
 
-        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsBeforeMigration.size()); //Includes subProcess
-        assertThat(executionsBeforeMigration).extracting("activityId").containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
+        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsBeforeMigration)
+                .extracting("activityId")
+                .containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2"); // Includes subProcess
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "InsideSimpleSubProcess1"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "InsideSimpleSubProcess1"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -904,20 +958,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm and move inside the subProcess
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");  // Includes subProcess
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOneTask, processInstance, "subProcess", "SimpleSubProcess", "SimpleSubProcess");
             checkActivityInstances(procDefOneTask, processInstance, "userTask", "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "InsideSimpleSubProcess1");
+                    "InsideSimpleSubProcess1",
+                    "InsideSimpleSubProcess1");
 
             checkTaskInstance(procDefOneTask, processInstance, "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "InsideSimpleSubProcess1");
+                    "InsideSimpleSubProcess1",
+                    "InsideSimpleSubProcess1");
         }
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -925,31 +983,34 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOneTask, processInstance, "subProcess", "SimpleSubProcess", "SimpleSubProcess");
             checkActivityInstances(procDefOneTask, processInstance, "userTask", "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "InsideSimpleSubProcess1",
-                "AfterSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "InsideSimpleSubProcess1",
+                    "AfterSubProcess");
 
             checkTaskInstance(procDefOneTask, processInstance, "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "InsideSimpleSubProcess1",
-                "AfterSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "InsideSimpleSubProcess1",
+                    "AfterSubProcess");
         }
-
 
         assertProcessEnded(processInstance.getId());
     }
 
     @Test
     public void testSimpleMigrationIntoEmbeddedSubProcess() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         //Confirm migration point before the subProcess
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -957,8 +1018,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefTwoTasks.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideSimpleSubProcess2"));
+                .migrateToProcessDefinition(procDefTwoTasks.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideSimpleSubProcess2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -966,29 +1027,37 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm and move inside the subProcess
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration).hasSize(2);
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");   //includes subProcess
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTasks.getId());
 
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History - should contain one SubProcess and 2 userTask Activities since the migratedUser task moved forward inside the last task of the subProcess
             HistoricActivityInstance subProcess = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("subProcess")
-                .singleResult();
+                    .processInstanceId(processInstance.getId())
+                    .activityType("subProcess")
+                    .singleResult();
             assertThat(subProcess).extracting(HistoricActivityInstance::getActivityId).isEqualTo("SimpleSubProcess");
             assertThat(subProcess).extracting(HistoricActivityInstance::getProcessDefinitionId).isEqualTo(procDefTwoTasks.getId());
 
             List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertEquals(2, userTasks.size());
-            assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsOnly("AfterSubProcess", "InsideSimpleSubProcess2");
-            assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefTwoTasks.getId());
+                    .processInstanceId(processInstance.getId())
+                    .activityType("userTask")
+                    .list();
+            assertThat(userTasks)
+                    .extracting(HistoricActivityInstance::getActivityId)
+                    .containsExactlyInAnyOrder("AfterSubProcess", "InsideSimpleSubProcess2");
+            assertThat(userTasks)
+                    .extracting(HistoricActivityInstance::getProcessDefinitionId)
+                    .containsOnly(procDefTwoTasks.getId());
         }
 
         assertProcessEnded(processInstance.getId());
@@ -996,16 +1065,20 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testSimpleMigrationOutOfEmbeddedSubProcess() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
 
         //Start an instance of the definition with two task inside the subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefTwoTasks.getId());
 
         //Confirm and move inside the subProcess
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTasks.getId());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
@@ -1018,8 +1091,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "BeforeSubProcess"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess2", "BeforeSubProcess"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1027,20 +1100,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm and move inside the subProcess
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executionsAfterMigration.size()); //No subProcess
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("BeforeSubProcess");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("BeforeSubProcess"); //No subProcess
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOneTask, processInstance, "subProcess", "SimpleSubProcess");
             checkActivityInstances(procDefOneTask, processInstance, "userTask", "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "BeforeSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "BeforeSubProcess");
 
             checkTaskInstance(procDefOneTask, processInstance, "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "BeforeSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "BeforeSubProcess");
         }
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -1048,41 +1125,105 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOneTask, processInstance, "subProcess", "SimpleSubProcess", "SimpleSubProcess");
             checkActivityInstances(procDefOneTask, processInstance, "userTask", "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "AfterSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "BeforeSubProcess",
+                    "InsideSimpleSubProcess1",
+                    "AfterSubProcess");
 
             checkTaskInstance(procDefOneTask, processInstance, "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "BeforeSubProcess",
-                "InsideSimpleSubProcess1",
-                "AfterSubProcess");
+                    "InsideSimpleSubProcess1",
+                    "BeforeSubProcess",
+                    "InsideSimpleSubProcess1",
+                    "AfterSubProcess");
         }
 
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testReceiveTaskToUserTaskMigration() {
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/receive-task-process.bpmn20.xml");
+
+        // Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        // Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("MP")
+                .list();
+
+        assertThat(processDefinitions).hasSize(2);
+
+        // Migrate process
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("receiveTask", "userTask1Id").withNewAssignee("johndoe"))
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
+        assertThat(executionsAfter).hasSize(2); //includes root execution
+        for (Execution execution : executionsAfter) {
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        }
+
+        List<Task> tasksAfter = taskService.createTaskQuery().list();
+        assertThat(tasksAfter.size()).isEqualTo(1);
+        Task taskAfter = tasksAfter.get(0);
+        assertThat(taskAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(taskAfter.getTaskDefinitionKey()).isEqualTo("userTask1Id");
+        assertThat(taskAfter.getAssignee()).isEqualTo("johndoe");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTaskInstancesAfter = historyService.createHistoricTaskInstanceQuery().list();
+            assertThat(historicTaskInstancesAfter.size()).isEqualTo(1);
+            HistoricTaskInstance historicTaskAfter = historicTaskInstancesAfter.get(0);
+            assertThat(historicTaskAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+            assertThat(historicTaskAfter.getTaskDefinitionKey()).isEqualTo("userTask1Id");
+            assertThat(historicTaskAfter.getAssignee()).isEqualTo("johndoe");
+        }
+
+        //The first process version only had one activity, there should be a second activity in the process now
+        taskService.complete(tasksAfter.get(0).getId());
+        tasksAfter = taskService.createTaskQuery().list();
+        assertThat(tasksAfter)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("userTask2Id");
+
+        taskService.complete(tasksAfter.get(0).getId());
         assertProcessEnded(processInstance.getId());
     }
 
     @Test
     public void testMigrateActivityFromProcessRootIntoNestedEmbeddedSubProcess() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
 
         //Start an instance of the definition with two task inside the subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefNested.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
+                .migrateToProcessDefinition(procDefNested.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1090,10 +1231,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefNested.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefNested, processInstance, "subProcess", "OuterSubProcess", "SimpleSubProcess");
@@ -1117,24 +1262,28 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityFromProcessRootIntoNestedEmbeddedSubProcessWithDataObject() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
-        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
 
         //Start an instance of the definition with two task inside the subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefNested.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
+                .migrateToProcessDefinition(procDefNested.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("BeforeSubProcess", "InsideNestedSubProcess"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1142,17 +1291,22 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefNested.getId());
 
         //Should contain the dataObject of the new embedded process definition
-        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
-        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "dataScopeNested", String.class));
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess")
+                .singleResult();
+        assertThat(runtimeService.getVariableLocal(nestedSubProcess.getId(), "dataScopeNested", String.class)).isNotNull();
         DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "dataScopeNested");
-        assertNotNull(nameDataObject);
-        assertEquals("nestedSubProcess", nameDataObject.getValue());
+        assertThat(nameDataObject).isNotNull();
+        assertThat(nameDataObject.getValue()).isEqualTo("nestedSubProcess");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefNested, processInstance, "subProcess", "OuterSubProcess", "SimpleSubProcess");
@@ -1176,16 +1330,20 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityFromEmbeddedSubProcessIntoNestedEmbeddedSubProcess() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
-        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
 
         //Start an instance of the definition with two task inside the subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm and move inside the subProcess
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
@@ -1196,8 +1354,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefNested.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
+                .migrateToProcessDefinition(procDefNested.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1205,10 +1363,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm - we move from a subProcess to a nestedSubProcess with the same name (SimpleSubProcess), the original is not created, but cancelled and created from the new model
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size()); //2 subProcesses and 1 userTask
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess"); //2 subProcesses and 1 userTask
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefNested.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefNested, processInstance, "subProcess", "SimpleSubProcess", "OuterSubProcess", "SimpleSubProcess");
@@ -1232,16 +1394,20 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityFromEmbeddedSubProcessIntoNestedEmbeddedSubProcessWithDataObject() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
-        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
 
         //Start an instance of the definition with two task inside the subProcess
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm and move inside the subProcess
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size()); //includes root execution
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).hasSize(2); //includes root execution
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
@@ -1250,16 +1416,17 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
 
-        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
-        assertNotNull(runtimeService.getVariableLocal(subProcessExecution.getId(), "dataScope", String.class));
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess")
+                .singleResult();
+        assertThat(runtimeService.getVariableLocal(subProcessExecution.getId(), "dataScope", String.class)).isNotNull();
         DataObject nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "dataScope");
-        assertNotNull(nameDataObject);
-        assertEquals("subProcess", nameDataObject.getValue());
+        assertThat(nameDataObject).isNotNull();
+        assertThat(nameDataObject.getValue()).isEqualTo("subProcess");
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefNested.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
+                .migrateToProcessDefinition(procDefNested.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("InsideSimpleSubProcess1", "InsideNestedSubProcess"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1267,18 +1434,22 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm - we move from a subProcess to a nestedSubProcess with the same name (SimpleSubProcess), the original is not created, but cancelled and created from the new model
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size()); //2 subProcesses and 1 userTask
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess"); //2 subProcesses and 1 userTask
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefNested.getId());
 
         //Confirm we have the dataObject of the subProcess in the new definition (its a new SubProcess execution nonetheless)
         subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
         assertThat(runtimeService.getVariablesLocal(subProcessExecution.getId())).containsOnlyKeys("dataScopeNested");
         assertThat(runtimeService.getDataObjectsLocal(subProcessExecution.getId())).containsOnlyKeys("dataScopeNested");
         nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "dataScopeNested");
-        assertNotNull(nameDataObject);
-        assertEquals("nestedSubProcess", nameDataObject.getValue());
+        assertThat(nameDataObject).isNotNull();
+        assertThat(nameDataObject.getValue()).isEqualTo("nestedSubProcess");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefNested, processInstance, "subProcess", "SimpleSubProcess", "OuterSubProcess", "SimpleSubProcess");
@@ -1303,7 +1474,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     //-- Timers
     @Test
     public void testMigrateActivityToActivityWithTimerInNewDefinition() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefOWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml");
 
         //Start the processInstance without timer
@@ -1311,21 +1483,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob);
+        assertThat(timerJob).isNull();
 
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOWithTimer.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "firstTask"));
+                .migrateToProcessDefinition(procDefOWithTimer.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "firstTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1333,27 +1508,35 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsOnly("firstTask", "boundaryTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOWithTimer.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOWithTimer.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
-        assertThat(job).isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+        assertThat(job)
+                .isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.TIMER_SCHEDULED);
-        Optional<FlowableEvent> timerEvent = changeStateEventListener.getEvents().stream().filter(event -> event.getType().equals(FlowableEngineEventType.TIMER_SCHEDULED)).findFirst();
-        assertTrue(timerEvent.isPresent());
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.TIMER_SCHEDULED);
+        Optional<FlowableEvent> timerEvent = changeStateEventListener.getEvents().stream()
+                .filter(event -> event.getType().equals(FlowableEngineEventType.TIMER_SCHEDULED)).findFirst();
+        assertThat(timerEvent.isPresent()).isTrue();
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) timerEvent.get();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOWithTimer, processInstance, "userTask", "firstTask");
@@ -1367,11 +1550,15 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             //Check History
             List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .activityType("userTask")
-                .list();
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("firstTask", "secondTask");
-            assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOWithTimer.getId());
+                    .processInstanceId(processInstance.getId())
+                    .activityType("userTask")
+                    .list();
+            assertThat(taskExecutions)
+                    .extracting(HistoricActivityInstance::getActivityId)
+                    .containsExactlyInAnyOrder("firstTask", "secondTask");
+            assertThat(taskExecutions)
+                    .extracting(HistoricActivityInstance::getProcessDefinitionId)
+                    .containsOnly(procDefOWithTimer.getId());
 
             checkTaskInstance(procDefOWithTimer, processInstance, "firstTask", "secondTask");
         }
@@ -1382,31 +1569,36 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrateActivityWithTimerToActivityWithoutTimerInNewDefinition() {
         ProcessDefinition procDefOWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml");
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start the processInstance with timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOWithTimer.getId());
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
-        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOWithTimer.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOWithTimer.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
-        assertThat(job).isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+        assertThat(job)
+                .isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "userTask1Id"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1414,10 +1606,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsOnly("userTask1Id");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefOneTask, processInstance, "userTask", "userTask1Id");
@@ -1435,13 +1631,16 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         // Verify JOB cancellation event
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED);
-        Optional<FlowableEvent> jobCancelEvent = changeStateEventListener.getEvents().stream().filter(event -> event.getType().equals(FlowableEngineEventType.JOB_CANCELED)).findFirst();
-        assertTrue(jobCancelEvent.isPresent());
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.JOB_CANCELED);
+        Optional<FlowableEvent> jobCancelEvent = changeStateEventListener.getEvents().stream()
+                .filter(event -> event.getType().equals(FlowableEngineEventType.JOB_CANCELED)).findFirst();
+        assertThat(jobCancelEvent.isPresent()).isTrue();
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) jobCancelEvent.get();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1456,20 +1655,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
-        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTimer.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTimer.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
         Job timerJob1 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob1);
+        assertThat(timerJob1).isNotNull();
 
         changeStateEventListener.clear();
 
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefTwoTimers.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "secondTask"));
+                .migrateToProcessDefinition(procDefTwoTimers.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("firstTask", "secondTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1477,31 +1679,40 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("secondTask", "secondTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTwoTimers.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("secondTask", "secondTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTimers.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("secondTask");
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob2);
+        assertThat(timerJob2).isNotNull();
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
-        assertThat(job).isEqualToIgnoringGivenFields(timerJob2, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
-        assertThat(timerJob1).isNotEqualTo(timerJob2).extracting(Job::getExecutionId);
+        assertThat(job)
+                .isEqualToIgnoringGivenFields(timerJob2, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+        assertThat(timerJob1)
+                .extracting(Job::getExecutionId)
+                .isNotEqualTo(timerJob2);
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.TIMER_SCHEDULED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.TIMER_SCHEDULED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
         entityEvent = (FlowableEngineEntityEvent) iterator.next();
         timer = (Job) entityEvent.getEntity();
-        assertEquals("secondTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("secondTimerEvent");
 
         //Complete the process
         job = managementService.moveTimerToExecutableJob(timerJob2.getId());
@@ -1515,7 +1726,6 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         completeProcessInstanceTasks(processInstance.getId());
 
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefTwoTimers, processInstance, "userTask", "secondTask", "thirdTask");
 
@@ -1528,7 +1738,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrateActivityInsideEmbeddedSubProcessWithTimerToActivityOutsideEmbeddedSubProcessWithoutTimerInNewDefinition() {
         ProcessDefinition procDefSubProcWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml");
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefSubProcWithTimer.getId());
@@ -1539,21 +1750,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executions.size());
-        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefSubProcWithTimer.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefSubProcWithTimer.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         Job timerJob1 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob1);
+        assertThat(timerJob1).isNotNull();
         assertThat(timerJob1).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
         assertThat(timerJob1).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "userTask1Id"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1561,24 +1775,30 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
 
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob2);
+        assertThat(timerJob2).isNull();
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED);
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
         assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("subProcess");
 
@@ -1602,7 +1822,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityToActivityInsideEmbeddedSubProcessWithTimerInNewDefinition() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefSubProcWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml");
 
         //Start the processInstance without timer
@@ -1610,8 +1831,12 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
@@ -1619,8 +1844,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
+                .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1628,23 +1853,29 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefSubProcWithTimer.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration).
+                extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefSubProcWithTimer.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -1652,7 +1883,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefSubProcWithTimer, processInstance, "userTask", "subTask");
@@ -1674,7 +1905,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityToActivityInsideEmbeddedSubProcessWithTimerInNewDefinitionAndExecuteTimer() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
         ProcessDefinition procDefSubProcWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml");
 
         //Start the processInstance without timer
@@ -1682,8 +1914,12 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
@@ -1691,8 +1927,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
+                .migrateToProcessDefinition(procDefSubProcWithTimer.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1700,23 +1936,29 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefSubProcWithTimer.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefSubProcWithTimer.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -1724,7 +1966,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         //We will trigger the timer instead of the completing the task, it goes straight to the end
 
@@ -1743,7 +1985,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityWithTimerInsideEmbeddedSubProcessToActivityWithoutTimerInsideEmbeddedSubProcessInNewDefinition() {
-        ProcessDefinition procVersion1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-with-timer-inside-embedded-subprocess.bpmn20.xml");
+        ProcessDefinition procVersion1 = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-with-timer-inside-embedded-subprocess.bpmn20.xml");
         ProcessDefinition procVersion2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml");
 
         //Start the processInstance without timer
@@ -1752,21 +1995,25 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procVersion1.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId").
+                containsOnly(procVersion1.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procVersion1.getId());
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procVersion1.getId());
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procVersion2.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "subTask2"));
+                .migrateToProcessDefinition(procVersion2.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask", "subTask2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1774,26 +2021,32 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask2");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procVersion2.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask2");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procVersion2.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask2");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procVersion2.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob);
+        assertThat(timerJob).isNull();
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
         assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("subProcess");
@@ -1801,7 +2054,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         activityEvent = (FlowableActivityEvent) iterator.next();
         assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("subProcess");
 
-        assertFalse(iterator.hasNext());
+        assertThat(iterator.hasNext()).isFalse();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procVersion2, processInstance, "userTask", "taskBefore", "subTask2");
@@ -1823,16 +2076,22 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityToActivityWithTimerInsideEmbeddedSubProcessInNewDefinition() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
-        ProcessDefinition procDefTimerTaskInSubProcess = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefTimerTaskInSubProcess = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
@@ -1840,8 +2099,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
+                .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1849,27 +2108,34 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTimerTaskInSubProcess.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTimerTaskInSubProcess.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
         //Job is attached to the activity
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();
-        assertThat(timerJob).isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+        assertThat(timerJob)
+                .isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -1877,7 +2143,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procDefTimerTaskInSubProcess, processInstance, "userTask", "subTask");
@@ -1899,16 +2165,22 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateActivityToActivityWithTimerInsideEmbeddedSubProcessInNewDefinitionAndExecuteTimer() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
-        ProcessDefinition procDefTimerTaskInSubProcess = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefTimerTaskInSubProcess = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
@@ -1916,8 +2188,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
+                .migrateToProcessDefinition(procDefTimerTaskInSubProcess.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "subTask"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -1925,27 +2197,34 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executionsAfterMigration.size());
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTimerTaskInSubProcess.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("subProcess", "subTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTimerTaskInSubProcess.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
         //Job is attached to the activity
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();
-        assertThat(timerJob).isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+        assertThat(timerJob)
+                .isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -1953,7 +2232,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) iterator.next();
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
+        assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
         //We will trigger the timer instead of the completing the task, it goes straight to the end of the subProcess, skipping one task
         Job executableJob = managementService.moveTimerToExecutableJob(timerJob.getId());
@@ -1972,27 +2251,33 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     //-- Intermediate Signal Catch Events
     @Test
     public void testMigrateSimpleActivityToIntermediateSignalCatchingEventInNewDefinition() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
-        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
+                .migrateToProcessDefinition(procWithSignal.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2000,20 +2285,28 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
 
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "signal"));
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -2023,20 +2316,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
         assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
         assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("intermediateCatchEvent");
-        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("mySignal");
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("someSignal");
 
         //Trigger the event
         runtimeService.signalEventReceived("someSignal");
 
         executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("afterCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterCatchEvent");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procWithSignal, processInstance, "userTask", "userTask1Id", "afterCatchEvent");
@@ -2060,8 +2357,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateIntermediateSignalCatchingEventToSimpleActivityInNewDefinition() {
-        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
@@ -2073,19 +2372,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "signal"));
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2093,9 +2397,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
@@ -2105,8 +2414,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(eventSubscriptions).isEmpty();
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_STARTED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -2135,8 +2446,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateIntermediateSignalCatchingEventToIntermediateSignalCatchingEventInNewDefinition() {
-        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
-        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/simple-intermediate-signal-catch-event.bpmn20.xml");
+        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/simple-intermediate-signal-catch-event.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignalVer1.getId());
@@ -2148,19 +2461,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignalVer1.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer1.getId());
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
-
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "signal"));
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithSignalVer2.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "newIntermediateCatchEvent"));
+                .migrateToProcessDefinition(procWithSignalVer2.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "newIntermediateCatchEvent"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2168,39 +2485,51 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("newIntermediateCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("newIntermediateCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer2.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
 
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("newIntermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("newIntermediateCatchEvent", "signal"));
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
         assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
         assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("newIntermediateCatchEvent");
-        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("myNewSignal");
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("someNewSignal");
 
         //Trigger the event
         runtimeService.signalEventReceived("someNewSignal");
 
         executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterNewCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("afterNewCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer2.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterNewCatchEvent");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer2.getId());
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procWithSignalVer2, processInstance, "userTask", "beforeCatchEvent", "afterNewCatchEvent");
@@ -2225,27 +2554,33 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     //-- Intermediate Message Catch Events
     @Test
     public void testMigrateSimpleActivityToIntermediateMessageCatchingEventInNewDefinition() {
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
-        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        assertThat(executions).
+                extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithSignal.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
+                .migrateToProcessDefinition(procWithSignal.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "intermediateCatchEvent"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2253,20 +2588,28 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
 
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "message"));
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
@@ -2279,18 +2622,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someMessage");
 
         //Trigger the event
-        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("intermediateCatchEvent").singleResult();
+        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("intermediateCatchEvent")
+                .singleResult();
         runtimeService.messageEventReceived("someMessage", messageCatchExecution.getId());
 
         executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("afterCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterCatchEvent");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procWithSignal, processInstance, "userTask", "userTask1Id", "afterCatchEvent");
@@ -2314,8 +2662,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateIntermediateMessageCatchingEventToSimpleActivityInNewDefinition() {
-        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
-        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
@@ -2327,19 +2677,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignal.getId());
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "message"));
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procDefOneTask.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
+                .migrateToProcessDefinition(procDefOneTask.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2347,9 +2702,14 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("userTask1Id");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTask.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
@@ -2359,8 +2719,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(eventSubscriptions).isEmpty();
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableActivityEvent signalEvent = (FlowableMessageEvent) iterator.next();
@@ -2394,8 +2756,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     @Test
     public void testMigrateIntermediateMessageCatchingEventToIntermediateMessageCatchingEventInNewDefinition() {
-        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
-        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/simple-intermediate-message-catch-event.bpmn20.xml");
+        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/simple-intermediate-message-catch-event.bpmn20.xml");
 
         //Start the processInstance without timer
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignalVer1.getId());
@@ -2407,19 +2771,24 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignalVer1.getId());
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateCatchEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer1.getId());
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateCatchEvent", "message"));
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
-            .migrateToProcessDefinition(procWithSignalVer2.getId())
-            .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "intermediateNewCatchEvent"));
+                .migrateToProcessDefinition(procWithSignalVer2.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("intermediateCatchEvent", "intermediateNewCatchEvent"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
         assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
@@ -2427,20 +2796,28 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
-        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateNewCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("intermediateNewCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer2.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
 
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateNewCatchEvent");
-        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getActivityId, EventSubscription::getEventType)
+                .containsExactly(tuple("intermediateNewCatchEvent", "message"));
 
         // Verify events
-        assertTrue(changeStateEventListener.hasEvents());
-        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+        assertThat(changeStateEventListener.hasEvents()).isTrue();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
 
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         FlowableMessageEvent signalEvent = (FlowableMessageEvent) iterator.next();
@@ -2454,18 +2831,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someNewMessage");
 
         //Trigger the event
-        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("intermediateNewCatchEvent").singleResult();
+        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId())
+                .activityId("intermediateNewCatchEvent").singleResult();
         runtimeService.messageEventReceived("someNewMessage", messageCatchExecution.getId());
 
         executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterNewCatchEvent");
-        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactly("afterNewCatchEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procWithSignalVer2.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterNewCatchEvent");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer2.getId());
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertTrue(eventSubscriptions.isEmpty());
+        assertThat(eventSubscriptions).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             checkActivityInstances(procWithSignalVer2, processInstance, "userTask", "beforeCatchEvent", "afterNewCatchEvent");
@@ -2497,28 +2879,29 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
         runtimeService.trigger(execution.getId());
 
-        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+        assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
-        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder().preUpgradeScript(new Script("groovy",
-            "import com.fasterxml.jackson.databind.ObjectMapper\n"
-            + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
-            + "import org.flowable.engine.impl.context.Context\n"
-            + "\n"
-            + "List<String> list  = execution.getVariable('listVariable')\n"
-            + "\n"
-            + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
-            + "\n"
-            + "ArrayNode jsonArray = mapper.createArrayNode()\n"
-            + "list.each {jsonArray.add(it)}\n"
-            + "\n"
-            + "execution.setVariable(\"listVariable\", jsonArray)"))
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+                "import com.fasterxml.jackson.databind.ObjectMapper\n"
+                        + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
+                        + "import org.flowable.engine.impl.context.Context\n"
+                        + "\n"
+                        + "List<String> list  = execution.getVariable('listVariable')\n"
+                        + "\n"
+                        + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
+                        + "\n"
+                        + "ArrayNode jsonArray = mapper.createArrayNode()\n"
+                        + "list.each {jsonArray.add(it)}\n"
+                        + "\n"
+                        + "execution.setVariable(\"listVariable\", jsonArray)"))
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
@@ -2537,16 +2920,18 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
         runtimeService.trigger(execution.getId());
 
-        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+        assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
-        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
-        processMigrationService.createProcessInstanceMigrationBuilder().preUpgradeJavaDelegate("org.flowable.engine.test.api.runtime.migration.ConvertProcessVariable")
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .preUpgradeJavaDelegate("org.flowable.engine.test.api.runtime.migration.ConvertProcessVariable")
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
@@ -2565,23 +2950,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         variables.put("listVariable", new ArrayList());
         variables.put("convertProcessVariable", new ConvertProcessVariable()); // using instead of beans. Not nice, but it uses similar resolver as beans
         ProcessInstance processInstanceToMigrate = runtimeService
-            .startProcessInstanceByKey("MP", variables);
+                .startProcessInstanceByKey("MP", variables);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions()
-            .singleResult();
+                .singleResult();
         runtimeService.trigger(execution.getId());
 
         assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
         ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
-            "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .preUpgradeJavaDelegateExpression("${convertProcessVariable}")
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+                .preUpgradeJavaDelegateExpression("${convertProcessVariable}")
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // serializable - when starting the process instance (listVariable)
             // serializable - when starting the process instance (convertProcessVariable)
@@ -2602,28 +2987,29 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
         runtimeService.trigger(execution.getId());
 
-        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+        assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
-        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeScript(new Script("groovy",
-            "import com.fasterxml.jackson.databind.ObjectMapper\n"
-                + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
-                + "import org.flowable.engine.impl.context.Context\n"
-                + "\n"
-                + "List<String> list  = execution.getVariable('listVariable')\n"
-                + "\n"
-                + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
-                + "\n"
-                + "ArrayNode jsonArray = mapper.createArrayNode()\n"
-                + "list.each {jsonArray.add(it)}\n"
-                + "\n"
-                + "execution.setVariable(\"listVariable\", jsonArray)"))
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+                "import com.fasterxml.jackson.databind.ObjectMapper\n"
+                        + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
+                        + "import org.flowable.engine.impl.context.Context\n"
+                        + "\n"
+                        + "List<String> list  = execution.getVariable('listVariable')\n"
+                        + "\n"
+                        + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
+                        + "\n"
+                        + "ArrayNode jsonArray = mapper.createArrayNode()\n"
+                        + "list.each {jsonArray.add(it)}\n"
+                        + "\n"
+                        + "execution.setVariable(\"listVariable\", jsonArray)"))
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
@@ -2642,16 +3028,18 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
         runtimeService.trigger(execution.getId());
 
-        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+        assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
-        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
-        processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeJavaDelegate("org.flowable.engine.test.api.runtime.migration.ConvertProcessVariable")
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .postUpgradeJavaDelegate("org.flowable.engine.test.api.runtime.migration.ConvertProcessVariable")
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
@@ -2670,23 +3058,23 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         variables.put("listVariable", new ArrayList());
         variables.put("convertProcessVariable", new ConvertProcessVariable()); // using instead of beans. Not nice, but it uses similar resolver as beans
         ProcessInstance processInstanceToMigrate = runtimeService
-            .startProcessInstanceByKey("MP", variables);
+                .startProcessInstanceByKey("MP", variables);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions()
-            .singleResult();
+                .singleResult();
         runtimeService.trigger(execution.getId());
 
         assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
 
         ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
-            "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+                "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .postUpgradeJavaDelegateExpression("${convertProcessVariable}")
-            .migrateToProcessDefinition(targetProcessDefinition.getId())
-            .migrate(processInstanceToMigrate.getId());
+                .postUpgradeJavaDelegateExpression("${convertProcessVariable}")
+                .migrateToProcessDefinition(targetProcessDefinition.getId())
+                .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "serializable", "json", "json");
         }
@@ -2694,24 +3082,25 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     private void assertThatVariablesTypeHistoryIs(ProcessInstance processInstanceToMigrate, String... values) {
-        List<HistoricDetail> updateList = historyService.createHistoricDetailQuery().processInstanceId(processInstanceToMigrate.getId()).variableUpdates().list();
+        List<HistoricDetail> updateList = historyService.createHistoricDetailQuery().processInstanceId(processInstanceToMigrate.getId()).variableUpdates()
+                .list();
 
         Collections.sort(updateList, Comparator.comparingInt(histDetail -> Integer.parseInt(histDetail.getId())));
-        assertThat(updateList).
-            extracting(historicDetail -> ((HistoricDetailVariableInstanceUpdateEntity) historicDetail).getVariableType().getTypeName()).
-            containsExactly(values);
+        assertThat(updateList)
+                .extracting(historicDetail -> ((HistoricDetailVariableInstanceUpdateEntity) historicDetail).getVariableType().getTypeName())
+                .containsExactly(values);
     }
 
     private void assertThatProcessVariableConverted(ProcessInstance processInstanceToMigrate, Execution execution) {
-        assertThat((ArrayNode)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).
-            extracting(jsonNode -> jsonNode.asText()).
-            containsExactly("new value");
+        assertThat((ArrayNode) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable"))
+                .extracting(jsonNode -> jsonNode.asText())
+                .containsExactly("new value");
 
         runtimeService.trigger(execution.getId());
 
-        assertThat((ArrayNode)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).
-            extracting(jsonNode -> jsonNode.asText()).
-            containsExactly("new value", "new value 2");
+        assertThat((ArrayNode) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable"))
+                .extracting(jsonNode -> jsonNode.asText())
+                .containsExactly("new value", "new value 2");
 
         runtimeService.trigger(execution.getId());
 

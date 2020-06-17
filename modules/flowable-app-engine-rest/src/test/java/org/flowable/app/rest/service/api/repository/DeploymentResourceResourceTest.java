@@ -12,6 +12,9 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -28,9 +31,11 @@ import org.flowable.app.rest.service.BaseSpringRestTestCase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a resources that is part of a deployment.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
@@ -52,10 +57,14 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             // Check URL's for the resource
-            assertEquals(responseNode.get("url").textValue(), buildUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
-            assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
-            assertEquals("application/json", responseNode.get("mediaType").textValue());
-            assertEquals("appDefinition", responseNode.get("type").textValue());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "    url: '" + buildUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName) + "',"
+                            + "    contentUrl: '" + buildUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName) + "',"
+                            + "    mediaType: 'application/json',"
+                            + "    type: 'appDefinition'"
+                            + "}");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -100,15 +109,17 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
      */
     public void testGetDeploymentResourceContent() throws Exception {
         try {
-            AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
+            AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
+                    .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
+            HttpGet httpGet = new HttpGet(
+                    SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "text/plain"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             String responseAsString = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
-            assertNotNull(responseAsString);
-            assertEquals("Test content", responseAsString);
+            assertThat(responseAsString).isNotNull();
+            assertThat(responseAsString).isEqualTo("Test content");
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

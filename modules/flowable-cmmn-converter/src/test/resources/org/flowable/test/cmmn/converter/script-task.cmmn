@@ -15,6 +15,7 @@
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
         
             <planItem id="planItemTaskA" definitionRef="taskA" />
+            <planItem id="planItemTaskB" definitionRef="taskB" />
             <task id="taskA" name="A" flowable:type="script" flowable:scriptFormat="javascript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
                 <extensionElements>
                     <flowable:field name="script">
@@ -22,7 +23,15 @@
                     </flowable:field>
                 </extensionElements>
             </task>
-           
+
+            <task id="taskB" name="B" flowable:type="script" flowable:scriptFormat="groovy" flowable:autoStoreVariables="true">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string><![CDATA[var b = 5;]]></string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
         </casePlanModel>
     </case>
     

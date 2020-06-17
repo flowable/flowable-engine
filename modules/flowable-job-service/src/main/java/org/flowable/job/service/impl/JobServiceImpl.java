@@ -29,6 +29,7 @@ import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -94,6 +95,11 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
     
     @Override
+    public List<ExternalWorkerJobEntity> findExternalWorkerJobsByExecutionId(String executionId) {
+        return getExternalWorkerJobEntityManager().findJobsByExecutionId(executionId);
+    }
+
+    @Override
     public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
         return getJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
     }
@@ -152,6 +158,16 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     @Override
     public void insertJob(JobEntity job) {
         getJobEntityManager().insert(job);
+    }
+
+    @Override
+    public ExternalWorkerJobEntity createExternalWorkerJob() {
+        return getExternalWorkerJobEntityManager().create();
+    }
+
+    @Override
+    public void insertExternalWorkerJob(ExternalWorkerJobEntity job) {
+        getExternalWorkerJobEntityManager().insert(job);
     }
 
     @Override
@@ -214,5 +230,5 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
             }
         }
     }
-    
+
 }

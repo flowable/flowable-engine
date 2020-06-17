@@ -12,8 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.BpmnModel;
@@ -42,9 +41,9 @@ public class AdhocSubprocessConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("adhocSubProcess");
-        assertNotNull(flowElement);
+        assertThat(flowElement).isNotNull();
 
         AdhocSubProcess adhocSubProcess = (AdhocSubProcess) flowElement;
-        assertEquals("${completed}", adhocSubProcess.getCompletionCondition());
+        assertThat(adhocSubProcess.getCompletionCondition()).isEqualTo("${completed}");
     }
 }

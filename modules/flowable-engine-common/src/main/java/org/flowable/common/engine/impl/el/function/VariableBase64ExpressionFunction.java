@@ -40,9 +40,4 @@ public class VariableBase64ExpressionFunction extends AbstractFlowableVariableEx
         }
     }
 
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-
 }

@@ -27,4 +27,5 @@ public interface FormResourceEntityManager extends EntityManager<FormResourceEnt
 
     void deleteResourcesByDeploymentId(String deploymentId);
 
+    void deleteResourcesByName(String name);
 }

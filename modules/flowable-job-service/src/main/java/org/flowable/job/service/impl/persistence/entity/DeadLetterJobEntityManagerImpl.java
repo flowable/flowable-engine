@@ -34,6 +34,11 @@ public class DeadLetterJobEntityManagerImpl
     }
 
     @Override
+    public DeadLetterJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
+    }
+
+    @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
         return dataManager.findJobsByExecutionId(id);
     }
@@ -65,6 +70,9 @@ public class DeadLetterJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getServiceConfiguration().getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
     }
 

@@ -16,20 +16,30 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
+import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobFailureBuilderImpl;
+import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
@@ -44,6 +54,7 @@ import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
@@ -105,6 +116,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
 
     @Override
+    public Job moveSuspendedJobToExecutableJob(String jobId) {
+        return commandExecutor.execute(new MoveSuspendedJobToExecutableJobCmd(jobId));
+    }
+
+    @Override
     public void deleteJob(String jobId) {
         commandExecutor.execute(new DeleteJobCmd(jobId));
     }
@@ -137,6 +153,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public JobQuery createJobQuery() {
         return new JobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobQuery createExternalWorkerJobQuery() {
+        return new ExternalWorkerJobQueryImpl(commandExecutor);
     }
 
     @Override
@@ -175,6 +196,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     @Override
+    public String getExternalWorkerJobErrorDetails(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.EXTERNAL_WORKER));
+    }
+
+    @Override
     public void handleHistoryCleanupTimerJob() {
         commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
@@ -182,6 +208,38 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
+    }
+
+    @Override
+    public ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId) {
+        return new ExternalWorkerJobFailureBuilderImpl(externalJobId, workerId, commandExecutor, configuration.getJobServiceConfiguration());
+    }
+
+    @Override
+    public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
+        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
+    }
+    
+    public <T> T executeCommand(Command<T> command) {
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(command);
+    }
+
+    public <T> T executeCommand(CommandConfig config, Command<T> command) {
+        if (config == null) {
+            throw new FlowableIllegalArgumentException("The config is null");
+        }
+        if (command == null) {
+            throw new FlowableIllegalArgumentException("The command is null");
+        }
+        return commandExecutor.execute(config, command);
     }
 
 }

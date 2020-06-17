@@ -44,6 +44,7 @@ public class TaskQueryRequest extends PaginateRequest {
     private String candidateUser;
     private String candidateGroup;
     private List<String> candidateGroupIn;
+    private boolean ignoreAssignee;
     private String involvedUser;
     private String processInstanceId;
     private String processInstanceIdWithChildren;
@@ -207,6 +208,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setCandidateGroupIn(List<String> candidateGroupIn) {
         this.candidateGroupIn = candidateGroupIn;
+    }
+
+    public boolean isIgnoreAssignee() {
+        return ignoreAssignee;
+    }
+
+    public void setIgnoreAssignee(boolean ignoreAssignee) {
+        this.ignoreAssignee = ignoreAssignee;
     }
 
     public String getInvolvedUser() {

@@ -164,6 +164,9 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     @SuppressWarnings("unchecked")
     protected T variableValueLikeIgnoreCase(String name, String value, boolean localScope) {
+        if (value == null) {
+            throw new FlowableIllegalArgumentException("value is null");
+        }
         addVariable(name, value.toLowerCase(), QueryOperator.LIKE_IGNORE_CASE, localScope);
         return (T) this;
     }

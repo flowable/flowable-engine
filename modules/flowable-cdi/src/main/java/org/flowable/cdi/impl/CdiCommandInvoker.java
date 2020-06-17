@@ -13,6 +13,8 @@
 package org.flowable.cdi.impl;
 
 import org.flowable.cdi.impl.context.ExecutionContextHolder;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 
@@ -26,8 +28,12 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
  */
 public class CdiCommandInvoker extends CommandInvoker {
 
+    public CdiCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        super(agendaOperationRunner);
+    }
+    
     @Override
-    public void executeOperation(Runnable runnable) {
+    public void executeOperation(CommandContext commandContext, Runnable runnable) {
 
         boolean executionContextSet = false;
         if (runnable instanceof AbstractOperation) {
@@ -38,7 +44,7 @@ public class CdiCommandInvoker extends CommandInvoker {
             }
         }
 
-        super.executeOperation(runnable);
+        super.executeOperation(commandContext, runnable);
 
         if (executionContextSet) {
             ExecutionContextHolder.removeExecutionContext();

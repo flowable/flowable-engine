@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.model.IOParameter;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Joram Barrez
@@ -33,13 +34,15 @@ public interface ProcessInstanceService {
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
     String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+            Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
     String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+            Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Deletes the given process instance. Typically used to propagate termination.
@@ -70,6 +73,5 @@ public interface ProcessInstanceService {
      * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.
      */
     List<IOParameter> getOutputParametersOfCaseTask(String executionId);
-
 
 }

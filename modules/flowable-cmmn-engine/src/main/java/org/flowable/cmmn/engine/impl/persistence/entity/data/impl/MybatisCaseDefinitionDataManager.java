@@ -80,6 +80,23 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
     }
 
     @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("caseDefinitionKey", caseDefinitionKey);
+        return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByParentDeploymentAndKey", parameters);
+    }
+
+    @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("caseDefinitionKey", caseDefinitionKey);
+        parameters.put("tenantId", tenantId);
+        return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByParentDeploymentAndKeyAndTenantId", parameters);
+    }
+
+    @Override
     public CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
         Map<String, Object> params = new HashMap<>();
         params.put("caseDefinitionKey", caseDefinitionKey);

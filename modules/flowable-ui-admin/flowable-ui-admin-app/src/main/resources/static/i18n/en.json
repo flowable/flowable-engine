@@ -773,44 +773,6 @@
             }
         }
     },
-    "APP-DEPLOYMENTS": {
-        "TITLE": "App Deployments",
-        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching app deployments.",
-        "LIST-MESSAGE-EMPTY": "No matching app deployments.",
-        "FILTER": {
-            "NAME": "Name",
-            "TENANTID": "Tenant identifier",
-            "LATEST": "Latest version",
-            "LATEST-HELP": "Only show latest versions"
-        },
-        "SORT": {
-            "ID": "ID",
-            "NAME": "Name"
-        },
-        "HEADER": {
-            "ID": "ID",
-            "APP-DEFINITION-ID": "App ID",
-            "DEPLOYMENT-ID": "Process Deployment ID",
-            "DMN-DEPLOYMENT-ID": "DMN Deployment ID",
-            "NAME": "Name",
-            "DEPLOY-TIME": "Deploy time",
-            "DEPLOYED-BY": "Deployed by",
-            "TENANT": "Tenant ID"
-        },
-        "ACTION": {
-            "UPLOAD": "Upload and publish an app"
-        },
-        "POPUP": {
-            "UPLOAD": {
-                "DESCRIPTION": "Select a .zip app definition to deploy.",
-                "WARNING": "Uploading a process is only possible to an Flowable UI instance.",
-                "DROPZONE": "Or drop a file here",
-                "NO-DROP": "File drop is not supported by your browser",
-                "CANCEL-UPLOAD": "Cancel upload",
-                "ERROR": "Could not upload this file"
-            }
-        }
-    },
     "VARIABLES": {
         "HEADER": {
             "NAME": "Name",
@@ -1127,12 +1089,14 @@
         }
     },
     "APP-DEPLOYMENTS": {
-        "TITLE": "Deployments",
-        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
-        "LIST-MESSAGE-EMPTY": "No matching deployments.",
+        "TITLE": "App Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching app deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching app deployments.",
         "FILTER": {
-            "NAME": "Name (case sensitive)",
-            "TENANTID": "Tenant identifier (case sensitive)"
+            "NAME": "Name",
+            "TENANTID": "Tenant identifier",
+            "LATEST": "Latest version",
+            "LATEST-HELP": "Only show latest versions"
         },
         "SORT": {
             "ID": "ID",
@@ -1140,18 +1104,23 @@
         },
         "HEADER": {
             "ID": "ID",
+            "APP-DEFINITION-ID": "App ID",
+            "DEPLOYMENT-ID": "Process Deployment ID",
+            "DMN-DEPLOYMENT-ID": "DMN Deployment ID",
             "NAME": "Name",
             "DEPLOY-TIME": "Deploy time",
+            "DEPLOYED-BY": "Deployed by",
             "CATEGORY": "Category",
-            "TENANT": "Tenant"
+            "TENANT": "Tenant ID"
         },
         "ACTION": {
-            "UPLOAD": "Upload app",
+            "UPLOAD": "Upload and publish an app",
             "DELETE": "Delete deployment"
         },
         "POPUP": {
             "UPLOAD": {
-                "DESCRIPTION": "Select a .app app definition file to deploy or upload a package of an app with assets contained in a .zip or .bar file.",
+                "DESCRIPTION": "Select a .app app definition file to deploy or upload a package of an app with assets contained in a .zip or .bar file",
+                "WARNING": "Uploading an app is only possible to an Flowable UI instance.",
                 "DROPZONE": "Or drop a file here",
                 "NO-DROP": "File drop is not supported by your browser",
                 "CANCEL-UPLOAD": "Cancel upload",
@@ -1159,7 +1128,7 @@
             },
             "DELETE": {
                 "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
-                }
+            }
         }
     },
     "APP-DEPLOYMENT": {
