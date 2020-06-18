@@ -1080,7 +1080,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             if (expectedDeleteReason == null) {
                 assertThat(historicProcessInstance.getDeleteReason()).isNull();
             } else {
-                assertThat(historicProcessInstance.getDeleteReason().startsWith(expectedDeleteReason)).isTrue();
+                assertThat(historicProcessInstance.getDeleteReason()).startsWith(expectedDeleteReason);
             }
         }
     }
