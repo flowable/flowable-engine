@@ -13,7 +13,9 @@
 
 package org.flowable.engine.test.bpmn.subprocess.adhoc;
 
-import java.util.ArrayList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,31 +41,31 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
     public void testSimpleAdhocSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         Execution newTaskExecution = runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
-        assertNotNull(newTaskExecution);
-        assertNotNull(newTaskExecution.getId());
+        assertThat(newTaskExecution).isNotNull();
+        assertThat(newTaskExecution.getId()).isNotNull();
 
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask").singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         taskService.complete(subProcessTask.getId());
 
         enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.completeAdhocSubProcess(execution.getId());
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -71,37 +73,37 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
     public void testSimpleAdhocSubProcessViaExecution() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
         List<Execution> executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(executions.get(0).getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         Execution newTaskExecution = runtimeService.executeActivityInAdhocSubProcess(executions.get(0).getId(), "subProcessTask");
-        assertNotNull(newTaskExecution);
-        assertNotNull(newTaskExecution.getId());
+        assertThat(newTaskExecution).isNotNull();
+        assertThat(newTaskExecution.getId()).isNotNull();
 
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask").singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         taskService.complete(subProcessTask.getId());
 
         executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(executions.get(0).getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.completeAdhocSubProcess(executions.get(0).getId());
 
         executions = runtimeService.getAdhocSubProcessExecutions(pi.getId());
-        assertEquals(0, executions.size());
+        assertThat(executions).isEmpty();
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -111,34 +113,34 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         Execution newTaskExecution = runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
-        assertNotNull(newTaskExecution);
-        assertNotNull(newTaskExecution.getId());
+        assertThat(newTaskExecution).isNotNull();
+        assertThat(newTaskExecution.getId()).isNotNull();
 
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask").singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         taskService.complete(subProcessTask.getId());
 
         enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         newTaskExecution = runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
 
         subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task2 in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task2 in subprocess");
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
@@ -150,19 +152,14 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
                     .asc()
                     .list();
 
-            assertEquals(3, historicTasks.size());
             // only check for existence and assume that the SQL processing has ordered the values correctly
             // see https://github.com/flowable/flowable-engine/issues/8
-            List<String> tasks = new ArrayList<>(3);
-            tasks.add(historicTasks.get(0).getTaskDefinitionKey());
-            tasks.add(historicTasks.get(1).getTaskDefinitionKey());
-            tasks.add(historicTasks.get(2).getTaskDefinitionKey());
-            assertTrue(tasks.contains("subProcessTask"));
-            assertTrue(tasks.contains("subProcessTask2"));
-            assertTrue(tasks.contains("afterTask"));
+            assertThat(historicTasks)
+                    .extracting(HistoricTaskInstance::getTaskDefinitionKey)
+                    .containsExactlyInAnyOrder("subProcessTask", "subProcessTask2", "afterTask");
         }
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -172,29 +169,29 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -204,21 +201,18 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
-        try {
-            runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
-            fail("exception expected because can only enable one activity in a sequential ad-hoc sub process");
-        } catch (FlowableException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2"))
+                .as("exception expected because can only enable one activity in a sequential ad-hoc sub process")
+                .isInstanceOf(FlowableException.class);
 
         taskService.complete(subProcessTask.getId());
 
@@ -226,18 +220,18 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
 
         subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task2 in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task2 in subprocess");
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -247,37 +241,34 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         taskService.complete(subProcessTask.getId());
 
-        try {
-            runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
-            fail("exception expected because can only enable one activity in a sequential ad-hoc sub process");
-        } catch (FlowableException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2"))
+                .as("exception expected because can only enable one activity in a sequential ad-hoc sub process")
+                .isInstanceOf(FlowableException.class);
 
         subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("The next task", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("The next task");
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -287,25 +278,25 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -315,38 +306,38 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(3, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(3);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask3");
 
         org.flowable.task.api.Task subProcessTask2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask2").singleResult();
-        assertEquals("Task2 in subprocess", subProcessTask2.getName());
+        assertThat(subProcessTask2.getName()).isEqualTo("Task2 in subprocess");
         taskService.complete(subProcessTask2.getId());
 
         subProcessTask2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("sequentialTask2").singleResult();
-        assertEquals("The next task2", subProcessTask2.getName());
+        assertThat(subProcessTask2.getName()).isEqualTo("The next task2");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
         taskService.complete(subProcessTask.getId(), variableMap);
 
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -356,18 +347,18 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(2, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(2);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
@@ -375,17 +366,17 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
 
         // ad-hoc sub process is not completed because of cancelRemainingInstances is set to false
         subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task2 in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task2 in subprocess");
 
         taskService.complete(subProcessTask.getId());
 
         // with no remaining executions the ad-hoc sub process will be completed
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
     @Test
@@ -395,27 +386,27 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put("completed", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", variableMap);
         Execution execution = runtimeService.createExecutionQuery().activityId("adhocSubProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         List<FlowNode> enabledActivities = runtimeService.getEnabledActivitiesFromAdhocSubProcess(execution.getId());
-        assertEquals(3, enabledActivities.size());
+        assertThat(enabledActivities).hasSize(3);
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task in subprocess", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("Task in subprocess");
 
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask2");
         runtimeService.executeActivityInAdhocSubProcess(execution.getId(), "subProcessTask3");
 
         org.flowable.task.api.Task subProcessTask2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("subProcessTask2").singleResult();
-        assertEquals("Task2 in subprocess", subProcessTask2.getName());
+        assertThat(subProcessTask2.getName()).isEqualTo("Task2 in subprocess");
         taskService.complete(subProcessTask2.getId());
 
         subProcessTask2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("sequentialTask2").singleResult();
-        assertEquals("The next task2", subProcessTask2.getName());
+        assertThat(subProcessTask2.getName()).isEqualTo("The next task2");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         variableMap = new HashMap<>();
         variableMap.put("completed", true);
@@ -423,31 +414,31 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
 
         // ad-hoc sub process is not completed because of cancelRemainingInstances is set to false
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("sequentialTask").singleResult();
-        assertEquals("The next task", subProcessTask.getName());
+        assertThat(subProcessTask.getName()).isEqualTo("The next task");
 
         taskService.complete(subProcessTask.getId(), variableMap);
 
         // ad-hoc sub process is not completed because of cancelRemainingInstances is set to false
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         taskService.complete(subProcessTask2.getId(), variableMap);
 
         // ad-hoc sub process is not completed because of cancelRemainingInstances is set to false
         org.flowable.task.api.Task subProcessTask3 = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Task3 in subprocess", subProcessTask3.getName());
+        assertThat(subProcessTask3.getName()).isEqualTo("Task3 in subprocess");
 
         taskService.complete(subProcessTask3.getId(), variableMap);
 
         // with no remaining executions the ad-hoc sub process will be completed
         org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("After task", afterTask.getName());
+        assertThat(afterTask.getName()).isEqualTo("After task");
 
         taskService.complete(afterTask.getId());
 
-        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 }
