@@ -523,7 +523,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
              * 
              * execution id: On which execution it was set activity id: in which activity was the process instance when setting the variable
              */
-            assertThat(historicActivityInstance2.getExecutionId().equals(update2.getExecutionId())).isFalse();
+            assertThat(historicActivityInstance2).isNotEqualTo(update2.getExecutionId());
         }
     }
 

@@ -211,7 +211,7 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
 
         ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
         assertThat(loggingNode.get("type").asText()).isEqualTo(LoggingSessionConstants.TYPE_PROCESS_STARTED);
-        assertThat(loggingNode.get("message").asText().contains("Started process instance with id ")).isTrue();
+        assertThat(loggingNode.get("message").asText()).contains("Started process instance with id ");
         assertThat(loggingNode.get("scopeId").asText()).isEqualTo(processInstance.getId());
         assertThat(loggingNode.get("scopeType").asText()).isEqualTo(ScopeTypes.BPMN);
         assertThat(loggingNode.get("scopeDefinitionId").asText()).isEqualTo(processDefinition.getId());
