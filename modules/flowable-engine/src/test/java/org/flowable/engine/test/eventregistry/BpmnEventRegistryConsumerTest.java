@@ -187,7 +187,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         assertThat(eventSubscription).isNotNull();
         assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
-        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(0);
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         for (int i = 1; i <= 5; i++) {
             inboundEventChannelAdapter.triggerTestEvent();
@@ -208,10 +208,10 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         assertThat(eventSubscription).isNotNull();
         assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
-        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(0);
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
         
         inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
-        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(0);
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         for (int i = 1; i <= 5; i++) {
             inboundEventChannelAdapter.triggerTestEvent("testCustomer");
@@ -232,7 +232,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         assertThat(eventSubscription).isNotNull();
         assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
 
-        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(0);
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
         
         inboundEventChannelAdapter.triggerTestEvent("payloadStartCustomer");
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
