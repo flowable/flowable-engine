@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -77,17 +80,17 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleTimersOnUserTask");
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(3, jobs.size());
+        assertThat(jobs).hasSize(3);
 
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
-        assertEquals(0L, jobQuery.count());
+        assertThat(jobQuery.count()).isZero();
 
         // which means that the third task is reached
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Third Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Third Task");
     }
 
     @Test
@@ -98,9 +101,9 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("timerOnNestedSubprocesses");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("Inner subprocess task 1", tasks.get(0).getName());
-        assertEquals("Inner subprocess task 2", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Inner subprocess task 1", "Inner subprocess task 2");
 
         // Timer will fire in 2 hours
         processEngineConfiguration.getClock().setCurrentTime(new Date(testStartTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
@@ -109,7 +112,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("task outside subprocess", task.getName());
+        assertThat(task.getName()).isEqualTo("task outside subprocess");
     }
 
     @Test
@@ -126,23 +129,23 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
-        assertEquals(0L, jobQuery.count());
+        assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertFalse(listenerExecutedStartEvent);
-        assertTrue(listenerExecutedEndEvent);
+        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
         assertProcessEnded(pi.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertNotNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult());
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult()).isNotNull();
         }
     }
 
@@ -160,23 +163,23 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
         waitForJobExecutorToProcessAllJobs(7000L, 25L);
-        assertEquals(0L, jobQuery.count());
+        assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertFalse(listenerExecutedStartEvent);
-        assertTrue(listenerExecutedEndEvent);
+        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
         assertProcessEnded(pi.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertNotNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult());
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult()).isNotNull();
         }
     }
 
@@ -188,13 +191,10 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("duration", null);
 
         // After process start, there should be a timer created
-        try {
-            runtimeService.startProcessInstanceByKey("testNullExpressionOnTimer", variables);
-            fail("Expected wrong due date exception");
-        } catch (FlowableException e) {
-            // expected
-            assertEquals("Due date could not be determined for timer job null", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testNullExpressionOnTimer", variables))
+                .as("Expected wrong due date exception")
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("Due date could not be determined for timer job null");
     }
     
     @Test
@@ -208,11 +208,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("reminderTimeCycle", "0 0 0 1 1 ?");
 
         String processInstanceId = runtimeService.startProcessInstanceByKey("test-timers", variables).getProcessInstanceId();
-        assertNotNull(processInstanceId);
+        assertThat(processInstanceId).isNotNull();
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(processInstanceId);
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
     }
     
     @Test
@@ -225,13 +225,10 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("dueDate", new Date(new Date().getTime() + 6 * 60 * 60 * 1000)); // 6 hours later
         variables.put("reminderTimeCycle", "0 0 0 1 1 ? 2000");
 
-        try {
-            runtimeService.startProcessInstanceByKey("test-timers", variables).getProcessInstanceId();
-            fail("Expected wrong due date exception");
-        } catch (FlowableException e) {
-            // expected
-            assertEquals("Due date could not be determined for timer job 0 0 0 1 1 ? 2000", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("test-timers", variables).getProcessInstanceId())
+                .as("Expected wrong due date exception")
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("Due date could not be determined for timer job 0 0 0 1 1 ? 2000");
     }
 
     @Test
@@ -241,15 +238,15 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // associated with the execution are deleted.
         // broken before 5.10, see ACT-1133
         runtimeService.startProcessInstanceByKey("timerOnSubprocesses");
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
     @Test
     @Deployment
     public void testRepeatingTimerWithCancelActivity() {
         runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
-        assertEquals(1, managementService.createTimerJobQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         // Firing job should cancel the user task, destroy the scope,
         // re-enter the task and recreate the task. A new timer should also be
@@ -259,8 +256,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Job job = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
-        assertEquals(1, managementService.createTimerJobQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
     }
 
     @Test
@@ -285,7 +282,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
             // Verify due date
             if (previousDueDate != null) {
-                assertTrue(job.getDuedate().getTime() - previousDueDate.getTime() >= twentyFourHours);
+                assertThat(job.getDuedate().getTime() - previousDueDate.getTime()).isGreaterThanOrEqualTo(twentyFourHours);
             }
             previousDueDate = job.getDuedate();
 
@@ -318,7 +315,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
             // Verify due date
             if (previousDueDate != null) {
-                assertTrue(job.getDuedate().getTime() - previousDueDate.getTime() >= twentyFourHours);
+                assertThat(job.getDuedate().getTime() - previousDueDate.getTime()).isGreaterThanOrEqualTo(twentyFourHours);
             }
             previousDueDate = job.getDuedate();
 
@@ -340,16 +337,12 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("patient", "kermit");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1", vars);
-        
+
         List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(4, activityInstances.size());
-        List<String> activityInstanceIds = new ArrayList<>();
-        for (ActivityInstance activityInstance : activityInstances) {
-            activityInstanceIds.add(activityInstance.getActivityId());
-        }
-        assertTrue(activityInstanceIds.contains("startEvent"));
-        assertTrue(activityInstanceIds.contains("first_task"));
-        assertTrue(activityInstanceIds.contains("boundaryTimerEvent"));
+        assertThat(activityInstances).hasSize(4);
+        assertThat(activityInstances)
+                .extracting(ActivityInstance::getActivityId)
+                .contains("startEvent", "first_task", "boundaryTimerEvent");
 
         // just wait for 2 seconds to run any job if it's the case
         try {
@@ -359,11 +352,12 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
 
         // there should be a userTask waiting for user input
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
         List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobList.size());
+        assertThat(jobList).hasSize(1);
 
         // let's see what's happening after 2 minutes
         // nothing should change since the timer have to executed after 10 minutes
@@ -379,14 +373,16 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
+
         jobList = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobList.size());
-        
+        assertThat(jobList).hasSize(1);
+
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertEquals("boundaryTimerEvent", job.getElementId());
-        assertEquals("Timer event", job.getElementName());
+        assertThat(job.getElementId()).isEqualTo("boundaryTimerEvent");
+        assertThat(job.getElementName()).isEqualTo("Timer event");
 
         // after another 8 minutes (the timer will have to execute because it wasa set to be executed @ 10 minutes after process start)
         long tenMinutes = 8L * 60L * 1000L;
@@ -403,24 +399,25 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // there should be only one userTask and it should be the one triggered by the boundary timer event.
         // after the boundary event is triggered there should be no active job.
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("Second Task", tasks.get(0).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Second Task");
+
         activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(6, activityInstances.size());
+        assertThat(activityInstances).hasSize(6);
         Map<String, ActivityInstance> activityInstanceMap = new HashMap<>();
         for (ActivityInstance activityInstance : activityInstances) {
             activityInstanceMap.put(activityInstance.getActivityId(), activityInstance);
         }
-        assertNotNull(activityInstanceMap.get("startEvent").getEndTime());
-        assertNotNull(activityInstanceMap.get("first_task").getEndTime());
-        assertNotNull(activityInstanceMap.get("boundaryTimerEvent").getEndTime());
-        assertNull(activityInstanceMap.get("second_task").getEndTime());
-        
+        assertThat(activityInstanceMap.get("startEvent").getEndTime()).isNotNull();
+        assertThat(activityInstanceMap.get("first_task").getEndTime()).isNotNull();
+        assertThat(activityInstanceMap.get("boundaryTimerEvent").getEndTime()).isNotNull();
+        assertThat(activityInstanceMap.get("second_task").getEndTime()).isNull();
+
         jobList = managementService.createJobQuery().list();
-        assertEquals(0, jobList.size());
+        assertThat(jobList).isEmpty();
         jobList = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobList.size());
+        assertThat(jobList).isEmpty();
     }
 
     @Test
@@ -442,10 +439,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // there should be a userTask waiting for user input
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("Start", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Start");
         List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobList.size());
+        assertThat(jobList).hasSize(1);
 
         // after another 2 minutes
         long tenMinutes = 2L * 60L * 1000L;
@@ -461,11 +459,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // there should be no userTask
         tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
         jobList = managementService.createJobQuery().list();
-        assertEquals(0, jobList.size());
+        assertThat(jobList).isEmpty();
         jobList = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobList.size());
+        assertThat(jobList).isEmpty();
     }
 
     @Test
@@ -481,25 +479,26 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds < 100);
+        assertThat(diffInMilliseconds).isLessThan(100);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         Job rescheduledTimerJob = managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
-        assertNotNull(rescheduledTimerJob);
-        assertNotNull(rescheduledTimerJob.getId());
-        assertNotSame(timerJob.getId(), rescheduledTimerJob.getId());
+        assertThat(rescheduledTimerJob).isNotNull();
+        assertThat(rescheduledTimerJob.getId()).isNotNull();
+        assertThat(rescheduledTimerJob.getId()).isNotSameAs(timerJob.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(timerJob.getId(), rescheduledTimerJob.getId());
+        assertThat(rescheduledTimerJob.getId()).isEqualTo(timerJob.getId());
         diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds > (59 * 60 * 1000));
+        assertThat(diffInMilliseconds).isGreaterThan(59 * 60 * 1000);
 
         // Move clock forward 1 hour from now
         calendar = Calendar.getInstance();
@@ -510,10 +509,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has not run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         // Move clock forward 2 hours from now
         calendar = Calendar.getInstance();
@@ -523,10 +523,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 3", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 3");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob);
+        assertThat(timerJob).isNull();
     }
     
     @Test
@@ -542,11 +543,12 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // there should be a userTask waiting for user input
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         
         List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobList.size());
-        assertEquals("myCategory", jobList.get(0).getCategory());
+        assertThat(jobList)
+                .extracting(Job::getCategory)
+                .containsExactly("myCategory");
 
         // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
         long afterTenMinutes = 12L * 60L * 1000L;
@@ -556,11 +558,12 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("Second Task", tasks.get(0).getName());
-        
-        assertEquals(0, managementService.createJobQuery().list().size());
-        assertEquals(0, managementService.createTimerJobQuery().list().size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Second Task");
+
+        assertThat(managementService.createJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
     }
     
     @Test
@@ -579,27 +582,24 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
             currentTime = new Date(currentTime.getTime() + afterTenMinutes);
             processEngineConfiguration.getClock().setCurrentTime(currentTime);
     
-            try {
-                waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
-                fail("job should still be there");
-            } catch (Exception e) {
-                // expected
-            }
-            
-            assertEquals(1, managementService.createTimerJobQuery().list().size());
+            assertThatThrownBy(() -> waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200))
+                    .as("job should still be there")
+                    .isInstanceOf(Exception.class);
+
+            assertThat(managementService.createTimerJobQuery().list()).hasSize(1);
     
             Task task = taskService.createTaskQuery().singleResult();
-            assertEquals("First Task", task.getName());
+            assertThat(task.getName()).isEqualTo("First Task");
             
             processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
             
             waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
             
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("Second Task", task.getName());
+            assertThat(task.getName()).isEqualTo("Second Task");
             
-            assertEquals(0, managementService.createJobQuery().list().size());
-            assertEquals(0, managementService.createTimerJobQuery().list().size());
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         } finally {
             processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
         }
@@ -618,8 +618,9 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("timerProcess", vars);
         
         List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobList.size());
-        assertEquals("testValue", jobList.get(0).getCategory());
+        assertThat(jobList)
+                .extracting(Job::getCategory)
+                .containsExactly("testValue");
 
         // after another 8 minutes (the timer will have to execute because it was set to be executed @ 10 minutes after process start)
         long afterTenMinutes = 12L * 60L * 1000L;
@@ -629,8 +630,9 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
 
         List<Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("Second Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Second Task");
     }
     
     @Test
@@ -654,10 +656,10 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
             waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(4000, 200);
             
             Task task = taskService.createTaskQuery().singleResult();
-            assertEquals("Second Task", task.getName());
+            assertThat(task.getName()).isEqualTo("Second Task");
             
-            assertEquals(0, managementService.createJobQuery().list().size());
-            assertEquals(0, managementService.createTimerJobQuery().list().size());
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         } finally {
             processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
         }
@@ -676,26 +678,27 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds < 100);
+        assertThat(diffInMilliseconds).isLessThan(100);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         String timeCycle = "R/PT2H";
         Job rescheduledTimerJob = managementService.rescheduleTimerJob(timerJob.getId(), null, null, timeCycle, null, null);
-        assertNotNull(rescheduledTimerJob);
-        assertNotNull(rescheduledTimerJob.getId());
-        assertNotSame(timerJob.getId(), rescheduledTimerJob.getId());
+        assertThat(rescheduledTimerJob).isNotNull();
+        assertThat(rescheduledTimerJob.getId()).isNotNull();
+        assertThat(rescheduledTimerJob.getId()).isNotSameAs(timerJob.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(timerJob.getId(), rescheduledTimerJob.getId());
+        assertThat(rescheduledTimerJob.getId()).isEqualTo(timerJob.getId());
         diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds > (59 * 60 * 1000));
+        assertThat(diffInMilliseconds).isGreaterThan(59 * 60 * 1000);
 
         // Move clock forward 1 hour from now
         calendar = Calendar.getInstance();
@@ -706,10 +709,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has not run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         // Move clock forward 2 hours from now
         calendar = Calendar.getInstance();
@@ -719,10 +723,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 3", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 3");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob);
+        assertThat(timerJob).isNull();
     }
 
     @Test
@@ -738,12 +743,13 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds < 100);
+        assertThat(diffInMilliseconds).isLessThan(100);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
@@ -753,7 +759,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertTrue(diffInMilliseconds > (59 * 60 * 1000));
+        assertThat(diffInMilliseconds).isGreaterThan(59 * 60 * 1000);
 
         // Move clock forward 1 hour from now
         calendar = Calendar.getInstance();
@@ -764,10 +770,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has not run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         // Move clock forward 2 hours from now
         calendar = Calendar.getInstance();
@@ -777,10 +784,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 3", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 3");
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(timerJob);
+        assertThat(timerJob).isNull();
     }
 
     @Test
@@ -788,75 +796,78 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public void test3BoundaryTimerEvents() throws Exception {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("threeTimersProcess");
-        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isZero();
         
         // there should be a userTask waiting for user input
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
+
         
         // first job fires after 1 hour
         Calendar currentCal = processEngineConfiguration.getClock().getCurrentCalendar();
         currentCal.add(Calendar.MINUTE, 61);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         Job timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
         
         tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
-        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(tasks).hasSize(2);
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isZero();
         
         // second job fires after 1 hour
         currentCal.add(Calendar.MINUTE, 61);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
         
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
 
         // last timer fires after another 2 hours
         currentCal.add(Calendar.MINUTE, 121);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
         
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         processEngineConfiguration.getClock().reset();
     }
@@ -867,75 +878,77 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("threeTimersProcess");
 
-        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isZero();
 
         // there should be a userTask waiting for user input
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
 
         // first job fires after 1 hour
         Calendar currentCal = processEngineConfiguration.getClock().getCurrentCalendar();
         currentCal.add(Calendar.MINUTE, 61);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         Job timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
 
         tasks = taskService.createTaskQuery().taskName("Reminder Task").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         taskService.complete(tasks.get(0).getId());
         
-        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
 
         // intermediate timer catch event job fires after 1 hour
         currentCal.add(Calendar.MINUTE, 61);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
         
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("First Task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("First Task");
         
         // last timer fires after another 2 hours
         currentCal.add(Calendar.MINUTE, 121);
         processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
         
-        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         
         managementService.executeJob(timerJob.getId());
         
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         processEngineConfiguration.getClock().reset();
     }

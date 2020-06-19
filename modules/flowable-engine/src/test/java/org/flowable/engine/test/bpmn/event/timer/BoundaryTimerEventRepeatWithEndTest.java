@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -56,25 +59,24 @@ public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCa
         runtimeService.setVariable(processInstance.getId(), "EndDateForBoundary", dateStr);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Task A", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task A");
 
         // Test Boundary Events
         // complete will cause timer to be created
-        taskService.complete(task.getId());
+        taskService.complete(tasks.get(0).getId());
 
         List<Job> jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // boundary events
         Job executableJob = managementService.moveTimerToExecutableJob(jobs.get(0).getId());
         managementService.executeJob(executableJob.getId());
 
-        assertEquals(0, managementService.createJobQuery().list().size());
+        assertThat(managementService.createJobQuery().list()).isEmpty();
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         nextTimeCal.add(Calendar.MINUTE, 15); // after 15 minutes
         processEngineConfiguration.getClock().setCurrentTime(nextTimeCal.getTime());
@@ -82,9 +84,9 @@ public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCa
         executableJob = managementService.moveTimerToExecutableJob(jobs.get(0).getId());
         managementService.executeJob(executableJob.getId());
 
-        assertEquals(0, managementService.createJobQuery().list().size());
+        assertThat(managementService.createJobQuery().list()).isEmpty();
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         nextTimeCal.add(Calendar.MINUTE, 5); // after another 5 minutes (20 minutes and 1 second from the baseTime) the BoundaryEndTime is reached
         nextTimeCal.add(Calendar.SECOND, 1);
@@ -94,42 +96,42 @@ public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCa
         managementService.executeJob(executableJob.getId());
 
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         tasks = taskService.createTaskQuery().list();
-        task = tasks.get(0);
-        assertEquals("Task B", task.getName());
-        assertEquals(1, tasks.size());
-        taskService.complete(task.getId());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task B");
+        taskService.complete(tasks.get(0).getId());
 
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .singleResult();
-            assertNotNull(historicInstance.getEndTime());
+            assertThat(historicInstance.getEndTime()).isNotNull();
         }
 
         // now all the process instances should be completed
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
 
         // no jobs
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         // no tasks
         tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
     }
 
 }
