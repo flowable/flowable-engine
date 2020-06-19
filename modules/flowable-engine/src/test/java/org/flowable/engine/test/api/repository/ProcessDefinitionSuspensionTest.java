@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +36,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/db/processOne.bpmn20.xml" })
     public void testProcessDefinitionActiveByDefault() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
     }
 
     @Test
@@ -41,17 +44,17 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     public void testSuspendActivateProcessDefinitionById() {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         // suspend
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         // activate
         repositoryService.activateProcessDefinitionById(processDefinition.getId());
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
     }
 
     @Test
@@ -59,17 +62,17 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     public void testSuspendActivateProcessDefinitionByKey() {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         // suspend
         repositoryService.suspendProcessDefinitionByKey(processDefinition.getKey());
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         // activate
         repositoryService.activateProcessDefinitionByKey(processDefinition.getKey());
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
     }
 
     @Test
@@ -77,15 +80,10 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     public void testCannotActivateActiveProcessDefinition() {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
-        try {
-            repositoryService.activateProcessDefinitionById(processDefinition.getId());
-            fail("Exception expected");
-        } catch (FlowableException e) {
-            // expected
-        }
-
+        assertThatThrownBy(() -> repositoryService.activateProcessDefinitionById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -93,16 +91,12 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
     public void testCannotSuspendActiveProcessDefinition() {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
-        try {
-            repositoryService.suspendProcessDefinitionById(processDefinition.getId());
-            fail("Exception expected");
-        } catch (FlowableException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> repositoryService.suspendProcessDefinitionById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -111,14 +105,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // default = all definitions
         List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(2, processDefinitionList.size());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().active().count());
+        assertThat(processDefinitionList).hasSize(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(2);
 
         ProcessDefinition processDefinition = processDefinitionList.get(0);
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
     }
 
     @Test
@@ -127,15 +121,15 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // default = all definitions
         List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(2, processDefinitionList.size());
+        assertThat(processDefinitionList).hasSize(2);
 
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().active().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(2);
 
         ProcessDefinition processDefinition = processDefinitionList.get(0);
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(1);
     }
 
     @Test
@@ -145,20 +139,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         // By id
-        try {
-            runtimeService.startProcessInstanceById(processDefinition.getId());
-            fail("Exception is expected but not thrown");
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot start process instance");
 
         // By Key
-        try {
-            runtimeService.startProcessInstanceByKey(processDefinition.getKey());
-            fail("Exception is expected but not thrown");
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey(processDefinition.getKey()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot start process instance");
     }
 
     @Test
@@ -171,15 +159,15 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // Verify one task is created
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        assertThat(task).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         // Suspend process definition
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         // Process should be able to continue
         taskService.complete(task.getId());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -193,30 +181,27 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         for (int i = 0; i < nrOfProcessInstances; i++) {
             runtimeService.startProcessInstanceByKey(processDefinition.getKey());
         }
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().active().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isEqualTo(nrOfProcessInstances);
 
         // Suspend process definitions and include process instances
         repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true, null);
 
         // Verify all process instances are also suspended
         for (ProcessInstance processInstance : runtimeService.createProcessInstanceQuery().list()) {
-            assertTrue(processInstance.isSuspended());
+            assertThat(processInstance.isSuspended()).isTrue();
         }
 
         // Verify all process instances can't be continued
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            try {
-                taskService.complete(task.getId());
-                fail("A suspended task shouldn't be able to be continued");
-            } catch (FlowableException e) {
-                // This is good
-            }
+            assertThatThrownBy(() -> taskService.complete(task.getId()))
+                    .as("A suspended task shouldn't be able to be continued")
+                    .isInstanceOf(FlowableException.class);
         }
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isZero();
 
         // Activate the process definition again
         repositoryService.activateProcessDefinitionById(processDefinition.getId(), true, null);
@@ -225,9 +210,9 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isZero();
     }
 
     @Test
@@ -236,21 +221,11 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
-        try {
-            formService.submitStartFormData(processDefinition.getId(), new HashMap<>());
-            fail();
-        } catch (FlowableException e) {
-            // This is expected
-        }
+        assertThatThrownBy(() -> formService.submitStartFormData(processDefinition.getId(), new HashMap<>()))
+                .isInstanceOf(FlowableException.class);
 
-        try {
-            formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<>());
-            fail();
-        } catch (FlowableException e) {
-            e.printStackTrace();
-            // This is expected
-        }
-
+        assertThatThrownBy(() -> formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<>()))
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -260,20 +235,18 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         Date now = new Date();
         processEngineConfiguration.getClock().setCurrentTime(now);
 
-        // Suspending the process definition should not stop the execution of
-        // jobs
-        // Added this test because in previous implementations, this was the
-        // case.
+        // Suspending the process definition should not stop the execution of jobs
+        // Added this test because in previous implementations, this was the case.
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         runtimeService.startProcessInstanceById(processDefinition.getId());
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
-        assertEquals(1, managementService.createTimerJobQuery().count());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
 
         // The jobs should simply be executed
         processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
         waitForJobExecutorToProcessAllJobs(2000L, 100L);
-        assertEquals(0, managementService.createJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
     }
 
     @Test
@@ -290,12 +263,12 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // Verify we can just start process instances
         runtimeService.startProcessInstanceById(processDefinition.getId());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
 
         // verify there is a job created
-        assertEquals(1, managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count()).isEqualTo(1);
 
         // Move clock 8 days further and let job executor run
         long eightDaysSinceStartTime = oneWeekFromStartTime + (24 * 60 * 60 * 1000);
@@ -303,26 +276,23 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
         // verify job is now removed
-        assertEquals(0, managementService.createJobQuery().processDefinitionId(processDefinition.getId()).count());
-        assertEquals(0, managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count());
+        assertThat(managementService.createJobQuery().processDefinitionId(processDefinition.getId()).count()).isZero();
+        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count()).isZero();
 
         // Try to start process instance. It should fail now.
-        try {
-            runtimeService.startProcessInstanceById(processDefinition.getId());
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("suspended", e.getMessage());
-        }
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("suspended");
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(1);
 
         // Activate again
         repositoryService.activateProcessDefinitionById(processDefinition.getId());
         runtimeService.startProcessInstanceById(processDefinition.getId());
-        assertEquals(2, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
     }
 
     @Test
@@ -339,13 +309,13 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceById(processDefinition.getId());
         }
 
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().active().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(0, taskService.createTaskQuery().suspended().count());
-        assertEquals(nrOfProcessInstances, taskService.createTaskQuery().active().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isZero();
+        assertThat(taskService.createTaskQuery().suspended().count()).isZero();
+        assertThat(taskService.createTaskQuery().active().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
 
         // Suspend process definition in one week from now
         long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
@@ -354,7 +324,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         // Verify we can start process instances
         runtimeService.startProcessInstanceById(processDefinition.getId());
         nrOfProcessInstances = nrOfProcessInstances + 1;
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
 
         // Move clock 9 days further and let job executor run
         long eightDaysSinceStartTime = oneWeekFromStartTime + (2 * 24 * 60 * 60 * 1000);
@@ -362,29 +332,26 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // Try to start process instance. It should fail now.
-        try {
-            runtimeService.startProcessInstanceById(processDefinition.getId());
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("suspended", e.getMessage());
-        }
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(nrOfProcessInstances, taskService.createTaskQuery().suspended().count());
-        assertEquals(0, taskService.createTaskQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("suspended");
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(taskService.createTaskQuery().suspended().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(taskService.createTaskQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(1);
 
         // Activate again
         repositoryService.activateProcessDefinitionById(processDefinition.getId(), true, null);
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().active().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(0, taskService.createTaskQuery().suspended().count());
-        assertEquals(nrOfProcessInstances, taskService.createTaskQuery().active().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isZero();
+        assertThat(taskService.createTaskQuery().suspended().count()).isZero();
+        assertThat(taskService.createTaskQuery().active().count()).isEqualTo(nrOfProcessInstances);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
     }
 
     @Test
@@ -398,15 +365,13 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         // Try to start process instance. It should fail now.
-        try {
-            runtimeService.startProcessInstanceById(processDefinition.getId());
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("suspended", e.getMessage());
-        }
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(processDefinition.getId()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("suspended");
+
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(1);
 
         // Activate in a day from now
         long oneDayFromStart = startTime.getTime() + (24 * 60 * 60 * 1000);
@@ -419,9 +384,9 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // Starting a process instance should now succeed
         runtimeService.startProcessInstanceById(processDefinition.getId());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
     }
 
     @Test
@@ -432,33 +397,33 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         for (int i = 0; i < nrOfProcessDefinitions; i++) {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml").deploy();
         }
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
 
         // Suspend all process definitions with same key
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess");
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(nrOfProcessDefinitions);
 
         // Activate again
         repositoryService.activateProcessDefinitionByKey("oneTaskProcess");
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
 
         // Start process instance
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // And suspend again, cascading to process instances
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         // Clean DB
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
@@ -478,48 +443,48 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         for (int i = 0; i < nrOfProcessDefinitions; i++) {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml").deploy();
         }
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
 
         // Start process instance
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // Suspend all process definitions with same key in 2 hours from now
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, new Date(startTime.getTime() + (2 * hourInMs)));
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isEqualTo(1);
 
         // Verify a job is created for each process definition
-        assertEquals(nrOfProcessDefinitions, managementService.createTimerJobQuery().count());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(nrOfProcessDefinitions);
         for (ProcessDefinition processDefinition : repositoryService.createProcessDefinitionQuery().list()) {
-            assertEquals(1, managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count());
+            assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinition.getId()).count()).isEqualTo(1);
         }
 
         // Move time 3 hours and run job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (3 * hourInMs)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(6000L, 100L);
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isEqualTo(1);
 
         // Activate again in 5 hours from now
         repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, new Date(startTime.getTime() + (5 * hourInMs)));
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isEqualTo(1);
 
         // Move time 6 hours and run job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (6 * hourInMs)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().active().count()).isEqualTo(1);
 
         // Clean DB
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
