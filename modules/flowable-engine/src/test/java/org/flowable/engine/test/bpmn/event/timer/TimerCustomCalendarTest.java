@@ -13,9 +13,8 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Date;
 import java.util.List;
@@ -42,23 +41,27 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
     @Deployment
     public void testCycleTimer() {
         List<Job> jobs = this.managementService.createTimerJobQuery().list();
-
-        assertThat("One job is scheduled", jobs.size(), is(1));
-        assertThat("Job must be scheduled by custom business calendar to Date(1000)", jobs.get(0).getDuedate(), is(new Date(1000)));
-
-        managementService.moveTimerToExecutableJob(jobs.get(0).getId());
-        managementService.executeJob(jobs.get(0).getId());
-
-        jobs = this.managementService.createTimerJobQuery().list();
-
-        assertThat("One job is scheduled (repetition is 2x)", jobs.size(), is(1));
-        assertThat("Job must be scheduled by custom business calendar to Date(1000)", jobs.get(0).getDuedate(), is(new Date(1000)));
+        assertThat(jobs)
+                .extracting(Job::getDuedate)
+                .as("One job is scheduled; Job must be scheduled by custom business calendar to Date(1000)")
+                .containsExactly(new Date(1000));
 
         managementService.moveTimerToExecutableJob(jobs.get(0).getId());
         managementService.executeJob(jobs.get(0).getId());
 
         jobs = this.managementService.createTimerJobQuery().list();
-        assertThat("There must be no job.", jobs.isEmpty());
+        assertThat(jobs)
+                .extracting(Job::getDuedate)
+                .as("One job is scheduled (repetition is 2x); Job must be scheduled by custom business calendar to Date(1000)")
+                .containsExactly(new Date(1000));
+
+        managementService.moveTimerToExecutableJob(jobs.get(0).getId());
+        managementService.executeJob(jobs.get(0).getId());
+
+        jobs = this.managementService.createTimerJobQuery().list();
+        assertThat(jobs)
+                .as("There must be no job.")
+                .isEmpty();
     }
 
     @Test
@@ -67,9 +70,10 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey("testCustomDurationCalendar");
 
         List<Job> jobs = this.managementService.createTimerJobQuery().list();
-
-        assertThat("One job is scheduled", jobs.size(), is(1));
-        assertThat("Job must be scheduled by custom business calendar to Date(1000)", jobs.get(0).getDuedate(), is(new Date(1000)));
+        assertThat(jobs)
+                .extracting(Job::getDuedate)
+                .as("One job is scheduled; Job must be scheduled by custom business calendar to Date(1000)")
+                .containsExactly(new Date(1000));
 
         managementService.moveTimerToExecutableJob(jobs.get(0).getId());
         managementService.executeJob(jobs.get(0).getId());
@@ -82,12 +86,10 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
     @Test
     @Deployment
     public void testInvalidDurationTimerCalendar() {
-        try {
-            this.runtimeService.startProcessInstanceByKey("testCustomDurationCalendar");
-            fail("Activiti exception expected - calendar not found");
-        } catch (FlowableException e) {
-            assertThat(e.getMessage(), containsString("INVALID does not exist"));
-        }
+        assertThatThrownBy(() -> this.runtimeService.startProcessInstanceByKey("testCustomDurationCalendar"))
+                .as("Exception expected - calendar not found")
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("INVALID does not exist");
     }
 
     @Test
@@ -96,8 +98,10 @@ public class TimerCustomCalendarTest extends ResourceFlowableTestCase {
         this.runtimeService.startProcessInstanceByKey("testBoundaryTimer");
 
         List<Job> jobs = this.managementService.createTimerJobQuery().list();
-        assertThat("One job is scheduled", jobs.size(), is(1));
-        assertThat("Job must be scheduled by custom business calendar to Date(1000)", jobs.get(0).getDuedate(), is(new Date(1000)));
+        assertThat(jobs)
+                .extracting(Job::getDuedate)
+                .as("One job is scheduled; Job must be scheduled by custom business calendar to Date(1000)")
+                .containsExactly(new Date(1000));
 
         managementService.moveTimerToExecutableJob(jobs.get(0).getId());
         managementService.executeJob(jobs.get(0).getId());

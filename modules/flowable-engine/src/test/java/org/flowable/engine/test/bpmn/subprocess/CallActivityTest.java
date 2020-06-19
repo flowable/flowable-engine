@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +70,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 .addBpmnModel("messageTriggered.bpmn20.xml", messageTriggeredBpmnModel).deploy();
 
         ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
-        assertNotNull(childProcessInstance);
+        assertThat(childProcessInstance).isNotNull();
     }
 
     @Test
@@ -78,13 +82,9 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
         suspendProcessDefinitions(messageTriggeredBpmnDeployment);
 
-        try {
-            runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Cannot start process instance. Process definition Message Triggered Process", ae.getMessage());
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot start process instance. Process definition Message Triggered Process");
     }
 
     @Test
@@ -94,7 +94,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
         ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByKey("childProcess");
-        assertNotNull(childProcessInstance);
+        assertThat(childProcessInstance).isNotNull();
     }
 
     @Test
@@ -105,13 +105,9 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
         suspendProcessDefinitions(childDeployment);
 
-        try {
-            runtimeService.startProcessInstanceByKey("childProcess");
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("childProcess"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot start process instance. Process definition Child Process");
     }
 
     @Test
@@ -125,13 +121,9 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
         suspendProcessDefinitions(childDeployment);
 
-        try {
-            runtimeService.startProcessInstanceByKey("masterProcess");
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("masterProcess"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot start process instance. Process definition Child Process");
     }
 
     @Test
@@ -166,9 +158,9 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         HistoricVariableInstanceQuery variableInstanceQuery = historyService.createHistoricVariableInstanceQuery();
         List<HistoricVariableInstance> variableInstances = variableInstanceQuery.processInstanceId(calledInstanceId).list();
 
-        assertEquals(4, variableInstances.size());
+        assertThat(variableInstances).hasSize(4);
         for (HistoricVariableInstance variable : variableInstances) {
-            assertEquals(variables.get(variable.getVariableName()), variable.getValue());
+            assertThat(variable.getValue()).isEqualTo(variables.get(variable.getVariableName()));
         }
     }
 
@@ -205,7 +197,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         variableInstanceQuery.processInstanceId(calledInstanceId);
         List<HistoricVariableInstance> variableInstances = variableInstanceQuery.list();
 
-        assertEquals(0, variableInstances.size());
+        assertThat(variableInstances).isEmpty();
     }
 
     @Test
@@ -230,10 +222,10 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKey("mainProcess");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
+        assertThat(task.getName()).as("The child process must have the name of the child process within the same deployment").isEqualTo("User Task");
     }
     
     @Test
@@ -260,10 +252,10 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
+        assertThat(task.getName()).as("The child process must have the name of the child process within the same deployment").isEqualTo("User Task");
     }
 
     @Test
@@ -288,10 +280,10 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKey("mainProcess");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
+        assertThat(task.getName()).as("The child process must have the name of the newest child process deployment").isEqualTo("User Task V2");
     }
     
     @Test
@@ -318,10 +310,10 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
+        assertThat(task.getName()).as("The child process must have the name of the newest child process deployment").isEqualTo("User Task V2");
     }
 
     @Test
@@ -350,11 +342,12 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKey("mainProcess");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the newest child process deployment as it there " +
-                "is no deployed child process in the same deployment", "User Task V2", task.getName());
+        assertThat(task.getName())
+                .as("The child process must have the name of the newest child process deployment as it there is no deployed child process in the same deployment")
+                .isEqualTo("User Task V2");
     }
     
     @Test
@@ -386,11 +379,12 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
 
         List<Task> list = taskService.createTaskQuery().list();
-        assertEquals("There must be one task from the child process", 1, list.size());
+        assertThat(list).as("There must be one task from the child process").hasSize(1);
 
         Task task = list.get(0);
-        assertEquals("The child process must have the name of the newest child process deployment as it there " +
-                "is no deployed child process in the same deployment", "User Task V2", task.getName());
+        assertThat(task.getName())
+                .as("The child process must have the name of the newest child process deployment as it there is no deployed child process in the same deployment")
+                .isEqualTo("User Task V2");
     }
     
     @Test
@@ -416,33 +410,29 @@ public class CallActivityTest extends ResourceFlowableTestCase {
             variables.put("var1", "test value");
     
             ProcessInstance mainProcessInstance = runtimeService.startProcessInstanceByKey("mainProcess", variables);
-            assertEquals("testKey", mainProcessInstance.getBusinessKey());
+            assertThat(mainProcessInstance.getBusinessKey()).isEqualTo("testKey");
             
             HistoricProcessInstance subProcessInstance = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(mainProcessInstance.getId()).singleResult();
-            assertEquals("testSubKey", subProcessInstance.getBusinessKey());
+            assertThat(subProcessInstance.getBusinessKey()).isEqualTo("testSubKey");
             
             HistoricVariableInstanceQuery variableInstanceQuery = historyService.createHistoricVariableInstanceQuery();
             List<HistoricVariableInstance> variableInstances = variableInstanceQuery.processInstanceId(mainProcessInstance.getId()).list();
-    
-            assertEquals(2, variableInstances.size());
-            Map<String, Object> variableMap = new HashMap<>();
-            for (HistoricVariableInstance variable : variableInstances) {
-                variableMap.put(variable.getVariableName(), variable.getValue());
-            }
-            assertEquals("test value", variableMap.get("var1"));
-            assertEquals("test", variableMap.get("beforeContextVar"));
+            assertThat(variableInstances)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("var1", "test value"),
+                            tuple("beforeContextVar", "test")
+                    );
             
             variableInstances = variableInstanceQuery.processInstanceId(subProcessInstance.getId()).list();
-            
-            assertEquals(3, variableInstances.size());
-            variableMap = new HashMap<>();
-            for (HistoricVariableInstance variable : variableInstances) {
-                variableMap.put(variable.getVariableName(), variable.getValue());
-            }
-            assertEquals("test value", variableMap.get("var1"));
-            assertEquals("test", variableMap.get("beforeContextVar"));
-            assertEquals("subtest", variableMap.get("beforeSubContextVar"));
-            
+            assertThat(variableInstances)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("var1", "test value"),
+                            tuple("beforeContextVar", "test"),
+                            tuple("beforeSubContextVar", "subtest")
+                    );
+
         } finally {
             processEngineConfiguration.setStartProcessInstanceInterceptor(null);
         }

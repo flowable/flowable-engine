@@ -73,7 +73,7 @@ public class InboundChannelModelValidator implements ChannelValidator {
                 throw new FlowableEventJsonException(
                     "The channel deserializer delegate expression was not set for the channel model with key " + inboundChannelModel);
             }
-        } else {
+        } else if (deserializerType != null) {
             throw new FlowableEventJsonException(
                 "The deserializer type is not supported " + deserializerType + " for the channel model with key " + inboundChannelModel.getKey());
         }

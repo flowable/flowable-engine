@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,8 +46,8 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
     public void testDefaultFlowOnly() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("usertask1").singleResult();
-        assertNotNull(execution);
-        assertEquals("usertask1", execution.getActivityId());
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("usertask1");
     }
 
     @Test
@@ -55,7 +57,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("usertask2").singleResult();
-        assertNotNull(execution);
-        assertEquals("usertask2", execution.getActivityId());
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("usertask2");
     }
 }
