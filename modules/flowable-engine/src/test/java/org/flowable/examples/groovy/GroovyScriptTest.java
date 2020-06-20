@@ -13,6 +13,8 @@
 
 package org.flowable.examples.groovy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -35,7 +37,7 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
 
         Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        assertEquals(15, result.intValue());
+        assertThat(result.intValue()).isEqualTo(15);
     }
 
     @Test
@@ -45,8 +47,8 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
 
         // Since 'def' is used, the 'scriptVar' will be script local
         // and not automatically stored as a process variable.
-        assertNull(runtimeService.getVariable(pi.getId(), "scriptVar"));
-        assertEquals("test123", runtimeService.getVariable(pi.getId(), "myVar"));
+        assertThat(runtimeService.getVariable(pi.getId(), "scriptVar")).isNull();
+        assertThat(runtimeService.getVariable(pi.getId(), "myVar")).isEqualTo("test123");
     }
 
     @Test
@@ -56,10 +58,10 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
 
         JobQuery jobQuery = managementService.createJobQuery().processInstanceId(processInstance.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         waitForJobExecutorToProcessAllJobs(7000L, 100L);
-        assertEquals(0L, jobQuery.count());
+        assertThat(jobQuery.count()).isZero();
 
         assertProcessEnded(processInstance.getId());
     }
