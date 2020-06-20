@@ -17,7 +17,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
-import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -32,9 +31,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
-
-    protected Map<String, CmmnModelInfo> decisionTableKeyMap;
+public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         fillJsonTypes(convertersToCmmnMap);
@@ -56,7 +53,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         DecisionTask decisionTask = new DecisionTask();
 
@@ -86,17 +83,18 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         DecisionTask decisionTask = (DecisionTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
         propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-        CmmnModelInfo modelInfo = decisionTableKeyMap != null && decisionTask.getDecisionRef() != null ? decisionTableKeyMap.get(decisionTask.getDecisionRef()) : null;
+        Map<String, String> modelInfo = converterContext.getDecisionModelInfoForDecisionModelKey(decisionTask.getDecisionRef());
         if (modelInfo != null) {
-            decisionReferenceNode.put("id", modelInfo.getId());
-            decisionReferenceNode.put("name", modelInfo.getName());
-            decisionReferenceNode.put("key", modelInfo.getKey());
+            decisionReferenceNode.put("id", modelInfo.get("id"));
+            decisionReferenceNode.put("name", modelInfo.get("name"));
+            decisionReferenceNode.put("key", modelInfo.get("key"));
         }
 
         for (FieldExtension fieldExtension : decisionTask.getFieldExtensions()) {
@@ -111,8 +109,4 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, decisionTask);
     }
 
-    @Override
-    public void setDecisionTableKeyMap(Map<String, CmmnModelInfo> decisionTableMap) {
-        decisionTableKeyMap = decisionTableMap;
-    }
 }

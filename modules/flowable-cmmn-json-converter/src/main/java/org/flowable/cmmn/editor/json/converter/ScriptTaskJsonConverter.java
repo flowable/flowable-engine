@@ -46,7 +46,7 @@ public class ScriptTaskJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
         ScriptServiceTask scriptServiceTask = new ScriptServiceTask();
         
         scriptServiceTask.setImplementationType(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT, elementNode));
@@ -62,7 +62,8 @@ public class ScriptTaskJsonConverter extends BaseCmmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         // Done in service task converter
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItem) baseElement).getPlanItemDefinition());
     }

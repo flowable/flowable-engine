@@ -46,7 +46,7 @@ public class ExternalWorkerServiceTaskJsonConverter extends BaseCmmnJsonConverte
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         ExternalWorkerServiceTask task = new ExternalWorkerServiceTask();
 
@@ -57,7 +57,7 @@ public class ExternalWorkerServiceTaskJsonConverter extends BaseCmmnJsonConverte
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement,
-            CmmnModel cmmnModel) {
+            CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
 
         ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) baseElement;
 

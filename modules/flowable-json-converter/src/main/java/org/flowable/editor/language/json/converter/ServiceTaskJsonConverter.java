@@ -22,7 +22,6 @@ import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -31,9 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableKeyAwareConverter {
-
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
@@ -56,7 +53,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
         setPropertyValue(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression(), propertiesNode);
@@ -85,16 +83,18 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
 
         } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) &&
-                        decisionTableKeyMap != null && decisionTableKeyMap.containsKey(fieldExtension.getStringValue())) {
+
+                String decisionModelKey = converterContext.getDecisionModelKeyForDecisionModelId(fieldExtension.getStringValue());
+                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) && decisionModelKey != null) {
 
                     ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
                     propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-                    ModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
-                    decisionReferenceNode.put("id", modelInfo.getId());
-                    decisionReferenceNode.put("name", modelInfo.getName());
-                    decisionReferenceNode.put("key", modelInfo.getKey());
+                    Map<String, String> modelInfo = converterContext.getDecisionModelInfoForDecisionModelKey(fieldExtension.getStringValue());
+                    decisionReferenceNode.put("id", modelInfo.get("id"));
+                    decisionReferenceNode.put("name", modelInfo.get("name"));
+                    decisionReferenceNode.put("key", modelInfo.get("key"));
+
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
                             BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));
@@ -178,7 +178,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ServiceTask task = new ServiceTask();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {
             task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
@@ -283,8 +284,4 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         }
     }
 
-    @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
-        this.decisionTableKeyMap = decisionTableKeyMap;
-    }
 }

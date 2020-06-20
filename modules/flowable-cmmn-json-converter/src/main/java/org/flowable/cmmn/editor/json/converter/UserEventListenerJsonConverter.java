@@ -44,12 +44,14 @@ public class UserEventListenerJsonConverter extends AbstractEventListenerJsonCon
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         convertCommonElementToJson(elementNode, propertiesNode, baseElement);
     }
 
     @Override
-    protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
+    protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
+            Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
         UserEventListener userEventListener = new UserEventListener();
         convertCommonJsonToElement(elementNode, userEventListener);
         return userEventListener;

@@ -46,7 +46,9 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
+
         convertCommonElementToJson(elementNode, propertiesNode, baseElement);
 
         GenericEventListener genericEventListener = (GenericEventListener) ((PlanItem) baseElement).getPlanItemDefinition();
@@ -82,7 +84,7 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
         
         GenericEventListener genericEventListener = new GenericEventListener();
         convertCommonJsonToElement(elementNode, genericEventListener);

@@ -87,7 +87,8 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     protected double subProcessY;
     protected ArrayNode shapesArrayNode;
 
-    public void convertToJson(BaseElement baseElement, ActivityProcessor processor, BpmnModel model, FlowElementsContainer container, ArrayNode shapesArrayNode, double subProcessX, double subProcessY) {
+    public void convertToJson(BpmnJsonConverterContext converterContext, BaseElement baseElement, ActivityProcessor processor, BpmnModel model,
+            FlowElementsContainer container, ArrayNode shapesArrayNode, double subProcessX, double subProcessY) {
 
         this.model = model;
         this.processor = processor;
@@ -135,7 +136,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             }
         }
 
-        convertElementToJson(propertiesNode, baseElement);
+        convertElementToJson(propertiesNode, baseElement, converterContext);
 
         flowElementNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
@@ -311,12 +312,13 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         shapesArrayNode.add(flowNode);
     }
 
-    public void convertToBpmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, BpmnModel bpmnModel) {
+    public void convertToBpmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
+            Map<String, JsonNode> shapeMap, BpmnModel bpmnModel, BpmnJsonConverterContext converterContext) {
 
         this.processor = processor;
         this.model = bpmnModel;
 
-        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, shapeMap);
+        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, shapeMap, converterContext);
         baseElement.setId(BpmnJsonConverterUtil.getElementId(elementNode));
 
         if (baseElement instanceof FlowElement) {
@@ -413,9 +415,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         }
     }
 
-    protected abstract void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement);
+    protected abstract void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext);
 
-    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap);
+    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext);
 
     protected abstract String getStencilId(BaseElement baseElement);
 
