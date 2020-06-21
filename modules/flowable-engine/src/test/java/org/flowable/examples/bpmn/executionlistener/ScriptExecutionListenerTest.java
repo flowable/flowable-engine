@@ -12,9 +12,10 @@
  */
 package org.flowable.examples.bpmn.executionlistener;
 
-import java.util.HashMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -36,18 +37,13 @@ public class ScriptExecutionListenerTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-            Map<String, Object> varMap = new HashMap<>();
-            for (HistoricVariableInstance historicVariableInstance : historicVariables) {
-                varMap.put(historicVariableInstance.getVariableName(), historicVariableInstance.getValue());
-            }
-
-            assertTrue(varMap.containsKey("foo"));
-            assertEquals("FOO", varMap.get("foo"));
-            assertTrue(varMap.containsKey("var1"));
-            assertEquals("test", varMap.get("var1"));
-            assertFalse(varMap.containsKey("bar"));
-            assertTrue(varMap.containsKey("myVar"));
-            assertEquals("BAR", varMap.get("myVar"));
+            assertThat(historicVariables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("foo", "FOO"),
+                            tuple("var1", "test"),
+                            tuple("myVar", "BAR")
+                    );
         }
     }
 

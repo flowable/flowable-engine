@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.event.error;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,17 +54,16 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         variables.put("customerName", "Alfresco");
         String procId = runtimeService.startProcessInstanceByKey("reviewSaledLead", variables).getId();
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
-        assertEquals("Provide new sales lead", task.getName());
+        assertThat(task.getName()).isEqualTo("Provide new sales lead");
 
         // After completing the task, the review subprocess will be active
         taskService.complete(task.getId());
         org.flowable.task.api.Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
-        assertEquals("Review customer rating", ratingTask.getName());
+        assertThat(ratingTask.getName()).isEqualTo("Review customer rating");
         org.flowable.task.api.Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
-        assertEquals("Review profitability", profitabilityTask.getName());
+        assertThat(profitabilityTask.getName()).isEqualTo("Review profitability");
 
-        // Complete the management task by stating that not enough info was
-        // provided
+        // Complete the management task by stating that not enough info was provided
         // This should throw the error event, which closes the subprocess
         variables = new HashMap<>();
         variables.put("notEnoughInformation", true);
@@ -69,14 +71,15 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // The 'provide additional details' task should now be active
         org.flowable.task.api.Task provideDetailsTask = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
-        assertEquals("Provide additional details", provideDetailsTask.getName());
+        assertThat(provideDetailsTask.getName()).isEqualTo("Provide additional details");
 
         // Providing more details (ie. completing the task), will activate the
         // subprocess again
         taskService.complete(provideDetailsTask.getId());
         List<org.flowable.task.api.Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals("Review customer rating", reviewTasks.get(0).getName());
-        assertEquals("Review profitability", reviewTasks.get(1).getName());
+        assertThat(reviewTasks)
+                .extracting(Task::getName)
+                .containsExactly("Review customer rating", "Review profitability");
 
         // Completing both tasks normally ends the process
         taskService.complete(reviewTasks.get(0).getId());
