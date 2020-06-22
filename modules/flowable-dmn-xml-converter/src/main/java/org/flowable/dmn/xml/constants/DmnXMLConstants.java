@@ -27,7 +27,7 @@ public interface DmnXMLConstants {
     String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
     String DMNDI_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DMNDI/";
     String DMNDI_PREFIX = "dmndi";
-    String OMGDC_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DC";
+    String OMGDC_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DC/";
     String OMGDC_PREFIX = "dc";
     String OMGDI_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DI/";
     String OMGDI_PREFIX = "di";

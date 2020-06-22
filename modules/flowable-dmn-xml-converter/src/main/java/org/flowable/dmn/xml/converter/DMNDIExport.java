@@ -81,7 +81,7 @@ public class DMNDIExport implements DmnXMLConstants {
         xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_DECISION_SERVICE_DIVIDER_LINE, DMNDI_NAMESPACE);
 
         for (GraphicInfo graphicInfo : graphicInfoList) {
-            xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_WAYPOINT, OMGDC_NAMESPACE);
+            xtw.writeStartElement(OMGDI_PREFIX, ELEMENT_DI_WAYPOINT, OMGDI_NAMESPACE);
             xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
             xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
             xtw.writeEndElement();
@@ -96,7 +96,7 @@ public class DMNDIExport implements DmnXMLConstants {
         xtw.writeAttribute(ATTRIBUTE_DI_DMN_ELEMENT_REF, elementId);
 
         for (GraphicInfo graphicInfo : graphicInfoList) {
-            xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_WAYPOINT, OMGDC_NAMESPACE);
+            xtw.writeStartElement(OMGDI_PREFIX, ELEMENT_DI_WAYPOINT, OMGDI_NAMESPACE);
             xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
             xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
             xtw.writeEndElement();
