@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.usertask.taskcandidate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,29 +78,31 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
         // org.flowable.task.service.Task should not yet be assigned to kermit
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
-        assertTrue(tasks.isEmpty());
+        assertThat(tasks).isEmpty();
 
         // The task should be visible in the candidate task list
         tasks = taskService.createTaskQuery().taskCandidateUser(KERMIT).list();
-        assertEquals(1, tasks.size());
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Pay out expenses", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Pay out expenses");
+        String taskId = tasks.get(0).getId();
 
         // Claim the task
-        taskService.claim(task.getId(), KERMIT);
+        taskService.claim(taskId, KERMIT);
 
         // The task must now be gone from the candidate task list
         tasks = taskService.createTaskQuery().taskCandidateUser(KERMIT).list();
-        assertTrue(tasks.isEmpty());
+        assertThat(tasks).isEmpty();
 
         // The task will be visible on the personal task list
         tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
-        assertEquals(1, tasks.size());
-        task = tasks.get(0);
-        assertEquals("Pay out expenses", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Pay out expenses");
+        taskId = tasks.get(0).getId();
 
         // Completing the task ends the process
-        taskService.complete(task.getId());
+        taskService.complete(taskId);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -112,39 +117,39 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         // org.flowable.task.service.Task should not yet be assigned to anyone
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
 
-        assertTrue(tasks.isEmpty());
+        assertThat(tasks).isEmpty();
         tasks = taskService.createTaskQuery().taskAssignee(GONZO).list();
 
-        assertTrue(tasks.isEmpty());
+        assertThat(tasks).isEmpty();
 
-        // The task should be visible in the candidate task list of Gonzo and
-        // Kermit
+        // The task should be visible in the candidate task list of Gonzo and Kermit
         // and anyone in the management/accountancy group
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(GONZO).list().size());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("management").count());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("accountancy").count());
-        assertEquals(0, taskService.createTaskQuery().taskCandidateGroup("sales").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).hasSize(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser(GONZO).list()).hasSize(1);
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("management").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("accountancy").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("sales").count()).isZero();
 
         // Gonzo claims the task
         tasks = taskService.createTaskQuery().taskCandidateUser(GONZO).list();
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Approve expenses", task.getName());
-        taskService.claim(task.getId(), GONZO);
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Approve expenses");
+        taskService.claim(tasks.get(0).getId(), GONZO);
 
         // The task must now be gone from the candidate task lists
-        assertTrue(taskService.createTaskQuery().taskCandidateUser(KERMIT).list().isEmpty());
-        assertTrue(taskService.createTaskQuery().taskCandidateUser(GONZO).list().isEmpty());
-        assertEquals(0, taskService.createTaskQuery().taskCandidateGroup("management").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).isEmpty();
+        assertThat(taskService.createTaskQuery().taskCandidateUser(GONZO).list()).isEmpty();
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("management").count()).isZero();
 
         // The task will be visible on the personal task list of Gonzo
-        assertEquals(1, taskService.createTaskQuery().taskAssignee(GONZO).count());
+        assertThat(taskService.createTaskQuery().taskAssignee(GONZO).count()).isEqualTo(1);
 
         // But not on the personal task list of (for example) Kermit
-        assertEquals(0, taskService.createTaskQuery().taskAssignee(KERMIT).count());
+        assertThat(taskService.createTaskQuery().taskAssignee(KERMIT).count()).isZero();
 
         // Completing the task ends the process
-        taskService.complete(task.getId());
+        taskService.complete(tasks.get(0).getId());
 
         assertProcessEnded(processInstance.getId());
     }
@@ -154,25 +159,25 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     public void testMultipleCandidateUsers() {
         runtimeService.startProcessInstanceByKey("multipleCandidateUsersExample", Collections.singletonMap("Variable", (Object) "var"));
 
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(GONZO).list().size());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(GONZO).list()).hasSize(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).hasSize(1);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         org.flowable.task.api.Task task = tasks.get(0);
         taskService.setVariableLocal(task.getId(), "taskVar", 123);
         tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).includeProcessVariables().includeTaskLocalVariables().list();
         task = tasks.get(0);
 
-        assertEquals(1, task.getProcessVariables().size());
-        assertEquals(1, task.getTaskLocalVariables().size());
+        assertThat(task.getProcessVariables()).hasSize(1);
+        assertThat(task.getTaskLocalVariables()).hasSize(1);
         taskService.addUserIdentityLink(task.getId(), GONZO, "test");
 
         tasks = taskService.createTaskQuery().taskInvolvedUser(GONZO).includeProcessVariables().includeTaskLocalVariables().list();
-        assertEquals(1, tasks.size());
-        assertEquals(1, task.getProcessVariables().size());
-        assertEquals(1, task.getTaskLocalVariables().size());
+        assertThat(tasks).hasSize(1);
+        assertThat(task.getProcessVariables()).hasSize(1);
+        assertThat(task.getTaskLocalVariables()).hasSize(1);
     }
 
     @Test
@@ -180,8 +185,8 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     public void testMixedCandidateUserAndGroup() {
         runtimeService.startProcessInstanceByKey("mixedCandidateUserAndGroupExample");
 
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(GONZO).list().size());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(GONZO).list()).hasSize(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).hasSize(1);
     }
 
     // test if candidate group works with expression, when there is a function
@@ -193,7 +198,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         params.put("testBean", new TestBean());
 
         runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).hasSize(1);
 
     }
 
@@ -206,8 +211,8 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         params.put("testBean", new TestBean());
 
         runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).count());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("sales").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("sales").count()).isEqualTo(1);
     }
 
 }

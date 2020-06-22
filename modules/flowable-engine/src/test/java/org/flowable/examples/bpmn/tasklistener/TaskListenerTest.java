@@ -158,8 +158,8 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskCompleteListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        assertNull(runtimeService.getVariable(processInstance.getId(), "greeting"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "expressionValue"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "greeting")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "expressionValue")).isNull();
 
         // Completing first task will change the description
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -173,7 +173,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskListenerWithExpression() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
-        assertNull(runtimeService.getVariable(processInstance.getId(), "greeting2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "greeting2")).isNull();
 
         // Completing first task will change the description
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
