@@ -90,6 +90,10 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
                 keyDefined = true;
                 break;
             }
+            if (fieldName.equals("decisionServiceReferenceKey") && fieldValue != null && fieldValue.length() > 0) {
+                keyDefined = true;
+                break;
+            }
         }
 
         if (!keyDefined) {
