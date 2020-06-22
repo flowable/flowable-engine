@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -69,24 +72,24 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
         runtimeService.setVariable(processInstance.getId(), "EndDateForCatch2", dateStr2);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Task A", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task A");
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task A (endDate not reached but it will be executed according to the expression)
-        taskService.complete(task.getId());
+        taskService.complete(tasks.get(0).getId());
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
 
         // Expected that job isn't executed because the timer is in t0");
         Job timerJobAfter = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(timerJob.getId(), timerJobAfter.getId());
+        assertThat(timerJobAfter.getId()).isEqualTo(timerJob.getId());
 
         nextTimeCal.add(Calendar.HOUR, 1); // after 1 hour and 5 minutes the timer event should be executed.
         nextTimeCal.add(Calendar.MINUTE, 5);
@@ -96,15 +99,15 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
         // expect to execute because the time is reached.
 
         List<Job> jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        task = tasks.get(0);
-        assertEquals("Task C", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task C");
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task C
-        taskService.complete(task.getId());
+        taskService.complete(tasks.get(0).getId());
         nextTimeCal.add(Calendar.HOUR, 1); // after 1 hour and 5 minutes the timer event should be executed.
         nextTimeCal.add(Calendar.MINUTE, 5);
         processEngineConfiguration.getClock().setCurrentTime(nextTimeCal.getTime());
@@ -116,20 +119,20 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .singleResult();
-            assertNotNull(historicInstance.getEndTime());
+            assertThat(historicInstance.getEndTime()).isNotNull();
         }
 
         // now all the process instances should be completed
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
 
         // no jobs
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         // no tasks
         tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
     }
 
 }

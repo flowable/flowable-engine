@@ -81,18 +81,18 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         EventRepositoryService otherEventRepositoryService = getOtherProcessEngineEventRegistryRepositoryService();
         EventDeploymentManager otherEventDeploymentManager = getOtherProcessEngineEventRegistryDeploymentManager();
         
-        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(0);
-        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isZero();
         
-        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(0);
-        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isZero();
 
         // Set the time for both engines to the same start time
         Date startTime = new Date();
         processEngineConfiguration.getClock().setCurrentTime(startTime);
         otherProcessEngine.getProcessEngineConfiguration().getClock().setCurrentTime(startTime);
 
-        assertThat(eventRegistryEngine.getEventRepositoryService().createEventDefinitionQuery().count()).isEqualTo(0);
+        assertThat(eventRegistryEngine.getEventRepositoryService().createEventDefinitionQuery().count()).isZero();
 
         // Deploy a channel definition on engine1
         EventDeployment engine1Deployment = eventRegistryEngine.getEventRepositoryService().createDeployment().addClasspathResource("org/flowable/engine/test/eventregistry/simpleChannel.channel").deploy();
@@ -103,7 +103,7 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
         
         assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
-        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isZero();
 
         // Manually trigger the detect changes logic on engine2
         getOtherProcessEngineEventRegistryManagementService().executeEventRegistryChangeDetection();
@@ -161,7 +161,7 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         eventRegistryEngine.getEventRepositoryService().deleteDeployment(engine2Deployment.getId());
 
         assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).isEmpty(); // removed on engine1
-        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isZero();
 
         assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).isEmpty(); // but not yet on engine2, timer job needs to pass first
         assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
@@ -170,10 +170,10 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         getOtherProcessEngineEventRegistryManagementService().executeEventRegistryChangeDetection();
 
         assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
-        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isZero();
 
         assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).isEmpty();
-        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isZero();
     }
 
     protected EventRegistry getEventRegistry() {

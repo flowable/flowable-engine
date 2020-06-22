@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -37,12 +39,12 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
     @Deployment
     public void testExpressionStartTimerEvent() throws Exception {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
-        assertEquals(1, jobQuery.count());
+        assertThat(jobQuery.count()).isEqualTo(1);
 
         waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery();
-        assertEquals(0, jobQuery.count());
+        assertThat(jobQuery.count()).isZero();
     }
 
     @Test
@@ -55,7 +57,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         Calendar nowCal = processEngineConfiguration.getClock().getCurrentCalendar();
         nowCal.add(Calendar.MINUTE, 3);
@@ -63,7 +65,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         
         try {
             waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 25L);
-            assertEquals(0L, jobQuery.count());
+            assertThat(jobQuery.count()).isZero();
             
             assertProcessEnded(pi.getId());
         } finally {
@@ -78,7 +80,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         Calendar nowCal = processEngineConfiguration.getClock().getCurrentCalendar();
         nowCal.add(Calendar.MINUTE, 3);
@@ -86,7 +88,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         
         try {
             waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 25L);
-            assertEquals(0L, jobQuery.count());
+            assertThat(jobQuery.count()).isZero();
             
             assertProcessEnded(pi.getId());
             

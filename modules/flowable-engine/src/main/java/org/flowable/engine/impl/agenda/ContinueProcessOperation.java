@@ -359,15 +359,9 @@ public class ContinueProcessOperation extends AbstractOperation {
         execution.setCurrentFlowElement(targetFlowElement);
 
         LOGGER.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}", sequenceFlow.getId(), execution.getId());
-        
-        execution.setActive(false);
-        //agenda.planContinueProcessOperation(execution);
-        
-        if (targetFlowElement instanceof FlowNode) {
-            continueThroughFlowNode((FlowNode) targetFlowElement);
-        } else {
-            agenda.planContinueProcessOperation(execution);
-        }
+
+        execution.setActive(targetFlowElement instanceof FlowNode);
+        agenda.planContinueProcessOperation(execution);
     }
 
     protected List<ExecutionEntity> createBoundaryEvents(List<BoundaryEvent> boundaryEvents, ExecutionEntity execution) {
