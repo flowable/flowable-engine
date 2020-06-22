@@ -13,6 +13,8 @@
 
 package org.flowable.examples.bpmn.mail;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -82,14 +84,14 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("sendMailExample", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         MimeMessage mimeMessage = message.getMimeMessage();
 
-        assertEquals("Your order " + orderId + " has been shipped", mimeMessage.getHeader("Subject", null));
-        assertEquals(from, mimeMessage.getHeader("From", null));
-        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
+        assertThat(mimeMessage.getHeader("Subject", null)).isEqualTo("Your order " + orderId + " has been shipped");
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
     }
 
     @Test
@@ -106,16 +108,16 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("sendMailWithStaticHeaderExample", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         MimeMessage mimeMessage = message.getMimeMessage();
 
-        assertEquals(from, mimeMessage.getHeader("From", null));
-        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
-        assertEquals("value1", mimeMessage.getHeader("X-Attribute1", null));
-        assertEquals("value2", mimeMessage.getHeader("X-Attribute2", null));
-        assertEquals("value3", mimeMessage.getHeader("X-Attribute3", null));
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
+        assertThat(mimeMessage.getHeader("X-Attribute1", null)).isEqualTo("value1");
+        assertThat(mimeMessage.getHeader("X-Attribute2", null)).isEqualTo("value2");
+        assertThat(mimeMessage.getHeader("X-Attribute3", null)).isEqualTo("value3");
     }
 
     @Test
@@ -136,16 +138,16 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("sendMailWithVariableHeaderExample", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         MimeMessage mimeMessage = message.getMimeMessage();
 
-        assertEquals(from, mimeMessage.getHeader("From", null));
-        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
-        assertEquals("value1", mimeMessage.getHeader("X-Attribute1", null));
-        assertEquals("value2", mimeMessage.getHeader("X-Attribute2", null));
-        assertEquals("value3", mimeMessage.getHeader("X-Attribute3", null));
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
+        assertThat(mimeMessage.getHeader("X-Attribute1", null)).isEqualTo("value1");
+        assertThat(mimeMessage.getHeader("X-Attribute2", null)).isEqualTo("value2");
+        assertThat(mimeMessage.getHeader("X-Attribute3", null)).isEqualTo("value3");
     }
 
 }
