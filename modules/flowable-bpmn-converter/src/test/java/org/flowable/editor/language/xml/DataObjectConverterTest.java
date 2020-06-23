@@ -51,9 +51,10 @@ public class DataObjectConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(StartEvent.class);
-        assertThat(flowElement.getId()).isEqualTo("start1");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         // verify the main process data objects
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
@@ -98,16 +99,17 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(UserTask.class);
-        assertThat(flowElement.getId()).isEqualTo("userTask1");
-        UserTask userTask = (UserTask) flowElement;
-        assertThat(userTask.getAssignee()).isEqualTo("kermit");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("userTask1");
+                    assertThat(userTask.getAssignee()).isEqualTo("kermit");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(SubProcess.class);
-        assertThat(flowElement.getId()).isEqualTo("subprocess1");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                });
         SubProcess subProcess = (SubProcess) flowElement;
         assertThat(subProcess.getFlowElements()).hasSize(12);
 

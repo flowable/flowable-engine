@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +61,8 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel bpmnModel) {
         //temp vars
-        GraphicInfo gi = null;
-        GraphicInfo start = null;
-        GraphicInfo end = null;
-        List<GraphicInfo> flowLocationGraphicInfo = null;
+        GraphicInfo gi;
+        List<GraphicInfo> flowLocationGraphicInfo;
 
         //validate parent
         gi = bpmnModel.getGraphicInfo(START_EVENT);
@@ -74,19 +73,17 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
         assertThat(gi.getExpanded()).isNull();
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS);
-        assertThat(flowLocationGraphicInfo).hasSize(2);
 
         gi = bpmnModel.getGraphicInfo(COLLAPSEDSUBPROCESS);
         assertThat(gi.getExpanded()).isFalse();
 
         //intersection points traversed from xml are full points it seems...
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX()).isEqualTo(102.0);
-        assertThat(start.getY()).isEqualTo(111.0);
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX()).isEqualTo(165.0);
-        assertThat(end.getY()).isEqualTo(112.0);
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(102.0, 111.0),
+                        tuple(165.0, 112.0)
+                );
 
         //validate graphic infos
         FlowElement flowElement = bpmnModel.getFlowElement(IN_CSB_START_EVENT);
@@ -99,23 +96,24 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
         assertThat(gi.getHeight()).isEqualTo(30.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
-        assertThat(flowElement.getName()).isEqualTo("to ut");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SequenceFlow.class, sequenceFlow -> {
+                            assertThat(sequenceFlow.getName()).isEqualTo("to ut");
+                        });
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowLocationGraphicInfo).hasSize(2);
-
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX()).isEqualTo(120.0);
-        assertThat(start.getY()).isEqualTo(150.0);
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX()).isEqualTo(232.0);
-        assertThat(end.getY()).isEqualTo(150.0);
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(120.0, 150.0),
+                        tuple(232.0, 150.0)
+                );
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_USERTASK);
-        assertThat(flowElement).isInstanceOf(UserTask.class);
-        assertThat(flowElement.getName()).isEqualTo("User task 1");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getName()).isEqualTo("User task 1");
+                });
 
         gi = bpmnModel.getGraphicInfo(IN_CSB_USERTASK);
         assertThat(gi.getX()).isEqualTo(232.0);
@@ -124,19 +122,19 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
         assertThat(gi.getHeight()).isEqualTo(80.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
-        assertThat(flowElement.getName()).isEqualTo("to end");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SequenceFlow.class, sequenceFlow -> {
+                    assertThat(sequenceFlow.getName()).isEqualTo("to end");
+                });
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowLocationGraphicInfo).hasSize(2);
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(332.0, 150.0),
+                        tuple(435.0, 150.0)
+                );
 
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX()).isEqualTo(332.0);
-        assertThat(start.getY()).isEqualTo(150.0);
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX()).isEqualTo(435.0);
-        assertThat(end.getY()).isEqualTo(150.0);
     }
 
     @Override
@@ -192,7 +190,7 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
             if (diInfo == null) {
                 diInfo = multiSubEdgeMap.get(id);
             }
-            assertThat(diInfo).hasSize(info.size());
+            assertThat(diInfo).hasSameSizeAs(info);
             compareCollections(info, diInfo);
         }
 
@@ -208,4 +206,5 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
             assertThat(locationMap.get(id).equals(shapeInfo));
         }
     }
+
 }

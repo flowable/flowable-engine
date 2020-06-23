@@ -45,29 +45,30 @@ public class CompleteConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(UserTask.class);
-        assertThat(flowElement.getId()).isEqualTo("userTask1");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("userTask1");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("catchsignal");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
-        assertThat(flowElement.getId()).isEqualTo("catchsignal");
-        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
-        assertThat(catchEvent.getEventDefinitions().get(0)).isInstanceOf(SignalEventDefinition.class);
-        SignalEventDefinition signalEvent = (SignalEventDefinition) catchEvent.getEventDefinitions().get(0);
-        assertThat(signalEvent.getSignalRef()).isEqualTo("testSignal");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(IntermediateCatchEvent.class, intermediateCatchEvent -> {
+                    assertThat(intermediateCatchEvent.getId()).isEqualTo("catchsignal");
+                    assertThat(intermediateCatchEvent.getEventDefinitions()).hasSize(1);
+                    assertThat(intermediateCatchEvent.getEventDefinitions().get(0)).isInstanceOf(SignalEventDefinition.class);
+                    SignalEventDefinition signalEvent = (SignalEventDefinition) intermediateCatchEvent.getEventDefinitions().get(0);
+                    assertThat(signalEvent.getSignalRef()).isEqualTo("testSignal");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("subprocess");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(SubProcess.class);
-        assertThat(flowElement.getId()).isEqualTo("subprocess");
-        SubProcess subProcess = (SubProcess) flowElement;
-
-        flowElement = subProcess.getFlowElement("receiveTask");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(ReceiveTask.class);
-        assertThat(flowElement.getId()).isEqualTo("receiveTask");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess");
+                    FlowElement task = subProcess.getFlowElement("receiveTask");
+                    assertThat(task)
+                            .isInstanceOfSatisfying(ReceiveTask.class, receiveTask -> {
+                                assertThat(receiveTask.getId()).isEqualTo("receiveTask");
+                            });
+                });
     }
 }

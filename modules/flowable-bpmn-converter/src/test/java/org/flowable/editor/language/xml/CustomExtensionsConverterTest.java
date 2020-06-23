@@ -54,7 +54,6 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
-        assertThat(process.getAttributes()).isNotNull();
         assertThat(process.getAttributes()).hasSize(1);
         List<ExtensionAttribute> attributes = process.getAttributes().get("version");
         assertThat(attributes).isNotNull();
@@ -69,34 +68,31 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
         validateExtensionElements(extensionElementMap);
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(ServiceTask.class);
-        assertThat(flowElement.getId()).isEqualTo("servicetask");
-        ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertThat(serviceTask.getId()).isEqualTo("servicetask");
-        assertThat(serviceTask.getName()).isEqualTo("Service task");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask");
+                    assertThat(serviceTask.getName()).isEqualTo("Service task");
+                    List<FieldExtension> fields = serviceTask.getFieldExtensions();
+                    assertThat(fields)
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+                            .containsExactly(
+                                    tuple("testField", "test", null),
+                                    tuple("testField2", null, "${test}")
+                            );
+                    List<FlowableListener> listener = serviceTask.getExecutionListeners();
+                    validateExecutionListeners(listener);
 
-        List<FieldExtension> fields = serviceTask.getFieldExtensions();
-        assertThat(fields)
-                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
-                .containsExactly(
-                        tuple("testField", "test", null),
-                        tuple("testField2", null, "${test}")
-                );
+                    Map<String, List<ExtensionElement>> extensionElementsMap = serviceTask.getExtensionElements();
+                    validateExtensionElements(extensionElementsMap);
 
-        listeners = serviceTask.getExecutionListeners();
-        validateExecutionListeners(listeners);
-
-        extensionElementMap = serviceTask.getExtensionElements();
-        validateExtensionElements(extensionElementMap);
-
-        assertThat(serviceTask.getBoundaryEvents()).hasSize(1);
-        BoundaryEvent boundaryEvent = serviceTask.getBoundaryEvents().get(0);
-        assertThat(boundaryEvent.getId()).isEqualTo("timerEvent");
-        assertThat(boundaryEvent.getEventDefinitions()).hasSize(1);
-        assertThat(boundaryEvent.getEventDefinitions().get(0)).isInstanceOf(TimerEventDefinition.class);
-        extensionElementMap = boundaryEvent.getEventDefinitions().get(0).getExtensionElements();
-        validateExtensionElements(extensionElementMap);
+                    assertThat(serviceTask.getBoundaryEvents()).hasSize(1);
+                    BoundaryEvent boundaryEvent = serviceTask.getBoundaryEvents().get(0);
+                    assertThat(boundaryEvent.getId()).isEqualTo("timerEvent");
+                    assertThat(boundaryEvent.getEventDefinitions()).hasSize(1);
+                    assertThat(boundaryEvent.getEventDefinitions().get(0)).isInstanceOf(TimerEventDefinition.class);
+                    extensionElementsMap = boundaryEvent.getEventDefinitions().get(0).getExtensionElements();
+                    validateExtensionElements(extensionElementsMap);
+                });
     }
 
     protected void validateExecutionListeners(List<FlowableListener> listeners) {

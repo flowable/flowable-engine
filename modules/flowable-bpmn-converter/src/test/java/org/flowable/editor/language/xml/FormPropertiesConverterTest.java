@@ -54,54 +54,59 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement startFlowElement = model.getMainProcess().getFlowElement("startNode");
-        assertThat(startFlowElement).isNotNull();
-        assertThat(startFlowElement).isInstanceOf(StartEvent.class);
-        StartEvent startEvent = (StartEvent) startFlowElement;
-
-        for (FormProperty formProperty : startEvent.getFormProperties()) {
-            assertThat(formProperty.isRequired()).isTrue();
-        }
+        assertThat(startFlowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                            for (FormProperty formProperty : startEvent.getFormProperties()) {
+                                assertThat(formProperty.isRequired()).isTrue();
+                            }
+                        });
 
         FlowElement userFlowElement = model.getMainProcess().getFlowElement("userTask");
-        assertThat(userFlowElement).isNotNull();
-        assertThat(userFlowElement).isInstanceOf(UserTask.class);
-        UserTask userTask = (UserTask) userFlowElement;
+        assertThat(userFlowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
 
-        List<FormProperty> formProperties = userTask.getFormProperties();
+                    List<FormProperty> formProperties = userTask.getFormProperties();
+                    assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
-        assertThat(formProperties).isNotNull();
-        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
+                    for (FormProperty formProperty : formProperties) {
+                        switch (formProperty.getId()) {
+                            case "new_property_1":
+                                checkFormProperty(formProperty, false, false, false);
+                                break;
+                            case "new_property_2":
+                                checkFormProperty(formProperty, false, false, true);
+                                break;
+                            case "new_property_3":
+                                checkFormProperty(formProperty, false, true, false);
+                                break;
+                            case "new_property_4":
+                                checkFormProperty(formProperty, false, true, true);
+                                break;
+                            case "new_property_5":
+                                checkFormProperty(formProperty, true, false, false);
 
-        for (FormProperty formProperty : formProperties) {
-            if (formProperty.getId().equals("new_property_1")) {
-                checkFormProperty(formProperty, false, false, false);
-            } else if (formProperty.getId().equals("new_property_2")) {
-                checkFormProperty(formProperty, false, false, true);
-            } else if (formProperty.getId().equals("new_property_3")) {
-                checkFormProperty(formProperty, false, true, false);
-            } else if (formProperty.getId().equals("new_property_4")) {
-                checkFormProperty(formProperty, false, true, true);
-            } else if (formProperty.getId().equals("new_property_5")) {
-                checkFormProperty(formProperty, true, false, false);
+                                List<Map<String, Object>> formValues = new ArrayList<>();
+                                for (FormValue formValue : formProperty.getFormValues()) {
+                                    Map<String, Object> formValueMap = new HashMap<>();
+                                    formValueMap.put("id", formValue.getId());
+                                    formValueMap.put("name", formValue.getName());
+                                    formValues.add(formValueMap);
+                                }
+                                checkFormPropertyFormValues(formValues);
 
-                List<Map<String, Object>> formValues = new ArrayList<>();
-                for (FormValue formValue : formProperty.getFormValues()) {
-                    Map<String, Object> formValueMap = new HashMap<>();
-                    formValueMap.put("id", formValue.getId());
-                    formValueMap.put("name", formValue.getName());
-                    formValues.add(formValueMap);
-                }
-                checkFormPropertyFormValues(formValues);
-
-            } else if (formProperty.getId().equals("new_property_6")) {
-                checkFormProperty(formProperty, true, false, true);
-            } else if (formProperty.getId().equals("new_property_7")) {
-                checkFormProperty(formProperty, true, true, false);
-            } else if (formProperty.getId().equals("new_property_8")) {
-                checkFormProperty(formProperty, true, true, true);
-            }
-        }
-
+                                break;
+                            case "new_property_6":
+                                checkFormProperty(formProperty, true, false, true);
+                                break;
+                            case "new_property_7":
+                                checkFormProperty(formProperty, true, true, false);
+                                break;
+                            case "new_property_8":
+                                checkFormProperty(formProperty, true, true, true);
+                                break;
+                        }
+                    }
+                });
     }
 
     private void checkFormProperty(FormProperty formProperty, boolean shouldBeRequired, boolean shouldBeReadable, boolean shouldBeWritable) {

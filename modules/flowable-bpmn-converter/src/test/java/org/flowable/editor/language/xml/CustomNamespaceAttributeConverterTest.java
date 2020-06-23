@@ -55,25 +55,23 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
                 .containsExactly(tuple("http://custom.org/bpmn", "custom", "version", "9"));
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(UserTask.class);
-        assertThat(flowElement.getId()).isEqualTo("usertask");
-        UserTask userTask = (UserTask) flowElement;
-        assertThat(userTask.getId()).isEqualTo("usertask");
-        assertThat(userTask.getName()).isEqualTo("User Task");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("usertask");
+                    assertThat(userTask.getName()).isEqualTo("User Task");
 
-        Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
-        assertThat(attributesMap).isNotNull();
-        assertThat(attributesMap).hasSize(2);
+                    Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
+                    assertThat(attributesMap).hasSize(2);
 
-        attributes = attributesMap.get("id");
-        assertThat(attributes)
-                .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
-                .containsExactly(tuple("id", "test", "custom2", "http://custom2.org/bpmn"));
+                    List<ExtensionAttribute> attr = attributesMap.get("id");
+                    assertThat(attr)
+                            .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
+                            .containsExactly(tuple("id", "test", "custom2", "http://custom2.org/bpmn"));
 
-        attributes = attributesMap.get("attr");
-        assertThat(attributes)
-                .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
-                .containsExactly(tuple("attr", "attrValue", "custom2", "http://custom2.org/bpmn"));
+                    attr = attributesMap.get("attr");
+                    assertThat(attr)
+                            .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
+                            .containsExactly(tuple("attr", "attrValue", "custom2", "http://custom2.org/bpmn"));
+                });
     }
 }

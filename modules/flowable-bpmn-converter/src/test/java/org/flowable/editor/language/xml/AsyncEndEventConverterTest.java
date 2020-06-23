@@ -15,8 +15,6 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.FlowElement;
@@ -46,16 +44,13 @@ public class AsyncEndEventConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("endEvent");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(EndEvent.class);
-        assertThat(flowElement.getId()).isEqualTo("endEvent");
-        EndEvent endEvent = (EndEvent) flowElement;
-        assertThat(endEvent.getId()).isEqualTo("endEvent");
-        assertThat(endEvent.isAsynchronous()).isTrue();
-
-        List<FlowableListener> listeners = endEvent.getExecutionListeners();
-        assertThat(listeners)
-                .extracting(FlowableListener::getImplementationType, FlowableListener::getImplementation, FlowableListener::getEvent)
-                .containsExactly(tuple(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.test.TestClass", "start"));
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(EndEvent.class, endEvent -> {
+                    assertThat(endEvent.getId()).isEqualTo("endEvent");
+                    assertThat(endEvent.isAsynchronous()).isTrue();
+                    assertThat(endEvent.getExecutionListeners())
+                            .extracting(FlowableListener::getImplementationType, FlowableListener::getImplementation, FlowableListener::getEvent)
+                            .containsExactly(tuple(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.test.TestClass", "start"));
+                });
     }
 }

@@ -15,8 +15,6 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -45,29 +43,23 @@ public class CallActivityWithNoFallbackConverterTest extends AbstractConverterTe
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(CallActivity.class);
-        CallActivity callActivity = (CallActivity) flowElement;
-        assertThat(callActivity.getId()).isEqualTo("callactivity");
-        assertThat(callActivity.getName()).isEqualTo("Call activity");
-
-        assertThat(callActivity.getCalledElement()).isEqualTo("processId");
-
-        assertThat(callActivity.getFallbackToDefaultTenant()).isNull();
-
-        List<IOParameter> parameters = callActivity.getInParameters();
-        assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
-                .containsExactly(
-                        tuple("test", "test", null),
-                        tuple(null, "test", "${test}")
-                );
-
-        parameters = callActivity.getOutParameters();
-        assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
-                .containsExactly(
-                        tuple("test", "test")
-                );
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(CallActivity.class, callActivity -> {
+                    assertThat(callActivity.getId()).isEqualTo("callactivity");
+                    assertThat(callActivity.getName()).isEqualTo("Call activity");
+                    assertThat(callActivity.getCalledElement()).isEqualTo("processId");
+                    assertThat(callActivity.getFallbackToDefaultTenant()).isNull();
+                    assertThat(callActivity.getInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                            .containsExactly(
+                                    tuple("test", "test", null),
+                                    tuple(null, "test", "${test}")
+                            );
+                    assertThat(callActivity.getOutParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(
+                                    tuple("test", "test")
+                            );
+                });
     }
 }

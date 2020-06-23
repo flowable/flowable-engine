@@ -15,8 +15,6 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
@@ -45,30 +43,24 @@ public class CaseServiceTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("caseServiceTask");
-        assertThat(flowElement).isNotNull();
-        assertThat(flowElement).isInstanceOf(CaseServiceTask.class);
-        CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
-        assertThat(caseServiceTask.getId()).isEqualTo("caseServiceTask");
-        assertThat(caseServiceTask.getName()).isEqualTo("Case task");
-
-        assertThat(caseServiceTask.getCaseDefinitionKey()).isEqualTo("caseId");
-
-        assertThat(caseServiceTask.isFallbackToDefaultTenant()).isTrue();
-        assertThat(caseServiceTask.isSameDeployment()).isFalse();
-
-        List<IOParameter> parameters = caseServiceTask.getInParameters();
-        assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
-                .containsExactly(
-                        tuple("test", "test", null),
-                        tuple(null, "test", "${test}")
-                );
-
-        parameters = caseServiceTask.getOutParameters();
-        assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
-                .containsExactly(
-                        tuple("test", "test")
-                );
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(CaseServiceTask.class, caseServiceTask -> {
+                    assertThat(caseServiceTask.getId()).isEqualTo("caseServiceTask");
+                    assertThat(caseServiceTask.getName()).isEqualTo("Case task");
+                    assertThat(caseServiceTask.getCaseDefinitionKey()).isEqualTo("caseId");
+                    assertThat(caseServiceTask.isFallbackToDefaultTenant()).isTrue();
+                    assertThat(caseServiceTask.isSameDeployment()).isFalse();
+                    assertThat(caseServiceTask.getInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                            .containsExactly(
+                                    tuple("test", "test", null),
+                                    tuple(null, "test", "${test}")
+                            );
+                    assertThat(caseServiceTask.getOutParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(
+                                    tuple("test", "test")
+                            );
+                });
     }
 }

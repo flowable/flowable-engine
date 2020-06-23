@@ -44,23 +44,22 @@ public class ExternalWorkerServiceTaskWithExtensionElementsConverterTest extends
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("externalWorkerServiceTask");
         assertThat(flowElement)
-                .isNotNull()
-                .isInstanceOf(ExternalWorkerServiceTask.class);
-        ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) flowElement;
-        assertThat(externalWorkerServiceTask.getId()).isEqualTo("externalWorkerServiceTask");
-        assertThat(externalWorkerServiceTask.getName()).isEqualTo("External worker task");
+                .isInstanceOfSatisfying(ExternalWorkerServiceTask.class, externalWorkerServiceTask -> {
+                    assertThat(externalWorkerServiceTask.getId()).isEqualTo("externalWorkerServiceTask");
+                    assertThat(externalWorkerServiceTask.getName()).isEqualTo("External worker task");
 
-        assertThat(externalWorkerServiceTask.getTopic()).isEqualTo("topic");
-        assertThat(externalWorkerServiceTask.getSkipExpression()).isEqualTo("skipExpression");
-        assertThat(externalWorkerServiceTask.isExclusive()).isTrue();
+                    assertThat(externalWorkerServiceTask.getTopic()).isEqualTo("topic");
+                    assertThat(externalWorkerServiceTask.getSkipExpression()).isEqualTo("skipExpression");
+                    assertThat(externalWorkerServiceTask.isExclusive()).isTrue();
 
-        assertThat(externalWorkerServiceTask.getExtensionElements())
-                .containsOnlyKeys("customValue");
+                    assertThat(externalWorkerServiceTask.getExtensionElements())
+                            .containsOnlyKeys("customValue");
 
-        assertThat(externalWorkerServiceTask.getExtensionElements().get("customValue"))
-                .extracting(ExtensionElement::getNamespacePrefix, ExtensionElement::getName, ExtensionElement::getElementText)
-                .containsOnly(
-                        tuple("flowable", "customValue", "test")
-                );
+                    assertThat(externalWorkerServiceTask.getExtensionElements().get("customValue"))
+                            .extracting(ExtensionElement::getNamespacePrefix, ExtensionElement::getName, ExtensionElement::getElementText)
+                            .containsOnly(
+                                    tuple("flowable", "customValue", "test")
+                            );
+                });
     }
 }
