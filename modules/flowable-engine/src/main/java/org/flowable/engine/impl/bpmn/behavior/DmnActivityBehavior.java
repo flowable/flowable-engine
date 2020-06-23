@@ -45,7 +45,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     private static final long serialVersionUID = 1L;
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
-    protected static final String EXPRESSION_DECISION_SERVICE_REFERENCE_KEY = "decisionServiceReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
     protected static final String EXPRESSION_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     protected static final String EXPRESSION_DECISION_TABLE_SAME_DEPLOYMENT = "sameDeployment";
@@ -58,31 +57,15 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
     @Override
     public void execute(DelegateExecution execution) {
-        FieldExtension decisionServiceFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_SERVICE_REFERENCE_KEY);
-        FieldExtension decisionTableFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_REFERENCE_KEY);
-        FieldExtension fieldExtension = null;
+        FieldExtension fieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_REFERENCE_KEY);
+        if (fieldExtension == null || ((fieldExtension.getStringValue() == null || fieldExtension.getStringValue().length() == 0) &&
+                (fieldExtension.getExpression() == null || fieldExtension.getExpression().length() == 0))) {
 
-        boolean decisionServiceExtensionUsed = false;
-        boolean decisionTableExtensionUsed = false;
-
-        if (decisionServiceFieldExtension != null && ((decisionServiceFieldExtension.getStringValue() != null && decisionServiceFieldExtension.getStringValue().length() != 0) ||
-            (decisionServiceFieldExtension.getExpression() != null && decisionServiceFieldExtension.getExpression().length() != 0))) {
-            fieldExtension = decisionServiceFieldExtension;
-            decisionServiceExtensionUsed = true;
+            throw new FlowableException("decisionTableReferenceKey is a required field extension for the dmn task " + task.getId());
         }
 
-        if (decisionTableFieldExtension != null && ((decisionTableFieldExtension.getStringValue() != null && decisionTableFieldExtension.getStringValue().length() != 0) ||
-                (decisionTableFieldExtension.getExpression() != null && decisionTableFieldExtension.getExpression().length() != 0))) {
-            fieldExtension = decisionTableFieldExtension;
-            decisionTableExtensionUsed = true;
-        }
-
-        if (!decisionServiceExtensionUsed && !decisionTableExtensionUsed) {
-            throw new FlowableException("at least decisionTableReferenceKey or decisionServiceReferenceKey is a required field extension for the dmn task " + task.getId());
-        }
-
-        String activeDecisionKey;
-        if (fieldExtension != null && fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
+        String activeDecisionKey = null;
+        if (fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
             activeDecisionKey = fieldExtension.getExpression();
 
         } else {
@@ -97,24 +80,24 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             activeDecisionKey = DynamicPropertyUtil.getActiveValue(activeDecisionKey, DynamicBpmnConstants.DMN_TASK_DECISION_TABLE_KEY, taskElementProperties);
         }
 
-        String finaldecisionKeyValue = null;
+        String finalDecisionKeyValue = null;
         Object decisionKeyValue = expressionManager.createExpression(activeDecisionKey).getValue(execution);
         if (decisionKeyValue != null) {
             if (decisionKeyValue instanceof String) {
-                finaldecisionKeyValue = (String) decisionKeyValue;
+                finalDecisionKeyValue = (String) decisionKeyValue;
             } else {
-                throw new FlowableIllegalArgumentException(decisionServiceExtensionUsed ? "decisionServiceReferenceKey" : "decisionTableReferenceKey" + " expression does not resolve to a string: " + decisionKeyValue);
+                throw new FlowableIllegalArgumentException("decisionTableReferenceKey expression does not resolve to a string: " + decisionKeyValue);
             }
         }
 
-        if (finaldecisionKeyValue == null || finaldecisionKeyValue.length() == 0) {
-            throw new FlowableIllegalArgumentException(decisionServiceExtensionUsed ? "decisionServiceReferenceKey" : "decisionTableReferenceKey" + " expression resolves to an empty value: " + decisionKeyValue);
+        if (finalDecisionKeyValue == null || finalDecisionKeyValue.length() == 0) {
+            throw new FlowableIllegalArgumentException("decisionTableReferenceKey expression resolves to an empty value: " + decisionKeyValue);
         }
 
         DmnDecisionService ruleService = CommandContextUtil.getDmnRuleService();
 
         ExecuteDecisionBuilder executeDecisionBuilder = ruleService.createExecuteDecisionBuilder()
-            .decisionKey(finaldecisionKeyValue)
+            .decisionKey(finalDecisionKeyValue)
             .instanceId(execution.getProcessInstanceId())
             .executionId(execution.getId())
             .activityId(task.getId())
@@ -127,7 +110,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.evaluateDecisionWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + finaldecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
@@ -143,14 +126,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
             if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorString != null) {
                 if ("true".equalsIgnoreCase(throwErrorString)) {
-                    throw new FlowableException("DMN decision with key " + finaldecisionKeyValue + " did not hit any rules for the provided input.");
+                    throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
                     
                 } else if (!"false".equalsIgnoreCase(throwErrorString)) {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
                     if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
-                        throw new FlowableException("DMN decision with key " + finaldecisionKeyValue + " did not hit any rules for the provided input.");
+                        throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
                     }
                 }
             }
@@ -158,17 +141,17 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
             processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
-                finaldecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+                finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
             
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
             if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
                 DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
-                setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finaldecisionKeyValue,
+                setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             } else {
-                setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionKeyValue,
+                setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             }
         }
