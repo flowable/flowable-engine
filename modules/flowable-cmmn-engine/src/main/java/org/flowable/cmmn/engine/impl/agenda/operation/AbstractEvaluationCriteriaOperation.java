@@ -52,7 +52,6 @@ import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -101,7 +100,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             boolean activatePlanItemInstance = evaluateRepetitionRule(planItemInstanceEntity, satisfiedEntryCriterion, planItemInstanceContainer,
                 evaluationResult);
 
-            if (planItem.getPlanItemDefinition() instanceof EventListener && !(planItem.getPlanItemDefinition() instanceof SignalEventListener)) {
+            if (planItem.getPlanItemDefinition() instanceof EventListener) {
                 activatePlanItemInstance = false; // event listeners occur, they don't become active
             }
 
