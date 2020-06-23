@@ -46,16 +46,16 @@ public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverte
 
     public void validateModel(CmmnModel cmmnModel) {
         PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition("eventListener");
-        assertThat(planItemDefinition).isInstanceOf(GenericEventListener.class);
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(GenericEventListener.class, genericEventListener -> {
+                    assertThat(genericEventListener.getEventType()).isEqualTo("myEvent");
 
-        GenericEventListener genericEventListener = (GenericEventListener) planItemDefinition;
-        assertThat(genericEventListener.getEventType()).isEqualTo("myEvent");
-
-        List<ExtensionElement> correlationParameters = genericEventListener.getExtensionElements().getOrDefault("eventCorrelationParameter", new ArrayList<>());
-        assertThat(correlationParameters)
-                .extracting(extensionElement -> extensionElement.getAttributeValue(null, "name"),
-                        extensionElement -> extensionElement.getAttributeValue(null, "value"))
-                .containsExactly(tuple("customerId", "${customerIdVar}"));
+                    List<ExtensionElement> correlationParameters = genericEventListener.getExtensionElements().getOrDefault("eventCorrelationParameter", new ArrayList<>());
+                    assertThat(correlationParameters)
+                            .extracting(extensionElement -> extensionElement.getAttributeValue(null, "name"),
+                                    extensionElement -> extensionElement.getAttributeValue(null, "value"))
+                            .containsExactly(tuple("customerId", "${customerIdVar}"));
+                });
     }
 
 }

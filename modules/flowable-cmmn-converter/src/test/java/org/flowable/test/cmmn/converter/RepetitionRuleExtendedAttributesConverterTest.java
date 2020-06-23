@@ -48,7 +48,6 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
 
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
-        assertThat(cmmnModel.getCases()).isNotNull();
         assertThat(cmmnModel.getCases()).hasSize(1);
 
         Map<String, CaseElement> caseElements = cmmnModel.getCases().get(0).getAllCaseElements();

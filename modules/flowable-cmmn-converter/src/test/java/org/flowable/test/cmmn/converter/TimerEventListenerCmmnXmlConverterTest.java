@@ -41,9 +41,10 @@ public class TimerEventListenerCmmnXmlConverterTest extends AbstractConverterTes
 
         List<TimerEventListener> timerEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(TimerEventListener.class, true);
         assertThat(timerEventListeners)
-                .extracting(TimerEventListener::getTimerExpression, TimerEventListener::getTimerStartTriggerStandardEvent)
-                .containsExactly(tuple("PT6H", PlanItemTransition.COMPLETE));
-        assertThat(timerEventListeners.get(0).getTimerStartTriggerPlanItem().getName()).isEqualTo("A");
+                .extracting(timerEventListener -> timerEventListener.getTimerExpression(),
+                        timerEventListener -> timerEventListener.getTimerStartTriggerStandardEvent(),
+                        timerEventListener -> timerEventListener.getTimerStartTriggerPlanItem().getName())
+                .containsExactly(tuple("PT6H", PlanItemTransition.COMPLETE, "A"));
     }
 
 }

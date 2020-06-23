@@ -80,7 +80,6 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
             planItemDefinitions.forEach(definition -> {
                 assertThat(definition.getDefaultControl()).isNotNull();
                 assertThat(definition.getDefaultControl().getCompletionNeutralRule()).isNotNull();
-                assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isNotNull();
                 assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + definition.getId() + "}");
             });
 

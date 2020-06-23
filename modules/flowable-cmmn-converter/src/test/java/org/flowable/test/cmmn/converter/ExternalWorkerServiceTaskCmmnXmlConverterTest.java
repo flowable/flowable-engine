@@ -68,32 +68,33 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConve
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
         assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
-        assertThat(planItemDefinition).isInstanceOf(ExternalWorkerServiceTask.class);
-
-        ExternalWorkerServiceTask taskA = (ExternalWorkerServiceTask) planItemDefinition;
-        assertThat(taskA.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
-        assertThat(taskA.getName()).isEqualTo("A");
-        assertThat(taskA.getTopic()).isEqualTo("simple");
-        assertThat(taskA.isAsync()).isFalse();
-        assertThat(taskA.isExclusive()).isFalse();
-        assertThat(taskA.getExtensionElements()).containsOnlyKeys("customValue");
-        assertThat(taskA.getExtensionElements().get("customValue"))
-                .extracting(ExtensionElement::getNamespacePrefix, ExtensionElement::getName, ExtensionElement::getElementText)
-                .containsOnly(
-                        tuple("flowable", "customValue", "test")
-                );
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ExternalWorkerServiceTask.class, externalWorkerServiceTask -> {
+                            assertThat(externalWorkerServiceTask.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
+                            assertThat(externalWorkerServiceTask.getName()).isEqualTo("A");
+                            assertThat(externalWorkerServiceTask.getTopic()).isEqualTo("simple");
+                            assertThat(externalWorkerServiceTask.isAsync()).isFalse();
+                            assertThat(externalWorkerServiceTask.isExclusive()).isFalse();
+                            assertThat(externalWorkerServiceTask.getExtensionElements()).containsOnlyKeys("customValue");
+                            assertThat(externalWorkerServiceTask.getExtensionElements().get("customValue"))
+                                    .extracting(ExtensionElement::getNamespacePrefix, ExtensionElement::getName, ExtensionElement::getElementText)
+                                    .containsOnly(
+                                            tuple("flowable", "customValue", "test")
+                                    );
+                        });
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
         assertThat(planItemTaskB.getEntryCriteria()).hasSize(1);
-        assertThat(planItemDefinition).isInstanceOf(ExternalWorkerServiceTask.class);
-        ExternalWorkerServiceTask taskB = (ExternalWorkerServiceTask) planItemDefinition;
-        assertThat(taskB.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
-        assertThat(taskB.getName()).isEqualTo("B");
-        assertThat(taskB.getTopic()).isNull();
-        assertThat(taskB.isAsync()).isFalse();
-        assertThat(taskB.isExclusive()).isTrue();
-        assertThat(taskB.getExtensionElements()).isEmpty();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ExternalWorkerServiceTask.class, externalWorkerServiceTask -> {
+                    assertThat(externalWorkerServiceTask.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
+                    assertThat(externalWorkerServiceTask.getName()).isEqualTo("B");
+                    assertThat(externalWorkerServiceTask.getTopic()).isNull();
+                    assertThat(externalWorkerServiceTask.isAsync()).isFalse();
+                    assertThat(externalWorkerServiceTask.isExclusive()).isTrue();
+                    assertThat(externalWorkerServiceTask.getExtensionElements()).isEmpty();
+                });
     }
 
 }

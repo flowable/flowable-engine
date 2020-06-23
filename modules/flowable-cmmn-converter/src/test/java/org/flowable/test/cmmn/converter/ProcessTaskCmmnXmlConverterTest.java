@@ -60,20 +60,22 @@ public class ProcessTaskCmmnXmlConverterTest extends AbstractConverterTest {
 
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem1");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
-        ProcessTask task1 = (ProcessTask) planItemDefinition;
-        assertThat(task1.getProcessRefExpression()).isEqualTo("${processDefinitionKey}");
-        assertThat((task1.isSameDeployment())).isNotNull();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ProcessTask.class, processTask -> {
+                    assertThat(processTask.getId()).isEqualTo("theProcess");
+                    assertThat(processTask.getProcessRefExpression()).isEqualTo("${processDefinitionKey}");
+                    assertThat((processTask.isSameDeployment())).isNotNull();
 
-        assertThat(task1.getInParameters())
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
-                .containsExactly(tuple("num2", "num"));
+                    assertThat(processTask.getInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(tuple("num2", "num"));
 
-        assertThat(task1.getOutParameters())
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
-                .containsExactly(tuple("num", "num3"));
+                    assertThat(processTask.getOutParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(tuple("num", "num3"));
 
-        assertThat(task1.getFallbackToDefaultTenant()).isTrue();
+                    assertThat(processTask.getFallbackToDefaultTenant()).isTrue();
+                });
     }
 
 }
