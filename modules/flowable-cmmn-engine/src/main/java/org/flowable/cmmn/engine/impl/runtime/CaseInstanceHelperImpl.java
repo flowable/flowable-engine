@@ -241,7 +241,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())) {
                 PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil
                     .getPlanItemInstanceEntityManager(commandContext).findById(caseInstanceEntity.getCallbackId());
-                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
+                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
+                        planItemInstanceEntity.getPlanItemDefinitionId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
             }
         }
 

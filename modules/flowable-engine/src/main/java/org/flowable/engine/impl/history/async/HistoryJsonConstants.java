@@ -210,6 +210,8 @@ public interface HistoryJsonConstants {
     
     String SCOPE_DEFINITION_ID = "scopeDefinitionId";
     
+    String PARENT_ELEMENT_ID = "parentElementId";
+    
     String REF_SCOPE_ID = "referenceScopeId";
     
     String REF_SCOPE_TYPE = "referenceScopeType";

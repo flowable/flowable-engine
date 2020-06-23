@@ -126,7 +126,8 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         }
         
         if (processEngineConfiguration.isEnableEntityLinks()) {
-            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
+            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(), caseServiceTask.getId(),
+                    caseInstanceId, ScopeTypes.CMMN);
         }
 
         String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);

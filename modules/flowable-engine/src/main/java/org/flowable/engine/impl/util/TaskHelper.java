@@ -195,7 +195,8 @@ public class TaskHelper {
             }
 
             if (addEntityLinks) {
-                EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(),
+                        taskEntity.getTaskDefinitionKey(), taskEntity.getId(), ScopeTypes.TASK);
             }
 
         }
