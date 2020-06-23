@@ -57,7 +57,7 @@
       ]
     },
     {
-      "name": "decisionreferencepackage",
+      "name": "decisiondecisiontablereferencepackage",
       "properties": [
         {
           "id": "decisiondecisiontablereference",
@@ -105,7 +105,7 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "decisionreferencepackage"
+        "decisiondecisiontablereferencepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
