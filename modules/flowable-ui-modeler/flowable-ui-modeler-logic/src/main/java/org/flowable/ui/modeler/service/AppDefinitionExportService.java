@@ -15,6 +15,7 @@ package org.flowable.ui.modeler.service;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -95,20 +96,21 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
 
             Map<String, Model> formMap = new HashMap<>();
             Map<String, Model> decisionTableMap = new HashMap<>();
+            Map<String, Model> decisionServiceMap = new HashMap<>();
             Map<String, Model> processMap = new HashMap<>();
 
             List<AppModelDefinition> modelDefinitions = appDefinition.getDefinition().getModels();
             if (CollectionUtils.isNotEmpty(modelDefinitions)) {
-                createBpmnZipEntries(modelDefinitions, zipOutputStream, formMap, decisionTableMap);
+                createBpmnZipEntries(modelDefinitions, zipOutputStream, formMap, decisionTableMap, decisionServiceMap);
             }
             
             List<AppModelDefinition> cmmnModelDefinitions = appDefinition.getDefinition().getCmmnModels();
             if (CollectionUtils.isNotEmpty(cmmnModelDefinitions)) {
-                createCmmnZipEntries(cmmnModelDefinitions, zipOutputStream, formMap, decisionTableMap, processMap);
+                createCmmnZipEntries(cmmnModelDefinitions, zipOutputStream, formMap, decisionTableMap, decisionServiceMap, processMap);
 
                 if (!processMap.isEmpty()){
                     findAndAddReferencedBpmnModels(processMap);
-                    createBpmnZipEntries(processMap, zipOutputStream, formMap, decisionTableMap);
+                    createBpmnZipEntries(processMap, zipOutputStream, formMap, decisionTableMap, decisionServiceMap);
                 }
             }
             
@@ -116,7 +118,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                 createZipEntries(formModel, "form-models", zipOutputStream);
             }
             Map<String, String> decisionTableEditorJSONs = new HashMap<>();
-            if (!decisionTableMap.isEmpty()) {
+            if (!decisionTableMap.isEmpty() || !decisionServiceMap.isEmpty()) {
                 List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
                 decisionTableEditorJSONs = decisionTableModels.stream()
                     .collect(Collectors.toMap(
@@ -125,17 +127,8 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                     ));
             }
 
-            for (Model decisionTableModel : decisionTableMap.values()) {
-                createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
-                try {
-                    JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
-                    DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(), decisionTableEditorJSONs);
-                    byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-                    createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
-                } catch (Exception e) {
-                    throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableModel.getName()));
-                }
-            }
+            createDecisionTableZipEntries(decisionTableMap, decisionTableEditorJSONs, zipOutputStream);
+            createDecisionServiceZipEntries(decisionServiceMap, decisionTableEditorJSONs, zipOutputStream);
 
             zipOutputStream.close();
 
@@ -146,6 +139,45 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         } catch (Exception e) {
             LOGGER.error("Could not generate app definition zip archive", e);
             throw new InternalServerErrorException("Could not generate app definition zip archive");
+        }
+    }
+
+    protected void createDecisionTableZipEntries(Map<String, Model> decisionTableMap, Map<String, String> decisionTableEditorJSONs, ZipOutputStream zipOutputStream) throws Exception {
+        for (Model decisionTableModel : decisionTableMap.values()) {
+            createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
+            try {
+                JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(), decisionTableEditorJSONs);
+                byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+                createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
+            } catch (Exception e) {
+                throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableModel.getName()));
+            }
+        }
+    }
+
+    protected void createDecisionServiceZipEntries(Map<String, Model> decisionServiceMap, Map<String, String> decisionTableEditorJSONs, ZipOutputStream zipOutputStream) throws Exception {
+        for (Model decisionServiceModel : decisionServiceMap.values()) {
+            createZipEntries(decisionServiceModel, "decision-service-models", zipOutputStream);
+
+            Map<String, Model> decisionTableMap = new HashMap<>();
+            List<Model> decisionServiceReferencedModels = modelRepository.findByParentModelId(decisionServiceModel.getId());
+            for (Model decisionServiceChildModel : decisionServiceReferencedModels) {
+                if (Model.MODEL_TYPE_DECISION_TABLE == decisionServiceChildModel.getModelType()) {
+                    decisionTableMap.put(decisionServiceChildModel.getId(), decisionServiceChildModel);
+                }
+            }
+
+            createDecisionTableZipEntries(decisionTableMap, decisionTableEditorJSONs, zipOutputStream);
+
+            try {
+                JsonNode decisionServiceNode = objectMapper.readTree(decisionServiceModel.getModelEditorJson());
+                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), decisionTableEditorJSONs);
+                byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+                createZipEntry(zipOutputStream, "decision-service-models/" + decisionServiceModel.getKey() + ".dmn", dmnXMLBytes);
+            } catch (Exception e) {
+                throw new InternalServerErrorException(String.format("Error converting decision service %s to XML", decisionServiceModel.getName()));
+            }
         }
     }
 
@@ -171,7 +203,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
     
     protected void createBpmnZipEntries(List<AppModelDefinition> modelDefinitions, ZipOutputStream zipOutputStream, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) throws Exception {
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> decisionServiceMap) throws Exception {
         
         for (AppModelDefinition modelDef : modelDefinitions) {
             Model model = modelService.getModel(modelDef.getId());
@@ -181,12 +213,18 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                 if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                     formMap.put(childModel.getId(), childModel);
 
-                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType() || Model.MODEL_TYPE_DRD == childModel.getModelType()) {
+                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
+                } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    decisionServiceMap.put(childModel.getId(), childModel);
                 }
             }
 
-            BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+            Map<String, Model> decisionMap = new HashMap<>();
+            decisionMap.putAll(decisionTableMap);
+            decisionMap.putAll(decisionServiceMap);
+
+            BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionMap);
             Map<String, StartEvent> noneStartEventMap = new HashMap<>();
             postProcessFlowElements(new ArrayList<>(), noneStartEventMap, bpmnModel);
 
@@ -205,11 +243,16 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createBpmnZipEntries(Map<String, Model> modelDefinitions, ZipOutputStream zipOutputStream,
-                                        Map<String, Model> formMap, Map<String, Model> decisionTableMap) throws Exception {
+                                        Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> decisionServiceMap) throws Exception {
+
+        // merge decision maps
+        Map<String, Model> decisionMap = new HashMap<>();
+        decisionMap.putAll(decisionTableMap);
+        decisionMap.putAll(decisionServiceMap);
 
         for (Model model : modelDefinitions.values()) {
 
-            BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+            BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionMap);
             Map<String, StartEvent> noneStartEventMap = new HashMap<>();
             postProcessFlowElements(new ArrayList<>(), noneStartEventMap, bpmnModel);
 
@@ -228,7 +271,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
     
     protected void createCmmnZipEntries(List<AppModelDefinition> modelDefinitions, ZipOutputStream zipOutputStream, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> processMap) throws Exception {
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> decisionServiceMap, Map<String, Model> processMap) throws Exception {
         
         for (AppModelDefinition modelDef : modelDefinitions) {
             Model model = modelService.getModel(modelDef.getId());
@@ -240,11 +283,11 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
-
+                } else if  (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    decisionServiceMap.put(childModel.getId(), childModel);
                 } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
                     processMap.put(childModel.getId(), childModel);
                 }
-
             }
 
             CmmnModel cmmnModel = modelService.getCmmnModel(model, formMap, decisionTableMap, null, processMap);
