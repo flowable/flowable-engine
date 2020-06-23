@@ -27,8 +27,8 @@ import java.util.Map;
  */
 public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionAwareConverter {
 
-    protected static String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
-    protected static String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
+    protected static final String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
+    protected static final String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
 
     protected Map<String, String> decisionMap;
 
