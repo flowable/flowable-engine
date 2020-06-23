@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableKeyAwareConverter {
+public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionKeyAwareConverter {
 
     protected Map<String, ModelInfo> decisionTableKeyMap;
 
@@ -284,7 +284,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     }
 
     @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
+    public void setDecisionKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
         this.decisionTableKeyMap = decisionTableKeyMap;
     }
 }

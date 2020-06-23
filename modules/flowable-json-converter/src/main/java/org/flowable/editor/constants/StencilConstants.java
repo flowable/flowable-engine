@@ -295,15 +295,19 @@ public interface StencilConstants {
     final String PROPERTY_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";
 
     final String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
+    final String PROPERTY_DECISIONSERVICE_REFERENCE = "decisiontaskdecisionservicereference";
     final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    final String PROPERTY_DECISIONSERVICE_REFERENCE_KEY = "decisionServiceReferenceKey";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
     final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT = "decisiontasksamedeployment";
     final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY = "sameDeployment";
+    final String PROPERTY_DECISION_REFERENCE_TYPE = "decisionReferenceType";
+
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";

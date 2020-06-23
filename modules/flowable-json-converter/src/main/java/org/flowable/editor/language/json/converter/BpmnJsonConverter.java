@@ -435,8 +435,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 if (converterInstance instanceof FormKeyAwareConverter) {
                     ((FormKeyAwareConverter) converterInstance).setFormKeyMap(formKeyMap);
                 }
-                if (converterInstance instanceof DecisionTableKeyAwareConverter) {
-                    ((DecisionTableKeyAwareConverter) converterInstance).setDecisionTableKeyMap(decisionTableKeyMap);
+                if (converterInstance instanceof DecisionKeyAwareConverter) {
+                    ((DecisionKeyAwareConverter) converterInstance).setDecisionKeyMap(decisionTableKeyMap);
                 }
 
                 converterInstance.convertToJson(flowElement, this, model, container, shapesArrayNode, containerX, containerY);
@@ -472,7 +472,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return convertToBpmnModel(modelNode, null, null);
     }
 
-    public BpmnModel convertToBpmnModel(JsonNode modelNode, Map<String, String> formKeyMap, Map<String, String> decisionTableKeyMap) {
+    public BpmnModel convertToBpmnModel(JsonNode modelNode, Map<String, String> formKeyMap, Map<String, String> decisionKeyMap) {
 
         BpmnModel bpmnModel = new BpmnModel();
 
@@ -560,7 +560,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         lane.setParentProcess(process);
                         process.getLanes().add(lane);
 
-                        processJsonElements(laneNode.get(EDITOR_CHILD_SHAPES), modelNode, lane, shapeMap, formKeyMap, decisionTableKeyMap, bpmnModel);
+                        processJsonElements(laneNode.get(EDITOR_CHILD_SHAPES), modelNode, lane, shapeMap, formKeyMap, decisionKeyMap, bpmnModel);
                         if (CollectionUtils.isNotEmpty(lane.getFlowReferences())) {
                             for (String elementRef : lane.getFlowReferences()) {
                                 elementInLaneMap.put(elementRef, lane);
@@ -680,7 +680,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             
             process.setEnableEagerExecutionTreeFetching(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EAGER_EXECUTION_FETCHING, modelNode, false));
 
-            processJsonElements(shapesArrayNode, modelNode, process, shapeMap, formKeyMap, decisionTableKeyMap, bpmnModel);
+            processJsonElements(shapesArrayNode, modelNode, process, shapeMap, formKeyMap, decisionKeyMap, bpmnModel);
 
         } else {
             // sequence flows are on root level so need additional parsing for pools
@@ -773,15 +773,15 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
     @Override
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
-            Map<String, String> formMap, Map<String, String> decisionTableMap, BpmnModel bpmnModel) {
+            Map<String, String> formMap, Map<String, String> decisionMap, BpmnModel bpmnModel) {
 
         for (JsonNode shapeNode : shapesArrayNode) {
             String stencilId = BpmnJsonConverterUtil.getStencilId(shapeNode);
             Class<? extends BaseBpmnJsonConverter> converter = convertersToBpmnMap.get(stencilId);
             try {
                 BaseBpmnJsonConverter converterInstance = converter.newInstance();
-                if (converterInstance instanceof DecisionTableAwareConverter) {
-                    ((DecisionTableAwareConverter) converterInstance).setDecisionTableMap(decisionTableMap);
+                if (converterInstance instanceof DecisionAwareConverter) {
+                    ((DecisionAwareConverter) converterInstance).setDecisionMap(decisionMap);
                 }
 
                 if (converterInstance instanceof FormAwareConverter) {

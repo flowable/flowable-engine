@@ -25,9 +25,12 @@ import java.util.Map;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableAwareConverter {
+public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionAwareConverter {
 
-    protected Map<String, String> decisionTableMap;
+    protected static String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
+    protected static String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
+
+    protected Map<String, String> decisionMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
                                  Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -54,18 +57,35 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);
 
+        String decisionId = null;
+        String referenceType = null;
+
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
+            decisionId = decisionTableReferenceNode.get("id").asText();
+            referenceType = REFERENCE_TYPE_DECISION_TABLE;
+        }
 
-            String decisionTableId = decisionTableReferenceNode.get("id").asText();
-            if (decisionTableMap != null) {
-                String decisionTableKey = decisionTableMap.get(decisionTableId);
+        JsonNode decisionServiceReferenceNode = getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
+        if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
+            decisionId = decisionServiceReferenceNode.get("id").asText();
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+        }
 
-                FieldExtension decisionTableKeyField = new FieldExtension();
-                decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
-                decisionTableKeyField.setStringValue(decisionTableKey);
-                serviceTask.getFieldExtensions().add(decisionTableKeyField);
-            }
+        if (decisionId != null && decisionMap != null) {
+            String decisionTableKey = decisionMap.get(decisionId);
+
+            FieldExtension decisionTableKeyField = new FieldExtension();
+            decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
+            decisionTableKeyField.setStringValue(decisionTableKey);
+            serviceTask.getFieldExtensions().add(decisionTableKeyField);
+        }
+
+        if (referenceType != null) {
+            FieldExtension decisionReferenceType = new FieldExtension();
+            decisionReferenceType.setFieldName(PROPERTY_DECISION_REFERENCE_TYPE);
+            decisionReferenceType.setStringValue(referenceType);
+            serviceTask.getFieldExtensions().add(decisionReferenceType);
         }
 
         boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
@@ -95,7 +115,7 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     }
 
     @Override
-    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-        this.decisionTableMap = decisionTableMap;
+    public void setDecisionMap(Map<String, String> decisionMap) {
+        this.decisionMap = decisionMap;
     }
 }

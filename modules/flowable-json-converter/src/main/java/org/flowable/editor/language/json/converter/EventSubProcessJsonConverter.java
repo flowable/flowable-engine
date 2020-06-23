@@ -29,12 +29,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public class EventSubProcessJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter,
-        DecisionTableAwareConverter, DecisionTableKeyAwareConverter {
+    DecisionAwareConverter, DecisionKeyAwareConverter {
 
     protected Map<String, String> formMap;
     protected Map<String, ModelInfo> formKeyMap;
-    protected Map<String, String> decisionTableMap;
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+    protected Map<String, String> decisionMap;
+    protected Map<String, ModelInfo> decisionKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
@@ -63,7 +63,7 @@ public class EventSubProcessJsonConverter extends BaseBpmnJsonConverter implemen
         ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
         GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
         processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap,
-                decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
+            decisionKeyMap, graphicInfo.getX(), graphicInfo.getY());
         flowElementNode.set("childShapes", subProcessShapesArrayNode);
     }
 
@@ -71,7 +71,7 @@ public class EventSubProcessJsonConverter extends BaseBpmnJsonConverter implemen
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         EventSubProcess subProcess = new EventSubProcess();
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-        processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionTableMap, model);
+        processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionMap, model);
         return subProcess;
     }
 
@@ -86,12 +86,12 @@ public class EventSubProcessJsonConverter extends BaseBpmnJsonConverter implemen
     }
 
     @Override
-    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-        this.decisionTableMap = decisionTableMap;
+    public void setDecisionMap(Map<String, String> decisionMap) {
+        this.decisionMap = decisionMap;
     }
 
     @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
-        this.decisionTableKeyMap = decisionTableKeyMap;
+    public void setDecisionKeyMap(Map<String, ModelInfo> decisionKeyMap) {
+        this.decisionKeyMap = decisionKeyMap;
     }
 }
