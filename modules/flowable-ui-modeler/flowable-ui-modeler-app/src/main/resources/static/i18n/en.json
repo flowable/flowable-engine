@@ -28,7 +28,9 @@
             "NEW-FORM": "New form",
             "CREATE-FORM": "Create form",
             "NEW-DECISION-TABLE": "New Decision Table",
-            "CREATE-DECISION-TABLE": "Create Decision Table"
+            "CREATE-DECISION-TABLE": "Create Decision Table",
+            "NEW-DECISION-SERVICE": "New Decision Service",
+            "CREATE-DECISION-SERVICE": "Create Decision Service"
         },
         "MESSAGE": {
           "SELECT-GROUP-HELP": "Use &uparrow; and &downarrow; to select and press Enter to confirm",
@@ -897,6 +899,12 @@
             "DESCRIPTION" : "Set the decision table reference"
           }
         },
+        "DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE" : {
+          "DECISIONTASKDECISIONSERVICEREFERENCE" : {
+            "TITLE" : "Decision service reference",
+            "DESCRIPTION" : "Set the decision service reference"
+          }
+        },
         "DECISIONTASKTHROWERRORONNOHITSPACKAGE" : {
           "DECISIONTASKTHROWERRORONNOHITS" : {
             "TITLE" : "Throw error if no rules were hit",
@@ -1423,6 +1431,12 @@
           "DECISIONTASKDECISIONTABLEREFERENCE": {
             "TITLE": "Decision table reference",
             "DESCRIPTION": "Set the decision table reference"
+          }
+        },
+        "DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE": {
+          "DECISIONTASKDECISIONSERVICEREFERENCE": {
+            "TITLE": "Decision service reference",
+            "DESCRIPTION": "Set the decision service reference"
           }
         },
         "DECISIONTASKTHROWERRORONNOHITSPACKAGE": {
@@ -2897,6 +2911,12 @@
     "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "There was an error loading the decision tables. Try again later",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Loading decision tables...",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "This folder contains no decision tables",
+
+    "PROPERTY.DECISIONSERVICEREFERENCE.EMPTY" : "No reference selected",
+    "PROPERTY.DECISIONSERVICEREFERENCE.TITLE" : "Decision service reference",
+    "PROPERTY.DECISIONSERVICEREFERENCE.ERROR.FORM" : "There was an error loading the decision services. Try again later",
+    "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.LOADING" : "Loading decision services...",
+    "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.EMPTY" : "This folder contains no decision services",
     
     "PROPERTY.CASEREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.CASEREFERENCE.TITLE" : "Case model reference",

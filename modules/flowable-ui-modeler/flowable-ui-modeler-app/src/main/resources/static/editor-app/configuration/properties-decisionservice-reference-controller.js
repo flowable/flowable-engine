@@ -11,12 +11,12 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl',
+angular.module('flowableModeler').controller('FlowableDecisionServiceReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 
      // Config for the modal window
      var opts = {
-         template:  'editor-app/configuration/properties/decisiontable-reference-popup.html?version=' + Date.now(),
+         template:  'editor-app/configuration/properties/decisionservice-reference-popup.html?version=' + Date.now(),
          scope: $scope
      };
 
@@ -24,16 +24,16 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl
      _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location', 'editorManager',
+angular.module('flowableModeler').controller('FlowableDecisionServiceReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location', 'editorManager',
     function($rootScope, $scope, $http, $location, editorManager) {
 
         $scope.state = {
-            'loadingDecisionTables': true,
-            'decisionTableError': false
+            'loadingDecisionServices': true,
+            'decisionServiceError': false
         };
 
         $scope.popup = {
-            'state': 'decisionTableReference'
+            'state': 'decisionServiceReference'
         };
 
         $scope.foldersBreadCrumbs = [];
@@ -51,19 +51,19 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
             $scope.$hide();
         };
 
-        // Selecting/deselecting a decision table
-        $scope.selectDecisionTable = function(decisionTable, $event) {
+        // Selecting/deselecting a decision service
+        $scope.selectDecisionService = function(decisionService, $event) {
             $event.stopPropagation();
-            if ($scope.selectedDecisionTable && $scope.selectedDecisionTable.id && decisionTable.id == $scope.selectedDecisionTable.id) {
+            if ($scope.selectedDecisionService && $scope.selectedDecisionService.id && decisionService.id == $scope.selectedDecisionService.id) {
                 // un-select the current selection
-                $scope.selectedDecisionTable = null;
+                $scope.selectedDecisionService = null;
             } else {
-                $scope.selectedDecisionTable = decisionTable;
+                $scope.selectedDecisionService = decisionService;
             }
         };
 
         $scope.isSelected = function () {
-            if ($scope.selectedDecisionTable && $scope.selectedDecisionTable.id) {
+            if ($scope.selectedDecisionService && $scope.selectedDecisionService.id) {
                 return true;
             }
             return false;
@@ -71,11 +71,11 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
         // Saving the selected value
         $scope.save = function() {
-            if ($scope.selectedDecisionTable) {
+            if ($scope.selectedDecisionService) {
                 $scope.property.value = {
-                    'id': $scope.selectedDecisionTable.id,
-                    'name': $scope.selectedDecisionTable.name,
-                    'key': $scope.selectedDecisionTable.key
+                    'id': $scope.selectedDecisionService.id,
+                    'name': $scope.selectedDecisionService.name,
+                    'key': $scope.selectedDecisionService.key
                 };
 
             } else {
@@ -87,11 +87,11 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
         // Open the selected value
         $scope.open = function() {
-            if ($scope.selectedDecisionTable) {
+            if ($scope.selectedDecisionService) {
                 $scope.property.value = {
-                    'id': $scope.selectedDecisionTable.id,
-                    'name': $scope.selectedDecisionTable.name,
-                    'key': $scope.selectedDecisionTable.key
+                    'id': $scope.selectedDecisionService.id,
+                    'name': $scope.selectedDecisionService.name,
+                    'key': $scope.selectedDecisionService.key
                 };
                 $scope.updatePropertyInModel($scope.property);
 
@@ -134,7 +134,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
                         });
 
 						$rootScope.addHistoryItem($scope.selectedShape.resourceId);
-						$location.path('decision-table-editor/' + $scope.selectedDecisionTable.id);
+						$location.path('decision-service-editor/' + $scope.selectedDecisionService.id);
                     })
                     .error(function(data, status, headers, config) {
 
@@ -147,38 +147,38 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
         $scope.newDecisionTable = function() {
             $scope.property.value.variablesmapping = [];
 
-            $scope.popup.state = 'newDecisionTable';
+            $scope.popup.state = 'newDecisionService';
 
             var modelMetaData = editorManager.getBaseModelData();
 
             $scope.model = {
                 loading: false,
-                decisionTable: {
+                decisionService: {
                     name: '',
                     key: '',
                     description: '',
-                    modelType: 4
+                    modelType: 6
                 },
                 defaultStencilSet: undefined,
                 decisionTableStencilSets: []
             };
         };
 
-        $scope.createDecisionTable = function() {
+        $scope.createDecisionService = function() {
 
-            if (!$scope.model.decisionTable.name || $scope.model.decisionTable.name.length == 0 ||
-            	!$scope.model.decisionTable.key || $scope.model.decisionTable.key.length == 0) {
+            if (!$scope.model.decisionService.name || $scope.model.decisionService.name.length == 0 ||
+            	!$scope.model.decisionService.key || $scope.model.decisionService.key.length == 0) {
 
                 return;
             }
 
-            var stencilSetId = $scope.model.decisionTable.stencilSet;
+            var stencilSetId = $scope.model.decisionService.stencilSet;
             $scope.model.loading = true;
 
             $http({
                 method: 'POST',
                 url: FLOWABLE.APP_URL.getModelsUrl(),
-                data: $scope.model.decisionTable
+                data: $scope.model.decisionService
             }).
             success(function(data, status, headers, config) {
 
@@ -233,7 +233,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
                         $scope.$hide();
 
                         $rootScope.addHistoryItem($scope.selectedShape.resourceId);
-                        $location.path('decision-table-editor/' + newDecisionTableId);
+                        $location.path('decision-service-editor/' + newDecisionTableId);
                     })
                     .error(function(data, status, headers, config) {
                         $scope.model.loading = false;
@@ -252,37 +252,37 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
         };
 
         $scope.resetCurrent = function () {
-            for (var i = 0, found = false; i < $scope.decisionTables.length && found === false; i++) {
-                var table = $scope.decisionTables[i];
-                if (table.id === $scope.property.value.id) {
-                    $scope.selectedDecisionTable = table;
+            for (var i = 0, found = false; i < $scope.decisionServices.length && found === false; i++) {
+                var decision = $scope.decisionServices[i];
+                if (decision.id === $scope.property.value.id) {
+                    $scope.selectedDecisionService = decision;
                     found = true;
                 }
             }
         };
 
-        $scope.loadDecisionTables = function() {
+        $scope.loadDecisionServices = function() {
             var modelMetaData = editorManager.getBaseModelData();
-            $http.get(FLOWABLE.APP_URL.getDecisionTableModelsUrl())
+            $http.get(FLOWABLE.APP_URL.getDecisionServiceModelsUrl())
                 .success(
                     function(response) {
-                            $scope.state.loadingDecisionTables = false;
-                            $scope.state.decisionTableError = false;
-                            $scope.decisionTables = response.data;
+                            $scope.state.loadingDecisionServices = false;
+                            $scope.state.decisionServiceError = false;
+                            $scope.decisionServices = response.data;
                             $scope.resetCurrent();
                 })
                 .error(
                     function(data, status, headers, config) {
-                    $scope.state.loadingDecisionTables = false;
-                    $scope.state.decisionTableError = true;
+                    $scope.state.loadingDecisionServices = false;
+                    $scope.state.decisionServiceError = true;
                 });
         };
 
         if ($scope.property && $scope.property.value && $scope.property.value.id) {
-            $scope.selectedDecisionTable = $scope.property.value;
+            $scope.selectedDecisionService = $scope.property.value;
             $scope.storedId = $scope.property.value.id;
         }
 
-        $scope.loadDecisionTables();
+        $scope.loadDecisionServices();
     }
 ]);
