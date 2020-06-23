@@ -43,9 +43,7 @@ public class ExternalWorkerServiceTaskWithExtensionElementsConverterTest extends
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("externalWorkerServiceTask");
-        assertThat(flowElement)
-                .isNotNull()
-                .isInstanceOf(ExternalWorkerServiceTask.class);
+        assertThat(flowElement).isInstanceOf(ExternalWorkerServiceTask.class);
         ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) flowElement;
         assertThat(externalWorkerServiceTask.getId()).isEqualTo("externalWorkerServiceTask");
         assertThat(externalWorkerServiceTask.getName()).isEqualTo("External worker task");

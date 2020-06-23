@@ -54,7 +54,6 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
-        assertThat(process.getAttributes()).isNotNull();
         assertThat(process.getAttributes()).hasSize(1);
         List<ExtensionAttribute> attributes = process.getAttributes().get("version");
         assertThat(attributes).isNotNull();

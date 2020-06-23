@@ -164,7 +164,7 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
             if (diInfo == null) {
                 diInfo = multiSubEdgeMap.get(id);
             }
-            assertThat(diInfo).hasSize(info.size());
+            assertThat(diInfo).hasSameSizeAs(info);
             compareCollections(info, diInfo);
         }
 

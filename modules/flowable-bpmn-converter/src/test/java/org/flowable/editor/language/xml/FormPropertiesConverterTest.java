@@ -54,7 +54,6 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement startFlowElement = model.getMainProcess().getFlowElement("startNode");
-        assertThat(startFlowElement).isNotNull();
         assertThat(startFlowElement).isInstanceOf(StartEvent.class);
         StartEvent startEvent = (StartEvent) startFlowElement;
 
