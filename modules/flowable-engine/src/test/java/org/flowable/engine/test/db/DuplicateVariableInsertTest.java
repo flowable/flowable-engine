@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,12 +79,12 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception
-        assertEquals(1, exceptions.size());
+        assertThat(exceptions).hasSize(1);
 
         // One variable should be set
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(1, variables.size());
-        assertEquals("12345", variables.get("var"));
+        assertThat(variables)
+            .containsExactly(entry("var", "12345"));
         runtimeService.deleteProcessInstance(processInstance.getId(), "ShouldNotFail");
     }
 
@@ -130,13 +133,13 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception
-        assertEquals(1, exceptions.size());
-        assertTrue(exceptions.get(0) instanceof FlowableOptimisticLockingException);
+        assertThat(exceptions).hasSize(1);
+        assertThat(exceptions.get(0)).isInstanceOf(FlowableOptimisticLockingException.class);
 
         // One variable should be set
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(1, variables.size());
-        assertEquals("12345", variables.get("var"));
+        assertThat(variables)
+            .containsExactly(entry("var", "12345"));
         runtimeService.deleteProcessInstance(processInstance.getId(), "ShouldNotFail");
     }
 
