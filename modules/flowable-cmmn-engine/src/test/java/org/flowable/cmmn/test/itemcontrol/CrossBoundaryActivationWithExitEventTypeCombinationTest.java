@@ -132,7 +132,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
         assertThat(planItemInstances).isEmpty();
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 }

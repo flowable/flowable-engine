@@ -166,9 +166,9 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             MimeMessage mimeMessage = emailMessage.getMimeMessage();
 
             if (htmlMail) {
-                assertThat(mimeMessage.getContentType().contains("multipart/mixed")).isTrue();
+                assertThat(mimeMessage.getContentType()).contains("multipart/mixed");
             } else {
-                assertThat(mimeMessage.getContentType().contains("text/plain")).isTrue();
+                assertThat(mimeMessage.getContentType()).contains("text/plain");
             }
 
             assertThat(mimeMessage.getHeader("Subject", null)).isEqualTo(subject);

@@ -56,7 +56,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
     }
@@ -69,7 +69,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
     }
@@ -82,7 +82,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").list()).isEmpty();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").singleResult()).isNull();
     }
@@ -94,7 +94,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("gonzo").count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("gonzo").count()).isZero();
     }
 
     @Test
@@ -137,7 +137,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId())
@@ -151,7 +151,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).list()).isEmpty();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).singleResult()).isNull();
     }
@@ -163,7 +163,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).list()).isEmpty();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).singleResult()).isNull();
     }
@@ -178,7 +178,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(

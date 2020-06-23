@@ -81,7 +81,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(1);
         List<HistoricPlanItemInstance> planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
         for (HistoricPlanItemInstance planItemInstance : planItemInstances) {
-            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1L);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1);
         }
     }
 
@@ -108,10 +108,8 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testByPlanItemDefinitionType() {
         startInstances(3);
-        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK).list().size())
-                .isEqualTo(6);
-        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE).list().size())
-                .isEqualTo(6);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK).list()).hasSize(6);
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE).list()).hasSize(6);
     }
 
     @Test

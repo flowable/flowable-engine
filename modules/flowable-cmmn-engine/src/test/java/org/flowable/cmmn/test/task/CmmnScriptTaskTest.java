@@ -86,7 +86,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         //Check the case variables, one will be created by the script execution
         Map<String, Object> caseVariables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(caseVariables).isNotNull();
         assertThat(caseVariables).hasSize(1);
         assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "aInt")).isTrue();
         Object integer = cmmnRuntimeService.getVariable(caseInstance.getId(), "aInt");
@@ -225,7 +224,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance).isNotNull();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variables).isNotNull();
         assertThat(variables).hasSize(2);
 
         assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum")).isTrue();
@@ -248,7 +246,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance).isNotNull();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variables).isNotNull();
         assertThat(variables).hasSize(1);
 
         assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum")).isFalse();

@@ -88,7 +88,7 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testIfPartTriggeredOnce")
                 .variable("var", new TestCondition())
                 .start();
-        assertThat(TestCondition.COUNTER.get()).isEqualTo(0);
+        assertThat(TestCondition.COUNTER.get()).isZero();
 
         List<Task> tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks)

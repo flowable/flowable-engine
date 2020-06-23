@@ -172,7 +172,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
             .caseDefinitionKey("testStageCompleteWithAvailableEventListener")
             .start();
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().count()).isZero();
 
         // Completing the task should make the available condition (cmmn:isStageCompletable()) true and make the eventlistener available)
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
