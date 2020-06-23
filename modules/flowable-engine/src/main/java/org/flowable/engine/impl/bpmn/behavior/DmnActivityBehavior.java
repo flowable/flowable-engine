@@ -140,8 +140,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
 
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
-            processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
-                finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
+                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+                processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionResult(),
+                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+            } else {
+                processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
+                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+            }
             
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
