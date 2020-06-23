@@ -66,14 +66,8 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
 
     // Maps that store unresolved models. 'unresolved key' -> Model using that key
     // (this can happen due to the order of reading the files in the app zip)
-    protected Map<String, List<String>> unresolvedProcessModelKeyToProcessModelKeys = new HashMap<>();
-    protected Map<String, List<String>> unresolvedCaseModelKeyToProcessModelKeys = new HashMap<>();
-    protected Map<String, List<String>> unresolvedFormModelKeyToProcessModelKeys = new HashMap<>();
-    protected Map<String, List<String>> unresolvedDecisionModelKeyToProcessModelKeys = new HashMap<>();
     protected Map<String, List<CmmnModel>> unresolvedProcessModelKeyToCmmnModels = new HashMap<>();
     protected Map<String, List<CmmnModel>> unresolvedCaseModelKeyToCmmnModels = new HashMap<>();
-    protected Map<String, List<String>> unresolvedFormModelKeyToCaseModelKeys = new HashMap<>();
-    protected Map<String, List<String>> unresolvedDecisionModelKeyToCaseModelKeys = new HashMap<>();
 
     public ConverterContext(ModelService modelService, ObjectMapper objectMapper) {
         this.modelService = modelService;

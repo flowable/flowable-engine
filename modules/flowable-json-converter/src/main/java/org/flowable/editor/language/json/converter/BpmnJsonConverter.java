@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
