@@ -147,8 +147,10 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         assertThat(dataObj.getId()).isEqualTo("dObj1");
         assertThat(dataObj.getName()).isEqualTo("StringTest");
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
-        assertThat(dataObj.getValue()).isInstanceOf(String.class);
-        assertThat(dataObj.getValue()).isEqualTo("Testing123");
+        assertThat(dataObj.getValue())
+                .isInstanceOfSatisfying(String.class, value -> {
+                    assertThat(value).isEqualTo("Testing123");
+                });
 
         /*
          * Verify DataObject attributes extension
@@ -187,8 +189,10 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         assertThat(dataObj.getId()).isEqualTo("dObj2");
         assertThat(dataObj.getName()).isEqualTo("BooleanTest");
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:boolean");
-        assertThat(dataObj.getValue()).isInstanceOf(Boolean.class);
-        assertThat(dataObj.getValue()).isEqualTo(Boolean.TRUE);
+        assertThat(dataObj.getValue())
+                .isInstanceOfSatisfying(Boolean.class, value -> {
+                    assertThat(value).isTrue();
+                });
 
         /*
          * Verify DataObject attributes extension
