@@ -102,7 +102,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         cmmnTaskService.complete(task.getId());
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
@@ -171,7 +171,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             assertThat(task.getTenantId()).isEqualTo("flowable");
             cmmnTaskService.complete(task.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         } finally {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
@@ -208,7 +208,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             assertThat(task.getTenantId()).isEqualTo("flowable");
             cmmnTaskService.complete(task.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         } finally {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
             Authentication.setAuthenticatedUserId(null);
@@ -231,7 +231,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         // Completing A should delete B and C
         cmmnTaskService.complete(tasks.get(0).getId());
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertCaseInstanceEnded(caseInstance);
 
         List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().list();

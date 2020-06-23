@@ -157,7 +157,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         );
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().singleResult();
-        assertThat(historicCaseInstance.getCaseVariables().get("variableToUpdate")).isEqualTo("updatedVariableValue");
+        assertThat(historicCaseInstance.getCaseVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
     }
 
     @Test
@@ -175,7 +175,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         );
         HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).
                 includeTaskLocalVariables().singleResult();
-        assertThat(historicTaskInstance.getTaskLocalVariables().get("variableToUpdate")).isEqualTo("updatedVariableValue");
+        assertThat(historicTaskInstance.getTaskLocalVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
     }
 
     @Test
@@ -192,7 +192,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate")).isEqualTo("newValue");
+        assertThat(updatedCaseInstance.getCaseVariables()).containsEntry("varToUpdate", "newValue");
     }
 
     @Test
@@ -213,7 +213,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                         ScopeTypes.CMMN);
 
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
         assertCaseInstanceEnded(caseInstance);
     }
 

@@ -59,7 +59,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -87,7 +87,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -118,7 +118,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -146,7 +146,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -174,7 +174,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())

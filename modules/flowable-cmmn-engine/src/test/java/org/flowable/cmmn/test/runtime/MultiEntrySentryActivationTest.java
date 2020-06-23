@@ -69,8 +69,8 @@ public class MultiEntrySentryActivationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage B Form", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -121,8 +121,8 @@ public class MultiEntrySentryActivationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage B Form", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -164,7 +164,7 @@ public class MultiEntrySentryActivationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage B Form", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 }

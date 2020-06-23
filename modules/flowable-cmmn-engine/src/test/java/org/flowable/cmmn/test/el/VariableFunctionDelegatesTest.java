@@ -153,7 +153,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .variable("yesterday", yesterday)
                 .variable("tomorrow", tomorrow)
                 .start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         Date myVar = new Date(yesterday.getTime() - (60 * 60 * 1000)); // day before yesterday
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", myVar);
@@ -166,7 +166,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .variable("yesterday", yesterday)
                 .variable("tomorrow", tomorrow)
                 .start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         myVar = new Date(tomorrow.getTime() + (60 * 60 * 1000)); // day after tomorrow
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", myVar);

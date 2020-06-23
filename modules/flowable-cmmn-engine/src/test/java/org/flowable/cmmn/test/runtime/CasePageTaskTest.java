@@ -87,8 +87,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
 
         // Finish case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
@@ -128,8 +128,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
 
         // Finish case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -222,8 +222,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
 
         // Finish case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());

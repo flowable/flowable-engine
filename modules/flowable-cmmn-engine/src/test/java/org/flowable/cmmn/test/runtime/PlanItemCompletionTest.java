@@ -62,8 +62,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // trigger user listener to complete stage
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "User Listener A"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -94,8 +94,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // trigger user listener to complete stage
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "User Listener A"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -121,8 +121,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.completeGenericEventListenerInstance(userEventListenerInstance.getId());
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -192,8 +192,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -278,8 +278,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // complete Task B -> case must be completed now
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -304,8 +304,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         runComplexCompletionTestScenario(true);
 
         // because autocompletion is on, the case will be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 

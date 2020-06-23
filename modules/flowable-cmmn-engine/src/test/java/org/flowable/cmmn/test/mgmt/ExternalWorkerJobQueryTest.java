@@ -79,7 +79,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .containsOnly(caseInstance2.getId());
 
         query = cmmnManagementService.createExternalWorkerJobQuery().caseInstanceId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -100,7 +100,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .containsOnly(caseInstance1.getId(), caseInstance2.getId());
 
         query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -132,7 +132,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
         assertThat(query.singleResult()).isNotNull();
 
         query = cmmnManagementService.createExternalWorkerJobQuery().planItemInstanceId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -154,7 +154,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
 
         query = cmmnManagementService.createExternalWorkerJobQuery().elementId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
 
     }
@@ -176,7 +176,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
 
         query = cmmnManagementService.createExternalWorkerJobQuery().elementName("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -192,7 +192,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
         assertThat(query.list()).hasSize(2);
 
         query = cmmnManagementService.createExternalWorkerJobQuery().handlerType("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -252,7 +252,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
         assertThat(job.getExceptionMessage()).isEqualTo("Error message");
 
         query = cmmnManagementService.createExternalWorkerJobQuery().exceptionMessage("Error");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -333,7 +333,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
         assertThat(job.getLockExpirationTime()).isNotNull();
 
         query = cmmnManagementService.createExternalWorkerJobQuery().lockOwner("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }

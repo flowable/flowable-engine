@@ -61,8 +61,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -119,8 +119,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -145,8 +145,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -206,8 +206,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         // complete Task C -> will complete the case
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -250,8 +250,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -307,8 +307,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -340,8 +340,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         // set the auto-complete flag on the case plan model which should directly complete the case
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enablePlanModelAutoComplete", true);
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
@@ -403,8 +403,8 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         // complete Task C -> will complete the case
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 

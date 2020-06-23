@@ -78,7 +78,7 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
     public void testQueryByInvalidDeploymentId() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
-        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
@@ -93,7 +93,7 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
     public void testQueryByInvalidDeploymentName() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").singleResult()).isNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").list()).isEmpty();
-        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentName("invalid").count()).isZero();
     }
 
     @Test
@@ -105,7 +105,7 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").singleResult()).isNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").list()).isEmpty();
-        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").count()).isZero();
     }
 
     @Test
@@ -120,7 +120,7 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
     public void testQueryByInvalidDeploymentCategory() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").singleResult()).isNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").list()).isEmpty();
-        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentCategory("invalid").count()).isZero();
     }
 
     @Test

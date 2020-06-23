@@ -77,7 +77,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         //one Task, one Stage, one Milestone
         List<PlanItemInstance> currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(currentPlanItems).isNotNull();
         assertThat(currentPlanItems).hasSize(3);
         assertThat(currentPlanItems.stream().map(PlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.STAGE::equalsIgnoreCase))
                 .isTrue();
@@ -88,7 +87,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         //Milestone are just another planItem too, so it will appear in the planItemInstance History
         List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicPlanItems).isNotNull();
         assertThat(historicPlanItems).hasSize(3);
         assertThat(historicPlanItems.stream().map(HistoricPlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.STAGE::equalsIgnoreCase))
                 .isTrue();
@@ -118,7 +116,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         //Milestone history is only filled when the milestone occurs
         List<HistoricMilestoneInstance> historicMilestones = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicMilestones).isNotNull();
         assertThat(historicMilestones).isEmpty();
 
         //////////////////////////////////////////////////////////////////
@@ -131,7 +128,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         //Now there are 2 plan items in a non-final state, a Stage and its containing task (only 1 new planItem)
         currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(currentPlanItems).isNotNull();
         assertThat(currentPlanItems).hasSize(2);
         assertThat(currentPlanItems.stream().map(PlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.STAGE::equalsIgnoreCase))
                 .isTrue();
@@ -139,7 +135,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 .anyMatch(p -> "task".equalsIgnoreCase(p.getPlanItemDefinitionType()) && "planItemTaskB".equalsIgnoreCase(p.getElementId()))).isTrue();
 
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicPlanItems).isNotNull();
         assertThat(historicPlanItems).hasSize(4);
         assertThat(
                 cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(historicPlanItems.get(0).getId()).planItemInstanceWithoutTenantId()
@@ -162,7 +157,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         //Milestone appears now in the MilestoneHistory
         historicMilestones = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicMilestones).isNotNull();
         assertThat(historicMilestones).hasSize(1);
 
         //////////////////////////////////////////////////
@@ -175,7 +169,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         //History remains
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicPlanItems).isNotNull();
         assertThat(historicPlanItems).hasSize(4);
         historicPlanItems.forEach(assertCreateTimeHistoricPlanItemInstance
                 .andThen(assertStartedTimeHistoricPlanItemInstance)
@@ -184,7 +177,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         );
 
         historicMilestones = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicMilestones).isNotNull();
         assertThat(historicMilestones).hasSize(1);
     }
 
@@ -270,7 +262,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEntryAndExitPropagate").start();
 
         List<PlanItemInstance> currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(currentPlanItems).isNotNull();
         assertThat(currentPlanItems).hasSize(3);
         assertThat(currentPlanItems.stream()
                 .filter(p -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(p.getPlanItemDefinitionType()))
@@ -283,7 +274,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicPlanItems).isNotNull();
         assertThat(historicPlanItems).hasSize(3);
         checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
         assertThat(historicPlanItems.stream().filter(h -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(h.getPlanItemDefinitionType()))
@@ -325,12 +315,10 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
         //A userEventListeners is removed and two human task are instanced
         currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(currentPlanItems).isNotNull();
         assertThat(currentPlanItems).hasSize(4);
 
         //Two more planItemInstances in the history
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        assertThat(historicPlanItems).isNotNull();
         assertThat(historicPlanItems).hasSize(5);
         checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 
@@ -588,7 +576,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                     .findFirst()
                     .map(HistoricPlanItemInstance::getCreateTime)
                     .map(Date::getTime);
-            assertThat(createTimestamp.isPresent()).isTrue();
+            assertThat(createTimestamp).isPresent();
             long delta = createTimestamp.orElse(Long.MAX_VALUE) - p.getCreateTime().getTime();
             assertThat(delta).isLessThanOrEqualTo(threshold);
         });

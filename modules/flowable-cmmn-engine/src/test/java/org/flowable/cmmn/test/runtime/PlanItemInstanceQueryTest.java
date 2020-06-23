@@ -86,7 +86,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(1);
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().list();
         for (PlanItemInstance planItemInstance : planItemInstances) {
-            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1L);
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1);
         }
     }
 

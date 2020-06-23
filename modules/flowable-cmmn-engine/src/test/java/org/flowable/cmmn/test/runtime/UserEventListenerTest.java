@@ -95,7 +95,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeUserEventListenerInstance(listenerInstance.getId());
 
         //UserEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isZero();
 
         //Only 2 PlanItems left
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
@@ -142,7 +142,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
 
         //UserEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isZero();
 
         //Only 2 PlanItems left (1 stage & 1 active task)
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
@@ -236,7 +236,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
 
         //UserEventListener is consumed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isZero();
 
         //Task is om Active state and a second task instance waiting for repetition
         Map<String, List<PlanItemInstance>> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
@@ -245,9 +245,9 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
                 .list().stream()
                 .collect(Collectors.groupingBy(PlanItemInstance::getState));
         assertThat(tasks).hasSize(2);
-        assertThat(tasks.containsKey(PlanItemInstanceState.ACTIVE)).isTrue();
+        assertThat(tasks).containsKey(PlanItemInstanceState.ACTIVE);
         assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
-        assertThat(tasks.containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION)).isTrue();
+        assertThat(tasks).containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION);
         assertThat(tasks.get(PlanItemInstanceState.WAITING_FOR_REPETITION)).hasSize(1);
 
         //Complete active task
@@ -479,7 +479,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         // Completing the other task with the exit sentry should still keep the user event, as it's reference by the entry of B
         cmmnTaskService.complete(tasks.get(0).getId());
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNotNull();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Firing the user event listener should start B
         cmmnRuntimeService.completeUserEventListenerInstance(
@@ -508,7 +508,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testMultipleEventListenersAsEntry() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMultipleEventListenersAsEntry").start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
@@ -518,7 +518,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
         // Completing A should change nothing
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
         assertThat(userEventListenerInstances)
@@ -528,7 +528,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         // Completing B should activate the stage and remove the orphan event listener C
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(0).getId());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -545,7 +545,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
         // Completing C should also remove A and B
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstances.get(2).getId());
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isEqualTo("Outside stage");
 
     }
@@ -614,7 +614,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(taskC.getName()).isEqualTo("C");
 
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
     }
 
@@ -646,7 +646,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
         // Completing task C should remove the user event listener
         cmmnTaskService.complete(tasks.get(2).getId());
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     @Test
