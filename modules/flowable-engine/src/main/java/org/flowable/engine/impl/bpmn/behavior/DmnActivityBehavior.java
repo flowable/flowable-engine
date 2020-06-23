@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.DynamicBpmnConstants;
@@ -123,7 +124,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         applyFallbackToDefaultTenant(execution, executeDecisionBuilder);
         applyParentDeployment(execution, executeDecisionBuilder, processEngineConfiguration);
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.evaluateDecisionWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision with key " + finaldecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
@@ -161,8 +162,15 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
-            setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionKeyValue,
-                            execution, processEngineConfiguration.getObjectMapper(), multipleResults);
+
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
+                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+                setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finaldecisionKeyValue,
+                    execution, processEngineConfiguration.getObjectMapper(), multipleResults);
+            } else {
+                setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionKeyValue,
+                    execution, processEngineConfiguration.getObjectMapper(), multipleResults);
+            }
         }
 
         leave(execution);
@@ -196,6 +204,43 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         }
         executeDecisionBuilder.parentDeploymentId(parentDeploymentId);
+    }
+
+    protected void setVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionServiceKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
+            return;
+        }
+
+        // multiple rule results
+        // put on execution as JSON array; each entry contains output id (key) and output value (value)
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
+            ObjectNode decisionResultNode = objectMapper.createObjectNode();
+
+            for (Map.Entry<String, List<Map<String, Object>>> decisionExecutionResult : executionResult.entrySet()) {
+                ArrayNode ruleResultNode = objectMapper.createArrayNode();
+                for (Map<String, Object> ruleResult : decisionExecutionResult.getValue()) {
+                    ObjectNode outputResultNode = objectMapper.createObjectNode();
+                    for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
+                        outputResultNode.set(outputResult.getKey(), objectMapper.convertValue(outputResult.getValue(), JsonNode.class));
+                    }
+                    ruleResultNode.add(outputResultNode);
+                }
+
+                decisionResultNode.set(decisionExecutionResult.getKey(), ruleResultNode);
+            }
+
+            execution.setVariable(decisionServiceKey, decisionResultNode);
+        } else {
+            // single rule result
+            // put on execution output id (key) and output value (value)
+            executionResult.values().forEach(decisionResult -> {
+                for (Map.Entry<String, Object> outputResult : decisionResult.get(0).entrySet()) {
+                    execution.setVariable(outputResult.getKey(), outputResult.getValue());
+                }
+            });
+
+        }
     }
 
     protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
