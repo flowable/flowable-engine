@@ -418,8 +418,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
             historicEntityLinkEntity.setCreateTime(entityLink.getCreateTime());
             historicEntityLinkEntity.setScopeId(entityLink.getScopeId());
+            historicEntityLinkEntity.setSubScopeId(entityLink.getSubScopeId());
             historicEntityLinkEntity.setScopeType(entityLink.getScopeType());
             historicEntityLinkEntity.setScopeDefinitionId(entityLink.getScopeDefinitionId());
+            historicEntityLinkEntity.setParentElementId(entityLink.getParentElementId());
             historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
             historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
             historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());

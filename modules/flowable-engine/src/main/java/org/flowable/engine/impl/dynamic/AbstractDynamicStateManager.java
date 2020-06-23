@@ -794,7 +794,8 @@ public abstract class AbstractDynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(subProcessDefinition, parentExecution, businessKey, initialActivityId);
-        EntityLinkUtil.createEntityLinks(parentExecution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
+        EntityLinkUtil.createEntityLinks(parentExecution.getProcessInstanceId(), parentExecution.getId(), callActivity.getId(),
+                subProcessInstance.getId(), ScopeTypes.BPMN);
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();

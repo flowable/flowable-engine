@@ -34,6 +34,11 @@ public interface EntityLinkInfo {
     String getScopeId();
     
     /**
+     * Returns the sub scope id of the originating entity
+     */
+    String getSubScopeId();
+    
+    /**
      * The scope type associated with the originating entity
      */
     String getScopeType();
@@ -42,6 +47,11 @@ public interface EntityLinkInfo {
      * A scope definition id for the originating entity
      */
     String getScopeDefinitionId();
+    
+    /**
+     * The parent element id for the originating entity
+     */
+    String getParentElementId();
     
     /**
      * Returns the scope id of the referenced entity

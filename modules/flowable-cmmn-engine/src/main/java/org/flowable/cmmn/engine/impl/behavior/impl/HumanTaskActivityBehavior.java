@@ -139,7 +139,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
 
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
-                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
+                        planItemInstanceEntity.getPlanItemDefinitionId(), taskEntity.getId(), ScopeTypes.TASK);
             }
 
             if (cmmnEngineConfiguration.getCreateHumanTaskInterceptor() != null) {
