@@ -69,7 +69,6 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
                     assertThat(task1.getInParameters())
                             .extracting(IOParameter::getSource, IOParameter::getTarget)
                             .containsExactly(tuple("testSource", "testTarget"));
-
                 });
     }
 

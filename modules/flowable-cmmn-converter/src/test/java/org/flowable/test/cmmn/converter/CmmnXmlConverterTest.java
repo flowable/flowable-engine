@@ -129,7 +129,6 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
 
             if (!planItem.getId().equals("planItemTaskA")) {
                 assertThat(planItem.getEntryCriteria())
-                        .isNotNull()
                         .hasSize(1)
                         .extracting(Criterion::getSentry)
                         .isNotNull(); // Verify if sentry reference is resolved
