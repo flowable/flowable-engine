@@ -14,7 +14,6 @@ package org.flowable.ui.modeler.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -26,11 +25,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
-import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.editor.language.json.model.ModelInfo;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
@@ -79,7 +76,9 @@ public class AppDefinitionImportService {
         try {
             InputStream is = file.getInputStream();
             String fileName = file.getOriginalFilename();
-            return importAppDefinition(request, is, fileName, null, null, null, null, null);
+
+            ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
+            return importAppDefinition(is, fileName, null, converterContext);
 
         } catch (IOException e) {
             throw new InternalServerErrorException("Error loading file", e);
@@ -97,10 +96,7 @@ public class AppDefinitionImportService {
 
             AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(appModel);
 
-            Map<String, Model> existingProcessModelMap = new HashMap<>();
-            Map<String, Model> existingCaseModelMap = new HashMap<>();
-            Map<String, Model> existingFormModelMap = new HashMap<>();
-            Map<String, Model> existingDecisionTableMap = new HashMap<>();
+            ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
             if (appDefinition.getDefinition() != null && CollectionUtils.isNotEmpty(appDefinition.getDefinition().getModels())) {
                 for (AppModelDefinition modelDef : appDefinition.getDefinition().getModels()) {
                     Model processModel = modelService.getModel(modelDef.getId());
@@ -108,14 +104,16 @@ public class AppDefinitionImportService {
                     List<Model> referencedModels = modelRepository.findByParentModelId(processModel.getId());
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                            existingFormModelMap.put(childModel.getKey(), childModel);
+                            converterContext.addFormModel(childModel);
 
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                            existingDecisionTableMap.put(childModel.getKey(), childModel);
+                            converterContext.addDecisionTableModel(childModel);
+                        } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                            converterContext.addDecisionServiceModel(childModel);
                         }
                     }
 
-                    existingProcessModelMap.put(processModel.getKey(), processModel);
+                    converterContext.addProcessModel(processModel);
                 }
             }
             
@@ -126,47 +124,39 @@ public class AppDefinitionImportService {
                     List<Model> referencedModels = modelRepository.findByParentModelId(caseModel.getId());
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                            existingFormModelMap.put(childModel.getKey(), childModel);
+                            converterContext.addFormModel(childModel);
 
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                            existingDecisionTableMap.put(childModel.getKey(), childModel);
+                            converterContext.addDecisionTableModel(childModel);
+                        } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                            converterContext.addDecisionServiceModel(childModel);
                         }
                     }
 
-                    existingCaseModelMap.put(caseModel.getKey(), caseModel);
+                    converterContext.addCaseModel(caseModel);
                 }
             }
 
-            return importAppDefinition(request, is, fileName, appModel, existingProcessModelMap, existingCaseModelMap, existingFormModelMap, existingDecisionTableMap);
+            return importAppDefinition(is, fileName, appModel, converterContext);
 
         } catch (IOException e) {
             throw new InternalServerErrorException("Error loading file", e);
         }
     }
 
-    protected AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, InputStream is, String fileName, Model existingAppModel, 
-                    Map<String, Model> existingProcessModelMap, Map<String, Model> existingCaseModelMap,
-                    Map<String, Model> existingFormModelMap, Map<String, Model> existingDecisionTableModelMap) {
+    protected AppDefinitionRepresentation importAppDefinition(InputStream is, String fileName,
+            Model existingAppModel, ConverterContext converterContext) {
 
         if (fileName != null && (fileName.endsWith(".zip"))) {
-            Map<String, String> formMap = new HashMap<>();
-            Map<String, String> decisionTableMap = new HashMap<>();
-            Map<String, String> bpmnModelMap = new HashMap<>();
-            Map<String, String> cmmnModelMap = new HashMap<>();
-            Map<String, byte[]> thumbnailMap = new HashMap<>();
-
-            Model appDefinitionModel = readZipFile(is, formMap, decisionTableMap, bpmnModelMap, cmmnModelMap, thumbnailMap);
+            Model appDefinitionModel = readZipFile(is, converterContext);
             if (StringUtils.isNotEmpty(appDefinitionModel.getKey()) && StringUtils.isNotEmpty(appDefinitionModel.getModelEditorJson())) {
 
-                Map<String, Model> formKeyAndModelMap = importForms(formMap, thumbnailMap, existingFormModelMap);
-                Map<String, Model> decisionTableKeyAndModelMap = importDecisionTables(decisionTableMap, thumbnailMap, existingDecisionTableModelMap);
-                Map<String, Model> bpmnModelIdAndModelMap = importBpmnModels(bpmnModelMap, formKeyAndModelMap, decisionTableKeyAndModelMap,
-                        thumbnailMap, existingProcessModelMap);
-                Map<String, Model> cmmnModelIdAndModelMap = importCmmnModels(cmmnModelMap, formKeyAndModelMap, decisionTableKeyAndModelMap,
-                                thumbnailMap, existingCaseModelMap);
+                importForms(converterContext);
+                importDecisionTables(converterContext);
+                importBpmnModels(converterContext);
+                importCmmnModels(converterContext);
 
-                AppDefinitionRepresentation result = importAppDefinitionModel(appDefinitionModel, existingAppModel, bpmnModelIdAndModelMap, cmmnModelIdAndModelMap);
-                return result;
+                return importAppDefinitionModel(appDefinitionModel, existingAppModel, converterContext);
 
             } else {
                 throw new BadRequestException("Could not find app definition json");
@@ -207,8 +197,7 @@ public class AppDefinitionImportService {
         return result;
     }
 
-    protected Model readZipFile(InputStream inputStream, Map<String, String> formMap, Map<String, String> decisionTableMap,
-                                Map<String, String> bpmnModelMap, Map<String, String> cmmnModelMap, Map<String, byte[]> thumbnailMap) {
+    protected Model readZipFile(InputStream inputStream, ConverterContext converterContext) {
 
         Model appDefinitionModel = null;
         ZipInputStream zipInputStream = null;
@@ -227,23 +216,23 @@ public class AppDefinitionImportService {
                     }
 
                     if (modelFileName.endsWith(".png")) {
-                        thumbnailMap.put(modelFileName.replace(".png", ""), IOUtils.toByteArray(zipInputStream));
+                        converterContext.getModelKeyToThumbnailMap().put(modelFileName.replace(".png", ""), IOUtils.toByteArray(zipInputStream));
 
                     } else {
                         modelFileName = modelFileName.replace(".json", "");
                         String json = IOUtils.toString(zipInputStream, "utf-8");
 
                         if (zipEntryName.startsWith("bpmn-models/")) {
-                            bpmnModelMap.put(modelFileName, json);
+                            converterContext.getProcessKeyToJsonStringMap().put(modelFileName, json);
                             
                         } else if (zipEntryName.startsWith("cmmn-models/")) {
-                            cmmnModelMap.put(modelFileName, json);
+                            converterContext.getCaseKeyToJsonStringMap().put(modelFileName, json);
 
                         } else if (zipEntryName.startsWith("form-models/")) {
-                            formMap.put(modelFileName, json);
+                            converterContext.getFormKeyToJsonStringMap().put(modelFileName, json);
 
                         } else if (zipEntryName.startsWith("decision-table-models/")) {
-                            decisionTableMap.put(modelFileName, json);
+                            converterContext.getDecisionTableKeyToJsonStringMap().put(modelFileName, json);
 
                         } else if (!zipEntryName.contains("/")) {
                             appDefinitionModel = createModelObject(json, Model.MODEL_TYPE_APP);
@@ -274,20 +263,16 @@ public class AppDefinitionImportService {
         return appDefinitionModel;
     }
 
-    protected Map<String, Model> importForms(Map<String, String> formMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingFormModelMap) {
+    protected void importForms(ConverterContext converterContext) {
 
-        Map<String, Model> oldFormIdAndModelMap = new HashMap<>();
+        Map<String, String> formMap = converterContext.getFormKeyToJsonStringMap();
+        Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
 
         for (String formKey : formMap.keySet()) {
 
             Model formModel = createModelObject(formMap.get(formKey), Model.MODEL_TYPE_FORM);
-            String oldFormId = formModel.getId();
 
-            Model existingModel = null;
-            if (existingFormModelMap != null && existingFormModelMap.containsKey(formModel.getKey())) {
-                existingModel = existingFormModelMap.get(formModel.getKey());
-            }
-
+            Model existingModel = converterContext.getFormModelByKey(formModel.getKey());
             Model updatedFormModel = null;
             if (existingModel != null) {
                 byte[] imageBytes = null;
@@ -307,16 +292,14 @@ public class AppDefinitionImportService {
                 }
             }
 
-            oldFormIdAndModelMap.put(oldFormId, updatedFormModel);
+            converterContext.addFormModel(updatedFormModel, formModel.getId());
         }
-
-        return oldFormIdAndModelMap;
     }
 
-    protected Map<String, Model> importDecisionTables(Map<String, String> decisionTableMap, Map<String, byte[]> thumbnailMap,
-                                                      Map<String, Model> existingDecisionTableMap) {
+    protected void importDecisionTables(ConverterContext converterContext) {
 
-        Map<String, Model> oldDecisionTableIdAndModelMap = new HashMap<>();
+        Map<String, String> decisionTableMap = converterContext.getDecisionTableKeyToJsonStringMap();
+        Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
 
         for (String decisionTableKey : decisionTableMap.keySet()) {
 
@@ -327,11 +310,7 @@ public class AppDefinitionImportService {
 
             String oldDecisionTableId = decisionTableModel.getId();
 
-            Model existingModel = null;
-            if (existingDecisionTableMap != null && existingDecisionTableMap.containsKey(decisionTableModel.getKey())) {
-                existingModel = existingDecisionTableMap.get(decisionTableModel.getKey());
-            }
-
+            Model existingModel = converterContext.getDecisionTableModelByKey(decisionTableModel.getKey());
             Model updatedDecisionTableModel = null;
             if (existingModel != null) {
                 byte[] imageBytes = null;
@@ -351,22 +330,16 @@ public class AppDefinitionImportService {
                 }
             }
 
-            oldDecisionTableIdAndModelMap.put(oldDecisionTableId, updatedDecisionTableModel);
+            converterContext.addDecisionTableModel(updatedDecisionTableModel, oldDecisionTableId);
         }
-
-        return oldDecisionTableIdAndModelMap;
     }
 
-    protected Map<String, Model> importBpmnModels(Map<String, String> bpmnModelMap, Map<String, Model> formKeyAndModelMap,
-                                                  Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingProcessModelMap) {
+    protected void importBpmnModels(ConverterContext converterContext) {
 
-        Map<String, Model> bpmnModelIdAndModelMap = new HashMap<>();
+        Map<String, String> bpmnModelMap = converterContext.getProcessKeyToJsonStringMap();
+        Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
         for (String bpmnModelKey : bpmnModelMap.keySet()) {
-
-            Model existingModel = null;
-            if (existingProcessModelMap != null && existingProcessModelMap.containsKey(bpmnModelKey)) {
-                existingModel = existingProcessModelMap.get(bpmnModelKey);
-            }
 
             String bpmnModelJson = bpmnModelMap.get(bpmnModelKey);
             Model bpmnModelObject = createModelObject(bpmnModelJson, Model.MODEL_TYPE_BPMN);
@@ -380,26 +353,10 @@ public class AppDefinitionImportService {
                 throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
             }
 
-            Map<String, String> oldFormIdFormKeyMap = new HashMap<>();
-            Map<String, ModelInfo> formKeyModelIdMap = new HashMap<>();
-            for (String oldFormId : formKeyAndModelMap.keySet()) {
-                Model formModel = formKeyAndModelMap.get(oldFormId);
-                oldFormIdFormKeyMap.put(oldFormId, formModel.getKey());
-                formKeyModelIdMap.put(formModel.getKey(), new ModelInfo(formModel.getId(), formModel.getName(), formModel.getKey()));
-            }
+            BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(bpmnModelNode, converterContext);
+            String updatedBpmnJson = bpmnJsonConverter.convertToJson(bpmnModel, converterContext).toString();
 
-            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<>();
-            Map<String, ModelInfo> decisionTableKeyModelIdMap = new HashMap<>();
-            for (String oldDecisionTableId : decisionTableKeyAndModelMap.keySet()) {
-                Model decisionTableModel = decisionTableKeyAndModelMap.get(oldDecisionTableId);
-                oldDecisionTableIdDecisionTableKeyMap.put(oldDecisionTableId, decisionTableModel.getKey());
-                decisionTableKeyModelIdMap.put(decisionTableModel.getKey(), new ModelInfo(decisionTableModel.getId(),
-                        decisionTableModel.getName(), decisionTableModel.getKey()));
-            }
-
-            BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(bpmnModelNode, oldFormIdFormKeyMap, oldDecisionTableIdDecisionTableKeyMap);
-            String updatedBpmnJson = bpmnJsonConverter.convertToJson(bpmnModel, formKeyModelIdMap, decisionTableKeyModelIdMap).toString();
-
+            Model existingModel = converterContext.getProcessModelByKey(bpmnModelKey);
             Model updatedProcessModel = null;
             if (existingModel != null) {
                 byte[] imageBytes = null;
@@ -422,22 +379,16 @@ public class AppDefinitionImportService {
                 }
             }
 
-            bpmnModelIdAndModelMap.put(oldBpmnModelId, updatedProcessModel);
+            converterContext.addProcessModel(updatedProcessModel, oldBpmnModelId);
         }
-
-        return bpmnModelIdAndModelMap;
     }
     
-    protected Map<String, Model> importCmmnModels(Map<String, String> cmmnModelMap, Map<String, Model> formKeyAndModelMap,
-                    Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingCaseModelMap) {
+    protected void importCmmnModels(ConverterContext converterContext) {
 
-        Map<String, Model> cmmnModelIdAndModelMap = new HashMap<>();
+        Map<String, String> cmmnModelMap = converterContext.getCaseKeyToJsonStringMap();
+        Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
         for (String cmmnModelKey : cmmnModelMap.keySet()) {
-
-            Model existingModel = null;
-            if (existingCaseModelMap != null && existingCaseModelMap.containsKey(cmmnModelKey)) {
-                existingModel = existingCaseModelMap.get(cmmnModelKey);
-            }
 
             String cmmnModelJson = cmmnModelMap.get(cmmnModelKey);
             Model cmmnModelObject = createModelObject(cmmnModelJson, Model.MODEL_TYPE_CMMN);
@@ -451,26 +402,10 @@ public class AppDefinitionImportService {
                 throw new InternalServerErrorException("Error reading CMMN json for " + cmmnModelKey);
             }
 
-            Map<String, String> oldFormIdFormKeyMap = new HashMap<>();
-            Map<String, CmmnModelInfo> formKeyModelIdMap = new HashMap<>();
-            for (String oldFormId : formKeyAndModelMap.keySet()) {
-                Model formModel = formKeyAndModelMap.get(oldFormId);
-                oldFormIdFormKeyMap.put(oldFormId, formModel.getKey());
-                formKeyModelIdMap.put(formModel.getKey(), new CmmnModelInfo(formModel.getId(), formModel.getName(), formModel.getKey()));
-            }
+            CmmnModel cmmnModel = cmmnJsonConverter.convertToCmmnModel(cmmnModelNode, converterContext);
+            String updatedCmmnJson = cmmnJsonConverter.convertToJson(cmmnModel, converterContext).toString();
 
-            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<>();
-            Map<String, CmmnModelInfo> decisionTableKeyModelIdMap = new HashMap<>();
-            for (String oldDecisionTableId : decisionTableKeyAndModelMap.keySet()) {
-                Model decisionTableModel = decisionTableKeyAndModelMap.get(oldDecisionTableId);
-                oldDecisionTableIdDecisionTableKeyMap.put(oldDecisionTableId, decisionTableModel.getKey());
-                decisionTableKeyModelIdMap.put(decisionTableModel.getKey(), new CmmnModelInfo(decisionTableModel.getId(),
-                                decisionTableModel.getName(), decisionTableModel.getKey()));
-            }
-
-            CmmnModel cmmnModel = cmmnJsonConverter.convertToCmmnModel(cmmnModelNode, oldFormIdFormKeyMap, oldDecisionTableIdDecisionTableKeyMap, null, null);
-            String updatedCmmnJson = cmmnJsonConverter.convertToJson(cmmnModel, formKeyModelIdMap, decisionTableKeyModelIdMap).toString();
-
+            Model existingModel = converterContext.getCaseModelByKey(cmmnModelKey);
             Model updatedCaseModel = null;
             if (existingModel != null) {
                 byte[] imageBytes = null;
@@ -493,14 +428,12 @@ public class AppDefinitionImportService {
                 }
             }
 
-            cmmnModelIdAndModelMap.put(oldCmmnModelId, updatedCaseModel);
+            converterContext.addCaseModel(updatedCaseModel, oldCmmnModelId);
         }
-
-        return cmmnModelIdAndModelMap;
     }
 
-    protected AppDefinitionRepresentation importAppDefinitionModel(Model appDefinitionModel, Model existingAppModel, 
-                    Map<String, Model> bpmnModelIdAndModelMap, Map<String, Model> cmmnModelIdAndModelMap) {
+    protected AppDefinitionRepresentation importAppDefinitionModel(Model appDefinitionModel,
+            Model existingAppModel, ConverterContext converterContext) {
 
         AppDefinition appDefinition = null;
         try {
@@ -512,8 +445,8 @@ public class AppDefinitionImportService {
 
         if (appDefinition.getModels() != null) {
             for (AppModelDefinition modelDef : appDefinition.getModels()) {
-                if (bpmnModelIdAndModelMap.containsKey(modelDef.getId())) {
-                    Model newModel = bpmnModelIdAndModelMap.get(modelDef.getId());
+                Model newModel = converterContext.getProcessModelById(modelDef.getId());
+                if (newModel != null) {
                     modelDef.setId(newModel.getId());
                     modelDef.setName(newModel.getName());
                     modelDef.setCreatedBy(newModel.getCreatedBy());
@@ -526,8 +459,8 @@ public class AppDefinitionImportService {
         
         if (appDefinition.getCmmnModels() != null) {
             for (AppModelDefinition modelDef : appDefinition.getCmmnModels()) {
-                if (cmmnModelIdAndModelMap.containsKey(modelDef.getId())) {
-                    Model newModel = cmmnModelIdAndModelMap.get(modelDef.getId());
+                Model newModel = converterContext.getCaseModelById(modelDef.getId());
+                if (newModel != null) {
                     modelDef.setId(newModel.getId());
                     modelDef.setName(newModel.getName());
                     modelDef.setCreatedBy(newModel.getCreatedBy());

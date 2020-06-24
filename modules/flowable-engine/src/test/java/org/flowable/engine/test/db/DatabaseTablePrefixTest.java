@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.db;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -77,8 +77,8 @@ public class DatabaseTablePrefixTest {
         try {
             engine1.getRepositoryService().createDeployment().addClasspathResource("org/flowable/engine/test/db/oneJobProcess.bpmn20.xml").deploy();
 
-            assertEquals(1, engine1.getRepositoryService().createDeploymentQuery().count());
-            assertEquals(0, engine2.getRepositoryService().createDeploymentQuery().count());
+            assertThat(engine1.getRepositoryService().createDeploymentQuery().count()).isEqualTo(1);
+            assertThat(engine2.getRepositoryService().createDeploymentQuery().count()).isZero();
 
         } finally {
             engine1.close();
@@ -115,11 +115,11 @@ public class DatabaseTablePrefixTest {
             processEngine1 = createProcessEngine("SCHEMA1");
             processEngine1.getRepositoryService().createDeployment()
                 .addClasspathResource("org/flowable/engine/test/db/oneJobProcess.bpmn20.xml").deploy();
-            assertEquals(1, processEngine1.getRepositoryService().createDeploymentQuery().count());
+            assertThat(processEngine1.getRepositoryService().createDeploymentQuery().count()).isEqualTo(1);
             
             // Boot second engine on other schema. Shouldn't be able to see the data
             processEngine2 = createProcessEngine("SCHEMA2");
-            assertEquals(0, processEngine2.getRepositoryService().createDeploymentQuery().count());
+            assertThat(processEngine2.getRepositoryService().createDeploymentQuery().count()).isZero();
             
             // Reboot both engines. The results should still be the same as before
             processEngine1.close();
@@ -128,8 +128,8 @@ public class DatabaseTablePrefixTest {
             processEngine1 = createProcessEngine("SCHEMA1");
             processEngine2 = createProcessEngine("SCHEMA2");
             
-            assertEquals(1, processEngine1.getRepositoryService().createDeploymentQuery().count());
-            assertEquals(0, processEngine2.getRepositoryService().createDeploymentQuery().count());
+            assertThat(processEngine1.getRepositoryService().createDeploymentQuery().count()).isEqualTo(1);
+            assertThat(processEngine2.getRepositoryService().createDeploymentQuery().count()).isZero();
             
         } finally {
             if (processEngine1 != null) {

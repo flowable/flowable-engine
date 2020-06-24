@@ -49,7 +49,8 @@ public class ExternalWorkerServiceTaskJsonConverter extends BaseBpmnJsonConverte
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) baseElement;
 
         setPropertyValue(PROPERTY_SKIP_EXPRESSION, externalWorkerServiceTask.getSkipExpression(), propertiesNode);
@@ -58,7 +59,8 @@ public class ExternalWorkerServiceTaskJsonConverter extends BaseBpmnJsonConverte
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ExternalWorkerServiceTask task = new ExternalWorkerServiceTask();
         task.setType(ServiceTask.EXTERNAL_WORKER_TASK);
 

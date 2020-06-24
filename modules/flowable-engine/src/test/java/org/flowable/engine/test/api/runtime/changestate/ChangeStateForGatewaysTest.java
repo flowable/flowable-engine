@@ -108,7 +108,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("task2");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
@@ -174,7 +174,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskAfter");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -1172,7 +1172,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(4);
 
         Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertThat(parallelJoinExecution.isPresent()).isFalse();
+        assertThat(parallelJoinExecution).isNotPresent();
 
         taskService.complete(tasks.get(0).getId());
 
@@ -1183,7 +1183,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(3);
 
         parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertThat(parallelJoinExecution.isPresent()).isTrue();
+        assertThat(parallelJoinExecution).isPresent();
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
@@ -1304,7 +1304,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(5);
 
         Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertThat(parallelJoinExecution.isPresent()).isFalse();
+        assertThat(parallelJoinExecution).isNotPresent();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
         taskService.complete(task.getId());
@@ -1322,7 +1322,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(4);
 
         parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertThat(parallelJoinExecution.isPresent()).isTrue();
+        assertThat(parallelJoinExecution).isPresent();
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
@@ -1442,7 +1442,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(5);
 
         Optional<Execution> inclusiveJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("inclusiveJoin")).findFirst();
-        assertThat(inclusiveJoinExecution.isPresent()).isTrue();
+        assertThat(inclusiveJoinExecution).isPresent();
         assertThat(((ExecutionEntity) inclusiveJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();

@@ -50,7 +50,8 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) baseElement;
         
         String eventType = sendEventServiceTask.getEventType();
@@ -96,7 +97,8 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         SendEventServiceTask task = new SendEventServiceTask();
         task.setType(ServiceTask.SEND_EVENT_TASK);
         

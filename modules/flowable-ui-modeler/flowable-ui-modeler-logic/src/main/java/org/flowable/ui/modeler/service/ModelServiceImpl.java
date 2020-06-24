@@ -643,20 +643,22 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model) {
         BpmnModel bpmnModel = null;
         try {
-            Map<String, Model> formMap = new HashMap<>();
-            Map<String, Model> decisionMap = new HashMap<>();
-
+            ConverterContext converterContext = new ConverterContext(this, objectMapper);
             List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
                 if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                    formMap.put(childModel.getId(), childModel);
+                    converterContext.addFormModel(childModel);
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    decisionMap.put(childModel.getId(), childModel);
+                    converterContext.addDecisionTableModel(childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    converterContext.addDecisionServiceModel(childModel);
+
                 }
             }
 
-            bpmnModel = getBpmnModel(model, formMap, decisionMap);
+            bpmnModel = getBpmnModel(model, converterContext);
 
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
@@ -667,20 +669,10 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionMap) {
+    public BpmnModel getBpmnModel(AbstractModel model, ConverterContext appConverterContext) {
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
-            Map<String, String> formKeyMap = new HashMap<>();
-            for (Model formModel : formMap.values()) {
-                formKeyMap.put(formModel.getId(), formModel.getKey());
-            }
-
-            Map<String, String> decisionKeyMap = new HashMap<>();
-            for (Model decisionModel : decisionMap.values()) {
-                decisionKeyMap.put(decisionModel.getId(), decisionModel.getKey());
-            }
-
-            return bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionKeyMap);
+            return bpmnJsonConverter.convertToBpmnModel(editorJsonNode, appConverterContext);
 
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
@@ -692,28 +684,29 @@ public class ModelServiceImpl implements ModelService {
     public CmmnModel getCmmnModel(AbstractModel model) {
         CmmnModel cmmnModel = null;
         try {
-            Map<String, Model> formMap = new HashMap<>();
-            Map<String, Model> decisionTableMap = new HashMap<>();
-            Map<String, Model> caseModelMap = new HashMap<>();
-            Map<String, Model> processModelMap = new HashMap<>();
 
+            ConverterContext converterContext = new ConverterContext(this, objectMapper);
             List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
                 if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                    formMap.put(childModel.getId(), childModel);
+                    converterContext.addFormModel(childModel);
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    decisionTableMap.put(childModel.getId(), childModel);
+                    converterContext.addDecisionTableModel(childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    converterContext.addDecisionServiceModel(childModel);
 
                 } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
-                    caseModelMap.put(childModel.getId(), childModel);
+                    converterContext.addCaseModel(childModel);
 
                 } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
-                    processModelMap.put(childModel.getId(), childModel);
+                    converterContext.addProcessModel(childModel);
+
                 }
             }
 
-            cmmnModel = getCmmnModel(model, formMap, decisionTableMap, caseModelMap, processModelMap);
+            cmmnModel = getCmmnModel(model, converterContext);
 
         } catch (Exception e) {
             LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
@@ -724,17 +717,11 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap,
-                    Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
+    public CmmnModel getCmmnModel(AbstractModel model, ConverterContext converterContext) {
 
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
-            Map<String, String> formKeyMap = convertToModelKeyMap(formMap);
-            Map<String, String> decisionTableKeyMap = convertToModelKeyMap(decisionTableMap);
-            Map<String, String> caseModelKeyMap = convertToModelKeyMap(caseModelMap);
-            Map<String, String> processModelKeyMap = convertToModelKeyMap(processModelMap);
-
-            return cmmnJsonConverter.convertToCmmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap, caseModelKeyMap, processModelKeyMap);
+            return cmmnJsonConverter.convertToCmmnModel(editorJsonNode, converterContext);
 
         } catch (Exception e) {
             LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
@@ -829,7 +816,7 @@ public class ModelServiceImpl implements ModelService {
                 }
 
                 modelRepository.save(model);
-                handleDrdModelDecisionTableRelations(model, jsonNode);
+                handleDecisionServiceModelDecisionTableRelations(model, jsonNode);
             }
         }
 
@@ -892,11 +879,11 @@ public class ModelServiceImpl implements ModelService {
         handleModelRelations(appModel, processModelIds, ModelRelationTypes.TYPE_PROCESS_MODEL);
     }
 
-    protected void handleDrdModelDecisionTableRelations(AbstractModel drdModel, ObjectNode editorJsonNode) {
+    protected void handleDecisionServiceModelDecisionTableRelations(AbstractModel decisionServiceModel, ObjectNode editorJsonNode) {
         List<JsonNode> decisionTableNodes = DmnJsonConverterUtil.filterOutJsonNodes(DmnJsonConverterUtil.getDmnModelDecisionTableReferences(editorJsonNode));
         Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
 
-        handleModelRelations(drdModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
+        handleModelRelations(decisionServiceModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
 
     /**

@@ -14,7 +14,6 @@ package org.flowable.ui.modeler.serviceapi;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.model.CmmnModel;
@@ -25,6 +24,7 @@ import org.flowable.ui.modeler.domain.ModelHistory;
 import org.flowable.ui.modeler.model.ModelKeyRepresentation;
 import org.flowable.ui.modeler.model.ModelRepresentation;
 import org.flowable.ui.modeler.model.ReviveModelResultRepresentation;
+import org.flowable.ui.modeler.service.ConverterContext;
 
 public interface ModelService {
 
@@ -40,22 +40,21 @@ public interface ModelService {
 
     Long getModelCountForUser(User user, int modelTypeApp);
 
-    BpmnModel getBpmnModel(AbstractModel model);
+    BpmnModel getBpmnModel(AbstractModel model, ConverterContext converterContext);
 
     byte[] getBpmnXML(BpmnModel bpmnMode);
 
     byte[] getBpmnXML(AbstractModel model);
 
-    BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    BpmnModel getBpmnModel(AbstractModel model);
     
     CmmnModel getCmmnModel(AbstractModel model);
 
     byte[] getCmmnXML(CmmnModel cmmnModel);
 
     byte[] getCmmnXML(AbstractModel model);
-    
-    CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, 
-                    Map<String, Model> caseModelMap, Map<String, Model> processModelMap);
+
+    CmmnModel getCmmnModel(AbstractModel model, ConverterContext converterContext);
     
     String createModelJson(ModelRepresentation model);
 

@@ -29,7 +29,6 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,10 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class StartEventJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
-
-    protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+public class StartEventJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
         fillJsonTypes(convertersToBpmnMap);
@@ -92,19 +88,20 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         StartEvent startEvent = (StartEvent) baseElement;
         if (StringUtils.isNotEmpty(startEvent.getInitiator())) {
             propertiesNode.put(PROPERTY_NONE_STARTEVENT_INITIATOR, startEvent.getInitiator());
         }
 
         if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-            if (formKeyMap != null && formKeyMap.containsKey(startEvent.getFormKey())) {
+            Map<String, String> modelInfo = converterContext.getFormModelInfoForFormModelKey(startEvent.getFormKey());
+            if (modelInfo != null) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                ModelInfo modelInfo = formKeyMap.get(startEvent.getFormKey());
-                formRefNode.put("id", modelInfo.getId());
-                formRefNode.put("name", modelInfo.getName());
-                formRefNode.put("key", modelInfo.getKey());
+                formRefNode.put("id", modelInfo.get("id"));
+                formRefNode.put("name", modelInfo.get("name"));
+                formRefNode.put("key", modelInfo.get("key"));
                 propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
 
             } else {
@@ -126,7 +123,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         StartEvent startEvent = new StartEvent();
         startEvent.setInitiator(getPropertyValueAsString(PROPERTY_NONE_STARTEVENT_INITIATOR, elementNode));
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
@@ -138,8 +136,10 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                 JsonNode formReferenceNode = getProperty(PROPERTY_FORM_REFERENCE, elementNode);
                 if (formReferenceNode != null && formReferenceNode.get("id") != null) {
 
-                    if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
-                        startEvent.setFormKey(formMap.get(formReferenceNode.get("id").asText()));
+                    String formModelId = formReferenceNode.get("id").asText();
+                    String formModelKey = converterContext.getFormModelKeyForFormModelId(formModelId);
+                    if (formModelKey != null) {
+                        startEvent.setFormKey(formModelKey);
                     }
                 }
             }
@@ -205,16 +205,6 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         return startEvent;
     }
 
-    @Override
-    public void setFormMap(Map<String, String> formMap) {
-        this.formMap = formMap;
-    }
-
-    @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
-        this.formKeyMap = formKeyMap;
-    }
-    
     protected void addEventRegistryProperties(StartEvent startEvent, ObjectNode propertiesNode) {
         String eventType = getExtensionValue("eventType", startEvent);
         if (StringUtils.isNotEmpty(eventType)) {

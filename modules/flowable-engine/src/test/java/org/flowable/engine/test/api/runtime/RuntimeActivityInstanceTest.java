@@ -217,7 +217,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getId());
 
-        assertThat(0L).isEqualTo(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count());
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count()).isZero();
     }
 
     protected void assertThatActivityInstancesAreSame(String userTask) {

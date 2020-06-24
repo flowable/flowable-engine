@@ -17,7 +17,6 @@ import java.util.Map;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElementsContainer;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -27,9 +26,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public interface ActivityProcessor {
 
-    public void processFlowElements(FlowElementsContainer container, BpmnModel model, ArrayNode shapesArrayNode,
-            Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY);
+    void processFlowElements(FlowElementsContainer container, BpmnModel model, ArrayNode shapesArrayNode,
+        BpmnJsonConverterContext converterContext, double subProcessX, double subProcessY);
 
-    public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement,
-            Map<String, JsonNode> shapeMap, Map<String, String> formKeyMap, Map<String, String> decisionTableMap, BpmnModel bpmnModel);
+    void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement,
+            Map<String, JsonNode> shapeMap, BpmnJsonConverterContext converterContext, BpmnModel bpmnModel);
 }

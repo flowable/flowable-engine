@@ -138,6 +138,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
     String FIELD_SCOPE_TYPE = "scopeType";
     String FIELD_SUB_SCOPE_ID = "subScopeId";
+    String FIELD_PARENT_ELEMENT_ID = "parentElementId";
     String FIELD_REF_SCOPE_ID = "refScopeId";
     String FIELD_REF_SCOPE_DEFINITION_ID = "refScopeDefinitionId";
     String FIELD_REF_SCOPE_TYPE = "refScopeType";

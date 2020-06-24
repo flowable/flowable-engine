@@ -21,7 +21,6 @@ import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -30,13 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter,
-    DecisionAwareConverter, DecisionKeyAwareConverter {
-
-    protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
-    protected Map<String, String> decisionMap;
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -68,7 +61,8 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         SubProcess subProcess = (SubProcess) baseElement;
 
         propertiesNode.put("activitytype", getStencilId(baseElement));
@@ -79,10 +73,11 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
         
         if (isExpanded != null && isExpanded == false) {
-            processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap, decisionTableKeyMap, 0, 0);
+            processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, converterContext,
+                0, 0);
         } else {
-            processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap,
-                    decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
+            processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, converterContext,
+                graphicInfo.getX(), graphicInfo.getY());
         }
         
         flowElementNode.set("childShapes", subProcessShapesArrayNode);
@@ -95,7 +90,8 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         SubProcess subProcess = null;
         if (getPropertyValueAsBoolean("istransaction", elementNode)) {
             subProcess = new Transaction();
@@ -105,7 +101,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         }
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-        processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionMap, model);
+        processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, converterContext, model);
 
         JsonNode processDataPropertiesNode = elementNode.get(EDITOR_SHAPE_PROPERTIES).get(PROPERTY_DATA_PROPERTIES);
         if (processDataPropertiesNode != null) {
@@ -121,25 +117,5 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         }
 
         return subProcess;
-    }
-
-    @Override
-    public void setFormMap(Map<String, String> formMap) {
-        this.formMap = formMap;
-    }
-
-    @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
-        this.formKeyMap = formKeyMap;
-    }
-
-    @Override
-    public void setDecisionMap(Map<String, String> decisionTableMap) {
-        this.decisionMap = decisionTableMap;
-    }
-
-    @Override
-    public void setDecisionKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
-        this.decisionTableKeyMap = decisionTableKeyMap;
     }
 }

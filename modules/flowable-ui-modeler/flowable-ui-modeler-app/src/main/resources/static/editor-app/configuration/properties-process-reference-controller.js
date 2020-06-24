@@ -24,7 +24,7 @@ angular.module('flowableModeler').controller('FlowableProcessReferenceCtrl',
         _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('FlowableProcessReferencePopupCtrl', [ '$scope', '$http', function($scope, $http) {
+angular.module('flowableModeler').controller('FlowableProcessReferencePopupCtrl', [ '$scope', '$http', '$location', function($scope, $http, $location) {
 	
     $scope.state = {'loadingProcesses' : true, 'error' : false};
     
@@ -44,11 +44,17 @@ angular.module('flowableModeler').controller('FlowableProcessReferencePopupCtrl'
    	 		$scope.selectedProcess = processModel;
    	 	}
     };
+
+	$scope.open = function() {
+		if ($scope.selectedProcess) {
+			$location.path("/editor/" + $scope.selectedProcess.id);
+		}
+	};
     
     // Saving the selected value
     $scope.save = function() {
    	 	if ($scope.selectedProcess) {
-   	 		$scope.property.value = {'id' : $scope.selectedProcess.id, 'name' : $scope.selectedProcess.name};
+   	 		$scope.property.value = {'id' : $scope.selectedProcess.id, 'name' : $scope.selectedProcess.name, 'key': $scope.selectedProcess.key};
    	 	} else {
    	 		$scope.property.value = null; 
    	 	}

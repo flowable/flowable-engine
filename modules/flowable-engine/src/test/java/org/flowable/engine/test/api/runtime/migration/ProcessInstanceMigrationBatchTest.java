@@ -358,8 +358,8 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
         assertThat(migrationResult.getAllMigrationParts()).hasSize(successInstances.size() + failedInstances.size());
         assertThat(migrationResult.getWaitingMigrationParts()).isEmpty();
-        assertThat(migrationResult.getSuccessfulMigrationParts()).hasSize(successInstances.size());
-        assertThat(migrationResult.getFailedMigrationParts()).hasSize(failedInstances.size());
+        assertThat(migrationResult.getSuccessfulMigrationParts()).hasSameSizeAs(successInstances);
+        assertThat(migrationResult.getFailedMigrationParts()).hasSameSizeAs(failedInstances);
 
         for (ProcessInstanceBatchMigrationPartResult part : migrationResult.getSuccessfulMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
@@ -382,11 +382,11 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(searchBatches.get(0).getCreateTime()).isNotNull();
 
         assertThat(managementService.createBatchQuery().searchKey(version1ProcessDef.getId()).count()).isEqualTo(1);
-        assertThat(managementService.createBatchQuery().searchKey(version2ProcessDef.getId()).count()).isEqualTo(0);
-        assertThat(managementService.createBatchQuery().searchKey2(version1ProcessDef.getId()).count()).isEqualTo(0);
+        assertThat(managementService.createBatchQuery().searchKey(version2ProcessDef.getId()).count()).isZero();
+        assertThat(managementService.createBatchQuery().searchKey2(version1ProcessDef.getId()).count()).isZero();
         assertThat(managementService.createBatchQuery().searchKey2(version2ProcessDef.getId()).count()).isEqualTo(1);
         assertThat(managementService.createBatchQuery().createTimeLowerThan(new Date()).count()).isEqualTo(1);
-        assertThat(managementService.createBatchQuery().createTimeHigherThan(new Date()).count()).isEqualTo(0);
+        assertThat(managementService.createBatchQuery().createTimeHigherThan(new Date()).count()).isZero();
 
         List<BatchPart> searchBatchParts = managementService.findBatchPartsByBatchId(migrationBatch.getId());
         assertThat(searchBatchParts).hasSize(20);

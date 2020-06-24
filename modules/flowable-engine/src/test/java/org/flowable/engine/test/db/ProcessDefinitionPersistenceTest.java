@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.bpmn.model.EndEvent;
@@ -37,7 +39,7 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
 
         repositoryService.deleteDeployment(deploymentId);
     }
@@ -49,28 +51,29 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         ProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(procDefId);
 
-        assertEquals(procDefId, processDefinition.getId());
-        assertEquals("Process One", processDefinition.getName());
+        assertThat(processDefinition.getId()).isEqualTo(procDefId);
+        assertThat(processDefinition.getName()).isEqualTo("Process One");
 
         Process process = repositoryService.getBpmnModel(processDefinition.getId()).getMainProcess();
         StartEvent startElement = (StartEvent) process.getFlowElement("start");
-        assertNotNull(startElement);
-        assertEquals("start", startElement.getId());
-        assertEquals("S t a r t", startElement.getName());
-        assertEquals("the start event", startElement.getDocumentation());
+        assertThat(startElement).isNotNull();
+        assertThat(startElement.getId()).isEqualTo("start");
+        assertThat(startElement.getName()).isEqualTo("S t a r t");
+        assertThat(startElement.getDocumentation()).isEqualTo("the start event");
         List<SequenceFlow> outgoingFlows = startElement.getOutgoingFlows();
-        assertEquals(1, outgoingFlows.size());
-        assertEquals("${a == b}", outgoingFlows.get(0).getConditionExpression());
+        assertThat(outgoingFlows)
+                .extracting(SequenceFlow::getConditionExpression)
+                .containsExactly("${a == b}");
 
         EndEvent endElement = (EndEvent) process.getFlowElement("end");
-        assertNotNull(endElement);
-        assertEquals("end", endElement.getId());
+        assertThat(endElement).isNotNull();
+        assertThat(endElement.getId()).isEqualTo("end");
 
-        assertEquals("flow1", outgoingFlows.get(0).getId());
-        assertEquals("Flow One", outgoingFlows.get(0).getName());
-        assertEquals("The only transitions in the process", outgoingFlows.get(0).getDocumentation());
-        assertSame(startElement, outgoingFlows.get(0).getSourceFlowElement());
-        assertSame(endElement, outgoingFlows.get(0).getTargetFlowElement());
+        assertThat(outgoingFlows.get(0).getId()).isEqualTo("flow1");
+        assertThat(outgoingFlows.get(0).getName()).isEqualTo("Flow One");
+        assertThat(outgoingFlows.get(0).getDocumentation()).isEqualTo("The only transitions in the process");
+        assertThat(outgoingFlows.get(0).getSourceFlowElement()).isSameAs(startElement);
+        assertThat(outgoingFlows.get(0).getTargetFlowElement()).isSameAs(endElement);
 
         repositoryService.deleteDeployment(deploymentId);
     }
@@ -82,13 +85,13 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().orderByProcessDefinitionVersion().asc().list();
 
-        assertEquals(2, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(2);
 
         String deployment2Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
 
-        assertEquals(4, repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().count());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().latestVersion().orderByProcessDefinitionName().asc().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().count()).isEqualTo(4);
+        assertThat(repositoryService.createProcessDefinitionQuery().latestVersion().orderByProcessDefinitionName().asc().count()).isEqualTo(2);
 
         repositoryService.deleteDeployment(deployment1Id);
         repositoryService.deleteDeployment(deployment2Id);
@@ -99,13 +102,13 @@ public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase 
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/process-with-di.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/db/process-without-di.bpmn20.xml").deploy().getId();
 
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
 
         ProcessDefinition processWithDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithDi").singleResult();
-        assertTrue(processWithDi.hasGraphicalNotation());
+        assertThat(processWithDi.hasGraphicalNotation()).isTrue();
 
         ProcessDefinition processWithoutDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithoutDi").singleResult();
-        assertFalse(processWithoutDi.hasGraphicalNotation());
+        assertThat(processWithoutDi.hasGraphicalNotation()).isFalse();
 
         repositoryService.deleteDeployment(deploymentId);
 

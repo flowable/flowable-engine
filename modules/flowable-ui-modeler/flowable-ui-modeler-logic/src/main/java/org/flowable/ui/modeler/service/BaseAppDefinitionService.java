@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -59,7 +58,6 @@ import org.flowable.ui.modeler.domain.AppDefinition;
 import org.flowable.ui.modeler.domain.AppModelDefinition;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.repository.ModelRepository;
-import org.flowable.ui.modeler.repository.ModelSort;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.flowable.ui.modeler.util.BpmnEventModelUtil;
 import org.flowable.ui.modeler.util.CmmnEventModelUtil;
@@ -211,39 +209,29 @@ public class BaseAppDefinitionService {
 
             deployableAssets.put(appDefinitionModel.getKey() + ".app", appDefinitionJsonBytes);
 
-            Map<String, Model> formMap = new HashMap<>();
-            Map<String, Model> decisionMap = new HashMap<>();
-            Map<String, Model> caseModelMap = new HashMap<>();
-            Map<String, Model> processModelMap = new HashMap<>();
+            ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
+            createDeployableAppModels(appDefinitionModel, appDefinition, deployableAssets, converterContext);
 
-            createDeployableAppModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionMap, caseModelMap, processModelMap);
-
-            if (formMap.size() > 0) {
-                for (String formId : formMap.keySet()) {
-                    Model formInfo = formMap.get(formId);
-                    String formModelEditorJson = formInfo.getModelEditorJson();
+            Collection<Model> allFormModels = converterContext.getAllFormModels();
+            if (allFormModels.size() > 0) {
+                for (Model formModel : allFormModels) {
+                    String formModelEditorJson = formModel.getModelEditorJson();
                     byte[] formModelEditorJsonBytes = formModelEditorJson.getBytes(StandardCharsets.UTF_8);
-                    deployableAssets.put("form-" + formInfo.getKey() + ".form", formModelEditorJsonBytes);
+                    deployableAssets.put("form-" + formModel.getKey() + ".form", formModelEditorJsonBytes);
                 }
             }
 
-            if (decisionMap.size() > 0) {
-                List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
-                Map<String, String> decisionTableEditorJSONs = decisionTableModels.stream()
-                    .collect(Collectors.toMap(
-                        AbstractModel::getKey,
-                        AbstractModel::getModelEditorJson
-                    ));
-
-                for (String decisionId : decisionMap.keySet()) {
-                    Model decisionInfo = decisionMap.get(decisionId);
+            Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
+            if (allDecisionTableModels.size() > 0) {
+                for (Model decisionTableModel : allDecisionTableModels) {
                     try {
-                        JsonNode decisionNode = objectMapper.readTree(decisionInfo.getModelEditorJson());
-                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionNode, decisionInfo.getId(), decisionTableEditorJSONs);
+                        JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(),
+                            decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
                         byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-                        deployableAssets.put("dmn-" + decisionInfo.getKey() + ".dmn", dmnXMLBytes);
+                        deployableAssets.put("dmn-" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {
-                        throw new InternalServerErrorException(String.format("Error converting decision %s to XML", decisionInfo.getName()));
+                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableModel.getName()));
                     }
                 }
             }
@@ -254,8 +242,8 @@ public class BaseAppDefinitionService {
         return deployZipArtifact;
     }
     
-    protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
+    protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets,
+            ConverterContext converterContext) {
         
         List<AppModelDefinition> appModels = new ArrayList<>();
         if (appDefinition.getModels() != null) {
@@ -267,8 +255,10 @@ public class BaseAppDefinitionService {
         }
         
         for (AppModelDefinition appModelDef : appModels) {
-            
-            if (caseModelMap.containsKey(appModelDef.getId()) || processModelMap.containsKey(appModelDef.getId())) {
+
+            String caseModelKey = converterContext.getCaseModelKeyForCaseModelId(appModelDef.getId());
+            String processModelKey = converterContext.getProcessModelKeyForProcessModelId(appModelDef.getId());
+            if (caseModelKey != null || processModelKey != null) {
                 return;
             }
 
@@ -277,35 +267,37 @@ public class BaseAppDefinitionService {
                 throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
             }
 
-            createDeployableModels(model, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+            createDeployableModels(model, deployableAssets, converterContext);
         }
     }
-    
-    protected void createDeployableModels(AbstractModel parentModel, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
-        
+
+    protected void createDeployableModels(AbstractModel parentModel, Map<String, byte[]> deployableAssets, ConverterContext converterContext) {
+
         List<Model> referencedModels = modelRepository.findByParentModelId(parentModel.getId());
         for (Model childModel : referencedModels) {
             if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                formMap.put(childModel.getId(), childModel);
+                converterContext.addFormModel(childModel);
 
-            } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType() || Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
-                decisionMap.put(childModel.getId(), childModel);
-            
+            } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                converterContext.addDecisionTableModel(childModel);
+
+            } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                converterContext.addDecisionServiceModel(childModel);
+
             } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
-                caseModelMap.put(childModel.getId(), childModel);
-                createDeployableModels(childModel, deployableAssets, formMap, decisionMap, caseModelMap, processModelMap);
+                converterContext.addCaseModel(childModel);
+                createDeployableModels(childModel, deployableAssets, converterContext);
             
             } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
-                processModelMap.put(childModel.getId(), childModel);
-                createDeployableModels(childModel, deployableAssets, formMap, decisionMap, caseModelMap, processModelMap);
+                converterContext.addProcessModel(childModel);
+                createDeployableModels(childModel, deployableAssets, converterContext);
             }
         }
 
         Map<String, EventModel> eventModelMap = new HashMap<>();
         Map<String, ChannelModel> channelModelMap = new HashMap<>();
         if (parentModel.getModelType() == null || parentModel.getModelType() == AbstractModel.MODEL_TYPE_BPMN) {
-            BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, formMap, decisionMap);
+            BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, converterContext);
             List<FlowElement> eventRegistryElements = new ArrayList<>();
             Map<String, StartEvent> noneStartEventMap = new HashMap<>();
             postProcessFlowElements(eventRegistryElements, noneStartEventMap, bpmnModel);
@@ -321,7 +313,7 @@ public class BaseAppDefinitionService {
             deployableAssets.put(parentModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
             
         } else {
-            CmmnModel cmmnModel = modelService.getCmmnModel(parentModel, formMap, decisionMap, caseModelMap, processModelMap);
+            CmmnModel cmmnModel = modelService.getCmmnModel(parentModel, converterContext);
             List<BaseElement> eventRegistryElements = new ArrayList<>();
             postProcessPlanItemDefinitions(eventRegistryElements, cmmnModel);
             

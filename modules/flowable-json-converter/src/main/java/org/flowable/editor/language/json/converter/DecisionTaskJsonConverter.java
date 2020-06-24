@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,28 +12,27 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionAwareConverter {
+public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
 
     protected static final String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
     protected static final String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
 
-    protected Map<String, String> decisionMap;
-
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
-                                 Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+        Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
@@ -52,33 +51,35 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
 
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);
 
-        String decisionId = null;
+        String decisionModelKey = null;
         String referenceType = null;
 
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
-            decisionId = decisionTableReferenceNode.get("id").asText();
+            String decisionTableId = decisionTableReferenceNode.get("id").asText();
+            decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(decisionTableId);
             referenceType = REFERENCE_TYPE_DECISION_TABLE;
         }
 
         JsonNode decisionServiceReferenceNode = getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
         if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
-            decisionId = decisionServiceReferenceNode.get("id").asText();
+            String decisionServiceId = decisionServiceReferenceNode.get("id").asText();
+            decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(decisionServiceId);
             referenceType = REFERENCE_TYPE_DECISION_SERVICE;
         }
 
-        if (decisionId != null && decisionMap != null) {
-            String decisionTableKey = decisionMap.get(decisionId);
-
+        if (decisionModelKey != null) {
             FieldExtension decisionTableKeyField = new FieldExtension();
             decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
-            decisionTableKeyField.setStringValue(decisionTableKey);
+            decisionTableKeyField.setStringValue(decisionModelKey);
             serviceTask.getFieldExtensions().add(decisionTableKeyField);
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
         }
 
         if (referenceType != null) {
@@ -110,12 +111,8 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
 
-    }
-
-    @Override
-    public void setDecisionMap(Map<String, String> decisionMap) {
-        this.decisionMap = decisionMap;
     }
 }

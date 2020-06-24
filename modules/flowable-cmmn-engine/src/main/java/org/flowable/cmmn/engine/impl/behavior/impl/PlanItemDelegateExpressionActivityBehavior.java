@@ -53,7 +53,7 @@ public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnTriggera
             if (delegate instanceof PlanItemActivityBehavior) {
                 ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
 
-            } else if (delegate instanceof CmmnActivityBehavior) { // includes CmmnTriggerableActivityBehavior
+            } else if (delegate instanceof CmmnActivityBehavior) {
                 ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
 
             } else if (delegate instanceof PlanItemJavaDelegate) {
