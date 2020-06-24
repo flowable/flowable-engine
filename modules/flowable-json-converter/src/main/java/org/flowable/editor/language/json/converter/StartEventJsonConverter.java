@@ -12,7 +12,6 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +22,6 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -168,34 +166,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
             convertJsonToSignalDefinition(elementNode, startEvent);
         
         } else if (STENCIL_EVENT_START_EVENT_REGISTRY.equals(stencilId)) {
-            String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
-            if (StringUtils.isNotEmpty(eventKey)) {
-                addFlowableExtensionElementWithValue("eventType", eventKey, startEvent);
-                addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), startEvent);
-                convertJsonToOutParameters(elementNode, startEvent);
-                convertJsonToCorrelationParameters(elementNode, "eventCorrelationParameter", startEvent);
-                
-                addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), startEvent);
-                
-                String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
-                String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-                String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
-                if (StringUtils.isNotEmpty(fixedValue)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, startEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonField)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, startEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonPointer)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, startEvent);
-                }
-            }
+            addReceiveEventExtensionElements(elementNode, startEvent);
+
         }
 
         if (!getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode)) {
@@ -205,43 +177,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
         return startEvent;
     }
 
-    protected void addEventRegistryProperties(StartEvent startEvent, ObjectNode propertiesNode) {
-        String eventType = getExtensionValue("eventType", startEvent);
-        if (StringUtils.isNotEmpty(eventType)) {
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", startEvent), propertiesNode);
-            addEventOutParameters(startEvent.getExtensionElements().get("eventOutParameter"), propertiesNode);
-            addEventCorrelationParameters(startEvent.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
-            
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", startEvent), propertiesNode);
-            
-            String keyDetectionType = getExtensionValue("keyDetectionType", startEvent);
-            String keyDetectionValue = getExtensionValue("keyDetectionValue", startEvent);
-            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
-                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
-                }
-            }
-        }
-    }
-    
-    protected String getExtensionValue(String name, FlowElement flowElement) {
-        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
-        if (extensionElements != null && extensionElements.size() > 0) {
-            return extensionElements.get(0).getElementText();
-        }
-        
-        return null;
-    }
+
     
     @Override
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {

@@ -589,6 +589,75 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         propertiesNode.set(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, valueNode);
     }
 
+    protected void addReceiveEventExtensionElements(JsonNode elementNode, FlowElement flowElement) {
+        String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
+        if (StringUtils.isNotEmpty(eventKey)) {
+            addFlowableExtensionElementWithValue("eventType", eventKey, flowElement);
+            addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), flowElement);
+            convertJsonToEventOutParameters(elementNode, flowElement);
+            convertJsonToEventCorrelationParameters(elementNode, "eventCorrelationParameter", flowElement);
+
+            addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), flowElement);
+            addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), flowElement);
+            addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), flowElement);
+            addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), flowElement);
+
+            String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
+            String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
+            String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
+            if (StringUtils.isNotEmpty(fixedValue)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", flowElement);
+                addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, flowElement);
+
+            } else if (StringUtils.isNotEmpty(jsonField)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", flowElement);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, flowElement);
+
+            } else if (StringUtils.isNotEmpty(jsonPointer)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", flowElement);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, flowElement);
+            }
+        }
+    }
+
+    protected void addEventRegistryProperties(FlowElement flowElement, ObjectNode propertiesNode) {
+        String eventType = getExtensionValue("eventType", flowElement);
+        if (StringUtils.isNotEmpty(eventType)) {
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", flowElement), propertiesNode);
+            addEventOutParameters(flowElement.getExtensionElements().get("eventOutParameter"), propertiesNode);
+            addEventCorrelationParameters(flowElement.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
+
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", flowElement), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", flowElement), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", flowElement), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", flowElement), propertiesNode);
+
+            String keyDetectionType = getExtensionValue("keyDetectionType", flowElement);
+            String keyDetectionValue = getExtensionValue("keyDetectionValue", flowElement);
+            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
+                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
+
+                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
+
+                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
+                }
+            }
+        }
+    }
+
+    protected String getExtensionValue(String name, FlowElement flowElement) {
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+
+        return null;
+    }
+
     protected void addMapException(List<MapExceptionEntry> exceptions, ObjectNode propertiesNode) {
         ObjectNode exceptionsNode = objectMapper.createObjectNode();
         ArrayNode itemsNode = objectMapper.createArrayNode();
@@ -803,7 +872,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         event.getEventDefinitions().add(eventDefinition);
     }
     
-    protected void convertJsonToOutParameters(JsonNode objectNode, Event event) {
+    protected void convertJsonToEventOutParameters(JsonNode objectNode, FlowElement event) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("outParameters") != null) {
@@ -903,7 +972,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         }
     }
     
-    protected void convertJsonToCorrelationParameters(JsonNode objectNode, String correlationPropertyName, FlowElement flowElement) {
+    protected void convertJsonToEventCorrelationParameters(JsonNode objectNode, String correlationPropertyName, FlowElement flowElement) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, objectNode);
         parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("correlationParameters") != null) {

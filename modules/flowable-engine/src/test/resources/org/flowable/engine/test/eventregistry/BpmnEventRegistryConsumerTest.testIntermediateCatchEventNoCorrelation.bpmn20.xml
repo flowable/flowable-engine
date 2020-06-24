@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <process id="process">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart" targetRef="catchEvent"/>
+
+        <intermediateCatchEvent id="catchEvent">
+            <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+            </extensionElements>
+        </intermediateCatchEvent>
+
+        <sequenceFlow sourceRef="catchEvent" targetRef="taskAfterTask"/>
+        <sequenceFlow sourceRef="taskAfterTask" targetRef="theEnd"/>
+
+        <userTask id="taskAfterTask"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>
