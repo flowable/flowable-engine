@@ -304,7 +304,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfInstances()).isEqualTo(2);
         assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfActiveInstances()).isEqualTo(1);
         assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfCompletedInstances()).isEqualTo(1);
-        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).isSequential()).isEqualTo(false);
+        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).isSequential()).isFalse();
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
@@ -422,9 +422,9 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
 
         assertThat(activityEvent.getActivityId()).isEqualTo("task");
         assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfInstances()).isEqualTo(2);
-        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfActiveInstances()).isEqualTo(0);
+        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfActiveInstances()).isZero();
         assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).getNumberOfCompletedInstances()).isEqualTo(2);
-        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).isSequential()).isEqualTo(false);
+        assertThat(((FlowableMultiInstanceActivityCompletedEvent) activityEvent).isSequential()).isFalse();
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);

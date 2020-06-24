@@ -24,7 +24,7 @@ angular.module('flowableModeler').controller('FlowableCaseReferenceCtrl',
         _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('FlowableCaseReferencePopupCtrl', [ '$scope', '$http', 'editorManager', function($scope, $http, editorManager) {
+angular.module('flowableModeler').controller('FlowableCaseReferencePopupCtrl', [ '$scope', '$http', 'editorManager', '$location', function($scope, $http, editorManager, $location) {
 	
     $scope.state = {'loadingCases' : true, 'error' : false};
     
@@ -44,11 +44,17 @@ angular.module('flowableModeler').controller('FlowableCaseReferencePopupCtrl', [
    	 		$scope.selectedCase = caseModel;
    	 	}
     };
+
+	$scope.open = function() {
+		if ($scope.selectedCase) {
+			$location.path("/editor/" + $scope.selectedCase.id);
+		}
+	};
     
     // Saving the selected value
     $scope.save = function() {
    	 	if ($scope.selectedCase) {
-   	 		$scope.property.value = {'id' : $scope.selectedCase.id, 'name' : $scope.selectedCase.name};
+   	 		$scope.property.value = {'id' : $scope.selectedCase.id, 'name' : $scope.selectedCase.name, 'key': $scope.selectedCase.key};
    	 	} else {
    	 		$scope.property.value = null; 
    	 	}

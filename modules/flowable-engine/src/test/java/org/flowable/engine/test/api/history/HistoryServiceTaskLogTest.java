@@ -793,8 +793,8 @@ public class HistoryServiceTaskLogTest {
                 hasManagement = true;
             }
 
-            assertThat(hasKermit).isEqualTo(true);
-            assertThat(hasManagement).isEqualTo(true);
+            assertThat(hasKermit).isTrue();
+            assertThat(hasManagement).isTrue();
 
             taskService.complete(tasks.get(0).getId());
 

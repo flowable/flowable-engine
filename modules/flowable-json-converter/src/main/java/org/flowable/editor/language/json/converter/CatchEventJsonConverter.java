@@ -15,6 +15,7 @@ package org.flowable.editor.language.json.converter;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
@@ -22,6 +23,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,6 +44,7 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_MESSAGE, CatchEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_SIGNAL, CatchEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_CONDITIONAL, CatchEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_CATCH_EVENT_REGISTRY, CatchEventJsonConverter.class);
     }
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -64,19 +67,28 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
             return STENCIL_EVENT_CATCH_SIGNAL;
         } else if (eventDefinition instanceof ConditionalEventDefinition) {
             return STENCIL_EVENT_CATCH_CONDITIONAL;
-        } else {
+        } else if (eventDefinition instanceof TimerEventDefinition) {
             return STENCIL_EVENT_CATCH_TIMER;
+        } else if (baseElement.getExtensionElements().get("eventType") != null && baseElement.getExtensionElements().get("eventType").size() > 0) {
+            String eventType = baseElement.getExtensionElements().get("eventType").get(0).getElementText();
+            if (StringUtils.isNotEmpty(eventType)) {
+                return STENCIL_EVENT_CATCH_EVENT_REGISTRY;
+            }
         }
+        return STENCIL_EVENT_CATCH_TIMER;
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) baseElement;
         addEventProperties(catchEvent, propertiesNode);
+        addEventRegistryProperties((FlowElement) baseElement, propertiesNode);
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_EVENT_CATCH_TIMER.equals(stencilId)) {
@@ -87,7 +99,10 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
             convertJsonToSignalDefinition(elementNode, catchEvent);
         } else if (STENCIL_EVENT_CATCH_CONDITIONAL.equals(stencilId)) {
             convertJsonToConditionalDefinition(elementNode, catchEvent);
-        } 
+        }  else if (STENCIL_EVENT_CATCH_EVENT_REGISTRY.equals(stencilId)) {
+            addReceiveEventExtensionElements(elementNode, catchEvent);
+
+        }
         return catchEvent;
     }
 }

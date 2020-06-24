@@ -45,7 +45,7 @@ public class MailTaskJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-        BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+        BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         ServiceTask task = new ServiceTask();
 
@@ -70,7 +70,7 @@ public class MailTaskJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement,
-        CmmnModel cmmnModel) {
+        CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
 
     }
 

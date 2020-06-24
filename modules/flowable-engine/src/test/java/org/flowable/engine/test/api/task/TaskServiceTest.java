@@ -1567,7 +1567,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
             for (HistoricDetail currentHistoricDetail : resultSet) {
-                assertThat(currentHistoricDetail instanceof HistoricDetailVariableInstanceUpdateEntity).isTrue();
+                assertThat(currentHistoricDetail).isInstanceOf(HistoricDetailVariableInstanceUpdateEntity.class);
                 HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = (HistoricDetailVariableInstanceUpdateEntity) currentHistoricDetail;
 
                 if (historicVariableUpdate.getName().equals(variableName)) {

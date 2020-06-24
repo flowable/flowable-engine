@@ -209,33 +209,29 @@ public class BaseAppDefinitionService {
 
             deployableAssets.put(appDefinitionModel.getKey() + ".app", appDefinitionJsonBytes);
 
-            Map<String, Model> formMap = new HashMap<>();
-            Map<String, Model> decisionTableMap = new HashMap<>();
-            Map<String, Model> caseModelMap = new HashMap<>();
-            Map<String, Model> processModelMap = new HashMap<>();
+            ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
+            createDeployableAppModels(appDefinitionModel, appDefinition, deployableAssets, converterContext);
 
-            createDeployableAppModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
-
-            if (formMap.size() > 0) {
-                for (String formId : formMap.keySet()) {
-                    Model formInfo = formMap.get(formId);
-                    String formModelEditorJson = formInfo.getModelEditorJson();
+            Collection<Model> allFormModels = converterContext.getAllFormModels();
+            if (allFormModels.size() > 0) {
+                for (Model formModel : allFormModels) {
+                    String formModelEditorJson = formModel.getModelEditorJson();
                     byte[] formModelEditorJsonBytes = formModelEditorJson.getBytes(StandardCharsets.UTF_8);
-                    deployableAssets.put("form-" + formInfo.getKey() + ".form", formModelEditorJsonBytes);
+                    deployableAssets.put("form-" + formModel.getKey() + ".form", formModelEditorJsonBytes);
                 }
             }
 
-            if (decisionTableMap.size() > 0) {
-                for (String decisionTableId : decisionTableMap.keySet()) {
-                    Model decisionTableInfo = decisionTableMap.get(decisionTableId);
+            Collection<Model> allDecisionModels = converterContext.getAllDecisionModels();
+            if (allDecisionModels.size() > 0) {
+                for (Model decisionModel : allDecisionModels) {
                     try {
-                        JsonNode decisionTableNode = objectMapper.readTree(decisionTableInfo.getModelEditorJson());
-                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(),
-                                decisionTableInfo.getVersion(), decisionTableInfo.getLastUpdated());
+                        JsonNode decisionTableNode = objectMapper.readTree(decisionModel.getModelEditorJson());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionModel.getId(),
+                            decisionModel.getVersion(), decisionModel.getLastUpdated());
                         byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-                        deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
+                        deployableAssets.put("dmn-" + decisionModel.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {
-                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableInfo.getName()));
+                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionModel.getName()));
                     }
                 }
             }
@@ -246,8 +242,8 @@ public class BaseAppDefinitionService {
         return deployZipArtifact;
     }
     
-    protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
+    protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets,
+            ConverterContext converterContext) {
         
         List<AppModelDefinition> appModels = new ArrayList<>();
         if (appDefinition.getModels() != null) {
@@ -259,8 +255,10 @@ public class BaseAppDefinitionService {
         }
         
         for (AppModelDefinition appModelDef : appModels) {
-            
-            if (caseModelMap.containsKey(appModelDef.getId()) || processModelMap.containsKey(appModelDef.getId())) {
+
+            String caseModelKey = converterContext.getCaseModelKeyForCaseModelId(appModelDef.getId());
+            String processModelKey = converterContext.getProcessModelKeyForProcessModelId(appModelDef.getId());
+            if (caseModelKey != null || processModelKey != null) {
                 return;
             }
 
@@ -269,35 +267,34 @@ public class BaseAppDefinitionService {
                 throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
             }
 
-            createDeployableModels(model, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+            createDeployableModels(model, deployableAssets, converterContext);
         }
     }
     
-    protected void createDeployableModels(AbstractModel parentModel, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
+    protected void createDeployableModels(AbstractModel parentModel, Map<String, byte[]> deployableAssets, ConverterContext converterContext) {
         
         List<Model> referencedModels = modelRepository.findByParentModelId(parentModel.getId());
         for (Model childModel : referencedModels) {
             if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                formMap.put(childModel.getId(), childModel);
+                converterContext.addFormModel(childModel);
 
             } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                decisionTableMap.put(childModel.getId(), childModel);
-            
+                converterContext.addDecisionModel(childModel);
+
             } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
-                caseModelMap.put(childModel.getId(), childModel);
-                createDeployableModels(childModel, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+                converterContext.addCaseModel(childModel);
+                createDeployableModels(childModel, deployableAssets, converterContext);
             
             } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
-                processModelMap.put(childModel.getId(), childModel);
-                createDeployableModels(childModel, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+                converterContext.addProcessModel(childModel);
+                createDeployableModels(childModel, deployableAssets, converterContext);
             }
         }
 
         Map<String, EventModel> eventModelMap = new HashMap<>();
         Map<String, ChannelModel> channelModelMap = new HashMap<>();
         if (parentModel.getModelType() == null || parentModel.getModelType() == AbstractModel.MODEL_TYPE_BPMN) {
-            BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, formMap, decisionTableMap);
+            BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, converterContext);
             List<FlowElement> eventRegistryElements = new ArrayList<>();
             Map<String, StartEvent> noneStartEventMap = new HashMap<>();
             postProcessFlowElements(eventRegistryElements, noneStartEventMap, bpmnModel);
@@ -313,7 +310,7 @@ public class BaseAppDefinitionService {
             deployableAssets.put(parentModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
             
         } else {
-            CmmnModel cmmnModel = modelService.getCmmnModel(parentModel, formMap, decisionTableMap, caseModelMap, processModelMap);
+            CmmnModel cmmnModel = modelService.getCmmnModel(parentModel, converterContext);
             List<BaseElement> eventRegistryElements = new ArrayList<>();
             postProcessPlanItemDefinitions(eventRegistryElements, cmmnModel);
             

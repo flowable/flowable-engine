@@ -50,7 +50,8 @@ public class MessageFlowJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    public void convertToJson(BaseElement baseElement, ActivityProcessor processor, BpmnModel model, FlowElementsContainer container, ArrayNode shapesArrayNode, double subProcessX, double subProcessY) {
+    public void convertToJson(BpmnJsonConverterContext converterContext, BaseElement baseElement, ActivityProcessor processor, BpmnModel model,
+            FlowElementsContainer container, ArrayNode shapesArrayNode, double subProcessX, double subProcessY) {
 
         MessageFlow messageFlow = (MessageFlow) baseElement;
         ObjectNode flowNode = BpmnJsonConverterUtil.createChildShape(messageFlow.getId(), STENCIL_MESSAGE_FLOW, 172, 212, 128, 212);
@@ -91,12 +92,14 @@ public class MessageFlowJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         // nothing to do
     }
 
     @Override
-    protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         MessageFlow flow = new MessageFlow();
 
         String sourceRef = BpmnJsonConverterUtil.lookForSourceRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES));

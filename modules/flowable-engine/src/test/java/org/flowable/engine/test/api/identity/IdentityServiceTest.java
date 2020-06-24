@@ -104,7 +104,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
         assertThat(user.getFirstName()).isEqualTo("John");
         assertThat(user.getLastName()).isEqualTo("Doe");
         assertThat(user.getEmail()).isEqualTo("johndoe@alfresco.com");
-        assertThat(user.getTenantId()).isEqualTo(null);
+        assertThat(user.getTenantId()).isNull();
 
         identityService.deleteUser(user.getId());
     }

@@ -262,12 +262,12 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // Check with empty null
         FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(0);
+        assertThat(types.length).isZero();
 
         // Check with empty string
         types = FlowableEngineEventType.getTypesFromString("");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(0);
+        assertThat(types.length).isZero();
 
         // Single value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED");

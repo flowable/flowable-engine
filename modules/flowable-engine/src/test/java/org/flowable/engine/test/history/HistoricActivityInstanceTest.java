@@ -57,7 +57,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(historicActivityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(historicActivityInstance.getStartTime()).isNotNull();
         assertThat(historicActivityInstance.getEndTime()).isNotNull();
-        assertThat(historicActivityInstance.getDurationInMillis() >= 0).isTrue();
+        assertThat(historicActivityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
     }
     
     @Test
@@ -166,7 +166,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(historicActivityInstance.getActivityId()).isEqualTo("receive");
         assertThat(historicActivityInstance.getActivityType()).isEqualTo("receiveTask");
         assertThat(historicActivityInstance.getEndTime()).isNotNull();
-        assertThat(historicActivityInstance.getDurationInMillis() >= 0).isTrue();
+        assertThat(historicActivityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
         assertThat(historicActivityInstance.getProcessDefinitionId()).isNotNull();
         assertThat(historicActivityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(historicActivityInstance.getStartTime()).isNotNull();

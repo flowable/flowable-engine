@@ -514,11 +514,11 @@ public class JsonTest extends PluggableFlowableTestCase {
 
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ);
         assertThat(value).isNotNull();
-        assertThat(value.toString()).isEqualTo(createBigJsonObject().toString());
+        assertThat(value).hasToString(createBigJsonObject().toString());
 
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), BIG_JSON_OBJ);
         assertThat(variableInstance).isNotNull();
-        assertThat(variableInstance.getValue().toString()).isEqualTo(createBigJsonObject().toString());
+        assertThat(variableInstance.getValue()).hasToString(createBigJsonObject().toString());
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task).isNotNull();
@@ -532,7 +532,7 @@ public class JsonTest extends PluggableFlowableTestCase {
             assertThat(historicVariableInstances.get(0).getVariableName()).isEqualTo(BIG_JSON_OBJ);
             value = (ObjectNode) historicVariableInstances.get(0).getValue();
             assertThat(value).isNotNull();
-            assertThat(value.toString()).isEqualTo(createBigJsonObject().toString());
+            assertThat(value).hasToString(createBigJsonObject().toString());
 
             assertThat(historicVariableInstances.get(1).getVariableName()).isEqualTo(MY_JSON_OBJ);
             value = (ObjectNode) historicVariableInstances.get(1).getValue();
@@ -550,7 +550,7 @@ public class JsonTest extends PluggableFlowableTestCase {
                     .singleResult();
 
             assertThat(historicVariableInstance).isNotNull();
-            assertThat(historicVariableInstance.getValue().toString()).isEqualTo(createBigJsonObject().toString());
+            assertThat(historicVariableInstance.getValue()).hasToString(createBigJsonObject().toString());
         }
 
         // It should be possible do remove a json variable

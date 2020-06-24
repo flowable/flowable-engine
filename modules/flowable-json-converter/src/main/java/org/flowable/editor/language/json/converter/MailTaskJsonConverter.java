@@ -46,12 +46,14 @@ public class MailTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         // will be handled by ServiceTaskJsonConverter
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ServiceTask task = new ServiceTask();
         task.setType(ServiceTask.MAIL_TASK);
         addField(PROPERTY_MAILTASK_HEADERS, elementNode, task);
