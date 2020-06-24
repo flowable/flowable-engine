@@ -361,9 +361,4 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                 );
     }
 
-    protected FormRepositoryService getFormRepositoryService() {
-        return ((FormEngineConfigurationApi) cmmnEngineConfiguration.getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG))
-                .getFormRepositoryService();
-    }
 }

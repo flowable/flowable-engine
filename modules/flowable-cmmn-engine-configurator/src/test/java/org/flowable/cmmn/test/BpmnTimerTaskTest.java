@@ -69,8 +69,9 @@ public class BpmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         processEngine.getProcessEngineConfiguration().setClock(clock);
 
         timerJobs = processEngineManagementService.createTimerJobQuery().processInstanceId(processInstance.getId()).executable().list();
-        assertThat(timerJobs).hasSize(1);
-        assertThat(timerJobs.get(0).getId()).isEqualTo(timerJobId);
+        assertThat(timerJobs)
+                .extracting(Job::getId)
+                .containsExactly(timerJobId);
 
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngineManagementService, 7000, 200, true);
 
@@ -83,7 +84,7 @@ public class BpmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
         cmmnEngineConfiguration.resetClock();
         ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).resetClock();

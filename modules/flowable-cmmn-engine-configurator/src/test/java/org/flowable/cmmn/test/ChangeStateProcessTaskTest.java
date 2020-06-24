@@ -56,8 +56,8 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -73,9 +73,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
         assertThat(planItemInstances).hasSize(1);
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -97,9 +97,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -128,9 +128,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
     public void testActivateProcessTaskInStage() {
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("activateStage", false);
 
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
@@ -173,9 +173,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -208,9 +208,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
 
         processEngineTaskService.complete(task.getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -257,9 +257,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
                 .list();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -350,9 +350,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
         assertThat(planItemInstances).hasSize(1);
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -391,9 +391,9 @@ public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegration
                 .variableName("numVar")
                 .singleResult().getValue()).isEqualTo(10);
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
-        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     protected CaseInstance startCaseInstanceWithOneTaskProcess(String variableName, boolean activate) {
