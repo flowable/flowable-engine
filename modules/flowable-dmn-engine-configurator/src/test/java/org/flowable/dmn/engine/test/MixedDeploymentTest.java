@@ -201,7 +201,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackTrueWithoutDeployment() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("DMN decision with key decision1 execution failed. Cause: No decision found for key: decision1. There was also no fall back decision table found without tenant.");
+        this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
 
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
