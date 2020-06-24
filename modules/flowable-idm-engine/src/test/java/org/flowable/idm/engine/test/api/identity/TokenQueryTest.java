@@ -337,8 +337,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         // paging
         assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
         assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(2);
-        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").listPage(0, 1).size())
-                .isEqualTo(1);
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").listPage(0, 1)).hasSize(1);
     }
 
 }
