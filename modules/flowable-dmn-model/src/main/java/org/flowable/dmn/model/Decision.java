@@ -15,6 +15,8 @@ package org.flowable.dmn.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Yvo Swillens
  */
@@ -28,6 +30,8 @@ public class Decision extends DRGElement {
     protected List<AuthorityRequirement> authorityRequirements = new ArrayList<>();
     protected Expression expression;
     protected boolean forceDMN11;
+
+    @JsonIgnore
     protected DmnDefinition dmnDefinition;
 
     public String getQuestion() {
@@ -97,6 +101,7 @@ public class Decision extends DRGElement {
         this.forceDMN11 = forceDMN11;
     }
 
+    @JsonIgnore
     public DmnDefinition getDmnDefinition() {
         return dmnDefinition;
     }

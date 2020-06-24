@@ -15,6 +15,8 @@ package org.flowable.dmn.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Yvo Swillens
  */
@@ -24,6 +26,8 @@ public class DecisionService extends Invocable {
     protected List<DmnElementReference> encapsulatedDecisions = new ArrayList<>();
     protected List<DmnElementReference> inputDecisions = new ArrayList<>();
     protected List<DmnElementReference> inputData = new ArrayList<>();
+
+    @JsonIgnore
     protected DmnDefinition dmnDefinition;
 
     public List<DmnElementReference> getOutputDecisions() {
@@ -62,9 +66,12 @@ public class DecisionService extends Invocable {
     public void addInputData(DmnElementReference inputData) {
         this.inputData.add(inputData);
     }
+
+    @JsonIgnore
     public DmnDefinition getDmnDefinition() {
         return dmnDefinition;
     }
+
     public void setDmnDefinition(DmnDefinition dmnDefinition) {
         this.dmnDefinition = dmnDefinition;
     }
