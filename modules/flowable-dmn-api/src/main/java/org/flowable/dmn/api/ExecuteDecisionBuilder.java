@@ -80,55 +80,12 @@ public interface ExecuteDecisionBuilder {
 
     /**
      * Executes a decision returning one or more output results with variables
+     *
+     * Deprecated:
+     * Use {@link #executeDecision()} to execute a Decision (table)
      **/
+    @Deprecated
     List<Map<String, Object>> execute();
-
-    /**
-     * Executes a decision returning one output result with variables
-     **/
-    Map<String, Object> executeWithSingleResult();
-
-    /**
-     * Executes a decision returning a result object including an audit trail
-     **/
-    DecisionExecutionAuditContainer executeWithAuditTrail();
-
-    /**
-     * Execute a decision service
-     *
-     * @return a Map with decision result(s) per output decision
-     */
-    Map<String, List<Map<String, Object>>> executeDecisionService();
-
-    /**
-     * Execute a decision service
-     *
-     * @return a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
-     */
-    DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail();
-
-    /**
-     * Execute a decision service
-     *
-     * @return a Map with the decision service result.
-     * An {@link FlowableException} will be thrown when multiple rules were hit.
-     */
-    Map<String, Object> executeDecisionServiceWithSingleResult();
-
-    /**
-     * Execute a single decision or a decision service depending on the provided decision key
-     *
-     * @return a Map with decision result(s) per decision
-     */
-    Map<String, List<Map<String, Object>>> evaluateDecision();
-
-    /**
-     * Execute a single decision or a decision service depending on the provided decision key
-     *
-     * @return the {@link DecisionExecutionAuditContainer} when a decision was executed
-     * or a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
-     */
-    DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail();
 
     /**
      * Execute a single decision or a decision service depending on the provided decision key
@@ -136,8 +93,62 @@ public interface ExecuteDecisionBuilder {
      * @return a Map with the decision(s) result(s). When multiple output decisions use the same
      * variable IDs the last occurrence will be present in the Map.
      * An {@link FlowableException} will be thrown when multiple rules were hit.
+     **/
+    Map<String, Object> executeWithSingleResult();
+
+    /**
+     * Execute a single decision or a decision service depending on the provided decision key
+     *
+     * @return the {@link DecisionExecutionAuditContainer} when a decision was executed
+     * or a {@link DecisionServiceExecutionAuditContainer} when a decision service was executed
+     **/
+    DecisionExecutionAuditContainer executeWithAuditTrail();
+
+    /**
+     * Executes a decision (table)
+     *
+     * @returnon A List with one or more rule results mapped to variables
+     *
+     **/
+    List<Map<String, Object>> executeDecision();
+
+    /**
+     * Execute a decision service
+     *
+     * @return a Map with decision rule result(s) mapped to variables per output decision
      */
-    Map<String, Object> evaluateDecisionWithSingleResult();
+    Map<String, List<Map<String, Object>>> executeDecisionService();
+
+    /**
+     * Execute a decision (table)
+     *
+     * @return a {@link DecisionExecutionAuditContainer}
+     */
+    DecisionExecutionAuditContainer executeDecisionWithAuditTrail();
+
+    /**
+     * Execute a decision service
+     *
+     * @return a {@link DecisionServiceExecutionAuditContainer}
+     */
+    DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail();
+
+    /**
+     * Execute a decision (table)
+     *
+     * @return a Map with the decision result.
+     * An {@link FlowableException} will be thrown when multiple rules were hit.
+     */
+    Map<String, Object> executeDecisionWithSingleResult();
+
+    /**
+     * Execute a decision service
+     *
+     * @return a Map with the decision(s) result(s). When multiple output decisions use the same
+     * variable IDs the last occurrence will be present in the Map.
+     * An {@link FlowableException} will be thrown when multiple rules were hit.
+     */
+    Map<String, Object> executeDecisionServiceWithSingleResult();
 
     ExecuteDecisionContext buildExecuteDecisionContext();
 }

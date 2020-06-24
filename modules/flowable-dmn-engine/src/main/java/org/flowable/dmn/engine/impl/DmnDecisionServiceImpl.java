@@ -50,56 +50,6 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
     }
 
     @Override
-    public Map<String, List<Map<String, Object>>> evaluateDecision(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new EvaluateDecisionCmd(executeDecisionContext));
-
-        Map<String, List<Map<String, Object>>> decisionResult = composeEvaluateDecisionResult(executeDecisionContext);
-
-        persistDecisionAudit(executeDecisionContext);
-
-        return decisionResult;
-    }
-
-    @Override
-    public DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new EvaluateDecisionCmd(executeDecisionContext));
-
-        composeEvaluateDecisionResult(executeDecisionContext);
-
-        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
-
-        return decisionExecution;
-    }
-
-    @Override
-    public Map<String, Object> evaluateDecisionWithSingleResult(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new EvaluateDecisionCmd(executeDecisionContext));
-
-        Map<String, Object> singleDecisionResult = new HashMap<>();
-        Map<String, List<Map<String, Object>>> decisionResult = composeEvaluateDecisionResult(executeDecisionContext);
-
-        persistDecisionAudit(executeDecisionContext);
-
-        for (Map.Entry<String, List<Map<String, Object>>> entry : decisionResult.entrySet()) {
-            List<Map<String, Object>> decisionResults = entry.getValue();
-            if (decisionResults != null && !decisionResults.isEmpty()) {
-                if (decisionResults.size() > 1) {
-                    throw new FlowableException("more than one result in decision: " + entry.getKey());
-                }
-                singleDecisionResult.putAll(decisionResults.get(0));
-            }
-        }
-
-        return singleDecisionResult;
-    }
-
-    @Override
     public List<Map<String, Object>> executeDecision(ExecuteDecisionBuilder builder) {
         ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
 
@@ -110,6 +60,46 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         persistDecisionAudit(executeDecisionContext);
 
         return decisionResult;
+    }
+
+    @Override
+    public Map<String, List<Map<String, Object>>> executeDecisionService(ExecuteDecisionBuilder builder) {
+        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new ExecuteDecisionServiceCmd(executeDecisionContext));
+
+        Map<String, List<Map<String, Object>>> decisionResult = composeDecisionServiceResult(executeDecisionContext);
+
+        persistDecisionAudit(executeDecisionContext);
+
+        return decisionResult;
+    }
+
+    @Override
+    public Map<String, Object> executeWithSingleResult(ExecuteDecisionBuilder builder) {
+        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new EvaluateDecisionCmd(executeDecisionContext));
+
+        Map<String, Object> singleDecisionResult = null;
+        Map<String, List<Map<String, Object>>> decisionResult = composeEvaluateDecisionResult(executeDecisionContext);
+
+        persistDecisionAudit(executeDecisionContext);
+
+        for (Map.Entry<String, List<Map<String, Object>>> entry : decisionResult.entrySet()) {
+            List<Map<String, Object>> decisionResults = entry.getValue();
+            if (decisionResults != null && !decisionResults.isEmpty()) {
+                if (decisionResults.size() > 1) {
+                    throw new FlowableException("more than one result in decision: " + entry.getKey());
+                }
+                if (singleDecisionResult == null) {
+                    singleDecisionResult = new HashMap<>();
+                }
+                singleDecisionResult.putAll(decisionResults.get(0));
+            }
+        }
+
+        return singleDecisionResult;
     }
 
     @Override
@@ -131,45 +121,6 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         }
 
         return singleDecisionResult;
-    }
-
-    @Override
-    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionContext));
-
-        composeDecisionResult(executeDecisionContext);
-
-        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
-
-        return decisionExecution;
-    }
-
-    @Override
-    public Map<String, List<Map<String, Object>>> executeDecisionService(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new ExecuteDecisionServiceCmd(executeDecisionContext));
-
-        Map<String, List<Map<String, Object>>> decisionResult = composeDecisionServiceResult(executeDecisionContext);
-
-        persistDecisionAudit(executeDecisionContext);
-
-        return decisionResult;
-    }
-
-    @Override
-    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail(ExecuteDecisionBuilder builder) {
-        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
-
-        commandExecutor.execute(new ExecuteDecisionServiceCmd(executeDecisionContext));
-
-        composeDecisionServiceResult(executeDecisionContext);
-
-        DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) persistDecisionAudit(executeDecisionContext);
-
-        return decisionServiceExecutionAuditContainer;
     }
 
     @Override
@@ -196,6 +147,46 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         return singleDecisionResult;
     }
 
+    @Override
+    public DecisionExecutionAuditContainer executeWithAuditTrail(ExecuteDecisionBuilder builder) {
+        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new EvaluateDecisionCmd(executeDecisionContext));
+
+        composeEvaluateDecisionResult(executeDecisionContext);
+
+        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
+
+        return decisionExecution;
+    }
+
+    @Override
+    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilder builder) {
+        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionContext));
+
+        composeDecisionResult(executeDecisionContext);
+
+        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
+
+        return decisionExecution;
+    }
+
+    @Override
+    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail(ExecuteDecisionBuilder builder) {
+        ExecuteDecisionContext executeDecisionContext = builder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new ExecuteDecisionServiceCmd(executeDecisionContext));
+
+        composeDecisionServiceResult(executeDecisionContext);
+
+        DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) persistDecisionAudit(executeDecisionContext);
+
+        return decisionServiceExecutionAuditContainer;
+    }
+
+
 
     protected Map<String, List<Map<String, Object>>> composeEvaluateDecisionResult(ExecuteDecisionContext executeDecisionContext) {
         Map<String, List<Map<String, Object>>> result;
@@ -205,7 +196,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
             result = composeDecisionServiceResult(executeDecisionContext);
         } else if (executeDecisionContext.getDmnElement() instanceof Decision) {
             result = new HashMap<>();
-            result.put(executeDecisionContext.getDecisionId(), executeDecisionContext.getDecisionExecution().getDecisionResult());
+            result.put(executeDecisionContext.getDecisionKey(), executeDecisionContext.getDecisionExecution().getDecisionResult());
         } else {
             LOGGER.error("Execution was not a decision or decision service");
             throw new FlowableException("Execution was not a decision or decision service");

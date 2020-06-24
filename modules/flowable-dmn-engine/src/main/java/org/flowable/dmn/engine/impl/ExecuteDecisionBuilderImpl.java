@@ -114,18 +114,14 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     }
 
     @Override
+    @Deprecated
     public List<Map<String, Object>> execute() {
         return decisionService.executeDecision(this);
     }
-    
+
     @Override
-    public Map<String, Object> executeWithSingleResult() {
-        return decisionService.executeDecisionWithSingleResult(this);
-    }
-    
-    @Override
-    public DecisionExecutionAuditContainer executeWithAuditTrail() {
-        return decisionService.executeDecisionWithAuditTrail(this);
+    public List<Map<String, Object>> executeDecision() {
+        return decisionService.executeDecision(this);
     }
 
     @Override
@@ -134,8 +130,13 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     }
 
     @Override
-    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail() {
-        return decisionService.executeDecisionServiceWithAuditTrail(this);
+    public Map<String, Object> executeWithSingleResult() {
+        return decisionService.executeWithSingleResult(this);
+    }
+
+    @Override
+    public Map<String, Object> executeDecisionWithSingleResult() {
+        return decisionService.executeDecisionWithSingleResult(this);
     }
 
     @Override
@@ -143,19 +144,20 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return decisionService.executeDecisionServiceWithSingleResult(this);
     }
 
+
     @Override
-    public Map<String, List<Map<String, Object>>> evaluateDecision() {
-        return decisionService.evaluateDecision(this);
+    public DecisionExecutionAuditContainer executeWithAuditTrail() {
+        return decisionService.executeWithAuditTrail(this);
     }
 
     @Override
-    public DecisionExecutionAuditContainer evaluateDecisionWithAuditTrail() {
-        return decisionService.evaluateDecisionWithAuditTrail(this);
+    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail() {
+        return decisionService.executeDecisionWithAuditTrail(this);
     }
 
     @Override
-    public Map<String, Object> evaluateDecisionWithSingleResult() {
-        return decisionService.evaluateDecisionWithSingleResult(this);
+    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail() {
+        return decisionService.executeDecisionServiceWithAuditTrail(this);
     }
 
     public String getDecisionKey() {

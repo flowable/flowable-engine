@@ -647,6 +647,10 @@ public class DmnJsonConverterTest {
         decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertNotNull(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())));
 
         dmnDefinition.getDecisions().forEach(decision -> assertNotNull(decision.getExpression()));
+
+        JsonNode decisionServiceJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+
+        assertNotNull(decisionServiceJson);
     }
 
     @Test

@@ -107,7 +107,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         applyFallbackToDefaultTenant(execution, executeDecisionBuilder);
         applyParentDeployment(execution, executeDecisionBuilder, processEngineConfiguration);
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.evaluateDecisionWithAuditTrail();
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());

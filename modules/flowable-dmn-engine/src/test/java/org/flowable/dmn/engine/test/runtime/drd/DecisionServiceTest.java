@@ -150,7 +150,7 @@ public class DecisionServiceTest {
         Map<String, List<Map<String, Object>>> result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("evaluateMortgageRequestService")
             .variables(inputVariables)
-            .evaluateDecision();
+            .executeDecisionService();
 
         Map<String, Object> expectedResult = new HashMap<>();
         expectedResult.put("approval", "APPROVED");
@@ -285,7 +285,7 @@ public class DecisionServiceTest {
             .variable("input2", "test2")
             .variable("input3", "test3")
             .variable("input4", "test4")
-            .evaluateDecisionWithSingleResult();
+            .executeWithSingleResult();
 
         Map<String, Object> expectedResult = new HashMap<>();
         expectedResult.put("output1", "NOT EMPTY");
@@ -307,7 +307,7 @@ public class DecisionServiceTest {
             .variable("input2", "test2")
             .variable("input3", "test3")
             .variable("input4", "test4")
-            .evaluateDecisionWithSingleResult())
+            .executeWithSingleResult())
             .isInstanceOf(FlowableException.class)
             .hasMessageContaining("more than one result in decision: decision1");
     }
