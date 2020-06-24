@@ -15,7 +15,6 @@ package org.flowable.idm.engine.test.api.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -191,21 +190,12 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult();
         List<PrivilegeMapping> privilegeMappings = idmIdentityService.getPrivilegeMappingsByPrivilegeId(modelerPrivilege.getId());
         assertThat(privilegeMappings).hasSize(3);
-        List<String> users = new ArrayList<>();
-        List<String> groups = new ArrayList<>();
-
-        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
-            if (privilegeMapping.getUserId() != null) {
-                users.add(privilegeMapping.getUserId());
-
-            } else if (privilegeMapping.getGroupId() != null) {
-                groups.add(privilegeMapping.getGroupId());
-            }
-        }
-
-        assertThat(users.contains("kermit")).isTrue();
-        assertThat(groups.contains("admins")).isTrue();
-        assertThat(groups.contains("engineering")).isTrue();
+        assertThat(privilegeMappings)
+                .extracting(PrivilegeMapping::getUserId)
+                .contains("kermit");
+        assertThat(privilegeMappings)
+                .extracting(PrivilegeMapping::getGroupId)
+                .contains("admins", "engineering");
     }
 
     @Test
