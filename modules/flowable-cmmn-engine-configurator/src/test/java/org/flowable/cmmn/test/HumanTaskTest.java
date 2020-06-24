@@ -51,9 +51,9 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
     public void completeHumanTaskWithoutVariables() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("myCase").
-                start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
         assertThat(caseInstance).isNotNull();
 
         Task caseTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

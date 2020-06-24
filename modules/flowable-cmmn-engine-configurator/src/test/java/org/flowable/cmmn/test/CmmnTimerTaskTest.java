@@ -51,7 +51,7 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerInStage").start();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                .count()).isEqualTo(1L);
+                .count()).isEqualTo(1);
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
@@ -59,7 +59,7 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
                 .singleResult();
         assertThat(planItemInstance).isNotNull();
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1L);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
 
         List<Job> timerJobs = processEngineManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).list();
         assertThat(timerJobs).hasSize(1);
@@ -83,8 +83,9 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         cmmnEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (3 * 60 * 60 * 1000 + 1)));
 
         timerJobs = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).executable().list();
-        assertThat(timerJobs).hasSize(1);
-        assertThat(timerJobs.get(0).getId()).isEqualTo(timerJobId);
+        assertThat(timerJobs)
+                .extracting(Job::getId)
+                .containsExactly(timerJobId);
 
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
 

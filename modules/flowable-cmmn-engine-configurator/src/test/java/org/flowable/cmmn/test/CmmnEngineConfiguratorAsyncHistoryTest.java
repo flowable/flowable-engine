@@ -87,8 +87,8 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
                 cmmnEngine.getCmmnRuntimeService().createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
 
         // As async history is enabled, there should be  no historical entries yet, but there should be history jobs
-        assertThat(cmmnEngine.getCmmnHistoryService().createHistoricCaseInstanceQuery().count()).isEqualTo(0);
-        assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnEngine.getCmmnHistoryService().createHistoricCaseInstanceQuery().count()).isZero();
+        assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery().count()).isZero();
 
         // 3 history jobs expected:
         // - one for the case instance start
@@ -120,8 +120,8 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
 
         assertThat(cmmnEngine.getCmmnHistoryService().createHistoricCaseInstanceQuery().count()).isEqualTo(1);
         assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery().count()).isEqualTo(1);
-        assertThat(cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count()).isEqualTo(0);
-        assertThat(processEngine.getManagementService().createHistoryJobQuery().count()).isEqualTo(0);
+        assertThat(cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count()).isZero();
+        assertThat(processEngine.getManagementService().createHistoryJobQuery().count()).isZero();
     }
 
     @Test
