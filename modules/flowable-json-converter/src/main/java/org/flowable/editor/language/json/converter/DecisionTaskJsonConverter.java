@@ -70,7 +70,7 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
         JsonNode decisionServiceReferenceNode = getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
         if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
             String decisionServiceId = decisionServiceReferenceNode.get("id").asText();
-            decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(decisionServiceId);
+            decisionModelKey = converterContext.getDecisionServiceModelKeyForDecisionServiceModelId(decisionServiceId);
             referenceType = REFERENCE_TYPE_DECISION_SERVICE;
         }
 
