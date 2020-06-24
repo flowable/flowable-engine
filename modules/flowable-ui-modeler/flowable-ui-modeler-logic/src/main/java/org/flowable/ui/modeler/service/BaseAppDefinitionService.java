@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -222,16 +223,26 @@ public class BaseAppDefinitionService {
             }
 
             Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
+
+            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
             if (allDecisionTableModels.size() > 0) {
-                for (Model decisionTableModel : allDecisionTableModels) {
+                decisionTableEditorJSONs = allDecisionTableModels.stream()
+                    .collect(Collectors.toMap(
+                        AbstractModel::getKey,
+                        AbstractModel::getModelEditorJson
+                    ));
+            }
+
+            Collection<Model> allDecisionServiceModels = converterContext.getAllDecisionServiceModels();
+            if (allDecisionServiceModels.size() > 0) {
+                for (Model decisionServiceModel : allDecisionServiceModels) {
                     try {
-                        JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
-                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(),
-                            decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
+                        JsonNode decisionServiceNode = objectMapper.readTree(decisionServiceModel.getModelEditorJson());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), decisionTableEditorJSONs);
                         byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-                        deployableAssets.put("dmn-" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
+                        deployableAssets.put("dmn-" + decisionServiceModel.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {
-                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableModel.getName()));
+                        throw new InternalServerErrorException(String.format("Error converting decision service %s to XML", decisionServiceModel.getName()));
                     }
                 }
             }
@@ -283,6 +294,10 @@ public class BaseAppDefinitionService {
 
             } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
                 converterContext.addDecisionServiceModel(childModel);
+                List<Model> referencedDecisionTableModels = modelRepository.findByParentModelId(childModel.getId());
+                referencedDecisionTableModels.stream()
+                    .filter(refModel -> Model.MODEL_TYPE_DECISION_TABLE == refModel.getModelType())
+                    .forEach(converterContext::addDecisionTableModel);
 
             } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
                 converterContext.addCaseModel(childModel);
