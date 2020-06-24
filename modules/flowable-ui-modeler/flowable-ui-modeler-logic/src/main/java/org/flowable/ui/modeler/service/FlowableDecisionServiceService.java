@@ -82,14 +82,14 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
     protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
     protected DmnXMLConverter dmnXmlConverter = new DmnXMLConverter();
 
-    public List<DecisionTableRepresentation> getDecisionServices(String[] decisionTableIds) {
-        List<DecisionTableRepresentation> decisionTableRepresentations = new ArrayList<>();
-        for (String decisionTableId : decisionTableIds) {
-            Model model = getModel(decisionTableId, true, false);
-            DecisionTableRepresentation decisionTableRepresentation = createDecisionTableRepresentation(model);
-            decisionTableRepresentations.add(decisionTableRepresentation);
+    public List<DecisionServiceRepresentation> getDecisionServices(String[] decisionServiceIds) {
+        List<DecisionServiceRepresentation> decisionServiceRepresentations = new ArrayList<>();
+        for (String decisionServiceId : decisionServiceIds) {
+            Model model = getModel(decisionServiceId, true, false);
+            DecisionServiceRepresentation decisionTableRepresentation = createDecisionServiceRepresentation(model);
+            decisionServiceRepresentations.add(decisionTableRepresentation);
         }
-        return decisionTableRepresentations;
+        return decisionServiceRepresentations;
     }
 
     public ResultListDataRepresentation getDecisionServices(String filter) {
@@ -148,7 +148,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
         exportDefinition(response, definitionModel, Collections.emptyMap());
     }
 
-    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, Map<String, String> decisionTablesEditorJson) {
+    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, Map<String, String> decisionServiceEditorJson) {
         try {
 
             JsonNode editorJsonNode = objectMapper.readTree(definitionModel.getModelEditorJson());
@@ -160,7 +160,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/xml");
 
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), decisionTablesEditorJson);
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), decisionServiceEditorJson);
             byte[] xmlBytes = dmnXmlConverter.convertToXML(dmnDefinition);
 
             BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
@@ -183,7 +183,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
         }
     }
 
-    public ModelRepresentation importDecisionTable(HttpServletRequest request, MultipartFile file) {
+    public ModelRepresentation importDecisionService(HttpServletRequest request, MultipartFile file) {
 
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".dmn") || fileName.endsWith(".xml"))) {
@@ -222,15 +222,6 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
 
     }
 
-    public void migrateDecisionTables() {
-        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
-
-        decisionTableModels.forEach(decisionTableModel -> {
-            decisionTableModel = DecisionTableModelConversionUtil.convertModelToV3(decisionTableModel);
-            modelRepository.save(decisionTableModel);
-        });
-    }
-
     protected String makeValidFilterText(String filterText) {
         String validFilter = null;
 
@@ -243,7 +234,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
         return validFilter;
     }
 
-    public Model getDecisionTableModel(String decisionTableId) {
+    public Model getDecisionServiceModel(String decisionTableId) {
 
         Model decisionTableModel = getModel(decisionTableId, true, false);
 
@@ -253,67 +244,26 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
         return decisionTableModel;
     }
 
-    public DecisionTableRepresentation getDecisionTable(String decisionTableId) {
-        return createDecisionTableRepresentation(getDecisionTableModel(decisionTableId));
+    public DecisionServiceRepresentation getDecisionService(String decisionTableId) {
+        return createDecisionServiceRepresentation(getDecisionServiceModel(decisionTableId));
     }
 
-    public DecisionTableRepresentation getDecisionTableRepresentation(AbstractModel decisionTableModel) {
-        return createDecisionTableRepresentation(decisionTableModel);
+    public DecisionServiceRepresentation getDecisionTableRepresentation(AbstractModel decisionTableModel) {
+        return createDecisionServiceRepresentation(decisionTableModel);
     }
 
-    public DecisionTableRepresentation getHistoricDecisionTable(String modelHistoryId) {
+    public DecisionServiceRepresentation getHistoricDecisionService(String modelHistoryId) {
         // Get the historic model
         ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
 
         // Load model and check we have read rights
         getModel(modelHistory.getModelId(), true, false);
 
-        return createDecisionTableRepresentation(modelHistory);
+        return createDecisionServiceRepresentation(modelHistory);
     }
 
-    protected DecisionTableRepresentation createDecisionTableRepresentation(AbstractModel model) {
-        DecisionTableDefinitionRepresentation decisionTableDefinitionRepresentation = null;
-        try {
-            decisionTableDefinitionRepresentation = objectMapper.readValue(model.getModelEditorJson(), DecisionTableDefinitionRepresentation.class);
-        } catch (Exception e) {
-            LOGGER.error("Error deserializing decision table", e);
-            throw new InternalServerErrorException("Could not deserialize decision table definition");
-        }
-        DecisionTableRepresentation result = new DecisionTableRepresentation(model);
-        result.setDecisionTableDefinition(decisionTableDefinitionRepresentation);
-        return result;
-    }
-
-    public DecisionTableRepresentation saveDecisionTable(String decisionTableId, DecisionTableSaveRepresentation saveRepresentation) {
-
-        User user = SecurityUtils.getCurrentUserObject();
-        Model model = getModel(decisionTableId, false, false);
-
-        String decisionKey = saveRepresentation.getDecisionTableRepresentation().getKey();
-        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(model, model.getModelType(), decisionKey);
-        if (modelKeyInfo.isKeyAlreadyExists()) {
-            throw new BadRequestException("Provided model key already exists: " + decisionKey);
-        }
-
-        model.setName(saveRepresentation.getDecisionTableRepresentation().getName());
-        model.setKey(decisionKey);
-        model.setDescription(saveRepresentation.getDecisionTableRepresentation().getDescription());
-
-        saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition().setKey(decisionKey);
-
-        String editorJson = null;
-        try {
-            editorJson = objectMapper.writeValueAsString(saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition());
-        } catch (Exception e) {
-            LOGGER.error("Error while processing decision table json", e);
-            throw new InternalServerErrorException("Decision table could not be saved " + decisionTableId);
-        }
-
-        String filteredImageString = saveRepresentation.getDecisionTableImageBase64().replace("data:image/png;base64,", "");
-        byte[] imageBytes = Base64.getDecoder().decode(filteredImageString);
-        model = modelService.saveModel(model, editorJson, imageBytes, saveRepresentation.isNewVersion(), saveRepresentation.getComment(), user);
-        DecisionTableRepresentation result = new DecisionTableRepresentation(model);
-        result.setDecisionTableDefinition(saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition());
+    protected DecisionServiceRepresentation createDecisionServiceRepresentation(AbstractModel model) {
+        DecisionServiceRepresentation result = new DecisionServiceRepresentation(model);
         return result;
     }
 }
