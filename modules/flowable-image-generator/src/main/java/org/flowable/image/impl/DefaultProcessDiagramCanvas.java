@@ -1306,17 +1306,23 @@ public class DefaultProcessDiagramCanvas {
             Point p = null;
 
             if (shapeFirst != null) {
-                Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
-                p = getIntersection(shapeFirst, lineFirst);
+                if (graphicInfoList.size() > 1) {
+                    Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
+                    p = getIntersection(shapeFirst, lineFirst);
+                }
                 if (p != null) {
                     graphicInfoFirst.setX(p.getX());
                     graphicInfoFirst.setY(p.getY());
                 }
             }
 
+            p = null;
+
             if (shapeLast != null) {
-                Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
-                p = getIntersection(shapeLast, lineLast);
+                if (graphicInfoList.size() >= 2) {
+                    Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
+                    p = getIntersection(shapeLast, lineLast);
+                }
                 if (p != null) {
                     graphicInfoLast.setX(p.getX());
                     graphicInfoLast.setY(p.getY());

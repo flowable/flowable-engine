@@ -47,6 +47,7 @@ public interface StencilConstants {
     final String STENCIL_TASK_MAIL = "MailTask";
     final String STENCIL_TASK_MANUAL = "ManualTask";
     final String STENCIL_TASK_RECEIVE = "ReceiveTask";
+    final String STENCIL_TASK_RECEIVE_EVENT = "ReceiveEventTask";
     final String STENCIL_TASK_SCRIPT = "ScriptTask";
     final String STENCIL_TASK_SEND = "SendTask";
     final String STENCIL_TASK_SERVICE = "ServiceTask";
@@ -78,6 +79,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_CATCH_TIMER = "CatchTimerEvent";
     final String STENCIL_EVENT_CATCH_MESSAGE = "CatchMessageEvent";
     final String STENCIL_EVENT_CATCH_CONDITIONAL = "CatchConditionalEvent";
+    final String STENCIL_EVENT_CATCH_EVENT_REGISTRY = "CatchEventRegistryEvent";
 
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";

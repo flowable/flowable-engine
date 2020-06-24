@@ -1014,6 +1014,10 @@
           "TITLE" : "Receive task",
           "DESCRIPTION" : "An task that waits for a signal"
         },
+        "RECEIVEEVENTTASK" : {
+          "TITLE" : "Receive event task",
+          "DESCRIPTION" : "An task that receives an event"
+        },
         "MANUALTASK" : {
           "TITLE" : "Manual task",
           "DESCRIPTION" : "An automatic task with no logic"
@@ -1137,6 +1141,10 @@
         "CATCHCONDITIONALEVENT" : {
           "TITLE" : "Intermediate conditional catching event",
           "DESCRIPTION" : "An intermediate catching event with a conditional trigger"
+        },
+        "CATCHEVENTREGISTRYEVENT" : {
+          "TITLE" : "Intermediate event registry catching event",
+          "DESCRIPTION" : "An intermediate catching event waiting to receive an event from the eventregistry"
         },
         "THROWNONEEVENT" : {
           "TITLE" : "Intermediate none throwing event",

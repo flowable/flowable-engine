@@ -129,7 +129,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                 addFlowableExtensionElementWithValue("triggerChannelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE, elementNode), task);
                 addFlowableExtensionElementWithValue("triggerChannelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION, elementNode), task);
                 
-                convertJsonToCorrelationParameters(elementNode, "triggerEventCorrelationParameter", task); 
+                convertJsonToEventCorrelationParameters(elementNode, "triggerEventCorrelationParameter", task);
                 
                 String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
                 String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
