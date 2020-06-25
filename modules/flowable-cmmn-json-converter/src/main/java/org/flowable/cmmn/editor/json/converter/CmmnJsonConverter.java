@@ -243,8 +243,21 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         if (StringUtils.isNotEmpty(planModelStage.getAutoCompleteCondition())) {
             planModelPropertiesNode.put(PROPERTY_AUTOCOMPLETE_CONDITION, planModelStage.getAutoCompleteCondition());
         }
-        if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
-            planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
+
+        String planModelFormKey = planModelStage.getFormKey();
+        if (StringUtils.isNotEmpty(planModelFormKey)) {
+
+            Map<String, String> modelInfo = converterContext.getFormModelInfoForFormModelKey(planModelFormKey);
+            if (modelInfo != null) {
+                ObjectNode formRefNode = objectMapper.createObjectNode();
+                formRefNode.put("id", modelInfo.get("id"));
+                formRefNode.put("name", modelInfo.get("name"));
+                formRefNode.put("key", modelInfo.get("key"));
+                planModelPropertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
+
+            } else {
+                setPropertyValue(PROPERTY_FORMKEY, planModelFormKey, planModelPropertiesNode);
+            }
         }
         if (StringUtils.isNotEmpty(planModelStage.getValidateFormFields())) {
             planModelPropertiesNode.put(PROPERTY_FORM_FIELD_VALIDATION, planModelStage.getValidateFormFields());
