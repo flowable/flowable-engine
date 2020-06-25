@@ -15,6 +15,8 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -34,6 +36,8 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tijs Rademakers
@@ -294,6 +298,52 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                 tuple(IdentityLinkType.PARTICIPANT, "test", null),
                 tuple(IdentityLinkType.PARTICIPANT, "test2", null)
             );
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskCandidatesExpression.cmmn")
+    public void humanTaskWithCollectionExpressionCandidates() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("userVar", Arrays.asList("kermit", "gonzo"))
+                .transientVariable("groupVar", Collections.singletonList("management"))
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.CANDIDATE, "kermit", null),
+                        tuple(IdentityLinkType.CANDIDATE, "gonzo", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "management")
+                );
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskCandidatesExpression.cmmn")
+    public void humanTaskWithArrayNodeExpressionCandidates() {
+        ArrayNode userVar = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
+        userVar.add("kermit");
+        ArrayNode groupVar = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
+        groupVar.add("management").add("sales");
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("userVar", userVar)
+                .transientVariable("groupVar", groupVar)
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.CANDIDATE, "kermit", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "management"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "sales")
+                );
     }
 
 }

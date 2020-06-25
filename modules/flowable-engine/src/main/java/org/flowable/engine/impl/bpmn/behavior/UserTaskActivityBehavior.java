@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +55,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -327,18 +329,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(execution);
                 if (value != null) {
-                    List<IdentityLinkEntity> identityLinkEntities = null;
-                    if (value instanceof Collection) {
-                        identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
-                        
-                    } else {
-                        String strValue = value.toString();
-                        if (StringUtils.isNotEmpty(strValue)) {
-                            List<String> candidates = extractCandidates(strValue);
-                            identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
-                        }
-                    }
-                    
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
+
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -361,18 +354,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(execution);
                 if (value != null) {
-                    List<IdentityLinkEntity> identityLinkEntities = null;
-                    if (value instanceof Collection) {
-                        identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
 
-                    } else {
-                        String strValue = value.toString();
-                        if (StringUtils.isNotEmpty(strValue)) {
-                            List<String> candidates = extractCandidates(strValue);
-                            identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
-                        }
-                    }
-                    
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -396,23 +380,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 for (String userIdentityLink : userTask.getCustomUserIdentityLinks().get(customUserIdentityLinkType)) {
                     Expression idExpression = expressionManager.createExpression(userIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    
-                    if (value instanceof Collection) {
-                        Iterator userIdSet = ((Collection) value).iterator();
-                        while (userIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), userIdSet.next().toString(), null, customUserIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
-                        
-                    } else {
-                        List<String> userIds = extractCandidates(value.toString());
-                        for (String userId : userIds) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
+
+                    Collection<String> userIds = extractCandidates(value);
+                    for (String userId : userIds) {
+                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
+                        IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        customIdentityLinkEntities.add(identityLinkEntity);
                     }
                 }
             }
@@ -434,24 +407,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
                     Expression idExpression = expressionManager.createExpression(groupIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    
-                    if (value instanceof Collection) {
-                        Iterator groupIdSet = ((Collection) value).iterator();
-                        while (groupIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), null, groupIdSet.next().toString(), customGroupIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
-                        
-                    } else {
-                        List<String> groupIds = extractCandidates(value.toString());
-                        for (String groupId : groupIds) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), null, groupId, customGroupIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
+                    Collection<String> groupIds = extractCandidates(value);
+                    for (String groupId : groupIds) {
+                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                task.getId(), null, groupId, customGroupIdentityLinkType);
+                        IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        customIdentityLinkEntities.add(identityLinkEntity);
                     }
                 }
             }
@@ -467,14 +428,26 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
     }
 
-    /**
-     * Extract a candidate list from a string.
-     *
-     * @param str
-     * @return
-     */
-    protected List<String> extractCandidates(String str) {
-        return Arrays.asList(str.split("[\\s]*,[\\s]*"));
+    protected Collection<String> extractCandidates(Object value) {
+        if (value instanceof Collection) {
+            return (Collection<String>) value;
+        } else if (value instanceof ArrayNode) {
+            ArrayNode valueArrayNode = (ArrayNode) value;
+            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
+            for (JsonNode node : valueArrayNode) {
+                candidates.add(node.asText());
+            }
+
+            return candidates;
+        } else if (value != null) {
+            String str = value.toString();
+            if (StringUtils.isNotEmpty(str)) {
+                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
+            }
+        }
+
+        return Collections.emptyList();
+
     }
     
     protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
