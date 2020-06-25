@@ -80,7 +80,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isOne();
         
         assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
-        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
     }
     
@@ -91,7 +91,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.form").count()).isOne();
         
         assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").singleResult()).isNull();
-        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").count()).isZero();
     }
     
@@ -101,7 +101,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").count()).isEqualTo(3);
         
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").singleResult()).isNull();
-        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").count()).isZero();
     }
     
@@ -112,7 +112,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").count()).isOne();
         
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").singleResult()).isNull();
-        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").count()).isZero();
     }
     
@@ -130,7 +130,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").list()).hasSize(2);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("tenantA").count()).isEqualTo(2);
         
-        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("invalid").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("invalid").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId("invalid").count()).isZero();
     }
     
@@ -139,7 +139,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").list()).hasSize(3);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("tenant%").count()).isEqualTo(3);
         
-        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantIdLike("invalid").count()).isZero();
     }
     
@@ -148,7 +148,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKey("form2").list()).hasSize(1);
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKey("form2").count()).isOne();
         
-        assertThat(repositoryService.createDeploymentQuery().formDefinitionKey("invalid").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().formDefinitionKey("invalid").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKey("invalid").count()).isZero();
     }
     
@@ -160,7 +160,7 @@ public class DeploymentQueryTest extends AbstractFlowableFormTest {
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKeyLike("form%").listPage(0, 2)).hasSize(2);
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKeyLike("form%").listPage(1, 2)).hasSize(2);
         
-        assertThat(repositoryService.createDeploymentQuery().formDefinitionKeyLike("inva%").list()).hasSize(0);
+        assertThat(repositoryService.createDeploymentQuery().formDefinitionKeyLike("inva%").list()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().formDefinitionKeyLike("inva%").count()).isZero();
     }
     

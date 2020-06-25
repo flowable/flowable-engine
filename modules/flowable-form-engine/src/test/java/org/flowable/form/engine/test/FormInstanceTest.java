@@ -12,6 +12,7 @@
  */
 package org.flowable.form.engine.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
@@ -32,6 +33,8 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 public class FormInstanceTest extends AbstractFlowableFormTest {
 
     @Test
@@ -51,15 +54,19 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         FormInstanceInfo formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
         assertThat(formInstanceModel.getKey()).isEqualTo("form1");
         
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
         assertThat(formModel.getFields().size()).isOne();
-        FormField formField = formModel.getFields().get(0);
         assertThat(formModel.getFields())
             .extracting(FormField::getId, FormField::getValue)
             .containsExactly(tuple("input1", "test"));
@@ -86,17 +93,21 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(valuesMap, formInfo, "aTaskId", null, null, "flowable", "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         FormInstanceInfo formInstanceModel = formService.getFormInstanceModelByKey("form1", "aTaskId", null, null, "flowable", false);
         assertThat(formInstanceModel.getKey()).isEqualTo("form1");
         
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        FormField formField = formModel.getFields().get(0);
-        assertThat(formField.getId()).isEqualTo("input1");
-        assertThat(formField.getValue()).isEqualTo("test");
+        assertThat(formModel.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(tuple("input1", "test"));
         
         formInstance = formService.createFormInstanceQuery().formDefinitionId(formInfo.getId()).tenantId("flowable").singleResult();
         assertThat(formInstance).isNotNull();
@@ -114,7 +125,6 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
-        assertThat(formValues.get("input1")).isEqualTo("test");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -124,17 +134,21 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable", "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         FormInstanceInfo formInstanceModel = formService.getFormInstanceModelByKey("form1", "aTaskId", null, null, "flowable", true);
         assertThat(formInstanceModel.getKey()).isEqualTo("form1");
         
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        FormField formField = formModel.getFields().get(0);
-        assertThat(formField.getId()).isEqualTo("input1");
-        assertThat(formField.getValue()).isEqualTo("test");
+        assertThat(formModel.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(tuple("input1", "test"));
         
         formInstance = formService.createFormInstanceQuery().formDefinitionId(formInfo.getId()).tenantId("flowable").singleResult();
         assertThat(formInstance).isNotNull();
@@ -165,17 +179,21 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
             FormInstance formInstance = formService.createFormInstance(formValues, formInfo, "aTaskId", null, null, "flowable", "default");
             assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
             JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-            assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-            assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
-    
+            assertThatJson(formNode)
+                    .isEqualTo("{"
+                            + "   values: {"
+                            + "     input1: 'test'"
+                            + " },"
+                            + " flowable_form_outcome: 'default'"
+                            + "}");
+
             FormInstanceInfo formInstanceModel = formService.getFormInstanceModelByKey("form1", "aTaskId", null, null, "flowable", false);
             assertThat(formInstanceModel.getKey()).isEqualTo("form1");
             
             SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-            assertThat(formModel.getFields().size()).isOne();
-            FormField formField = formModel.getFields().get(0);
-            assertThat(formField.getId()).isEqualTo("input1");
-            assertThat(formField.getValue()).isEqualTo("test");
+            assertThat(formModel.getFields())
+                    .extracting(FormField::getId, FormField::getValue)
+                    .containsExactly(tuple("input1", "test"));
             
             formInstance = formService.createFormInstanceQuery().formDefinitionId(formInfo.getId()).tenantId("flowable").singleResult();
             assertThat(formInstance).isNotNull();
@@ -214,14 +232,18 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "date");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        JsonNode valuesNode = formNode.get("values");
-        assertThat(valuesNode.size()).isEqualTo(4);
-        assertThat(valuesNode.get("input1").asText()).isEqualTo("test");
-        assertThat(valuesNode.get("date1").asText()).isEqualTo("2016-01-01");
-        assertThat(valuesNode.get("date2").asText()).isEqualTo("2017-01-01");
-        assertThat(valuesNode.get("date3").asText()).isEqualTo("2018-01-01");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("date");
-        
+        assertThatJson(formNode)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test',"
+                        + "     date1: '2016-01-01',"
+                        + "     date2: '2017-01-01',"
+                        + "     date3: '2018-01-01'"
+                        + " },"
+                        + " flowable_form_outcome: 'date'"
+                        + "}");
+
         assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isOne();
         formService.deleteFormInstancesByFormDefinition(formInstance.getFormDefinitionId());
         assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isZero();
@@ -246,16 +268,20 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null, "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         FormInstanceInfo formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
         assertThat(formInstanceModel.getKey()).isEqualTo("form1");
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        FormField formField = formModel.getFields().get(0);
-        assertThat(formField.getId()).isEqualTo("input1");
-        assertThat(formField.getValue()).isEqualTo("test");
+        assertThat(formModel.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(tuple("input1", "test"));
 
         valuesMap = new HashMap<>();
         valuesMap.put("input1", "updatedValue");
@@ -269,17 +295,21 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         formInstance = formService.saveFormInstance(formValues, formInfo, taskId, "someId", "testDefId", null, "updatedOutcome");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("updatedValue");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("updatedOutcome");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'updatedValue'"
+                        + " },"
+                        + " flowable_form_outcome: 'updatedOutcome'"
+                        + "}");
 
         formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
         assertThat(formInstanceModel.getKey()).isEqualTo("form1");
         assertThat(formInstanceModel.getSubmittedBy()).isEqualTo("User");
         formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        formField = formModel.getFields().get(0);
-        assertThat(formField.getId()).isEqualTo("input1");
-        assertThat(formField.getValue()).isEqualTo("updatedValue");
+        assertThat(formModel.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(tuple("input1", "updatedValue"));
 
         assertThat(formService.createFormInstanceQuery().formDefinitionId(formInfo.getId()).count()).isOne();
         
@@ -310,7 +340,13 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstanceWithScopeId(formValues, formInfo, "123456", "someId", "cmmn", "testDefId", null, "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("plainLink").asText()).isEqualTo("http://notmylink.com");
+        assertThatJson(formNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     plainLink: 'http://notmylink.com'"
+                        + " }"
+                        + "}");
         // no variable provided for expressionLink and anotherPlainLink
         assertThat(formNode.get("values").get("expressionLink")).isNull();
         assertThat(formNode.get("values").get("anotherPlainLink")).isNull();
@@ -320,34 +356,24 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         assertThat(formInstanceModel.getKey()).isEqualTo("hyperlink");
 
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
-        assertThat(formModel.getFields().size()).isEqualTo(3);
-        FormField plainLinkField = formModel.getFields().get(0);
-        assertThat(plainLinkField.getId()).isEqualTo("plainLink");
-        assertThat(plainLinkField.getValue()).isEqualTo("http://notmylink.com");
-
-        FormField expressionLinkField = formModel.getFields().get(1);
-        assertThat(expressionLinkField.getId()).isEqualTo("expressionLink");
-        assertThat(expressionLinkField.getValue()).isEqualTo("http://www.flowable.org/downloads.html");
-
-        FormField anotherPlainLinkField = formModel.getFields().get(2);
-        assertThat(anotherPlainLinkField.getId()).isEqualTo("anotherPlainLink");
-        assertThat(anotherPlainLinkField.getValue()).isEqualTo("http://blog.flowable.org");
+        assertThat(formModel.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(
+                        tuple("plainLink", "http://notmylink.com"),
+                        tuple("expressionLink", "http://www.flowable.org/downloads.html"),
+                        tuple("anotherPlainLink", "http://blog.flowable.org")
+                );
 
         // test hyperlink expression parsing in GetFormModelWithVariablesCmd
         FormInfo formInfoWithVars = formService.getFormModelWithVariablesById(formInfo.getId(), null, variables);
         SimpleFormModel model = (SimpleFormModel) formInfoWithVars.getFormModel();
-        assertThat(model.getFields().size()).isEqualTo(3);
-        plainLinkField = model.getFields().get(0);
-        assertThat(plainLinkField.getId()).isEqualTo("plainLink");
-        assertThat(plainLinkField.getValue()).isEqualTo("http://notmylink.com");
-
-        expressionLinkField = model.getFields().get(1);
-        assertThat(expressionLinkField.getId()).isEqualTo("expressionLink");
-        assertThat(expressionLinkField.getValue()).isEqualTo("http://www.flowable.org/downloads.html");
-
-        anotherPlainLinkField = model.getFields().get(2);
-        assertThat(anotherPlainLinkField.getId()).isEqualTo("anotherPlainLink");
-        assertThat(anotherPlainLinkField.getValue()).isEqualTo("http://blog.flowable.org");
+        assertThat(model.getFields())
+                .extracting(FormField::getId, FormField::getValue)
+                .containsExactly(
+                        tuple("plainLink", "http://notmylink.com"),
+                        tuple("expressionLink", "http://www.flowable.org/downloads.html"),
+                        tuple("anotherPlainLink", "http://blog.flowable.org")
+                );
         
         assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isOne();
         formService.deleteFormInstancesByScopeDefinition("testDefId");
