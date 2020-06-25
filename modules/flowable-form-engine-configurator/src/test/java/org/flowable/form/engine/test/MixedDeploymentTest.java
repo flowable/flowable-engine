@@ -12,15 +12,14 @@
  */
 package org.flowable.form.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.flowable.form.api.FormDefinition;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yvo Swillens
@@ -36,18 +35,19 @@ public class MixedDeploymentTest extends AbstractFlowableFormEngineConfiguratorT
                 .processDefinitionKey("oneTaskWithFormProcess")
                 .singleResult();
 
-        assertNotNull(processDefinition);
-        assertEquals("oneTaskWithFormProcess", processDefinition.getKey());
+        assertThat(processDefinition).isNotNull();
+        assertThat(processDefinition.getKey()).isEqualTo("oneTaskWithFormProcess");
 
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery()
                 .latestVersion()
                 .formDefinitionKey("form1")
                 .singleResult();
-        assertNotNull(formDefinition);
-        assertEquals("form1", formDefinition.getKey());
+        assertThat(formDefinition).isNotNull();
+        assertThat(formDefinition.getKey()).isEqualTo("form1");
 
         List<FormDefinition> formDefinitionList = repositoryService.getFormDefinitionsForProcessDefinition(processDefinition.getId());
-        assertEquals(1l, formDefinitionList.size());
-        assertEquals("form1", formDefinitionList.get(0).getKey());
+        assertThat(formDefinitionList)
+                .extracting(FormDefinition::getKey)
+                .containsExactly("form1");
     }
 }
