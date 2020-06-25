@@ -45,7 +45,7 @@ import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -588,12 +588,12 @@ public class CommandContextUtil {
         return (DmnEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
     }
 
-    public static DmnRuleService getDmnRuleService(CommandContext commandContext) {
+    public static DmnDecisionService getDmnRuleService(CommandContext commandContext) {
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(commandContext);
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("Dmn engine is not configured");
         }
-        return dmnEngineConfiguration.getDmnRuleService();
+        return dmnEngineConfiguration.getDmnDecisionService();
     }
 
     public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {

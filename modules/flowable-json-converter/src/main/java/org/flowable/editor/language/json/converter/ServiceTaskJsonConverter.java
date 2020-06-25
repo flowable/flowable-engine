@@ -84,13 +84,13 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
         } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
 
-                String decisionModelKey = converterContext.getDecisionModelKeyForDecisionModelId(fieldExtension.getStringValue());
+                String decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(fieldExtension.getStringValue());
                 if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) && decisionModelKey != null) {
 
                     ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
                     propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-                    Map<String, String> modelInfo = converterContext.getDecisionModelInfoForDecisionModelKey(fieldExtension.getStringValue());
+                    Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(fieldExtension.getStringValue());
                     decisionReferenceNode.put("id", modelInfo.get("id"));
                     decisionReferenceNode.put("name", modelInfo.get("name"));
                     decisionReferenceNode.put("key", modelInfo.get("key"));

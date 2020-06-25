@@ -47,13 +47,15 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     protected Map<String, String> processKeyToJsonStringMap = new HashMap<>();
     protected Map<String, String> caseKeyToJsonStringMap = new HashMap<>();
     protected Map<String, String> formKeyToJsonStringMap = new HashMap<>();
-    protected Map<String, String> decisionKeyToJsonStringMap = new HashMap<>();
+    protected Map<String, String> decisionTableKeyToJsonStringMap = new HashMap<>();
+    protected Map<String, String> decisionServiceKeyToJsonStringMap = new HashMap<>();
 
     // Maps that store key -> persisted Model
     protected Map<String, Model> processKeyToModelMap = new HashMap<>();
     protected Map<String, Model> caseKeyToModelMap = new HashMap<>();
     protected Map<String, Model> formKeyToModelMap = new HashMap<>();
-    protected Map<String, Model> decisionKeyToModelMap = new HashMap<>();
+    protected Map<String, Model> decisionTableKeyToModelMap = new HashMap<>();
+    protected Map<String, Model> decisionServiceKeyToModelMap = new HashMap<>();
 
     // Thumbnails part of the app
     protected Map<String, byte[]> modelKeyToThumbnailMap = new HashMap<>();
@@ -62,7 +64,8 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     protected Map<String, Model> processIdToModelMap = new HashMap<>();
     protected Map<String, Model> caseIdToModelMap = new HashMap<>();
     protected Map<String, Model> formIdToModelMap = new HashMap<>();
-    protected Map<String, Model> decisionIdToModelMap = new HashMap<>();
+    protected Map<String, Model> decisionTableIdToModelMap = new HashMap<>();
+    protected Map<String, Model> decisionServiceIdToModelMap = new HashMap<>();
 
     // Maps that store unresolved models. 'unresolved key' -> Model using that key
     // (this can happen due to the order of reading the files in the app zip)
@@ -105,13 +108,23 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     }
 
     @Override
-    public String getDecisionModelKeyForDecisionModelId(String decisionModelId) {
-        return getKeyForId(decisionIdToModelMap, decisionModelId);
+    public String getDecisionTableModelKeyForDecisionTableModelId(String decisionTableModelId) {
+        return getKeyForId(decisionTableIdToModelMap, decisionTableModelId);
     }
 
     @Override
-    public Map<String, String> getDecisionModelInfoForDecisionModelKey(String decisionModelKey) {
-        return modelToModelInfo(decisionKeyToModelMap, decisionModelKey);
+    public Map<String, String> getDecisionTableModelInfoForDecisionTableModelKey(String decisionTableModelKey) {
+        return modelToModelInfo(decisionTableKeyToModelMap, decisionTableModelKey);
+    }
+
+    @Override
+    public String getDecisionServiceModelKeyForDecisionServiceModelId(String decisionServiceModelId) {
+        return getKeyForId(decisionServiceIdToModelMap, decisionServiceModelId);
+    }
+
+    @Override
+    public Map<String, String> getDecisionServiceModelInfoForDecisionServiceModelKey(String decisionServiceModelKey) {
+        return modelToModelInfo(decisionServiceKeyToModelMap, decisionServiceModelKey);
     }
 
     protected String getKeyForId(Map<String, Model> modelMap, String id) {
@@ -202,7 +215,6 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
        addFormModel(model, null);
     }
 
-
     public void addFormModel(Model model, String ... oldFormModelIds) {
         this.formKeyToModelMap.put(model.getKey(), model);
         this.formIdToModelMap.put(model.getId(), model);
@@ -217,17 +229,35 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         // as the import of forms always happens before the model referencing them
     }
 
-    public void addDecisionModel(Model model) {
-        addDecisionModel(model, null);
+    public void addDecisionTableModel(Model model) {
+        addDecisionTableModel(model, null);
     }
 
-    public void addDecisionModel(Model model, String ... oldDecisionModelIds) {
-        this.decisionKeyToModelMap.put(model.getKey(), model);
-        this.decisionIdToModelMap.put(model.getId(), model);
+    public void addDecisionTableModel(Model model, String ... oldDecisionTableModelIds) {
+        this.decisionTableKeyToModelMap.put(model.getKey(), model);
+        this.decisionTableIdToModelMap.put(model.getId(), model);
 
-        if (oldDecisionModelIds != null) {
-            for (String oldDecisionModelId : oldDecisionModelIds) {
-                this.decisionIdToModelMap.put(oldDecisionModelId, model);
+        if (oldDecisionTableModelIds != null) {
+            for (String oldDecisionTableModelId : oldDecisionTableModelIds) {
+                this.decisionTableIdToModelMap.put(oldDecisionTableModelId, model);
+            }
+        }
+
+        // For decision models there is no 'unresolved' key handling needed,
+        // as the import of decisions always happens before the model referencing them
+    }
+
+    public void addDecisionServiceModel(Model model) {
+        addDecisionServiceModel(model, null);
+    }
+
+    public void addDecisionServiceModel(Model model, String ... oldDecisionServiceModelIds) {
+        this.decisionServiceKeyToModelMap.put(model.getKey(), model);
+        this.decisionServiceIdToModelMap.put(model.getId(), model);
+
+        if (oldDecisionServiceModelIds != null) {
+            for (String oldDecisionServiceModelId : oldDecisionServiceModelIds) {
+                this.decisionServiceIdToModelMap.put(oldDecisionServiceModelId, model);
             }
         }
 
@@ -300,14 +330,21 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         return formIdToModelMap.get(id);
     }
 
-    public Model getDecisionModelByKey(String key) {
-        return decisionKeyToModelMap.get(key);
+    public Model getDecisionTableModelByKey(String key) {
+        return decisionTableKeyToModelMap.get(key);
     }
 
-    public Model getDecisionModelById(String id) {
-        return decisionIdToModelMap.get(id);
+    public Model getDecisionTableModelById(String id) {
+        return decisionTableIdToModelMap.get(id);
     }
 
+    public Model getDecisionServiceModelByKey(String key) {
+        return decisionServiceKeyToModelMap.get(key);
+    }
+
+    public Model getDecisionServiceModelById(String id) {
+        return decisionServiceIdToModelMap.get(id);
+    }
     /*
      * All models retrieval
      */
@@ -320,8 +357,12 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         return caseKeyToModelMap.values();
     }
 
-    public Collection<Model> getAllDecisionModels() {
-        return decisionKeyToModelMap.values();
+    public Collection<Model> getAllDecisionTableModels() {
+        return decisionTableKeyToModelMap.values();
+    }
+
+    public Collection<Model> getAllDecisionServiceModels() {
+        return decisionServiceKeyToModelMap.values();
     }
 
     public Collection<Model> getAllFormModels() {
@@ -341,8 +382,11 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     public Map<String, String> getFormKeyToJsonStringMap() {
         return formKeyToJsonStringMap;
     }
-    public Map<String, String> getDecisionKeyToJsonStringMap() {
-        return decisionKeyToJsonStringMap;
+    public Map<String, String> getDecisionTableKeyToJsonStringMap() {
+        return decisionTableKeyToJsonStringMap;
+    }
+    public Map<String, String> getDecisionServiceKeyToJsonStringMap() {
+        return decisionServiceKeyToJsonStringMap;
     }
 
     /*

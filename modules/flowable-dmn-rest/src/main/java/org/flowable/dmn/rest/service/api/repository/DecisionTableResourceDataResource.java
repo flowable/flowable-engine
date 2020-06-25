@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,7 +41,7 @@ public class DecisionTableResourceDataResource extends BaseDecisionTableResource
     @GetMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", produces = "application/json")
     @ResponseBody
     public byte[] getDecisionTableResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletResponse response) {
-        DmnDecisionTable decisionTable = getDecisionTableFromRequest(decisionTableId);
+        DmnDecision decisionTable = getDecisionTableFromRequest(decisionTableId);
         return getDeploymentResourceData(decisionTable.getDeploymentId(), decisionTable.getResourceName(), response);
     }
 }

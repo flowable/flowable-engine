@@ -17,7 +17,7 @@ import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 
 public interface DmnEngine extends Engine {
 
@@ -30,7 +30,7 @@ public interface DmnEngine extends Engine {
 
     DmnRepositoryService getDmnRepositoryService();
 
-    DmnRuleService getDmnRuleService();
+    DmnDecisionService getDmnDecisionService();
     
     DmnHistoryService getDmnHistoryService();
 

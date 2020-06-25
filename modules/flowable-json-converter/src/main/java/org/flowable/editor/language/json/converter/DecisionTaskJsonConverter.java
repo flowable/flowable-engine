@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,8 +28,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
 
+    protected static final String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
+    protected static final String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
+
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
-                                 Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+        Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
@@ -54,17 +57,36 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);
 
+        String decisionModelKey = null;
+        String referenceType = null;
+
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
-
             String decisionTableId = decisionTableReferenceNode.get("id").asText();
-            String decisionModelKey = converterContext.getDecisionModelKeyForDecisionModelId(decisionTableId);
-            if (decisionModelKey != null) {
-                FieldExtension decisionTableKeyField = new FieldExtension();
-                decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
-                decisionTableKeyField.setStringValue(decisionModelKey);
-                serviceTask.getFieldExtensions().add(decisionTableKeyField);
-            }
+            decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(decisionTableId);
+            referenceType = REFERENCE_TYPE_DECISION_TABLE;
+        }
+
+        JsonNode decisionServiceReferenceNode = getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
+        if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
+            String decisionServiceId = decisionServiceReferenceNode.get("id").asText();
+            decisionModelKey = converterContext.getDecisionServiceModelKeyForDecisionServiceModelId(decisionServiceId);
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+        }
+
+        if (decisionModelKey != null) {
+            FieldExtension decisionTableKeyField = new FieldExtension();
+            decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
+            decisionTableKeyField.setStringValue(decisionModelKey);
+            serviceTask.getFieldExtensions().add(decisionTableKeyField);
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+        }
+
+        if (referenceType != null) {
+            FieldExtension decisionReferenceType = new FieldExtension();
+            decisionReferenceType.setFieldName(PROPERTY_DECISION_REFERENCE_TYPE);
+            decisionReferenceType.setStringValue(referenceType);
+            serviceTask.getFieldExtensions().add(decisionReferenceType);
         }
 
         boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);

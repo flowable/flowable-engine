@@ -74,7 +74,7 @@ public class DecisionTaskTest {
     )
     public void testUnknowPropertyUsedInDmn() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("DMN decision table with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
+        this.expectedException.expectMessage("DMN decision with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
         
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
@@ -154,7 +154,7 @@ public class DecisionTaskTest {
     )
     public void testThrowErrorOnNoHit() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("DMN decision table with key decisionTable did not hit any rules for the provided input.");
+        this.expectedException.expectMessage("DMN decision with key decisionTable did not hit any rules for the provided input.");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", true)
@@ -294,7 +294,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithFallbackFalse() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision table found without parent deployment id.");
+        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision found without parent deployment id.");
 
         deployDmnTableAssertCaseStarted();
     }
@@ -315,7 +315,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithGlobalTenantFallbackNoDefinition() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("There was also no fall back decision table found for default tenant defaultFlowable");
+        this.expectedException.expectMessage("There was also no fall back decision found for default tenant defaultFlowable");
 
         deployDmnTableWithGlobalTenantFallback("otherTenant");
     }

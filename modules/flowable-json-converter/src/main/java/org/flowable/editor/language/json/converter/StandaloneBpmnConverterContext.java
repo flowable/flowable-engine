@@ -33,11 +33,19 @@ public class StandaloneBpmnConverterContext implements BpmnJsonConverterContext 
         return null;
     }
     @Override
-    public String getDecisionModelKeyForDecisionModelId(String decisionModelId) {
+    public String getDecisionTableModelKeyForDecisionTableModelId(String decisionTableModelId) {
         return null;
     }
     @Override
-    public Map<String, String> getDecisionModelInfoForDecisionModelKey(String decisionModelKey) {
+    public Map<String, String> getDecisionTableModelInfoForDecisionTableModelKey(String decisionTableModelKey) {
+        return null;
+    }
+    @Override
+    public String getDecisionServiceModelKeyForDecisionServiceModelId(String decisionServiceModelId) {
+        return null;
+    }
+    @Override
+    public Map<String, String> getDecisionServiceModelInfoForDecisionServiceModelKey(String decisionServiceModelKey) {
         return null;
     }
 }

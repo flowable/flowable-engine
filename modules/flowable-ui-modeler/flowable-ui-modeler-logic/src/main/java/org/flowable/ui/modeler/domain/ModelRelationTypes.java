@@ -25,4 +25,7 @@ public interface ModelRelationTypes {
     String TYPE_CASE_MODEL_CHILD = "case-model-child";
     
     String TYPE_PROCESS_MODEL_CHILD = "process-model-child";
+
+    String TYPE_DECISION_SERVICE_MODEL_CHILD = "decision-service-model";
+
 }

@@ -15,7 +15,7 @@ package org.flowable.dmn.rest.service.api.repository;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
@@ -30,22 +30,22 @@ public class DecisionTableResourceTest extends BaseSpringDmnRestTestCase {
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionTable() throws Exception {
 
-        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, definition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(decisionTable.getId(), responseNode.get("id").textValue());
-        assertEquals(decisionTable.getKey(), responseNode.get("key").textValue());
-        assertEquals(decisionTable.getCategory(), responseNode.get("category").textValue());
-        assertEquals(decisionTable.getVersion(), responseNode.get("version").intValue());
-        assertEquals(decisionTable.getDescription(), responseNode.get("description").textValue());
-        assertEquals(decisionTable.getName(), responseNode.get("name").textValue());
+        assertEquals(definition.getId(), responseNode.get("id").textValue());
+        assertEquals(definition.getKey(), responseNode.get("key").textValue());
+        assertEquals(definition.getCategory(), responseNode.get("category").textValue());
+        assertEquals(definition.getVersion(), responseNode.get("version").intValue());
+        assertEquals(definition.getDescription(), responseNode.get("description").textValue());
+        assertEquals(definition.getName(), responseNode.get("name").textValue());
 
         // Check URL's
         assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(decisionTable.getDeploymentId(), responseNode.get("deploymentId").textValue());
+        assertEquals(definition.getDeploymentId(), responseNode.get("deploymentId").textValue());
     }
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })

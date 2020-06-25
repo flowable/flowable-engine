@@ -118,7 +118,7 @@
   
   <sql id="selectHistoricDecisionExecutionsByQueryCriteriaSql">  
     from ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
-        inner join ${prefix}ACT_DMN_DECISION_TABLE DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
+        inner join ${prefix}ACT_DMN_DECISION DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
     <where>
       <if test="id != null">
         RES.ID_ = #{id}

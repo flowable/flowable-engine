@@ -15,7 +15,7 @@ package org.flowable.dmn.rest.conf.engine;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
@@ -46,8 +46,8 @@ public class FlowableDmnEngineConfiguration {
     }
 
     @Bean
-    public DmnRuleService dmnRuleService() {
-        return ruleEngine().getDmnRuleService();
+    public DmnDecisionService dmnRuleService() {
+        return ruleEngine().getDmnDecisionService();
     }
     
     @Bean

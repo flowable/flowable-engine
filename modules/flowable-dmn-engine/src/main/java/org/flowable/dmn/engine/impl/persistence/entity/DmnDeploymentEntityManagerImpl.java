@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
@@ -49,20 +49,20 @@ public class DmnDeploymentEntityManagerImpl
     @Override
     public void deleteDeployment(String deploymentId) {
         getHistoricDecisionExecutionEntityManager().deleteHistoricDecisionExecutionsByDeploymentId(deploymentId);
-        getDecisionTableEntityManager().deleteDecisionTablesByDeploymentId(deploymentId);
+        getDecisionTableEntityManager().deleteDecisionsByDeploymentId(deploymentId);
         getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
     }
 
-    protected DecisionTableEntity findLatestDecisionTable(DmnDecisionTable decisionTable) {
-        DecisionTableEntity latestDecisionTable = null;
-        if (decisionTable.getTenantId() != null && !DmnEngineConfiguration.NO_TENANT_ID.equals(decisionTable.getTenantId())) {
-            latestDecisionTable = getDecisionTableEntityManager()
-                    .findLatestDecisionTableByKeyAndTenantId(decisionTable.getKey(), decisionTable.getTenantId());
+    protected DecisionEntity findLatestDefinition(DmnDecision definition) {
+        DecisionEntity latestDefinition = null;
+        if (definition.getTenantId() != null && !DmnEngineConfiguration.NO_TENANT_ID.equals(definition.getTenantId())) {
+            latestDefinition = getDecisionTableEntityManager()
+                    .findLatestDecisionByKeyAndTenantId(definition.getKey(), definition.getTenantId());
         } else {
-            latestDecisionTable = getDecisionTableEntityManager().findLatestDecisionTableByKey(decisionTable.getKey());
+            latestDefinition = getDecisionTableEntityManager().findLatestDecisionByKey(definition.getKey());
         }
-        return latestDecisionTable;
+        return latestDefinition;
     }
 
     @Override
@@ -98,8 +98,8 @@ public class DmnDeploymentEntityManagerImpl
         return engineConfiguration.getHistoricDecisionExecutionEntityManager();
     }
 
-    protected DecisionTableEntityManager getDecisionTableEntityManager() {
-        return engineConfiguration.getDecisionTableEntityManager();
+    protected DecisionEntityManager getDecisionTableEntityManager() {
+        return engineConfiguration.getDecisionEntityManager();
     }
 
 }

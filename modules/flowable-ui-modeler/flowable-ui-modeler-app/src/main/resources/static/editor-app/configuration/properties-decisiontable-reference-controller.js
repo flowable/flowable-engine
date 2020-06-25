@@ -266,16 +266,16 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
             $http.get(FLOWABLE.APP_URL.getDecisionTableModelsUrl())
                 .success(
                     function(response) {
-                        $scope.state.loadingDecisionTables = false;
-                        $scope.state.decisionTableError = false;
-                        $scope.decisionTables = response.data;
-                        $scope.resetCurrent();
-                    })
+                            $scope.state.loadingDecisionTables = false;
+                            $scope.state.decisionTableError = false;
+                            $scope.decisionTables = response.data;
+                            $scope.resetCurrent();
+                })
                 .error(
                     function(data, status, headers, config) {
-                        $scope.state.loadingDecisionTables = false;
-                        $scope.state.decisionTableError = true;
-                    });
+                    $scope.state.loadingDecisionTables = false;
+                    $scope.state.decisionTableError = true;
+                });
         };
 
         if ($scope.property && $scope.property.value && $scope.property.value.id) {

@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -33,12 +33,12 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
 
     protected ApplicationContext applicationContext;
     protected DmnRepositoryService repositoryService;
-    protected DmnRuleService ruleService;
+    protected DmnDecisionService ruleService;
 
     protected void createAppContext(String path) {
         this.applicationContext = new ClassPathXmlApplicationContext(path);
         this.repositoryService = applicationContext.getBean(DmnRepositoryService.class);
-        this.ruleService = applicationContext.getBean(DmnRuleService.class);
+        this.ruleService = applicationContext.getBean(DmnDecisionService.class);
     }
 
     @Override

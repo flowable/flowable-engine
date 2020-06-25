@@ -33,8 +33,11 @@ public interface CmmnJsonConverterContext {
     String getProcessModelKeyForProcessModelId(String processModelId);
     Map<String, String> getProcessModelInfoForProcessModelKey(String processModelKey);
 
-    String getDecisionModelKeyForDecisionModelId(String decisionModelId);
-    Map<String, String> getDecisionModelInfoForDecisionModelKey(String decisionModelKey);
+    String getDecisionTableModelKeyForDecisionTableModelId(String decisionTableModelId);
+    Map<String, String> getDecisionTableModelInfoForDecisionTableModelKey(String decisionTableModelKey);
+
+    String getDecisionServiceModelKeyForDecisionServiceModelId(String decisionServiceModelId);
+    Map<String, String> getDecisionServiceModelInfoForDecisionServiceModelKey(String decisionServiceModelKey);
 
     void registerUnresolvedCaseModelReferenceForCaseModel(String unresolvedCaseModelKey, CmmnModel cmmnModel);
 

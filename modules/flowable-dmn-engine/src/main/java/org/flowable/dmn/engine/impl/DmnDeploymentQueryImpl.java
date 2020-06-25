@@ -41,8 +41,8 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     protected boolean withoutTenantId;
     protected String parentDeploymentId;
     protected String parentDeploymentIdLike;
-    protected String decisionTableKey;
-    protected String decisionTableKeyLike;
+    protected String decisionKey;
+    protected String decisionKeyLike;
 
     public DmnDeploymentQueryImpl() {
     }
@@ -143,20 +143,20 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     }
 
     @Override
-    public DmnDeploymentQueryImpl decisionTableKey(String key) {
+    public DmnDeploymentQueryImpl decisionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
         }
-        this.decisionTableKey = key;
+        this.decisionKey = key;
         return this;
     }
 
     @Override
-    public DmnDeploymentQueryImpl decisionTableKeyLike(String keyLike) {
+    public DmnDeploymentQueryImpl decisionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
         }
-        this.decisionTableKeyLike = keyLike;
+        this.decisionKeyLike = keyLike;
         return this;
     }
 
@@ -228,11 +228,11 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
         return withoutTenantId;
     }
 
-    public String getDecisionTableKey() {
-        return decisionTableKey;
+    public String getDecisionKey() {
+        return decisionKey;
     }
 
-    public String getDecisionTableKeyLike() {
-        return decisionTableKeyLike;
+    public String getDecisionKeyLike() {
+        return decisionKeyLike;
     }
 }

@@ -22,7 +22,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -50,10 +50,10 @@ public class BaseDecisionTableResource {
     protected DmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link DmnDecisionTable} that is requested. Throws the right exceptions when bad request was made or decision table was not found.
+     * Returns the {@link DmnDecision} that is requested. Throws the right exceptions when bad request was made or decision table was not found.
      */
-    protected DmnDecisionTable getDecisionTableFromRequest(String decisionTableId) {
-        DmnDecisionTable decisionTable = dmnRepositoryService.getDecisionTable(decisionTableId);
+    protected DmnDecision getDecisionTableFromRequest(String decisionTableId) {
+        DmnDecision decisionTable = dmnRepositoryService.getDecision(decisionTableId);
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("Could not find a decision table with id '" + decisionTableId);

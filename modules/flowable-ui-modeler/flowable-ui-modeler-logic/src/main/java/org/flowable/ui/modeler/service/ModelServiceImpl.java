@@ -36,6 +36,7 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.editor.converter.DmnJsonConverterUtil;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
@@ -261,6 +262,105 @@ public class ModelServiceImpl implements ModelService {
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "CasePlanModel");
+            json = editorNode.toString();
+
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DECISION_SERVICE).equals(model.getModelType())) {
+            ObjectNode editorNode = objectMapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectMapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/dmn1.2#");
+            editorNode.set("stencilset", stencilSetNode);
+
+            ObjectNode propertiesNode = objectMapper.createObjectNode();
+            propertiesNode.put("drd_id", "DMNDiagram_" + model.getKey());
+            propertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                propertiesNode.put("documentation", model.getDescription());
+            }
+            editorNode.set("properties", propertiesNode);
+
+            ArrayNode childShapeArray = objectMapper.createArrayNode();
+            editorNode.set("childShapes", childShapeArray);
+
+            ObjectNode childNode = objectMapper.createObjectNode();
+            childShapeArray.add(childNode);
+            ObjectNode boundsNode = objectMapper.createObjectNode();
+            childNode.set("bounds", boundsNode);
+            ObjectNode lowerRightNode = objectMapper.createObjectNode();
+            boundsNode.set("lowerRight", lowerRightNode);
+            lowerRightNode.put("x", 750);
+            lowerRightNode.put("y", 554);
+            ObjectNode upperLeftNode = objectMapper.createObjectNode();
+            boundsNode.set("upperLeft", upperLeftNode);
+            upperLeftNode.put("x", 150);
+            upperLeftNode.put("y", 74);
+
+            ArrayNode childShapes = objectMapper.createArrayNode();
+
+            childNode.set("childShapes", childShapes);
+            childNode.set("dockers", objectMapper.createArrayNode());
+            childNode.set("outgoing", objectMapper.createArrayNode());
+            childNode.put("resourceId", "expandedDecisionService");
+
+            ObjectNode stencilNode = objectMapper.createObjectNode();
+            childNode.set("stencil", stencilNode);
+            stencilNode.put("id", "ExpandedDecisionService");
+
+            ObjectNode decisionServicePropertiesNode = objectMapper.createObjectNode();
+            childNode.set("properties", decisionServicePropertiesNode);
+            decisionServicePropertiesNode.put("overrideid", model.getKey());
+            decisionServicePropertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                decisionServicePropertiesNode.put("documentation", model.getDescription());
+            }
+
+            ObjectNode outgoingDecisionsShape = objectMapper.createObjectNode();
+            childShapes.add(outgoingDecisionsShape);
+
+            ObjectNode outgoingDecisionsStencilNode = objectMapper.createObjectNode();
+            outgoingDecisionsShape.set("stencil", outgoingDecisionsStencilNode);
+            outgoingDecisionsStencilNode.put("id", "OutputDecisionsDecisionServiceSection");
+
+            outgoingDecisionsShape.set("childShapes", objectMapper.createArrayNode());
+            outgoingDecisionsShape.set("dockers", objectMapper.createArrayNode());
+            outgoingDecisionsShape.set("outgoing", objectMapper.createArrayNode());
+            outgoingDecisionsShape.put("resourceId", "outputDecisions");
+
+            ObjectNode outgoingDecisionsBoundsNode = objectMapper.createObjectNode();
+            outgoingDecisionsShape.set("bounds", outgoingDecisionsBoundsNode);
+            ObjectNode outgoingDecisionsLowerRightNode = objectMapper.createObjectNode();
+            outgoingDecisionsBoundsNode.set("lowerRight", outgoingDecisionsLowerRightNode);
+            outgoingDecisionsLowerRightNode.put("x", 600);
+            outgoingDecisionsLowerRightNode.put("y", 240);
+            ObjectNode outgoingDecisionsUpperLeftNode = objectMapper.createObjectNode();
+            outgoingDecisionsBoundsNode.set("upperLeft", outgoingDecisionsUpperLeftNode);
+            outgoingDecisionsUpperLeftNode.put("x", 0);
+            outgoingDecisionsUpperLeftNode.put("y", 0);
+
+            ObjectNode encapsulatedDecisionsShape = objectMapper.createObjectNode();
+            childShapes.add(encapsulatedDecisionsShape);
+
+            ObjectNode encapsulatedDecisionsStencilNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsShape.set("stencil", encapsulatedDecisionsStencilNode);
+            encapsulatedDecisionsStencilNode.put("id", "EncapsulatedDecisionsDecisionServiceSection");
+
+            encapsulatedDecisionsShape.set("childShapes", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.set("dockers", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.set("outgoing", objectMapper.createArrayNode());
+            encapsulatedDecisionsShape.put("resourceId", "encapsulatedDecisions");
+
+            ObjectNode encapsulatedDecisionsBoundsNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsShape.set("bounds", encapsulatedDecisionsBoundsNode);
+            ObjectNode encapsulatedDecisionsLowerRightNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsBoundsNode.set("lowerRight", encapsulatedDecisionsLowerRightNode);
+            encapsulatedDecisionsLowerRightNode.put("x", 600);
+            encapsulatedDecisionsLowerRightNode.put("y", 480);
+            ObjectNode encapsulatedDecisionsUpperLeftNode = objectMapper.createObjectNode();
+            encapsulatedDecisionsBoundsNode.set("upperLeft", encapsulatedDecisionsUpperLeftNode);
+            encapsulatedDecisionsUpperLeftNode.put("x", 0);
+            encapsulatedDecisionsUpperLeftNode.put("y", 240);
+
             json = editorNode.toString();
 
         } else {
@@ -543,7 +643,6 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model) {
         BpmnModel bpmnModel = null;
         try {
-
             ConverterContext converterContext = new ConverterContext(this, objectMapper);
             List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
@@ -551,7 +650,10 @@ public class ModelServiceImpl implements ModelService {
                     converterContext.addFormModel(childModel);
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    converterContext.addDecisionModel(childModel);
+                    converterContext.addDecisionTableModel(childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    converterContext.addDecisionServiceModel(childModel);
 
                 }
             }
@@ -590,7 +692,10 @@ public class ModelServiceImpl implements ModelService {
                     converterContext.addFormModel(childModel);
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    converterContext.addDecisionModel(childModel);
+                    converterContext.addDecisionTableModel(childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
+                    converterContext.addDecisionServiceModel(childModel);
 
                 } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
                     converterContext.addCaseModel(childModel);
@@ -702,6 +807,16 @@ public class ModelServiceImpl implements ModelService {
 
                 modelRepository.save(model);
                 handleAppModelProcessRelations(model, jsonNode);
+            } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_SERVICE) {
+                // Thumbnail
+//                byte[] thumbnail = modelImageService.generateDrdThumbnailImage(model, jsonNode);
+                byte[] thumbnail = null;
+                if (thumbnail != null) {
+                    model.setThumbnail(thumbnail);
+                }
+
+                modelRepository.save(model);
+                handleDecisionServiceModelDecisionTableRelations(model, jsonNode);
             }
         }
 
@@ -724,6 +839,11 @@ public class ModelServiceImpl implements ModelService {
         Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
 
         handleModelRelations(bpmnProcessModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
+
+        List<JsonNode> decisionServiceNodes = JsonConverterUtil.filterOutJsonNodes(JsonConverterUtil.getBpmnProcessModelDecisionServiceReferences(editorJsonNode));
+        Set<String> decisionServiceIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionServiceNodes, "id");
+
+        handleModelRelations(bpmnProcessModel, decisionServiceIds, ModelRelationTypes.TYPE_DECISION_SERVICE_MODEL_CHILD);
     }
 
     protected void handleCmmnFormModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
@@ -757,6 +877,13 @@ public class ModelServiceImpl implements ModelService {
     protected void handleAppModelProcessRelations(AbstractModel appModel, ObjectNode appModelJsonNode) {
         Set<String> processModelIds = JsonConverterUtil.getAppModelReferencedModelIds(appModelJsonNode);
         handleModelRelations(appModel, processModelIds, ModelRelationTypes.TYPE_PROCESS_MODEL);
+    }
+
+    protected void handleDecisionServiceModelDecisionTableRelations(AbstractModel decisionServiceModel, ObjectNode editorJsonNode) {
+        List<JsonNode> decisionTableNodes = DmnJsonConverterUtil.filterOutJsonNodes(DmnJsonConverterUtil.getDmnModelDecisionTableReferences(editorJsonNode));
+        Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
+
+        handleModelRelations(decisionServiceModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
 
     /**

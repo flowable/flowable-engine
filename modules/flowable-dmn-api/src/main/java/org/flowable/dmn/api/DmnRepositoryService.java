@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * Service providing access to the repository of decision tables and deployments.
+ * Service providing access to the repository of decision(services) and deployments.
  *
  * @author Tijs Rademakers
  * @author Yvo Swillens
@@ -29,9 +29,9 @@ public interface DmnRepositoryService {
 
     void deleteDeployment(String deploymentId);
 
-    DmnDecisionTableQuery createDecisionTableQuery();
+    DmnDecisionQuery createDecisionQuery();
 
-    NativeDecisionTableQuery createNativeDecisionTableQuery();
+    NativeDecisionQuery createNativeDecisionQuery();
 
     /**
      * Changes the category of a deployment.
@@ -71,11 +71,11 @@ public interface DmnRepositoryService {
 
     NativeDmnDeploymentQuery createNativeDeploymentQuery();
 
-    DmnDecisionTable getDecisionTable(String decisionTableId);
+    DmnDecision getDecision(String decisionId);
 
-    InputStream getDmnResource(String decisionTableId);
+    InputStream getDmnResource(String decisionId);
 
-    void setDecisionTableCategory(String decisionTableId, String category);
+    void setDecisionCategory(String decisionId, String category);
 
-    DmnDefinition getDmnDefinition(String decisionTableId);
+    DmnDefinition getDmnDefinition(String decisionId);
 }

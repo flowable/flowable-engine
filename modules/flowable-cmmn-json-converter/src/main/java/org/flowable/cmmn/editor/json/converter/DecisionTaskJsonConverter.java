@@ -92,7 +92,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
             decisionReferenceNode.put("key", decisionTask.getDecisionRef());
             propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-            Map<String, String> modelInfo = converterContext.getDecisionModelInfoForDecisionModelKey(decisionTask.getDecisionRef());
+            Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(decisionTask.getDecisionRef());
             if (modelInfo != null) {
                 decisionReferenceNode.put("id", modelInfo.get("id"));
                 decisionReferenceNode.put("name", modelInfo.get("name"));

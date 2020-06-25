@@ -71,6 +71,11 @@ public class DecisionTableResource {
         decisionTableService.exportDecisionTable(response, decisionTableId);
     }
 
+    @GetMapping(value = "/{decisionTableId}/export-decision-service")
+    public void exportDecisionService(HttpServletResponse response, @PathVariable String decisionTableId) {
+        decisionTableService.exportDefinition(response, decisionTableId);
+    }
+
     @PostMapping(value = "/import-decision-table", produces = "application/json")
     public ModelRepresentation importDecisionTable(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return decisionTableService.importDecisionTable(request, file);

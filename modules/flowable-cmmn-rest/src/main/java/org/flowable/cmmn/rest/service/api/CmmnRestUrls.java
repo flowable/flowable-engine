@@ -79,7 +79,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_SIGNALS = "signals";
     public static final String SEGMENT_IMAGE = "image";
     public static final String SEGMENT_START_FORM = "start-form";
-    public static final String SEGMENT_DECISION_TABLES = "decision-tables";
+    public static final String SEGMENT_DECISIONS = "decisions";
     public static final String SEGMENT_FORM_DEFINITIONS = "form-definitions";
     public static final String SEGMENT_STAGE_OVERVIEW = "stage-overview";
 
@@ -144,9 +144,10 @@ public final class CmmnRestUrls {
     public static final String[] URL_CASE_DEFINITION_IMAGE = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_IMAGE };
 
     /**
-     * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/decision-tables</i>
+     * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/decisions</i>
      */
-    public static final String[] URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_DECISION_TABLES };
+    public static final String[] URL_CASE_DEFINITION_DECISION_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}",
+        SEGMENT_DECISIONS };
 
     /**
      * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/form-definitions</i>

@@ -21,7 +21,7 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -163,13 +163,26 @@ public interface CmmnRepositoryService {
     void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
     
     /**
-     * Retrieves the {@link DmnDecisionTable}s associated with the given case definition.
+     * Retrieves the {@link DmnDecision}s associated with the given case definition.
      *
      * @param caseDefinitionId
      *            id of the case definition, cannot be null.
      *
+     *
      */
-    List<DmnDecisionTable> getDecisionTablesForCaseDefinition(String caseDefinitionId);
+    List<DmnDecision> getDecisionsForCaseDefinition(String caseDefinitionId);
+
+    /**
+     * Retrieves the {@link DmnDecision}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     * @deprecated replaced by getDecisionsForCaseDefinition(String caseDefinition)
+     *
+     */
+    @Deprecated
+    List<DmnDecision> getDecisionTablesForCaseDefinition(String caseDefinitionId);
 
     /**
      * Retrieves the {@link FormDefinition}s associated with the given case definition.

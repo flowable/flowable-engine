@@ -130,24 +130,24 @@ public class DeploymentQueryTest extends AbstractFlowableDmnTest {
     }
     
     @Test
-    public void testQueryByDecisionTableKey() {
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKey("anotherDecision").list()).hasSize(1);
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKey("anotherDecision").count()).isEqualTo(1);
+    public void testQueryByDecisionKey() {
+        assertThat(repositoryService.createDeploymentQuery().decisionKey("anotherDecision").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().decisionKey("anotherDecision").count()).isEqualTo(1);
 
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKey("invalid").list()).isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKey("invalid").count()).isZero();
+        assertThat(repositoryService.createDeploymentQuery().decisionKey("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().decisionKey("invalid").count()).isZero();
     }
     
     @Test
-    public void testQueryByDecisionTableKeyLike() {
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("%sion").list()).hasSize(3);
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("%sion").count()).isEqualTo(3);
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("%sion").listPage(0, 1)).hasSize(1);
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("%sion").listPage(0, 2)).hasSize(2);
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("%sion").listPage(1, 2)).hasSize(2);
+    public void testQueryByDecisionKeyLike() {
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("%sion").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("%sion").count()).isEqualTo(3);
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("%sion").listPage(0, 1)).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("%sion").listPage(0, 2)).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("%sion").listPage(1, 2)).hasSize(2);
 
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("inva%").list()).isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().decisionTableKeyLike("inva%").count()).isZero();
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().decisionKeyLike("inva%").count()).isZero();
     }
     
 }

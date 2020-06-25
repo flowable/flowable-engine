@@ -127,6 +127,14 @@ flowableModeler
         .when('/app-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
+        })
+        .when('/decision-service-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
+        .when('/decision-services/:modelId', {
+            templateUrl: appResourceRoot + 'views/decision-service.html',
+            controller: 'DecisionServiceDetailsCtrl'
         });
 
         if (FLOWABLE.CONFIG.appDefaultRoute) {
@@ -215,7 +223,7 @@ flowableModeler
                 },
                 {
                     'id': 'decision-tables',
-                    'title': 'GENERAL.NAVIGATION.DECISION-TABLES',
+                    'title': 'GENERAL.NAVIGATION.DECISIONS',
                     'path': '/decision-tables'
                 },
                 {
