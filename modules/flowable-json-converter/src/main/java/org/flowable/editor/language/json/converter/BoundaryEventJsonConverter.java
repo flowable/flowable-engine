@@ -26,7 +26,6 @@ import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -104,7 +103,8 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         BoundaryEvent boundaryEvent = (BoundaryEvent) baseElement;
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
@@ -137,7 +137,8 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         BoundaryEvent boundaryEvent = new BoundaryEvent();
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_EVENT_BOUNDARY_TIMER.equals(stencilId)) {
@@ -173,34 +174,8 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
         
         } else if (STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY.equals(stencilId)) {
-            String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
-            if (StringUtils.isNotEmpty(eventKey)) {
-                addFlowableExtensionElementWithValue("eventType", eventKey, boundaryEvent);
-                addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), boundaryEvent);
-                convertJsonToOutParameters(elementNode, boundaryEvent);
-                convertJsonToCorrelationParameters(elementNode, "eventCorrelationParameter", boundaryEvent);
-                
-                addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), boundaryEvent);
-                addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), boundaryEvent);
-                addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), boundaryEvent);
-                addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), boundaryEvent);
-                
-                String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
-                String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-                String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
-                if (StringUtils.isNotEmpty(fixedValue)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", boundaryEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, boundaryEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonField)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", boundaryEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, boundaryEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonPointer)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", boundaryEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, boundaryEvent);
-                }
-            }
+            addReceiveEventExtensionElements(elementNode, boundaryEvent);
+
         }
         boundaryEvent.setAttachedToRefId(lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES)));
         return boundaryEvent;
@@ -236,44 +211,6 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         }
 
         return attachedRefId;
-    }
-    
-    protected void addEventRegistryProperties(BoundaryEvent boundaryEvent, ObjectNode propertiesNode) {
-        String eventType = getExtensionValue("eventType", boundaryEvent);
-        if (StringUtils.isNotEmpty(eventType)) {
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", boundaryEvent), propertiesNode);
-            addEventOutParameters(boundaryEvent.getExtensionElements().get("eventOutParameter"), propertiesNode);
-            addEventCorrelationParameters(boundaryEvent.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
-            
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", boundaryEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", boundaryEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", boundaryEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", boundaryEvent), propertiesNode);
-            
-            String keyDetectionType = getExtensionValue("keyDetectionType", boundaryEvent);
-            String keyDetectionValue = getExtensionValue("keyDetectionValue", boundaryEvent);
-            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
-                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
-                }
-            }
-        }
-    }
-    
-    protected String getExtensionValue(String name, FlowElement flowElement) {
-        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
-        if (extensionElements != null && extensionElements.size() > 0) {
-            return extensionElements.get(0).getElementText();
-        }
-        
-        return null;
     }
     
     @Override

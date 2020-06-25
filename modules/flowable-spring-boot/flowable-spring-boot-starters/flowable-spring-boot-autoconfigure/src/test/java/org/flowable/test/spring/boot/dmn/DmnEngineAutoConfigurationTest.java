@@ -32,7 +32,7 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.spring.AutoDeploymentStrategy;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -336,9 +336,9 @@ public class DmnEngineAutoConfigurationTest {
     }
 
     protected void assertAutoDeployment(DmnRepositoryService repositoryService) {
-        List<DmnDecisionTable> decisions = repositoryService.createDecisionTableQuery().list();
-        assertThat(decisions)
-            .extracting(DmnDecisionTable::getKey, DmnDecisionTable::getName)
+        List<DmnDecision> definitions = repositoryService.createDecisionQuery().list();
+        assertThat(definitions)
+            .extracting(DmnDecision::getKey, DmnDecision::getName)
             .containsExactlyInAnyOrder(
                 tuple("RiskRating", "Risk Rating Decision Table"),
                 tuple("simple", "Full Decision"),
@@ -349,9 +349,9 @@ public class DmnEngineAutoConfigurationTest {
 
     protected void assertAutoDeploymentWithAppEngine(AssertableApplicationContext context) {
         DmnRepositoryService repositoryService = context.getBean(DmnRepositoryService.class);
-        List<DmnDecisionTable> decisions = repositoryService.createDecisionTableQuery().list();
-        assertThat(decisions)
-            .extracting(DmnDecisionTable::getKey, DmnDecisionTable::getName)
+        List<DmnDecision> definitions = repositoryService.createDecisionQuery().list();
+        assertThat(definitions)
+            .extracting(DmnDecision::getKey, DmnDecision::getName)
             .containsExactlyInAnyOrder(
                 tuple("RiskRating", "Risk Rating Decision Table"),
                 tuple("simple", "Full Decision"),
@@ -360,11 +360,11 @@ public class DmnEngineAutoConfigurationTest {
                 tuple("managerApprovalNeeded", "Manager approval needed2")
             );
         
-        DmnDecisionTable dmnDecisionTable = repositoryService.createDecisionTableQuery().latestVersion().decisionTableKey("strings1").singleResult();
-        assertThat(dmnDecisionTable.getVersion()).isOne();
+        DmnDecision definition = repositoryService.createDecisionQuery().latestVersion().decisionKey("strings1").singleResult();
+        assertThat(definition.getVersion()).isOne();
         
-        dmnDecisionTable = repositoryService.createDecisionTableQuery().latestVersion().decisionTableKey("managerApprovalNeeded").singleResult();
-        assertThat(dmnDecisionTable.getVersion()).isOne();
+        definition = repositoryService.createDecisionQuery().latestVersion().decisionKey("managerApprovalNeeded").singleResult();
+        assertThat(definition.getVersion()).isOne();
         
         List<DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
 

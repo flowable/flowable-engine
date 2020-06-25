@@ -69,8 +69,7 @@ flowableAdminApp.controller('DecisionTableExecutionsController', ['$rootScope', 
             }
         };
 
-        $q.all([$translate('DECISION-TABLE-EXECUTIONS.HEADER.ID'),
-                $translate('DECISION-TABLE-EXECUTIONS.HEADER.DECISION-DEFINITION-KEY'),
+        $q.all([$translate('DECISION-TABLE-EXECUTIONS.HEADER.DECISION-DEFINITION-KEY'),
                 $translate('DECISION-TABLE-EXECUTIONS.HEADER.DECISION-DEFINITION-NAME'),
                 $translate('DECISION-TABLE-EXECUTIONS.HEADER.END-TIME'),
                 $translate('DECISION-TABLE-EXECUTIONS.HEADER.FAILED'),
@@ -85,13 +84,16 @@ flowableAdminApp.controller('DecisionTableExecutionsController', ['$rootScope', 
                     keepLastSelected: false,
                     rowHeight: 36,
                     afterSelectionChange: $scope.decisionTableExecutionSelected,
+                    sortInfo: {
+                        fields: ['endTime'],
+                        directions: ['desc']
+                    },
                     columnDefs: [
-                        {field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'decisionKey', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'decisionName', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'endTime', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
-                        {field: 'failed', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate},
-                        {field: 'tenantId', displayName: headers[5], cellTemplate: gridConstants.defaultTemplate}]
+                        {field: 'decisionKey', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'decisionName', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'endTime', displayName: headers[2], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'failed', displayName: headers[3], cellTemplate: gridConstants.defaultTemplate},
+                        {field: 'tenantId', displayName: headers[4], cellTemplate: gridConstants.defaultTemplate}]
                 };
             });
 

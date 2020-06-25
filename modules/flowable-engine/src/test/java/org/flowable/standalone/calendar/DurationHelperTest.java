@@ -116,7 +116,7 @@ public class DurationHelperTest {
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT1H", testingClock);
         Calendar expected = parseCalendarWithOffset("20131103-01:45:00-04:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertThat(expected.compareTo(dh.getCalendarAfter())).isZero();
+        assertThat(expected).isEqualByComparingTo(dh.getCalendarAfter());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class DurationHelperTest {
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT2H", testingClock);
         Calendar expected = parseCalendarWithOffset("20131103-01:45:00-05:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertThat(expected.compareTo(dh.getCalendarAfter())).isZero();
+        assertThat(expected).isEqualByComparingTo(dh.getCalendarAfter());
     }
 
     @Test

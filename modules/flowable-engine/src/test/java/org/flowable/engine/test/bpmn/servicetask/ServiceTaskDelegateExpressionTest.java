@@ -62,20 +62,20 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
                 
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
-                assertThat(activityInstances.size()).isEqualTo(5);
+                assertThat(activityInstances).hasSize(5);
                 Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
                 assertThat(activityInstanceMap.containsKey("theStart")).isTrue();
-                assertThat(activityInstanceMap.get("theStart").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("theStart")).hasSize(1);
                 assertThat(activityInstanceMap.get("theStart").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("theStart").get(0).getTransactionOrder()).isEqualTo(1);
                 
                 assertThat(activityInstanceMap.containsKey("service1")).isTrue();
-                assertThat(activityInstanceMap.get("service1").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("service1")).hasSize(1);
                 assertThat(activityInstanceMap.get("service1").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("service1").get(0).getTransactionOrder()).isEqualTo(3);
                 
                 assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
-                assertThat(activityInstanceMap.get("usertask1").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("usertask1")).hasSize(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNull();
                 assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
                 
@@ -99,15 +99,15 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
                 
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
-                assertThat(activityInstances.size()).isEqualTo(7);
+                assertThat(activityInstances).hasSize(7);
                 Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
                 assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
-                assertThat(activityInstanceMap.get("usertask1").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("usertask1")).hasSize(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
                 
                 assertThat(activityInstanceMap.containsKey("theEnd")).isTrue();
-                assertThat(activityInstanceMap.get("theEnd").size()).isEqualTo(1);
+                assertThat(activityInstanceMap.get("theEnd")).hasSize(1);
                 assertThat(activityInstanceMap.get("theEnd").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("theEnd").get(0).getTransactionOrder()).isEqualTo(2);
                 
@@ -133,7 +133,7 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
                 
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
-                assertThat(activityInstances.size()).isEqualTo(5);
+                assertThat(activityInstances).hasSize(5);
                 
                 ActivityInstanceEntity activityInstance = activityInstances.get(0);
                 assertThat(activityInstance.getActivityId()).isEqualTo("theStart");
@@ -172,7 +172,7 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
                 
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
-                assertThat(activityInstances.size()).isEqualTo(0);
+                assertThat(activityInstances).isEmpty();
                 
                 return null;
             }

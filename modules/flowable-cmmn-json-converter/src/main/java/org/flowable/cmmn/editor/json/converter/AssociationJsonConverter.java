@@ -141,13 +141,14 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+        BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         // nothing to do
     }
 
     @Override
     protected Association convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         Association association = new Association();
 

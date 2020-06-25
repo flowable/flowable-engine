@@ -19,7 +19,8 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgenda;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
@@ -69,12 +70,12 @@ public class CommandContextUtil {
         return getDmnEngineConfiguration(commandContext).getDeploymentEntityManager();
     }
     
-    public static DecisionTableEntityManager getDecisionTableEntityManager() {
-        return getDecisionTableEntityManager(getCommandContext());
+    public static DecisionEntityManager getDecisionEntityManager() {
+        return getDecisionEntityManager(getCommandContext());
     }
     
-    public static DecisionTableEntityManager getDecisionTableEntityManager(CommandContext commandContext) {
-        return getDmnEngineConfiguration(commandContext).getDecisionTableEntityManager();
+    public static DecisionEntityManager getDecisionEntityManager(CommandContext commandContext) {
+        return getDmnEngineConfiguration(commandContext).getDecisionEntityManager();
     }
     
     public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
@@ -92,7 +93,15 @@ public class CommandContextUtil {
     public static DmnRepositoryService getDmnRepositoryService(CommandContext commandContext) {
         return getDmnEngineConfiguration(commandContext).getDmnRepositoryService();
     }
-    
+
+    public static DmnEngineAgenda getAgenda() {
+        return getAgenda(getCommandContext());
+    }
+
+    public static DmnEngineAgenda getAgenda(CommandContext commandContext) {
+        return commandContext.getSession(DmnEngineAgenda.class);
+    }
+
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
     }

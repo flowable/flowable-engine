@@ -90,7 +90,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("firstTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -133,7 +133,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("firstTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -171,7 +171,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("secondTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -206,7 +206,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("secondTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -262,7 +262,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("secondTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -312,7 +312,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("secondTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -369,7 +369,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         Job timer = (Job) entityEvent.getEntity();
         assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -429,7 +429,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -462,7 +462,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob2).isNotNull();
-        assertThat(!timerJob1.getExecutionId().equals(timerJob2.getExecutionId())).isTrue();
+        assertThat(timerJob1.getExecutionId()).isNotEqualTo(timerJob2.getExecutionId());
 
         // Verify events
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
@@ -491,7 +491,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         timer = (Job) entityEvent.getEntity();
         assertThat(getJobActivityId(timer)).isEqualTo("secondTimerEvent");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         Job job = managementService.moveTimerToExecutableJob(timerJob2.getId());
         managementService.executeJob(job.getId());
@@ -545,7 +545,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskBefore");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -600,7 +600,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskBefore");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -660,7 +660,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -715,7 +715,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -778,7 +778,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -841,7 +841,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -905,7 +905,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskBefore");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -976,7 +976,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskBefore");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1042,7 +1042,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1099,7 +1099,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1154,7 +1154,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         Job executableJob = managementService.moveTimerToExecutableJob(timerJob.getId());
         managementService.executeJob(executableJob.getId());
@@ -1211,7 +1211,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask2");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1270,7 +1270,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask2");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1320,7 +1320,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         Job timer = (Job) entityEvent.getEntity();
         assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -1387,7 +1387,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         Job timer = (Job) entityEvent.getEntity();
         assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1448,7 +1448,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         Job timer = (Job) entityEvent.getEntity();
         assertThat(getJobActivityId(timer)).isEqualTo("boundaryTimerEvent");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         Job executableTimerJob = managementService.moveTimerToExecutableJob(timerJob.getId());
         managementService.executeJob(executableTimerJob.getId());
@@ -1501,7 +1501,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1569,7 +1569,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1624,7 +1624,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1691,7 +1691,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1745,7 +1745,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1811,7 +1811,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1864,7 +1864,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1932,7 +1932,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("nestedSubTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -1992,7 +1992,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTaskAfter");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -2047,7 +2047,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTaskAfter");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -2102,7 +2102,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -2164,7 +2164,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subTask");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -2229,7 +2229,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subtask2");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 
@@ -2285,7 +2285,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
         assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("subtask2");
 
-        assertThat(!iterator.hasNext()).isTrue();
+        assertThat(iterator.hasNext()).isFalse();
 
         taskService.complete(task.getId());
 

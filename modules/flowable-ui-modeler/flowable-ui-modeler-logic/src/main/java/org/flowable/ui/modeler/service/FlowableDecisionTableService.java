@@ -22,7 +22,10 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.editor.dmn.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
@@ -112,7 +115,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
     }
 
     public void exportDecisionTable(HttpServletResponse response, String decisionTableId) {
-        exportDecisionTable(response, getModel(decisionTableId, true, false));
+        exportDefinition(response, getModel(decisionTableId, true, false));
     }
 
     public void exportHistoricDecisionTable(HttpServletResponse response, String modelHistoryId) {
@@ -122,28 +125,41 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         // Load model and check we have read rights
         getModel(modelHistory.getModelId(), true, false);
 
-        exportDecisionTable(response, modelHistory);
+        exportDefinition(response, modelHistory);
     }
 
     public void exportDecisionTableHistory(HttpServletResponse response, String decisionTableId) {
-        exportDecisionTable(response, getModel(decisionTableId, true, false));
+        exportDefinition(response, getModel(decisionTableId, true, false));
     }
 
-    protected void exportDecisionTable(HttpServletResponse response, AbstractModel decisionTableModel) {
-        DecisionTableRepresentation decisionTableRepresentation = getDecisionTableRepresentation(decisionTableModel);
+    public void exportDefinition(HttpServletResponse response, String decisionId) {
+        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
+        Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
+            .collect(Collectors.toMap(
+                AbstractModel::getKey,
+                AbstractModel::getModelEditorJson
+            ));
 
+        exportDefinition(response, getModel(decisionId, true, false), decisionTableEditorJSON);
+    }
+
+    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel) {
+        exportDefinition(response, definitionModel, Collections.emptyMap());
+    }
+
+    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, Map<String, String> decisionTablesEditorJson) {
         try {
 
-            JsonNode editorJsonNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+            JsonNode editorJsonNode = objectMapper.readTree(definitionModel.getModelEditorJson());
 
             // URLEncoder.encode will replace spaces with '+', to keep the actual name replacing '+' to '%20'
-            String fileName = URLEncoder.encode(decisionTableRepresentation.getName(), "UTF-8").replaceAll("\\+", "%20") + ".dmn";
+            String fileName = URLEncoder.encode(definitionModel.getName(), "UTF-8").replaceAll("\\+", "%20") + ".dmn";
             response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/xml");
 
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, decisionTableModel.getId(), decisionTableModel.getVersion(), decisionTableModel.getLastUpdated());
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), decisionTablesEditorJson);
             byte[] xmlBytes = dmnXmlConverter.convertToXML(dmnDefinition);
 
             BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));

@@ -262,7 +262,6 @@ public class ModelResource {
     }
 
     protected ModelRepresentation updateModel(Model model, MultiValueMap<String, String> values, boolean forceNewVersion) {
-
         String name = values.getFirst("name");
         String key = values.getFirst("key").replaceAll(" ", "");
         String description = values.getFirst("description");

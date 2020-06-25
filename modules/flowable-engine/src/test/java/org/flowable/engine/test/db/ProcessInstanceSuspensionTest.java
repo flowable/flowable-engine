@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -46,20 +48,20 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // now there is one job:
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         makeSureJobDue(job);
 
         // the acquirejobs command sees the job:
         List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(1, acquiredJobs.size());
+        assertThat(acquiredJobs).hasSize(1);
 
         // suspend the process instance:
         runtimeService.suspendProcessInstanceById(pi.getId());
 
         // now, the acquirejobs command does not see the job:
         acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(0, acquiredJobs.size());
+        assertThat(acquiredJobs).isEmpty();
     }
 
     @Test
@@ -71,20 +73,20 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // now there is one job:
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         makeSureJobDue(job);
 
         // the acquire jobs command sees the job:
         List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(1, acquiredJobs.size());
+        assertThat(acquiredJobs).hasSize(1);
 
         // suspend the process instance:
         repositoryService.suspendProcessDefinitionById(pd.getId(), true, null);
 
         // now, the acquire jobs command does not see the job:
         acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(0, acquiredJobs.size());
+        assertThat(acquiredJobs).isEmpty();
     }
 
     @Test
@@ -96,20 +98,20 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // now there is one job:
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         makeSureJobDue(job);
 
         // the acquire jobs command sees the job:
         List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(1, acquiredJobs.size());
+        assertThat(acquiredJobs).hasSize(1);;
 
         // suspend the process instance:
         repositoryService.suspendProcessDefinitionById(pd.getId());
 
         // the acquire jobs command still sees the job, because the process instances are not suspended:
         acquiredJobs = executeAcquireJobsCommand();
-        assertEquals(1, acquiredJobs.size());
+        assertThat(acquiredJobs).hasSize(1);
     }
 
     @Test
@@ -117,8 +119,8 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
     public void testSuspendedProcessTimerExecution() throws Exception {
         // Process with boundary timer-event that fires in 1 hour
         ProcessInstance procInst = runtimeService.startProcessInstanceByKey("suspendProcess");
-        assertNotNull(procInst);
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(procInst.getId()).count());
+        assertThat(procInst).isNotNull();
+        assertThat(managementService.createTimerJobQuery().processInstanceId(procInst.getId()).count()).isEqualTo(1);
 
         // Roll time ahead to be sure timer is due to fire
         Calendar tomorrow = Calendar.getInstance();
@@ -136,7 +138,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             }
 
         });
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // Suspend process instance
         runtimeService.suspendProcessInstanceById(procInst.getId());
@@ -150,7 +152,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             }
         });
 
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
     }
 
     protected void makeSureJobDue(final Job job) {

@@ -215,7 +215,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		var searchShape = shape;
 		while (hasParent)
 		{
-		    if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' || searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') 
+		    if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' || searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram' ||  searchShape.getParentShape().getStencil().idWithoutNs() === 'DMNDiagram')
 			{
 				hasParent = false;
 			}

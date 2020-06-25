@@ -45,12 +45,14 @@ public class HttpTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         // done in service task
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         HttpServiceTask task = new HttpServiceTask();
         task.setType("http");
         addField("requestMethod", PROPERTY_HTTPTASK_REQ_METHOD, "GET", elementNode, task);

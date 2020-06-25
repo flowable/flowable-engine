@@ -23,7 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -59,16 +59,17 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertThat(processDefinition.getKey()).isEqualTo("oneDecisionTaskProcess");
 
             DmnRepositoryService dmnRepositoryService = DmnEngines.getDefaultDmnEngine().getDmnRepositoryService();
-            DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
+            DmnDecision definition = dmnRepositoryService.createDecisionQuery()
                     .latestVersion()
-                    .decisionTableKey("decision1")
+                    .decisionKey("decision1")
                     .singleResult();
-            assertThat(decisionTable).isNotNull();
-            assertThat(decisionTable.getKey()).isEqualTo("decision1");
 
-            List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
-            assertThat(decisionTableList)
-                    .extracting(DmnDecisionTable::getKey)
+            assertThat(definition).isNotNull();
+            assertThat(definition.getKey()).isEqualTo("decision1");
+
+            List<DmnDecision> decisionsList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+            assertThat(decisionsList)
+                    .extracting(DmnDecision::getKey)
                     .containsExactly("decision1");
         } finally {
             deleteAllDmnDeployments();

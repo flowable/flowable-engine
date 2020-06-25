@@ -176,6 +176,12 @@ FLOWABLE.APP_URL = {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/' + modelId + '/history/' + modelHistoryId;
     },
 
+    /* DECISION SERVICE URLS */
+
+    getDecisionServiceModelsUrl: function () {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-service-models';
+    },
+
     /* FORM MODEL URLS */
 
     getFormModelsUrl: function () {

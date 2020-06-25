@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -115,10 +115,10 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
 
     public void testBasicActivitiSpringIntegration() {
         createAppContextWithoutDeploymentMode();
-        List<DmnDecisionTable> decisionTables = repositoryService.createDecisionTableQuery().orderByDecisionTableKey().asc().list();
+        List<DmnDecision> decisionTables = repositoryService.createDecisionQuery().orderByDecisionKey().asc().list();
 
         Set<String> decisionTableKeys = new HashSet<>();
-        for (DmnDecisionTable decisionTable : decisionTables) {
+        for (DmnDecision decisionTable : decisionTables) {
             decisionTableKeys.add(decisionTable.getKey());
         }
 
@@ -132,14 +132,15 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         DmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+
         assertThat(deploymentQuery.count()).isEqualTo(1);
-        DmnDecisionTableQuery decisionTableQuery = repositoryService.createDecisionTableQuery();
-        assertThat(decisionTableQuery.count()).isEqualTo(2);
+        DmnDecisionQuery decisionQuery = repositoryService.createDecisionQuery();
+        assertThat(decisionQuery.count()).isEqualTo(2);
 
         // Creating a new app context with same resources doesn't lead to more deployments
         createAppContextWithoutDeploymentMode();
         assertThat(deploymentQuery.count()).isEqualTo(1);
-        assertThat(decisionTableQuery.count()).isEqualTo(2);
+        assertThat(decisionQuery.count()).isEqualTo(2);
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
@@ -169,13 +170,13 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         // Assertions come AFTER the file write! Otherwise the form file is
         // messed up if the assertions fail.
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
-        assertThat(repositoryService.createDecisionTableQuery().count()).isEqualTo(4);
+        assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(4);
     }
 
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
-        assertThat(repositoryService.createDecisionTableQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(2);
     }
 
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeDefault() {
@@ -189,8 +190,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         // Some of the resources should have been deployed
         properties.put("deploymentResources", "classpath*:/notExisting*.bpmn20.xml");
         createAppContext(properties);
-        assertThat(repositoryService.createDecisionTableQuery().list())
-                .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+                .extracting(DmnDecision::getKey)
                 .isEmpty();
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
@@ -202,8 +203,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         properties.put("throwExceptionOnDeploymentFailure", false);
         createAppContext(properties);
 
-        assertThat(repositoryService.createDecisionTableQuery().list())
-                .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+                .extracting(DmnDecision::getKey)
                 .isEmpty();
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
@@ -211,7 +212,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
-        assertThat(repositoryService.createDecisionTableQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(2);
     }
 
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeSingleResource() {
@@ -225,8 +226,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         // Some of the resources should have been deployed
         properties.put("deploymentResources", "classpath*:/notExisting*.dmn");
         createAppContext(properties);
-        assertThat(repositoryService.createDecisionTableQuery().list())
-            .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+            .extracting(DmnDecision::getKey)
             .containsExactlyInAnyOrder("decision", "decision2");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
     }
@@ -238,8 +239,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         properties.put("throwExceptionOnDeploymentFailure", false);
         createAppContext(properties);
 
-        assertThat(repositoryService.createDecisionTableQuery().list())
-            .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+            .extracting(DmnDecision::getKey)
             .containsExactlyInAnyOrder("decision", "decision2");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
     }
@@ -247,7 +248,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParenFolderDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
-        assertThat(repositoryService.createDecisionTableQuery().count()).isEqualTo(3);
+        assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(3);
     }
 
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeResourceParentFolder() {
@@ -262,8 +263,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         properties.put("deploymentResources", "classpath*:/notExisting*.dmn");
         createAppContext(properties);
 
-        assertThat(repositoryService.createDecisionTableQuery().list())
-                .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+                .extracting(DmnDecision::getKey)
                 .isEmpty();
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
@@ -274,8 +275,8 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
         properties.put("throwExceptionOnDeploymentFailure", false);
         createAppContext(properties);
-        assertThat(repositoryService.createDecisionTableQuery().list())
-            .extracting(DmnDecisionTable::getKey)
+        assertThat(repositoryService.createDecisionQuery().list())
+            .extracting(DmnDecision::getKey)
             .containsExactlyInAnyOrder("decision3");
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }

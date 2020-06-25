@@ -47,6 +47,7 @@ public interface StencilConstants {
     final String STENCIL_TASK_MAIL = "MailTask";
     final String STENCIL_TASK_MANUAL = "ManualTask";
     final String STENCIL_TASK_RECEIVE = "ReceiveTask";
+    final String STENCIL_TASK_RECEIVE_EVENT = "ReceiveEventTask";
     final String STENCIL_TASK_SCRIPT = "ScriptTask";
     final String STENCIL_TASK_SEND = "SendTask";
     final String STENCIL_TASK_SERVICE = "ServiceTask";
@@ -78,6 +79,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_CATCH_TIMER = "CatchTimerEvent";
     final String STENCIL_EVENT_CATCH_MESSAGE = "CatchMessageEvent";
     final String STENCIL_EVENT_CATCH_CONDITIONAL = "CatchConditionalEvent";
+    final String STENCIL_EVENT_CATCH_EVENT_REGISTRY = "CatchEventRegistryEvent";
 
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
@@ -295,15 +297,19 @@ public interface StencilConstants {
     final String PROPERTY_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";
 
     final String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
+    final String PROPERTY_DECISIONSERVICE_REFERENCE = "decisiontaskdecisionservicereference";
     final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    final String PROPERTY_DECISIONSERVICE_REFERENCE_KEY = "decisionServiceReferenceKey";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
     final String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
     final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT = "decisiontasksamedeployment";
     final String PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY = "sameDeployment";
+    final String PROPERTY_DECISION_REFERENCE_TYPE = "decisionReferenceType";
+
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";

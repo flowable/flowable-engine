@@ -67,6 +67,9 @@ angular.module('flowableModeler')
                 quickMenuDefinition = ['HumanTask', 'Association'];
                 ignoreForPaletteDefinition = ['CasePlanModel'];
                 
+            } else if (data.namespace == 'http://b3mn.org/stencilset/dmn1.2#') {
+                quickMenuDefinition = ['DecisionTableDecision', 'InformationRequirement', 'KnowledgeRequirement'];
+                ignoreForPaletteDefinition = [];
             } else {
                 quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
@@ -91,7 +94,8 @@ angular.module('flowableModeler')
                 // Check if the root group is the 'diagram' group. If so, this item should not be shown.
                 var currentGroupName = data.stencils[stencilIndex].groups[0];
                 if (currentGroupName === 'Diagram' || currentGroupName === 'BPMN.STENCILS.GROUPS.DIAGRAM' || 
-                        currentGroupName === 'CMMN.STENCILS.GROUPS.DIAGRAM') {
+                        currentGroupName === 'CMMN.STENCILS.GROUPS.DIAGRAM' ||
+                        currentGroupName === 'DMN.STENCILS.GROUPS.DIAGRAM') {
                         
                     continue;  // go to next item
                 }
@@ -165,7 +169,12 @@ angular.module('flowableModeler')
                       } else if (stencilRole === 'association_end') {
                         stencilItem.canConnectTo = true;
                       }
-                      
+                  } else if (data.namespace == 'http://b3mn.org/stencilset/dmn1.2#') {
+                      if (stencilRole === 'information_requirement_start') {
+                          stencilItem.canConnect = true;
+                      } else if (stencilRole === 'information_requirement_end') {
+                          stencilItem.canConnectTo = true;
+                      }
                   } else {
                       if (stencilRole === 'sequence_start') {
                         stencilItem.canConnect = true;
@@ -241,7 +250,8 @@ angular.module('flowableModeler')
                     var selectedShape = shapes.first();
                     var stencil = selectedShape.getStencil();
                     
-                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1 && stencil.id().indexOf('CMMNDiagram') !== -1) {
+                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1 && stencil.id().indexOf('CMMNDiagram') !== -1 &&
+                        stencil.id().indexOf('DMNDiagram') !== -1) {
                       // ignore canvas event because of empty selection when scrolling stops
                       return;
                     }
@@ -869,7 +879,8 @@ angular.module('flowableModeler')
                 option.position = pos;
 	              
                 if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' && 
-                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
+                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation' &&
+                        containedStencil.idWithoutNs() !== 'InformationRequirement' && containedStencil.idWithoutNs() !== 'KnowledgeRequirement') {
 	                        
                   var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
                   var targetStencil = editorManager.getRules().connectMorph(args);
@@ -878,7 +889,7 @@ angular.module('flowableModeler')
                   }
                   option.connectingType = targetStencil.id();
                 }
-	  
+
                 var command = new FLOWABLE.CreateCommand(option, $scope.dropTargetElement, pos, editorManager.getEditor());
 	              
                 editorManager.executeCommands([command]);
@@ -1097,7 +1108,11 @@ angular.module('flowableModeler')
                         }
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-                        if (parentItem.roles.indexOf('Activity') > -1) {
+                        if (parentCandidate.getStencil().id().endsWith("DecisionServiceSection")) {
+                            if (item.id === 'Decision') {
+                                _canContain = true;
+                            }
+                        } else if (parentItem.roles.indexOf('Activity') > -1) {
                             if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1 
                                 || item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
                                 || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {

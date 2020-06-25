@@ -23,7 +23,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.cmmn.model.SignalEventListener;
 
 /**
  * @author Joram Barrez
@@ -127,7 +126,7 @@ public class StateTransition {
     
     public static boolean isPossible(PlanItemInstance planItemInstance, String transition) {
         PlanItemDefinition planItemDefinition = ((PlanItemInstanceEntity) planItemInstance).getPlanItem().getPlanItemDefinition();
-        if (planItemDefinition instanceof EventListener && !(planItemDefinition instanceof SignalEventListener)) {
+        if (planItemDefinition instanceof EventListener) {
             return isEventListenerTransitionPossible(planItemInstance.getState(), transition);
         } else {
             return isPlanItemTransitionPossible(planItemInstance.getState(), transition);

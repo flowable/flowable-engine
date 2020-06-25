@@ -15,6 +15,7 @@ package org.flowable.dmn.api;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,17 @@ public class DecisionExecutionAuditContainer {
     protected Boolean strictMode;
 
     public DecisionExecutionAuditContainer() {
+    }
+
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, Boolean strictMode, Map<String, Object> inputVariables) {
+        this.startTime = new Date();
+        this.decisionKey = decisionKey;
+        this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
+        this.strictMode = strictMode;
+        this.inputVariableTypes = getVariablesTypeMap(inputVariables);
+        // create defensive copy of input variables
+        this.inputVariables = createDefensiveCopyInputVariables(inputVariables);
     }
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 

@@ -19,7 +19,7 @@ import java.io.Serializable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
 /**
@@ -41,7 +41,7 @@ public class GetDeploymentDmnResourceCmd implements Command<InputStream>, Serial
 
     @Override
     public InputStream execute(CommandContext commandContext) {
-        DecisionTableEntity decisionTable = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
+        DecisionEntity decisionTable = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
         String deploymentId = decisionTable.getDeploymentId();
         String resourceName = decisionTable.getResourceName();
         InputStream processModelStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);

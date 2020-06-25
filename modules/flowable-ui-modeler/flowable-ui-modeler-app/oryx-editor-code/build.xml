@@ -85,6 +85,7 @@
 				<file name="Plugins/keysMove.js" />
 				<file name="Plugins/Layouter/edgeLayouter.js" />
 				<file name="Plugins/bpmn2.0/bpmn2.0.js" />
+				<file name="Plugins/dmn1.2/dmn1.2.js" />
 			</filelist>
 		</concat>
 	</target>

@@ -38,7 +38,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -89,7 +89,7 @@ import org.flowable.rest.service.api.management.BatchPartResponse;
 import org.flowable.rest.service.api.management.BatchResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
-import org.flowable.rest.service.api.repository.DecisionTableResponse;
+import org.flowable.rest.service.api.repository.DecisionResponse;
 import org.flowable.rest.service.api.repository.DeploymentResourceResponse;
 import org.flowable.rest.service.api.repository.DeploymentResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
@@ -1296,24 +1296,24 @@ public class RestResponseFactory {
         return response;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables, String processDefinitionId) {
+    public List<DecisionResponse> createDecisionResponseList(List<DmnDecision> decisions, String processDefinitionId) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DecisionTableResponse> responseList = new ArrayList<>(decisionTables.size());
-        for (DmnDecisionTable decisionTable : decisionTables) {
-            responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
+        List<DecisionResponse> responseList = new ArrayList<>(decisions.size());
+        for (DmnDecision decision : decisions) {
+            responseList.add(createDecisionResponse(decision, processDefinitionId, urlBuilder));
         }
         return responseList;
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId) {
-        return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String processDefinitionId) {
+        return createDecisionResponse(decision, processDefinitionId, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId, RestUrlBuilder urlBuilder) {
-        DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
-        decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION, processDefinitionId));
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String processDefinitionId, RestUrlBuilder urlBuilder) {
+        DecisionResponse decisionResponse = new DecisionResponse(decision);
+        decisionResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_COLLECTION, processDefinitionId));
 
-        return decisionTableResponse;
+        return decisionResponse;
     }
 
     public List<FormDefinitionResponse> createFormDefinitionResponseList(List<FormDefinition> formDefinitions, String processDefinitionId) {

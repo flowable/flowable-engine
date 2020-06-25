@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -84,7 +84,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
@@ -155,7 +155,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
@@ -198,7 +198,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collectionDouble", collectionDouble);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")

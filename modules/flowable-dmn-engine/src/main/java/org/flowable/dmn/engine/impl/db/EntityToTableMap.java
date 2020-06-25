@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
@@ -33,7 +33,7 @@ public class EntityToTableMap {
 
         // DMN module
         entityToTableNameMap.put(DmnDeploymentEntity.class, "ACT_DMN_DEPLOYMENT");
-        entityToTableNameMap.put(DecisionTableEntity.class, "ACT_DMN_DECISION_TABLE");
+        entityToTableNameMap.put(DecisionEntity.class, "ACT_DMN_DECISION");
         entityToTableNameMap.put(DmnResourceEntity.class, "ACT_DMN_DEPLOYMENT_RESOURCE");
         entityToTableNameMap.put(HistoricDecisionExecutionEntity.class, "ACT_DMN_HI_DECISION_EXECUTION");
     }

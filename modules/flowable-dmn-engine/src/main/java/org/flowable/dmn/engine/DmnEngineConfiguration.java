@@ -42,13 +42,16 @@ import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
 import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
-import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
+import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
+import org.flowable.dmn.engine.impl.agenda.DefaultDmnEngineAgendaFactory;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaFactory;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaSessionFactory;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.SchemaOperationsDmnEngineBuild;
@@ -78,23 +81,24 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
+import org.flowable.dmn.engine.impl.interceptor.DmnCommandInvoker;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DefinitionEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManagerImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.HistoricDecisionExecutionDataManager;
-import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
@@ -111,25 +115,27 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected String dmnEngineName = DmnEngines.NAME_DEFAULT;
 
+    protected DmnEngineAgendaFactory dmnEngineAgendaFactory;
+
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
     protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
-    protected DmnRuleService ruleService = new DmnRuleServiceImpl();
+    protected DmnDecisionService ruleService = new DmnDecisionServiceImpl(this);
     protected DmnHistoryService dmnHistoryService = new DmnHistoryServiceImpl();
     protected RuleEngineExecutor ruleEngineExecutor;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
     protected DmnDeploymentDataManager deploymentDataManager;
-    protected DecisionTableDataManager decisionTableDataManager;
+    protected DecisionDataManager decisionDataManager;
     protected DmnResourceDataManager resourceDataManager;
     protected HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected DmnDeploymentEntityManager deploymentEntityManager;
-    protected DecisionTableEntityManager decisionTableEntityManager;
+    protected DecisionEntityManager decisionEntityManager;
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
 
@@ -154,7 +160,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected boolean historyEnabled;
 
     protected int decisionCacheLimit = -1; // By default, no limit
-    protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
+    protected DeploymentCache<DecisionCacheEntry> definitionCache;
 
     protected ObjectMapper dmnEngineObjectMapper = new ObjectMapper();
 
@@ -226,6 +232,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initDmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
             initDataSource();
@@ -274,8 +281,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisDmnDeploymentDataManager(this);
         }
-        if (decisionTableDataManager == null) {
-            decisionTableDataManager = new MybatisDecisionTableDataManager(this);
+        if (decisionDataManager == null) {
+            decisionDataManager = new MybatisDecisionDataManager(this);
         }
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisDmnResourceDataManager(this);
@@ -291,8 +298,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         if (deploymentEntityManager == null) {
             deploymentEntityManager = new DmnDeploymentEntityManagerImpl(this, deploymentDataManager);
         }
-        if (decisionTableEntityManager == null) {
-            decisionTableEntityManager = new DecisionTableEntityManagerImpl(this, decisionTableDataManager);
+        if (decisionEntityManager == null) {
+            decisionEntityManager = new DefinitionEntityManagerImpl(this, decisionDataManager);
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new DmnResourceEntityManagerImpl(this, resourceDataManager);
@@ -403,6 +410,24 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
+    @Override
+    public void initCommandInvoker() {
+        if (commandInvoker == null) {
+            commandInvoker = new DmnCommandInvoker();
+        }
+    }
+    public void initDmnEngineAgendaFactory() {
+        if (dmnEngineAgendaFactory == null) {
+            dmnEngineAgendaFactory = new DefaultDmnEngineAgendaFactory();
+        }
+    }
+
+    @Override
+    public void initSessionFactories() {
+        super.initSessionFactories();
+        addSessionFactory(new DmnEngineAgendaSessionFactory(dmnEngineAgendaFactory));
+    }
+
     // deployers
     // ////////////////////////////////////////////////////////////////
 
@@ -423,18 +448,18 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         }
 
         // Decision cache
-        if (decisionCache == null) {
+        if (definitionCache == null) {
             if (decisionCacheLimit <= 0) {
-                decisionCache = new DefaultDeploymentCache<>();
+                definitionCache = new DefaultDeploymentCache<>();
             } else {
-                decisionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
+                definitionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
             }
         }
 
-        deploymentManager = new DeploymentManager(decisionCache, this);
+        deploymentManager = new DeploymentManager(definitionCache, this);
         deploymentManager.setDeployers(deployers);
         deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
-        deploymentManager.setDecisionTableEntityManager(decisionTableEntityManager);
+        deploymentManager.setDecisionEntityManager(decisionEntityManager);
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
@@ -674,11 +699,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     }
 
     @Override
-    public DmnRuleService getDmnRuleService() {
+    public DmnDecisionService getDmnDecisionService() {
         return ruleService;
     }
 
-    public DmnEngineConfiguration setDmnRuleService(DmnRuleService ruleService) {
+    public DmnEngineConfiguration setDmnRuleService(DmnDecisionService ruleService) {
         this.ruleService = ruleService;
         return this;
     }
@@ -775,12 +800,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DeploymentCache<DecisionTableCacheEntry> getDecisionCache() {
-        return decisionCache;
+    public DeploymentCache<DecisionCacheEntry> getDefinitionCache() {
+        return definitionCache;
     }
 
-    public DmnEngineConfiguration setDecisionCache(DeploymentCache<DecisionTableCacheEntry> decisionCache) {
-        this.decisionCache = decisionCache;
+    public DmnEngineConfiguration setDefinitionCache(DeploymentCache<DecisionCacheEntry> definitionCache) {
+        this.definitionCache = definitionCache;
         return this;
     }
 
@@ -793,12 +818,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DecisionTableDataManager getDecisionTableDataManager() {
-        return decisionTableDataManager;
+    public DecisionDataManager getDecisionDataManager() {
+        return decisionDataManager;
     }
 
-    public DmnEngineConfiguration setDecisionTableDataManager(DecisionTableDataManager decisionTableDataManager) {
-        this.decisionTableDataManager = decisionTableDataManager;
+    public DmnEngineConfiguration setDecisionDataManager(DecisionDataManager decisionDataManager) {
+        this.decisionDataManager = decisionDataManager;
         return this;
     }
 
@@ -829,12 +854,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DecisionTableEntityManager getDecisionTableEntityManager() {
-        return decisionTableEntityManager;
+    public DecisionEntityManager getDecisionEntityManager() {
+        return decisionEntityManager;
     }
 
-    public DmnEngineConfiguration setDecisionTableEntityManager(DecisionTableEntityManager decisionTableEntityManager) {
-        this.decisionTableEntityManager = decisionTableEntityManager;
+    public DmnEngineConfiguration setDecisionEntityManager(DecisionEntityManager decisionEntityManager) {
+        this.decisionEntityManager = decisionEntityManager;
         return this;
     }
 
@@ -854,6 +879,19 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     public DmnEngineConfiguration setResourceEntityManager(DmnResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
+    }
+
+    public DmnEngineAgendaFactory getDmnEngineAgendaFactory() {
+        return dmnEngineAgendaFactory;
+    }
+
+    public DmnEngineConfiguration setDmnEngineAgendaFactory(DmnEngineAgendaFactory dmnEngineAgendaFactory) {
+        this.dmnEngineAgendaFactory = dmnEngineAgendaFactory;
+        return this;
+    }
+
+    public TableDataManager getTableDataManager() {
+        return tableDataManager;
     }
 
     public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

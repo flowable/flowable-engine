@@ -30,9 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implements CaseModelAwareConverter {
-    
-    protected Map<String, String> caseModelMap;
+public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
     
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -55,8 +53,8 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
-            BaseElement baseElement, CmmnModel cmmnModel) {
-        // todo implement rest of the properties
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
+
         CaseTask caseTask = (CaseTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         if (caseTask.getFallbackToDefaultTenant() != null) {
@@ -67,6 +65,24 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
 
         if (StringUtils.isNotEmpty(caseTask.getCaseInstanceIdVariableName())) {
             propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, caseTask.getCaseInstanceIdVariableName());
+        }
+
+        String caseRef = caseTask.getCaseRef();
+        if (StringUtils.isNotEmpty(caseRef)) {
+
+            ObjectNode caseReferenceNode = objectMapper.createObjectNode();
+            caseReferenceNode.put("key", caseRef);
+            propertiesNode.set(PROPERTY_CASE_REFERENCE, caseReferenceNode);
+
+            Map<String, String> modelInfo = converterContext.getCaseModelInfoForCaseModelKey(caseRef);
+            if (modelInfo != null) {
+                caseReferenceNode.put("id", modelInfo.get("id"));
+                caseReferenceNode.put("name", modelInfo.get("name"));
+
+            } else {
+                converterContext.registerUnresolvedCaseModelReferenceForCaseModel(caseRef, cmmnModel);
+
+            }
         }
 
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, caseTask);
@@ -91,7 +107,7 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
         
         CaseTask task = new CaseTask();
         
@@ -99,10 +115,13 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
         if (caseModelReferenceNode != null && caseModelReferenceNode.has("id") && !caseModelReferenceNode.get("id").isNull()) {
 
             String caseModelId = caseModelReferenceNode.get("id").asText();
-            if (caseModelMap != null) {
-                String caseModelKey = caseModelMap.get(caseModelId);
-                task.setCaseRef(caseModelKey);
+            String caseModelKey = converterContext.getCaseModelKeyForCaseModelId(caseModelId);
+
+            if (StringUtils.isEmpty(caseModelKey) && caseModelReferenceNode.has("key")) {
+                caseModelKey = caseModelReferenceNode.get("key").asText();
             }
+            task.setCaseRef(caseModelKey);
+
         }
 
         JsonNode caseTaskInParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_CASE_IN_PARAMETERS, elementNode);
@@ -145,11 +164,6 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         return task;
-    }
-
-    @Override
-    public void setCaseModelMap(Map<String, String> caseModelMap) {
-        this.caseModelMap = caseModelMap;
     }
 
 }

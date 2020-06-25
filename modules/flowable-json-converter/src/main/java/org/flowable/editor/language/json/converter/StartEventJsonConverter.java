@@ -12,7 +12,6 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,13 +22,11 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,10 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class StartEventJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
-
-    protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+public class StartEventJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
         fillJsonTypes(convertersToBpmnMap);
@@ -92,19 +86,20 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         StartEvent startEvent = (StartEvent) baseElement;
         if (StringUtils.isNotEmpty(startEvent.getInitiator())) {
             propertiesNode.put(PROPERTY_NONE_STARTEVENT_INITIATOR, startEvent.getInitiator());
         }
 
         if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-            if (formKeyMap != null && formKeyMap.containsKey(startEvent.getFormKey())) {
+            Map<String, String> modelInfo = converterContext.getFormModelInfoForFormModelKey(startEvent.getFormKey());
+            if (modelInfo != null) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                ModelInfo modelInfo = formKeyMap.get(startEvent.getFormKey());
-                formRefNode.put("id", modelInfo.getId());
-                formRefNode.put("name", modelInfo.getName());
-                formRefNode.put("key", modelInfo.getKey());
+                formRefNode.put("id", modelInfo.get("id"));
+                formRefNode.put("name", modelInfo.get("name"));
+                formRefNode.put("key", modelInfo.get("key"));
                 propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
 
             } else {
@@ -126,7 +121,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         StartEvent startEvent = new StartEvent();
         startEvent.setInitiator(getPropertyValueAsString(PROPERTY_NONE_STARTEVENT_INITIATOR, elementNode));
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
@@ -138,8 +134,15 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                 JsonNode formReferenceNode = getProperty(PROPERTY_FORM_REFERENCE, elementNode);
                 if (formReferenceNode != null && formReferenceNode.get("id") != null) {
 
-                    if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
-                        startEvent.setFormKey(formMap.get(formReferenceNode.get("id").asText()));
+                    String formModelId = formReferenceNode.get("id").asText();
+                    String formModelKey = converterContext.getFormModelKeyForFormModelId(formModelId);
+                    if (formModelKey != null) {
+                        startEvent.setFormKey(formModelKey);
+                    } else {
+                        String key = formReferenceNode.get("key").asText();
+                        if (StringUtils.isNotEmpty(key)) {
+                            startEvent.setFormKey(key);
+                        }
                     }
                 }
             }
@@ -168,34 +171,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             convertJsonToSignalDefinition(elementNode, startEvent);
         
         } else if (STENCIL_EVENT_START_EVENT_REGISTRY.equals(stencilId)) {
-            String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
-            if (StringUtils.isNotEmpty(eventKey)) {
-                addFlowableExtensionElementWithValue("eventType", eventKey, startEvent);
-                addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), startEvent);
-                convertJsonToOutParameters(elementNode, startEvent);
-                convertJsonToCorrelationParameters(elementNode, "eventCorrelationParameter", startEvent);
-                
-                addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), startEvent);
-                addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), startEvent);
-                
-                String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
-                String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-                String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
-                if (StringUtils.isNotEmpty(fixedValue)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, startEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonField)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, startEvent);
-                    
-                } else if (StringUtils.isNotEmpty(jsonPointer)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", startEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, startEvent);
-                }
-            }
+            addReceiveEventExtensionElements(elementNode, startEvent);
+
         }
 
         if (!getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode)) {
@@ -205,53 +182,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         return startEvent;
     }
 
-    @Override
-    public void setFormMap(Map<String, String> formMap) {
-        this.formMap = formMap;
-    }
 
-    @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
-        this.formKeyMap = formKeyMap;
-    }
-    
-    protected void addEventRegistryProperties(StartEvent startEvent, ObjectNode propertiesNode) {
-        String eventType = getExtensionValue("eventType", startEvent);
-        if (StringUtils.isNotEmpty(eventType)) {
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", startEvent), propertiesNode);
-            addEventOutParameters(startEvent.getExtensionElements().get("eventOutParameter"), propertiesNode);
-            addEventCorrelationParameters(startEvent.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
-            
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", startEvent), propertiesNode);
-            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", startEvent), propertiesNode);
-            
-            String keyDetectionType = getExtensionValue("keyDetectionType", startEvent);
-            String keyDetectionValue = getExtensionValue("keyDetectionValue", startEvent);
-            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
-                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
-                    
-                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
-                }
-            }
-        }
-    }
-    
-    protected String getExtensionValue(String name, FlowElement flowElement) {
-        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
-        if (extensionElements != null && extensionElements.size() > 0) {
-            return extensionElements.get(0).getElementText();
-        }
-        
-        return null;
-    }
     
     @Override
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {

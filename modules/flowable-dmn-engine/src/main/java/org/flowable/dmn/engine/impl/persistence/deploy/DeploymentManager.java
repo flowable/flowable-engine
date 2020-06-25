@@ -18,30 +18,30 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.DecisionQueryImpl;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
-import org.flowable.dmn.model.DmnDefinition;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Yvo Swillens
  */
 public class DeploymentManager {
 
     protected DmnEngineConfiguration engineConfig;
-    protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
+    protected DeploymentCache<DecisionCacheEntry> decisionCache;
 
     protected List<Deployer> deployers;
-    protected DecisionTableEntityManager decisionTableEntityManager;
+    protected DecisionEntityManager decisionEntityManager;
     protected DmnDeploymentEntityManager deploymentEntityManager;
 
-    public DeploymentManager(DeploymentCache<DecisionTableCacheEntry> decisionCache, DmnEngineConfiguration engineConfig) {
+    public DeploymentManager(DeploymentCache<DecisionCacheEntry> decisionCache, DmnEngineConfiguration engineConfig) {
         this.decisionCache = decisionCache;
         this.engineConfig = engineConfig;
     }
@@ -56,89 +56,87 @@ public class DeploymentManager {
         }
     }
 
-    public DecisionTableEntity findDeployedDecisionById(String decisionId) {
+    public DecisionEntity findDeployedDecisionById(String decisionId) {
         if (decisionId == null) {
             throw new FlowableException("Invalid decision id : null");
         }
 
         // first try the cache
-        DecisionTableCacheEntry cacheEntry = decisionCache.get(decisionId);
-        DecisionTableEntity decisionTable = cacheEntry != null ? cacheEntry.getDecisionTableEntity() : null;
+        DecisionCacheEntry cacheEntry = decisionCache.get(decisionId);
+        DecisionEntity decision = cacheEntry != null ? cacheEntry.getDecisionEntity() : null;
 
-        if (decisionTable == null) {
-            decisionTable = engineConfig.getDecisionTableEntityManager().findById(decisionId);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("no deployed decision found with id '" + decisionId + "'");
+        if (decision == null) {
+            decision = engineConfig.getDecisionEntityManager().findById(decisionId);
+            if (decision == null) {
+                throw new FlowableObjectNotFoundException("no decision found with id '" + decisionId + "'");
             }
-            decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
+            decision = resolveDecision(decision).getDecisionEntity();
         }
-        return decisionTable;
+        return decision;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKey(String decisionKey) {
+    public DecisionEntity findDeployedLatestDefinitionByKey(String definitionKey) {
+        DecisionEntity definition = decisionEntityManager.findLatestDecisionByKey(definitionKey);
 
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKey(decisionKey);
-
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
+        if (definition == null) {
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + definitionKey + "'");
         }
-        decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
-        return decisionTable;
+        definition = resolveDecision(definition).getDecisionEntity();
+        return definition;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKeyAndTenantId(String decisionKey, String tenantId) {
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
+    public DecisionEntity findDeployedLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+        DecisionEntity definition = decisionEntityManager.findLatestDecisionByKeyAndTenantId(definitionKey, tenantId);
 
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
+        if (definition == null) {
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + definitionKey + "' for tenant identifier '" + tenantId + "'");
         }
-        decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
-        return decisionTable;
+        definition = resolveDecision(definition).getDecisionEntity();
+        return definition;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKeyAndDeploymentId(String decisionTableKey, String deploymentId) {
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByDeploymentAndKey(deploymentId, decisionTableKey);
+    public DecisionEntity findDeployedLatestDecisionByKeyAndDeploymentId(String definitionKey, String deploymentId) {
+        DecisionEntity definition = decisionEntityManager.findDecisionByDeploymentAndKey(deploymentId, definitionKey);
 
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
+        if (definition == null) {
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + definitionKey +
                             "' for deployment id '" + deploymentId + "'");
         }
-        decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
-        return decisionTable;
+        definition = resolveDecision(definition).getDecisionEntity();
+        return definition;
     }
 
-    public DecisionTableEntity findDeployedLatestDecisionByKeyDeploymentIdAndTenantId(String decisionTableKey,
+    public DecisionEntity findDeployedLatestDecisionByKeyDeploymentIdAndTenantId(String definitionKey,
             String deploymentId, String tenantId) {
+        DecisionEntity definition = decisionEntityManager.findDecisionByDeploymentAndKeyAndTenantId(deploymentId, definitionKey, tenantId);
 
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByDeploymentAndKeyAndTenantId(deploymentId, decisionTableKey, tenantId);
-
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
+        if (definition == null) {
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + definitionKey +
                             "' for deployment id '" + deploymentId + "' and tenant identifier " + tenantId);
         }
-        decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
-        return decisionTable;
+        definition = resolveDecision(definition).getDecisionEntity();
+        return definition;
     }
 
-    public DecisionTableEntity findDeployedDecisionByKeyAndVersionAndTenantId(String decisionKey, int decisionVersion, String tenantId) {
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByKeyAndVersionAndTenantId(decisionKey, decisionVersion, tenantId);
+    public DecisionEntity findDeployedDefinitionByKeyAndVersionAndTenantId(String definitionKey, int definitionVersion, String tenantId) {
+        DecisionEntity definition = decisionEntityManager.findDecisionByKeyAndVersionAndTenantId(definitionKey, definitionVersion, tenantId);
 
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
+        if (definition == null) {
+            throw new FlowableObjectNotFoundException("no decision deployed with key = '" + definitionKey + "' and version = '" + definitionVersion + "'");
         }
 
-        decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
-        return decisionTable;
+        definition = resolveDecision(definition).getDecisionEntity();
+        return definition;
     }
 
     /**
-     * Resolving the decision will fetch the DMN, parse it and store the {@link DmnDefinition} in memory.
+     * Resolving the decision will fetch the DMN, parse it and store the {@link org.flowable.dmn.model.DmnDefinition} in memory.
      */
-    public DecisionTableCacheEntry resolveDecisionTable(DmnDecisionTable decision) {
+    public DecisionCacheEntry resolveDecision(DmnDecision decision) {
         String decisionId = decision.getId();
         String deploymentId = decision.getDeploymentId();
 
-        DecisionTableCacheEntry cachedDecision = decisionCache.get(decisionId);
+        DecisionCacheEntry cachedDecision = decisionCache.get(decisionId);
 
         if (cachedDecision == null) {
             DmnDeploymentEntity deployment = engineConfig.getDeploymentEntityManager().findById(deploymentId);
@@ -166,13 +164,13 @@ public class DeploymentManager {
         }
 
         // Remove any dmn definition from the cache
-        List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
+        List<DmnDecision> definitions = new DecisionQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data
         deploymentEntityManager.deleteDeployment(deploymentId);
 
-        for (DmnDecisionTable decisionTable : decisionTables) {
-            decisionCache.remove(decisionTable.getId());
+        for (DmnDecision definition : definitions) {
+            decisionCache.remove(definition.getId());
         }
     }
 
@@ -184,20 +182,20 @@ public class DeploymentManager {
         this.deployers = deployers;
     }
 
-    public DeploymentCache<DecisionTableCacheEntry> getDecisionCache() {
+    public DeploymentCache<DecisionCacheEntry> getDecisionCache() {
         return decisionCache;
     }
 
-    public void setDecisionCache(DeploymentCache<DecisionTableCacheEntry> decisionCache) {
+    public void setDecisionCache(DeploymentCache<DecisionCacheEntry> decisionCache) {
         this.decisionCache = decisionCache;
     }
 
-    public DecisionTableEntityManager getDecisionTableEntityManager() {
-        return decisionTableEntityManager;
+    public DecisionEntityManager getDecisionEntityManager() {
+        return decisionEntityManager;
     }
 
-    public void setDecisionTableEntityManager(DecisionTableEntityManager decisionTableEntityManager) {
-        this.decisionTableEntityManager = decisionTableEntityManager;
+    public void setDecisionEntityManager(DecisionEntityManager decisionEntityManager) {
+        this.decisionEntityManager = decisionEntityManager;
     }
 
     public DmnDeploymentEntityManager getDeploymentEntityManager() {

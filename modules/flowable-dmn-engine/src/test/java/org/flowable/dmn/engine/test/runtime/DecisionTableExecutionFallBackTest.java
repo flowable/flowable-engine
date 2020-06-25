@@ -141,7 +141,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
             inputVariables.put("inputVariable1", 2);
             inputVariables.put("inputVariable2", "test2");
 
-            Map<String, Object> result = flowableDmnRule.getDmnEngine().getDmnRuleService().createExecuteDecisionBuilder()
+            Map<String, Object> result = flowableDmnRule.getDmnEngine().getDmnDecisionService().createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .tenantId("flowable")
                 .parentDeploymentId(localDeployment.getId())
@@ -160,7 +160,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        return flowableDmnRule.getDmnEngine().getDmnRuleService().createExecuteDecisionBuilder()
+        return flowableDmnRule.getDmnEngine().getDmnDecisionService().createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .tenantId(tenantId)
                 .parentDeploymentId(parentDeploymentId)
