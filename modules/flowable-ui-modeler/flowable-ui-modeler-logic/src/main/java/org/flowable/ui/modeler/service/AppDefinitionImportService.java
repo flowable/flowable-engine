@@ -153,6 +153,7 @@ public class AppDefinitionImportService {
 
                 importForms(converterContext);
                 importDecisionTables(converterContext);
+                importDecisionServices(converterContext);
                 importBpmnModels(converterContext);
                 importCmmnModels(converterContext);
 
@@ -233,6 +234,9 @@ public class AppDefinitionImportService {
 
                         } else if (zipEntryName.startsWith("decision-table-models/")) {
                             converterContext.getDecisionTableKeyToJsonStringMap().put(modelFileName, json);
+
+                        } else if (zipEntryName.startsWith("decision-service-models/")) {
+                            converterContext.getDecisionServiceKeyToJsonStringMap().put(modelFileName, json);
 
                         } else if (!zipEntryName.contains("/")) {
                             appDefinitionModel = createModelObject(json, Model.MODEL_TYPE_APP);
@@ -331,6 +335,42 @@ public class AppDefinitionImportService {
             }
 
             converterContext.addDecisionTableModel(updatedDecisionTableModel, oldDecisionTableId);
+        }
+    }
+
+    protected void importDecisionServices(ConverterContext converterContext) {
+
+        Map<String, String> decisionServicesMap = converterContext.getDecisionServiceKeyToJsonStringMap();
+        Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
+        for (String decisionServiceKey : decisionServicesMap.keySet()) {
+
+            Model decisionServiceModel = createModelObject(decisionServicesMap.get(decisionServiceKey), Model.MODEL_TYPE_DECISION_SERVICE);
+
+            // migrate to new version
+            String oldDecisionServiceId = decisionServiceModel.getId();
+
+            Model existingModel = converterContext.getDecisionServiceModelByKey(decisionServiceModel.getKey());
+            Model updatedDecisionServiceModel = null;
+            if (existingModel != null) {
+                byte[] imageBytes = null;
+                if (thumbnailMap.containsKey(decisionServiceKey)) {
+                    imageBytes = thumbnailMap.get(decisionServiceKey);
+                }
+                updatedDecisionServiceModel = modelService.saveModel(existingModel, decisionServiceModel.getModelEditorJson(), imageBytes,
+                    true, "App definition import", SecurityUtils.getCurrentUserObject());
+
+            } else {
+                decisionServiceModel.setId(null);
+                updatedDecisionServiceModel = modelService.createModel(decisionServiceModel, SecurityUtils.getCurrentUserObject());
+
+                if (thumbnailMap.containsKey(decisionServiceKey)) {
+                    updatedDecisionServiceModel.setThumbnail(thumbnailMap.get(decisionServiceKey));
+                    modelRepository.save(updatedDecisionServiceModel);
+                }
+            }
+
+            converterContext.addDecisionServiceModel(updatedDecisionServiceModel, oldDecisionServiceId);
         }
     }
 
