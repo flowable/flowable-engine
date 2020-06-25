@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,10 +65,10 @@ public class RetryInterceptorTest {
             processEngine.getManagementService().executeCommand(new CommandThrowingOptimisticLockingException());
             Assert.fail("ActivitiException expected.");
         } catch (FlowableException e) {
-            Assert.assertTrue(e.getMessage().contains(retryInterceptor.getNumOfRetries() + " retries failed"));
+            assertThat(e.getMessage()).contains(retryInterceptor.getNumOfRetries() + " retries failed");
         }
 
-        Assert.assertEquals(retryInterceptor.getNumOfRetries() + 1, counter.get()); // +1, we retry 3 times, so one extra for the regular execution
+        assertThat(counter.get()).isEqualTo(retryInterceptor.getNumOfRetries() + 1); // +1, we retry 3 times, so one extra for the regular execution
     }
 
     public static AtomicInteger counter = new AtomicInteger();
