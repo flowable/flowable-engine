@@ -218,6 +218,11 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter {
                 String formModelKey = converterContext.getFormModelKeyForFormModelId(formModelId);
                 if (formModelKey != null) {
                     task.setFormKey(formModelKey);
+                } else {
+                    String key = formReferenceNode.get("key").asText();
+                    if (StringUtils.isNotEmpty(key)) {
+                        task.setFormKey(key);
+                    }
                 }
             }
         }
