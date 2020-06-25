@@ -135,7 +135,7 @@ public class EngineServiceUtil {
         DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(engineConfiguration);
         if (dmnEngineConfiguration != null) {
-            dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+            dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         }
         
         return dmnRuleService;

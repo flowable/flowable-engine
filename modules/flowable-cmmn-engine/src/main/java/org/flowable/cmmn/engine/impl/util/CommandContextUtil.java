@@ -593,7 +593,7 @@ public class CommandContextUtil {
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("Dmn engine is not configured");
         }
-        return dmnEngineConfiguration.getDmnRuleService();
+        return dmnEngineConfiguration.getDmnDecisionService();
     }
 
     public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {

@@ -98,7 +98,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
         dmnEngine = DmnEngines.getDefaultDmnEngine();
         dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
         dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
 
         // Create http client for all tests

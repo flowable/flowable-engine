@@ -16,7 +16,7 @@ public interface DmnEngineConfigurationApi {
 
     DmnRepositoryService getDmnRepositoryService();
     
-    DmnDecisionService getDmnRuleService();
+    DmnDecisionService getDmnDecisionService();
     
     DmnManagementService getDmnManagementService();
     

@@ -415,7 +415,7 @@ public class CommandContextUtil {
         DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
         if (dmnEngineConfiguration != null) {
-            dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+            dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         }
 
         return dmnRuleService;

@@ -699,7 +699,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     }
 
     @Override
-    public DmnDecisionService getDmnRuleService() {
+    public DmnDecisionService getDmnDecisionService() {
         return ruleService;
     }
 

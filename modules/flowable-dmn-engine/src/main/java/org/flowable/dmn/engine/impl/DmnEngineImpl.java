@@ -42,7 +42,7 @@ public class DmnEngineImpl implements DmnEngine {
         this.name = dmnEngineConfiguration.getEngineName();
         this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        this.dmnDecisionService = dmnEngineConfiguration.getDmnRuleService();
+        this.dmnDecisionService = dmnEngineConfiguration.getDmnDecisionService();
         this.dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
         
         if (dmnEngineConfiguration.getSchemaManagementCmd() != null) {
