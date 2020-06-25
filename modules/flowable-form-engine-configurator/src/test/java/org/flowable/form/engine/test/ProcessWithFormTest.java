@@ -12,9 +12,8 @@
  */
 package org.flowable.form.engine.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 
@@ -76,8 +75,8 @@ public class ProcessWithFormTest {
             deployment -> repositoryService.deleteDeployment(deployment.getId(), true)
         );
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
-        formRepositoryService.createDeploymentQuery().list().
-            forEach(
+        formRepositoryService.createDeploymentQuery().list()
+            .forEach(
                 formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId(), true)
             );
         SideEffectExecutionListener.reset();
@@ -86,10 +85,10 @@ public class ProcessWithFormTest {
     @BeforeEach
     public void deployModels(RepositoryService repositoryService) {
         repositoryService.createDeployment().
-            addClasspathResource("org/flowable/form/engine/test/deployment/simple.form").
-            addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml", ONE_TASK_PROCESS.
-                replace("START_EVENT_VALIDATION", "true").
-                replace("USER_TASK_VALIDATION", "true")
+            addClasspathResource("org/flowable/form/engine/test/deployment/simple.form")
+                .addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml", ONE_TASK_PROCESS
+                        .replace("START_EVENT_VALIDATION", "true")
+                        .replace("USER_TASK_VALIDATION", "true")
             ).
             deploy();
     }
@@ -98,12 +97,11 @@ public class ProcessWithFormTest {
     public void throwExceptionValidationOnStartProcess(RuntimeService runtimeService, RepositoryService repositoryService) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
             .singleResult();
-        assertThrows(RuntimeException.class,
-            () -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.singletonMap("name", "nameValue"), "test"),
-            "validation failed"
-        );
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.singletonMap("name", "nameValue"), "test"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("validation failed");
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
@@ -114,8 +112,8 @@ public class ProcessWithFormTest {
                 .singleResult();
             ProcessInstance processInstance = runtimeService
                 .startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.singletonMap("name", "nameValue"), "test");
-            assertNotNull(processInstance);
-            assertEquals(1, SideEffectExecutionListener.getSideEffect());
+            assertThat(processInstance).isNotNull();
+            assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
         } finally {
             ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(true);
         }
@@ -125,29 +123,27 @@ public class ProcessWithFormTest {
     public void throwExceptionValidationOnStartProcessWithoutVariables(RuntimeService runtimeService, RepositoryService repositoryService) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskWithFormSideEffectProcess")
             .singleResult();
-        assertThrows(RuntimeException.class,
-            () -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", null, "test"),
-            "validation failed"
-        );
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", null, "test"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("validation failed");
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
     public void throwExceptionValidationOnCompleteTask(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormSideEffectProcess");
-        assertEquals(1, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
         SideEffectExecutionListener.reset();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-        assertThrows( FlowableException.class,
-            () ->taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.emptyMap())
-        );
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.emptyMap()))
+                .isInstanceOf(FlowableException.class);
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
@@ -155,7 +151,7 @@ public class ProcessWithFormTest {
         ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(false);
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormSideEffectProcess");
-            assertEquals(1, SideEffectExecutionListener.getSideEffect());
+            assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
             SideEffectExecutionListener.reset();
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -165,7 +161,7 @@ public class ProcessWithFormTest {
 
             taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"));
 
-            assertEquals(1, SideEffectExecutionListener.getSideEffect());
+            assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
         } finally {
             ((ProcessEngineConfigurationImpl) processEngineConfiguration).setFormFieldValidationEnabled(true);
         }
@@ -185,7 +181,7 @@ public class ProcessWithFormTest {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(),"__COMPLETE", Collections.emptyMap(),
             "oneTaskWithFormSideEffectProcess");
-        assertEquals(1, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
         SideEffectExecutionListener.reset();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -195,7 +191,7 @@ public class ProcessWithFormTest {
 
         taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"));
 
-        assertEquals(1, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isEqualTo(1);
     }
 
     @Test
@@ -211,17 +207,12 @@ public class ProcessWithFormTest {
             deploy();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
 
-        assertEquals(
-            "validation failed",
-            assertThrows(
-                RuntimeException.class,
-                () -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "__COMPLETE",
-                    Collections.singletonMap("allowValidation", Boolean.TRUE),
-                    "oneTaskWithFormSideEffectProcess")
-            ).getMessage()
-        );
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "__COMPLETE",
+                Collections.singletonMap("allowValidation", Boolean.TRUE),"oneTaskWithFormSideEffectProcess"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("validation failed");
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
             "oneTaskWithFormSideEffectProcess",
@@ -234,12 +225,10 @@ public class ProcessWithFormTest {
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-        assertThrows(
-            RuntimeException.class,
-            () -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"))
-        );
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator")))
+                .isInstanceOf(RuntimeException.class);
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
@@ -264,16 +253,10 @@ public class ProcessWithFormTest {
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-        assertEquals(
-            "Unknown property used in expression: ${BAD_EXPRESSION}",
-            assertThrows(
-                FlowableException.class,
-                () -> taskService
-                    .completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"))
-
-            ).getMessage()
-        );
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator")))
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("Unknown property used in expression: ${BAD_EXPRESSION}");
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
@@ -298,15 +281,11 @@ public class ProcessWithFormTest {
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-        assertEquals(
-            "validation failed",
-            assertThrows(
-            RuntimeException.class,
-            () -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"))
-        ).getMessage()
-        );
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator")))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
     @Test
@@ -331,15 +310,11 @@ public class ProcessWithFormTest {
         FormRepositoryService formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
         FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-        assertEquals(
-            "validation failed",
-            assertThrows(
-            RuntimeException.class,
-            () -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator"))
-        ).getMessage()
-        );
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("initiator", "someInitiator")))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
 
-        assertEquals(0, SideEffectExecutionListener.getSideEffect());
+        assertThat(SideEffectExecutionListener.getSideEffect()).isZero();
     }
 
 }
