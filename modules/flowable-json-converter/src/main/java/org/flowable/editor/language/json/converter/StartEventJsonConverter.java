@@ -138,6 +138,11 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
                     String formModelKey = converterContext.getFormModelKeyForFormModelId(formModelId);
                     if (formModelKey != null) {
                         startEvent.setFormKey(formModelKey);
+                    } else {
+                        String key = formReferenceNode.get("key").asText();
+                        if (StringUtils.isNotEmpty(key)) {
+                            startEvent.setFormKey(key);
+                        }
                     }
                 }
             }

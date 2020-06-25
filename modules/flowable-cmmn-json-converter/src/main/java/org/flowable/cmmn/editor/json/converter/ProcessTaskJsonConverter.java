@@ -71,15 +71,15 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
 
             ObjectNode processReferenceNode = objectMapper.createObjectNode();
             processReferenceNode.put("key", processRef);
+            propertiesNode.set(PROPERTY_PROCESS_REFERENCE, processReferenceNode);
 
             Map<String, String> modelInfo = converterContext.getProcessModelInfoForProcessModelKey(processRef);
             if (modelInfo != null) {
                 processReferenceNode.put("id", modelInfo.get("id"));
                 processReferenceNode.put("name", modelInfo.get("name"));
-                propertiesNode.set(PROPERTY_PROCESS_REFERENCE, processReferenceNode);
 
             } else {
-
+                converterContext.registerUnresolvedProcessModelReferenceForCaseModel(processRef, cmmnModel);
 
             }
         }
