@@ -21,7 +21,6 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
 
