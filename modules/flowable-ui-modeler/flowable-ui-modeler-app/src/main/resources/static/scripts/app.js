@@ -84,9 +84,26 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/form.html',
             controller: 'FormCtrl'
         })
+        .when('/decisions', {
+            templateUrl: appResourceRoot + 'views/decisions.html',
+            controller: 'DecisionsController',
+            resolve: {
+                modelType:()=>4
+            }
+        })
         .when('/decision-tables', {
-            templateUrl: appResourceRoot + 'views/decision-tables.html',
-            controller: 'DecisionTablesController'
+            templateUrl: appResourceRoot + 'views/decisions.html',
+            controller: 'DecisionsController',
+            resolve: {
+                modelType:()=>4
+            }
+        })
+        .when('/decision-services', {
+            templateUrl: appResourceRoot + 'views/decisions.html',
+            controller: 'DecisionsController',
+            resolve: {
+                modelType:()=>6
+            }
         })
         .when('/decision-tables/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table.html',
@@ -222,9 +239,9 @@ flowableModeler
                     'path': '/forms'
                 },
                 {
-                    'id': 'decision-tables',
+                    'id': 'decisions',
                     'title': 'GENERAL.NAVIGATION.DECISIONS',
-                    'path': '/decision-tables'
+                    'path': '/decisions'
                 },
                 {
                     'id': 'apps',
