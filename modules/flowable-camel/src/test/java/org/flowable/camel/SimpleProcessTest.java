@@ -13,6 +13,8 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +90,8 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
 
         service1.assertIsSatisfied();
         Map<?, ?> m = service2.getExchanges().get(0).getIn().getBody(Map.class);
-        assertEquals("ala", m.get("var1"));
-        assertEquals("var2", m.get("var2"));
+        assertThat(m.get("var1")).isEqualTo("ala");
+        assertThat(m.get("var2")).isEqualTo("var2");
     }
 
     @Test

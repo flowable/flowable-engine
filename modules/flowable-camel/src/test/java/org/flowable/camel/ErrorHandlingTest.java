@@ -12,6 +12,8 @@
  */
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,12 +54,12 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
         Thread.sleep(WAIT);
 
-        assertEquals("Process instance not completed", 0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).as("Process instance not completed").isZero();
     }
 
     /**
@@ -73,9 +75,9 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 
-        assertEquals("No roll-back to previous wait state", 1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(PREVIOUS_WAIT_STATE).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(PREVIOUS_WAIT_STATE).count()).as("No roll-back to previous wait state").isEqualTo(1);
 
-        assertEquals("Process instance advanced to next wait state", 0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(NEXT_WAIT_STATE).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(NEXT_WAIT_STATE).count()).as("Process instance advanced to next wait state").isZero();
     }
 
     /**
@@ -92,11 +94,11 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
         Thread.sleep(WAIT);
 
-        assertEquals("Process instance did not reach next wait state", 1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(NEXT_WAIT_STATE).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId(NEXT_WAIT_STATE).count()).as("Process instance did not reach next wait state").isEqualTo(1);
     }
 }

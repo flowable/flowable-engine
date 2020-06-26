@@ -13,6 +13,8 @@
 
 package org.flowable.camel.revisited;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -62,11 +64,11 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcessRevisited");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
-        assertEquals(3, executionList.size());
+        assertThat(executionList).hasSize(3);
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000, 200);
 
-        assertTrue(oneExchangeSendToFlowableReceive1.matchesMockWaitTime());
-        assertTrue(oneExchangeSendToFlowableReceive2.matchesMockWaitTime());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(oneExchangeSendToFlowableReceive1.matchesMockWaitTime()).isTrue();
+        assertThat(oneExchangeSendToFlowableReceive2.matchesMockWaitTime()).isTrue();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

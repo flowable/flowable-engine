@@ -13,6 +13,9 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +99,10 @@ public class CustomContextTest extends SpringFlowableTestCase {
 
         @SuppressWarnings("rawtypes")
         Map m = service2.getExchanges().get(0).getIn().getBody(Map.class);
-        assertEquals("ala", m.get("var1"));
-        assertEquals("var2", m.get("var2"));
+        assertThat(m)
+                .contains(
+                        entry("var1", "ala"),
+                        entry("var2", "var2")
+                );
     }
 }
