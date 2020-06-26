@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import groovy.lang.MissingPropertyException;
+
 /**
  * @author Joram Barrez
  * @author Christian Stettler
@@ -51,14 +53,14 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testFailingScript() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failingScript"))
-                .hasStackTraceContaining("MissingPropertyException");
+                .hasRootCauseInstanceOf(MissingPropertyException.class);
     }
 
     @Test
     @Deployment
     public void testExceptionThrownInScript() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failingScript"))
-                .hasStackTraceContaining("IllegalStateException");
+                .hasRootCauseInstanceOf(IllegalStateException.class);
     }
 
     @Test
