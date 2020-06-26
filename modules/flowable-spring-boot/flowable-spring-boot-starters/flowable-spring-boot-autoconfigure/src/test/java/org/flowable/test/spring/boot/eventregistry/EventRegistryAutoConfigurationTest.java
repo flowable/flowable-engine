@@ -339,8 +339,6 @@ public class EventRegistryAutoConfigurationTest {
                 EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
-                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
                     eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
@@ -497,7 +495,6 @@ public class EventRegistryAutoConfigurationTest {
 
                 DefaultSpringEventRegistryChangeDetectionExecutor executor = (DefaultSpringEventRegistryChangeDetectionExecutor)
                     eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
-                assertThat(executor.getTaskScheduler()).isNotNull();
                 assertThat(executor.getTaskScheduler()).isInstanceOf(ThreadPoolTaskScheduler.class);
             });
     }
@@ -520,7 +517,6 @@ public class EventRegistryAutoConfigurationTest {
 
             DefaultSpringEventRegistryChangeDetectionExecutor executor = (DefaultSpringEventRegistryChangeDetectionExecutor)
                 eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
-            assertThat(executor.getTaskScheduler()).isNotNull();
             assertThat(executor.getTaskScheduler()).isEqualTo(context.getBean(TaskScheduler.class));
         });
     }

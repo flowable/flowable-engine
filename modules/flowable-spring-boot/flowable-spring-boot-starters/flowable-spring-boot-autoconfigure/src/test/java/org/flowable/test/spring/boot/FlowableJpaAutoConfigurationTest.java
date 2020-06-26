@@ -80,7 +80,7 @@ public class FlowableJpaAutoConfigurationTest {
                 assertThat(configuration.getJpaEntityManagerFactory())
                     .as("Process JPA Entity Manager Factory")
                     .isNull();
-                assertThat(configuration.isJpaCloseEntityManager())
+                assertThat(configuration.isJpaHandleTransaction())
                     .as("Process JPA handle transaction")
                     .isFalse();
                 assertThat(configuration.isJpaCloseEntityManager())
@@ -92,7 +92,7 @@ public class FlowableJpaAutoConfigurationTest {
                 assertThat(configuration.getJpaEntityManagerFactory())
                     .as("Process JPA Entity Manager Factory")
                     .isSameAs(entityManagerFactory);
-                assertThat(configuration.isJpaCloseEntityManager())
+                assertThat(configuration.isJpaHandleTransaction())
                     .as("Process JPA handle transaction")
                     .isFalse();
                 assertThat(configuration.isJpaCloseEntityManager())

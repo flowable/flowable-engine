@@ -46,7 +46,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
-import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.SpringFormExpressionManager;
@@ -171,7 +170,6 @@ public class AllEnginesAutoConfigurationTest {
             SpringDmnEngineConfigurator dmnConfigurator = context.getBean(SpringDmnEngineConfigurator.class);
             SpringFormEngineConfigurator formConfigurator = context.getBean(SpringFormEngineConfigurator.class);
             SpringIdmEngineConfigurator idmConfigurator = context.getBean(SpringIdmEngineConfigurator.class);
-            SpringEventRegistryConfigurator eventConfigurator = context.getBean(SpringEventRegistryConfigurator.class);
             SpringProcessEngineConfigurator processConfigurator = context.getBean(SpringProcessEngineConfigurator.class);
             assertThat(appEngineConfiguration.getConfigurators())
                     .as("AppEngineConfiguration configurators")
