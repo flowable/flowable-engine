@@ -204,6 +204,14 @@ public class AllEnginesAutoConfigurationTest {
             assertThat(formEngineConfiguration.getExpressionManager()).isInstanceOf(SpringFormExpressionManager.class);
             assertThat(formEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
 
+            assertThat(cmmnEngineConfiguration.isDisableEventRegistry()).isTrue();
+            assertThat(cmmnEngineConfiguration.getEventRegistryConfigurator()).isNull();
+            assertThat(processEngineConfiguration.isDisableEventRegistry()).isTrue();
+            assertThat(processEngineConfiguration.getEventRegistryConfigurator()).isNull();
+            assertThat(appEngineConfiguration.getEventRegistryConfigurator())
+                    .as("AppEngineConfiguration eventEngineConfiguration")
+                    .isSameAs(eventConfigurator);
+
             deleteDeployments(context.getBean(AppEngine.class));
             deleteDeployments(context.getBean(CmmnEngine.class));
             deleteDeployments(context.getBean(DmnEngine.class));
