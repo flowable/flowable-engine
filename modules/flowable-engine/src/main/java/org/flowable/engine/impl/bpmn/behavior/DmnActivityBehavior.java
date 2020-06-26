@@ -142,7 +142,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
             if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
                 DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
-                processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
+                processEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
             } else {
                 processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
@@ -154,7 +154,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
             if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
                 DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
-                setVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
+                setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             } else {
                 setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finalDecisionKeyValue,
@@ -195,7 +195,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         executeDecisionBuilder.parentDeploymentId(parentDeploymentId);
     }
 
-    protected void setVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionServiceKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+    protected void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionServiceKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
         if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
             return;
         }
