@@ -132,6 +132,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";
 
     String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
+    String PROPERTY_DECISIONSERVICE_REFERENCE = "decisiontaskdecisionservicereference";
     String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
@@ -139,6 +140,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
     String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT = "decisiontaskfallbacktodefaulttenant";
     String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
+    String PROPERTY_DECISION_REFERENCE_TYPE = "decisionReferenceType";
 
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
     String PROPERTY_CASE_IN_PARAMETERS = "casetaskinparameters";

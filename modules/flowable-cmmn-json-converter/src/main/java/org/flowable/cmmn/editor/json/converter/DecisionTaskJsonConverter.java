@@ -21,6 +21,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
 
@@ -32,6 +33,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Yvo Swillens
  */
 public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
+
+    protected static final String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
+    protected static final String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         fillJsonTypes(convertersToCmmnMap);
@@ -56,21 +60,36 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         DecisionTask decisionTask = new DecisionTask();
+        String referenceType = null;
 
+        // when both decision table and decision service reference are present
+        // decision services reference will prevail
         JsonNode decisionTableReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
 
             String decisionTableKey = decisionTableReferenceNode.get("key").asText();
             if (StringUtils.isNotEmpty(decisionTableKey)) {
                 decisionTask.setDecisionRef(decisionTableKey);
+                referenceType = REFERENCE_TYPE_DECISION_TABLE;
             }
         }
+
+        JsonNode decisionServiceReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
+        if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
+
+            String decisionServiceKey = decisionServiceReferenceNode.get("key").asText();
+            if (StringUtils.isNotEmpty(decisionServiceKey)) {
+                decisionTask.setDecisionRef(decisionServiceKey);
+                referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+            }
+        }
+
+        addFlowableExtensionElementWithValue(PROPERTY_DECISION_REFERENCE_TYPE, referenceType, decisionTask);
 
         addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
         addBooleanField(elementNode, decisionTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
 
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, decisionTask);
-
         return decisionTask;
     }
 
