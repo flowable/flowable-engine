@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -85,34 +86,21 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
             referenceType = REFERENCE_TYPE_DECISION_SERVICE;
         }
 
-        if (referenceType != null) {
-            ExtensionElement extensionElement = new ExtensionElement();
-            extensionElement.setNamespace(NAMESPACE);
-            extensionElement.setNamespacePrefix("modeler");
-            extensionElement.setName(PROPERTY_DECISION_REFERENCE_TYPE);
-            extensionElement.setElementText(referenceType);
-            serviceTask.addExtensionElement(extensionElement);
-        }
+        addFlowableExtensionElementWithValue(PROPERTY_DECISION_REFERENCE_TYPE, referenceType, serviceTask);
 
-        boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
-        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
-        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
-        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
-        serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
-
-        boolean fallbackToDefaultTenant = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, elementNode);
-        FieldExtension fallbackToDefaultTenantField = new FieldExtension();
-        fallbackToDefaultTenantField.setFieldName(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
-        fallbackToDefaultTenantField.setStringValue(fallbackToDefaultTenant ? "true" : "false");
-        serviceTask.getFieldExtensions().add(fallbackToDefaultTenantField);
-
-        boolean sameDeployment = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT, elementNode);
-        FieldExtension sameDeploymentField = new FieldExtension();
-        sameDeploymentField.setFieldName(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY);
-        sameDeploymentField.setStringValue(sameDeployment ? "true" : "false");
-        serviceTask.getFieldExtensions().add(sameDeploymentField);
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT, PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY);
 
         return serviceTask;
+    }
+
+    protected void addBooleanField(JsonNode elementNode, ServiceTask decisionTask, String propertyName, String fieldName) {
+        boolean decisionTableThrowErrorOnNoHitsNode = JsonConverterUtil.getPropertyValueAsBoolean(propertyName, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(fieldName);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
     }
 
     @Override
