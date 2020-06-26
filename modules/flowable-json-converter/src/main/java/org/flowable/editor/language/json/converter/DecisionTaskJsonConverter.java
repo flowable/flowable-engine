@@ -15,6 +15,7 @@ package org.flowable.editor.language.json.converter;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
@@ -60,6 +61,8 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
         String decisionModelKey = null;
         String referenceType = null;
 
+        // when both decision table and decision service reference are present
+        // decision services reference will prevail
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
             String decisionTableId = decisionTableReferenceNode.get("id").asText();
@@ -83,10 +86,12 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
         }
 
         if (referenceType != null) {
-            FieldExtension decisionReferenceType = new FieldExtension();
-            decisionReferenceType.setFieldName(PROPERTY_DECISION_REFERENCE_TYPE);
-            decisionReferenceType.setStringValue(referenceType);
-            serviceTask.getFieldExtensions().add(decisionReferenceType);
+            ExtensionElement extensionElement = new ExtensionElement();
+            extensionElement.setNamespace(NAMESPACE);
+            extensionElement.setNamespacePrefix("modeler");
+            extensionElement.setName(PROPERTY_DECISION_REFERENCE_TYPE);
+            extensionElement.setElementText(referenceType);
+            serviceTask.addExtensionElement(extensionElement);
         }
 
         boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
