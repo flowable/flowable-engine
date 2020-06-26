@@ -55,8 +55,8 @@ public class SecurityAutoConfigurationTest {
         this.applicationContext.refresh();
         UserDetailsService userDetailsService = this.applicationContext.getBean(UserDetailsService.class);
         assertThat(userDetailsService).as("the userDetailsService should not be null").isNotNull();
-        assertThat(userDetailsService.loadUserByUsername("jlong2").getAuthorities().size()).as("there should only be 1 authority").isEqualTo(1);
-        assertThat(userDetailsService.loadUserByUsername("jbarrez2").getAuthorities().size()).as("there should be 2 authorities").isEqualTo(2);
+        assertThat(userDetailsService.loadUserByUsername("jlong2").getAuthorities()).as("there should only be 1 authority").hasSize(1);
+        assertThat(userDetailsService.loadUserByUsername("jbarrez2").getAuthorities()).as("there should be 2 authorities").hasSize(2);
     }
 
     @Configuration(proxyBeanMethods = false)

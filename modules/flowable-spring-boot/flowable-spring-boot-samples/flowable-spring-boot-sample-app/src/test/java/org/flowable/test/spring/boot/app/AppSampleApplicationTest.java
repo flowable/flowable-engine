@@ -38,6 +38,6 @@ public class AppSampleApplicationTest {
         assertThat(repositoryService).as("App repository service").isNotNull();
         assertThat(repositoryService.createAppDefinitionQuery().count())
             .as("All app definitions")
-            .isEqualTo(0);
+            .isZero();
     }
 }
