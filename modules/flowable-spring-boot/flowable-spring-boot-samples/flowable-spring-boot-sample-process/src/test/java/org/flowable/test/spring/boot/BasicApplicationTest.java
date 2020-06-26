@@ -49,11 +49,8 @@ public class BasicApplicationTest {
             .processDefinitionKey("waiter")
             .list();
         assertThat(processDefinitionList)
-            .hasSize(1)
-            .first()
-            .as("First process definition")
-            .satisfies(processDefinition -> assertThat(processDefinition.getKey())
-                .as("Process definition key")
-                .isEqualTo("waiter"));
+            .extracting(ProcessDefinition::getKey)
+            .as("First process definition with definition key")
+            .containsExactly("waiter");
     }
 }

@@ -42,7 +42,7 @@ public class FormSampleApplicationTest {
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().list();
         assertThat(formDefinitions)
             .extracting(FormDefinition::getKey, FormDefinition::getName)
-            .containsExactlyInAnyOrder(
+            .containsExactly(
                 tuple("form1", "My first form")
             );
     }
