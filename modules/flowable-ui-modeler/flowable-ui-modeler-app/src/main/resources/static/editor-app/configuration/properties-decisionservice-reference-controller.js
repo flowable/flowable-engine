@@ -144,7 +144,7 @@ angular.module('flowableModeler').controller('FlowableDecisionServiceReferencePo
             }
         };
 
-        $scope.newDecisionTable = function() {
+        $scope.newDecisionService = function() {
             $scope.property.value.variablesmapping = [];
 
             $scope.popup.state = 'newDecisionService';
