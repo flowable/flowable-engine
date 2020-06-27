@@ -62,13 +62,10 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         Map<String, List<Association>> byRelationShip = associations.stream()
                 .collect(Collectors.groupingBy(a -> buildAssociationString(model, a)));
 
-        assertThat(byRelationShip).hasSize(5);
-        assertThat(byRelationShip.containsKey("taskA|taskC|complete")).isTrue();
-        assertThat(byRelationShip.containsKey("taskB|taskC|complete")).isTrue();
-        assertThat(byRelationShip.containsKey("stage1|stage2|terminate")).isTrue();
-        //EXIT CRITERIA ARE "READ" BACKWARDS
-        assertThat(byRelationShip.containsKey("timedTask|expireTimer|occur")).isTrue();
-        assertThat(byRelationShip.containsKey("stage2|abortStageTask|complete")).isTrue();
+        assertThat(byRelationShip)
+                .containsOnlyKeys("taskA|taskC|complete", "taskB|taskC|complete", "stage1|stage2|terminate",
+                        //EXIT CRITERIA ARE "READ" BACKWARDS
+                        "timedTask|expireTimer|occur", "stage2|abortStageTask|complete");
 
         //Coordinates of associations are recalculated based on other elements?
         //This is only a stub that checks the "approximate" coordinates of 1 association

@@ -39,7 +39,7 @@ public class CriterionConverterTest extends AbstractConverterTest {
         
         PlanItem userEventListenerPlanItem = planModelStage.findPlanItemForPlanItemDefinitionInPlanFragmentOrDownwards("userEventListener1");
         assertThat(userEventListenerPlanItem).isNotNull();
-        assertThat(userEventListenerPlanItem.getOutgoingAssociations().size()).isEqualTo(1);
+        assertThat(userEventListenerPlanItem.getOutgoingAssociations()).hasSize(1);
         Association association = userEventListenerPlanItem.getOutgoingAssociations().get(0);
         assertThat(association.getSourceRef()).isNotNull();
         assertThat(planModelStage.findPlanItemInPlanFragmentOrDownwards(association.getSourceRef()).getPlanItemDefinition().getId()).isEqualTo("userEventListener1");
@@ -48,13 +48,13 @@ public class CriterionConverterTest extends AbstractConverterTest {
         Criterion exitCriterion = (Criterion) association.getTargetElement();
         assertThat(exitCriterion.getAttachedToRefId()).isNull();
         
-        assertThat(planModelStage.getExitCriteria().size()).isEqualTo(2);
+        assertThat(planModelStage.getExitCriteria()).hasSize(2);
         assertThat(planModelStage.getExitCriteria()).extracting(Criterion::getId)
                 .containsExactlyInAnyOrder("exitCriterion1", "exitCriterion2");
         
         Stage claimDecisionStage = (Stage) planModelStage.findPlanItemDefinitionInStageOrDownwards("claimDecisionStage");
         assertThat(claimDecisionStage).isNotNull();
-        assertThat(claimDecisionStage.getExitCriteria().size()).isEqualTo(2);
+        assertThat(claimDecisionStage.getExitCriteria()).hasSize(2);
         assertThat(claimDecisionStage.getExitCriteria()).extracting(Criterion::getId)
                 .containsExactlyInAnyOrder("acceptedExitCriterion", "rejectedExitCriterion");
     }
