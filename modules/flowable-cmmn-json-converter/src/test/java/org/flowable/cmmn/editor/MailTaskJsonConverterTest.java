@@ -41,7 +41,6 @@ public class MailTaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planModelStage).isNotNull();
 
         PlanItemDefinition mailTaskDefinition = planModelStage.findPlanItemDefinitionInStageOrDownwards("mailTask");
-        assertThat(mailTaskDefinition).isNotNull();
         assertThat(mailTaskDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask mailServiceTask = (ServiceTask) mailTaskDefinition;
         assertThat(mailServiceTask.getType()).isEqualTo(ServiceTask.MAIL_TASK);
