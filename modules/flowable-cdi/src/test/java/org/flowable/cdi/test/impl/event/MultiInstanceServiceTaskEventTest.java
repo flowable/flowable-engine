@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.impl.event;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
@@ -27,29 +27,29 @@ public class MultiInstanceServiceTaskEventTest extends CdiFlowableTestCase {
         TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
         listenerBean.reset();
 
-        assertEquals(0, listenerBean.getStartActivityService1WithLoopCounter());
-        assertEquals(0, listenerBean.getEndActivityService1WithLoopCounter());
-        assertEquals(0, listenerBean.getEndActivityService1WithoutLoopCounter());
+        assertThat(listenerBean.getStartActivityService1WithLoopCounter()).isZero();
+        assertThat(listenerBean.getEndActivityService1WithLoopCounter()).isZero();
+        assertThat(listenerBean.getEndActivityService1WithoutLoopCounter()).isZero();
 
-        assertEquals(0, listenerBean.getStartActivityService2WithLoopCounter());
-        assertEquals(0, listenerBean.getEndActivityService2WithLoopCounter());
-        assertEquals(0, listenerBean.getEndActivityService2WithoutLoopCounter());
+        assertThat(listenerBean.getStartActivityService2WithLoopCounter()).isZero();
+        assertThat(listenerBean.getEndActivityService2WithLoopCounter()).isZero();
+        assertThat(listenerBean.getEndActivityService2WithoutLoopCounter()).isZero();
 
         // start the process
         runtimeService.startProcessInstanceByKey("process1");
 
         // assert
-        assertEquals(1, listenerBean.getTakeTransitiont1());
-        assertEquals(1, listenerBean.getTakeTransitiont2());
-        assertEquals(1, listenerBean.getTakeTransitiont3());
+        assertThat(listenerBean.getTakeTransitiont1()).isEqualTo(1);
+        assertThat(listenerBean.getTakeTransitiont2()).isEqualTo(1);
+        assertThat(listenerBean.getTakeTransitiont3()).isEqualTo(1);
 
-        assertEquals(2, listenerBean.getStartActivityService1WithLoopCounter());
-        assertEquals(3, listenerBean.getStartActivityService2WithLoopCounter());
+        assertThat(listenerBean.getStartActivityService1WithLoopCounter()).isEqualTo(2);
+        assertThat(listenerBean.getStartActivityService2WithLoopCounter()).isEqualTo(3);
 
-        assertEquals(2, listenerBean.getEndActivityService1WithLoopCounter());
-        assertEquals(1, listenerBean.getEndActivityService1WithoutLoopCounter());
-        assertEquals(3, listenerBean.getEndActivityService2WithLoopCounter());
-        assertEquals(1, listenerBean.getEndActivityService2WithoutLoopCounter());
+        assertThat(listenerBean.getEndActivityService1WithLoopCounter()).isEqualTo(2);
+        assertThat(listenerBean.getEndActivityService1WithoutLoopCounter()).isEqualTo(1);
+        assertThat(listenerBean.getEndActivityService2WithLoopCounter()).isEqualTo(3);
+        assertThat(listenerBean.getEndActivityService2WithoutLoopCounter()).isEqualTo(1);
 
     }
 }
