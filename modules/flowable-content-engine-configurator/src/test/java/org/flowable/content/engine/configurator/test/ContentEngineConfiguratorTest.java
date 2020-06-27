@@ -12,8 +12,7 @@
  */
 package org.flowable.content.engine.configurator.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.List;
@@ -90,12 +89,12 @@ public class ContentEngineConfiguratorTest {
         processEngine.getRuntimeService().startProcessInstanceByKey("testSendEmailWithAttachment");
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
 
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
         String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
-        assertEquals("myDocument.txt", attachmentFileName);
+        assertThat(attachmentFileName).isEqualTo("myDocument.txt");
     }
 
     @Test
@@ -108,7 +107,7 @@ public class ContentEngineConfiguratorTest {
         processEngine.getRuntimeService().startProcessInstanceByKey("testSendEmailWithAttachments");
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
 
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
@@ -131,8 +130,8 @@ public class ContentEngineConfiguratorTest {
             }
         }
 
-        assertTrue(names.containsAll(TestAttachmentBean.TEST_NAMES));
-        assertTrue(contentTypes.containsAll(TestAttachmentBean.TEST_MIME_TYPES));
+        assertThat(names).containsAll(TestAttachmentBean.TEST_NAMES);
+        assertThat(contentTypes).containsAll(TestAttachmentBean.TEST_MIME_TYPES);
     }
 
 
