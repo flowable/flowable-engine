@@ -775,20 +775,22 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     // Unit test for https://activiti.atlassian.net/browse/ACT-4152
     @Test
     public void testQueryWithIncludeTaskVariableAndTaskCategory() {
-        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").list();
-        assertThat(tasks)
-                .extracting(HistoricTaskInstance::getCategory)
-                .containsOnly("testCategory");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").list();
+            assertThat(tasks)
+                    .extracting(HistoricTaskInstance::getCategory)
+                    .containsOnly("testCategory");
 
-        tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").includeTaskLocalVariables().list();
-        assertThat(tasks)
-                .extracting(HistoricTaskInstance::getCategory)
-                .containsOnly("testCategory");
+            tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").includeTaskLocalVariables().list();
+            assertThat(tasks)
+                    .extracting(HistoricTaskInstance::getCategory)
+                    .containsOnly("testCategory");
 
-        tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").includeProcessVariables().list();
-        assertThat(tasks)
-                .extracting(HistoricTaskInstance::getCategory)
-                .containsOnly("testCategory");
+            tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").includeProcessVariables().list();
+            assertThat(tasks)
+                    .extracting(HistoricTaskInstance::getCategory)
+                    .containsOnly("testCategory");
+        }
     }
 
     /**
