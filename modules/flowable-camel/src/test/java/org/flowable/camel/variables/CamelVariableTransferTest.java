@@ -176,7 +176,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
                         entry("property1", "sampleValueForProperty1"),
                         entry("property2", "sampleValueForProperty2")
                 )
-                .doesNotContain(entry("property3", null));
+                .doesNotContainKey("property3");
     }
 
     @Test
@@ -193,10 +193,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
         assertThat(variables)
-                .doesNotContain(
-                        entry("property1", null),
-                        entry("property2", null),
-                        entry("property3", null));
+                .doesNotContainKeys("property1", "property2", "property3");
     }
 
     @Test
@@ -238,7 +235,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
                         entry("property1", "sampleValueForProperty1"),
                         entry("property2", "sampleValueForProperty2")
                 )
-                .doesNotContain(entry("property3", null));
+                .doesNotContainKey("property3");
     }
 
     @Test
@@ -255,10 +252,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
         assertThat(variables)
-                .doesNotContain(
-                        entry("property1", null),
-                        entry("property2", null),
-                        entry("property3", null));
+                .doesNotContainKeys("property1", "property2", "property3");
     }
 
 }
