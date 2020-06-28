@@ -12,8 +12,7 @@
  */
 package org.flowable.cdi.test.impl.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.ProcessScopedMessageBean;
@@ -33,10 +32,10 @@ public class ThreadContextAssociationTest extends CdiFlowableTestCase {
 
         waitForJobExecutorToProcessAllJobs(50000000L, 100L);
 
-        assertNull(managementService.createJobQuery().singleResult());
+        assertThat(managementService.createJobQuery().singleResult()).isNull();
 
         ProcessScopedMessageBean messageBean = (ProcessScopedMessageBean) runtimeService.getVariable(pid, "processScopedMessageBean");
-        assertEquals("test", messageBean.getMessage());
+        assertThat(messageBean.getMessage()).isEqualTo("test");
 
     }
 

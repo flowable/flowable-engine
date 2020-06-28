@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.impl.el;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.MessageBean;
@@ -29,7 +29,7 @@ public class ElTest extends CdiFlowableTestCase {
     public void testSetBeanProperty() throws Exception {
         MessageBean messageBean = getBeanInstance(MessageBean.class);
         runtimeService.startProcessInstanceByKey("setBeanProperty");
-        assertEquals("Greetings from Flowable", messageBean.getMessage());
+        assertThat(messageBean.getMessage()).isEqualTo("Greetings from Flowable");
     }
 
     // @Test

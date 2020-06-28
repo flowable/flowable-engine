@@ -12,9 +12,7 @@
  */
 package org.flowable.cdi.test.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
@@ -40,25 +38,25 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
         businessProcess.startProcessByKey("businessProcessBeanTest").getId();
 
         // ensure that the process is started:
-        assertNotNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult()).isNotNull();
 
         // ensure that there is a single task waiting
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         String value = "value";
         businessProcess.setVariable("key", value);
-        assertEquals(value, businessProcess.getVariable("key"));
+        assertThat((String) businessProcess.getVariable("key")).isEqualTo(value);
 
         // complete the task
-        assertEquals(task.getId(), businessProcess.startTask(task.getId()).getId());
+        assertThat(businessProcess.startTask(task.getId()).getId()).isEqualTo(task.getId());
         businessProcess.completeTask();
 
         // assert the task is completed
-        assertNull(processEngine.getTaskService().createTaskQuery().singleResult());
+        assertThat(processEngine.getTaskService().createTaskQuery().singleResult()).isNull();
 
         // assert that the process is ended:
-        assertNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult()).isNull();
 
     }
 
@@ -71,7 +69,7 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
         businessProcess.startProcessByKey("businessProcessBeanTest").getId();
 
         // assert that the process is ended:
-        assertNull(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery().singleResult()).isNull();
     }
 
     @Test
@@ -79,18 +77,18 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
     public void testResolveProcessInstanceBean() {
         BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-        assertNull(getBeanInstance(ProcessInstance.class));
-        assertNull(getBeanInstance("processInstanceId"));
-        assertNull(getBeanInstance(Execution.class));
-        assertNull(getBeanInstance("executionId"));
+        assertThat(getBeanInstance(ProcessInstance.class)).isNull();
+        assertThat(getBeanInstance("processInstanceId")).isNull();
+        assertThat(getBeanInstance(Execution.class)).isNull();
+        assertThat(getBeanInstance("executionId")).isNull();
 
         String pid = businessProcess.startProcessByKey("businessProcessBeanTest").getId();
 
         // assert that now we can resolve the ProcessInstance-bean
-        assertEquals(pid, getBeanInstance(ProcessInstance.class).getId());
-        assertEquals(pid, getBeanInstance("processInstanceId"));
-        assertEquals(pid, getBeanInstance(Execution.class).getId());
-        assertEquals(pid, getBeanInstance("executionId"));
+        assertThat(getBeanInstance(ProcessInstance.class).getId()).isEqualTo(pid);
+        assertThat(getBeanInstance("processInstanceId")).isEqualTo(pid);
+        assertThat(getBeanInstance(Execution.class).getId()).isEqualTo(pid);
+        assertThat(getBeanInstance("executionId")).isEqualTo(pid);
 
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
     }
@@ -100,8 +98,8 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
     public void testResolveTaskBean() {
         BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-        assertNull(getBeanInstance(Task.class));
-        assertNull(getBeanInstance("taskId"));
+        assertThat(getBeanInstance(Task.class)).isNull();
+        assertThat(getBeanInstance("taskId")).isNull();
 
         businessProcess.startProcessByKey("businessProcessBeanTest");
         String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -109,8 +107,8 @@ public class BusinessProcessBeanTest extends CdiFlowableTestCase {
         businessProcess.startTask(taskId);
 
         // assert that now we can resolve the Task-bean
-        assertEquals(taskId, getBeanInstance(Task.class).getId());
-        assertEquals(taskId, getBeanInstance("taskId"));
+        assertThat(getBeanInstance(Task.class).getId()).isEqualTo(taskId);
+        assertThat(getBeanInstance("taskId")).isEqualTo(taskId);
 
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
     }

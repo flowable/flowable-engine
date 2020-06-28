@@ -12,10 +12,7 @@
  */
 package org.flowable.cdi.test.impl.util;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Named;
@@ -67,7 +64,7 @@ public class ProgrammaticBeanLookupTest {
     public void testLookupBean() {
         deployer.deploy("normal");
         Object lookup = ProgrammaticBeanLookup.lookup("testOnly");
-        assertTrue(lookup.getClass().isAssignableFrom(TestBean.class));
+        assertThat(lookup.getClass().isAssignableFrom(TestBean.class)).isTrue();
         deployer.undeploy("normal");
     }
 
@@ -75,7 +72,7 @@ public class ProgrammaticBeanLookupTest {
     public void testLookupShouldFindAlternative() {
         deployer.deploy("withAlternative");
         Object lookup = ProgrammaticBeanLookup.lookup("testOnly");
-        assertThat(lookup.getClass().getName(), is(equalTo(AlternativeTestBean.class.getName())));
+        assertThat(lookup.getClass().getName()).isEqualTo(AlternativeTestBean.class.getName());
         deployer.undeploy("withAlternative");
     }
 
@@ -83,7 +80,7 @@ public class ProgrammaticBeanLookupTest {
     public void testLookupShouldFindSpecialization() {
         deployer.deploy("withSpecialization");
         Object lookup = ProgrammaticBeanLookup.lookup("testOnly");
-        assertThat(lookup.getClass().getName(), is(equalTo(SpecializedTestBean.class.getName())));
+        assertThat(lookup.getClass().getName()).isEqualTo(SpecializedTestBean.class.getName());
         deployer.undeploy("withSpecialization");
     }
 
