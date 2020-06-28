@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
         String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-        assertEquals("The counter has the value -1. Good news", response);
+        assertThat(response).isEqualTo("The counter has the value -1. Good news");
     }
 
     @Test
@@ -54,7 +56,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
         String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-        assertEquals("The counter has the value -1. Good news (NO NAME)", response);
+        assertThat(response).isEqualTo("The counter has the value -1. Good news (NO NAME)");
     }
 
     @Test
@@ -68,6 +70,6 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
         String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-        assertEquals("The counter has the value -1. Good news Keyword", response);
+        assertThat(response).isEqualTo("The counter has the value -1. Good news Keyword");
     }
 }
