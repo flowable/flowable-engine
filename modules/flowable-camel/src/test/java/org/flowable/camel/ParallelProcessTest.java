@@ -13,6 +13,8 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -64,6 +66,6 @@ public class ParallelProcessTest extends SpringFlowableTestCase {
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelCamelProcess");
         Thread.sleep(4000);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

@@ -13,6 +13,8 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -70,8 +72,8 @@ public class AsyncProcessTest extends SpringFlowableTestCase {
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcess");
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
-        assertEquals(3, executionList.size());
+        assertThat(executionList).hasSize(3);
         Thread.sleep(4000);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }
