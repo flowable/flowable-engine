@@ -118,7 +118,6 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("myProcess");
         Job job = managementService.createJobQuery().singleResult();
-        assertThat(job).isNotNull();
         assertThat(job).isInstanceOf(JobEntity.class);
         
         JobEntity jobEntity = (JobEntity) job;

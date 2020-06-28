@@ -33,7 +33,7 @@ public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testQueryByExceptionWithRealJobExecutor() {
         TimerJobQuery query = managementService.createTimerJobQuery().withException();
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
 
