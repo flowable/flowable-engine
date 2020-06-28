@@ -47,10 +47,12 @@ public class EntitiesTest {
     public void verifyEntitiesInEntityDependencyOrder() {
         Set<String> mappedResources = getMappedResources();
         for (String mappedResource : mappedResources) {
-            assertThat(EntityDependencyOrder.INSERT_ORDER.contains(getAndAssertEntityImplClass(mappedResource)))
-                .as("No insert entry in EntityDependencyOrder for " + mappedResource).isTrue();
-            assertThat(EntityDependencyOrder.DELETE_ORDER.contains(getAndAssertEntityImplClass(mappedResource)))
-                .as("No delete entry in EntityDependencyOrder for " + mappedResource).isTrue();
+            assertThat(EntityDependencyOrder.INSERT_ORDER)
+                    .as("No insert entry in EntityDependencyOrder for " + mappedResource)
+                    .contains(getAndAssertEntityImplClass(mappedResource));
+            assertThat(EntityDependencyOrder.DELETE_ORDER)
+                    .as("No delete entry in EntityDependencyOrder for " + mappedResource)
+                    .contains(getAndAssertEntityImplClass(mappedResource));
         }
     }
     
@@ -58,8 +60,9 @@ public class EntitiesTest {
     public void verifyEntitiesInTableDataManager() {
         Set<String> mappedResources = getMappedResources();
         for (String mappedResource : mappedResources) {
-            assertThat(EntityToTableMap.entityToTableNameMap.containsKey(getAndAssertEntityInterfaceClass(mappedResource)))
-                .as("No entry in TableDataManagerImpl for " + mappedResource).isTrue();
+            assertThat(EntityToTableMap.entityToTableNameMap)
+                    .as("No entry in TableDataManagerImpl for " + mappedResource)
+                    .containsKey(getAndAssertEntityInterfaceClass(mappedResource));
         }
     }
     

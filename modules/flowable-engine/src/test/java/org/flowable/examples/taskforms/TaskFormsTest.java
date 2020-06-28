@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.taskforms;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,11 +52,11 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         // Get start form
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         Object startForm = formService.getRenderedStartForm(procDefId);
-        assertNotNull(startForm);
+        assertThat(startForm).isNotNull();
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         String processDefinitionId = processDefinition.getId();
-        assertEquals("org/flowable/examples/taskforms/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
+        assertThat(formService.getStartFormData(processDefinitionId).getFormKey()).isEqualTo("org/flowable/examples/taskforms/request.form");
 
         // Define variables that would be filled in through the form
         Map<String, String> formProperties = new HashMap<>();
@@ -65,25 +67,25 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
 
         // Management should now have a task assigned to them
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
-        assertEquals("Vacation request by kermit", task.getDescription());
+        assertThat(task.getDescription()).isEqualTo("Vacation request by kermit");
         Object taskForm = formService.getRenderedTaskForm(task.getId());
-        assertNotNull(taskForm);
+        assertThat(taskForm).isNotNull();
 
         // Rejecting the task should put the process back to first task
         taskService.complete(task.getId(), CollectionUtil.singletonMap("vacationApproved", "false"));
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("Adjust vacation request", task.getName());
+        assertThat(task.getName()).isEqualTo("Adjust vacation request");
     }
 
     @Test
     @Deployment
     public void testTaskFormUnavailable() {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-        assertNull(formService.getRenderedStartForm(procDefId));
+        assertThat(formService.getRenderedStartForm(procDefId)).isNull();
 
         runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNull(formService.getRenderedTaskForm(task.getId()));
+        assertThat(formService.getRenderedTaskForm(task.getId())).isNull();
     }
 
 }

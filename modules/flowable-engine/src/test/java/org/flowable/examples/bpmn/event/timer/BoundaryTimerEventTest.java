@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -32,7 +34,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // There should be one task, with a timer : first line support
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("First line support", task.getName());
+        assertThat(task.getName()).isEqualTo("First line support");
 
         // Manually execute the job
         Job timer = managementService.createTimerJobQuery().singleResult();
@@ -41,7 +43,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // The timer has fired, and the second task (second line support) now exists
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Handle escalated issue", task.getName());
+        assertThat(task.getName()).isEqualTo("Handle escalated issue");
     }
 
 }

@@ -114,11 +114,11 @@ public class ProcessEngineAutoConfigurationTest {
     @Test
     public void standaloneProcessEngineWithBasicDatasource() {
         contextRunner.run(context -> {
-            assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
-            assertThat(context)
-                .doesNotHaveBean(AppEngine.class)
-                .doesNotHaveBean(IdGenerator.class)
-                .doesNotHaveBean("processAppEngineConfigurationConfigurer");
+            assertThat(context).as("Process engine")
+                    .hasSingleBean(ProcessEngine.class)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(IdGenerator.class)
+                    .doesNotHaveBean("processAppEngineConfigurationConfigurer");
 
             ProcessEngine processEngine = context.getBean(ProcessEngine.class);
 
@@ -179,11 +179,11 @@ public class ProcessEngineAutoConfigurationTest {
                 "flowable.auto-deployment.engine.bpmn.lock-name=testLock"
             )
             .run(context -> {
-                assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
-                assertThat(context)
-                    .doesNotHaveBean(AppEngine.class)
-                    .doesNotHaveBean(IdGenerator.class)
-                    .doesNotHaveBean("processAppEngineConfigurationConfigurer");
+                assertThat(context).as("Process engine")
+                        .hasSingleBean(ProcessEngine.class)
+                        .doesNotHaveBean(AppEngine.class)
+                        .doesNotHaveBean(IdGenerator.class)
+                        .doesNotHaveBean("processAppEngineConfigurationConfigurer");
 
                 ProcessEngine processEngine = context.getBean(ProcessEngine.class);
 

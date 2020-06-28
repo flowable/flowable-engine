@@ -53,7 +53,7 @@ public class NestedStagesCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(nestedStage).isNotNull();
         assertThat(nestedStage.getName()).isEqualTo("Nested Stage");
 
-        // Nested stage has 3 plan items, and one of them refereces the rootTask from the plan model
+        // Nested stage has 3 plan items, and one of them references the rootTask from the plan model
         assertThat(nestedStage.getPlanItems()).hasSize(3);
         Stage nestedNestedStage = null;
         for (PlanItem planItem : nestedStage.getPlanItems()) {

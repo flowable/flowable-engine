@@ -96,7 +96,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeGenericEventListenerInstance(listenerInstance.getId());
 
         //UserEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).count()).isZero();
 
         //Only 2 PlanItems left
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
@@ -146,7 +146,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
 
         //UserEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isZero();
 
         //Only 2 PlanItems left (1 stage & 1 active task)
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
@@ -268,7 +268,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
         // Completing the other task with the exit sentry should still keep the event, as it's reference by the entry of B
         cmmnTaskService.complete(tasks.get(0).getId());
         assertThat(cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNotNull();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Firing the event listener should start B
         cmmnRuntimeService.completeGenericEventListenerInstance(
@@ -281,7 +281,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testMultipleEventListenersAsEntry() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMultipleEventListenersAsEntry").start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         List<GenericEventListenerInstance> eventListenerInstances = cmmnRuntimeService.createGenericEventListenerInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
@@ -291,7 +291,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
 
         // Completing A should change nothing
         cmmnRuntimeService.completeGenericEventListenerInstance(eventListenerInstances.get(0).getId());
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         eventListenerInstances = cmmnRuntimeService.createGenericEventListenerInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
         assertThat(eventListenerInstances)
@@ -301,7 +301,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
         // Completing B should activate the stage and remove the orphan event listener C
         cmmnRuntimeService.completeGenericEventListenerInstance(eventListenerInstances.get(0).getId());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        assertThat(cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
 }

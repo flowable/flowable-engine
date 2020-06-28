@@ -394,6 +394,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskdecisionservicereferencepackage",
+    "properties" : [ {
+      "id" : "decisiontaskdecisionservicereference",
+      "type" : "Complex",
+      "title" : "CMMN.PROPERTYPACKAGES.DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE.DECISIONTASKDECISIONSERVICEREFERENCE.TITLE",
+      "value" : "",
+      "description" : "CMMN.PROPERTYPACKAGES.DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE.DECISIONTASKDECISIONSERVICEREFERENCE.DESCRIPTION",
+      "popular" : true
+    } ]
+  }, {
     "name" : "decisiontaskthrowerroronnohitspackage",
     "properties" : [ {
       "id" : "decisiontaskthrowerroronnohits",
@@ -1241,6 +1251,7 @@
         "namepackage",
         "documentationpackage",
         "decisiontaskdecisiontablereferencepackage",
+        "decisiontaskdecisionservicereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
         "decisiontaskfallbacktodefaulttenantpackage",
         "asyncpackage",

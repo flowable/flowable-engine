@@ -28,6 +28,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 
@@ -135,13 +136,25 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
 
         if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
-            cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), 
-                            externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
-            
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
+                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+                cmmnEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
+                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            } else {
+                cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(),
+                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            }
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
-            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef,
-                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
+
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
+                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+                setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), externalRef,
+                    planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
+            } else {
+                setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef,
+                    planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
+            }
         }
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
@@ -181,6 +194,45 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
                 planItemInstanceEntity.setVariable(outputResult.getKey(), outputResult.getValue());
             }
+        }
+    }
+
+    protected void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionServiceKey,
+        PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper,
+        boolean multipleResults) {
+
+        if (executionResult == null || (executionResult.isEmpty() && !multipleResults)) {
+            return;
+        }
+
+        // multiple rule results
+        // put on execution as JSON array; each entry contains output id (key) and output value (value)
+        // this should be always done for decision tables of type rule order and output order
+        if (executionResult.size() > 1 || multipleResults) {
+            ObjectNode decisionResultNode = objectMapper.createObjectNode();
+
+            for (Map.Entry<String, List<Map<String, Object>>> decisionExecutionResult : executionResult.entrySet()) {
+                ArrayNode ruleResultNode = objectMapper.createArrayNode();
+                for (Map<String, Object> ruleResult : decisionExecutionResult.getValue()) {
+                    ObjectNode outputResultNode = objectMapper.createObjectNode();
+                    for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
+                        outputResultNode.set(outputResult.getKey(), objectMapper.convertValue(outputResult.getValue(), JsonNode.class));
+                    }
+                    ruleResultNode.add(outputResultNode);
+                }
+
+                decisionResultNode.set(decisionExecutionResult.getKey(), ruleResultNode);
+            }
+
+            planItemInstanceEntity.setVariable(decisionServiceKey, decisionResultNode);
+        } else {
+            // single rule result
+            // put on execution output id (key) and output value (value)
+            executionResult.values().forEach(decisionResult -> {
+                for (Map.Entry<String, Object> outputResult : decisionResult.get(0).entrySet()) {
+                    planItemInstanceEntity.setVariable(outputResult.getKey(), outputResult.getValue());
+                }
+            });
         }
     }
 

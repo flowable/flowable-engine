@@ -29,7 +29,6 @@ public class CommaSplitterTest {
     public void testNoComma() {
         String testString = "Test String";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly(testString);
     }
 
@@ -37,7 +36,6 @@ public class CommaSplitterTest {
     public void testOneComa() {
         String testString = "Test,String";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("Test", "String");
     }
 
@@ -45,7 +43,6 @@ public class CommaSplitterTest {
     public void testManyCommas() {
         String testString = "does,anybody,really,read,this,nonsense";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("does", "anybody", "really", "read", "this", "nonsense");
     }
 
@@ -53,7 +50,6 @@ public class CommaSplitterTest {
     public void testCommaAtStart() {
         String testString = ",first,second";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("first", "second");
     }
 
@@ -61,7 +57,6 @@ public class CommaSplitterTest {
     public void testCommaAtEnd() {
         String testString = "first,second,";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("first", "second");
     }
 
@@ -69,7 +64,6 @@ public class CommaSplitterTest {
     public void testCommaAtStartAndEnd() {
         String testString = ",first,second,";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("first", "second");
     }
 
@@ -77,7 +71,6 @@ public class CommaSplitterTest {
     public void testOneComaInExpression() {
         String testString = "${first,second}";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly(testString);
     }
 
@@ -85,7 +78,6 @@ public class CommaSplitterTest {
     public void testOManyComaInExpression() {
         String testString = "${Everything,should,be,made,as,simple,as,possible},but,no,simpler";
         List<String> result = CommaSplitter.splitCommas(testString);
-        assertThat(result).isNotNull();
         assertThat(result).containsExactly("${Everything,should,be,made,as,simple,as,possible}", "but", "no", "simpler");
     }
 }

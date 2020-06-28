@@ -95,7 +95,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
 
         // SignalEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).count()).isZero();
 
         // Only 2 PlanItems left
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);

@@ -54,11 +54,9 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
                 .planItemInstanceStateActive()
                 .list();
 
-        assertThat(stages).isNotNull();
         assertThat(stages).hasSize(2);
 
         List<Task> tasks = cmmnTaskService.createTaskQuery().active().list();
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(5);
 
         assertStageInstanceId(tasks, "Task A", stages.get(0).getId());
@@ -73,7 +71,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
                 .propagatedStageInstanceId(stages.get(0).getId())
                 .list();
 
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(3);
 
         assertStageInstanceId(tasks, "Task A", stages.get(0).getId());
@@ -85,14 +82,12 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
                 .propagatedStageInstanceId(stages.get(1).getId())
                 .list();
 
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(1);
 
         assertStageInstanceId(tasks, "Task D", stages.get(1).getId());
 
         // now complete the tasks to move the to the history
         tasks = cmmnTaskService.createTaskQuery().active().caseInstanceId(caseInstance.getId()).list();
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(3);
 
         for (Task task : tasks) {
@@ -100,7 +95,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         }
 
         tasks = processEngineTaskService.createTaskQuery().active().list();
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(2);
 
         for (Task task : tasks) {
@@ -114,7 +108,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .list();
 
-        assertThat(historicTasks).isNotNull();
         assertThat(historicTasks).hasSize(5);
 
         assertStageInstanceId(historicTasks, "Task A", stages.get(0).getId());
@@ -127,7 +120,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
                 .propagatedStageInstanceId(stages.get(0).getId())
                 .list();
 
-        assertThat(historicTasks).isNotNull();
         assertThat(historicTasks).hasSize(3);
 
         assertStageInstanceId(historicTasks, "Task A", stages.get(0).getId());
@@ -138,7 +130,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
                 .propagatedStageInstanceId(stages.get(1).getId())
                 .list();
 
-        assertThat(historicTasks).isNotNull();
         assertThat(historicTasks).hasSize(1);
 
         assertStageInstanceId(historicTasks, "Task D", stages.get(1).getId());

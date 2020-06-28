@@ -115,11 +115,11 @@ public class SampleLdapApplicationRestTest extends AbstractSampleLdapTest {
 
     protected static HttpHeaders createHeaders(String username, String password) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, base64Auhentication(username, password));
+        headers.set(HttpHeaders.AUTHORIZATION, base64Authentication(username, password));
         return headers;
     }
 
-    protected static String base64Auhentication(String username, String password) {
+    protected static String base64Authentication(String username, String password) {
         String auth = username + ":" + password;
         return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }

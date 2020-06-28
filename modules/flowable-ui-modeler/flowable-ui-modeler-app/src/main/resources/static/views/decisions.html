@@ -1,8 +1,8 @@
 <div class="subheader" id="list-header">
 	<div class="fixed-container">
 	    <div class="btn-group pull-right">
-	        <button type="button" class="btn btn-default" ng-click="createDecisionService()" ng-disabled="readOnly" translate>DECISION-TABLES-LIST.ACTION.CREATE-DECISION-SERVICE</button>
-	        <button type="button" class="btn btn-default" ng-click="createDecisionTable()" ng-disabled="readOnly" translate>DECISION-TABLES-LIST.ACTION.CREATE</button>
+	        <button ng-if="model.activeFilter.type === 'decision-services'" type="button" class="btn btn-default" ng-click="createDecisionService()" ng-disabled="readOnly" translate>DECISION-TABLES-LIST.ACTION.CREATE-DECISION-SERVICE</button>
+	        <button ng-if="model.activeFilter.type === 'decision-tables'" type="button" class="btn btn-default" ng-click="createDecisionTable()" ng-disabled="readOnly" translate>DECISION-TABLES-LIST.ACTION.CREATE</button>
 	        <button type="button" class="btn btn-default" ng-click="importDecisionTable()" ng-disabled="readOnly" translate>DECISION-TABLES-LIST.ACTION.IMPORT</button>
 	    </div>
 	    <h2>{{'DECISION-TABLES-LIST.TITLE' | translate}}</h2>
@@ -18,7 +18,9 @@
             </div>
             <ul class="filter-list">
                 <li ng-repeat="filter in model.filters" ng-class="{'current' : filter.id == model.activeFilter.id}">
-                    <a ng-click="activateFilter(filter)">{{'DECISION-TABLES-LIST.FILTER.' + filter.labelKey | translate}}</a>
+                    <a ng-href="#/{{filter.type}}">
+                        {{'DECISION-TABLES-LIST.FILTER.' + filter.labelKey | translate}}
+                    </a>
                 </li>
             </ul>
         </div>

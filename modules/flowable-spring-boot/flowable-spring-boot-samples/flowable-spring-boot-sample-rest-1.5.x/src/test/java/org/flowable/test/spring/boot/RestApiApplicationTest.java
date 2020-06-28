@@ -114,7 +114,7 @@ public class RestApiApplicationTest {
         assertThat(contentItems).isNotNull();
         assertThat(contentItems.getData())
             .isEmpty();
-        assertThat(contentItems.getTotal()).isEqualTo(0);
+        assertThat(contentItems.getTotal()).isZero();
     }
 
     @Test
@@ -133,7 +133,7 @@ public class RestApiApplicationTest {
         assertThat(deployments).isNotNull();
         assertThat(deployments.getData())
             .isEmpty();
-        assertThat(deployments.getTotal()).isEqualTo(0);
+        assertThat(deployments.getTotal()).isZero();
     }
 
     @Test
@@ -152,7 +152,7 @@ public class RestApiApplicationTest {
         assertThat(formDefinitions).isNotNull();
         assertThat(formDefinitions.getData())
             .isEmpty();
-        assertThat(formDefinitions.getTotal()).isEqualTo(0);
+        assertThat(formDefinitions.getTotal()).isZero();
     }
 
     @Test
@@ -171,7 +171,7 @@ public class RestApiApplicationTest {
         assertThat(groups).isNotNull();
         assertThat(groups.getData())
             .extracting(GroupResponse::getId, GroupResponse::getType, GroupResponse::getName, GroupResponse::getUrl)
-            .containsExactlyInAnyOrder(
+            .containsExactly(
                 tuple("user", "security-role", "users", null)
             );
         assertThat(groups.getTotal()).isEqualTo(1);

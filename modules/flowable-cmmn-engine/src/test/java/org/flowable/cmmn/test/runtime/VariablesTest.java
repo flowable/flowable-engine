@@ -64,17 +64,17 @@ public class VariablesTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variablesFromGet.containsKey("stringVar")).isTrue();
-        assertThat(variablesFromGet.get("stringVar")).isEqualTo("Hello World");
-        assertThat(variablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(variablesFromGet).containsKey("stringVar");
+        assertThat(variablesFromGet).containsEntry("stringVar", "Hello World");
+        assertThat(variablesFromGet).containsKey("intVar");
         assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
 
         Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
-        assertThat(variableInstancesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(variableInstancesFromGet).containsKey("stringVar");
         VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
         assertThat(variableInstance.getValue()).isEqualTo("Hello World");
         assertThat(variableInstance.getTypeName()).isEqualTo("string");
-        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
+        assertThat(variableInstancesFromGet).containsKey("intVar");
         variableInstance = variableInstancesFromGet.get("intVar");
         assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(42);
         assertThat(variableInstance.getTypeName()).isEqualTo("integer");
@@ -107,33 +107,33 @@ public class VariablesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "intVar", 21);
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variablesFromGet.containsKey("stringVar")).isTrue();
-        assertThat(variablesFromGet.get("stringVar")).isEqualTo("Hello World");
-        assertThat(variablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(variablesFromGet).containsKey("stringVar");
+        assertThat(variablesFromGet).containsEntry("stringVar", "Hello World");
+        assertThat(variablesFromGet).containsKey("intVar");
         assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
 
         Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
-        assertThat(variableInstancesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(variableInstancesFromGet).containsKey("stringVar");
         VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
         assertThat(variableInstance.getValue()).isEqualTo("Hello World");
         assertThat(variableInstance.getTypeName()).isEqualTo("string");
-        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
+        assertThat(variableInstancesFromGet).containsKey("intVar");
         variableInstance = variableInstancesFromGet.get("intVar");
         assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(42);
         assertThat(variableInstance.getTypeName()).isEqualTo("integer");
 
         Map<String, Object> localVariablesFromGet = cmmnRuntimeService.getLocalVariables(planItemInstance.getId());
-        assertThat(localVariablesFromGet.containsKey("stringVar")).isTrue();
-        assertThat(localVariablesFromGet.get("stringVar")).isEqualTo("Changed value");
-        assertThat(localVariablesFromGet.containsKey("intVar")).isTrue();
+        assertThat(localVariablesFromGet).containsKey("stringVar");
+        assertThat(localVariablesFromGet).containsEntry("stringVar", "Changed value");
+        assertThat(localVariablesFromGet).containsKey("intVar");
         assertThat(((Integer) localVariablesFromGet.get("intVar")).intValue()).isEqualTo(21);
 
         Map<String, VariableInstance> localVariableInstancesFromGet = cmmnRuntimeService.getLocalVariableInstances(planItemInstance.getId());
-        assertThat(localVariableInstancesFromGet.containsKey("stringVar")).isTrue();
+        assertThat(localVariableInstancesFromGet).containsKey("stringVar");
         variableInstance = localVariableInstancesFromGet.get("stringVar");
         assertThat(variableInstance.getValue()).isEqualTo("Changed value");
         assertThat(variableInstance.getTypeName()).isEqualTo("string");
-        assertThat(variableInstancesFromGet.containsKey("intVar")).isTrue();
+        assertThat(variableInstancesFromGet).containsKey("intVar");
         variableInstance = localVariableInstancesFromGet.get("intVar");
         assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(21);
         assertThat(variableInstance.getTypeName()).isEqualTo("integer");
@@ -268,7 +268,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
         // Variables should not be persisted
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -320,7 +320,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate")).isEqualTo("newValue");
+        assertThat(updatedCaseInstance.getCaseVariables()).containsEntry("varToUpdate", "newValue");
     }
 
     @Test
@@ -355,8 +355,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"))
-                .as("resolving variable name expressions does not make sense when it is set locally").isEqualTo("newValue");
+        assertThat(updatedCaseInstance.getCaseVariables())
+                .as("resolving variable name expressions does not make sense when it is set locally")
+                .containsEntry("varToUpdate", "newValue");
     }
 
     @Test
@@ -376,7 +377,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 caseInstanceId(subCaseInstance.getId()).
                 includeCaseVariables().
                 singleResult();
-        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate")).isEqualTo("newValue");
+        assertThat(updatedCaseInstance.getCaseVariables()).containsEntry("varToUpdate", "newValue");
     }
 
     @Test

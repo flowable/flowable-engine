@@ -12,6 +12,9 @@
  */
 package org.flowable.examples.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,50 +51,31 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         variables.put("input", 1);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(3, tasks.size());
-        Map<String, String> expectedMessages = new HashMap<>();
-        expectedMessages.put(TASK1_NAME, TASK1_NAME);
-        expectedMessages.put(TASK2_NAME, TASK2_NAME);
-        expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (org.flowable.task.api.Task task : tasks) {
-            expectedMessages.remove(task.getName());
-        }
-        assertEquals(0, expectedMessages.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(TASK1_NAME, TASK2_NAME, TASK3_NAME);
 
         // Test with input == 2
         variables.put("input", 2);
         pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(2, tasks.size());
-        expectedMessages = new HashMap<>();
-        expectedMessages.put(TASK2_NAME, TASK2_NAME);
-        expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (org.flowable.task.api.Task task : tasks) {
-            expectedMessages.remove(task.getName());
-        }
-        assertEquals(0, expectedMessages.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(TASK2_NAME, TASK3_NAME);
 
         // Test with input == 3
         variables.put("input", 3);
         pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        assertEquals(1, tasks.size());
-        expectedMessages = new HashMap<>();
-        expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (org.flowable.task.api.Task task : tasks) {
-            expectedMessages.remove(task.getName());
-        }
-        assertEquals(0, expectedMessages.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly(TASK3_NAME);
 
         // Test with input == 4
         variables.put("input", 4);
-        try {
-            runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
-            fail();
-        } catch (FlowableException e) {
-            // Exception is expected since no outgoing sequence flow matches
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("inclusiveGateway", variables))
+                .as("Exception is expected since no outgoing sequence flow matches")
+                .isInstanceOf(FlowableException.class);
     }
 
 }

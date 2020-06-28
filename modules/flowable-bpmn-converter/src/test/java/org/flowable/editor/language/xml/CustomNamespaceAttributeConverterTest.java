@@ -55,12 +55,10 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
                 .containsExactly(tuple("http://custom.org/bpmn", "custom", "version", "9"));
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(UserTask.class);
         assertThat(flowElement.getId()).isEqualTo("usertask");
+        assertThat(flowElement.getName()).isEqualTo("User Task");
         UserTask userTask = (UserTask) flowElement;
-        assertThat(userTask.getId()).isEqualTo("usertask");
-        assertThat(userTask.getName()).isEqualTo("User Task");
 
         Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
         assertThat(attributesMap).isNotNull();

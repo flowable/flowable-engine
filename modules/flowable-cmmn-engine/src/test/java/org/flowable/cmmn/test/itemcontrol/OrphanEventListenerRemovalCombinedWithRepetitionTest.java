@@ -87,8 +87,8 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -123,8 +123,8 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "kill Stage A", AVAILABLE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -186,7 +186,7 @@ public class OrphanEventListenerRemovalCombinedWithRepetitionTest extends Flowab
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 }

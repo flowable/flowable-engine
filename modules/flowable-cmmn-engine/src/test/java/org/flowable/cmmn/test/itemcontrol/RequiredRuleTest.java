@@ -177,7 +177,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance.getId()).singleResult();
         assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         assertThat(stagePlanItemInstance.isCompletable()).isTrue();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Making the other task active, should disable the completeable flag again
         cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("nonRequired", true));
@@ -214,7 +214,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertThat(stagePlanItemInstance2.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         assertThat(stagePlanItemInstance2.isCompletable()).isTrue();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompletable().singleResult()).isNotNull();
         cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance2.getId());
@@ -317,7 +317,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
 
         // D is required. But B is still active
         cmmnTaskService.complete(tasks.get(1).getId());
-        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
         cmmnTaskService.complete(tasks.get(0).getId());
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 

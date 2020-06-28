@@ -103,8 +103,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidDeploymentId() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
@@ -127,8 +127,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidDeploymentIds() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isZero();
     }
 
     @Test
@@ -158,8 +158,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionId() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").count()).isZero();
     }
 
     @Test
@@ -182,8 +182,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionIds() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count()).isZero();
     }
 
     @Test
@@ -194,8 +194,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionCategory() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").count()).isZero();
     }
 
     @Test
@@ -206,8 +206,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionCategoryLike() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%n").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%n").count()).isZero();
     }
 
     @Test
@@ -215,8 +215,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").list()).hasSize(4);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").count()).isEqualTo(4);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").count()).isZero();
     }
 
     @Test
@@ -233,8 +233,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionName() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").count()).isZero();
     }
 
     @Test
@@ -245,8 +245,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").list()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").count()).isEqualTo(1);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").count()).isZero();
     }
 
     @Test
@@ -260,8 +260,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionKey() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").count()).isZero();
     }
 
     @Test
@@ -275,8 +275,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionKeyLike() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").count()).isZero();
     }
 
     @Test
@@ -290,8 +290,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).list()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).count()).isZero();
     }
 
     @Test
@@ -299,8 +299,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).list()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).count()).isEqualTo(1);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).count()).isZero();
     }
 
     @Test
@@ -311,8 +311,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).list()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).count()).isEqualTo(1);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).count()).isZero();
     }
 
     @Test
@@ -368,8 +368,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionResourceName() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").count()).isZero();
     }
 
     @Test
@@ -383,8 +383,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidAppDefinitionResourceNameLike() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").list()).hasSize(0);
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").count()).isZero();
     }
 
     @Test

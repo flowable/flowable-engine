@@ -41,7 +41,7 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
     @After
     public void deleteTasks() {
         if (task != null) {
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(0L);
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
             cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
             cmmnTaskService.deleteTask(task.getId());
         }

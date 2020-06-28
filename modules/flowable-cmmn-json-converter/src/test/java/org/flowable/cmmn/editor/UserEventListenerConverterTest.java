@@ -43,12 +43,8 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel cmmnModel) {
         Stage model = cmmnModel.getPrimaryCase().getPlanModel();
-        assertThat(model.getPlanItemDefinitionMap()).hasSize(4);
-
-        assertThat(model.getPlanItemDefinitionMap().get("taskA")).isNotNull();
-        assertThat(model.getPlanItemDefinitionMap().get("taskB")).isNotNull();
-        assertThat(model.getPlanItemDefinitionMap().get("startTaskAUserEvent")).isNotNull();
-        assertThat(model.getPlanItemDefinitionMap().get("stopTaskBUserEvent")).isNotNull();
+        assertThat(model.getPlanItemDefinitionMap())
+                .containsOnlyKeys("taskA", "taskB", "startTaskAUserEvent", "stopTaskBUserEvent");
 
         Map<String, Sentry> sentries = model.getSentries().stream()
                 .collect(Collectors.toMap(Sentry::getName, Function.identity(), (s1, s2) -> s1));

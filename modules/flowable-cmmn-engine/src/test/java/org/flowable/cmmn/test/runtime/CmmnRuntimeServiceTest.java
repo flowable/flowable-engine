@@ -80,7 +80,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
             }
         });
         
-        assertThat(planItemInstances.size()).isEqualTo(1);
+        assertThat(planItemInstances).hasSize(1);
         assertThat(planItemInstances.get(0).getPlanItemDefinitionId()).isEqualTo("theTask");
 
         // default values for callbacks are null
@@ -151,10 +151,10 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
         assertThat(caseInstance).isNotNull();
         assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count())
-                .as("Plan items are created asynchronously").isEqualTo(0l);
+                .as("Plan items are created asynchronously").isZero();
 
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200, true);
-        assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1l);
+        assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
     }
 
     @Test

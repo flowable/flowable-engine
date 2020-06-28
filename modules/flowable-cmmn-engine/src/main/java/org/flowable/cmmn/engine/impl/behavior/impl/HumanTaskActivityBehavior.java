@@ -51,6 +51,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -314,18 +316,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             for (String candidateUser : candidateUsers) {
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(planItemInstanceEntity);
-                List<IdentityLinkEntity> identityLinkEntities = null;
-                if (value instanceof String) {
-                    List<String> candidates = extractCandidates((String) value);
-                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
+                Collection<String> candidates = extractCandidates(value);
+                List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
 
-                } else if (value instanceof Collection) {
-                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), (Collection) value);
-
-                } else {
-                    throw new FlowableException("Expression did not resolve to a string or collection of strings");
-                }
-                
                 if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                     IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
                     allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -352,18 +345,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             for (String candidateGroup : candidateGroups) {
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(planItemInstanceEntity);
-                List<IdentityLinkEntity> identityLinkEntities = null;
-                if (value instanceof String) {
-                    List<String> candidates = extractCandidates((String) value);
-                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
+                Collection<String> candidates = extractCandidates(value);
+                List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
 
-                } else if (value instanceof Collection) {
-                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), (Collection) value);
-
-                } else {
-                    throw new FlowableIllegalArgumentException("Expression did not resolve to a string or collection of strings");
-                }
-                
                 if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                     IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
                     allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -380,8 +364,24 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
     }
 
-    protected List<String> extractCandidates(String str) {
-        return Arrays.asList(str.split("[\\s]*,[\\s]*"));
+    protected Collection<String> extractCandidates(Object value) {
+        if (value instanceof String) {
+            return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
+
+        } else if (value instanceof Collection) {
+            return (Collection<String>) value;
+
+        } else if (value instanceof ArrayNode) {
+            ArrayNode valueArrayNode = (ArrayNode) value;
+            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
+            for (JsonNode node : valueArrayNode) {
+                candidates.add(node.asText());
+            }
+
+            return candidates;
+        } else {
+            throw new FlowableException("Expression did not resolve to a string, collection of strings or an array node");
+        }
     }
 
     @Override

@@ -19,11 +19,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
+import org.flowable.content.api.ContentObjectStorageMetadata;
 import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
@@ -81,7 +83,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             }
 
             ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
-            ContentObject createContentObject = contentStorage.createContentObject(inputStream, metaData);
+            ContentObject createContentObject = contentStorage.createContentObject(inputStream, new ContentItemContentObjectMetadata());
             contentItemEntity.setContentStoreId(createContentObject.getId());
             contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
             contentItemEntity.setContentAvailable(true);
@@ -108,6 +110,51 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
         }
 
         return null;
+    }
+
+    protected class ContentItemContentObjectMetadata implements ContentObjectStorageMetadata {
+
+        @Override
+        public String getName() {
+            return contentItem.getName();
+        }
+
+        @Override
+        public String getScopeId() {
+            if (contentItem.getTaskId() != null) {
+                return contentItem.getTaskId();
+            } else if (contentItem.getProcessInstanceId() != null) {
+                return contentItem.getProcessInstanceId();
+            } else {
+                return contentItem.getScopeId();
+            }
+        }
+
+        @Override
+        public String getScopeType() {
+            if (contentItem.getTaskId() != null) {
+                return ScopeTypes.TASK;
+            } else if (contentItem.getProcessInstanceId() != null) {
+                return ScopeTypes.BPMN;
+            } else {
+                return contentItem.getScopeType();
+            }
+        }
+
+        @Override
+        public String getMimeType() {
+            return contentItem.getMimeType();
+        }
+
+        @Override
+        public String getTenantId() {
+            return contentItem.getTenantId();
+        }
+
+        @Override
+        public Object getStoredObject() {
+            return contentItem;
+        }
     }
 
 }

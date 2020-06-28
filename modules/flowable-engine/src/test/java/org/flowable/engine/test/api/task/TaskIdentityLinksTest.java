@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +29,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tom Baeyens
@@ -431,6 +438,54 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 assertEquals("kermit", userId);
             }
         }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLinkExpression.bpmn20.xml")
+    public void testCustomIdentityLinkCollectionExpression() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("customIdentityLink")
+                .transientVariable("userVar", Arrays.asList("kermit", "gonzo"))
+                .transientVariable("groupVar", Arrays.asList("management", "sales"))
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(taskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple("businessAdministrator", "kermit", null),
+                        tuple("businessAdministrator", "gonzo", null),
+                        tuple("businessAdministrator", null, "management"),
+                        tuple("businessAdministrator", null, "sales")
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLinkExpression.bpmn20.xml")
+    public void testCustomIdentityLinkArrayNodeExpression() {
+        ArrayNode userVar = processEngineConfiguration.getObjectMapper().createArrayNode();
+        userVar.add("kermit").add("gonzo");
+        ArrayNode groupVar = processEngineConfiguration.getObjectMapper().createArrayNode();
+        groupVar.add("management").add("sales");
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("customIdentityLink")
+                .variable("userVar", userVar)
+                .variable("groupVar", groupVar)
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(taskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple("businessAdministrator", "kermit", null),
+                        tuple("businessAdministrator", "gonzo", null),
+                        tuple("businessAdministrator", null, "management"),
+                        tuple("businessAdministrator", null, "sales")
+                );
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,

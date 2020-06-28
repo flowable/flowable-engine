@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cfg.executioncount;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -126,8 +128,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         // Validate (cause this tended to be screwed up)
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-            Assert.assertNotNull(historicActivityInstance.getStartTime());
-            Assert.assertNotNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getStartTime()).isNotNull();
+            assertThat(historicActivityInstance.getEndTime()).isNotNull();
         }
 
         FlowableProfiler.getInstance().reset();
@@ -136,7 +138,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
-        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
+        assertThat(runtimeService.createActivityInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -155,8 +157,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -175,8 +177,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -195,8 +197,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -214,8 +216,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -233,8 +235,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -253,8 +255,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -273,8 +275,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "HistoricVariableInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -308,8 +310,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                             "Bulk-delete-deleteTasksByExecutionId", 1L,
                             "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -614,35 +616,39 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 System.out.println(command);
             }
         }
-        Assert.assertEquals(commands.length, allStats.size());
+        assertThat(allStats).hasSameSizeAs(commands);
 
         for (String command : commands) {
-            Assert.assertNotNull("Could not get stats for " + command, getStatsForCommand(command, allStats));
+            assertThat(getStatsForCommand(command, allStats)).as("Could not get stats for " + command).isNotNull();
         }
     }
 
     protected void assertDatabaseSelects(String commandClass, Object... expectedSelects) {
         CommandStats stats = getStats(commandClass);
 
-        Assert.assertEquals("Unexpected number of database selects for " + commandClass + ". ", expectedSelects.length / 2, stats.getDbSelects().size());
+        assertThat(stats.getDbSelects()).as("Unexpected number of database selects for " + commandClass + ". ").hasSize(expectedSelects.length / 2);
 
         for (int i = 0; i < expectedSelects.length; i += 2) {
             String dbSelect = (String) expectedSelects[i];
             Long count = (Long) expectedSelects[i + 1];
 
-            Assert.assertEquals("Wrong select count for " + dbSelect, count, stats.getDbSelects().get(dbSelect));
+            assertThat(stats.getDbSelects())
+                    .as("Wrong select count for " + dbSelect)
+                    .containsEntry(dbSelect, count);
         }
     }
 
     protected void assertDatabaseUpdates(String commandClass, Object... expectedUpdates) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals("Unexpected number of database updates for " + commandClass + ". ", expectedUpdates.length / 2, stats.getDbUpdates().size());
+        assertThat(stats.getDbUpdates()).as("Unexpected number of database updates for " + commandClass + ". ").hasSize(expectedUpdates.length / 2);
 
         for (int i = 0; i < expectedUpdates.length; i += 2) {
             String dbUpdate = (String) expectedUpdates[i];
             Long count = (Long) expectedUpdates[i + 1];
 
-            Assert.assertEquals("Wrong update count for " + dbUpdate, count, stats.getDbUpdates().get(dbUpdate));
+            assertThat(stats.getDbUpdates())
+                    .as("Wrong update count for " + dbUpdate)
+                    .containsEntry(dbUpdate, count);
         }
     }
 
@@ -657,7 +663,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             String dbInsert = (String) expectedInserts[i];
             Long count = (Long) expectedInserts[i + 1];
 
-            Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get(getQualifiedClassName(dbInsert)));
+            assertThat(stats.getDbInserts())
+                    .as("Insert count for " + dbInsert + " not correct")
+                    .containsEntry(getQualifiedClassName(dbInsert), count);
         }
     }
 
@@ -672,13 +680,15 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             String dbDelete = (String) expectedDeletes[i];
             Long count = (Long) expectedDeletes[i + 1];
 
-            Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get(getQualifiedClassName(dbDelete)));
+            assertThat(stats.getDbDeletes())
+                    .as("Delete count count for " + dbDelete + " not correct")
+                    .containsEntry(getQualifiedClassName(dbDelete), count);
         }
     }
 
     protected void assertNoInserts(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbInserts().size());
+        assertThat(stats.getDbInserts()).isEmpty();
     }
 
     protected void assertNoUpdatesAndDeletes(String commandClass) {
@@ -688,12 +698,12 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected void assertNoDeletes(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbDeletes().size());
+        assertThat(stats.getDbDeletes()).isEmpty();
     }
 
     protected void assertNoUpdates(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbUpdates().size());
+        assertThat(stats.getDbUpdates()).isEmpty();
     }
 
     protected CommandStats getStats(String commandClass) {

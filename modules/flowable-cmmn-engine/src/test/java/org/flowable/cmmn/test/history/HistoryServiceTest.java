@@ -48,23 +48,23 @@ public class HistoryServiceTest extends FlowableCmmnTestCase {
                 .start();
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var1", "test").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var1", "test2").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var1", "test2").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var1", "TEST").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var1", "TEST2").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var1", "TEST2").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var1", "te%").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var1", "te2%").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLike("var1", "te2%").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var1", "TE%").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var1", "TE2%").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLikeIgnoreCase("var1", "TE2%").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("var2", 5).count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("var2", 11).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueGreaterThan("var2", 11).count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("var2", 11).count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("var2", 8).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueLessThan("var2", 8).count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableExists("var1").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableExists("var3").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableExists("var3").count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableNotExists("var3").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableNotExists("var1").count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableNotExists("var1").count()).isZero();
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -100,7 +100,7 @@ public class HistoryServiceTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("startVar", "test").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("changeVar", 11).count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("changeVar", 10).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("changeVar", 10).count()).isZero();
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -110,7 +110,7 @@ public class HistoryServiceTest extends FlowableCmmnTestCase {
         assertThat(planItemInstance.getName()).isEqualTo("Task B");
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test

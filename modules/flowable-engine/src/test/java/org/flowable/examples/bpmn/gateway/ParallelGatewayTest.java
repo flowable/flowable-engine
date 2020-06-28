@@ -13,11 +13,14 @@
 
 package org.flowable.examples.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
@@ -34,20 +37,19 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
 
         List<org.flowable.task.api.Task> tasks = query.list();
-        assertEquals(2, tasks.size());
         // the tasks are ordered by name (see above)
-        org.flowable.task.api.Task task1 = tasks.get(0);
-        assertEquals("Receive Payment", task1.getName());
-        org.flowable.task.api.Task task2 = tasks.get(1);
-        assertEquals("Ship Order", task2.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Receive Payment", "Ship Order");
 
         // Completing both tasks will join the concurrent executions
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
 
         tasks = query.list();
-        assertEquals(1, tasks.size());
-        assertEquals("Archive Order", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Archive Order");
     }
 
     @Test
@@ -58,30 +60,26 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
 
         List<org.flowable.task.api.Task> tasks = query.list();
-        assertEquals(3, tasks.size());
         // the tasks are ordered by name (see above)
-        org.flowable.task.api.Task task1 = tasks.get(0);
-        assertEquals("Task 1", task1.getName());
-        org.flowable.task.api.Task task2 = tasks.get(1);
-        assertEquals("Task 2", task2.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 1", "Task 2", "Task 3");
 
         // Completing the first task should *not* trigger the join
-        taskService.complete(task1.getId());
+        taskService.complete(tasks.get(0).getId());
 
         // Completing the second task should trigger the first join
-        taskService.complete(task2.getId());
+        taskService.complete(tasks.get(1).getId());
 
         tasks = query.list();
-        org.flowable.task.api.Task task3 = tasks.get(0);
-        assertEquals(2, tasks.size());
-        assertEquals("Task 3", task3.getName());
-        org.flowable.task.api.Task task4 = tasks.get(1);
-        assertEquals("Task 4", task4.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 3", "Task 4");
 
         // Completing the remaining tasks should trigger the second join and end
         // the process
-        taskService.complete(task3.getId());
-        taskService.complete(task4.getId());
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
 
         assertProcessEnded(pi.getId());
     }

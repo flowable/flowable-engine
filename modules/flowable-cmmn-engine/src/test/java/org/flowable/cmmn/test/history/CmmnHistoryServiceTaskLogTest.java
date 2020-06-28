@@ -590,7 +590,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries)
                     .extracting(HistoricTaskLogEntry::getTaskId)
                     .containsExactly(task.getId());
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1l);
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1);
         } finally {
             deleteTaskWithLogEntries(anotherTask.getId());
         }
@@ -802,7 +802,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                     .extracting(HistoricTaskLogEntry::getTaskId)
                     .containsExactly(anotherTask.getId(), task.getId(), task.getId());
 
-            assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3l);
+            assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3);
 
             List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries).hasSize(1);
@@ -858,10 +858,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             cmmnRepositoryService.deleteDeployment(cmmnRepositoryService.createCaseDefinitionQuery()
                     .caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getDeploymentId(), true);
 
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count())
-                    .isEqualTo(0);
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count())
-                    .isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count()).isZero();
         }
     }
 

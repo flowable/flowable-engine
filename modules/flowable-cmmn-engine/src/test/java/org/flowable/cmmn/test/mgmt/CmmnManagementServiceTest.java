@@ -48,14 +48,14 @@ public class CmmnManagementServiceTest extends FlowableCmmnTestCase {
             return suspendedJobEntity;
         });
 
-        assertThat(cmmnManagementService.createJobQuery().count()).isEqualTo(0);
+        assertThat(cmmnManagementService.createJobQuery().count()).isZero();
         assertThat(cmmnManagementService.createSuspendedJobQuery().count()).isEqualTo(1);
 
         Job executableJob = cmmnManagementService.moveSuspendedJobToExecutableJob(jobEntity.getId());
         assertThat(executableJob).isNotNull();
 
         assertThat(cmmnManagementService.createJobQuery().count()).isEqualTo(1);
-        assertThat(cmmnManagementService.createSuspendedJobQuery().count()).isEqualTo(0);
+        assertThat(cmmnManagementService.createSuspendedJobQuery().count()).isZero();
     }
 
 }

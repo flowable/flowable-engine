@@ -121,6 +121,6 @@ public class JpaApplicationTest {
         taskService.complete(reviewTask.getId(), Collections.singletonMap("approved", true));
 
         assertThat(runtimeService.createProcessInstanceQuery().count())
-            .isEqualTo(0);
+            .isZero();
     }
 }

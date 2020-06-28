@@ -15,9 +15,9 @@
 'use strict';
 
 angular.module('flowableModeler')
-    .controller('DecisionTablesController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
+    .controller('DecisionsController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', 'modelType', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, modelType) {
 
-        $rootScope.setMainPageById('decision-tables');
+        $rootScope.setMainPageById('decisions');
         $rootScope.decisionTableItems = undefined;
 
         // get latest thumbnails
@@ -25,8 +25,8 @@ angular.module('flowableModeler')
 
         $scope.model = {
             filters: [
-                {id: 'decisionTables', labelKey: 'DECISION-TABLES'},
-                {id: 'decisionServices', labelKey: 'DECISION-SERVICES'}
+                {id: 'decisionTables', labelKey: 'DECISION-TABLES', type: 'decision-tables'},
+                {id: 'decisionServices', labelKey: 'DECISION-SERVICES', type: 'decision-services'}
             ],
 
             sorts: [
@@ -37,38 +37,18 @@ angular.module('flowableModeler')
             ]
         };
 
-        if ($rootScope.decisionFilter) {
-            $scope.model.activeFilter = $rootScope.decisionFilter.filter;
-            $scope.model.activeSort = $rootScope.decisionFilter.sort;
-            $scope.model.filterText = $rootScope.decisionFilter.filterText;
-            $scope.model.pendingFilterText = $scope.model.filterText; // The search textfield uses this
-
+        if (modelType && modelType === 6) {
+            $scope.model.activeFilter = $scope.model.filters[1];
+            $scope.model.activeSort = $scope.model.sorts[0];
+            $rootScope.decisionFilter = $scope.model.activeFilter;
         } else {
-            // By default, show first filter and use first sort
             $scope.model.activeFilter = $scope.model.filters[0];
             $scope.model.activeSort = $scope.model.sorts[0];
-            $rootScope.decisionFilter = {
-                filter: $scope.model.activeFilter,
-                sort: $scope.model.activeSort,
-                filterText: ''
-            };
+            $rootScope.decisionFilter = $scope.model.activeFilter;
         }
-
-        $scope.activateFilter = function (filter) {
-            $scope.model.activeFilter = filter;
-            $rootScope.decisionFilter.filter = filter;
-
-            if (filter && filter.id === 'decisionTables') {
-                $scope.loadDecisionTables();
-            } else {
-                $scope.loadDecisionServices();
-            }
-        };
 
         $scope.activateSort = function (sort) {
             $scope.model.activeSort = sort;
-            $rootScope.decisionFilter.sort = sort;
-            $scope.loadDecisionTables();
         };
 
         $scope.importDecisionTable = function () {
@@ -187,7 +167,7 @@ angular.module('flowableModeler')
             if (decision) {
                 $rootScope.editorHistory = [];
                 if (decision.modelType === 4) {
-                    $location.url("/decision-table-editor/" + encodeURIComponent(decision.id));
+                    $location.url("/decision-table-editor/" + eFncodeURIComponent(decision.id));
                 } else if (decision.modelType === 6) {
                     $location.url("/decision-service-editor/" + encodeURIComponent(decision.id));
                 }
@@ -195,8 +175,8 @@ angular.module('flowableModeler')
         };
 
         if ($rootScope.decisionFilter &&
-			$rootScope.decisionFilter.filter &&
-			$rootScope.decisionFilter.filter.id === 'decisionServices') {
+			$rootScope.decisionFilter &&
+			$rootScope.decisionFilter.id === 'decisionServices') {
             $scope.loadDecisionServices();
         } else {
 			$scope.loadDecisionTables();

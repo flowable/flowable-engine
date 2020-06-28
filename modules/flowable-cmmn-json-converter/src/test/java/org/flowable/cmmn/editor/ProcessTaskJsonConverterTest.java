@@ -46,7 +46,6 @@ public class ProcessTaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planItem.getId()).isEqualTo("planItem1");
         assertThat(planItem.getName()).isEqualTo("processTaskName");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
         ProcessTask processTask = (ProcessTask) planItemDefinition;
         assertThat(processTask.getId()).isEqualTo("sid-5E1BEB30-72F7-463C-A1CB-77F000CA7E0F");

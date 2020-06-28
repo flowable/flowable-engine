@@ -33,7 +33,7 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
 
-            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -60,11 +60,11 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             processEngineTaskService.complete(task2.getId());
 
-            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isEqualTo(0);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isZero();
 
             cmmnTaskService.complete(cmmnTask.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
@@ -83,7 +83,7 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             CaseInstance anotherCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
 
-            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -120,11 +120,11 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             processEngineTaskService.complete(task2.getId());
 
-            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isEqualTo(0);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isZero();
 
             cmmnTaskService.complete(cmmnTask.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
@@ -141,7 +141,7 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
 
-            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -168,11 +168,11 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             processEngineTaskService.complete(task2.getId());
 
-            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isEqualTo(0);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isZero();
 
             cmmnTaskService.complete(cmmnTask.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
@@ -191,7 +191,7 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             CaseInstance anotherCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
 
-            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
@@ -220,11 +220,11 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             processEngineTaskService.complete(task2.getId());
 
-            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isEqualTo(0);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isZero();
 
             cmmnTaskService.complete(cmmnTask.getId());
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
             assertThat(anotherEventSubscription.getEventName()).isEqualTo("testSignal");
@@ -249,16 +249,16 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertThat(task).isNotNull();
 
-            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
 
             cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
 
-            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isEqualTo(0);
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).count()).isZero();
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);

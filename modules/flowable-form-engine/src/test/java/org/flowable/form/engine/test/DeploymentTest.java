@@ -12,6 +12,7 @@
  */
 package org.flowable.form.engine.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -55,7 +56,6 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = repositoryService.getFormModelByKey("form1");
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields()).hasSize(1);
         assertThat(formModel.getFields())
             .extracting(FormField::getId, FormField::getName)
             .containsExactly(tuple("input1", "Input1"));
@@ -74,7 +74,6 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         formInfo = repositoryService.getFormModelByKey("form1");
         formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields()).hasSize(1);
         assertThat(formModel.getFields())
             .extracting(FormField::getId, FormField::getName)
             .containsExactly(tuple("input2", "Input2"));
@@ -87,8 +86,6 @@ public class DeploymentTest extends AbstractFlowableFormTest {
             "org/flowable/form/engine/test/deployment/form_with_dates.form" })
     public void deploy2Forms() {
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
-        assertThat(formDefinitions).hasSize(2);
-
         assertThat(formDefinitions)
             .extracting(FormDefinition::getName)
             .containsExactly("My date form", "My first form");
@@ -145,8 +142,13 @@ public class DeploymentTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         assertThat(formService.createFormInstanceQuery().count()).isOne();
         repositoryService.deleteDeployment(deployment.getId(), true);
@@ -166,8 +168,13 @@ public class DeploymentTest extends AbstractFlowableFormTest {
         FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
         assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-        assertThat(formNode.get("values").get("input1").asText()).isEqualTo("test");
-        assertThat(formNode.get("flowable_form_outcome").asText()).isEqualTo("default");
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
 
         assertThat(formService.createFormInstanceQuery().count()).isOne();
 

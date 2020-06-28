@@ -56,7 +56,6 @@ public class TaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planItem.getName()).isEqualTo("shareniu_task");
 
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(Task.class);
 
         Task task = (Task) planItemDefinition;
@@ -70,7 +69,6 @@ public class TaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planItem2.getName()).isEqualTo("shareniu_human_task");
 
         PlanItemDefinition planItemDefinition2 = planItem2.getPlanItemDefinition();
-        assertThat(planItemDefinition2).isNotNull();
         assertThat(planItemDefinition2).isInstanceOf(HumanTask.class);
 
         HumanTask humanTask = (HumanTask) planItemDefinition2;

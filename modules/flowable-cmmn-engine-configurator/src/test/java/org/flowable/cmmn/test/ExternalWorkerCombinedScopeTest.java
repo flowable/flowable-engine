@@ -45,7 +45,7 @@ public class ExternalWorkerCombinedScopeTest extends AbstractProcessEngineIntegr
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ExternalWorkerCombinedScopeTest.simpleCase.cmmn")
     public void testSimpleCombined() {
-        Deployment deployment = processEngineRepositoryService.createDeployment()
+        processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/ExternalWorkerCombinedScopeTest.simpleProcess.bpmn20.xml")
                 .deploy();
 

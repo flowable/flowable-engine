@@ -204,6 +204,14 @@ public class AllEnginesAutoConfigurationTest {
             assertThat(formEngineConfiguration.getExpressionManager()).isInstanceOf(SpringFormExpressionManager.class);
             assertThat(formEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
 
+            assertThat(cmmnEngineConfiguration.isDisableEventRegistry()).isTrue();
+            assertThat(cmmnEngineConfiguration.getEventRegistryConfigurator()).isNull();
+            assertThat(processEngineConfiguration.isDisableEventRegistry()).isTrue();
+            assertThat(processEngineConfiguration.getEventRegistryConfigurator()).isNull();
+            assertThat(appEngineConfiguration.getEventRegistryConfigurator())
+                    .as("AppEngineConfiguration eventEngineConfiguration")
+                    .isSameAs(eventConfigurator);
+
             deleteDeployments(context.getBean(AppEngine.class));
             deleteDeployments(context.getBean(CmmnEngine.class));
             deleteDeployments(context.getBean(DmnEngine.class));
@@ -225,8 +233,8 @@ public class AllEnginesAutoConfigurationTest {
             TaskService taskService = processEngineConfiguration.getTaskService();
 
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(0);
-            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
@@ -243,8 +251,8 @@ public class AllEnginesAutoConfigurationTest {
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
 
-            assertThat(taskService.createTaskQuery().count()).isEqualTo(0);
-            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+            assertThat(taskService.createTaskQuery().count()).isZero();
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
             planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())

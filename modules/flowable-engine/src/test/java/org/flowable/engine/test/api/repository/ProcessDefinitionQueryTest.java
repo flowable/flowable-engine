@@ -13,11 +13,14 @@
 
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -28,6 +31,8 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -58,23 +63,16 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().orderByProcessDefinitionVersion().asc()
                 .orderByProcessDefinitionCategory().asc().list();
 
-        ProcessDefinition processDefinition = processDefinitions.get(0);
-        assertEquals("one", processDefinition.getKey());
-        assertEquals("One", processDefinition.getName());
-        assertTrue(processDefinition.getId().startsWith("one:1"));
-        assertEquals("Examples", processDefinition.getCategory());
-
-        processDefinition = processDefinitions.get(1);
-        assertEquals("one", processDefinition.getKey());
-        assertEquals("One", processDefinition.getName());
-        assertTrue(processDefinition.getId().startsWith("one:2"));
-        assertEquals("Examples", processDefinition.getCategory());
-
-        processDefinition = processDefinitions.get(2);
-        assertEquals("two", processDefinition.getKey());
-        assertEquals("Two", processDefinition.getName());
-        assertTrue(processDefinition.getId().startsWith("two:1"));
-        assertEquals("Examples2", processDefinition.getCategory());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey, ProcessDefinition::getName, ProcessDefinition::getCategory)
+                .containsExactly(
+                        tuple("one", "One", "Examples"),
+                        tuple("one", "One", "Examples"),
+                        tuple("two", "Two", "Examples2")
+                );
+        assertThat(processDefinitions.get(0).getId()).startsWith("one:1");
+        assertThat(processDefinitions.get(1).getId()).startsWith("one:2");
+        assertThat(processDefinitions.get(2).getId()).startsWith("two:1");
     }
 
     @Test
@@ -88,11 +86,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().deploymentId("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().deploymentId(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().deploymentId(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -109,11 +104,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionName("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().processDefinitionName(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionName(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -144,11 +136,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().processDefinitionKey(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionKey(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -162,11 +151,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -198,17 +184,11 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(3);
         verifyQueryResults(query, 0);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list())
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list())
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -269,35 +249,31 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         // Typical use case
         query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().orderByProcessDefinitionVersion().desc();
         List<ProcessDefinition> processDefinitions = query.list();
-        assertEquals(3, processDefinitions.size());
-
-        assertEquals("one", processDefinitions.get(0).getKey());
-        assertEquals(2, processDefinitions.get(0).getVersion());
-        assertEquals("one", processDefinitions.get(1).getKey());
-        assertEquals(1, processDefinitions.get(1).getVersion());
-        assertEquals("two", processDefinitions.get(2).getKey());
-        assertEquals(1, processDefinitions.get(2).getVersion());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey, ProcessDefinition::getVersion)
+                .containsExactly(
+                        tuple("one", 2),
+                        tuple("one", 1),
+                        tuple("two", 1)
+                );
     }
 
     private void verifyQueryResults(ProcessDefinitionQuery query, int countExpected) {
-        assertEquals(countExpected, query.list().size());
-        assertEquals(countExpected, query.count());
+        assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {
-            assertNotNull(query.singleResult());
+            assertThat(query.singleResult()).isNotNull();
         } else if (countExpected > 1) {
             verifySingleResultFails(query);
         } else if (countExpected == 0) {
-            assertNull(query.singleResult());
+            assertThat(query.singleResult()).isNull();
         }
     }
 
     private void verifySingleResultFails(ProcessDefinitionQuery query) {
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -305,31 +281,31 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/processWithNewBookingMessage.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/repository/processWithNewInvoiceMessage.bpmn20.xml").deploy();
 
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("newInvoiceMessage").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("newInvoiceMessage").count()).isEqualTo(1);
 
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("newBookingMessage").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("newBookingMessage").count()).isEqualTo(1);
 
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("bogus").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().messageEventSubscriptionName("bogus").count()).isZero();
 
         repositoryService.deleteDeployment(deployment.getId());
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinition.class, false));
-        assertEquals("ACT_RE_PROCDEF", managementService.getTableName(ProcessDefinitionEntity.class, false));
+        assertThat(managementService.getTableName(ProcessDefinition.class, false)).isEqualTo("ACT_RE_PROCDEF");
+        assertThat(managementService.getTableName(ProcessDefinitionEntity.class, false)).isEqualTo("ACT_RE_PROCDEF");
         String tableName = managementService.getTableName(ProcessDefinition.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 
-        assertEquals(3, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).list().size());
+        assertThat(repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).list()).hasSize(3);
 
-        assertEquals(3, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql + " where KEY_ like #{key}").parameter("key", "%o%").list().size());
+        assertThat(repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql + " where KEY_ like #{key}").parameter("key", "%o%").list()).hasSize(3);
 
-        assertEquals(2, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql + " where NAME_ = #{name}").parameter("name", "One").list().size());
+        assertThat(repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql + " where NAME_ = #{name}").parameter("name", "One").list()).hasSize(2);
 
         // paging
-        assertEquals(2, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(2, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).listPage(1, 3).size());
+        assertThat(repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
+        assertThat(repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(2);
     }
 
     @Test
@@ -341,9 +317,9 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         }
 
         List<ProcessDefinition> queryResults = repositoryService.createProcessDefinitionQuery().processDefinitionIds(ids).list();
-        assertEquals(queryResults.size(), ids.size());
+        assertThat(ids).hasSameSizeAs(queryResults);
         for (ProcessDefinition processDefinition : queryResults) {
-            assertTrue(ids.contains(processDefinition.getId()));
+            assertThat(ids).contains(processDefinition.getId());
         }
     }
 
@@ -357,16 +333,16 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
                 .processDefinitionKey("localizedProcess")
                 .singleResult();
 
-        assertEquals("A localized process", processDefinition.getName());
-        assertEquals("This a process that can be localized", processDefinition.getDescription());
+        assertThat(processDefinition.getName()).isEqualTo("A localized process");
+        assertThat(processDefinition.getDescription()).isEqualTo("This a process that can be localized");
 
         processDefinition = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey("localizedProcess")
                 .locale("es")
                 .singleResult();
 
-        assertEquals("Nombre del proceso", processDefinition.getName());
-        assertEquals("Descripción del proceso", processDefinition.getDescription());
+        assertThat(processDefinition.getName()).isEqualTo("Nombre del proceso");
+        assertThat(processDefinition.getDescription()).isEqualTo("Descripción del proceso");
 
         ObjectNode infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinition.getId());
         dynamicBpmnService.changeLocalizationName("en-GB", "localizedProcess", "The process name in 'en-GB'", infoNode);
@@ -378,8 +354,8 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
                 .locale("en-GB")
                 .singleResult();
 
-        assertEquals("The process name in 'en-GB'", processDefinition.getName());
-        assertEquals("The process description in 'en-GB'", processDefinition.getDescription());
+        assertThat(processDefinition.getName()).isEqualTo("The process name in 'en-GB'");
+        assertThat(processDefinition.getDescription()).isEqualTo("The process description in 'en-GB'");
 
         repositoryService.deleteDeployment(deployment.getId());
     }

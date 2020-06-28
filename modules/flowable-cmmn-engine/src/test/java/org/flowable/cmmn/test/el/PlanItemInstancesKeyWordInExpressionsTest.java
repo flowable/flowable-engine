@@ -264,7 +264,7 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count()).isZero();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("A");
@@ -295,7 +295,7 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
 
         // The user event listeners should not be active after start
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
-                .planItemInstanceStateAvailable().count()).isEqualTo(0);
+                .planItemInstanceStateAvailable().count()).isZero();
 
         // Starting the human tasks should make the user event listeners available
         cmmnRuntimeService.startPlanItemInstance(
@@ -316,7 +316,7 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
 
         cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().name("cancel 2").singleResult().getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
-                .planItemInstanceStateAvailable().count()).isEqualTo(0);
+                .planItemInstanceStateAvailable().count()).isZero();
 
     }
 

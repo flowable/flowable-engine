@@ -19,6 +19,10 @@ FLOWABLE.TOOLBAR.ACTIONS.closeEditor =  function(services) {
             services.$location.path("/casemodels");
             return;
         }
+        if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('dmn1.2') !== -1) {
+            services.$location.path("/decision-services");
+            return;
+        }
     }
 	services.$location.path("/processes");
 };
