@@ -64,7 +64,7 @@ public class ProgrammaticBeanLookupTest {
     public void testLookupBean() {
         deployer.deploy("normal");
         Object lookup = ProgrammaticBeanLookup.lookup("testOnly");
-        assertThat(lookup.getClass().isAssignableFrom(TestBean.class));
+        assertThat(lookup.getClass().isAssignableFrom(TestBean.class)).isTrue();
         deployer.undeploy("normal");
     }
 
