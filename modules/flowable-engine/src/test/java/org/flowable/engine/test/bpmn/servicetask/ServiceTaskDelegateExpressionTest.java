@@ -64,17 +64,17 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
                 assertThat(activityInstances).hasSize(5);
                 Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
-                assertThat(activityInstanceMap.containsKey("theStart")).isTrue();
+                assertThat(activityInstanceMap).containsKey("theStart");
                 assertThat(activityInstanceMap.get("theStart")).hasSize(1);
                 assertThat(activityInstanceMap.get("theStart").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("theStart").get(0).getTransactionOrder()).isEqualTo(1);
                 
-                assertThat(activityInstanceMap.containsKey("service1")).isTrue();
+                assertThat(activityInstanceMap).containsKey("service1");
                 assertThat(activityInstanceMap.get("service1")).hasSize(1);
                 assertThat(activityInstanceMap.get("service1").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("service1").get(0).getTransactionOrder()).isEqualTo(3);
                 
-                assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
+                assertThat(activityInstanceMap).containsKey("usertask1");
                 assertThat(activityInstanceMap.get("usertask1")).hasSize(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNull();
                 assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
@@ -101,12 +101,12 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
                 assertThat(activityInstances).hasSize(7);
                 Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
-                assertThat(activityInstanceMap.containsKey("usertask1")).isTrue();
+                assertThat(activityInstanceMap).containsKey("usertask1");
                 assertThat(activityInstanceMap.get("usertask1")).hasSize(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
                 
-                assertThat(activityInstanceMap.containsKey("theEnd")).isTrue();
+                assertThat(activityInstanceMap).containsKey("theEnd");
                 assertThat(activityInstanceMap.get("theEnd")).hasSize(1);
                 assertThat(activityInstanceMap.get("theEnd").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("theEnd").get(0).getTransactionOrder()).isEqualTo(2);
