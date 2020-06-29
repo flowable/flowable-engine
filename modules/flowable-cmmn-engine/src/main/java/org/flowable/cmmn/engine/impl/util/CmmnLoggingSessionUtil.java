@@ -243,6 +243,9 @@ public class CmmnLoggingSessionUtil {
     }
     
     protected static void fillScopeDefinitionInfo(String caseDefinitionId, ObjectNode loggingNode) {
+        if(!loggingNode.has("scopeDefinitionId")) {
+            loggingNode.put("scopeDefinitionId", caseDefinitionId);
+        }
         CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
         loggingNode.put("scopeDefinitionKey", caseDefinition.getKey());
         loggingNode.put("scopeDefinitionName", caseDefinition.getName());
