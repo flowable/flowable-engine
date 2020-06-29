@@ -996,7 +996,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(processInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+        assertThat(processInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
 
         managementService.executeCommand(new ClearProcessInstanceLockTimesCmd(processEngineConfiguration.getAsyncExecutor().getLockOwner()));
 
@@ -1006,7 +1006,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(processInstance.getLockTime()).isEqualTo(acquiredJob.getLockExpirationTime());
+        assertThat(processInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
 
         managementService.executeCommand(new ClearProcessInstanceLockTimesCmd("worker1"));
 
