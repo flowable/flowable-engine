@@ -13,6 +13,8 @@
 
 package org.flowable.camel.examples.initiator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -58,10 +60,10 @@ public class InitiatorCamelCallTest extends SpringFlowableTestCase {
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
 
         String initiator = (String) runtimeService.getVariable(instanceId, "initiator");
-        assertEquals("kermit", initiator);
+        assertThat(initiator).isEqualTo("kermit");
 
         Object camelInitiatorHeader = runtimeService.getVariable(instanceId, "CamelProcessInitiatorHeader");
-        assertNull(camelInitiatorHeader);
+        assertThat(camelInitiatorHeader).isNull();
     }
 
 }

@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.webservice;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -48,16 +48,16 @@ public class WSDLImporterTest {
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<>(importer.getServices().values());
-        assertEquals(1, services.size());
+        assertThat(services).hasSize(1);
         WSService service = services.get(0);
 
-        assertEquals("Counter", service.getName());
-        assertEquals("http://localhost:63081/webservicemock", service.getLocation());
+        assertThat(service.getName()).isEqualTo("Counter");
+        assertThat(service.getLocation()).isEqualTo("http://localhost:63081/webservicemock");
 
         List<StructureDefinition> structures = sortStructures();
         List<WSOperation> operations = sortOperations();
 
-        assertEquals(7, operations.size());
+        assertThat(operations).hasSize(7);
         this.assertOperation(operations.get(0), "getCount", service);
         this.assertOperation(operations.get(1), "inc", service);
         this.assertOperation(operations.get(2), "noNameResult", service);
@@ -66,7 +66,7 @@ public class WSDLImporterTest {
         this.assertOperation(operations.get(5), "reset", service);
         this.assertOperation(operations.get(6), "setTo", service);
 
-        assertEquals(14, structures.size());
+        assertThat(structures).hasSize(14);
         this.assertStructure(structures.get(0), "getCount", new String[] {}, new Class<?>[] {});
         this.assertStructure(structures.get(1), "getCountResponse", new String[] { "count" }, new Class<?>[] { Integer.class });
         this.assertStructure(structures.get(2), "inc", new String[] {}, new Class<?>[] {});
@@ -89,16 +89,15 @@ public class WSDLImporterTest {
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<>(importer.getServices().values());
-        assertEquals(1, services.size());
-        WSService service = services.get(0);
-
-        assertEquals("Counter", service.getName());
-        assertEquals("http://localhost:63081/webservicemock", service.getLocation());
+        assertThat(services)
+                .extracting(WSService::getName, WSService::getLocation)
+                .containsExactly(tuple("Counter", "http://localhost:63081/webservicemock"));
 
         List<StructureDefinition> structures = sortStructures();
         List<WSOperation> operations = sortOperations();
 
-        assertEquals(7, operations.size());
+        WSService service = services.get(0);
+        assertThat(operations).hasSize(7);
         this.assertOperation(operations.get(0), "getCount", service);
         this.assertOperation(operations.get(1), "inc", service);
         this.assertOperation(operations.get(2), "noNameResult", service);
@@ -107,7 +106,7 @@ public class WSDLImporterTest {
         this.assertOperation(operations.get(5), "reset", service);
         this.assertOperation(operations.get(6), "setTo", service);
 
-        assertEquals(14, structures.size());
+        assertThat(structures).hasSize(14);
         this.assertStructure(structures.get(0), "getCount", new String[] {}, new Class<?>[] {});
         this.assertStructure(structures.get(1), "getCountResponse", new String[] { "count" }, new Class<?>[] { Integer.class });
         this.assertStructure(structures.get(2), "inc", new String[] {}, new Class<?>[] {});
@@ -147,39 +146,39 @@ public class WSDLImporterTest {
     }
 
     private void assertOperation(WSOperation wsOperation, String name, WSService service) {
-        assertEquals(name, wsOperation.getName());
-        assertEquals(service, wsOperation.getService());
+        assertThat(wsOperation.getName()).isEqualTo(name);
+        assertThat(wsOperation.getService()).isEqualTo(service);
     }
 
     private void assertStructure(StructureDefinition structure, String structureId, String[] parameters, Class<?>[] classes) {
         SimpleStructureDefinition simpleStructure = (SimpleStructureDefinition) structure;
 
-        assertEquals(structureId, simpleStructure.getId());
+        assertThat(simpleStructure.getId()).isEqualTo(structureId);
 
         for (int i = 0; i < simpleStructure.getFieldSize(); i++) {
-            assertEquals(parameters[i], simpleStructure.getFieldNameAt(i));
-            assertEquals(classes[i], simpleStructure.getFieldTypeAt(i));
+            assertThat(simpleStructure.getFieldNameAt(i)).isEqualTo(parameters[i]);
+            assertThat(simpleStructure.getFieldTypeAt(i)).isEqualTo(classes[i]);
         }
     }
 
     @Test
     public void testImportInheritedElement() throws Exception {
         URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/inherited-elements-in-types.wsdl");
-        assertNotNull(url);
+        assertThat(url).isNotNull();
         importer.importFrom(url.toString());
 
         List<StructureDefinition> structures = sortStructures();
-        assertEquals(1, structures.size());
+        assertThat(structures).hasSize(1);
         final Object structureTypeInst = ReflectUtil.instantiate("org.flowable.webservice.counter.StructureType");
         final Class<? extends Object> structureType = structureTypeInst.getClass();
         this.assertStructure(structures.get(0), "inheritedRequest", new String[] { "rootElt", "inheritedElt", "newSimpleElt",
                 "newStructuredElt" }, new Class<?>[] { Short.class, Integer.class, String.class, structureType });
         List<Field> declaredFields = filterJacoco(structureType.getDeclaredFields());
-        assertEquals(2, declaredFields.size());
-        assertNotNull(structureType.getDeclaredField("booleanElt"));
-        assertNotNull(structureType.getDeclaredField("dateElt"));
-        assertEquals(1, filterJacoco(structureType.getSuperclass().getDeclaredFields()).size());
-        assertNotNull(structureType.getSuperclass().getDeclaredField("rootElt"));
+        assertThat(declaredFields).hasSize(2);
+        assertThat(structureType.getDeclaredField("booleanElt")).isNotNull();
+        assertThat(structureType.getDeclaredField("dateElt")).isNotNull();
+        assertThat(filterJacoco(structureType.getSuperclass().getDeclaredFields())).hasSize(1);
+        assertThat(structureType.getSuperclass().getDeclaredField("rootElt")).isNotNull();
     }
 
     protected List<Field> filterJacoco(Field[] declaredFields) {
@@ -191,7 +190,7 @@ public class WSDLImporterTest {
     @Test
     public void testImportBasicElement() throws Exception {
         URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/basic-elements-in-types.wsdl");
-        assertNotNull(url);
+        assertThat(url).isNotNull();
         importer.importFrom(url.toString());
     }
 

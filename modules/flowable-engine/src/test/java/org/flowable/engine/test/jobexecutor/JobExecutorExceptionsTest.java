@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.concurrent.Callable;
 
@@ -20,7 +22,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.TimerJobQuery;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +33,7 @@ public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testQueryByExceptionWithRealJobExecutor() {
         TimerJobQuery query = managementService.createTimerJobQuery().withException();
-        Assert.assertEquals(0, query.count());
+        assertThat(query.count()).isZero();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
 
@@ -49,7 +50,7 @@ public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
         });
 
         query = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).withException();
-        Assert.assertEquals(1, query.count());
+        assertThat(query.count()).isEqualTo(1);
     }
 
 }

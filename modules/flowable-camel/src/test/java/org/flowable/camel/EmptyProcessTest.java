@@ -13,6 +13,8 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -72,11 +74,11 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
         assertProcessEnded(instanceId);
         HistoricVariableInstance var = processEngine.getHistoryService().createHistoricVariableInstanceQuery().variableName("camelBody").singleResult();
-        assertNotNull(var);
-        assertEquals(body, var.getValue());
+        assertThat(var).isNotNull();
+        assertThat(var.getValue()).isEqualTo(body);
         var = processEngine.getHistoryService().createHistoricVariableInstanceQuery().variableName("MyVar").singleResult();
-        assertNotNull(var);
-        assertEquals("Foo", var.getValue());
+        assertThat(var).isNotNull();
+        assertThat(var.getValue()).isEqualTo("Foo");
     }
 
     @Test
@@ -91,8 +93,8 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
         assertProcessEnded(instanceId);
         HistoricVariableInstance var = processEngine.getHistoryService().createHistoricVariableInstanceQuery().variableName("camelBody").singleResult();
-        assertNotNull(var);
-        assertEquals(expectedObj, var.getValue());
+        assertThat(var).isNotNull();
+        assertThat(var.getValue()).isEqualTo(expectedObj);
     }
 
     @Test
@@ -110,7 +112,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
 
         assertProcessEnded(instanceId);
         HistoricVariableInstance var = processEngine.getHistoryService().createHistoricVariableInstanceQuery().variableName("camelBody").singleResult();
-        assertNotNull(var);
-        assertEquals(expectedObj.toString(), var.getValue().toString());
+        assertThat(var).isNotNull();
+        assertThat(var.getValue()).hasToString(expectedObj.toString());
     }
 }

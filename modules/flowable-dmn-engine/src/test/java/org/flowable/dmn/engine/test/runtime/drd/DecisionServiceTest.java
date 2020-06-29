@@ -24,7 +24,6 @@ import java.util.Map;
 import org.assertj.core.util.Maps;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;

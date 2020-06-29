@@ -13,6 +13,8 @@
 
 package org.flowable.camel.revisited;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -48,6 +50,6 @@ public class ParallelProcessRevisitedTest extends SpringFlowableTestCase {
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelCamelProcessRevisited");
         Thread.sleep(4000);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

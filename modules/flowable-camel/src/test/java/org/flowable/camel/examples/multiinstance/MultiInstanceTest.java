@@ -13,6 +13,8 @@
 
 package org.flowable.camel.examples.multiinstance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -54,11 +56,12 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miProcessExample");
         List<Job> jobList = managementService.createJobQuery().list();
-        assertEquals(5, jobList.size());
+        assertThat(jobList).hasSize(5);
 
-        assertEquals(5, runtimeService.createExecutionQuery()
+        assertThat(runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
-                .activityId("serviceTask1").count());
+                .activityId("serviceTask1")
+                .count()).isEqualTo(5);
 
         waitForJobExecutorToProcessAllJobs(3000, 500);
         int counter = 0;
@@ -68,6 +71,6 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
             processInstanceCount = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count();
             counter++;
         }
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

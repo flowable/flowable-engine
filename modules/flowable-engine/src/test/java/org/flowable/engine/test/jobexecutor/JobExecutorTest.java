@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -69,6 +71,6 @@ public class JobExecutorTest extends JobExecutorTestCase {
         expectedMessages.add("timer-one");
         expectedMessages.add("timer-two");
 
-        assertEquals(new TreeSet<>(expectedMessages), new TreeSet<>(messages));
+        assertThat(new TreeSet<>(messages)).isEqualTo(new TreeSet<>(expectedMessages));
     }
 }
