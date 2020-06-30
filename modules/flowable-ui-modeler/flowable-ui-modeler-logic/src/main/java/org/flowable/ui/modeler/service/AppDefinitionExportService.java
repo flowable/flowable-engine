@@ -13,7 +13,7 @@
 package org.flowable.ui.modeler.service;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -353,7 +353,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createZipEntry(ZipOutputStream zipOutputStream, String filename, String content) throws Exception {
-        createZipEntry(zipOutputStream, filename, content.getBytes(Charset.forName("UTF-8")));
+        createZipEntry(zipOutputStream, filename, content.getBytes(StandardCharsets.UTF_8));
     }
 
     protected void createZipEntry(ZipOutputStream zipOutputStream, String filename, byte[] content) throws Exception {

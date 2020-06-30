@@ -12,10 +12,6 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +55,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Service for invoking Flowable REST services.
@@ -148,7 +148,7 @@ public class FlowableClientService {
         try {
             try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
-                String strResponse = IOUtils.toString(responseContent, "utf-8");
+                String strResponse = IOUtils.toString(responseContent, StandardCharsets.UTF_8);
 
                 boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
                 if (success) {
@@ -208,7 +208,7 @@ public class FlowableClientService {
 
                 } else {
                     JsonNode bodyNode = null;
-                    String strResponse = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+                    String strResponse = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
                     try {
                         bodyNode = objectMapper.readTree(strResponse);
                     } catch (Exception e) {
@@ -393,7 +393,7 @@ public class FlowableClientService {
             CloseableHttpResponse response = client.execute(request);
             boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
             if (success) {
-                result = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+                result = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             } else {
                 String errorMessage = null;
                 try {
@@ -648,7 +648,7 @@ public class FlowableClientService {
 
     protected JsonNode readJsonContent(InputStream requestContent) {
         try {
-            return objectMapper.readTree(IOUtils.toString(requestContent, "utf-8"));
+            return objectMapper.readTree(IOUtils.toString(requestContent, StandardCharsets.UTF_8));
         } catch (Exception e) {
             LOGGER.debug("Error parsing error message", e);
         }

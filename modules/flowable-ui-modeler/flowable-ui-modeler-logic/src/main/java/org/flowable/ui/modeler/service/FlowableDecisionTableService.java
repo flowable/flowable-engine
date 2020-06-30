@@ -12,14 +12,11 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -35,9 +32,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
@@ -60,6 +57,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author erikwinlof
@@ -189,7 +190,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             try {
 
                 XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
 
                 DmnDefinition dmnDefinition = dmnXmlConverter.convertToDmnModel(xtr);

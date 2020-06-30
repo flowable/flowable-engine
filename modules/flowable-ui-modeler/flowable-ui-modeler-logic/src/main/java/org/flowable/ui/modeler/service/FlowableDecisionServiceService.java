@@ -16,8 +16,8 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
@@ -42,12 +41,8 @@ import org.flowable.ui.common.util.XmlUtil;
 import org.flowable.ui.modeler.domain.AbstractModel;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.domain.ModelHistory;
-import org.flowable.ui.modeler.model.DecisionTableSaveRepresentation;
-import org.flowable.ui.modeler.model.ModelKeyRepresentation;
 import org.flowable.ui.modeler.model.ModelRepresentation;
 import org.flowable.ui.modeler.model.decisionservice.DecisionServiceRepresentation;
-import org.flowable.ui.modeler.model.decisiontable.DecisionTableDefinitionRepresentation;
-import org.flowable.ui.modeler.model.decisiontable.DecisionTableRepresentation;
 import org.flowable.ui.modeler.repository.ModelSort;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
@@ -190,7 +185,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
             try {
 
                 XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
 
                 DmnDefinition dmnDefinition = dmnXmlConverter.convertToDmnModel(xtr);

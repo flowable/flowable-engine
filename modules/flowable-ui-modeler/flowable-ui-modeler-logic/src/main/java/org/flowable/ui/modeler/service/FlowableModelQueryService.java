@@ -13,7 +13,7 @@
 package org.flowable.ui.modeler.service;
 
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +90,7 @@ public class FlowableModelQueryService {
 
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filterText = null;
-        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), StandardCharsets.UTF_8);
         if (params != null) {
             for (NameValuePair nameValuePair : params) {
                 if ("filterText".equalsIgnoreCase(nameValuePair.getName())) {
@@ -174,7 +174,7 @@ public class FlowableModelQueryService {
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
             try {
                 XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
                 BpmnModel bpmnModel = bpmnXmlConverter.convertToBpmnModel(xtr);
                 if (CollectionUtils.isEmpty(bpmnModel.getProcesses())) {
@@ -221,7 +221,7 @@ public class FlowableModelQueryService {
         if (fileName != null && (fileName.endsWith(".cmmn") || fileName.endsWith(".cmmn.xml"))) {
             try {
                 XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
                 CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(xtr);
                 if (CollectionUtils.isEmpty(cmmnModel.getCases())) {

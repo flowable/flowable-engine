@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
@@ -29,7 +29,6 @@ import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
  */
 public abstract class AbstractEncryptingService {
 
-    public static final String UTF8_ENCODING = "UTF-8";
     public static final String AES_KEY = "AES";
     public static final String AES_CYPHER = "AES/CBC/PKCS5PADDING";
 
@@ -42,13 +41,8 @@ public abstract class AbstractEncryptingService {
         String ivString = encryption.getCredentialsIVSpec();
         String secretString = encryption.getCredentialsSecretSpec();
 
-        try {
-            initializationVectorSpec = new IvParameterSpec(ivString.getBytes(UTF8_ENCODING));
-            secretKeySpec = new SecretKeySpec(secretString.getBytes(UTF8_ENCODING), AES_KEY);
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen, UTF-8 is supported on all java platforms
-            throw new RuntimeException(e);
-        }
+        initializationVectorSpec = new IvParameterSpec(ivString.getBytes(StandardCharsets.UTF_8));
+        secretKeySpec = new SecretKeySpec(secretString.getBytes(StandardCharsets.UTF_8), AES_KEY);
     }
 
     protected String encrypt(String value) {
@@ -56,11 +50,9 @@ public abstract class AbstractEncryptingService {
             Cipher cipher = Cipher.getInstance(AES_CYPHER);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, initializationVectorSpec);
             byte[] encrypted = cipher.doFinal(value.getBytes());
-            return new String(Base64.getEncoder().encode(encrypted), UTF8_ENCODING);
+            return new String(Base64.getEncoder().encode(encrypted), StandardCharsets.UTF_8);
         } catch (GeneralSecurityException nsae) {
             throw new RuntimeException(nsae);
-        } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException(uee);
         }
     }
 
@@ -69,12 +61,10 @@ public abstract class AbstractEncryptingService {
         try {
             cipher = Cipher.getInstance(AES_CYPHER);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, initializationVectorSpec);
-            byte[] original = cipher.doFinal(Base64.getDecoder().decode(encrypted.getBytes(UTF8_ENCODING)));
-            return new String(original, UTF8_ENCODING);
+            byte[] original = cipher.doFinal(Base64.getDecoder().decode(encrypted.getBytes(StandardCharsets.UTF_8)));
+            return new String(original, StandardCharsets.UTF_8);
         } catch (GeneralSecurityException nsae) {
             throw new RuntimeException(nsae);
-        } catch (UnsupportedEncodingException usee) {
-            throw new RuntimeException(usee);
         }
     }
 
