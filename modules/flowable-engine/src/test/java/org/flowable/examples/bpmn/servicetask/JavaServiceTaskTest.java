@@ -37,9 +37,9 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testJavaServiceDelegation() {
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation", CollectionUtil.singletonMap("input", "Activiti BPM Engine"));
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation", CollectionUtil.singletonMap("input", "Flowable BPM Engine"));
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState").singleResult();
-        assertThat(runtimeService.getVariable(execution.getId(), "input")).isEqualTo("ACTIVITI BPM ENGINE");
+        assertThat(runtimeService.getVariable(execution.getId(), "input")).isEqualTo("FLOWABLE BPM ENGINE");
     }
 
     @Test
@@ -169,7 +169,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("var", "no-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // If variable value == 'throw-exception', process executes
         // service task, which generates and catches exception,

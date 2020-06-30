@@ -79,7 +79,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
         // Should have rolled back to task
         assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
-        assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(0L);
+        assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isZero();
 
         // The logic in the tasklistener (creating a new user) should rolled back too:
         // no new user should have been created

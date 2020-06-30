@@ -378,7 +378,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -392,7 +392,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         Execution signalExecution = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").singleResult();
         runtimeService.signalEventReceived("alert", signalExecution.getId());
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -414,7 +414,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(waitingExecution).isNotNull();
         runtimeService.signalEventReceived("alert", waitingExecution.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 

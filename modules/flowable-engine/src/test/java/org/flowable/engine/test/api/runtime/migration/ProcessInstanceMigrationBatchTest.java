@@ -143,7 +143,6 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         migrationResult = processMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatch.getId());
         assertThat(migrationResult).isNotNull();
 
-        assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
@@ -245,7 +244,6 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         migrationResult = processMigrationService.getResultsOfBatchProcessInstanceMigration(migrationBatch.getId());
         assertThat(migrationResult).isNotNull();
 
-        assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
