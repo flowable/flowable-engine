@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.api.app;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.InputStream;
 
 import org.flowable.engine.app.AppModel;
@@ -32,24 +35,19 @@ public class AppResourceDeploymentTest extends PluggableFlowableTestCase {
         Deployment deployment = repositoryService.createDeployment().addInputStream("test.app", inputStream).deploy();
 
         Object appObject = repositoryService.getAppResourceObject(deployment.getId());
-        assertNotNull(appObject);
-        assertTrue(appObject instanceof AppModel);
+        assertThat(appObject).isInstanceOf(AppModel.class);
         AppModel appModel = (AppModel) appObject;
-        assertEquals("testTheme", appModel.getTheme());
-        assertEquals("testIcon", appModel.getIcon());
+        assertThat(appModel.getTheme()).isEqualTo("testTheme");
+        assertThat(appModel.getIcon()).isEqualTo("testIcon");
 
         appModel = repositoryService.getAppResourceModel(deployment.getId());
-        assertEquals("testTheme", appModel.getTheme());
-        assertEquals("testIcon", appModel.getIcon());
+        assertThat(appModel.getTheme()).isEqualTo("testTheme");
+        assertThat(appModel.getIcon()).isEqualTo("testIcon");
 
         repositoryService.deleteDeployment(deployment.getId(), true);
 
-        try {
-            appObject = repositoryService.getAppResourceObject(deployment.getId());
-            fail("exception excepted");
-        } catch (Exception e) {
-            // expected exception
-        }
+        assertThatThrownBy(() -> repositoryService.getAppResourceObject(deployment.getId()))
+                .isInstanceOf(Exception.class);
     }
 
     @Test
@@ -63,28 +61,23 @@ public class AppResourceDeploymentTest extends PluggableFlowableTestCase {
                 .deploy();
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
-        assertEquals("one", processDefinition.getKey());
-        assertEquals(deployment.getId(), processDefinition.getDeploymentId());
+        assertThat(processDefinition.getKey()).isEqualTo("one");
+        assertThat(processDefinition.getDeploymentId()).isEqualTo(deployment.getId());
 
         Object appObject = repositoryService.getAppResourceObject(deployment.getId());
-        assertNotNull(appObject);
-        assertTrue(appObject instanceof AppModel);
+        assertThat(appObject).isInstanceOf(AppModel.class);
         AppModel appModel = (AppModel) appObject;
-        assertEquals("testTheme", appModel.getTheme());
-        assertEquals("testIcon", appModel.getIcon());
+        assertThat(appModel.getTheme()).isEqualTo("testTheme");
+        assertThat(appModel.getIcon()).isEqualTo("testIcon");
 
         appModel = repositoryService.getAppResourceModel(deployment.getId());
-        assertEquals("testTheme", appModel.getTheme());
-        assertEquals("testIcon", appModel.getIcon());
+        assertThat(appModel.getTheme()).isEqualTo("testTheme");
+        assertThat(appModel.getIcon()).isEqualTo("testIcon");
 
         repositoryService.deleteDeployment(deployment.getId(), true);
 
-        try {
-            appObject = repositoryService.getAppResourceObject(deployment.getId());
-            fail("exception excepted");
-        } catch (Exception e) {
-            // expected exception
-        }
+        assertThatThrownBy(() -> repositoryService.getAppResourceObject(deployment.getId()))
+                .isInstanceOf(Exception.class);
     }
 
 }
