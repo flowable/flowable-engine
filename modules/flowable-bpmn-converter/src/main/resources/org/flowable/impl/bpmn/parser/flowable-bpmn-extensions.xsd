@@ -883,4 +883,12 @@
       </documentation>
     </annotation>
   </attribute>
+
+  <attribute name="taskIdVariableName" type="string" default="">
+    <annotation>
+      <documentation>
+        Allows to specify a variable name on a user task where the task ID will be stored.
+      </documentation>
+    </annotation>
+  </attribute>
 </schema>

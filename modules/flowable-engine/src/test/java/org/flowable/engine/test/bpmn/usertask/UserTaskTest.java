@@ -281,6 +281,15 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskIdVariableName.bpmn20.xml")
+    public void testUserTaskIdVariableName() throws Exception {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
+            String actualTaskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+            String myTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
+            assertEquals(actualTaskId, myTaskId);
+    }
+
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
         
         protected int beforeCreateUserTaskCounter = 0;
