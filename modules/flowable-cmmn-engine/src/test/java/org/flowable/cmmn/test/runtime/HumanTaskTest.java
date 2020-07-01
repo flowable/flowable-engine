@@ -365,7 +365,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         // Expression
         Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
-        assertThat(firstTask).isNotNull();
+        assertThat(secondTask).isNotNull();
 
         actualTaskId = secondTask.getId();
         String myExpressionTaskId = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myExpressionTaskId");

@@ -12,12 +12,12 @@
  */
 package org.flowable.test.cmmn.converter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Matthias Stöckli

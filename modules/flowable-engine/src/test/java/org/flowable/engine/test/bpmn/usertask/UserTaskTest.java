@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -284,15 +286,23 @@ public class UserTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskIdVariableName.bpmn20.xml")
     public void testUserTaskIdVariableName() throws Exception {
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
 
-            String firstActualTaskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult().getId();
-            String firstVariableTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
-            assertEquals(firstActualTaskId, firstVariableTaskId);
+        // Normal string
+        Task firstTask = taskService.createTaskQuery().caseInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
 
-            String secondActualTaskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult().getId();
-            String secondVariableTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
-            assertEquals(secondActualTaskId, secondVariableTaskId);
+        String actualTaskId = firstTask.getId();
+        String myTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
+        assertThat(myTaskId).isEqualTo(actualTaskId);
+
+        // Expression
+        Task secondTask = taskService.createTaskQuery().caseInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+
+        actualTaskId = secondTask.getId();
+        String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
+        assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
