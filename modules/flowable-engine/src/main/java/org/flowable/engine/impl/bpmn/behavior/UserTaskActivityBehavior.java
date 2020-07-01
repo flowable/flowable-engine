@@ -98,6 +98,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         String activeTaskSkipExpression = null;
         String activeTaskAssignee = null;
         String activeTaskOwner = null;
+        String activeTaskIdVariableName = null;
         List<String> activeTaskCandidateUsers = null;
         List<String> activeTaskCandidateGroups = null;
 
@@ -117,7 +118,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
-
+            activeTaskIdVariableName = DynamicPropertyUtil.getActiveValue(userTask.getTaskIdVariableName(), DynamicBpmnConstants.USER_TASK_TASK_ID_VARIABLE_NAME, taskElementProperties);
         } else {
             activeTaskName = userTask.getName();
             activeTaskDescription = userTask.getDocumentation();
@@ -130,6 +131,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskOwner = userTask.getOwner();
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
+            activeTaskIdVariableName = userTask.getTaskIdVariableName();
         }
         
         CreateUserTaskBeforeContext beforeContext = new CreateUserTaskBeforeContext(userTask, execution, activeTaskName, activeTaskDescription, activeTaskDueDate, 
@@ -265,6 +267,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
             
+            if (StringUtils.isNotEmpty(activeTaskIdVariableName)) {
+                Expression expression = expressionManager.createExpression(userTask.getTaskIdVariableName());
+                String idVariableName = (String) expression.getValue(execution);
+                if (StringUtils.isNotEmpty(idVariableName)) {
+                    execution.setVariable(idVariableName, task.getId());
+                }
+            }
         } else {
             TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);

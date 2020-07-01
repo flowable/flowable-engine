@@ -112,6 +112,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "taskidvariablenamepackage",
+    "properties" : [ {
+      "id" : "taskidvariablename",
+      "type" : "String",
+      "title" : "CMMN.PROPERTYPACKAGES.TASKIDVARIABLENAMEPACKAGE.TASKIDVARIABLENAME.TITLE",
+      "value" : "",
+      "description" : "CMMN.PROPERTYPACKAGES.TASKIDVARIABLENAMEPACKAGE.TASKIDVARIABLENAME.DESCRIPTION",
+      "popular" : true
+    } ]
+  }, {
     "name" : "tasklistenerspackage",
     "properties" : [ {
       "id" : "tasklisteners",
@@ -1217,7 +1227,9 @@
       "repetitionrulepackage",
       "manualactivationrulepackage",
       "completionneutralrulepackage",
-      "planitemlifecyclelistenerspackage" ],
+      "planitemlifecyclelistenerspackage",
+      "taskidvariablenamepackage"
+    ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

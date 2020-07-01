@@ -88,6 +88,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter {
 
         setPropertyValue(PROPERTY_USERTASK_DUEDATE, humanTask.getDueDate(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, humanTask.getCategory(), propertiesNode);
+        setPropertyValue(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, humanTask.getTaskIdVariableName(), propertiesNode);
 
         convertTaskListenersToJson(propertiesNode, humanTask);
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, humanTask);
@@ -260,6 +261,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter {
 
         task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
+        task.setTaskIdVariableName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, elementNode));
 
         convertJsonToTaskListeners(elementNode, task);
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);

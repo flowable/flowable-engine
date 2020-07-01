@@ -39,6 +39,7 @@ public class UserTask extends Task {
     protected List<FlowableListener> taskListeners = new ArrayList<>();
     protected String skipExpression;
     protected String validateFormFields;
+    protected String taskIdVariableName;
 
     protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<>();
     protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<>();
@@ -215,6 +216,14 @@ public class UserTask extends Task {
         this.validateFormFields = validateFormFields;
     }
 
+    public String getTaskIdVariableName() {
+        return taskIdVariableName;
+    }
+
+    public void setTaskIdVariableName(String taskIdVariableName) {
+        this.taskIdVariableName = taskIdVariableName;
+    }
+
     @Override
     public UserTask clone() {
         UserTask clone = new UserTask();
@@ -231,6 +240,7 @@ public class UserTask extends Task {
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
+        setTaskIdVariableName(otherElement.getTaskIdVariableName());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
         setValidateFormFields(otherElement.getValidateFormFields());

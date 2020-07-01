@@ -139,7 +139,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-
+            handleTaskIdVariableStorage(planItemInstanceEntity, humanTask, expressionManager, taskEntity);
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
                         planItemInstanceEntity.getPlanItemDefinitionId(), taskEntity.getId(), ScopeTypes.TASK);
@@ -381,6 +381,16 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             return candidates;
         } else {
             throw new FlowableException("Expression did not resolve to a string, collection of strings or an array node");
+        }
+    }
+
+    private void handleTaskIdVariableStorage(PlanItemInstanceEntity planItemInstanceEntity, HumanTask humanTask, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getTaskIdVariableName())) {
+            Expression expression = expressionManager.createExpression(humanTask.getTaskIdVariableName());
+            String idVariableName = (String) expression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                planItemInstanceEntity.setVariable(idVariableName, taskEntity.getId());
+            }
         }
     }
 

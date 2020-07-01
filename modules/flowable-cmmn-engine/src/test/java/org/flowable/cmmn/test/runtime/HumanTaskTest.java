@@ -346,4 +346,30 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                 );
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskIdVariableName.cmmn")
+    public void testHumanTaskIdVariableName() {
+        Authentication.setAuthenticatedUserId("JohnDoe");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        // Normal string
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+
+        String actualTaskId = firstTask.getId();
+        String myTaskId = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myTaskId");
+        assertThat(myTaskId).isEqualTo(actualTaskId);
+
+        // Expression
+        Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+
+        actualTaskId = secondTask.getId();
+        String myExpressionTaskId = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myExpressionTaskId");
+        assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
+    }
+
 }

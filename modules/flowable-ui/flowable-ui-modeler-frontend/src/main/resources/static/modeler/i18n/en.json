@@ -202,6 +202,12 @@
             "DESCRIPTION" : "Priority of the user task."
           }
         },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the id of the task will be stored in this variable"
+          }
+        },
         "SERVICETASKCLASSPACKAGE" : {
           "SERVICETASKCLASS" : {
             "TITLE" : "Class",
@@ -1326,6 +1332,12 @@
           "PRIORITYDEFINITION": {
             "TITLE": "Priority",
             "DESCRIPTION": "Priority of the user task."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the id of the task will be stored in this variable"
           }
         },
         "SERVICETASKCLASSPACKAGE": {

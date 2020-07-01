@@ -283,6 +283,28 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskIdVariableName.bpmn20.xml")
+    public void testUserTaskIdVariableName() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
+
+        // Normal string
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+
+        String actualTaskId = firstTask.getId();
+        String myTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
+        assertThat(myTaskId).isEqualTo(actualTaskId);
+
+        // Expression
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+
+        actualTaskId = secondTask.getId();
+        String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
+        assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
+    }
+
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
         
         protected int beforeCreateUserTaskCounter = 0;

@@ -100,6 +100,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
     String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
     String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
+    String PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME = "taskidvariablename";
 
     String PROPERTY_USERTASK_LISTENERS = "tasklisteners";
     String PROPERTY_LISTENER_EVENT = "event";
