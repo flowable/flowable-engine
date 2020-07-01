@@ -47,44 +47,34 @@ public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnTriggera
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
-            if (delegate instanceof PlanItemActivityBehavior) {
-                ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
+        Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
+        if (delegate instanceof PlanItemActivityBehavior) {
+            ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
 
-            } else if (delegate instanceof CmmnActivityBehavior) {
-                ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
+        } else if (delegate instanceof CmmnActivityBehavior) {
+            ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
 
-            } else if (delegate instanceof PlanItemJavaDelegate) {
-                PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
-                behavior.execute(planItemInstanceEntity);
+        } else if (delegate instanceof PlanItemJavaDelegate) {
+            PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
+            behavior.execute(planItemInstanceEntity);
 
-            } else {
-                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + 
-                                PlanItemActivityBehavior.class + ", " + CmmnActivityBehavior.class + " nor " + PlanItemJavaDelegate.class);
-            }    
-           
-        } catch (Exception exc) {
-            throw new FlowableException(exc.getMessage(), exc);
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " +
+                    PlanItemActivityBehavior.class + ", " + CmmnActivityBehavior.class + " nor " + PlanItemJavaDelegate.class);
         }
     }
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
-             if (delegate instanceof CmmnTriggerableActivityBehavior) { // includes CmmnTriggerableActivityBehavior
-                ((CmmnTriggerableActivityBehavior) delegate).trigger(planItemInstanceEntity);
+        Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
+        if (delegate instanceof CmmnTriggerableActivityBehavior) { // includes CmmnTriggerableActivityBehavior
+            ((CmmnTriggerableActivityBehavior) delegate).trigger(planItemInstanceEntity);
 
-            } else {
-                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of "
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of "
                     + CmmnTriggerableActivityBehavior.class);
-            }
-
-        } catch (Exception exc) {
-            throw new FlowableException(exc.getMessage(), exc);
         }
     }
 
