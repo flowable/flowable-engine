@@ -28,6 +28,7 @@ public class HumanTask extends Task {
     protected String validateFormFields;
     protected String dueDate;
     protected String category;
+    protected String taskIdVariableName;
     protected List<String> candidateUsers = new ArrayList<>();
     protected List<String> candidateGroups = new ArrayList<>();
     protected List<FlowableListener> taskListeners = new ArrayList<>();
@@ -94,6 +95,14 @@ public class HumanTask extends Task {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getTaskIdVariableName() {
+        return taskIdVariableName;
+    }
+
+    public void setTaskIdVariableName(String taskIdVariableName) {
+        this.taskIdVariableName = taskIdVariableName;
     }
 
     public List<String> getCandidateUsers() {

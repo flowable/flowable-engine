@@ -46,7 +46,8 @@ public class HumanTaskXmlConverter extends TaskXmlConverter {
         task.setValidateFormFields(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_FIELD_VALIDATION));
         task.setDueDate(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DUE_DATE));
         task.setCategory(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CATEGORY));
-        
+        task.setTaskIdVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TASK_ID_VARIABLE_NAME));
+
         String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
         if (StringUtils.isNotEmpty(candidateUsersString)) {
             String[] candidateUsers = candidateUsersString.split(",");

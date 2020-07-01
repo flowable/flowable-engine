@@ -71,7 +71,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         execute(commandContext, planItemInstanceEntity, null);
     }
-    
+
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, MigrationContext migrationContext) {
         if (evaluateIsBlocking(planItemInstanceEntity)) {
@@ -96,17 +96,17 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             if (planItemInstanceEntity.getName() != null) {
                 taskName = planItemInstanceEntity.getName();
             }
-            
+
             CreateHumanTaskBeforeContext beforeContext = new CreateHumanTaskBeforeContext(humanTask, planItemInstanceEntity, taskName,
-                    humanTask.getDocumentation(), humanTask.getDueDate(), humanTask.getPriority(), humanTask.getCategory(), 
-                    humanTask.getFormKey(), humanTask.getAssignee(), humanTask.getOwner(), 
+                    humanTask.getDocumentation(), humanTask.getDueDate(), humanTask.getPriority(), humanTask.getCategory(),
+                    humanTask.getFormKey(), humanTask.getAssignee(), humanTask.getOwner(),
                     humanTask.getCandidateUsers(), humanTask.getCandidateGroups());
-            
+
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (cmmnEngineConfiguration.getCreateHumanTaskInterceptor() != null) {
                 cmmnEngineConfiguration.getCreateHumanTaskInterceptor().beforeCreateHumanTask(beforeContext);
             }
-            
+
             handleTaskName(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity, beforeContext, migrationContext);
@@ -117,20 +117,20 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
 
             TaskHelper.insertTask(taskEntity, true);
-            
+
             if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_CREATE, "Human task '" + 
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_CREATE, "Human task '" +
                                 taskEntity.getName() + "' created", taskEntity, planItemInstanceEntity);
-                
+
                 if (StringUtils.isNotEmpty(taskEntity.getAssignee())) {
-                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + 
+                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " +
                                     taskEntity.getAssignee(), taskEntity, planItemInstanceEntity);
                     loggingNode.put("taskAssignee", taskEntity.getAssignee());
                     LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_ASSIGNEE, loggingNode);
                 }
-                
+
                 if (StringUtils.isNotEmpty(taskEntity.getOwner())) {
-                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + 
+                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " +
                                     taskEntity.getOwner(), taskEntity, planItemInstanceEntity);
                     loggingNode.put("taskOwner", taskEntity.getOwner());
                     LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_OWNER, loggingNode);
@@ -139,7 +139,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-
+            handleTaskIdVariableStorage(planItemInstanceEntity, humanTask, expressionManager, taskEntity);
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
                         planItemInstanceEntity.getPlanItemDefinitionId(), taskEntity.getId(), ScopeTypes.TASK);
@@ -154,7 +154,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(
                     humanTask, taskEntity, TaskListener.EVENTNAME_CREATE);
-            
+
 
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
@@ -163,9 +163,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
     }
 
-    protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, 
+    protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
                     TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getName())) {
             Object name = expressionManager.createExpression(beforeContext.getName()).getValue(planItemInstanceEntity);
             if (name != null) {
@@ -178,9 +178,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
     }
 
-    protected void handleTaskDescription(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, 
+    protected void handleTaskDescription(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
                     TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getDescription())) {
             Object description = expressionManager.createExpression(beforeContext.getDescription()).getValue(planItemInstanceEntity);
             if (description != null) {
@@ -196,15 +196,15 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     protected void handleAssignee(PlanItemInstanceEntity planItemInstanceEntity, TaskService taskService,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext,
             MigrationContext migrationContext) {
-        
+
         String assigneeStringValue = null;
         if (migrationContext != null && migrationContext.getAssignee() != null) {
             assigneeStringValue = migrationContext.getAssignee();
-            
+
         } else if (StringUtils.isNotEmpty(beforeContext.getAssignee())) {
             assigneeStringValue = beforeContext.getAssignee();
         }
-        
+
         if (StringUtils.isNotEmpty(assigneeStringValue)) {
             Object assigneeExpressionValue = expressionManager.createExpression(assigneeStringValue).getValue(planItemInstanceEntity);
             String assigneeValue = null;
@@ -218,7 +218,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     protected void handleOwner(PlanItemInstanceEntity planItemInstanceEntity, TaskService taskService,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getOwner())) {
             Object ownerExpressionValue = expressionManager.createExpression(beforeContext.getOwner()).getValue(planItemInstanceEntity);
             String ownerValue = null;
@@ -230,9 +230,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
     }
 
-    protected void handlePriority(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, 
+    protected void handlePriority(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
                     TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
             Object priority = expressionManager.createExpression(beforeContext.getPriority()).getValue(planItemInstanceEntity);
             if (priority != null) {
@@ -253,7 +253,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     protected void handleFormKey(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
             TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
             Object formKey = expressionManager.createExpression(beforeContext.getFormKey()).getValue(planItemInstanceEntity);
             if (formKey != null) {
@@ -268,7 +268,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     protected void handleDueDate(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
             Object dueDate = expressionManager.createExpression(beforeContext.getDueDate()).getValue(planItemInstanceEntity);
             if (dueDate != null) {
@@ -293,7 +293,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     protected void handleCategory(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
             TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
             final Object category = expressionManager.createExpression(beforeContext.getCategory()).getValue(planItemInstanceEntity);
             if (category != null) {
@@ -309,7 +309,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateUsers(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         List<String> candidateUsers = beforeContext.getCandidateUsers();
         if (candidateUsers != null && !candidateUsers.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
@@ -324,10 +324,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                     allIdentityLinkEntities.addAll(identityLinkEntities);
                 }
             }
-            
+
             if (!allIdentityLinkEntities.isEmpty()) {
                 if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
+                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS,
                                     "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
                                     allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
                 }
@@ -338,7 +338,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateGroups(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         List<String> candidateGroups = beforeContext.getCandidateGroups();
         if (candidateGroups != null && !candidateGroups.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
@@ -353,10 +353,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                     allIdentityLinkEntities.addAll(identityLinkEntities);
                 }
             }
-            
+
             if (!allIdentityLinkEntities.isEmpty()) {
                 if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
+                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS,
                                     "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", true,
                                     allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
                 }
@@ -381,6 +381,16 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             return candidates;
         } else {
             throw new FlowableException("Expression did not resolve to a string, collection of strings or an array node");
+        }
+    }
+
+    private void handleTaskIdVariableStorage(PlanItemInstanceEntity planItemInstanceEntity, HumanTask humanTask, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getTaskIdVariableName())) {
+            Expression expression = expressionManager.createExpression(humanTask.getTaskIdVariableName());
+            String idVariableName = (String) expression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                planItemInstanceEntity.setVariable(idVariableName, taskEntity.getId());
+            }
         }
     }
 

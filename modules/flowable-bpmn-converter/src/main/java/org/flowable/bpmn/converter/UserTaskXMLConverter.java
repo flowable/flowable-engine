@@ -161,6 +161,9 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         if (userTask.getSkipExpression() != null) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION, userTask.getSkipExpression(), xtw);
         }
+        if (userTask.getTaskIdVariableName() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME, userTask.getTaskIdVariableName(), xtw);
+        }
         // write custom attributes
         BpmnXMLUtil.writeCustomAttributes(userTask.getAttributes().values(), xtw, defaultElementAttributes,
                 defaultActivityAttributes, defaultUserTaskAttributes);

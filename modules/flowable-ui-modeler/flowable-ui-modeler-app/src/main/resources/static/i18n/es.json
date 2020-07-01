@@ -199,6 +199,12 @@
             "DESCRIPTION" : "Prioridad de la tarea de usuario."
           }
         },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
+          }
+        },
         "SERVICETASKCLASSPACKAGE" : {
           "SERVICETASKCLASS" : {
             "TITLE" : "Clase",
@@ -1293,6 +1299,12 @@
           "PRIORITYDEFINITION" : {
             "TITLE" : "Prioridad",
             "DESCRIPTION" : "Prioridad de la tarea de usuario."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
           }
         },
         "SERVICETASKCLASSPACKAGE" : {

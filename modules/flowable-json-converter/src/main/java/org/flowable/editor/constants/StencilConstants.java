@@ -192,7 +192,7 @@ public interface StencilConstants {
     final String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
     final String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
     final String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
-    final String PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME = "activetaskidvariablename";
+    final String PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME = "taskidvariablename";
 
     final String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
     final String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
