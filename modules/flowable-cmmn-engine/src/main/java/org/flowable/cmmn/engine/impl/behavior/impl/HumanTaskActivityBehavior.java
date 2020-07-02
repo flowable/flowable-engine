@@ -158,7 +158,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
 
         }
     }
@@ -403,7 +403,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             }
         }
 
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
 
     @Override

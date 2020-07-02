@@ -151,7 +151,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
 

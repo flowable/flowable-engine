@@ -135,7 +135,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             cmmnEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled());
             
             // See the beforeInit
-            ((CmmnEngineConfiguration) cmmnEngineConfiguration).setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
+            cmmnEngineConfiguration.setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
         }
     }
     
