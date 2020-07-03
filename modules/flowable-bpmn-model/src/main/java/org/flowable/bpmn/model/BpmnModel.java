@@ -113,11 +113,15 @@ public class BpmnModel {
                 }
             }
 
-            if (poolRef == null && !foundPool) {
+            if (poolRef == null && !foundPool && process.isExecutable()) {
                 return process;
             } else if (poolRef != null && foundPool) {
                 return process;
             }
+        }
+        
+        if (poolRef == null && !processes.isEmpty()) {
+            return processes.get(0);
         }
 
         return null;
