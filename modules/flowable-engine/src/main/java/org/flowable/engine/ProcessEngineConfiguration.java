@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -114,7 +115,12 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean jpaCloseEntityManager;
 
     protected AsyncExecutor asyncExecutor;
+    protected AsyncTaskExecutor asyncTaskExecutor;
+    protected boolean shutdownAsyncTaskExecutor;
+
     protected AsyncExecutor asyncHistoryExecutor;
+    protected AsyncTaskExecutor asyncHistoryTaskExecutor;
+    protected boolean shutdownAsyncHistoryTaskExecutor;
     /**
      * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
      * retried again.
@@ -713,12 +719,30 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
     
+    public AsyncTaskExecutor getAsyncTaskExecutor() {
+        return asyncTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+        this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
     public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
 
     public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
+        return this;
+    }
+
+    public AsyncTaskExecutor getAsyncHistoryTaskExecutor() {
+        return asyncHistoryTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
+        this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
         return this;
     }
 
