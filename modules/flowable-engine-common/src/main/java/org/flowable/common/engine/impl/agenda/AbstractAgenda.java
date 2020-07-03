@@ -13,6 +13,8 @@
 package org.flowable.common.engine.impl.agenda;
 
 import java.util.LinkedList;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -65,6 +67,11 @@ public abstract class AbstractAgenda implements Agenda {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Operation {} added to agenda", operation.getClass());
         }
+    }
+
+    @Override
+    public <V> void planFutureOperation(Future<V> future, BiConsumer<V, Throwable> completeAction) {
+        planOperation(new OperationWithFuture<>(this, future, completeAction));
     }
 
     public LinkedList<Runnable> getOperations() {

@@ -12,6 +12,9 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
@@ -44,6 +47,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
                 return agenda.getNextOperation();
             }
             throw new FlowableException("WatchDog limit exceeded.");
+        }
+
+        @Override
+        public <V> void planFutureOperation(Future<V> future, BiConsumer<V, Throwable> completeAction) {
+            agenda.planFutureOperation(future, completeAction);
         }
 
         @Override

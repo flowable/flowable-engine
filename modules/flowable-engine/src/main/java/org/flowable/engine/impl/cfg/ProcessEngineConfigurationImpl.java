@@ -51,6 +51,7 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -2180,6 +2181,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.shutdownAsyncTaskExecutor = true;
 
             this.asyncTaskExecutor = defaultAsyncTaskExecutor;
+        }
+
+        if (this.asyncTaskInvoker == null) {
+            this.asyncTaskInvoker = new DefaultAsyncTaskInvoker(this.asyncTaskExecutor);
         }
     }
 
