@@ -13,17 +13,18 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -143,6 +144,11 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                     processEngineConfiguration
                             .getDelegateInterceptor().handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
 
+                    if (loggingSessionEnabled) {
+                        BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
+                                "Executed service task with delegate " + delegate, execution);
+                    }
+
                 } else if (delegate instanceof JavaDelegate) {
                     processEngineConfiguration
                             .getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
@@ -150,13 +156,22 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                     if (!triggerable) {
                         leave(execution);
                     }
+
+                    if (loggingSessionEnabled) {
+                        BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
+                                "Executed service task with delegate " + delegate, execution);
+                    }
+                } else if (delegate instanceof FutureJavaDelegate) {
+                    //TODO do we need to use the delegate interceptor?
+                    FutureJavaDelegate<Object, Object> futureJavaDelegate = (FutureJavaDelegate<Object, Object>) delegate;
+                    Object inputData = futureJavaDelegate.beforeExecution(execution);
+
+                    Future<Object> future = processEngineConfiguration.getAsyncTaskInvoker().submit(() -> futureJavaDelegate.execute(inputData));
+
+                    CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
+
                 } else {
                     throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + ActivityBehavior.class + " nor " + JavaDelegate.class);
-                }
-
-                if (loggingSessionEnabled) {
-                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
-                            "Executed service task with delegate " + delegate, execution);
                 }
 
             } else {
@@ -168,34 +183,52 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
             }
         } catch (Exception exc) {
 
-            if (loggingSessionEnabled) {
-                BpmnLoggingSessionUtil.addErrorLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXCEPTION,
-                        "Service task with delegate expression " + expression + " threw exception " + exc.getMessage(), exc, execution);
-            }
+            handleException(exc, execution, loggingSessionEnabled);
 
-            Throwable cause = exc;
-            BpmnError error = null;
-            while (cause != null) {
-                if (cause instanceof BpmnError) {
-                    error = (BpmnError) cause;
-                    break;
+        }
+    }
 
-                } else if (cause instanceof RuntimeException) {
-                    if (ErrorPropagation.mapException((RuntimeException) cause, (ExecutionEntity) execution, mapExceptions)) {
-                        return;
+    protected void handleException(Throwable exc, DelegateExecution execution, boolean loggingSessionEnabled) {
+        if (loggingSessionEnabled) {
+            BpmnLoggingSessionUtil.addErrorLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXCEPTION,
+                    "Service task with delegate expression " + expression + " threw exception " + exc.getMessage(), exc, execution);
+        }
+
+        ErrorPropagation.handleException(exc, (ExecutionEntity) execution, mapExceptions);
+    }
+
+    protected class FutureJavaDelegateCompleteAction implements BiConsumer<Object, Throwable> {
+
+        protected final FutureJavaDelegate<?, Object> delegateInstance;
+        protected final DelegateExecution execution;
+        protected final boolean loggingSessionEnabled;
+
+        public FutureJavaDelegateCompleteAction(FutureJavaDelegate<?, Object> delegateInstance,
+                DelegateExecution execution, boolean loggingSessionEnabled) {
+            this.delegateInstance = delegateInstance;
+            this.execution = execution;
+            this.loggingSessionEnabled = loggingSessionEnabled;
+        }
+
+        @Override
+        public void accept(Object value, Throwable throwable) {
+            if (throwable == null) {
+                try {
+                    delegateInstance.afterExecution(execution, value);
+                    if (!triggerable) {
+                        leave(execution);
                     }
+                } catch (Exception ex) {
+                    handleException(ex, execution, loggingSessionEnabled);
                 }
-                cause = cause.getCause();
-            }
 
-            if (error != null) {
-                ErrorPropagation.propagateError(error, execution);
-            } else if (exc instanceof FlowableException) {
-                throw exc;
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
+                            "Executed service task with delegate " + delegateInstance, execution);
+                }
             } else {
-                throw new FlowableException(exc.getMessage(), exc);
+                handleException(throwable, execution, loggingSessionEnabled);
             }
-
         }
     }
 }

@@ -434,4 +434,27 @@ public class ErrorPropagation {
         }
         return finalErrorCode;
     }
+
+    public static <E extends Throwable> void handleException(Throwable exc, ExecutionEntity execution, List<MapExceptionEntry> exceptionMap) throws E {
+
+        Throwable cause = exc;
+        BpmnError error = null;
+        while (cause != null) {
+            if (cause instanceof BpmnError) {
+                error = (BpmnError) cause;
+                break;
+            } else if (cause instanceof RuntimeException) {
+                if (ErrorPropagation.mapException((RuntimeException) cause, (ExecutionEntity) execution, exceptionMap)) {
+                    return;
+                }
+            }
+            cause = cause.getCause();
+        }
+
+        if (error != null) {
+            ErrorPropagation.propagateError(error, execution);
+        } else {
+            throw (E) exc;
+        }
+    }
 }
