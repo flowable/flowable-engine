@@ -17,11 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -123,22 +121,22 @@ public class Flowable6Test extends PluggableFlowableTestCase {
     @Test
     @org.flowable.engine.test.Deployment
     public void testLongServiceTaskLoop() {
-        int maxCount = 3210; // You can make this as big as you want (as long as it still fits within transaction timeouts).
+        CountingServiceTaskTestDelegate.CALL_COUNT.set(0); // needs to be reset (because build will retry tests on failure)
+
+        int maxCount = 999; // You can make this as big as you want (as long as it still fits within transaction timeouts).
                              // Go on, try it!
         Map<String, Object> vars = new HashMap<>();
         vars.put("counter", 0);
         vars.put("maxCount", maxCount);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testLongServiceTaskLoop", vars);
         assertNotNull(processInstance);
-        assertTrue(processInstance.isEnded());
 
         assertEquals(maxCount, CountingServiceTaskTestDelegate.CALL_COUNT.get());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration, 1800000)) {
-            assertEquals(maxCount, historyService.createHistoricActivityInstanceQuery()
-                    .processInstanceId(processInstance.getId()).activityId("serviceTask").count());
-        }
+        assertEquals(maxCount,
+            runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("serviceTask")
+                .count());
     }
 
     @Test
