@@ -289,7 +289,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
 
         // Normal string
-        Task firstTask = taskService.createTaskQuery().caseInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
         assertThat(firstTask).isNotNull();
 
         String actualTaskId = firstTask.getId();
@@ -297,7 +297,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(myTaskId).isEqualTo(actualTaskId);
 
         // Expression
-        Task secondTask = taskService.createTaskQuery().caseInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
         assertThat(secondTask).isNotNull();
 
         actualTaskId = secondTask.getId();
