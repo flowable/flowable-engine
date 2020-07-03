@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
@@ -46,6 +47,7 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -57,7 +59,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -126,15 +128,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConfigurationProperties(prefix = "flowable.process.async.executor")
     @ConditionalOnMissingBean(name = "processAsyncExecutor")
     public SpringAsyncExecutor processAsyncExecutor(
-        ObjectProvider<TaskExecutor> taskExecutor,
-        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        return new SpringAsyncExecutor(
-            getIfAvailable(processTaskExecutor, taskExecutor),
-            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
-        );
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        asyncExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
+        return asyncExecutor;
     }
     
     @Bean
@@ -143,15 +142,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
     @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
     public SpringAsyncHistoryExecutor asyncHistoryExecutor(
-        ObjectProvider<TaskExecutor> taskExecutor,
-        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        return new SpringAsyncHistoryExecutor(
-            getIfAvailable(processTaskExecutor, taskExecutor),
-            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
-        );
+        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor();
+        asyncHistoryExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
+        return asyncHistoryExecutor;
     }
 
     @Bean
@@ -160,7 +156,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
+            @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncTaskExecutor> applicationTaskExecutorProvider,
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
+            ObjectProvider<AsyncTaskExecutor> taskExecutor,
+            @Process ObjectProvider<AsyncTaskExecutor> processTaskExecutor,
             ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -181,6 +180,18 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setAsyncExecutor(springAsyncExecutor);
         }
         
+        AsyncTaskExecutor asyncTaskExecutor = getIfAvailable(processTaskExecutor, taskExecutor);
+        if (asyncTaskExecutor == null) {
+            // Get the applicationTaskExecutor
+            asyncTaskExecutor = applicationTaskExecutorProvider.getObject();
+        }
+        if (asyncTaskExecutor != null) {
+            // The task executors are shared
+            org.flowable.common.engine.api.async.AsyncTaskExecutor flowableTaskExecutor = new SpringAsyncTaskExecutor(asyncTaskExecutor);
+            conf.setAsyncTaskExecutor(flowableTaskExecutor);
+            conf.setAsyncHistoryTaskExecutor(flowableTaskExecutor);
+        }
+
         AsyncExecutor springAsyncHistoryExecutor = asyncHistoryExecutorProvider.getIfUnique();
         if (springAsyncHistoryExecutor != null) {
             conf.setAsyncHistoryEnabled(true);

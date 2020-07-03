@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ThreadFactory;
 
 import javax.xml.namespace.QName;
 
@@ -49,6 +50,7 @@ import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -627,6 +629,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected boolean asyncExecutorAllowCoreThreadTimeout = true;
+
+    /**
+     * The thread factory that the async task executor should use.
+     */
+    protected ThreadFactory asyncExecutorThreadFactory;
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
@@ -2146,7 +2153,38 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // async executor
     // /////////////////////////////////////////////////////////////
 
+    protected void initAsyncTaskExecutor() {
+        if (this.asyncTaskExecutor == null) {
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+
+            // Thread pool config
+            defaultAsyncTaskExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
+            defaultAsyncTaskExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
+            defaultAsyncTaskExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncExecutorThreadPoolQueue != null) {
+                defaultAsyncTaskExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
+            }
+            defaultAsyncTaskExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+
+            defaultAsyncTaskExecutor.setThreadFactory(asyncExecutorThreadFactory);
+
+            // Core thread timeout
+            defaultAsyncTaskExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
+
+            // Shutdown
+            defaultAsyncTaskExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
+
+            defaultAsyncTaskExecutor.start();
+            this.shutdownAsyncTaskExecutor = true;
+
+            this.asyncTaskExecutor = defaultAsyncTaskExecutor;
+        }
+    }
+
     public void initAsyncExecutor() {
+        initAsyncTaskExecutor();
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
             if (asyncExecutorExecuteAsyncRunnableFactory != null) {
@@ -2155,17 +2193,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             // Message queue mode
             defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
-
-            // Thread pool config
-            defaultAsyncExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
-            defaultAsyncExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
-            defaultAsyncExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
-
-            // Threadpool queue
-            if (asyncExecutorThreadPoolQueue != null) {
-                defaultAsyncExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
-            }
-            defaultAsyncExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
 
             // Thread flags
             defaultAsyncExecutor.setAsyncJobAcquisitionEnabled(isAsyncExecutorAsyncJobAcquisitionEnabled);
@@ -2191,16 +2218,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
             defaultAsyncExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
 
-            // Core thread timeout
-            defaultAsyncExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
-
-            // Shutdown
-            defaultAsyncExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
-
             // Tenant
             defaultAsyncExecutor.setTenantId(asyncExecutorTenantId);
             
             asyncExecutor = defaultAsyncExecutor;
+        }
+
+        if (asyncExecutor instanceof DefaultAsyncJobExecutor) {
+            // Task executor
+            if (((DefaultAsyncJobExecutor) asyncExecutor).getTaskExecutor() == null) {
+                ((DefaultAsyncJobExecutor) asyncExecutor).setTaskExecutor(asyncTaskExecutor);
+            }
         }
 
         asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
@@ -2208,24 +2236,45 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         jobServiceConfiguration.setAsyncExecutor(asyncExecutor);
     }
 
+    protected void initAsyncHistoryTaskExecutor() {
+        if (this.asyncHistoryTaskExecutor == null) {
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+
+            // Thread pool config
+            defaultAsyncTaskExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
+            defaultAsyncTaskExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
+            defaultAsyncTaskExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncHistoryExecutorThreadPoolQueue != null) {
+                defaultAsyncTaskExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
+            }
+            defaultAsyncTaskExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+
+            // Core thread timeout
+            //defaultAsyncTaskExecutor.setAllowCoreThreadTimeout(asyncHistoryExecutorAllowCoreThreadTimeout);
+
+            // Shutdown
+            defaultAsyncTaskExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
+
+            defaultAsyncTaskExecutor.setThreadPoolNamingPattern("flowable-async-history-job-executor-thread-%d");
+
+            defaultAsyncTaskExecutor.start();
+            shutdownAsyncHistoryTaskExecutor = true;
+
+            this.asyncHistoryTaskExecutor = defaultAsyncTaskExecutor;
+        }
+    }
+
     public void initAsyncHistoryExecutor() {
         if (isAsyncHistoryEnabled) {
+            initAsyncHistoryTaskExecutor();
+
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
 
                 // Message queue mode
                 defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
-
-                // Thread pool config
-                defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
-                defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
-                defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
-
-                // Threadpool queue
-                if (asyncHistoryExecutorThreadPoolQueue != null) {
-                    defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
-                }
-                defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
 
                 // Thread flags
                 defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
@@ -2247,9 +2296,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 // Reset expired
                 defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
                 defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
-
-                // Shutdown
-                defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
 
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
 
@@ -2275,6 +2321,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
 
         if (asyncHistoryExecutor != null) {
+
+            if (asyncHistoryExecutor instanceof DefaultAsyncJobExecutor) {
+                // Task executor
+                if (((DefaultAsyncJobExecutor) asyncHistoryExecutor).getTaskExecutor() == null) {
+                    ((DefaultAsyncJobExecutor) asyncHistoryExecutor).setTaskExecutor(asyncHistoryTaskExecutor);
+                }
+            }
+
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
         }
@@ -2630,6 +2684,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowable5CompatibilityHandler.setJobProcessor(this.flowable5JobProcessors);
         }
     }
+
+    @Override
+    public void close() {
+        super.close();
+
+        if (asyncTaskExecutor != null && shutdownAsyncTaskExecutor) {
+            // The cast is OK, because the executor was created by this engine configuration
+            ((DefaultAsyncTaskExecutor) asyncTaskExecutor).shutdown();
+        }
+
+        if (asyncHistoryTaskExecutor != null && shutdownAsyncHistoryTaskExecutor) {
+            // The cast is OK, because the executor was created by this engine configuration
+            ((DefaultAsyncTaskExecutor) asyncHistoryTaskExecutor).shutdown();
+        }
+    }
+
 
     public Runnable getProcessEngineCloseRunnable() {
         return () -> {
@@ -4566,6 +4636,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncExecutorAllowCoreThreadTimeout(boolean asyncExecutorAllowCoreThreadTimeout) {
         this.asyncExecutorAllowCoreThreadTimeout = asyncExecutorAllowCoreThreadTimeout;
+        return this;
+    }
+
+    public ThreadFactory getAsyncExecutorThreadFactory() {
+        return asyncExecutorThreadFactory;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorThreadFactory(ThreadFactory asyncExecutorThreadFactory) {
+        this.asyncExecutorThreadFactory = asyncExecutorThreadFactory;
         return this;
     }
 

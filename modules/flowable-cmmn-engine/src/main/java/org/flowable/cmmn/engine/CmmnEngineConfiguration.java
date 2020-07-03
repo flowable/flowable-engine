@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadFactory;
 
 import javax.sql.DataSource;
 
@@ -200,6 +201,7 @@ import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -209,6 +211,7 @@ import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -500,6 +503,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected JobServiceConfiguration jobServiceConfiguration;
 
     protected AsyncExecutor asyncExecutor;
+    protected AsyncTaskExecutor asyncTaskExecutor;
+    protected boolean shutdownAsyncTaskExecutor;
     protected JobManager jobManager;
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
@@ -606,6 +611,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected boolean asyncExecutorAllowCoreThreadTimeout = true;
+
+    /**
+     * The thread factory that the async task executor should use.
+     */
+    protected ThreadFactory asyncExecutorThreadFactory;
 
     protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
 
@@ -738,6 +748,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean isAsyncExecutorResetExpiredJobsEnabled = true;
     
     protected AsyncExecutor asyncHistoryExecutor;
+    protected AsyncTaskExecutor asyncHistoryTaskExecutor;
+    protected boolean shutdownAsyncHistoryTaskExecutor;
     protected boolean isAsyncHistoryEnabled;
     protected boolean asyncHistoryExecutorActivate;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
@@ -1813,7 +1825,38 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    protected void initAsyncTaskExecutor() {
+        if (this.asyncTaskExecutor == null) {
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+
+            // Thread pool config
+            defaultAsyncTaskExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
+            defaultAsyncTaskExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
+            defaultAsyncTaskExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncExecutorThreadPoolQueue != null) {
+                defaultAsyncTaskExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
+            }
+            defaultAsyncTaskExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+
+            defaultAsyncTaskExecutor.setThreadFactory(asyncExecutorThreadFactory);
+
+            // Core thread timeout
+            defaultAsyncTaskExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
+
+            // Shutdown
+            defaultAsyncTaskExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
+
+            defaultAsyncTaskExecutor.start();
+            this.shutdownAsyncTaskExecutor = true;
+
+            this.asyncTaskExecutor = defaultAsyncTaskExecutor;
+        }
+    }
+
     public void initAsyncExecutor() {
+        initAsyncTaskExecutor();
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
             if (asyncExecutorExecuteAsyncRunnableFactory != null) {
@@ -1823,17 +1866,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             // Message queue mode
             defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
 
-            // Thread pool config
-            defaultAsyncExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
-            defaultAsyncExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
-            defaultAsyncExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
-
-            // Threadpool queue
-            if (asyncExecutorThreadPoolQueue != null) {
-                defaultAsyncExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
-            }
-            defaultAsyncExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
-            
             // Thread flags
             defaultAsyncExecutor.setAsyncJobAcquisitionEnabled(isAsyncExecutorAsyncJobAcquisitionEnabled);
             defaultAsyncExecutor.setTimerJobAcquisitionEnabled(isAsyncExecutorTimerJobAcquisitionEnabled);
@@ -1858,16 +1890,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
             defaultAsyncExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
 
-            // Core thread timeout
-            defaultAsyncExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
-
-            // Shutdown
-            defaultAsyncExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
-
             // Tenant
             defaultAsyncExecutor.setTenantId(asyncExecutorTenantId);
 
             asyncExecutor = defaultAsyncExecutor;
+        }
+
+        if (asyncExecutor instanceof DefaultAsyncJobExecutor) {
+            // Task executor
+            if (((DefaultAsyncJobExecutor) asyncExecutor).getTaskExecutor() == null) {
+                ((DefaultAsyncJobExecutor) asyncExecutor).setTaskExecutor(asyncTaskExecutor);
+            }
         }
 
         asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
@@ -1875,8 +1908,39 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobServiceConfiguration.setAsyncExecutor(asyncExecutor);
     }
     
+    protected void initAsyncHistoryTaskExecutor() {
+        if (this.asyncHistoryTaskExecutor == null) {
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+
+            // Thread pool config
+            defaultAsyncTaskExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
+            defaultAsyncTaskExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
+            defaultAsyncTaskExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncHistoryExecutorThreadPoolQueue != null) {
+                defaultAsyncTaskExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
+            }
+            defaultAsyncTaskExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+
+            // Core thread timeout
+            //defaultAsyncTaskExecutor.setAllowCoreThreadTimeout(asyncHistoryExecutorAllowCoreThreadTimeout);
+
+            // Shutdown
+            defaultAsyncTaskExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
+
+            defaultAsyncTaskExecutor.setThreadPoolNamingPattern("flowable-async-history-job-executor-thread-%d");
+
+            defaultAsyncTaskExecutor.start();
+            shutdownAsyncHistoryTaskExecutor = true;
+
+            this.asyncHistoryTaskExecutor = defaultAsyncTaskExecutor;
+        }
+    }
+
     public void initAsyncHistoryExecutor() {
         if (isAsyncHistoryEnabled) {
+            initAsyncHistoryTaskExecutor();
             
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
@@ -1884,17 +1948,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 // Message queue mode
                 defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
     
-                // Thread pool config
-                defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
-                defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
-                defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
-    
-                // Threadpool queue
-                if (asyncHistoryExecutorThreadPoolQueue != null) {
-                    defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
-                }
-                defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
-                
                 // Thread flags
                 defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
                 defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
@@ -1916,9 +1969,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
                 defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
     
-                // Shutdown
-                defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
-    
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
                 
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
@@ -1937,8 +1987,30 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         if (asyncHistoryExecutor != null) {
+
+            if (asyncHistoryExecutor instanceof DefaultAsyncJobExecutor) {
+                // Task executor
+                if (((DefaultAsyncJobExecutor) asyncHistoryExecutor).getTaskExecutor() == null) {
+                    ((DefaultAsyncJobExecutor) asyncHistoryExecutor).setTaskExecutor(asyncHistoryTaskExecutor);
+                }
+            }
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
+        }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        if (asyncTaskExecutor != null && shutdownAsyncTaskExecutor) {
+            // The cast is OK, because the executor was created by this engine configuration
+            ((DefaultAsyncTaskExecutor) asyncTaskExecutor).shutdown();
+        }
+
+        if (asyncHistoryTaskExecutor != null && shutdownAsyncHistoryTaskExecutor) {
+            // The cast is OK, because the executor was created by this engine configuration
+            ((DefaultAsyncTaskExecutor) asyncHistoryTaskExecutor).shutdown();
         }
     }
 
@@ -2987,6 +3059,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public AsyncTaskExecutor getAsyncTaskExecutor() {
+        return asyncTaskExecutor;
+    }
+
+    public CmmnEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+        this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -3101,6 +3182,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAsyncExecutorAllowCoreThreadTimeout(boolean asyncExecutorAllowCoreThreadTimeout) {
         this.asyncExecutorAllowCoreThreadTimeout = asyncExecutorAllowCoreThreadTimeout;
+        return this;
+    }
+
+    public ThreadFactory getAsyncExecutorThreadFactory() {
+        return asyncExecutorThreadFactory;
+    }
+
+    public CmmnEngineConfiguration setAsyncExecutorThreadFactory(ThreadFactory asyncExecutorThreadFactory) {
+        this.asyncExecutorThreadFactory = asyncExecutorThreadFactory;
         return this;
     }
 
@@ -3230,6 +3320,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
     
+    public AsyncTaskExecutor getAsyncHistoryTaskExecutor() {
+        return asyncHistoryTaskExecutor;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
+        this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
+        return this;
+    }
+
     public HistoricPlanItemInstanceDataManager getHistoricPlanItemInstanceDataManager() {
         return historicPlanItemInstanceDataManager;
     }
