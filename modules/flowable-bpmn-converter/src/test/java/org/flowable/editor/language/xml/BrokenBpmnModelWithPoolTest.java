@@ -14,21 +14,14 @@ package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
-import org.flowable.bpmn.model.ItemDefinition;
 import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.StringDataObject;
-import org.flowable.bpmn.model.ValuedDataObject;
 import org.junit.Test;
 
 public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
@@ -61,6 +54,50 @@ public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
         Process mainProcess = parsedModel.getMainProcess();
 
         assertThat(mainProcess).isNotNull();
+    }
+    
+    @Test
+    public void getMainProcessWithTwoBrokenPools() throws Exception {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process process = new Process();
+        process.setId("myProcess");
+        process.setExecutable(false);
+        bpmnModel.addProcess(process);
+        Pool brokenPool = new Pool();
+        brokenPool.setProcessRef("wrongProcessRef");
+        brokenPool.setId("cloudpool1");
+        brokenPool.setExecutable(false);
+        
+        Process process2 = new Process();
+        process2.setId("myProcess2");
+        bpmnModel.addProcess(process2);
+        Pool brokenPool2 = new Pool();
+        brokenPool2.setProcessRef("wrongProcessRef2");
+        brokenPool2.setId("cloudpool2");
+        brokenPool2.setExecutable(true);
+
+        bpmnModel.setPools(Arrays.asList(brokenPool, brokenPool2));
+        
+        StartEvent process1StartEvent = new StartEvent();
+        process1StartEvent.setId("process1Event1");
+        process.addFlowElement(process1StartEvent);
+
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId("event1");
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId("event2");
+
+        SequenceFlow flow = new SequenceFlow("event1", "event2");
+
+        process2.addFlowElement(startEvent);
+        process2.addFlowElement(endEvent);
+        process2.addFlowElement(flow);
+
+        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
+        Process mainProcess = parsedModel.getMainProcess();
+
+        assertThat(mainProcess).isNotNull();
+        assertThat(mainProcess.getFlowElements().size()).isEqualTo(3);
     }
 
     @Override
