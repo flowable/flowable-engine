@@ -61,7 +61,7 @@ public class CommandContextUtil {
     
     public static ByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
         if (commandContext != null) {
-            commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
+            return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
         }
         return null;
     }

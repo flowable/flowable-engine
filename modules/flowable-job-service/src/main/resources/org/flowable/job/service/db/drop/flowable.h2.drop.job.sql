@@ -10,9 +10,9 @@ drop index if exists ACT_IDX_SJOB_SCOPE_DEF;
 drop index if exists ACT_IDX_DJOB_SCOPE;
 drop index if exists ACT_IDX_DJOB_SUB_SCOPE;
 drop index if exists ACT_IDX_DJOB_SCOPE_DEF;  
-drop index if exists ACT_IDX_EXTERNAL_JOB_SCOPE;
-drop index if exists ACT_IDX_EXTERNAL_JOB_SUB_SCOPE;
-drop index if exists ACT_IDX_EXTERNAL_JOB_SCOPE_DEF;
+drop index if exists ACT_IDX_EJOB_SCOPE;
+drop index if exists ACT_IDX_EJOB_SUB_SCOPE;
+drop index if exists ACT_IDX_EJOB_SCOPE_DEF;
 
 drop table if exists ACT_RU_JOB cascade constraints;
 drop table if exists ACT_RU_EXTERNAL_JOB cascade constraints;
