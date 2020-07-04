@@ -154,7 +154,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
     String PROPERTY_SAME_DEPLOYMENT = "samedeployment";
     String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
-    String PROPERTY_ID_VARIABLE_NAME = "taskidvariablename";
+    String PROPERTY_ID_VARIABLE_NAME = "idvariablename";
 
     String PROPERTY_IN_PARAMETERS = "inParameters";
     String PROPERTY_OUT_PARAMETERS = "outParameters";
