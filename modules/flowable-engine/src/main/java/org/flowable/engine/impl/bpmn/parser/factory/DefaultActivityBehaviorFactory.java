@@ -353,8 +353,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
             }
 
             if (theClass == null) {
-                // Default Http behavior class
-                theClass = Class.forName("org.flowable.http.bpmn.impl.HttpActivityBehaviorImpl");
+                return classDelegateFactory.create(serviceTask.getId(), "org.flowable.http.bpmn.impl.DefaultBpmnHttpActivityDelegate",
+                        createFieldDeclarations(serviceTask.getFieldExtensions()),
+                        serviceTask.isTriggerable(),
+                        getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
