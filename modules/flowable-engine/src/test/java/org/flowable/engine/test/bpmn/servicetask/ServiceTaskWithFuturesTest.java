@@ -102,6 +102,7 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("myProcess")
                 .transientVariable("bean", testBean)
+                .transientVariable("counter", new AtomicInteger(0))
                 .start();
 
         assertProcessEnded(processInstance.getId());
@@ -160,10 +161,83 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
+    @Deployment
+    void testClassWithFutureJavaDelegate() {
+
+        String currentThreadName = Thread.currentThread().getName();
+
+        // When using a normal JavaDelegate this process cannot complete
+        // because the latch needs to be decreased twice before every task returns a result
+        // Try changing TestFutureJavaDelegate to implement JavaDelegate instead
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("counter", new AtomicInteger(0))
+                .transientVariable("countDownLatch", new CountDownLatch(2))
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
+                    .filter(variable -> !variable.getVariableName().equals("initiator"))
+                    .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
+
+            assertThat(historicVariables)
+                    .containsOnlyKeys(
+                            "counter1", "beforeExecutionThreadName1", "executionThreadName1", "afterExecutionThreadName1",
+                            "counter2", "beforeExecutionThreadName2", "executionThreadName2", "afterExecutionThreadName2"
+                    )
+                    .contains(
+                            entry("counter1", 1),
+                            entry("beforeExecutionThreadName1", currentThreadName),
+                            entry("afterExecutionThreadName1", currentThreadName),
+                            entry("counter2", 2),
+                            entry("beforeExecutionThreadName2", currentThreadName),
+                            entry("afterExecutionThreadName2", currentThreadName)
+                    );
+
+            assertThat(historicVariables.get("executionThreadName1"))
+                    .asInstanceOf(STRING)
+                    .isNotEqualTo(currentThreadName)
+                    .startsWith("flowable-async-job-executor-thread-");
+
+            assertThat(historicVariables.get("executionThreadName2"))
+                    .asInstanceOf(STRING)
+                    .isNotEqualTo(currentThreadName)
+                    // The executions should be done on different threads
+                    .isNotEqualTo(historicVariables.get("executionThreadName1"))
+                    .startsWith("flowable-async-job-executor-thread-");
+        }
+    }
+
+    @Test
+    @Deployment
+    void testClassWithJavaDelegate() {
+
+        // This is using a normal JavaDelegate and thus the process cannot complete
+        // because the latch needs to be decreased twice before every task returns a result
+        assertThatThrownBy(() -> {
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("myProcess")
+                    .transientVariable("countDownLatch", new CountDownLatch(2))
+                    .start();
+        })
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasNoCause()
+                .hasMessage("Countdown latch did not reach 0");
+
+    }
+
     protected static class TestFutureJavaDelegate implements FutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
 
-        protected final AtomicInteger counter = new AtomicInteger(0);
         protected final CountDownLatch countDownLatch;
+
+        @SuppressWarnings("unused") // used by the class delegate
+        public TestFutureJavaDelegate() {
+            this(null);
+        }
 
         public TestFutureJavaDelegate(CountDownLatch countDownLatch) {
             this.countDownLatch = countDownLatch;
@@ -173,12 +247,18 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
         public Map<String, Object> beforeExecution(DelegateExecution execution) {
             Map<String, Object> inputData = new HashMap<>();
             inputData.put("beforeExecutionThreadName", Thread.currentThread().getName());
+            AtomicInteger counter = (AtomicInteger) execution.getTransientVariable("counter");
             inputData.put("counter", counter.incrementAndGet());
+            inputData.put("countDownLatch", execution.getTransientVariable("countDownLatch"));
             return inputData;
         }
 
         @Override
         public Map<String, Object> execute(Map<String, Object> inputData) {
+            CountDownLatch countDownLatch = this.countDownLatch;
+            if (countDownLatch == null) {
+                countDownLatch = (CountDownLatch) inputData.get("countDownLatch");
+            }
             countDownLatch.countDown();
             try {
                 if (countDownLatch.await(2, TimeUnit.SECONDS)) {
@@ -217,12 +297,21 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
 
         protected final CountDownLatch countDownLatch;
 
+        @SuppressWarnings("unused") // used from the class delegate
+        public TestJavaDelegate() {
+            this(null);
+        }
+
         public TestJavaDelegate(CountDownLatch countDownLatch) {
             this.countDownLatch = countDownLatch;
         }
 
         @Override
         public void execute(DelegateExecution execution) {
+            CountDownLatch countDownLatch = this.countDownLatch;
+            if (countDownLatch == null) {
+                countDownLatch = (CountDownLatch) execution.getTransientVariable("countDownLatch");
+            }
             countDownLatch.countDown();
             try {
                 if (countDownLatch.await(2, TimeUnit.SECONDS)) {

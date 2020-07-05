@@ -37,7 +37,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Filip Hrisafov
  * @author Joram Barrez
  */
-public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements JavaDelegate {
+public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<HttpRequest, DefaultBpmnHttpActivityDelegate.ExecutionData> {
 
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
@@ -117,8 +117,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     }
 
     @Override
-    public void execute(DelegateExecution execution) {
-
+    public HttpRequest beforeExecution(DelegateExecution execution) {
         HttpRequest request;
 
         HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
@@ -143,13 +142,46 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         // Validate request
         requestValidator.validateRequest(request);
 
+        return request;
+    }
+
+    @Override
+    public ExecutionData execute(HttpRequest request) {
         try {
             // Prepare request
             ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
 
-            // Execute actual request
-            HttpResponse response = httpRequest.call();
+            return new ExecutionData(request, httpRequest.call());
+        } catch (BpmnError e) {
+            // Rethrow BPMN error so it can be propagated
+            throw e;
+        } catch (Exception ex) {
+            if (request.isIgnoreErrors()) {
+                return new ExecutionData(request, null, ex);
+            } else {
+                sneakyThrow(ex);
+            }
+        }
 
+        return null;
+    }
+
+    @Override
+    public void afterExecution(DelegateExecution execution, ExecutionData result) {
+
+        HttpRequest request = result.request;
+        HttpResponse response = result.response;
+
+        if (result.exception != null) {
+            LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), result.exception);
+            execution.setVariable(request.getPrefix() + "ErrorMessage", result.exception.getMessage());
+            return;
+        }
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
+
+        try {
             // Pass request through response handler
             HttpResponseHandler httpResponseHandler = createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), processEngineConfiguration);
 
@@ -224,7 +256,36 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         return fieldDeclarations;
     }
 
-    public static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+    private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
         throw (E) e;
+    }
+
+    protected static class ExecutionData {
+
+        protected HttpRequest request;
+        protected HttpResponse response;
+        protected Exception exception;
+
+        public ExecutionData(HttpRequest request, HttpResponse response) {
+            this(request, response, null);
+        }
+
+        public ExecutionData(HttpRequest request, HttpResponse response, Exception exception) {
+            this.request = request;
+            this.response = response;
+            this.exception = exception;
+        }
+
+        public HttpRequest getRequest() {
+            return request;
+        }
+
+        public HttpResponse getResponse() {
+            return response;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
     }
 }
