@@ -240,6 +240,7 @@ public class UserTask extends Task {
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
+        setTaskIdVariableName(otherElement.getTaskIdVariableName());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
         setValidateFormFields(otherElement.getValidateFormFields());

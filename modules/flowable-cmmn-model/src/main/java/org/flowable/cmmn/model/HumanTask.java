@@ -146,7 +146,8 @@ public class HumanTask extends Task {
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
-        
+        setTaskIdVariableName(otherElement.getTaskIdVariableName());
+
         setCandidateGroups(new ArrayList<>(otherElement.getCandidateGroups()));
         setCandidateUsers(new ArrayList<>(otherElement.getCandidateUsers()));
     }
