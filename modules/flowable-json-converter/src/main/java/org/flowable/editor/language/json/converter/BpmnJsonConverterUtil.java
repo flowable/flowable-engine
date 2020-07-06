@@ -542,20 +542,28 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                         ItemDefinition itemSubjectRef = new ItemDefinition();
                         String dataType = dataNode.get(PROPERTY_DATA_TYPE).asText();
 
-                        if (dataType.equals("string")) {
-                            dataObject = new StringDataObject();
-                        } else if (dataType.equals("int")) {
-                            dataObject = new IntegerDataObject();
-                        } else if (dataType.equals("long")) {
-                            dataObject = new LongDataObject();
-                        } else if (dataType.equals("double")) {
-                            dataObject = new DoubleDataObject();
-                        } else if (dataType.equals("boolean")) {
-                            dataObject = new BooleanDataObject();
-                        } else if (dataType.equals("datetime")) {
-                            dataObject = new DateDataObject();
-                        } else {
-                            LOGGER.error("Error converting {}", dataIdNode.asText());
+                        switch (dataType) {
+                            case "string":
+                                dataObject = new StringDataObject();
+                                break;
+                            case "int":
+                                dataObject = new IntegerDataObject();
+                                break;
+                            case "long":
+                                dataObject = new LongDataObject();
+                                break;
+                            case "double":
+                                dataObject = new DoubleDataObject();
+                                break;
+                            case "boolean":
+                                dataObject = new BooleanDataObject();
+                                break;
+                            case "datetime":
+                                dataObject = new DateDataObject();
+                                break;
+                            default:
+                                LOGGER.error("Error converting {}", dataIdNode.asText());
+                                break;
                         }
 
                         if (null != dataObject) {

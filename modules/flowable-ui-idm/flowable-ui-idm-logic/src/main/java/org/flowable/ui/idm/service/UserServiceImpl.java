@@ -55,16 +55,20 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         }
 
         if (StringUtils.isNotEmpty(sort)) {
-            if ("idDesc".equals(sort)) {
-                userQuery.orderByUserId().desc();
-            } else if ("idAsc".equals(sort)) {
-                userQuery.orderByUserId().asc();
-            } else if ("emailAsc".equals(sort)) {
-                userQuery.orderByUserEmail().asc();
-            } else if ("emailDesc".equals(sort)) {
-                userQuery.orderByUserEmail().desc();
+            switch (sort) {
+                case "idDesc":
+                    userQuery.orderByUserId().desc();
+                    break;
+                case "idAsc":
+                    userQuery.orderByUserId().asc();
+                    break;
+                case "emailAsc":
+                    userQuery.orderByUserEmail().asc();
+                    break;
+                case "emailDesc":
+                    userQuery.orderByUserEmail().desc();
+                    break;
             }
-
         }
         return userQuery;
     }

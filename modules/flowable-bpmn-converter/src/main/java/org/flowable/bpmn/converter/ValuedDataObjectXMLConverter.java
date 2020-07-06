@@ -63,22 +63,31 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(structureRef) && structureRef.contains(":")) {
             String dataType = structureRef.substring(structureRef.indexOf(':') + 1);
 
-            if (dataType.equals("string")) {
-                dataObject = new StringDataObject();
-            } else if (dataType.equals("int")) {
-                dataObject = new IntegerDataObject();
-            } else if (dataType.equals("long")) {
-                dataObject = new LongDataObject();
-            } else if (dataType.equals("double")) {
-                dataObject = new DoubleDataObject();
-            } else if (dataType.equals("boolean")) {
-                dataObject = new BooleanDataObject();
-            } else if (dataType.equals("datetime")) {
-                dataObject = new DateDataObject();
-            } else if (dataType.equals("json")) {
-                dataObject = new JsonDataObject();
-            } else {
-                LOGGER.error("Error converting {}, invalid data type: {}", xtr.getAttributeValue(null, ATTRIBUTE_DATA_NAME), dataType);
+            switch (dataType) {
+                case "string":
+                    dataObject = new StringDataObject();
+                    break;
+                case "int":
+                    dataObject = new IntegerDataObject();
+                    break;
+                case "long":
+                    dataObject = new LongDataObject();
+                    break;
+                case "double":
+                    dataObject = new DoubleDataObject();
+                    break;
+                case "boolean":
+                    dataObject = new BooleanDataObject();
+                    break;
+                case "datetime":
+                    dataObject = new DateDataObject();
+                    break;
+                case "json":
+                    dataObject = new JsonDataObject();
+                    break;
+                default:
+                    LOGGER.error("Error converting {}, invalid data type: {}", xtr.getAttributeValue(null, ATTRIBUTE_DATA_NAME), dataType);
+                    break;
             }
 
         } else {

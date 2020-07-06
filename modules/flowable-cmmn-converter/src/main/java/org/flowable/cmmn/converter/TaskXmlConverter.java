@@ -50,28 +50,31 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
 
         if (type != null) {
 
-            if (Objects.equals(type, ServiceTask.JAVA_TASK)) {
-                task = convertToJavaServiceTask(xtr, className);
-
-            } else if (Objects.equals(type, HttpServiceTask.HTTP_TASK)) {
-                task = convertToHttpTask(className);
-
-            } else if (Objects.equals(type, ServiceTask.MAIL_TASK)) {
-                task = convertToMailTask();
-
-            } else if (Objects.equals(type, ScriptServiceTask.SCRIPT_TASK)) {
-                task = convertToScriptTask(xtr);
-                
-            } else if (Objects.equals(type, CasePageTask.TYPE)) {
-                task = convertToCasePageTask(xtr);
-
-            } else if (Objects.equals(type, ExternalWorkerServiceTask.TYPE)) {
-                task = convertToExternalWorkerServiceTask(xtr);
-            } else if (Objects.equals(type, SendEventServiceTask.SEND_EVENT)) {
-              task = convertToSendEventTask(xtr);
-
-            } else {
-                task = new Task();
+            switch (type) {
+                case ServiceTask.JAVA_TASK:
+                    task = convertToJavaServiceTask(xtr, className);
+                    break;
+                case HttpServiceTask.HTTP_TASK:
+                    task = convertToHttpTask(className);
+                    break;
+                case ServiceTask.MAIL_TASK:
+                    task = convertToMailTask();
+                    break;
+                case ScriptServiceTask.SCRIPT_TASK:
+                    task = convertToScriptTask(xtr);
+                    break;
+                case CasePageTask.TYPE:
+                    task = convertToCasePageTask(xtr);
+                    break;
+                case ExternalWorkerServiceTask.TYPE:
+                    task = convertToExternalWorkerServiceTask(xtr);
+                    break;
+                case SendEventServiceTask.SEND_EVENT:
+                    task = convertToSendEventTask(xtr);
+                    break;
+                default:
+                    task = new Task();
+                    break;
             }
 
         } else {
