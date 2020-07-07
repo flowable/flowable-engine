@@ -17,6 +17,8 @@ import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_DEL
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -34,6 +36,7 @@ import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.async.AsyncTaskInvoker;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -48,6 +51,7 @@ import org.flowable.http.HttpResponse;
 import org.flowable.http.bpmn.impl.handler.ClassDelegateHttpHandler;
 import org.flowable.http.bpmn.impl.handler.DelegateExpressionHttpHandler;
 import org.flowable.http.client.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.client.AsyncExecutableHttpRequest;
 import org.flowable.http.client.ExecutableHttpRequest;
 import org.flowable.http.client.FlowableHttpClient;
 import org.flowable.http.delegate.HttpRequestHandler;
@@ -59,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * @author Filip Hrisafov
  * @author Joram Barrez
  */
-public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<HttpRequest, DefaultBpmnHttpActivityDelegate.ExecutionData> {
+public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<DefaultBpmnHttpActivityDelegate.ExecutionData> {
 
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
@@ -117,7 +121,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     }
 
     @Override
-    public HttpRequest beforeExecution(DelegateExecution execution) {
+    public Future<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
         HttpRequest request;
 
         HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
@@ -142,28 +146,32 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         // Validate request
         requestValidator.validateRequest(request);
 
-        return request;
-    }
+        // Prepare request
+        ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
 
-    @Override
-    public ExecutionData execute(HttpRequest request) {
-        try {
-            // Prepare request
-            ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
+        if (!httpServiceTask.isParallelInSameTransaction()) {
+            CompletableFuture<ExecutionData> future = new CompletableFuture<>();
 
-            return new ExecutionData(request, httpRequest.call());
-        } catch (BpmnError e) {
-            // Rethrow BPMN error so it can be propagated
-            throw e;
-        } catch (Exception ex) {
-            if (request.isIgnoreErrors()) {
-                return new ExecutionData(request, null, ex);
-            } else {
-                sneakyThrow(ex);
+            try {
+                HttpResponse response = httpRequest.call();
+                future.complete(new ExecutionData(request, response));
+            } catch (Exception ex) {
+                future.complete(new ExecutionData(request, null, ex));
             }
-        }
+            return future;
+        } else if (httpRequest instanceof AsyncExecutableHttpRequest) {
 
-        return null;
+            return ((AsyncExecutableHttpRequest) httpRequest).callAsync()
+                    .handle((response, throwable) -> new ExecutionData(request, response, throwable));
+        }
+        return taskInvoker.submit(() -> {
+            try {
+                return new ExecutionData(request, httpRequest.call());
+            } catch (Exception ex) {
+                return new ExecutionData(request, null, ex);
+            }
+        });
+
     }
 
     @Override
@@ -173,9 +181,13 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         HttpResponse response = result.response;
 
         if (result.exception != null) {
-            LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), result.exception);
-            execution.setVariable(request.getPrefix() + "ErrorMessage", result.exception.getMessage());
-            return;
+            if (request.isIgnoreErrors()) {
+                LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), result.exception);
+                execution.setVariable(request.getPrefix() + "ErrorMessage", result.exception.getMessage());
+                return;
+            }
+
+            sneakyThrow(result.exception);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -264,13 +276,13 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
         protected HttpRequest request;
         protected HttpResponse response;
-        protected Exception exception;
+        protected Throwable exception;
 
         public ExecutionData(HttpRequest request, HttpResponse response) {
             this(request, response, null);
         }
 
-        public ExecutionData(HttpRequest request, HttpResponse response, Exception exception) {
+        public ExecutionData(HttpRequest request, HttpResponse response, Throwable exception) {
             this.request = request;
             this.response = response;
             this.exception = exception;
@@ -284,7 +296,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             return response;
         }
 
-        public Exception getException() {
+        public Throwable getException() {
             return exception;
         }
     }
