@@ -31,7 +31,7 @@ import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.FutureJavaDelegate;
+import org.flowable.engine.delegate.FlowableFutureJavaDelegate;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -230,7 +230,7 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
 
     }
 
-    protected static class TestFutureJavaDelegate implements FutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
+    protected static class TestFutureJavaDelegate implements FlowableFutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
 
         protected final CountDownLatch countDownLatch;
 
@@ -244,7 +244,7 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public Map<String, Object> beforeExecution(DelegateExecution execution) {
+        public Map<String, Object> prepareExecutionData(DelegateExecution execution) {
             Map<String, Object> inputData = new HashMap<>();
             inputData.put("beforeExecutionThreadName", Thread.currentThread().getName());
             AtomicInteger counter = (AtomicInteger) execution.getTransientVariable("counter");

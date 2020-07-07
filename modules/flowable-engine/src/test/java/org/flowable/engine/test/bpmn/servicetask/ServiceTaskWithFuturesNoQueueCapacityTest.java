@@ -31,7 +31,7 @@ import org.flowable.common.engine.impl.async.AsyncTaskInvoker;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.FutureJavaDelegate;
+import org.flowable.engine.delegate.FlowableFutureJavaDelegate;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
@@ -122,7 +122,7 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
         }).isInstanceOf(RejectedExecutionException.class);
     }
 
-    protected static class TestFutureJavaDelegate implements FutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
+    protected static class TestFutureJavaDelegate implements FlowableFutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
 
         protected final AtomicInteger counter = new AtomicInteger(0);
         protected final CountDownLatch latch;
@@ -132,7 +132,7 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
         }
 
         @Override
-        public Map<String, Object> beforeExecution(DelegateExecution execution) {
+        public Map<String, Object> prepareExecutionData(DelegateExecution execution) {
             Map<String, Object> inputData = new HashMap<>();
             inputData.put("counter", counter.incrementAndGet());
             return inputData;

@@ -163,10 +163,9 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                     }
                 } else if (delegate instanceof FutureJavaDelegate) {
                     //TODO do we need to use the delegate interceptor?
-                    FutureJavaDelegate<Object, Object> futureJavaDelegate = (FutureJavaDelegate<Object, Object>) delegate;
-                    Object inputData = futureJavaDelegate.beforeExecution(execution);
+                    FutureJavaDelegate<Object> futureJavaDelegate = (FutureJavaDelegate<Object>) delegate;
 
-                    Future<Object> future = processEngineConfiguration.getAsyncTaskInvoker().submit(() -> futureJavaDelegate.execute(inputData));
+                    Future<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());;
 
                     CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
 
@@ -199,11 +198,11 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
 
     protected class FutureJavaDelegateCompleteAction implements BiConsumer<Object, Throwable> {
 
-        protected final FutureJavaDelegate<?, Object> delegateInstance;
+        protected final FutureJavaDelegate<Object> delegateInstance;
         protected final DelegateExecution execution;
         protected final boolean loggingSessionEnabled;
 
-        public FutureJavaDelegateCompleteAction(FutureJavaDelegate<?, Object> delegateInstance,
+        public FutureJavaDelegateCompleteAction(FutureJavaDelegate<Object> delegateInstance,
                 DelegateExecution execution, boolean loggingSessionEnabled) {
             this.delegateInstance = delegateInstance;
             this.execution = execution;

@@ -41,6 +41,7 @@ public class OperationWithFuture<T> implements Runnable {
                 action.accept(value, null);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                throw new FlowableException("Future was interrupted", e);
             } catch (ExecutionException e) {
                 action.accept(null, e.getCause());
             }
