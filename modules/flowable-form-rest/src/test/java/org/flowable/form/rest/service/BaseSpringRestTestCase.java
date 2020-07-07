@@ -12,9 +12,18 @@
  */
 package org.flowable.form.rest.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.TestCase;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -45,20 +54,14 @@ import org.flowable.form.rest.util.TestServerUtil.TestServer;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import junit.framework.TestCase;
 
 
 public abstract class BaseSpringRestTestCase extends TestCase {
@@ -214,7 +217,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             CloseableHttpResponse response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
@@ -224,7 +227,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 }
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
@@ -288,7 +291,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        // assertEquals(numberOfResultsExpected, dataNode.size());
+        // assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -296,9 +299,11 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             String id = aDataNode.get("id").textValue();
             String sb = aDataNode.get("submittedBy").textValue();
             toBeFound.remove(id);
-            assertEquals(sb, submittedBy);
+            assertThat(submittedBy).isEqualTo(sb);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound)
+                .as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                .isEmpty();
     }
 
     public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {

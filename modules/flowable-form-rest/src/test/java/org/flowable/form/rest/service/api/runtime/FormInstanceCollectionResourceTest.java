@@ -12,6 +12,9 @@
  */
 package org.flowable.form.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.entry;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +43,11 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         valuesMap.put("number", "1234");
 
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
-        assertEquals("test", formValues.get("user"));
-        assertEquals("default", formValues.get("form_form1_outcome"));
+        assertThat(formValues)
+                .contains(
+                        entry("user", "test"),
+                        entry("form_form1_outcome", "default")
+                );
 
         FormRequest formRequest = new FormRequest();
         formRequest.setFormDefinitionKey(formInfo.getKey());
@@ -88,7 +94,7 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         
-        assertEquals(2, dataNode.size());
+        assertThat(dataNode).hasSize(2);
         
         String formInstanceId = dataNode.get(0).get("id").asText();
         response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url + "?id=" + formInstanceId), HttpStatus.SC_OK);
@@ -97,8 +103,8 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         
-        assertEquals(1, dataNode.size());
-        assertEquals(formInstanceId, dataNode.get(0).get("id").asText());
+        assertThat(dataNode).hasSize(1);
+        assertThat(dataNode.get(0).get("id").asText()).isEqualTo(formInstanceId);
         
         List<FormInstance> formInstances = formService.createFormInstanceQuery().list();
         for (FormInstance formInstance : formInstances) {

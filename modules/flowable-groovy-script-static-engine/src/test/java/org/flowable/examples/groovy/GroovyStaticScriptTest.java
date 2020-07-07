@@ -13,6 +13,8 @@
 
 package org.flowable.examples.groovy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -32,8 +34,8 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        assertEquals("ABC", result);
-        assertEquals(15, sum.intValue());
+        assertThat(result).isEqualTo("ABC");
+        assertThat(sum).isEqualTo(15);
     }
     
     @Test
@@ -44,7 +46,7 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        assertEquals("ABC", result);
-        assertEquals(15, sum.intValue());
+        assertThat(result).isEqualTo("ABC");
+        assertThat(sum).isEqualTo(15);
     }
 }

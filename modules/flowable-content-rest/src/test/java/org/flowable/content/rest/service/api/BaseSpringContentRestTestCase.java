@@ -247,7 +247,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -256,7 +256,9 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound)
+                .as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                .isEmpty();
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
@@ -278,7 +280,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -288,7 +290,9 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                     String id = it.next().get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound)
+                        .as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                        .isEmpty();
             }
         }
 
@@ -302,7 +306,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(0, dataNode.size());
+        assertThat(dataNode).isEmpty();
     }
 
     /**
