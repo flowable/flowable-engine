@@ -40,7 +40,7 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
 
     private static final long serialVersionUID = 1L;
 
-    protected FutureJavaDelegate<?, ?> futureJavaDelegate;
+    protected FutureJavaDelegate<?> futureJavaDelegate;
     protected Expression skipExpression;
     protected boolean triggerable;
     protected List<MapExceptionEntry> mapExceptions;
@@ -48,7 +48,7 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
     protected ServiceTaskFutureJavaDelegateActivityBehavior() {
     }
 
-    public ServiceTaskFutureJavaDelegateActivityBehavior(FutureJavaDelegate<?, ?> futureJavaDelegate, boolean triggerable, Expression skipExpression, List<MapExceptionEntry> mapExceptions) {
+    public ServiceTaskFutureJavaDelegateActivityBehavior(FutureJavaDelegate<?> futureJavaDelegate, boolean triggerable, Expression skipExpression, List<MapExceptionEntry> mapExceptions) {
         this.futureJavaDelegate = futureJavaDelegate;
         this.triggerable = triggerable;
         this.skipExpression = skipExpression;
@@ -110,10 +110,9 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                 }
 
                 //TODO do we need to use the delegate interceptor?
-                FutureJavaDelegate<Object, Object> futureJavaDelegate = (FutureJavaDelegate<Object, Object>) this.futureJavaDelegate;
-                Object inputData = futureJavaDelegate.beforeExecution(execution);
+                FutureJavaDelegate<Object> futureJavaDelegate = (FutureJavaDelegate<Object>) this.futureJavaDelegate;
 
-                Future<Object> future = processEngineConfiguration.getAsyncTaskInvoker().submit(() -> futureJavaDelegate.execute(inputData));
+                Future<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());
 
                 CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
 
@@ -157,11 +156,11 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
 
     protected class FutureJavaDelegateCompleteAction implements BiConsumer<Object, Throwable> {
 
-        protected final FutureJavaDelegate<?, Object> delegateInstance;
+        protected final FutureJavaDelegate<Object> delegateInstance;
         protected final DelegateExecution execution;
         protected final boolean loggingSessionEnabled;
 
-        public FutureJavaDelegateCompleteAction(FutureJavaDelegate<?, Object> delegateInstance,
+        public FutureJavaDelegateCompleteAction(FutureJavaDelegate<Object> delegateInstance,
                 DelegateExecution execution, boolean loggingSessionEnabled) {
             this.delegateInstance = delegateInstance;
             this.execution = execution;

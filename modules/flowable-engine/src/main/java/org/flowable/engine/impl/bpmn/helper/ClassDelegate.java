@@ -264,7 +264,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         } else if (delegateInstance instanceof JavaDelegate) {
             return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, triggerable, skipExpression));
         } else if (delegateInstance instanceof FutureJavaDelegate) {
-            return determineBehaviour(new ServiceTaskFutureJavaDelegateActivityBehavior((FutureJavaDelegate<?, ?>) delegateInstance, triggerable, skipExpression, mapExceptions));
+            return determineBehaviour(new ServiceTaskFutureJavaDelegateActivityBehavior((FutureJavaDelegate<?>) delegateInstance, triggerable, skipExpression, mapExceptions));
         } else {
             throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + ", " + FutureJavaDelegate.class.getName() + " nor " + ActivityBehavior.class.getName());
         }
