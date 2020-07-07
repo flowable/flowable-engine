@@ -18,8 +18,6 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.dmn.api.DmnHistoricDecisionExecution;
-import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 

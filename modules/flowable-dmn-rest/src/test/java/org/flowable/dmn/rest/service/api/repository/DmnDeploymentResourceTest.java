@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -22,6 +25,8 @@ import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Yvo Swillens
@@ -42,26 +47,17 @@ public class DmnDeploymentResourceTest extends BaseSpringDmnRestTestCase {
         
         closeResponse(response);
 
-        String deploymentId = responseNode.get("id").textValue();
-        String name = responseNode.get("name").textValue();
-        String category = responseNode.get("category").textValue();
-        String deployTime = responseNode.get("deploymentTime").textValue();
-        String url = responseNode.get("url").textValue();
-        String tenantId = responseNode.get("tenantId").textValue();
-
-        assertEquals("", tenantId);
-        assertNotNull(deploymentId);
-        assertEquals(existingDeployment.getId(), deploymentId);
-
-        assertNotNull(name);
-        assertEquals(existingDeployment.getName(), name);
-
-        assertEquals(existingDeployment.getCategory(), category);
-
-        assertNotNull(deployTime);
-
-        assertNotNull(url);
-        assertTrue(url.endsWith(DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT, deploymentId)));
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + existingDeployment.getId() + "',"
+                        + "  url: '" + httpGet.getURI().toString() + "',"
+                        + "  category: " + existingDeployment.getCategory() + ","
+                        + "  name: '" + existingDeployment.getName() + "',"
+                        + "  deploymentTime: '${json-unit.any-string}',"
+                        + "  tenantId: ''"
+                        + "  }"
+                );
     }
 
     /**
@@ -80,7 +76,7 @@ public class DmnDeploymentResourceTest extends BaseSpringDmnRestTestCase {
     public void testDeleteDeployment() throws Exception {
         dmnRepositoryService.createDeploymentQuery().singleResult();
         org.flowable.dmn.api.DmnDeployment existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(existingDeployment);
+        assertThat(existingDeployment).isNotNull();
 
         // Delete the deployment
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
@@ -88,7 +84,7 @@ public class DmnDeploymentResourceTest extends BaseSpringDmnRestTestCase {
         closeResponse(response);
 
         existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
-        assertNull(existingDeployment);
+        assertThat(existingDeployment).isNull();
     }
 
     /**
