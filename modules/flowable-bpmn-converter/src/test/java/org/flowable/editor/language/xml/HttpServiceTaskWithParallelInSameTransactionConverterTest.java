@@ -13,15 +13,18 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableHttpRequestHandler;
+import org.flowable.bpmn.model.FlowableHttpResponseHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.junit.Test;
 
-public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
+public class HttpServiceTaskWithParallelInSameTransactionConverterTest extends AbstractConverterTest {
 
     @Test
     public void convertXMLToModel() throws Exception {
@@ -38,20 +41,18 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
 
     @Override
     protected String getResource() {
-        return "httpservicetaskmodel2.bpmn";
+        return "httpServiceTaskWithParallelInSameTransactionModel.bpmn";
     }
 
     private void validateModel(BpmnModel model) {
-        FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertThat(flowElement)
-                .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
-                    assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
-                    assertThat(httpServiceTask.getName()).isEqualTo("Service task");
-                    assertThat(httpServiceTask.getParallelInSameTransaction()).isNull();
-                    assertThat(httpServiceTask.getFieldExtensions()).isEmpty();
-                    assertThat(httpServiceTask.getHttpRequestHandler())
-                            .extracting(FlowableHttpRequestHandler::getImplementationType, FlowableHttpRequestHandler::getImplementation)
-                            .containsExactly(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${delegateExpression}");
-                });
+        FlowElement flowElement = model.getMainProcess().getFlowElement("serviceTask1");
+        assertThat(flowElement).isInstanceOf(HttpServiceTask.class);
+        HttpServiceTask httpServiceTask = (HttpServiceTask) flowElement;
+        assertThat(httpServiceTask.getParallelInSameTransaction()).isTrue();
+
+        flowElement = model.getMainProcess().getFlowElement("serviceTask2");
+        assertThat(flowElement).isInstanceOf(HttpServiceTask.class);
+        httpServiceTask = (HttpServiceTask) flowElement;
+        assertThat(httpServiceTask.getParallelInSameTransaction()).isFalse();
     }
 }

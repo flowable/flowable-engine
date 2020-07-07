@@ -12,12 +12,12 @@
  */
 package org.flowable.http.client;
 
-import org.flowable.http.HttpResponse;
+import org.flowable.http.HttpRequest;
 
 /**
  * @author Filip Hrisafov
  */
-public interface ExecutableHttpRequest {
+public interface FlowableAsyncHttpClient extends FlowableHttpClient {
 
-    HttpResponse call();
+    AsyncExecutableHttpRequest prepareRequest(HttpRequest request);
 }

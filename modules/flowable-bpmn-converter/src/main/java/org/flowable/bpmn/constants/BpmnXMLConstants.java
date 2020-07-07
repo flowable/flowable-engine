@@ -200,6 +200,8 @@ public interface BpmnXMLConstants {
 
     public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC = "topic";
 
+    public static final String ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
+
     public static final String ATTRIBUTE_TASK_USER_ASSIGNEE = "assignee";
     public static final String ATTRIBUTE_TASK_USER_OWNER = "owner";
     public static final String ATTRIBUTE_TASK_USER_CANDIDATEUSERS = "candidateUsers";
