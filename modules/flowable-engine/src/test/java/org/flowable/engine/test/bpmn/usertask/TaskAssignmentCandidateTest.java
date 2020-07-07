@@ -12,10 +12,13 @@
  */
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,13 +50,15 @@ public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
                 .createTaskQuery()
                 .taskCandidateGroup("management")
                 .list();
-        assertEquals(1, tasks.size());
-        assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("theTask");
         taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().taskCandidateGroup("accounting").list();
-        assertEquals(1, tasks.size());
-        assertEquals("theOtherTask", tasks.get(0).getTaskDefinitionKey());
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("theOtherTask");
         taskService.complete(tasks.get(0).getId());
     }
 

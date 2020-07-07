@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
 
 import org.flowable.engine.delegate.DelegateExecution;
@@ -85,15 +87,15 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("process");
 
         Job job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
         job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
-        assertTrue(isOkInDelegate2);
-        assertTrue(isOkInDelegate3);
+        assertThat(isOkInDelegate2).isTrue();
+        assertThat(isOkInDelegate3).isTrue();
     }
 
     @Test
@@ -106,8 +108,8 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(10000, 500);
 
         synchronized (ServiceTaskVariablesTest.class) {
-            assertTrue(isOkInDelegate2);
-            assertTrue(isOkInDelegate3);
+            assertThat(isOkInDelegate2).isTrue();
+            assertThat(isOkInDelegate3).isTrue();
         }
 
     }

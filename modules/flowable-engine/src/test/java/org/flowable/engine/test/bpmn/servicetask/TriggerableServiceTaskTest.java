@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +35,17 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         int count = (int) runtimeService.getVariable(processId, "count");
-        assertEquals(1, count);
+        assertThat(count).isEqualTo(1);
 
         Map<String,Object> processVariables = new HashMap<>();
         processVariables.put("count", ++count);
         runtimeService.trigger(execution.getId(), processVariables, null);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
-        assertNotNull(execution);
-        assertEquals(3, runtimeService.getVariable(processId, "count"));
+        assertThat(execution).isNotNull();
+        assertThat(runtimeService.getVariable(processId, "count")).isEqualTo(3);
     }
 
     @Test
@@ -55,17 +57,17 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         int count = (int) runtimeService.getVariable(processId, "count");
-        assertEquals(1, count);
+        assertThat(count).isEqualTo(1);
 
         Map<String,Object> processVariables = new HashMap<>();
         processVariables.put("count", ++count);
         runtimeService.trigger(execution.getId(), processVariables, null);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
-        assertNotNull(execution);
-        assertEquals(3, runtimeService.getVariable(processId, "count"));
+        assertThat(execution).isNotNull();
+        assertThat(runtimeService.getVariable(processId, "count")).isEqualTo(3);
     }
 
     @Test
@@ -78,16 +80,16 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
-        assertNotNull(execution);
-        assertTrue((boolean) runtimeService.getVariable(processId, "executed"));
+        assertThat(execution).isNotNull();
+        assertThat((boolean) runtimeService.getVariable(processId, "executed")).isTrue();
 
         Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("count", 1);
         runtimeService.trigger(execution.getId(), processVariables, null);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
-        assertNotNull(execution);
-        assertEquals(1, runtimeService.getVariable(processId, "count"));
+        assertThat(execution).isNotNull();
+        assertThat(runtimeService.getVariable(processId, "count")).isEqualTo(1);
     }
 
     @Test
@@ -96,28 +98,28 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
         
         List<Job> jobs = managementService.createJobQuery().processInstanceId(processId).list();
-        assertEquals(1, jobs.size());
-        assertEquals(AsyncContinuationJobHandler.TYPE, jobs.get(0).getJobHandlerType());
+        assertThat(jobs).hasSize(1);
+        assertThat(jobs.get(0).getJobHandlerType()).isEqualTo(AsyncContinuationJobHandler.TYPE);
         
         waitForJobExecutorToProcessAllJobs(7000L, 250L);
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         int count = (int) runtimeService.getVariable(processId, "count");
-        assertEquals(1, count);
+        assertThat(count).isEqualTo(1);
 
         Map<String,Object> processVariables = new HashMap<>();
         processVariables.put("count", ++count);
         runtimeService.triggerAsync(execution.getId(), processVariables);
         
         jobs = managementService.createJobQuery().processInstanceId(processId).list();
-        assertEquals(1, jobs.size());
-        assertEquals(AsyncTriggerJobHandler.TYPE, jobs.get(0).getJobHandlerType());
+        assertThat(jobs).hasSize(1);
+        assertThat(jobs.get(0).getJobHandlerType()).isEqualTo(AsyncTriggerJobHandler.TYPE);
         
         waitForJobExecutorToProcessAllJobs(7000L, 250L);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
-        assertNotNull(execution);
-        assertEquals(3, runtimeService.getVariable(processId, "count"));
+        assertThat(execution).isNotNull();
+        assertThat(runtimeService.getVariable(processId, "count")).isEqualTo(3);
     }
 }
