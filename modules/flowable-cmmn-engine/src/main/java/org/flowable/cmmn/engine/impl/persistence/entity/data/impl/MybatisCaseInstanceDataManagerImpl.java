@@ -170,7 +170,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         // paging doesn't work for combining case instances and variables due
         // to an outer join, so doing it in-memory
 
-        CaseInstanceQueryImpl caseInstanceQuery = (CaseInstanceQueryImpl) query;
+        CaseInstanceQueryImpl caseInstanceQuery = query;
         int firstResult = caseInstanceQuery.getFirstResult();
         int maxResults = caseInstanceQuery.getMaxResults();
 
