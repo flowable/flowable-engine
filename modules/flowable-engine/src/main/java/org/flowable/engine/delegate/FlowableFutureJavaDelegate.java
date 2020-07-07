@@ -14,7 +14,7 @@ package org.flowable.engine.delegate;
 
 import java.util.concurrent.Future;
 
-import org.flowable.common.engine.impl.async.AsyncTaskInvoker;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 
 /**
  * Convenience class which always uses the {@link AsyncTaskInvoker} to execute the async data.

@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.async.AsyncTaskInvoker;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;

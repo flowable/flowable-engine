@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.async;
+package org.flowable.common.engine.api.async;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;

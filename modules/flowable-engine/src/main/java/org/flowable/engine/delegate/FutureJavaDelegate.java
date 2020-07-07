@@ -14,7 +14,7 @@ package org.flowable.engine.delegate;
 
 import java.util.concurrent.Future;
 
-import org.flowable.common.engine.impl.async.AsyncTaskInvoker;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 
 /**
  * Convenience class that should be used when a Java delegation in a BPMN 2.0 process is required (for example, to call custom business logic).
