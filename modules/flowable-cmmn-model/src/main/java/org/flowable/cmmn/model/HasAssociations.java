@@ -19,16 +19,16 @@ import java.util.List;
  */
 public interface HasAssociations {
     
-    public void addIncomingAssociation(Association association);
+    void addIncomingAssociation(Association association);
     
-    public List<Association> getIncomingAssociations();
+    List<Association> getIncomingAssociations();
     
-    public void setIncomingAssociations(List<Association> incomingAssociations);
+    void setIncomingAssociations(List<Association> incomingAssociations);
     
-    public void addOutgoingAssociation(Association association);
+    void addOutgoingAssociation(Association association);
     
-    public List<Association> getOutgoingAssociations();
+    List<Association> getOutgoingAssociations();
     
-    public void setOutgoingAssociations(List<Association> outgoingAssociations);
+    void setOutgoingAssociations(List<Association> outgoingAssociations);
 
 }

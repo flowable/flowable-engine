@@ -21,8 +21,8 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
  */
 public interface EventHandler {
 
-    public String getEventHandlerType();
+    String getEventHandlerType();
 
-    public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext);
+    void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext);
 
 }

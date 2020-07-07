@@ -32,7 +32,7 @@ public interface UserCache {
 
     void invalidate(String userId);
 
-    public static class CachedUser {
+    class CachedUser {
 
         private Collection<GrantedAuthority> grantedAuthorities;
 

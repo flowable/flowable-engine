@@ -14,6 +14,6 @@ package org.flowable.app.api;
 
 public interface AppEngineConfigurationApi {
 
-    public AppManagementService getAppManagementService();
-    public AppRepositoryService getAppRepositoryService();
+    AppManagementService getAppManagementService();
+    AppRepositoryService getAppRepositoryService();
 }

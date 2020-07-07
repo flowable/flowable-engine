@@ -29,6 +29,6 @@ public interface PersistentTokenService {
 
     void delete(Token persistentToken);
 
-    public Token createToken(User user, String remoteAddress, String userAgent);
+    Token createToken(User user, String remoteAddress, String userAgent);
 
 }

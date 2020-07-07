@@ -20,8 +20,8 @@ import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 
 /** Constructs {@link ClassDelegate}s. */
 public interface ClassDelegateFactory {
-    public ClassDelegate create(String id, String className, List<FieldDeclaration> fieldDeclarations,
-            boolean triggerable, Expression skipExpression, List<MapExceptionEntry> mapExceptions);
+    ClassDelegate create(String id, String className, List<FieldDeclaration> fieldDeclarations,
+                         boolean triggerable, Expression skipExpression, List<MapExceptionEntry> mapExceptions);
 
-    public ClassDelegate create(String className, List<FieldDeclaration> fieldDeclarations);
+    ClassDelegate create(String className, List<FieldDeclaration> fieldDeclarations);
 }

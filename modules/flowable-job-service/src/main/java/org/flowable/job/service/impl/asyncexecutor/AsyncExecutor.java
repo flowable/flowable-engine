@@ -69,9 +69,9 @@ public interface AsyncExecutor {
 
     void setDefaultAsyncJobAcquireWaitTimeInMillis(int waitTimeInMillis);
 
-    public int getDefaultQueueSizeFullWaitTimeInMillis();
+    int getDefaultQueueSizeFullWaitTimeInMillis();
 
-    public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
+    void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
 
     int getMaxAsyncJobsDuePerAcquisition();
 
