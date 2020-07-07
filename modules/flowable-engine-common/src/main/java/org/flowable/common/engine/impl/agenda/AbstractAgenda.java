@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.agenda;
 
 import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 
@@ -71,7 +72,21 @@ public abstract class AbstractAgenda implements Agenda {
 
     @Override
     public <V> void planFutureOperation(Future<V> future, BiConsumer<V, Throwable> completeAction) {
-        planOperation(new OperationWithFuture<>(this, future, completeAction));
+        // If the future is done then get the value immediately and run the complete action without planning it on the agenda
+        if (future.isDone()) {
+            try {
+                V result = future.get();
+                completeAction.accept(result, null);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new FlowableException("Future was interrupted", e);
+
+            } catch (ExecutionException e) {
+                completeAction.accept(null, e.getCause());
+            }
+        } else {
+            planOperation(new OperationWithFuture<>(this, future, completeAction));
+        }
     }
 
     public LinkedList<Runnable> getOperations() {
