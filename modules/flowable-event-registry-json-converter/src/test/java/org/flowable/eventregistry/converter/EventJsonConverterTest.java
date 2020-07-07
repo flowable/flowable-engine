@@ -12,14 +12,13 @@
  */
 package org.flowable.eventregistry.converter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
@@ -27,7 +26,6 @@ import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -67,28 +65,21 @@ public class EventJsonConverterTest {
     }
 
     protected void validateSimpleEventModel(EventModel eventModel) {
-        assertNotNull(eventModel);
-        assertEquals("myEvent", eventModel.getKey());
-        assertEquals("My event", eventModel.getName());
+        assertThat(eventModel).isNotNull();
+        assertThat(eventModel.getKey()).isEqualTo("myEvent");
+        assertThat(eventModel.getName()).isEqualTo("My event");
         
-        assertEquals(1, eventModel.getCorrelationParameters().size());
-        EventPayload correlationParameter = eventModel.getCorrelationParameters().iterator().next();
-        assertEquals("customerId", correlationParameter.getName());
-        assertEquals("string", correlationParameter.getType());
+        assertThat(eventModel.getCorrelationParameters())
+                .extracting(EventPayload::getName, EventPayload::getType)
+                .containsExactly(tuple("customerId", "string"));
         
-        assertEquals(3, eventModel.getPayload().size());
-        Iterator<EventPayload> itPayload = eventModel.getPayload().iterator();
-        EventPayload payloadDefinition = itPayload.next();
-        assertEquals("payload1", payloadDefinition.getName());
-        assertEquals("string", payloadDefinition.getType());
-        
-        payloadDefinition = itPayload.next();
-        assertEquals("payload2", payloadDefinition.getName());
-        assertEquals("integer", payloadDefinition.getType());
-
-        payloadDefinition = itPayload.next();
-        assertEquals("customerId", payloadDefinition.getName());
-        assertEquals("string", payloadDefinition.getType());
+        assertThat(eventModel.getPayload())
+                .extracting(EventPayload::getName, EventPayload::getType)
+                .containsExactly(
+                        tuple("payload1", "string"),
+                        tuple("payload2", "integer"),
+                        tuple("customerId", "string")
+                );
     }
 
     /* Helper methods */
@@ -111,13 +102,4 @@ public class EventJsonConverterTest {
         return new EventJsonConverter().convertToEventModel(modelJson);
     }
 
-    protected JsonNode parseJson(String resource) {
-        String jsonString = readJsonToString(resource);
-        try {
-            return objectMapper.readTree(jsonString);
-        } catch (IOException e) {
-            fail("Could not parse " + resource + " : " + e.getMessage());
-        }
-        return null;
-    }
 }
