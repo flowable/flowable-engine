@@ -18,11 +18,15 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Filip Hrisafov
  */
 public class DefaultAsyncTaskInvoker implements AsyncTaskInvoker {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final AsyncTaskExecutor taskExecutor;
 
@@ -35,7 +39,7 @@ public class DefaultAsyncTaskInvoker implements AsyncTaskInvoker {
         try {
             return taskExecutor.submit(task);
         } catch (RejectedExecutionException rejected) {
-            // If the task was rejected then run it on the current thread
+            logger.debug("Task {} was rejected. It will be executed on the current thread.", task, rejected);
             FutureTask<T> futureTask = new FutureTask<>(task);
             futureTask.run();
             return futureTask;
