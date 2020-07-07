@@ -2335,8 +2335,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(localVariables.get("localVar2")).isEqualTo(20);
 
         // Verify events
-        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
-
         assertThat(changeStateEventListener.getEvents())
                 .extracting(FlowableEvent::getType)
                 .containsExactly(
@@ -2422,7 +2420,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(localVariables.get("localVar2")).isEqualTo(20);
 
         // Verify events
-        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
         assertThat(changeStateEventListener.getEvents())
                 .extracting(FlowableEvent::getType)
                 .containsExactly(
@@ -2604,7 +2601,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions).isEmpty();
-        ;
 
         //Move to catchEvent
         runtimeService.createChangeActivityStateBuilder()
@@ -2617,7 +2613,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2635,7 +2631,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -2662,7 +2657,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2684,7 +2679,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the task once more
         taskService.complete(tasks.get(0).getId());
@@ -2696,7 +2690,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2718,7 +2712,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -2744,7 +2737,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2765,7 +2758,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the task once more
         taskService.complete(tasks.get(0).getId());
@@ -2777,7 +2769,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2798,7 +2790,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -2820,7 +2811,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions).isEmpty();
-        ;
 
         //Move to catchEvent
         runtimeService.createChangeActivityStateBuilder()
@@ -2834,7 +2824,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2853,7 +2843,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -2876,7 +2865,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions).isEmpty();
-        ;
 
         //Move to catchEvent
         runtimeService.createChangeActivityStateBuilder()
@@ -2889,7 +2877,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2908,7 +2896,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -2935,7 +2922,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2957,7 +2944,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the task once more
         taskService.complete(tasks.get(0).getId());
@@ -2969,7 +2955,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -2991,7 +2977,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -3017,7 +3002,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3038,7 +3023,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the task once more
         taskService.complete(tasks.get(0).getId());
@@ -3050,7 +3034,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3071,7 +3055,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //Complete the process
         taskService.complete(tasks.get(0).getId());
@@ -3089,7 +3072,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
             List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
             Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
             assertThat(classifiedEventSubscriptions).isEmpty();
-            ;
         });
     }
 
@@ -3100,7 +3082,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
             assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
             List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
             assertThat(tasks).isEmpty();
-            ;
+
             List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
             Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
             assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3117,7 +3099,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
             assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
             List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
             assertThat(eventSubscriptions).isEmpty();
-            ;
         });
     }
 
@@ -3238,7 +3219,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3255,7 +3236,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions).isEmpty();
-        ;
 
         //Trigger signal
         runtimeService.signalEventReceived("someSignal");
@@ -3277,7 +3257,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //ProcessInstance2 is waiting for the event
         processId = processInstance2.getId();
@@ -3287,7 +3266,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3342,7 +3321,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         assertThat(tasks).isEmpty();
-        ;
+
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);
@@ -3359,7 +3338,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions).isEmpty();
-        ;
 
         //Trigger signal
         runtimeService.signalEventReceived("someSignal");
@@ -3385,7 +3363,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("afterCatchEvent")).hasSize(1);
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         assertThat(eventSubscriptions).isEmpty();
-        ;
 
         //ProcessInstance2 is waiting for the event
         processId = processInstance2.getId();
@@ -3395,7 +3372,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(classifiedExecutions.get("intermediateCatchEvent")).hasSize(1);
         tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         assertThat(tasks).isEmpty();
-        ;
+
         eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
         classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
         assertThat(classifiedEventSubscriptions.get("intermediateCatchEvent")).hasSize(1);

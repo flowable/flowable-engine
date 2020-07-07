@@ -483,14 +483,14 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // The parent and child process should be present in history
-            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(2L);
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(2);
 
             // Deleting the parent process should cascade the child-process
             historyService.deleteHistoricProcessInstance(pi.getId());
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
-            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0L);
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isZero();
         }
     }
 

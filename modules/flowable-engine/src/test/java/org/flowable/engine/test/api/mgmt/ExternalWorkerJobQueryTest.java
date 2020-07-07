@@ -72,7 +72,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsOnly(processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().processInstanceId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -89,7 +89,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsOnly(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().processDefinitionId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -119,7 +119,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.singleResult()).isNotNull();
 
         query = managementService.createExternalWorkerJobQuery().executionId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -137,7 +137,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().elementId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
 
     }
@@ -155,7 +155,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().elementName("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -169,7 +169,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.list()).hasSize(2);
 
         query = managementService.createExternalWorkerJobQuery().handlerType("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -225,7 +225,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getExceptionMessage()).isEqualTo("Error message");
 
         query = managementService.createExternalWorkerJobQuery().exceptionMessage("Error");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -302,7 +302,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getLockExpirationTime()).isNotNull();
 
         query = managementService.createExternalWorkerJobQuery().lockOwner("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }

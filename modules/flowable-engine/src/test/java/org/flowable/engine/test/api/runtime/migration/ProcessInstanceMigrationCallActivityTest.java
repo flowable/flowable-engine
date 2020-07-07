@@ -410,9 +410,9 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                 .containsOnly(procDefCallActivityV1.getId());
 
         List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
-        assertThat(task)
+        assertThat(subProcessTasks)
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
-                .contains("theTask", procDefSimpleOneTask.getId());
+                .contains(tuple("userTask1Id", procDefCallActivityV1.getId()));
 
         //Complete process
         completeProcessInstanceTasks(subProcessInstance.getId());
