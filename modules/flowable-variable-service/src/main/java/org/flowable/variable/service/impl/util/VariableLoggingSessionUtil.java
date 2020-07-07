@@ -110,7 +110,7 @@ public class VariableLoggingSessionUtil {
         } else if (JodaDateType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableValueName, LoggingSessionUtil.formatDate((LocalDate) variableValue));
         } else {
-            loggingNode.put(variableValueName, variableValue.toString());
+            loggingNode.put(variableValueName, String.valueOf(variableValue));
         }
     }
 }
