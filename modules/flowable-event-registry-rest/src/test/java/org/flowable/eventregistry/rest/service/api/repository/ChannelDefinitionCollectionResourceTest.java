@@ -88,7 +88,7 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, myChannelDef2.getId(), orderChannelDef2.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, firstChannelDef.getId(), myChannelDef.getId(), orderChannelDef.getId(), myChannelDef2.getId(), orderChannelDef2.getId());
+            assertResultsPresentInDataResponse(url, firstChannelDef.getId(), myChannelDef.getId(), orderChannelDef.getId(), myChannelDef2.getId(), orderChannelDef2.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

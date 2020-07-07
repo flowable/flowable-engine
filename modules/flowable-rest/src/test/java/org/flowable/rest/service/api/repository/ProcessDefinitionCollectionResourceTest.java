@@ -128,7 +128,7 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, latestOneTaskProcess.getId(), twoTaskprocess.getId(), oneTaskWithDiProcess.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, oneTaskProcess.getId(), twoTaskprocess.getId(), latestOneTaskProcess.getId(), oneTaskWithDiProcess.getId());
+            assertResultsPresentInDataResponse(url, oneTaskProcess.getId(), twoTaskprocess.getId(), latestOneTaskProcess.getId(), oneTaskWithDiProcess.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();
