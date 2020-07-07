@@ -892,8 +892,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         // Verify task parameters set on execution
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertThat(variables).hasSize(1);
-        assertThat(variables.get("myParam")).isEqualTo("myValue");
+        assertThat(variables)
+                .containsOnly(entry("myParam", "myValue"));
     }
 
     @Test
@@ -908,10 +908,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         // Complete first task
         Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("myParam", "myValue");
-        taskService.complete(task.getId(), taskParams, false); // Only
-        // difference
-        // with previous
-        // test
+        taskService.complete(task.getId(), taskParams, false); // Only difference with previous test
 
         // Fetch second task
         task = taskService.createTaskQuery().singleResult();
@@ -919,8 +916,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         // Verify task parameters set on execution
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertThat(variables).hasSize(1);
-        assertThat(variables.get("myParam")).isEqualTo("myValue");
+        assertThat(variables)
+                .containsOnly(entry("myParam", "myValue"));
     }
 
     @Test
@@ -1424,10 +1421,9 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.delegateTask(taskId, "fozzie");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        assertThat(identityLinks).hasSize(2);
         assertThat(identityLinks)
                 .extracting(IdentityLink::getUserId, IdentityLink::getGroupId, IdentityLink::getType)
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                         tuple("fozzie", null, IdentityLinkType.ASSIGNEE),
                         tuple("kermit", null, IdentityLinkType.OWNER)
                 );

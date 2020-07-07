@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.v6;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         Execution rootProcessInstance = null;
         Execution childExecution = null;
@@ -49,21 +50,21 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             if (execution.getId().equals(execution.getProcessInstanceId())) {
                 rootProcessInstance = execution;
 
-                assertNull(execution.getActivityId());
+                assertThat(execution.getActivityId()).isNull();
 
             } else {
                 childExecution = execution;
 
-                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-                assertEquals("theTask", execution.getActivityId());
+                assertThat(execution.getId()).isNotEqualTo(execution.getProcessInstanceId());
+                assertThat(execution.getActivityId()).isEqualTo("theTask");
             }
         }
 
-        assertNotNull(rootProcessInstance);
-        assertNotNull(childExecution);
+        assertThat(rootProcessInstance).isNotNull();
+        assertThat(childExecution).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals(childExecution.getId(), task.getExecutionId());
+        assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
         taskService.complete(task.getId());
 
@@ -71,21 +72,15 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
-            assertEquals(5, historicActivities.size());
-
-            List<String> activityIds = new ArrayList<>();
-            activityIds.add("theStart");
-            activityIds.add("flow1");
-            activityIds.add("theTask");
-            activityIds.add("flow2");
-            activityIds.add("theEnd");
-
-            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-                activityIds.remove(historicActivityInstance.getActivityId());
-                assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-            }
-
-            assertEquals(0, activityIds.size());
+            assertThat(historicActivities)
+                    .extracting(HistoricActivityInstance::getActivityId, HistoricActivityInstance::getExecutionId)
+                    .containsExactlyInAnyOrder(
+                            tuple("theStart", childExecution.getId()),
+                            tuple("flow1", childExecution.getId()),
+                            tuple("theTask", childExecution.getId()),
+                            tuple("flow2", childExecution.getId()),
+                            tuple("theEnd", childExecution.getId())
+                    );
         }
     }
 
@@ -95,7 +90,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneNestedTaskProcess");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         Execution rootProcessInstance = null;
         Execution childExecution = null;
@@ -104,48 +99,48 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             if (execution.getId().equals(execution.getProcessInstanceId())) {
                 rootProcessInstance = execution;
 
-                assertNull(execution.getActivityId());
+                assertThat(execution.getActivityId()).isNull();
 
             } else {
                 childExecution = execution;
 
-                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-                assertEquals("theTask1", execution.getActivityId());
+                assertThat(execution.getId()).isNotEqualTo(execution.getProcessInstanceId());
+                assertThat(execution.getActivityId()).isEqualTo("theTask1");
             }
         }
 
-        assertNotNull(rootProcessInstance);
-        assertNotNull(childExecution);
+        assertThat(rootProcessInstance).isNotNull();
+        assertThat(childExecution).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(childExecution.getId(), task.getExecutionId());
+        assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
         taskService.complete(task.getId());
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(3, executionList.size());
+        assertThat(executionList).hasSize(3);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subTask", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
         Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-        assertEquals("subTask", subTaskExecution.getActivityId());
+        assertThat(subTaskExecution.getActivityId()).isEqualTo("subTask");
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
-        assertEquals("runSubProcess", subProcessExecution.getActivityId());
-        assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
+        assertThat(subProcessExecution.getActivityId()).isEqualTo("runSubProcess");
+        assertThat(subProcessExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
         taskService.complete(task.getId());
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertFalse(childExecution.getId().equals(task.getExecutionId()));
+        assertThat(childExecution.getId()).isNotEqualTo(task.getExecutionId());
 
         Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-        assertEquals("theTask2", finalTaskExecution.getActivityId());
+        assertThat(finalTaskExecution.getActivityId()).isEqualTo("theTask2");
 
-        assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
+        assertThat(finalTaskExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
         taskService.complete(task.getId());
 
@@ -155,54 +150,24 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
-            assertEquals(14, historicActivities.size());
-
-            List<String> activityIds = new ArrayList<>();
-            activityIds.add("theStart");
-            activityIds.add("flow1");
-            activityIds.add("theTask1");
-            activityIds.add("flow2");
-            activityIds.add("runSubProcess");
-            activityIds.add("subStart");
-            activityIds.add("subflow1");
-            activityIds.add("subTask");
-            activityIds.add("subflow2");
-            activityIds.add("subEnd");
-            activityIds.add("flow3");
-            activityIds.add("theTask2");
-            activityIds.add("flow4");
-            activityIds.add("theEnd");
-
-            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-                String activityId = historicActivityInstance.getActivityId();
-                activityIds.remove(activityId);
-
-                if ("theStart".equalsIgnoreCase(activityId) ||
-                    "flow1".equalsIgnoreCase(activityId) ||
-                    "theTask1".equalsIgnoreCase(activityId) ||
-                    "flow2".equalsIgnoreCase(activityId)
-                ) {
-
-                    assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if ("flow3".equalsIgnoreCase(activityId) ||
-                        "theTask2".equalsIgnoreCase(activityId) ||
-                    "flow4".equalsIgnoreCase(activityId) ||
-                        "theEnd".equalsIgnoreCase(activityId)
-                ) {
-
-                    assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if (activityId.startsWith("sub")) {
-
-                    assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if ("runSubProcess".equalsIgnoreCase(activityId)) {
-                    assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
-                }
-            }
-
-            assertEquals(0, activityIds.size());
+            assertThat(historicActivities)
+                    .extracting(HistoricActivityInstance::getActivityId, HistoricActivityInstance::getExecutionId)
+                    .containsExactlyInAnyOrder(
+                            tuple("theStart", childExecution.getId()),
+                            tuple("flow1", childExecution.getId()),
+                            tuple("theTask1", childExecution.getId()),
+                            tuple("flow2", childExecution.getId()),
+                            tuple("runSubProcess", subProcessExecution.getId()),
+                            tuple("subStart", subTaskExecution.getId()),
+                            tuple("subflow1", subTaskExecution.getId()),
+                            tuple("subTask", subTaskExecution.getId()),
+                            tuple("subflow2", subTaskExecution.getId()),
+                            tuple("subEnd", subTaskExecution.getId()),
+                            tuple("flow3", finalTaskExecution.getId()),
+                            tuple("theTask2", finalTaskExecution.getId()),
+                            tuple("flow4", finalTaskExecution.getId()),
+                            tuple("theEnd", finalTaskExecution.getId())
+                    );
         }
     }
 
@@ -212,7 +177,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessWithTimer");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         Execution rootProcessInstance = null;
         Execution childExecution = null;
@@ -221,51 +186,51 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             if (execution.getId().equals(execution.getProcessInstanceId())) {
                 rootProcessInstance = execution;
 
-                assertNull(execution.getActivityId());
+                assertThat(execution.getActivityId()).isNull();
 
             } else {
                 childExecution = execution;
 
-                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-                assertEquals("theTask1", execution.getActivityId());
+                assertThat(execution.getId()).isNotEqualTo(execution.getProcessInstanceId());
+                assertThat(execution.getActivityId()).isEqualTo("theTask1");
             }
         }
 
-        assertNotNull(rootProcessInstance);
-        assertNotNull(childExecution);
+        assertThat(rootProcessInstance).isNotNull();
+        assertThat(childExecution).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(childExecution.getId(), task.getExecutionId());
+        assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
         taskService.complete(task.getId());
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(4, executionList.size());
+        assertThat(executionList).hasSize(4);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subTask", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
         Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-        assertEquals("subTask", subTaskExecution.getActivityId());
+        assertThat(subTaskExecution.getActivityId()).isEqualTo("subTask");
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
-        assertEquals("runSubProcess", subProcessExecution.getActivityId());
-        assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
+        assertThat(subProcessExecution.getActivityId()).isEqualTo("runSubProcess");
+        assertThat(subProcessExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
         
         Execution timerExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("timerEvent").singleResult();
-        assertNotNull(timerExecution);
+        assertThat(timerExecution).isNotNull();
         
         taskService.complete(task.getId());
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertFalse(childExecution.getId().equals(task.getExecutionId()));
+        assertThat(childExecution.getId()).isNotEqualTo(task.getExecutionId());
 
         Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-        assertEquals("theTask2", finalTaskExecution.getActivityId());
+        assertThat(finalTaskExecution.getActivityId()).isEqualTo("theTask2");
 
-        assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
+        assertThat(finalTaskExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
         taskService.complete(task.getId());
 
@@ -275,55 +240,31 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
-            assertEquals(15, historicActivities.size());
-
-            List<String> activityIds = new ArrayList<>();
-            activityIds.add("theStart");
-            activityIds.add("flow1");
-            activityIds.add("theTask1");
-            activityIds.add("flow2");
-            activityIds.add("runSubProcess");
-            activityIds.add("subStart");
-            activityIds.add("subflow1");
-            activityIds.add("subTask");
-            activityIds.add("subflow2");
-            activityIds.add("subEnd");
-            activityIds.add("timerEvent");
-            activityIds.add("flow5");
-            activityIds.add("theTask2");
-            activityIds.add("flow6");
-            activityIds.add("theEnd");
-
+            assertThat(historicActivities)
+                    .extracting(HistoricActivityInstance::getActivityId, HistoricActivityInstance::getExecutionId)
+                    .containsExactlyInAnyOrder(
+                            tuple("theStart", childExecution.getId()),
+                            tuple("flow1", childExecution.getId()),
+                            tuple("theTask1", childExecution.getId()),
+                            tuple("flow2", childExecution.getId()),
+                            tuple("runSubProcess", subProcessExecution.getId()),
+                            tuple("subStart", subTaskExecution.getId()),
+                            tuple("subflow1", subTaskExecution.getId()),
+                            tuple("subTask", subTaskExecution.getId()),
+                            tuple("subflow2", subTaskExecution.getId()),
+                            tuple("subEnd", subTaskExecution.getId()),
+                            tuple("timerEvent", timerExecution.getId()),
+                            tuple("flow5", finalTaskExecution.getId()),
+                            tuple("theTask2", finalTaskExecution.getId()),
+                            tuple("flow6", finalTaskExecution.getId()),
+                            tuple("theEnd", finalTaskExecution.getId())
+                    );
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 String activityId = historicActivityInstance.getActivityId();
-                activityIds.remove(activityId);
-
-                if ("theStart".equalsIgnoreCase(activityId) ||
-                        "theTask1".equalsIgnoreCase(activityId) ||
-                        "flow1".equalsIgnoreCase(activityId) ||
-                        "flow2".equalsIgnoreCase(activityId)) {
-
-                    assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if ("theTask2".equalsIgnoreCase(activityId) ||
-                        "theEnd".equalsIgnoreCase(activityId) ||
-                        "flow5".equalsIgnoreCase(activityId) ||
-                        "flow6".equalsIgnoreCase(activityId)) {
-
-                    assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
-                    
-                } else if ("timerEvent".equalsIgnoreCase(activityId)) {
-                    assertEquals(timerExecution.getId(), historicActivityInstance.getExecutionId());
-
-                } else if (activityId.startsWith("sub")) {
-                    assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
-                    
-                } else if (activityId.contains("flow")) {
-                    assertEquals(historicActivityInstance.getStartTime(), historicActivityInstance.getEndTime());
+                if (activityId.contains("flow")) {
+                    assertThat(historicActivityInstance.getEndTime()).isEqualTo(historicActivityInstance.getStartTime());
                 }
             }
-
-            assertEquals(0, activityIds.size());
         }
     }
 
@@ -350,15 +291,15 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         // Verify Events
         List<FlowableEvent> events = listener.getEventsReceived();
-        assertEquals(2, events.size());
+        assertThat(events).hasSize(2);
 
         FlowableActivityEvent event = (FlowableActivityEvent) events.get(0);
-        assertEquals("subProcess", event.getActivityType());
-        assertEquals(subProcessExecution.getId(), event.getExecutionId());
+        assertThat(event.getActivityType()).isEqualTo("subProcess");
+        assertThat(event.getExecutionId()).isEqualTo(subProcessExecution.getId());
 
         event = (FlowableActivityEvent) events.get(1);
-        assertEquals("subProcess", event.getActivityType());
-        assertEquals(subProcessExecution.getId(), event.getExecutionId());
+        assertThat(event.getActivityType()).isEqualTo("subProcess");
+        assertThat(event.getExecutionId()).isEqualTo(subProcessExecution.getId());
 
         processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
     }
