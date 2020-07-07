@@ -33,6 +33,7 @@ import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.ManualTask;
@@ -353,10 +354,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
             }
 
             if (theClass == null) {
-                return classDelegateFactory.create(serviceTask.getId(), "org.flowable.http.bpmn.impl.DefaultBpmnHttpActivityDelegate",
-                        createFieldDeclarations(serviceTask.getFieldExtensions()),
-                        serviceTask.isTriggerable(),
-                        getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
+                return createDefaultActivityBehaviour(serviceTask);
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
@@ -365,6 +363,19 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
+    protected ActivityBehavior createDefaultActivityBehaviour(ServiceTask serviceTask) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+            return createClassDelegateServiceTask(serviceTask);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+            return createServiceTaskDelegateExpressionActivityBehavior(serviceTask);
+        } else {
+            return classDelegateFactory.create(serviceTask.getId(), "org.flowable.http.bpmn.impl.DefaultBpmnHttpActivityDelegate",
+                    createFieldDeclarations(serviceTask.getFieldExtensions()),
+                    serviceTask.isTriggerable(),
+                    getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
         }
     }
 

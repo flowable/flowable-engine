@@ -83,6 +83,9 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
     protected FlowableHttpClient createHttpClient() {
         HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
+        if (config.getHttpClient() instanceof FlowableHttpClient) {
+            return (FlowableHttpClient) config.getHttpClient();
+        }
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings

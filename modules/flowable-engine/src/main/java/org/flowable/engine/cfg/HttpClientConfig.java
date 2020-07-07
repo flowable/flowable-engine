@@ -29,6 +29,8 @@ public class HttpClientConfig {
 
     protected boolean useSystemProperties = false;
 
+    protected Object httpClient;
+
     public int getConnectTimeout() {
         return connectTimeout;
     }
@@ -115,4 +117,11 @@ public class HttpClientConfig {
         setSocketTimeout(Math.toIntExact(socketTimeout.toMillis()));
     }
 
+    public Object getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(Object httpClient) {
+        this.httpClient = httpClient;
+    }
 }
