@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.modeler.service.FlowableDecisionServiceService;
-import org.flowable.ui.modeler.service.FlowableDecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,7 @@ public class DecisionServicesResource {
     public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filter = null;
-        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), StandardCharsets.UTF_8);
         if (params != null) {
             for (NameValuePair nameValuePair : params) {
                 if ("filter".equalsIgnoreCase(nameValuePair.getName())) {

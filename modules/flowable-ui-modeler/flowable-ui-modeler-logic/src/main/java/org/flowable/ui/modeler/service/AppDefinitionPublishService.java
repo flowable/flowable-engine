@@ -15,7 +15,7 @@ package org.flowable.ui.modeler.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import javax.net.ssl.HostnameVerifier;
@@ -116,7 +116,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
         HttpPost httpPost = new HttpPost(deployApiUrl);
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.getEncoder().encode((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+                Base64.getEncoder().encode((basicAuthUser + ":" + basicAuthPassword).getBytes(StandardCharsets.UTF_8))));
 
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

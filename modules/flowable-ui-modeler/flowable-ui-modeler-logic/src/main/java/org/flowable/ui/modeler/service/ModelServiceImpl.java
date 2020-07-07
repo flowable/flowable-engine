@@ -14,6 +14,7 @@ package org.flowable.ui.modeler.service;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -443,7 +444,7 @@ public class ModelServiceImpl implements ModelService {
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
             try {
                 XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-                InputStreamReader xmlIn = new InputStreamReader(modelStream, "UTF-8");
+                InputStreamReader xmlIn = new InputStreamReader(modelStream, StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
                 BpmnModel bpmnModel = bpmnXMLConverter.convertToBpmnModel(xtr);
                 if (CollectionUtils.isEmpty(bpmnModel.getProcesses())) {
