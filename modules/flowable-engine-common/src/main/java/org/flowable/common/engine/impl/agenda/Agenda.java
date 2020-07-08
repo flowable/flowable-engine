@@ -12,7 +12,7 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.flowable.common.engine.impl.interceptor.Session;
@@ -50,10 +50,10 @@ public interface Agenda extends Session {
     /**
      * Plan an operation for a future execution
      *
+     * @param <V> the type of the value the future returns
      * @param future the future that will return the value
      * @param completeAction the action that should be invoked once the future completes
-     * @param <V> the type of the value the future returns
      */
-    <V> void planFutureOperation(Future<V> future, BiConsumer<V, Throwable> completeAction);
+    <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction);
 
 }

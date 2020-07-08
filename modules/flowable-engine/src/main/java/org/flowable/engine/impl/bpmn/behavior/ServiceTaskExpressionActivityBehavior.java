@@ -14,7 +14,7 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,10 +91,10 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
                 }
 
                 value = expression.getValue(execution);
-                if (value instanceof Future) {
+                if (value instanceof CompletableFuture) {
                     // We should never leave when we have a future. The FutureCompleteAction should perform the leave
                     shouldLeave = false;
-                    CommandContextUtil.getAgenda(commandContext).planFutureOperation((Future) value, new FutureCompleteAction(execution));
+                    CommandContextUtil.getAgenda(commandContext).planFutureOperation((CompletableFuture) value, new FutureCompleteAction(execution));
                 } else {
                     setExecutionVariableValue(value, execution);
                 }

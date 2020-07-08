@@ -12,11 +12,13 @@
  */
 package org.flowable.common.engine.impl.async;
 
+import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -102,13 +104,20 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
-        return executorService.submit(task);
+    public CompletableFuture<?> submit(Runnable task) {
+        return CompletableFuture.runAsync(task, executorService);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        return executorService.submit(task);
+    public <T> CompletableFuture<T> submit(Callable<T> task) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return task.call();
+            } catch (Exception exception) {
+                sneakyThrow(exception);
+                return null;
+            }
+        }, executorService);
     }
 
     public void start() {

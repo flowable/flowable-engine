@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 
@@ -30,7 +30,7 @@ import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 public interface FlowableFutureJavaDelegate<Input, Output> extends FutureJavaDelegate<Output> {
 
     @Override
-    default Future<Output> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
+    default CompletableFuture<Output> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
         Input inputData = prepareExecutionData(execution);
         return taskInvoker.submit(() -> execute(inputData));
     }

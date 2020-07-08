@@ -13,8 +13,10 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
+
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
@@ -112,7 +114,7 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                 //TODO do we need to use the delegate interceptor?
                 FutureJavaDelegate<Object> futureJavaDelegate = (FutureJavaDelegate<Object>) this.futureJavaDelegate;
 
-                Future<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());
+                CompletableFuture<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());
 
                 CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
 
@@ -186,9 +188,5 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                 handleException(throwable, execution, loggingSessionEnabled);
             }
         }
-    }
-
-    private static <T extends Throwable> void sneakyThrow(Throwable throwable) throws T {
-        throw (T) throwable;
     }
 }

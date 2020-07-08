@@ -59,7 +59,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -156,10 +156,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
-            @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncTaskExecutor> applicationTaskExecutorProvider,
+            @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
-            ObjectProvider<AsyncTaskExecutor> taskExecutor,
-            @Process ObjectProvider<AsyncTaskExecutor> processTaskExecutor,
+            ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
+            @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
             ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -179,8 +179,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         if (springAsyncExecutor != null) {
             conf.setAsyncExecutor(springAsyncExecutor);
         }
-        
-        AsyncTaskExecutor asyncTaskExecutor = getIfAvailable(processTaskExecutor, taskExecutor);
+
+        AsyncListenableTaskExecutor asyncTaskExecutor = getIfAvailable(processTaskExecutor, taskExecutor);
         if (asyncTaskExecutor == null) {
             // Get the applicationTaskExecutor
             asyncTaskExecutor = applicationTaskExecutorProvider.getObject();

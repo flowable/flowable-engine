@@ -13,8 +13,7 @@
 package org.flowable.common.engine.impl.async;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
@@ -36,14 +35,18 @@ public class DefaultAsyncTaskInvoker implements AsyncTaskInvoker {
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
+    public <T> CompletableFuture<T> submit(Callable<T> task) {
         try {
             return taskExecutor.submit(task);
         } catch (RejectedExecutionException rejected) {
             logger.debug("Task {} was rejected. It will be executed on the current thread.", task, rejected);
-            FutureTask<T> futureTask = new FutureTask<>(task);
-            futureTask.run();
-            return futureTask;
+            CompletableFuture<T> future = new CompletableFuture<>();
+            try {
+                future.complete(task.call());
+            } catch (Exception exception) {
+                future.completeExceptionally(exception);
+            }
+            return future;
         }
     }
 }
