@@ -40,21 +40,16 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         Object value = null;
-        try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
-            value = expressionObject.getValue(planItemInstanceEntity);
-            if (resultVariable != null) {
-                if (storeResultVariableAsTransient) {
-                    planItemInstanceEntity.setTransientVariable(resultVariable, value);
-                } else {
-                    planItemInstanceEntity.setVariable(resultVariable, value);
-                }
+        Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+        value = expressionObject.getValue(planItemInstanceEntity);
+        if (resultVariable != null) {
+            if (storeResultVariableAsTransient) {
+                planItemInstanceEntity.setTransientVariable(resultVariable, value);
+            } else {
+                planItemInstanceEntity.setVariable(resultVariable, value);
             }
-
-            CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
-            
-        } catch (Exception exc) {
-            throw new FlowableException(exc.getMessage(), exc);
         }
+
+        CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 }

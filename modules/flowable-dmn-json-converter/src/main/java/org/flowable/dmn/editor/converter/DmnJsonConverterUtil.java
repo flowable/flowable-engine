@@ -280,7 +280,7 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
                     new SimpleDateFormat("yyyy-MM-dd").parse(expressionValue);
                     expressionType = "date";
                 } catch (ParseException pe) {
-                    if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionType)) {
+                    if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionValue)) {
                         expressionType = "boolean";
                     }
                 }

@@ -48,7 +48,7 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         // depending on the exit event type, we want to leave the stage in completed state, not terminated
         if (shouldStageGoIntoCompletedState()) {
             return PlanItemInstanceState.COMPLETED;
@@ -64,7 +64,7 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
 
     @Override
-    protected boolean abortOperationIfNewStateEqualsOldState() {
+    public boolean abortOperationIfNewStateEqualsOldState() {
         // on an exit operation, we abort the operation, if we don't go into terminated state, but remain in the current state
         return true;
     }
@@ -87,7 +87,7 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         // depending on the exit event type, we want to use the complete transition, not the exit one, so depending on-parts get triggered waiting for the
         // complete transition
         if (shouldStageGoIntoCompletedState()) {

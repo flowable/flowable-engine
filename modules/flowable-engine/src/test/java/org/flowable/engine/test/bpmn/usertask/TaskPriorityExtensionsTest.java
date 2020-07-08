@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +45,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
 
         final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertEquals(priority, task.getPriority());
+        assertThat(task.getPriority()).isEqualTo(priority);
     }
 
     @Test
@@ -51,6 +53,6 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
     public void testPriorityExtensionString() throws Exception {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
         final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(42, task.getPriority());
+        assertThat(task.getPriority()).isEqualTo(42);
     }
 }

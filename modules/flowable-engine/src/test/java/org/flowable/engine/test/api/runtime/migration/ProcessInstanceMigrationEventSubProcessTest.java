@@ -422,8 +422,9 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .extracting("processDefinitionId")
                 .containsOnly(procDefOneTask.getId());
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
-        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        assertThat(task)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactly("userTask1Id", procDefOneTask.getId());
         List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(eventSubscriptions).isEmpty();
 
@@ -449,8 +450,9 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .extracting("processDefinitionId")
                 .containsOnly(procWithSignal.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
-        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        assertThat(task)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactly("eventSubProcessTask", procWithSignal.getId());
 
         //Since the only task in the parent scope was moved, it behaves as a interrupting eventSubProcess
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();

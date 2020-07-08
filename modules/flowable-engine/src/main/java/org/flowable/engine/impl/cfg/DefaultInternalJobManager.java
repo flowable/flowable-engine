@@ -277,7 +277,6 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         int times = Integer.MAX_VALUE;
         List<String> expression = Arrays.asList(originalExpression.split("/"));
         if (expression.size() > 1 && expression.get(0).startsWith("R")) {
-            times = Integer.MAX_VALUE;
             if (expression.get(0).length() > 1) {
                 times = Integer.parseInt(expression.get(0).substring(1));
             }

@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.transactions;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.engine.ManagementService;
@@ -28,7 +31,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
- * @Author Joram Barrez
+ * @author Joram Barrez
  */
 public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
@@ -61,31 +64,22 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testRollback() {
-        try {
-            runtimeService.startProcessInstanceByKey("RollbackProcess");
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("RollbackProcess"))
+                .as("Starting the process instance should throw an exception")
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Buzzz");
 
-            fail("Starting the process instance should throw an exception");
-
-        } catch (Exception e) {
-            assertEquals("Buzzz", e.getMessage());
-        }
-
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/transactions/trivial.bpmn20.xml", "org/flowable/engine/test/transactions/rollbackAfterSubProcess.bpmn20.xml" })
     public void testRollbackAfterSubProcess() {
-        try {
-            runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
-
-            fail("Starting the process instance should throw an exception");
-
-        } catch (Exception e) {
-            assertEquals("Buzzz", e.getMessage());
-        }
-
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess"))
+                .as("Starting the process instance should throw an exception")
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Buzzz");
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -95,10 +89,10 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
         // The task should be created, as the service task with an exception is try-catched in the delegate.
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         String variable = (String) runtimeService.getVariable(processInstance.getId(), "theVariable");
-        assertEquals("test", variable);
+        assertThat(variable).isEqualTo("test");
     }
 
 }

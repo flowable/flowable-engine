@@ -49,7 +49,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         if (isEventListenerWithAvailableCondition(planItemInstanceEntity.getPlanItem())) {
             return PlanItemInstanceState.UNAVAILABLE;
         } else {
@@ -58,7 +58,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }
 

@@ -204,7 +204,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
-        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isZero();
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         Task afterTask = taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).singleResult();
@@ -218,7 +218,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         inboundEventChannelAdapter.triggerTestEvent("fozzie");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
-        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isZero();
 
         inboundEventChannelAdapter.triggerTestEvent("gonzo");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
@@ -260,7 +260,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
-        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isZero();
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         Task afterTask = taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).singleResult();
@@ -274,7 +274,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         inboundEventChannelAdapter.triggerTestEvent("fozzie");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
-        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isZero();
 
         inboundEventChannelAdapter.triggerTestEvent("gonzo");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);

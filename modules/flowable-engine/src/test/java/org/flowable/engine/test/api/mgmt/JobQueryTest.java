@@ -226,7 +226,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     public void testByInvalidCorrelationId() {
         assertThat(managementService.createJobQuery().correlationId("invalid").singleResult()).isNull();
         assertThat(managementService.createJobQuery().correlationId("invalid").list()).isEmpty();
-        assertThat(managementService.createJobQuery().correlationId("invalid").count()).isEqualTo(0);
+        assertThat(managementService.createJobQuery().correlationId("invalid").count()).isZero();
     }
 
     @Test

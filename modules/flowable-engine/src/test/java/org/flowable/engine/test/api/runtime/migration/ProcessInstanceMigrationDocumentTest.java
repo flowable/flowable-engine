@@ -339,7 +339,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionKeyVersion() {
 
         String definitionKey = "MyProcessKey";
-        Integer definitionVer = 5;
+        int definitionVer = 5;
         String definitionTenantId = "admin";
         ActivityMigrationMapping.OneToOneMapping oneToOne1 = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1");
         ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2");
@@ -368,7 +368,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
     @Test
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentWithVariables() {
         String definitionKey = "MyProcessKey";
-        Integer definitionVer = 5;
+        int definitionVer = 5;
         String definitionTenantId = "admin";
 
         ActivityMigrationMapping.OneToOneMapping oneToOne1 = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
@@ -376,7 +376,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2")
                 .withLocalVariable("variableDouble", 12345.6789);
 
-        HashMap processInstanceVars = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVars = new HashMap<String, Object>() {
 
             {
                 put("instanceVar1", "stringValue");

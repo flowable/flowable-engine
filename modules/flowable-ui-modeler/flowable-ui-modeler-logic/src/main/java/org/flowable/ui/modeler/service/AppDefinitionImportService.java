@@ -14,6 +14,7 @@ package org.flowable.ui.modeler.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -221,7 +222,7 @@ public class AppDefinitionImportService {
 
                     } else {
                         modelFileName = modelFileName.replace(".json", "");
-                        String json = IOUtils.toString(zipInputStream, "utf-8");
+                        String json = IOUtils.toString(zipInputStream, StandardCharsets.UTF_8);
 
                         if (zipEntryName.startsWith("bpmn-models/")) {
                             converterContext.getProcessKeyToJsonStringMap().put(modelFileName, json);

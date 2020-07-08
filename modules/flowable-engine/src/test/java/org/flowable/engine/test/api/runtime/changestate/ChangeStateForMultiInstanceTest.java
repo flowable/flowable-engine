@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -1020,8 +1019,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(6);
         Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(taskGroups.keySet()).hasSize(2);
-        assertThat(taskGroups.keySet()).isEqualTo(new HashSet<>(Arrays.asList("forkTask1", "forkTask2")));
+        assertThat(taskGroups)
+                .containsOnlyKeys("forkTask1", "forkTask2");
         assertThat(taskGroups.get("forkTask1")).hasSize(3);
         assertThat(taskGroups.get("forkTask2")).hasSize(3);
 
@@ -1098,8 +1097,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(6);
         Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(taskGroups.keySet()).hasSize(2);
-        assertThat(taskGroups.keySet()).isEqualTo(new HashSet<>(Arrays.asList("forkTask1", "forkTask2")));
+        assertThat(taskGroups)
+                .containsOnlyKeys("forkTask1", "forkTask2");
         assertThat(taskGroups.get("forkTask1")).hasSize(3);
         assertThat(taskGroups.get("forkTask2")).hasSize(3);
 
@@ -1166,8 +1165,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(classifiedTasks).hasSize(3);
-        assertThat(classifiedTasks).containsKeys("taskInclusive1", "taskInclusive2", "taskInclusive3");
+        assertThat(classifiedTasks)
+                .containsOnlyKeys("taskInclusive1", "taskInclusive2", "taskInclusive3");
 
         //Move all activities
         runtimeService.createChangeActivityStateBuilder()
@@ -1219,8 +1218,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(classifiedTasks).hasSize(3);
-        assertThat(classifiedTasks).containsKeys("taskInclusive1", "taskInclusive2", "taskInclusive3");
+        assertThat(classifiedTasks)
+                .containsOnlyKeys("taskInclusive1", "taskInclusive2", "taskInclusive3");
 
         //Finish one activity in two MI subProcesses
         taskService.complete(classifiedTasks.get("taskInclusive1").get(1).getId());
@@ -1278,8 +1277,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(classifiedTasks).hasSize(4);
-        assertThat(classifiedTasks).containsKeys("taskInclusive1", "taskInclusive2", "taskInclusive3", "postForkTask");
+        assertThat(classifiedTasks).containsOnlyKeys("taskInclusive1", "taskInclusive2", "taskInclusive3", "postForkTask");
         assertThat(classifiedTasks.get("taskInclusive1")).hasSize(1);
         assertThat(classifiedTasks.get("taskInclusive2")).hasSize(1);
         assertThat(classifiedTasks.get("taskInclusive3")).hasSize(2);
@@ -1311,8 +1309,8 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertThat(classifiedTasks).hasSize(2);
-        assertThat(classifiedTasks).containsKeys("postForkTask", "taskInclusive2");
+        assertThat(classifiedTasks)
+                .containsOnlyKeys("postForkTask", "taskInclusive2");
         assertThat(classifiedTasks.get("postForkTask")).hasSize(2);
         assertThat(classifiedTasks.get("taskInclusive2")).hasSize(1);
 

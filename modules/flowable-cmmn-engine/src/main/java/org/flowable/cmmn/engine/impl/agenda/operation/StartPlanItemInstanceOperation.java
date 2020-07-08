@@ -54,12 +54,12 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.ACTIVE;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.START;
     }
     

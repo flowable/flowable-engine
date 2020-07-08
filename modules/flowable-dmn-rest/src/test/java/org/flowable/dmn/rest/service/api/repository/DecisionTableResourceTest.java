@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +23,8 @@ import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Yvo Swillens
@@ -36,16 +40,19 @@ public class DecisionTableResourceTest extends BaseSpringDmnRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(definition.getId(), responseNode.get("id").textValue());
-        assertEquals(definition.getKey(), responseNode.get("key").textValue());
-        assertEquals(definition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(definition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(definition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(definition.getName(), responseNode.get("name").textValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(definition.getDeploymentId(), responseNode.get("deploymentId").textValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + definition.getId() + "',"
+                        + "  url: '" + httpGet.getURI().toString() + "',"
+                        + "  category: " + definition.getCategory() + ","
+                        + "  name: '" + definition.getName() + "',"
+                        + "  key: '" + definition.getKey() + "',"
+                        + "  description: " + definition.getDescription() + ","
+                        + "  version: " + definition.getVersion() + ","
+                        + "  deploymentId: '" + definition.getDeploymentId() + "'"
+                        + "  }"
+                );
     }
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })

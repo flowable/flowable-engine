@@ -307,7 +307,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
         if (usesCollection() && collectionElementVariable != null) {
-            Collection collection = (Collection) resolveAndValidateCollection(execution);
+            Collection collection = resolveAndValidateCollection(execution);
 
             Object value = null;
             int index = 0;

@@ -83,7 +83,7 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, latestDefinition.getId(), decisionTwo.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, firstDefinition.getId(), latestDefinition.getId(), decisionTwo.getId());
+            assertResultsPresentInDataResponse(url, firstDefinition.getId(), latestDefinition.getId(), decisionTwo.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

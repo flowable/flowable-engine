@@ -103,7 +103,7 @@ public abstract class AbstractFlowableVariableExpressionFunction implements Flow
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("Variable name passed is null");
         }
-        return variableContainer.getVariable((String) variableName);
+        return variableContainer.getVariable(variableName);
     }
     
     protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {

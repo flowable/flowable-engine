@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +24,8 @@ import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Yvo Swillens
@@ -38,11 +43,15 @@ public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
         // Check "OK" status
         JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(resultNode);
+        assertThat(resultNode).isNotNull();
         JsonNode firstDecision = resultNode.get("decisions").get(0);
-        assertNotNull(firstDecision);
+        assertThat(firstDecision).isNotNull();
 
         JsonNode decisionTableNode = firstDecision.get("expression");
-        assertEquals("decisionTable", decisionTableNode.get("id").textValue());
+        assertThatJson(decisionTableNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   id: 'decisionTable'"
+                        + " }");
     }
 }

@@ -94,10 +94,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .processDefinitionKey("MP")
                 .list();
 
-        assertThat(processDefinitions).hasSize(2);
-        processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
-        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getId)
+                .containsExactlyInAnyOrder(version1ProcessDef.getId(), version2ProcessDef.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executions).hasSize(2); //includes root execution
@@ -672,10 +671,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .processDefinitionKey("MP")
                 .list();
 
-        assertThat(processDefinitions).hasSize(2);
-        processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
-        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getId)
+                .containsExactlyInAnyOrder(version1ProcessDef.getId(), version2ProcessDef.getId());
 
         List<Execution> executionsBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionsBefore).hasSize(2); //includes root execution
@@ -766,10 +764,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .processDefinitionKey("MP")
                 .list();
 
-        assertThat(processDefinitions).hasSize(2);
-        processDefinitions.sort(Comparator.comparingInt(ProcessDefinition::getVersion));
-        assertThat(version1ProcessDef.getId()).isEqualTo(processDefinitions.get(0).getId());
-        assertThat(version2ProcessDef.getId()).isEqualTo(processDefinitions.get(1).getId());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getId)
+                .containsExactlyInAnyOrder(version1ProcessDef.getId(), version2ProcessDef.getId());
 
         List<Execution> executionsBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionsBefore).hasSize(2); //includes root execution
@@ -1761,7 +1758,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob1 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob1).isNotNull();
         assertThat(timerJob1).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
-        assertThat(timerJob1).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob1.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
@@ -1869,7 +1866,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
-        assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
 
         // Verify events
         assertThat(changeStateEventListener.hasEvents()).isTrue();
@@ -1952,7 +1949,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefSubProcWithTimer.getId());
-        assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
 
         // Verify events
         assertThat(changeStateEventListener.hasEvents()).isTrue();
@@ -2007,7 +2004,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procVersion1.getId());
-        assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
 
         changeStateEventListener.clear();
         //Migrate to the other processDefinition
@@ -2124,7 +2121,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
-        assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
         //Job is attached to the activity
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();
@@ -2213,7 +2210,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         assertThat(timerJob).extracting(Job::getProcessDefinitionId).isEqualTo(procDefTimerTaskInSubProcess.getId());
-        assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
+        assertThat(timerJob.getJobHandlerConfiguration()).contains("boundaryTimerEvent");
         //Job is attached to the activity
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();

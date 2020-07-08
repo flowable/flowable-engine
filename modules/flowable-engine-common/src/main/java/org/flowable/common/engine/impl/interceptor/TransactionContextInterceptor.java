@@ -44,7 +44,7 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
         try {
 
             if (openTransaction) {
-                TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
+                TransactionContext transactionContext = transactionContextFactory.openTransactionContext(commandContext);
                 Context.setTransactionContext(transactionContext);
                 isContextSet = true;
                 commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));

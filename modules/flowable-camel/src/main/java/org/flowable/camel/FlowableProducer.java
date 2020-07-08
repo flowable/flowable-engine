@@ -18,6 +18,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -38,6 +39,8 @@ public class FlowableProducer extends DefaultProducer {
     protected RuntimeService runtimeService;
 
     protected RepositoryService repositoryService;
+
+    protected ManagementService managementService;
 
     public static final String PROCESS_KEY_PROPERTY = "PROCESS_KEY_PROPERTY";
 
@@ -83,8 +86,11 @@ public class FlowableProducer extends DefaultProducer {
 
             Map<String, Object> processVariables = null;
             if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
-                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-                processVariables = compatibilityHandler.getVariables(pi);
+                // There is no command context at this, point, therefore we need to wrap it in one to get the v5 variables
+                processVariables = managementService.executeCommand(commandContext -> {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    return compatibilityHandler.getVariables(pi);
+                });
             } else {
                 processVariables = ((ExecutionEntity) pi).getVariables();
             }
@@ -202,5 +208,9 @@ public class FlowableProducer extends DefaultProducer {
 
     public void setRepositoryService(RepositoryService repositoryService) {
         this.repositoryService = repositoryService;
+    }
+
+    public void setManagementService(ManagementService managementService) {
+        this.managementService = managementService;
     }
 }

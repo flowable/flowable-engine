@@ -143,7 +143,13 @@ public class Flowable5Util {
     }
 
     public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
-        Flowable5CompatibilityHandler flowable5CompatibilityHandler = CommandContextUtil.getProcessEngineConfiguration().getFlowable5CompatibilityHandler(); 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
+        Flowable5CompatibilityHandler flowable5CompatibilityHandler = null;
+        if (processEngineConfiguration != null) {
+            flowable5CompatibilityHandler = processEngineConfiguration.getFlowable5CompatibilityHandler();
+        }
+
         if (flowable5CompatibilityHandler == null) {
             flowable5CompatibilityHandler = Flowable5CompatibilityContext.getFallbackFlowable5CompatibilityHandler();
         }

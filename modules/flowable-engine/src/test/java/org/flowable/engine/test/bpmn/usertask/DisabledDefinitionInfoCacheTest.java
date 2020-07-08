@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,7 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("test", task.getFormKey());
+        assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -52,7 +54,7 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("test", task.getFormKey());
+        assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -70,8 +72,8 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -91,8 +93,8 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());

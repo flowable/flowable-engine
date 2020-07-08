@@ -85,10 +85,16 @@ public class BpmnModel {
 
     public Process getMainProcess() {
         if (!getPools().isEmpty()) {
-            return getProcess(getPools().get(0).getId());
-        } else {
-            return getProcess(null);
+            Process process = getProcess(getPools().get(0).getId());
+            if (process != null) {
+                return process;
+            }
         }
+        return getProcessWithoutPool();
+    }
+
+    private Process getProcessWithoutPool() {
+        return getProcess(null);
     }
 
     public Process getProcess(String poolRef) {
@@ -107,11 +113,15 @@ public class BpmnModel {
                 }
             }
 
-            if (poolRef == null && !foundPool) {
+            if (poolRef == null && !foundPool && process.isExecutable()) {
                 return process;
             } else if (poolRef != null && foundPool) {
                 return process;
             }
+        }
+        
+        if (poolRef == null && !processes.isEmpty()) {
+            return processes.get(0);
         }
 
         return null;

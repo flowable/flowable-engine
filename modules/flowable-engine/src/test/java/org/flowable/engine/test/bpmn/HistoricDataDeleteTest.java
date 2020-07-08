@@ -93,7 +93,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     
             query.delete();
 
-            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
             assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
@@ -106,9 +106,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     
             historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
 
-            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
-            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
-            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
             assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);

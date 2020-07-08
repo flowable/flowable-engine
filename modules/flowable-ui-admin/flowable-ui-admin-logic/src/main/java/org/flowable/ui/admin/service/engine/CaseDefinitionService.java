@@ -14,6 +14,7 @@ package org.flowable.ui.admin.service.engine;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
@@ -80,7 +81,7 @@ public class CaseDefinitionService {
             try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
                 XMLInputFactory xif = XMLInputFactory.newInstance();
-                InputStreamReader in = new InputStreamReader(responseContent, "UTF-8");
+                InputStreamReader in = new InputStreamReader(responseContent, StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(in);
                 CmmnModel cmmmnModel = new CmmnXmlConverter().convertToCmmnModel(xtr);
 

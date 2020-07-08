@@ -6,7 +6,6 @@ package org.flowable.dmn.model;
 public class DmnElementReference {
 
     protected String href;
-    protected String parsedId;
 
     public String getHref() {
         return href;
@@ -20,8 +19,8 @@ public class DmnElementReference {
      * @return
      */
     public String getParsedId() {
-        if (href != null || href.length() > 1) {
-            return href.substring(1, href.length());
+        if (href != null && href.length() > 1) {
+            return href.substring(1);
         }
         return null;
     }

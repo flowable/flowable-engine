@@ -333,10 +333,10 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
                 tuple("taskKey123", "Task B")
             );
         assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).count())
-            .isEqualTo(2L);
+            .isEqualTo(2);
 
         assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).list()).isEmpty();
-        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isEqualTo(0L);
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isZero();
 
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid"))
             .endOr().list())
@@ -346,7 +346,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
                 tuple("taskKey123", "Task B")
             );
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid"))
-            .endOr().count()).isEqualTo(2L);
+            .endOr().count()).isEqualTo(2);
     }
 
     @Test

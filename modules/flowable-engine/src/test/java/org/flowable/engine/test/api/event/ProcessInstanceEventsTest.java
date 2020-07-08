@@ -467,7 +467,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(processCancelledEvent.getCause()).as("The cause has to be the same as in deleteProcessInstance method call").isEqualTo("delete_test");
 
         assertThat(this.taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).as("No task can be active for deleted process.")
-                .isEqualTo(0);
+                .isZero();
 
         List<FlowableEvent> taskCancelledEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
         assertThat(taskCancelledEvents).as("ActivitiEventType.ACTIVITY_CANCELLED was expected 2 times.").hasSize(2);
@@ -661,7 +661,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
     public void testDeleteMultiInstanceCallActivityProcessInstance() {
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().count()).isZero();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelCallActivity");
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(7);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(12);
@@ -673,8 +673,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
                 .isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
         assertThat(this.listener.getEventsReceived().get(2).getType()).as("SubProcess cancelled event has to be fired.")
                 .isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(taskService.createTaskQuery().count()).isZero();
     }
 
     @Test

@@ -192,12 +192,12 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertThat(failedJob.getRetries()).isEqualTo(2);
 
             // Three retries should each have triggered dispatching of a retry-decrement event
-            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
             managementService.moveTimerToExecutableJob(failedJob.getId());
             assertThatThrownBy(() -> managementService.executeJob(signalJob.getId()))
                     .isInstanceOf(FlowableException.class);
-            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
