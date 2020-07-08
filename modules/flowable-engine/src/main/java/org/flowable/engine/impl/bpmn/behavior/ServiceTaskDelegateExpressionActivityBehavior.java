@@ -13,7 +13,7 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -165,7 +165,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                     //TODO do we need to use the delegate interceptor?
                     FutureJavaDelegate<Object> futureJavaDelegate = (FutureJavaDelegate<Object>) delegate;
 
-                    Future<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());;
+                    CompletableFuture<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());;
 
                     CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
 

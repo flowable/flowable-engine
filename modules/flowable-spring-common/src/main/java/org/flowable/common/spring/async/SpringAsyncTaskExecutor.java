@@ -13,18 +13,19 @@
 package org.flowable.common.spring.async;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 
 /**
  * @author Filip Hrisafov
  */
 public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
-    protected final org.springframework.core.task.AsyncTaskExecutor asyncTaskExecutor;
+    protected final AsyncListenableTaskExecutor asyncTaskExecutor;
 
-    public SpringAsyncTaskExecutor(org.springframework.core.task.AsyncTaskExecutor asyncTaskExecutor) {
+    public SpringAsyncTaskExecutor(AsyncListenableTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
     }
 
@@ -34,16 +35,16 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
-        return asyncTaskExecutor.submit(task);
+    public CompletableFuture<?> submit(Runnable task) {
+        return asyncTaskExecutor.submitListenable(task).completable();
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        return asyncTaskExecutor.submit(task);
+    public <T> CompletableFuture<T> submit(Callable<T> task) {
+        return asyncTaskExecutor.submitListenable(task).completable();
     }
 
-    public org.springframework.core.task.AsyncTaskExecutor getAsyncTaskExecutor() {
+    public AsyncListenableTaskExecutor getAsyncTaskExecutor() {
         return asyncTaskExecutor;
     }
 }

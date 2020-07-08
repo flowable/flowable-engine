@@ -13,7 +13,7 @@
 package org.flowable.common.engine.api.async;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Flowable task executor interface that abstracts the execution of a {@link Runnable} or {@link Callable}
@@ -37,17 +37,17 @@ public interface AsyncTaskExecutor {
      * Submit a {@link Runnable} task for execution, receiving a Future representing the execution of the task.
      *
      * @param task the {@link Runnable} to execute
-     * @return a {@link Future} representing pending completion of the task
+     * @return a {@link CompletableFuture} representing pending completion of the task
      * @throws java.util.concurrent.RejectedExecutionException if the given task was not submitted
      */
-    Future<?> submit(Runnable task);
+    CompletableFuture<?> submit(Runnable task);
 
     /**
      * Submit a {@link Callable} task for execution, receiving a Future representing the execution of the task.
      *
      * @param task the {@link Runnable} to execute
-     * @return a {@link Future} representing pending completion of the task
+     * @return a {@link CompletableFuture} representing pending completion of the task
      * @throws java.util.concurrent.RejectedExecutionException if the given task was not submitted
      */
-    <T> Future<T> submit(Callable<T> task);
+    <T> CompletableFuture<T> submit(Callable<T> task);
 }

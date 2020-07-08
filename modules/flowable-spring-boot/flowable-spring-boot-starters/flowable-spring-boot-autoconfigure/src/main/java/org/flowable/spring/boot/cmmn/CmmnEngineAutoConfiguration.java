@@ -61,7 +61,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -133,9 +133,9 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
-        ObjectProvider<AsyncTaskExecutor> taskExecutor,
-        @Cmmn ObjectProvider<AsyncTaskExecutor> cmmnTaskExecutor,
-        @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncTaskExecutor> applicationTaskExecutorProvider,
+        ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
+        @Cmmn ObjectProvider<AsyncListenableTaskExecutor> cmmnTaskExecutor,
+        @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
         ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
@@ -157,7 +157,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             configuration.setAsyncExecutor(asyncExecutor);
         }
 
-        AsyncTaskExecutor asyncTaskExecutor = getIfAvailable(cmmnTaskExecutor, taskExecutor);
+        AsyncListenableTaskExecutor asyncTaskExecutor = getIfAvailable(cmmnTaskExecutor, taskExecutor);
         if (asyncTaskExecutor == null) {
             // Get the applicationTaskExecutor
             asyncTaskExecutor = applicationTaskExecutorProvider.getObject();

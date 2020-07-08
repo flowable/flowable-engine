@@ -14,11 +14,11 @@ package org.flowable.http.bpmn.impl;
 
 import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
+import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -124,7 +124,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     }
 
     @Override
-    public Future<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
+    public CompletableFuture<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
         HttpRequest request;
 
         HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
@@ -269,10 +269,6 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             fieldDeclarations.add(fieldDeclaration);
         }
         return fieldDeclarations;
-    }
-
-    private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
-        throw (E) e;
     }
 
     protected static class ExecutionData {

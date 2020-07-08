@@ -12,9 +12,10 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -32,19 +33,28 @@ public abstract class AbstractAgenda implements Agenda {
     protected CommandContext commandContext;
     protected LinkedList<Runnable> operations = new LinkedList<>();
 
+    protected List<ExecuteFutureActionOperation<?>> futureOperations = new ArrayList<>();
+
     public AbstractAgenda(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
 
     @Override
     public boolean isEmpty() {
-        return operations.isEmpty();
+        return operations.isEmpty() && futureOperations.isEmpty();
     }
 
     @Override
     public Runnable getNextOperation() {
         assertOperationsNotEmpty();
-        return operations.poll();
+        if (!operations.isEmpty()) {
+            return operations.poll();
+        } else {
+            // If there are no more operations then we need to wait until any of the schedule future operations are done
+            List<ExecuteFutureActionOperation<?>> copyOperations = new ArrayList<>(futureOperations);
+            futureOperations.clear();
+            return new WaitForAnyFutureToFinishOperation(this, copyOperations);
+        }
     }
 
     @Override
@@ -54,7 +64,7 @@ public abstract class AbstractAgenda implements Agenda {
     }
 
     protected void assertOperationsNotEmpty() {
-        if (operations.isEmpty()) {
+        if (operations.isEmpty() && futureOperations.isEmpty()) {
             throw new FlowableException("Unable to peek empty agenda.");
         }
     }
@@ -71,21 +81,16 @@ public abstract class AbstractAgenda implements Agenda {
     }
 
     @Override
-    public <V> void planFutureOperation(Future<V> future, BiConsumer<V, Throwable> completeAction) {
+    public <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction) {
         // If the future is done then get the value immediately and run the complete action without planning it on the agenda
         if (future.isDone()) {
-            try {
-                V result = future.get();
-                completeAction.accept(result, null);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new FlowableException("Future was interrupted", e);
-
-            } catch (ExecutionException e) {
-                completeAction.accept(null, e.getCause());
-            }
+            planOperation(new ExecuteFutureActionOperation<>(future, completeAction));
         } else {
-            planOperation(new OperationWithFuture<>(this, future, completeAction));
+            futureOperations.add(new ExecuteFutureActionOperation<>(future, completeAction));
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Future {} with action {} added to agenda", future, completeAction.getClass());
+            }
         }
     }
 

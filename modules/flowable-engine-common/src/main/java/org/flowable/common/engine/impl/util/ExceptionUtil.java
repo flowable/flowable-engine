@@ -10,18 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.async;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
+package org.flowable.common.engine.impl.util;
 
 /**
- * Invoker responsible for submitting tasks to the task executor.
- *
  * @author Filip Hrisafov
  */
-public interface AsyncTaskInvoker {
+public class ExceptionUtil {
 
-    <T> CompletableFuture<T> submit(Callable<T> task);
+    public static <E extends Throwable> void sneakyThrow(Throwable t) throws E {
+        throw (E) t;
+    }
 
 }

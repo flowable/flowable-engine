@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -105,7 +105,7 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
         processEngineConfiguration.setAsyncTaskInvoker(new AsyncTaskInvoker() {
 
             @Override
-            public <T> Future<T> submit(Callable<T> task) {
+            public <T> CompletableFuture<T> submit(Callable<T> task) {
                 return processEngineConfiguration.getAsyncTaskExecutor().submit(task);
             }
         });

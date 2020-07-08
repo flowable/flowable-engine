@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 
@@ -54,7 +54,7 @@ public interface FutureJavaDelegate<Output> {
      * @param taskInvoker the task invoker that can be used to execute expensive operation on another thread
      * @return the output data of the execution
      */
-    Future<Output> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker);
+    CompletableFuture<Output> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker);
 
     /**
      * Method invoked with the result from {@link #execute(DelegateExecution, AsyncTaskInvoker)}.
