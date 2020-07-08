@@ -28,12 +28,12 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.COMPLETED;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.COMPLETE;
     }
     

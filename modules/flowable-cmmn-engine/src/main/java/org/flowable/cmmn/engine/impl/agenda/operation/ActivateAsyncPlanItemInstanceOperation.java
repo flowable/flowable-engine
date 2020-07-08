@@ -45,12 +45,12 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.ASYNC_ACTIVATE;
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.ASYNC_ACTIVE;
     }
 

@@ -45,7 +45,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
         if (jobServiceConfiguration.isAsyncHistoryJsonGroupingEnabled() && historyObjectNodes.size() >= jobServiceConfiguration.getAsyncHistoryJsonGroupingThreshold()) {
             String jobType = getJobType(jobServiceConfiguration, true);
-            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
+            HistoryJobEntity jobEntity = createAndScheduleJob(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
             ArrayNode arrayNode = jobServiceConfiguration.getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
                 arrayNode.add(historyJsonNode);
@@ -57,7 +57,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
             List<HistoryJobEntity> historyJobEntities = new ArrayList<>(historyObjectNodes.size());
             String jobType = getJobType(jobServiceConfiguration, false);
             for (ObjectNode historyJsonNode : historyObjectNodes) {
-                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
+                HistoryJobEntity jobEntity = createAndScheduleJob(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
                 addJsonToJob(commandContext, jobServiceConfiguration, jobEntity, historyJsonNode, false);
                 historyJobEntities.add(jobEntity);
             }
@@ -66,7 +66,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         }
     }
     
-    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession, 
+    protected HistoryJobEntity createAndScheduleJob(CommandContext commandContext, AsyncHistorySession asyncHistorySession,
             JobServiceConfiguration jobServiceConfiguration, String jobType) {
         HistoryJobEntity currentJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
         currentJobEntity.setJobHandlerType(jobType);
@@ -74,8 +74,13 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
         currentJobEntity.setCreateTime(jobServiceConfiguration.getClock().getCurrentTime());
         currentJobEntity.setScopeType(jobServiceConfiguration.getHistoryJobExecutionScope());
-        jobServiceConfiguration.getJobManager().scheduleHistoryJob(currentJobEntity);
+        scheduleJob(commandContext, asyncHistorySession, jobServiceConfiguration, currentJobEntity);
         return currentJobEntity;
+    }
+
+    protected void scheduleJob(CommandContext commandContext, AsyncHistorySession asyncHistorySession,
+            JobServiceConfiguration jobServiceConfiguration, HistoryJobEntity currentJobEntity) {
+        jobServiceConfiguration.getJobManager().scheduleHistoryJob(currentJobEntity);
     }
 
     protected void addJsonToJob(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration, HistoryJobEntity jobEntity, JsonNode rootObjectNode, boolean applyCompression) {

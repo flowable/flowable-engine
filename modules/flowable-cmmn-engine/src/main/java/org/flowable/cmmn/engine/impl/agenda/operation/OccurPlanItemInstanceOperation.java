@@ -29,12 +29,12 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.COMPLETED;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.OCCUR;
     }
     

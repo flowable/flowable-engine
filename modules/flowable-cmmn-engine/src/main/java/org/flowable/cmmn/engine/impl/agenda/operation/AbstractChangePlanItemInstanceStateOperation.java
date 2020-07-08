@@ -87,9 +87,9 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
     }
 
-    protected abstract String getNewState();
+    public abstract String getNewState();
 
-    protected abstract String getLifeCycleTransition();
+    public abstract String getLifeCycleTransition();
 
     /**
      * Overwrite this default implemented hook, if the operation should be aborted on a void transition which might be the case, if the old and new state
@@ -97,7 +97,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
      *
      * @return true, if this operation should be aborted, if the new plan item state is the same as the old one, false, if the operation is to be executed in any case
      */
-    protected boolean abortOperationIfNewStateEqualsOldState() {
+    public boolean abortOperationIfNewStateEqualsOldState() {
         return false;
     }
 

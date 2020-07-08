@@ -28,12 +28,12 @@ public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePl
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.AVAILABLE;
     }
     

@@ -33,12 +33,12 @@ public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInst
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.TERMINATED;
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.TERMINATE;
     }
     

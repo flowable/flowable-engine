@@ -154,8 +154,8 @@ public class CommandContext {
     protected void executeCloseListenersClosing() {
         if (closeListeners != null) {
             try {
-            	for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closing(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closing(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -166,8 +166,8 @@ public class CommandContext {
     protected void executeCloseListenersAfterSessionFlushed() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.afterSessionsFlush(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).afterSessionsFlush(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -178,8 +178,8 @@ public class CommandContext {
     protected void executeCloseListenersClosed() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closed(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closed(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -190,8 +190,8 @@ public class CommandContext {
     protected void executeCloseListenersCloseFailure() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closeFailure(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closeFailure(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
