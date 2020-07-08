@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,15 +23,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -40,6 +48,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -1111,4 +1120,124 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
+
+    @Test
+    @Deployment
+    void testWithFutureDelegates() {
+        // the setup of the test is the following:
+        // there are 3 delegate executions:
+        // delegate1_1 -> delegate1_2
+        // delegate2_1
+        // for delegate 1_1 to complete delegate2_1 should start executing
+        // for delegate 1_2 to complete delegate2_1 should start executing and 1_1 should be done
+        // for delegate2_1 to complete delegate1_2 should complete
+
+        CountDownLatch delegate1_1Done = new CountDownLatch(1);
+        CountDownLatch delegate1_2Done = new CountDownLatch(1);
+        CountDownLatch delegate2_1Done = new CountDownLatch(1);
+        CountDownLatch delegate2_1Start = new CountDownLatch(1);
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate1_1 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+
+                try {
+
+                    if (delegate2_1Start.await(2, TimeUnit.SECONDS)) {
+                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        return Collections.singletonMap("counterDelegate1_1", counter.incrementAndGet());
+                    }
+
+                    throw new FlowableException("Delegate 2_1 did not start");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new FlowableException("Thread was interrupted");
+                }
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate1_1Done.countDown();
+            }
+        };
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate1_2 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+                assertThat(inputData)
+                        .contains(
+                                entry("counterDelegate1_1", 1)
+                        )
+                        .doesNotContainKeys("counterDelegate1_2", "counterDelegate2_1");
+                AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                return Collections.singletonMap("counterDelegate1_2", counter.incrementAndGet());
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate1_2Done.countDown();
+            }
+        };
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate2_1 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+                delegate2_1Start.countDown();
+
+                try {
+                    if (delegate1_2Done.await(2, TimeUnit.SECONDS)) {
+                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        return Collections.singletonMap("counterDelegate2_1", counter.incrementAndGet());
+                    }
+
+                    throw new FlowableException("Delegate 1_2 did not complete");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new FlowableException("Thread was interrupted");
+                }
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                assertThat(execution.getVariables())
+                        .contains(
+                                entry("counterDelegate1_1", 1),
+                                entry("counterDelegate1_2", 2)
+                        )
+                        .doesNotContainKeys("counterDelegate2_1");
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate2_1Done.countDown();
+            }
+        };
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("futureDelegate1_1", futureDelegate1_1)
+                .transientVariable("futureDelegate1_2", futureDelegate1_2)
+                .transientVariable("futureDelegate2_1", futureDelegate2_1)
+                .transientVariable("counter", new AtomicInteger(0))
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
+                    .filter(variable -> !variable.getVariableName().equals("initiator"))
+                    .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
+
+            assertThat(historicVariables)
+                    .containsOnly(
+                            entry("counterDelegate1_1", 1),
+                            entry("counterDelegate1_2", 2),
+                            entry("counterDelegate2_1", 3)
+                    );
+        }
+    }
+
 }

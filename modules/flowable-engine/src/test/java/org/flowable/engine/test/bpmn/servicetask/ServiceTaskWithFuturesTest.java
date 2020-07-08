@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FlowableFutureJavaDelegate;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -159,6 +161,125 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
                 .hasNoCause()
                 .hasMessage("Countdown latch did not reach 0");
 
+    }
+
+    @Test
+    @Deployment
+    void testDelegateExpressionParallelAndSequentialFutureJavaDelegates() {
+        // the setup of the test is the following:
+        // there are 3 delegate executions:
+        // delegate1_1 -> delegate1_2
+        // delegate2_1
+        // for delegate 1_1 to complete delegate2_1 should start executing
+        // for delegate 1_2 to complete delegate2_1 should start executing and 1_1 should be done
+        // for delegate2_1 to complete delegate1_2 should complete
+
+        CountDownLatch delegate1_1Done = new CountDownLatch(1);
+        CountDownLatch delegate1_2Done = new CountDownLatch(1);
+        CountDownLatch delegate2_1Done = new CountDownLatch(1);
+        CountDownLatch delegate2_1Start = new CountDownLatch(1);
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate1_1 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+
+                try {
+
+                    if (delegate2_1Start.await(2, TimeUnit.SECONDS)) {
+                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        return Collections.singletonMap("counterDelegate1_1", counter.incrementAndGet());
+                    }
+
+                    throw new FlowableException("Delegate 2_1 did not start");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new FlowableException("Thread was interrupted");
+                }
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate1_1Done.countDown();
+            }
+        };
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate1_2 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+                assertThat(inputData)
+                        .contains(
+                                entry("counterDelegate1_1", 1)
+                        )
+                        .doesNotContainKeys("counterDelegate1_2", "counterDelegate2_1");
+                AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                return Collections.singletonMap("counterDelegate1_2", counter.incrementAndGet());
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate1_2Done.countDown();
+            }
+        };
+
+        MapBasedFlowableFutureJavaDelegate futureDelegate2_1 = new MapBasedFlowableFutureJavaDelegate() {
+
+            @Override
+            public Map<String, Object> execute(Map<String, Object> inputData) {
+                delegate2_1Start.countDown();
+                
+                try {
+                    if (delegate1_2Done.await(2, TimeUnit.SECONDS)) {
+                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        return Collections.singletonMap("counterDelegate2_1", counter.incrementAndGet());
+                    }
+
+                    throw new FlowableException("Delegate 1_2 did not complete");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new FlowableException("Thread was interrupted");
+                }
+            }
+
+            @Override
+            public void afterExecution(DelegateExecution execution, Map<String, Object> executionData) {
+                assertThat(execution.getVariables())
+                        .contains(
+                                entry("counterDelegate1_1", 1),
+                                entry("counterDelegate1_2", 2)
+                        )
+                        .doesNotContainKeys("counterDelegate2_1");
+                MapBasedFlowableFutureJavaDelegate.super.afterExecution(execution, executionData);
+                delegate2_1Done.countDown();
+            }
+        };
+        
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("futureDelegate1_1", futureDelegate1_1)
+                .transientVariable("futureDelegate1_2", futureDelegate1_2)
+                .transientVariable("futureDelegate2_1", futureDelegate2_1)
+                .transientVariable("counter", new AtomicInteger(0))
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
+                    .filter(variable -> !variable.getVariableName().equals("initiator"))
+                    .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
+
+            assertThat(historicVariables)
+                    .containsOnly(
+                            entry("counterDelegate1_1", 1),
+                            entry("counterDelegate1_2", 2),
+                            entry("counterDelegate2_1", 3)
+                    );
+        }
     }
 
     @Test
