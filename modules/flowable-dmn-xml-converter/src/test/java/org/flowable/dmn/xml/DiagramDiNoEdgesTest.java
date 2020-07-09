@@ -22,7 +22,7 @@ public class DiagramDiNoEdgesTest extends AbstractConverterTest {
 
     @Override
     protected String getResource() {
-        return "dmndiNoInformationRequirements.dmn";
+        return "dmndiNoEdges.dmn";
     }
 
     private void validateModel(DmnDefinition model) {
