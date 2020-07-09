@@ -33,14 +33,6 @@ public interface Agenda extends Session {
     Runnable getNextOperation();
 
     /**
-     * Get next operation from agenda and keep operation on the top of the agenda
-     *
-     * @return the first operation from the agenda
-     * @throws {@link org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
-     */
-    Runnable peekOperation();
-
-    /**
      * Plan operation for execution
      *
      * @param operation operation to run

@@ -55,11 +55,6 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public Runnable peekOperation() {
-            return agenda.peekOperation();
-        }
-
-        @Override
         public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
             agenda.planOperation(operation, executionEntity);
         }

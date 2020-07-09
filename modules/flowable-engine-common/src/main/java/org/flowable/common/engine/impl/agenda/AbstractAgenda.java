@@ -57,12 +57,6 @@ public abstract class AbstractAgenda implements Agenda {
         }
     }
 
-    @Override
-    public Runnable peekOperation() {
-        assertOperationsNotEmpty();
-        return operations.peek();
-    }
-
     protected void assertOperationsNotEmpty() {
         if (operations.isEmpty() && futureOperations.isEmpty()) {
             throw new FlowableException("Unable to peek empty agenda.");
