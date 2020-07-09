@@ -72,6 +72,8 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_21 = "org/flowable/dmn/editor/converter/decisiontable_forceDMN11.json";
     private static final String JSON_RESOURCE_22 = "org/flowable/dmn/editor/converter/decisiontable_empty_outcomes.json";
     private static final String JSON_RESOURCE_23 = "org/flowable/dmn/editor/converter/decisionservice_1.json";
+    private static final String JSON_RESOURCE_24 = "org/flowable/dmn/editor/converter/decisionservice_1_no_info_reqs.json";
+    private static final String JSON_RESOURCE_25 = "org/flowable/dmn/editor/converter/decisionservice_1_no_decisions.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -666,6 +668,46 @@ public class DmnJsonConverterTest {
         dmnDefinition.getDecisions().forEach(decision -> assertThat(decision.getExpression()).isNull());
     }
 
+    @Test
+    public void testConvertDecisionServiceJsonToDMNNoInformationRequirements() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_24);
+
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
+
+        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+
+        DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
+
+        assertThat(decisionService.getOutputDecisions().size()).isEqualTo(2);
+        assertThat(decisionService.getEncapsulatedDecisions().size()).isEqualTo(2);
+
+        assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
+
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+
+        JsonNode decisionServiceJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+
+        assertThat(decisionServiceJson).isNotNull();
+    }
+
+    @Test
+    public void testConvertDecisionServiceJsonToDMNNoDecisions() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_25);
+
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
+
+        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+
+        DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
+
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+
+        JsonNode decisionServiceJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+
+        assertThat(decisionServiceJson).isNotNull();
+    }
 
     @Test
     public void testConvertDRDtoJson() {
