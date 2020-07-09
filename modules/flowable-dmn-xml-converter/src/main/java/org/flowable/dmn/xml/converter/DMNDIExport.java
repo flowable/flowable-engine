@@ -56,8 +56,10 @@ public class DMNDIExport implements DmnXMLConstants {
 
             // DI edge
             Map<String, List<GraphicInfo>> flowLocationGraphicInfoMap = model.getFlowLocationMapByDiagramId(diDiagram.getId());
-            for (Map.Entry<String, List<GraphicInfo>> flowLocationGraphicInfoEntry : flowLocationGraphicInfoMap.entrySet()) {
-                createDmnEdge(flowLocationGraphicInfoEntry.getKey(), flowLocationGraphicInfoEntry.getValue(), xtw);
+            if (flowLocationGraphicInfoMap != null) {
+                for (Map.Entry<String, List<GraphicInfo>> flowLocationGraphicInfoEntry : flowLocationGraphicInfoMap.entrySet()) {
+                    createDmnEdge(flowLocationGraphicInfoEntry.getKey(), flowLocationGraphicInfoEntry.getValue(), xtw);
+                }
             }
 
             // end DI diagram

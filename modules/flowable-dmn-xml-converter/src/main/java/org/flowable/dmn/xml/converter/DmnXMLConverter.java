@@ -325,20 +325,24 @@ public class DmnXMLConverter implements DmnXMLConstants {
         conversionHelper.getDiDiagrams()
             .forEach(diDiagram -> {
                 dmnDefinition.addDiDiagram(diDiagram);
-                conversionHelper.getDiShapes(diDiagram.getId())
-                    .forEach(dmnDiShape -> {
-                        dmnDefinition.addGraphicInfoByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo());
-                        if (dmnDiShape.getDecisionServiceDividerLine() != null) {
-                            dmnDefinition.addDecisionServiceDividerGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(),
-                                dmnDiShape.getDecisionServiceDividerLine().getWaypoints());
-                        }
-                    });
-                conversionHelper.getDiEdges(diDiagram.getId())
-                    .forEach(dmnDiEdge -> {
-                        if (dmnDiEdge.getId() != null) {
-                            dmnDefinition.addFlowGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiEdge.getDmnElementRef(), dmnDiEdge.getWaypoints());
-                        }
-                    });
+                if (conversionHelper.getDiShapes(diDiagram.getId()) != null) {
+                    conversionHelper.getDiShapes(diDiagram.getId())
+                        .forEach(dmnDiShape -> {
+                            dmnDefinition.addGraphicInfoByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(), dmnDiShape.getGraphicInfo());
+                            if (dmnDiShape.getDecisionServiceDividerLine() != null) {
+                                dmnDefinition.addDecisionServiceDividerGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiShape.getDmnElementRef(),
+                                    dmnDiShape.getDecisionServiceDividerLine().getWaypoints());
+                            }
+                        });
+                }
+                if (conversionHelper.getDiEdges(diDiagram.getId()) != null) {
+                    conversionHelper.getDiEdges(diDiagram.getId())
+                        .forEach(dmnDiEdge -> {
+                            if (dmnDiEdge.getId() != null) {
+                                dmnDefinition.addFlowGraphicInfoListByDiagramId(diDiagram.getId(), dmnDiEdge.getDmnElementRef(), dmnDiEdge.getWaypoints());
+                            }
+                        });
+                }
             });
     }
 
