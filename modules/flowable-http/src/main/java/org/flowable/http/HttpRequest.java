@@ -21,7 +21,7 @@ public class HttpRequest {
     
     protected String method;
     protected String url;
-    protected String headers;
+    protected HttpHeaders httpHeaders;
     protected String body;
     protected String bodyEncoding;
     protected int timeout;
@@ -51,12 +51,33 @@ public class HttpRequest {
         this.url = url;
     }
 
+    /**
+     * @deprecated use {@link #getHttpHeadersAsString()} instead
+     */
+    @Deprecated
     public String getHeaders() {
-        return headers;
+        return getHttpHeadersAsString();
     }
 
+    /**
+     * @deprecated use {@link #setHttpHeaders(HttpHeaders)} instead
+     */
+    @Deprecated
     public void setHeaders(String headers) {
-        this.headers = headers;
+        this.httpHeaders = HttpHeaders.parseFromString(headers);
+    }
+
+    public HttpHeaders getHttpHeaders() {
+        return httpHeaders;
+    }
+
+    public String getHttpHeadersAsString() {
+        return httpHeaders != null ? httpHeaders.formatAsString() : null;
+    }
+
+
+    public void setHttpHeaders(HttpHeaders httpHeaders) {
+        this.httpHeaders = httpHeaders;
     }
 
     public String getBody() {

@@ -16,12 +16,14 @@ import static org.flowable.http.ExpressionUtils.getBooleanFromField;
 import static org.flowable.http.ExpressionUtils.getIntFromField;
 import static org.flowable.http.ExpressionUtils.getStringFromField;
 import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_HEADERS_INVALID;
 
 import java.io.IOException;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 
@@ -87,7 +89,7 @@ public abstract class BaseHttpActivityDelegate {
 
         request.setMethod(getStringFromField(requestMethod, variableContainer));
         request.setUrl(getStringFromField(requestUrl, variableContainer));
-        request.setHeaders(getStringFromField(requestHeaders, variableContainer));
+        request.setHttpHeaders(getRequestHeaders(variableContainer));
         request.setBody(getStringFromField(requestBody, variableContainer));
         request.setBodyEncoding(getStringFromField(requestBodyEncoding, variableContainer));
         request.setTimeout(getIntFromField(requestTimeout, variableContainer));
@@ -117,7 +119,7 @@ public abstract class BaseHttpActivityDelegate {
         if (request.isSaveRequest()) {
             variableContainer.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
             variableContainer.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
-            variableContainer.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+            variableContainer.setVariable(request.getPrefix() + "RequestHeaders", request.getHttpHeadersAsString());
             variableContainer.setVariable(request.getPrefix() + "RequestBody", request.getBody());
             variableContainer.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
             variableContainer.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
@@ -141,12 +143,12 @@ public abstract class BaseHttpActivityDelegate {
                     variableContainer.setTransientVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
                     variableContainer.setTransientVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
                     variableContainer.setTransientVariable(request.getPrefix() + "ResponseReason", response.getReason());
-                    variableContainer.setTransientVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                    variableContainer.setTransientVariable(request.getPrefix() + "ResponseHeaders", response.getHttpHeadersAsString());
                 } else {
                     variableContainer.setVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
                     variableContainer.setVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
                     variableContainer.setVariable(request.getPrefix() + "ResponseReason", response.getReason());
-                    variableContainer.setVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                    variableContainer.setVariable(request.getPrefix() + "ResponseHeaders", response.getHttpHeadersAsString());
                 }
             }
 
@@ -192,6 +194,15 @@ public abstract class BaseHttpActivityDelegate {
                     }
                 }
             }
+        }
+    }
+
+    protected HttpHeaders getRequestHeaders(VariableContainer variableContainer) {
+        try {
+            String headersString = getStringFromField(requestHeaders, variableContainer);
+            return HttpHeaders.parseFromString(headersString);
+        } catch (FlowableIllegalArgumentException ex) {
+            throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID, ex);
         }
     }
 }

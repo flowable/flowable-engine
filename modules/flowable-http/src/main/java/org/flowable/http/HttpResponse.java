@@ -20,7 +20,7 @@ public class HttpResponse {
     protected int statusCode;
     protected String protocol;
     protected String reason;
-    protected String headers;
+    protected HttpHeaders httpHeaders;
     protected String body;
     protected boolean bodyResponseHandled;
 
@@ -33,7 +33,7 @@ public class HttpResponse {
 
     public HttpResponse(int statusCode, String headers) {
         this.statusCode = statusCode;
-        this.headers = headers;
+        this.httpHeaders = HttpHeaders.parseFromString(headers);
     }
 
     public int getStatusCode() {
@@ -60,12 +60,32 @@ public class HttpResponse {
         this.reason = reason;
     }
 
+    /**
+     * @deprecated use {@link #getHttpHeadersAsString()} instead
+     */
+    @Deprecated
     public String getHeaders() {
-        return headers;
+        return getHttpHeadersAsString();
     }
 
+    /**
+     * @deprecated use {@link #setHttpHeaders(HttpHeaders)} instead
+     */
+    @Deprecated
     public void setHeaders(String headers) {
-        this.headers = headers;
+        this.httpHeaders = HttpHeaders.parseFromString(headers);
+    }
+
+    public HttpHeaders getHttpHeaders() {
+        return httpHeaders;
+    }
+
+    public String getHttpHeadersAsString() {
+        return httpHeaders != null ? httpHeaders.formatAsString() : null;
+    }
+
+    public void setHttpHeaders(HttpHeaders httpHeaders) {
+        this.httpHeaders = httpHeaders;
     }
 
     public String getBody() {
