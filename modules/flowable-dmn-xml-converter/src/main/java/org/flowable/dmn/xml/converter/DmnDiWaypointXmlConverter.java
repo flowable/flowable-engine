@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,20 @@ public class DmnDiWaypointXmlConverter extends BaseDmnXMLConverter {
         GraphicInfo graphicInfo = new GraphicInfo();
         graphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_X)));
         graphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, DmnXMLConstants.ATTRIBUTE_DI_Y)));
+
+        // calculate width and height for output and decision service sections
+        if (conversionHelper.getCurrentDiShape().getDecisionServiceDividerLine() == conversionHelper.getCurrentDiEdge()) {
+            // output decisions
+            if (conversionHelper.getCurrentDiShape().getDecisionServiceDividerLine().getWaypoints().isEmpty()) {
+                GraphicInfo decisionServiceGraphicInfo = conversionHelper.getCurrentDiShape().getGraphicInfo();
+                graphicInfo.setWidth(decisionServiceGraphicInfo.getWidth());
+                graphicInfo.setHeight(graphicInfo.getY() - decisionServiceGraphicInfo.getY());
+            } else {
+                GraphicInfo decisionServiceGraphicInfo = conversionHelper.getCurrentDiShape().getGraphicInfo();
+                graphicInfo.setWidth(decisionServiceGraphicInfo.getWidth());
+                graphicInfo.setHeight(decisionServiceGraphicInfo.getHeight() - graphicInfo.getY() + decisionServiceGraphicInfo.getY());
+            }
+        }
 
         conversionHelper.getCurrentDiEdge().addWaypoint(graphicInfo);
 
