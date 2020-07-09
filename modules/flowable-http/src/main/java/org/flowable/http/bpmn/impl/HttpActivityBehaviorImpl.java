@@ -198,7 +198,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
                 if (request.isSaveRequest()) {
                     execution.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
                     execution.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
-                    execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+                    execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHttpHeadersAsString());
                     execution.setVariable(request.getPrefix() + "RequestBody", request.getBody());
                     execution.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
                     execution.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());

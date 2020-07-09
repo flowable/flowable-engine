@@ -12,13 +12,12 @@
  */
 package org.flowable.http;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -105,12 +104,12 @@ public class HttpActivityExecutor {
                         variableContainer.setTransientVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
                         variableContainer.setTransientVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
                         variableContainer.setTransientVariable(request.getPrefix() + "ResponseReason", response.getReason());
-                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseHeaders", response.getHttpHeadersAsString());
                     } else {
                         variableContainer.setVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
                         variableContainer.setVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
                         variableContainer.setVariable(request.getPrefix() + "ResponseReason", response.getReason());
-                        variableContainer.setVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                        variableContainer.setVariable(request.getPrefix() + "ResponseHeaders", response.getHttpHeadersAsString());
                     }
                 }
 
@@ -252,8 +251,8 @@ public class HttpActivityExecutor {
                 }
             }
 
-            if (requestInfo.getHeaders() != null) {
-                setHeaders(request, requestInfo.getHeaders());
+            if (requestInfo.getHttpHeaders() != null) {
+                setHeaders(request, requestInfo.getHttpHeaders());
             }
 
             setConfig(request, requestInfo,
@@ -272,7 +271,7 @@ public class HttpActivityExecutor {
             }
 
             if (response.getAllHeaders() != null) {
-                responseInfo.setHeaders(getHeadersAsString(response.getAllHeaders()));
+                responseInfo.setHttpHeaders(getHttpHeaders(response.getAllHeaders()));
             }
 
             if (response.getEntity() != null) {
@@ -338,23 +337,19 @@ public class HttpActivityExecutor {
         return hb.toString();
     }
 
-    protected void setHeaders(final HttpMessage base, final String headers) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
-            String line = reader.readLine();
-            while (line != null) {
-                int colonIndex = line.indexOf(':');
-                if (colonIndex > 0) {
-                    String headerName = line.substring(0, colonIndex);
-                    if (line.length() > colonIndex + 2) {
-                        base.addHeader(headerName, line.substring(colonIndex + 1));
-                    } else {
-                        base.addHeader(headerName, null);
-                    }
-                    line = reader.readLine();
+    protected HttpHeaders getHttpHeaders(Header[] headers) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        for (Header header : headers) {
+            httpHeaders.add(header.getName(), header.getValue());
+        }
+        return httpHeaders;
+    }
 
-                } else {
-                    throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
-                }
+    protected void setHeaders(final HttpMessage base, final HttpHeaders headers) {
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String headerName = entry.getKey();
+            for (String headerValue : entry.getValue()) {
+                base.addHeader(headerName, headerValue);
             }
         }
     }

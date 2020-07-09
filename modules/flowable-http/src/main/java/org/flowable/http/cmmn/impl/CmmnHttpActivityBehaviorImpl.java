@@ -177,7 +177,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
             if (request.isSaveRequest()) {
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
-                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestHeaders", request.getHttpHeadersAsString());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestBody", request.getBody());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
                 planItemInstanceEntity.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());

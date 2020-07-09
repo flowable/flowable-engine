@@ -20,6 +20,8 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +41,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.http.HttpHeaders;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpRequestValidator;
 import org.flowable.http.HttpResponse;
@@ -104,8 +107,8 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                 }
             }
 
-            if (requestInfo.getHeaders() != null) {
-                setHeaders(request, requestInfo.getHeaders());
+            if (requestInfo.getHttpHeaders() != null) {
+                setHeaders(request, requestInfo.getHttpHeaders());
             }
 
             setConfig(request, requestInfo);
@@ -132,23 +135,11 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
         }
     }
 
-    protected void setHeaders(final HttpMessage base, final String headers) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
-            String line = reader.readLine();
-            while (line != null) {
-                int colonIndex = line.indexOf(':');
-                if (colonIndex > 0) {
-                    String headerName = line.substring(0, colonIndex);
-                    if (line.length() > colonIndex + 2) {
-                        base.addHeader(headerName, line.substring(colonIndex + 1));
-                    } else {
-                        base.addHeader(headerName, null);
-                    }
-                    line = reader.readLine();
-
-                } else {
-                    throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
-                }
+    protected void setHeaders(final HttpMessage base, final HttpHeaders headers) {
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String headerName = entry.getKey();
+            for (String headerValue : entry.getValue()) {
+                base.addHeader(headerName, headerValue);
             }
         }
     }
@@ -172,7 +163,7 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
         }
 
         if (response.getAllHeaders() != null) {
-            responseInfo.setHeaders(getHeadersAsString(response.getAllHeaders()));
+            responseInfo.setHttpHeaders(getHeaders(response.getAllHeaders()));
         }
 
         if (response.getEntity() != null) {
@@ -183,12 +174,12 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
 
     }
 
-    protected String getHeadersAsString(final Header[] headers) {
-        StringBuilder hb = new StringBuilder();
+    protected HttpHeaders getHeaders(Header[] headers) {
+        HttpHeaders httpHeaders = new HttpHeaders();
         for (Header header : headers) {
-            hb.append(header.getName()).append(": ").append(header.getValue()).append('\n');
+            httpHeaders.add(header.getName(), header.getValue());
         }
-        return hb.toString();
+        return httpHeaders;
     }
 
     protected class ApacheHttpComponentsExecutableHttpRequest implements ExecutableHttpRequest {
