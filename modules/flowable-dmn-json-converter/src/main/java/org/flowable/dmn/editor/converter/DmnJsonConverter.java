@@ -179,8 +179,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 .add(createEncapsulatedDecisionNode(decisionRef, decisionServiceId, diDiagram.getId(), sourceTargetRefMap, model)));
 
         // create information requirement nodes
-        model.getFlowLocationMapByDiagramId(diDiagram.getId())
-            .forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, diDiagram.getId(), model)));
+        if (model.getFlowLocationMapByDiagramId(diDiagram.getId()) != null) {
+            model.getFlowLocationMapByDiagramId(diDiagram.getId())
+                .forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, diDiagram.getId(), model)));
+        }
         return modelNode;
     }
 
