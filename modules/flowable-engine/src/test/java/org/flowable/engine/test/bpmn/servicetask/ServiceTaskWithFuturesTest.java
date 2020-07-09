@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +69,141 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
             // Every service task sleeps for 1s, but when we use futures it should take less then 2s.
             assertThat(historicProcessInstance.getDurationInMillis()).isLessThan(1500);
         }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesTest.testParallelAndSequentialExpression.bpmn20.xml")
+    void testParallelAndSequentialExpressionDoesNotReturnFuture() {
+        // when the expression doesn't return a future then the execution order should be the following (same as the planned order):
+        // serviceTask1 -> serviceTask2 -> serviceTask1_2 -> serviceTask2_2
+        Object bean = new Object() {
+
+            public Integer invoke(AtomicInteger counter) {
+                return counter.incrementAndGet();
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("counter", new AtomicInteger(0))
+                .transientVariable("bean1", bean)
+                .transientVariable("bean2", bean)
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        assertThat(processInstance.getProcessVariables())
+                .contains(
+                        entry("service1_1Var", 1),
+                        entry("service1_2Var", 3),
+                        entry("service2_1Var", 2),
+                        entry("service2_2Var", 4)
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesTest.testParallelAndSequentialExpression.bpmn20.xml")
+    void testParallelAndSequentialExpressionReturnsCompletedFuture() {
+        // when the expression returns a completed future then the execution order should be the same as when it doesn't return a future.
+        // The order should be the following (same as the planned order):
+        // serviceTask1 -> serviceTask2 -> serviceTask1_2 -> serviceTask2_2
+        Object bean = new Object() {
+
+            public CompletableFuture<Integer> invoke(AtomicInteger counter) {
+                return CompletableFuture.completedFuture(counter.incrementAndGet());
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("counter", new AtomicInteger(0))
+                .transientVariable("bean1", bean)
+                .transientVariable("bean2", bean)
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        assertThat(processInstance.getProcessVariables())
+                .contains(
+                        entry("service1_1Var", 1),
+                        entry("service1_2Var", 3),
+                        entry("service2_1Var", 2),
+                        entry("service2_2Var", 4)
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesTest.testParallelAndSequentialExpression.bpmn20.xml")
+    void testParallelAndSequentialExpressionReturnsNotCompletedFuture() {
+        // This test has the most complex setup.
+        // The idea is to show that when a future is completed its action will immediately be executed.
+        // With this setup bean1 cannot continue until bean2 has started executing.
+        CountDownLatch bean1Enter = new CountDownLatch(1);
+        CountDownLatch bean2Enter = new CountDownLatch(1);
+        CountDownLatch commonLatch = new CountDownLatch(2);
+
+        Object bean1 = new Object() {
+
+            public CompletableFuture<Integer> invoke(AtomicInteger counter) {
+                return processEngineConfiguration.getAsyncTaskExecutor().submit(() -> {
+                    commonLatch.countDown();
+                    bean1Enter.countDown();
+                    // Now wait for bean2 to be entered
+                    try {
+                        if (!bean2Enter.await(2, TimeUnit.SECONDS)) {
+                            throw new FlowableException("Bean2 did not hit its latch");
+                        }
+
+                        if (commonLatch.await(2, TimeUnit.SECONDS)) {
+                            Thread.sleep(100); // Thread sleep to slower the execution a bit
+                            return counter.incrementAndGet();
+                        } else {
+                            throw new FlowableException("Countdown latch did not reach 0");
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    return counter.incrementAndGet();
+                });
+
+            }
+        };
+
+        Object bean2 = new Object() {
+
+            public CompletableFuture<Integer> invoke(AtomicInteger counter) {
+                return processEngineConfiguration.getAsyncTaskExecutor().submit(() -> {
+                    try {
+                        if (!bean1Enter.await(2, TimeUnit.SECONDS)) {
+                            throw new FlowableException("Bean1 did not hit its latch");
+                        }
+                        bean2Enter.countDown();
+                        return counter.incrementAndGet();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        commonLatch.countDown();
+                    }
+                    return counter.incrementAndGet();
+                });
+
+            }
+        };
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .transientVariable("counter", new AtomicInteger(0))
+                .transientVariable("bean1", bean1)
+                .transientVariable("bean2", bean2)
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
+        assertThat(processInstance.getProcessVariables())
+                .contains(
+                        entry("service1_1Var", 3),
+                        entry("service1_2Var", 4),
+                        entry("service2_1Var", 1),
+                        entry("service2_2Var", 2)
+                );
     }
 
     @Test
@@ -448,6 +584,7 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
 
     protected static class TestBeanReturnsFuture {
 
+        protected final AtomicInteger counter = new AtomicInteger(0);
         protected final CountDownLatch countDownLatch;
         protected final AsyncTaskExecutor asyncTaskExecutor;
 
@@ -456,19 +593,19 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
             this.asyncTaskExecutor = asyncTaskExecutor;
         }
 
-        public Future<String> invoke() {
+        public Future<Integer> invoke() {
             return asyncTaskExecutor.submit(() -> {
                 countDownLatch.countDown();
                 try {
                     if (countDownLatch.await(2, TimeUnit.SECONDS)) {
-                        return null;
+                        return counter.incrementAndGet();
                     } else {
                         throw new FlowableException("Countdown latch did not reach 0");
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                return null;
+                return counter.incrementAndGet();
             });
         }
     }
