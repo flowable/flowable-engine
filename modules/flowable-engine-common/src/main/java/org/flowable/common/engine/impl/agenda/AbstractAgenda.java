@@ -82,11 +82,15 @@ public abstract class AbstractAgenda implements Agenda {
 
     @Override
     public <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction) {
-        // If the future is done then get the value immediately and run the complete action without planning it on the agenda
+        ExecuteFutureActionOperation<V> operation = new ExecuteFutureActionOperation<>(future, completeAction);
         if (future.isDone()) {
-            planOperation(new ExecuteFutureActionOperation<>(future, completeAction));
+            // If the future is done, then plan the operation first (this makes sure that the complete action is invoked before any other operation is run)
+            operations.addFirst(operation);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Operation {} added to agenda", operation.getClass());
+            }
         } else {
-            futureOperations.add(new ExecuteFutureActionOperation<>(future, completeAction));
+            futureOperations.add(operation);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Future {} with action {} added to agenda", future, completeAction.getClass());
