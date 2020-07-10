@@ -12,24 +12,13 @@
  */
 package org.flowable.ui.task.application;
 
-import org.flowable.ui.task.conf.ApplicationConfiguration;
-import org.flowable.ui.task.servlet.AppDispatcherServletConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.lang.NonNull;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author Filip Hrisafov
  */
-@Import({
-    ApplicationConfiguration.class,
-    AppDispatcherServletConfiguration.class
-})
 @SpringBootApplication(proxyBeanMethods = false)
 public class FlowableTaskApplication extends SpringBootServletInitializer {
 
@@ -37,15 +26,4 @@ public class FlowableTaskApplication extends SpringBootServletInitializer {
         SpringApplication.run(FlowableTaskApplication.class, args);
     }
 
-    @Bean
-    public WebMvcConfigurer workflow() {
-        return new WebMvcConfigurer() {
-
-            @Override
-            public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-                registry.addViewController("/workflow").setViewName("redirect:/workflow/");
-                registry.addViewController("/workflow/").setViewName("forward:/workflow/index.html");
-            }
-        };
-    }
 }

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.task.conf;
+package org.flowable.ui.task.application;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +35,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  */
 public class FlowableTaskEventRegistryCondition extends SpringBootCondition
     implements AutoConfigurationImportFilter, BeanFactoryAware, Condition, EnvironmentAware {
+
+    // This is deliberately in the flowable-ui-task-app since it is only needed to enable / disable the dependency on the out of the box app
+    // if the Task UI Spring Boot Starter is used then people need to add the appropriate Kafka, JMS or RabbitMQ for the event registry
 
     protected BeanFactory beanFactory;
 
