@@ -10,30 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.bpmn.impl.handler;
+package org.flowable.engine.impl.bpmn.http.handler;
 
-import org.apache.http.client.HttpClient;
+import java.util.List;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
+import org.flowable.engine.impl.bpmn.http.delegate.HttpRequestHandlerInvocation;
+import org.flowable.engine.impl.bpmn.http.delegate.HttpResponseHandlerInvocation;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.delegate.HttpRequestHandler;
-import org.flowable.http.delegate.HttpResponseHandler;
-import org.flowable.http.bpmn.impl.delegate.HttpRequestHandlerInvocation;
-import org.flowable.http.bpmn.impl.delegate.HttpResponseHandlerInvocation;
-
-import java.util.List;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.api.delegate.HttpRequestHandler;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
 /**
  * @author Tijs Rademakers
  */
 public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpResponseHandler {
-
-    private static final long serialVersionUID = 1L;
 
     protected Expression expression;
     protected final List<FieldDeclaration> fieldDeclarations;
@@ -44,7 +42,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
     }
 
     @Override
-    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, HttpClient client) {
+    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, FlowableHttpClient client) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpRequestHandler) {
             CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(

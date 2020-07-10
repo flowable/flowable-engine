@@ -10,14 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.client;
 
-import org.flowable.http.HttpRequest;
+package org.flowable.http.common.api.delegate;
+
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 
 /**
- * @author Filip Hrisafov
+ * @author Tijs Rademakers
  */
-public interface FlowableHttpClient {
+public interface HttpRequestHandler {
 
-    ExecutableHttpRequest prepareRequest(HttpRequest request);
+    void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, FlowableHttpClient client);
 }

@@ -12,11 +12,7 @@
  */
 package org.flowable.http.client;
 
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_HEADERS_INVALID;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,10 +20,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpMessage;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -36,40 +38,92 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.http.HttpHeaders;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpRequestValidator;
-import org.flowable.http.HttpResponse;
+import org.flowable.http.common.api.HttpHeaders;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.ExecutableHttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.impl.HttpClientConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Filip Hrisafov
  */
-public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClient {
+public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClient, HttpClient {
+
+    // Implements HttpClient in order to be backwards compatible for the deprecated HttpRequestHandler
 
     private static final Pattern PLUS_CHARACTER_PATTERN = Pattern.compile("\\+");
     private static final String ENCODED_PLUS_CHARACTER = "%2B";
     private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
     private static final String ENCODED_SPACE_CHARACTER = "%20";
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected HttpClientBuilder clientBuilder;
-    protected HttpRequestValidator requestValidator;
     protected int socketTimeout;
     protected int connectTimeout;
     protected int connectionRequestTimeout;
 
-    public ApacheHttpComponentsFlowableHttpClient(HttpClientBuilder clientBuilder, HttpRequestValidator requestValidator) {
-        this(clientBuilder, requestValidator, 5000, 5000, 5000);
+    @SuppressWarnings("unused") // Used by HttpClientConfig determineHttpClient
+    public ApacheHttpComponentsFlowableHttpClient(HttpClientConfig config) {
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+
+        // https settings
+        if (config.isDisableCertVerify()) {
+            try {
+                SSLContextBuilder builder = new SSLContextBuilder();
+                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                httpClientBuilder.setSSLSocketFactory(
+                        new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+
+                            @Override
+                            public boolean verify(String s, SSLSession sslSession) {
+                                return true;
+                            }
+                        }));
+
+            } catch (Exception e) {
+                logger.error("Could not configure HTTP client SSL self signed strategy", e);
+            }
+        }
+
+        // request retry settings
+        int retryCount = 0;
+        if (config.getRequestRetryLimit() > 0) {
+            retryCount = config.getRequestRetryLimit();
+        }
+        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
+
+        // client builder settings
+        if (config.isUseSystemProperties()) {
+            httpClientBuilder.useSystemProperties();
+        }
+
+        this.clientBuilder = httpClientBuilder;
+
+        this.socketTimeout = config.getSocketTimeout();
+        this.connectTimeout = config.getConnectTimeout();
+        this.connectionRequestTimeout = config.getConnectionRequestTimeout();
     }
 
-    public ApacheHttpComponentsFlowableHttpClient(HttpClientBuilder clientBuilder, HttpRequestValidator requestValidator, int socketTimeout, int connectTimeout,
+    public ApacheHttpComponentsFlowableHttpClient(HttpClientBuilder clientBuilder, int socketTimeout, int connectTimeout,
             int connectionRequestTimeout) {
         this.clientBuilder = clientBuilder;
-        this.requestValidator = requestValidator;
         this.socketTimeout = socketTimeout;
         this.connectTimeout = connectTimeout;
         this.connectionRequestTimeout = connectionRequestTimeout;
@@ -77,7 +131,6 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
 
     @Override
     public ExecutableHttpRequest prepareRequest(HttpRequest requestInfo) {
-        requestValidator.validateRequest(requestInfo);
         try {
             HttpRequestBase request;
             URI uri = createUri(requestInfo.getUrl());
@@ -180,6 +233,77 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
             httpHeaders.add(header.getName(), header.getValue());
         }
         return httpHeaders;
+    }
+
+    // Apache HttpClient methods for backwards compatibility with deprecate HttpRequestHandler
+    @Override
+    public HttpParams getParams() {
+        return null;
+    }
+
+    @Override
+    public ClientConnectionManager getConnectionManager() {
+        return null;
+    }
+
+    @Override
+    public org.apache.http.HttpResponse execute(HttpUriRequest request) throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(request);
+        }
+    }
+
+    @Override
+    public org.apache.http.HttpResponse execute(HttpUriRequest request, HttpContext context) throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(request, context);
+        }
+    }
+
+    @Override
+    public org.apache.http.HttpResponse execute(HttpHost target, org.apache.http.HttpRequest request) throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(target, request);
+        }
+    }
+
+    @Override
+    public org.apache.http.HttpResponse execute(HttpHost target, org.apache.http.HttpRequest request, HttpContext context)
+            throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(target, request, context);
+        }
+    }
+
+    @Override
+    public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler) throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(request, responseHandler);
+        }
+    }
+
+    @Override
+    public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler, HttpContext context)
+            throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(request, responseHandler, context);
+        }
+    }
+
+    @Override
+    public <T> T execute(HttpHost target, org.apache.http.HttpRequest request, ResponseHandler<? extends T> responseHandler)
+            throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(target, request, responseHandler);
+        }
+    }
+
+    @Override
+    public <T> T execute(HttpHost target, org.apache.http.HttpRequest request, ResponseHandler<? extends T> responseHandler, HttpContext context)
+            throws IOException, ClientProtocolException {
+        try (CloseableHttpClient httpClient = clientBuilder.build()) {
+            return httpClient.execute(target, request, responseHandler, context);
+        }
     }
 
     protected class ApacheHttpComponentsExecutableHttpRequest implements ExecutableHttpRequest {

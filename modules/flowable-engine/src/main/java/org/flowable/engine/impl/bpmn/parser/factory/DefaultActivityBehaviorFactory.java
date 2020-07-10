@@ -123,6 +123,7 @@ import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegate;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DefaultClassDelegateFactory;
+import org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -357,9 +358,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
                 return createDefaultActivityBehaviour(serviceTask);
             }
 
-            List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
-            addExceptionMapAsFieldDeclaration(fieldDeclarations, serviceTask.getMapExceptions());
-            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations, serviceTask);
+            return classDelegateFactory.create(serviceTask.getId(), theClass.getName(),
+                    createFieldDeclarations(serviceTask.getFieldExtensions()),
+                    serviceTask.isTriggerable(),
+                    getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
@@ -372,7 +374,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
             return createServiceTaskDelegateExpressionActivityBehavior(serviceTask);
         } else {
-            return classDelegateFactory.create(serviceTask.getId(), "org.flowable.http.bpmn.impl.DefaultBpmnHttpActivityDelegate",
+            return classDelegateFactory.create(serviceTask.getId(), DefaultBpmnHttpActivityDelegate.class.getName(),
                     createFieldDeclarations(serviceTask.getFieldExtensions()),
                     serviceTask.isTriggerable(),
                     getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());

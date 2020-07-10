@@ -10,13 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http;
+
+package org.flowable.http.common.api.delegate;
+
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.http.common.api.HttpResponse;
 
 /**
- * @author Filip Hrisafov
+ * @author Tijs Rademakers
  */
-public interface HttpRequestValidator {
+public interface HttpResponseHandler {
 
-    void validateRequest(HttpRequest httpRequest);
-
+    void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse);
 }

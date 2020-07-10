@@ -10,13 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.bpmn.impl.delegate;
+package org.flowable.engine.impl.bpmn.http.delegate;
 
-import org.apache.http.client.HttpClient;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.delegate.HttpRequestHandler;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.api.delegate.HttpRequestHandler;
 
 /**
  * Class handling invocations of {@link HttpRequestHandler HttpRequestHandlers}
@@ -28,10 +28,10 @@ public class HttpRequestHandlerInvocation extends DelegateInvocation {
     protected final HttpRequestHandler httpRequestHandlerInstance;
     protected final VariableContainer delegateExecution;
     protected final HttpRequest httpRequest;
-    protected final HttpClient client;
+    protected final FlowableHttpClient client;
 
     public HttpRequestHandlerInvocation(HttpRequestHandler httpRequestHandlerInstance, VariableContainer delegateExecution,
-                    HttpRequest httpRequest, HttpClient client) {
+                    HttpRequest httpRequest, FlowableHttpClient client) {
 
         this.httpRequestHandlerInstance = httpRequestHandlerInstance;
         this.delegateExecution = delegateExecution;

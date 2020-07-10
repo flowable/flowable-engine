@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http;
+package org.flowable.http.common.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class HttpHeaders implements Map<String, List<String>> {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+        for (Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {
                 sb.append(headerName).append(": ").append(headerValue).append('\n');

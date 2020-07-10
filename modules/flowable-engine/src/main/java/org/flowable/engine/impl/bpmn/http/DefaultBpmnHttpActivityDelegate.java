@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.bpmn.impl;
+package org.flowable.engine.impl.bpmn.http;
 
 import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
@@ -20,15 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.FlowableHttpResponseHandler;
@@ -37,25 +29,26 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FutureJavaDelegate;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.bpmn.http.handler.ClassDelegateHttpHandler;
+import org.flowable.engine.impl.bpmn.http.handler.DelegateExpressionHttpHandler;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.http.BaseHttpActivityDelegate;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.bpmn.impl.handler.ClassDelegateHttpHandler;
-import org.flowable.http.bpmn.impl.handler.DelegateExpressionHttpHandler;
-import org.flowable.http.client.ApacheHttpComponentsFlowableHttpClient;
-import org.flowable.http.client.AsyncExecutableHttpRequest;
-import org.flowable.http.client.ExecutableHttpRequest;
-import org.flowable.http.client.FlowableHttpClient;
-import org.flowable.http.delegate.HttpRequestHandler;
-import org.flowable.http.delegate.HttpResponseHandler;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
+import org.flowable.http.common.api.client.ExecutableHttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.api.delegate.HttpRequestHandler;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
+import org.flowable.http.common.impl.BaseHttpActivityDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,62 +58,21 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<DefaultBpmnHttpActivityDelegate.ExecutionData> {
 
-    public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBpmnHttpActivityDelegate.class);
 
     protected FlowableHttpClient httpClient;
 
-    @SuppressWarnings("unused") // Method is used by the BehaviourFactory
     public DefaultBpmnHttpActivityDelegate() {
         this(null);
     }
 
     public DefaultBpmnHttpActivityDelegate(FlowableHttpClient httpClient) {
-        super(new ProcessErrorPropagator());
         this.httpClient = httpClient == null ? createHttpClient() : httpClient;
     }
 
     protected FlowableHttpClient createHttpClient() {
         HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
-        if (config.getHttpClient() instanceof FlowableHttpClient) {
-            return (FlowableHttpClient) config.getHttpClient();
-        }
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
-        // https settings
-        if (config.isDisableCertVerify()) {
-            try {
-                SSLContextBuilder builder = new SSLContextBuilder();
-                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-                httpClientBuilder.setSSLSocketFactory(
-                        new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
-
-                            @Override
-                            public boolean verify(String s, SSLSession sslSession) {
-                                return true;
-                            }
-                        }));
-
-            } catch (Exception e) {
-                LOGGER.error("Could not configure HTTP client SSL self signed strategy", e);
-            }
-        }
-
-        // request retry settings
-        int retryCount = 0;
-        if (config.getRequestRetryLimit() > 0) {
-            retryCount = config.getRequestRetryLimit();
-        }
-        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
-
-        // client builder settings
-        if (config.isUseSystemProperties()) {
-            httpClientBuilder.useSystemProperties();
-        }
-
-        return new ApacheHttpComponentsFlowableHttpClient(httpClientBuilder, this.requestValidator, config.getSocketTimeout(), config.getConnectTimeout(),
-                config.getConnectionRequestTimeout());
+        return config.determineHttpClient();
     }
 
     @Override
@@ -147,7 +99,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         }
 
         // Validate request
-        requestValidator.validateRequest(request);
+        validateRequest(request);
 
         // Prepare request
         ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
@@ -269,6 +221,11 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             fieldDeclarations.add(fieldDeclaration);
         }
         return fieldDeclarations;
+    }
+
+    @Override
+    protected void propagateError(VariableContainer container, String code) {
+        ErrorPropagation.propagateError("HTTP" + code, (DelegateExecution) container);
     }
 
     protected static class ExecutionData {

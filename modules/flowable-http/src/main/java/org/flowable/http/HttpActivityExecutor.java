@@ -43,6 +43,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
@@ -129,7 +130,7 @@ public class HttpActivityExecutor {
                 // Handle http status codes
                 if ((request.isNoRedirects() && response.getStatusCode() >= 300) || response.getStatusCode() >= 400) {
 
-                    String code = Integer.toString(response.statusCode);
+                    String code = Integer.toString(response.getStatusCode());
 
                     Set<String> handleCodes = request.getHandleCodes();
                     if (handleCodes != null && !handleCodes.isEmpty()) {

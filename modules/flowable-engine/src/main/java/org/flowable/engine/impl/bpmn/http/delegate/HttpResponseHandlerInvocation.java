@@ -10,12 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.bpmn.impl.delegate;
+package org.flowable.engine.impl.bpmn.http.delegate;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.delegate.HttpResponseHandler;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
 /**
  * Class handling invocations of {@link HttpResponseHandler HttpResponseHandlers}
