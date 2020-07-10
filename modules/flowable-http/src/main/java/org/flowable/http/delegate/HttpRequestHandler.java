@@ -18,11 +18,25 @@ import java.io.Serializable;
 import org.apache.http.client.HttpClient;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.HttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 
 /**
  * @author Tijs Rademakers
+ * @deprecated use {@link org.flowable.http.common.api.delegate.HttpRequestHandler} instead
  */
-public interface HttpRequestHandler extends Serializable {
+@Deprecated
+public interface HttpRequestHandler extends Serializable, org.flowable.http.common.api.delegate.HttpRequestHandler {
+
+    @Override
+    default void handleHttpRequest(VariableContainer execution, org.flowable.http.common.api.HttpRequest httpRequest, FlowableHttpClient client) {
+        HttpClient httpClient;
+        if (client instanceof HttpClient) {
+            httpClient = (HttpClient) client;
+        } else {
+            httpClient = null;
+        }
+        handleHttpRequest(execution, HttpRequest.fromApiHttpRequest(httpRequest), httpClient);
+    }
 
     void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, HttpClient client);
 }

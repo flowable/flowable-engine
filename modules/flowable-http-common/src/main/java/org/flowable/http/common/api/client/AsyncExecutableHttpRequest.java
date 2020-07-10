@@ -10,13 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.client;
+package org.flowable.http.common.api.client;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.http.HttpResponse;
+import org.flowable.http.common.api.HttpResponse;
 
 /**
  * @author Filip Hrisafov

@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.client;
+package org.flowable.http.common.api.client;
 
-import org.flowable.http.HttpResponse;
+import org.flowable.http.common.api.HttpResponse;
 
 /**
  * @author Filip Hrisafov

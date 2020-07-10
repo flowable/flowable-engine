@@ -10,13 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http;
-
-import static org.flowable.http.ExpressionUtils.getBooleanFromField;
-import static org.flowable.http.ExpressionUtils.getIntFromField;
-import static org.flowable.http.ExpressionUtils.getStringFromField;
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_HEADERS_INVALID;
+package org.flowable.http.common.impl;
 
 import java.io.IOException;
 import java.util.Set;
@@ -26,6 +20,9 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.http.common.api.HttpHeaders;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -34,6 +31,13 @@ import com.fasterxml.jackson.databind.node.MissingNode;
  * @author Filip Hrisafov
  */
 public abstract class BaseHttpActivityDelegate {
+
+    // Validation constants
+    public static final String HTTP_TASK_REQUEST_METHOD_REQUIRED = "requestMethod is required";
+    public static final String HTTP_TASK_REQUEST_METHOD_INVALID = "requestMethod is invalid";
+    public static final String HTTP_TASK_REQUEST_URL_REQUIRED = "requestUrl is required";
+    public static final String HTTP_TASK_REQUEST_HEADERS_INVALID = "requestHeaders are invalid";
+    public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
     // HttpRequest method (GET,POST,PUT etc)
     protected Expression requestMethod;
@@ -68,47 +72,31 @@ public abstract class BaseHttpActivityDelegate {
     // Prefix for the execution variable names (Optional)
     protected Expression resultVariablePrefix;
 
-    protected ErrorPropagator errorPropagator;
-    protected HttpRequestValidator requestValidator;
-
-    public BaseHttpActivityDelegate(ErrorPropagator errorPropagator) {
-        this(errorPropagator, null);
-    }
-
-    public BaseHttpActivityDelegate(ErrorPropagator errorPropagator, HttpRequestValidator requestValidator) {
-        this.errorPropagator = errorPropagator;
-        this.requestValidator = requestValidator == null ? createRequestValidator() : requestValidator;
-    }
-
-    protected HttpRequestValidator createRequestValidator() {
-        return new DefaultHttpRequestValidator();
-    }
-
     protected HttpRequest createRequest(VariableContainer variableContainer, String prefix) {
         HttpRequest request = new HttpRequest();
 
-        request.setMethod(getStringFromField(requestMethod, variableContainer));
-        request.setUrl(getStringFromField(requestUrl, variableContainer));
+        request.setMethod(ExpressionUtils.getStringFromField(requestMethod, variableContainer));
+        request.setUrl(ExpressionUtils.getStringFromField(requestUrl, variableContainer));
         request.setHttpHeaders(getRequestHeaders(variableContainer));
-        request.setBody(getStringFromField(requestBody, variableContainer));
-        request.setBodyEncoding(getStringFromField(requestBodyEncoding, variableContainer));
-        request.setTimeout(getIntFromField(requestTimeout, variableContainer));
-        request.setNoRedirects(getBooleanFromField(disallowRedirects, variableContainer));
-        request.setIgnoreErrors(getBooleanFromField(ignoreException, variableContainer));
-        request.setSaveRequest(getBooleanFromField(saveRequestVariables, variableContainer));
-        request.setSaveResponse(getBooleanFromField(saveResponseParameters, variableContainer));
-        request.setSaveResponseTransient(getBooleanFromField(saveResponseParametersTransient, variableContainer));
-        request.setSaveResponseAsJson(getBooleanFromField(saveResponseVariableAsJson, variableContainer));
-        request.setPrefix(getStringFromField(resultVariablePrefix, variableContainer));
+        request.setBody(ExpressionUtils.getStringFromField(requestBody, variableContainer));
+        request.setBodyEncoding(ExpressionUtils.getStringFromField(requestBodyEncoding, variableContainer));
+        request.setTimeout(ExpressionUtils.getIntFromField(requestTimeout, variableContainer));
+        request.setNoRedirects(ExpressionUtils.getBooleanFromField(disallowRedirects, variableContainer));
+        request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(ignoreException, variableContainer));
+        request.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, variableContainer));
+        request.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, variableContainer));
+        request.setSaveResponseTransient(ExpressionUtils.getBooleanFromField(saveResponseParametersTransient, variableContainer));
+        request.setSaveResponseAsJson(ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer));
+        request.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, variableContainer));
 
-        String failCodes = getStringFromField(failStatusCodes, variableContainer);
-        String handleCodes = getStringFromField(handleStatusCodes, variableContainer);
+        String failCodes = ExpressionUtils.getStringFromField(failStatusCodes, variableContainer);
+        String handleCodes = ExpressionUtils.getStringFromField(handleStatusCodes, variableContainer);
 
         if (failCodes != null) {
-            request.setFailCodes(getStringSetFromField(failCodes));
+            request.setFailCodes(ExpressionUtils.getStringSetFromField(failCodes));
         }
         if (handleCodes != null) {
-            request.setHandleCodes(getStringSetFromField(handleCodes));
+            request.setHandleCodes(ExpressionUtils.getStringSetFromField(handleCodes));
         }
 
         if (request.getPrefix() == null) {
@@ -169,7 +157,7 @@ public abstract class BaseHttpActivityDelegate {
             // Handle http status codes
             if ((request.isNoRedirects() && response.getStatusCode() >= 300) || response.getStatusCode() >= 400) {
 
-                String code = Integer.toString(response.statusCode);
+                String code = Integer.toString(response.getStatusCode());
 
                 Set<String> handleCodes = request.getHandleCodes();
                 if (handleCodes != null && !handleCodes.isEmpty()) {
@@ -178,7 +166,7 @@ public abstract class BaseHttpActivityDelegate {
                             || (code.startsWith("4") && handleCodes.contains("4XX"))
                             || (code.startsWith("3") && handleCodes.contains("3XX"))) {
 
-                        errorPropagator.propagateError(variableContainer, code);
+                        propagateError(variableContainer, code);
                         return;
                     }
                 }
@@ -197,12 +185,35 @@ public abstract class BaseHttpActivityDelegate {
         }
     }
 
+    // HttpRequest validation
+
+    public void validateRequest(HttpRequest request) throws FlowableException {
+        if (request.getMethod() == null) {
+            throw new FlowableException(HTTP_TASK_REQUEST_METHOD_REQUIRED);
+        }
+
+        switch (request.getMethod()) {
+            case "GET":
+            case "POST":
+            case "PUT":
+            case "DELETE":
+                break;
+            default:
+                throw new FlowableException(HTTP_TASK_REQUEST_METHOD_INVALID);
+        }
+
+        if (request.getUrl() == null) {
+            throw new FlowableException(HTTP_TASK_REQUEST_URL_REQUIRED);
+        }
+    }
     protected HttpHeaders getRequestHeaders(VariableContainer variableContainer) {
         try {
-            String headersString = getStringFromField(requestHeaders, variableContainer);
+            String headersString = ExpressionUtils.getStringFromField(requestHeaders, variableContainer);
             return HttpHeaders.parseFromString(headersString);
         } catch (FlowableIllegalArgumentException ex) {
             throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID, ex);
         }
     }
+
+    protected abstract void propagateError(VariableContainer container, String code);
 }

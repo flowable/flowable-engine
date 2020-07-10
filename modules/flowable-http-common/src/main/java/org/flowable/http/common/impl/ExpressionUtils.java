@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http;
+package org.flowable.http.common.impl;
 
 import java.util.Arrays;
 import java.util.Collections;

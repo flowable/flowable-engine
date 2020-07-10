@@ -12,9 +12,9 @@
  */
 package org.flowable.http.cmmn.impl;
 
-import static org.flowable.http.ExpressionUtils.getBooleanFromField;
-import static org.flowable.http.ExpressionUtils.getStringFromField;
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getBooleanFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringSetFromField;
 import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
 
 import java.util.Collections;
@@ -41,7 +41,7 @@ import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.http.ExpressionUtils;
+import org.flowable.http.common.impl.ExpressionUtils;
 import org.flowable.http.HttpActivityExecutor;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.NopErrorPropagator;

@@ -20,8 +20,8 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.HttpResponse;
 import org.flowable.http.delegate.HttpResponseHandler;
 
-import static org.flowable.http.ExpressionUtils.getStringFromField;
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringSetFromField;
 
 public class ParametrizedHttpResponseHandler implements HttpResponseHandler {
 
