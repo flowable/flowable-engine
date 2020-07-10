@@ -12,9 +12,11 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -23,35 +25,29 @@ import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import net.javacrumbs.jsonunit.core.Option;
-
 /**
  * @author Yvo Swillens
  */
-public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
+public class DecisionResourceDataResourceTest extends BaseSpringDmnRestTestCase {
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
-    public void testGetDecisionTableModel() throws Exception {
+    public void testGetDecisionResource() throws Exception {
 
-        DmnDecision decision = dmnRepositoryService.createDecisionQuery().singleResult();
+        DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_MODEL, decision.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_RESOURCE_CONTENT, definition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertThat(resultNode).isNotNull();
-        JsonNode firstDecision = resultNode.get("decisions").get(0);
-        assertThat(firstDecision).isNotNull();
+        assertThat(content).isNotNull();
+        assertThat(content.contains("Full Decision")).isTrue();
+    }
 
-        JsonNode decisionTableNode = firstDecision.get("expression");
-        assertThatJson(decisionTableNode)
-                .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo("{"
-                        + "   id: 'decisionTable'"
-                        + " }");
+    public void testGetDecisionResourceForUnexistingDecisionTable() throws Exception {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_RESOURCE_CONTENT, "unexisting"));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
     }
 }

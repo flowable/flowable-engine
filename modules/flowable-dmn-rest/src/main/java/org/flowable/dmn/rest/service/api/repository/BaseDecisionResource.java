@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-public class BaseDecisionTableResource {
+public class BaseDecisionResource {
 
     @Autowired
     protected ContentTypeResolver contentTypeResolver;
@@ -50,20 +50,20 @@ public class BaseDecisionTableResource {
     protected DmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link DmnDecision} that is requested. Throws the right exceptions when bad request was made or decision table was not found.
+     * Returns the {@link DmnDecision} that is requested. Throws the right exceptions when bad request was made or decision was not found.
      */
-    protected DmnDecision getDecisionTableFromRequest(String decisionTableId) {
-        DmnDecision decisionTable = dmnRepositoryService.getDecision(decisionTableId);
+    protected DmnDecision getDecisionFromRequest(String decisionId) {
+        DmnDecision decision = dmnRepositoryService.getDecision(decisionId);
 
-        if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("Could not find a decision table with id '" + decisionTableId);
+        if (decision == null) {
+            throw new FlowableObjectNotFoundException("Could not find a decision with id '" + decision);
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessDecisionTableInfoById(decisionTable);
+            restApiInterceptor.accessDecisionTableInfoById(decision);
         }
         
-        return decisionTable;
+        return decision;
     }
 
     protected byte[] getDeploymentResourceData(String deploymentId, String resourceId, HttpServletResponse response) {
