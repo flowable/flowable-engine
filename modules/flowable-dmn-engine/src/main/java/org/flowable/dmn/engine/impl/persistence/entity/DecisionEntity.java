@@ -37,4 +37,5 @@ public interface DecisionEntity extends DmnDecision, Entity {
 
     void setCategory(String category);
 
+    void setDecisionType(String decisionType);
 }

@@ -38,6 +38,7 @@ public class DecisionQueryProperty implements QueryProperty {
     public static final DecisionQueryProperty DECISION_NAME = new DecisionQueryProperty("RES.NAME_");
     public static final DecisionQueryProperty DECISION_DEPLOYMENT_ID = new DecisionQueryProperty("RES.DEPLOYMENT_ID_");
     public static final DecisionQueryProperty DECISION_TENANT_ID = new DecisionQueryProperty("RES.TENANT_ID_");
+    public static final DecisionQueryProperty DECISION_TYPE = new DecisionQueryProperty("RES.DECISION_TYPE_");
 
     private String name;
 

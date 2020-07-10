@@ -143,6 +143,8 @@ public interface DmnDecisionQuery extends Query<DmnDecisionQuery, DmnDecision> {
      */
     DmnDecisionQuery decisionWithoutTenantId();
 
+    DmnDecisionQuery decisionType(String decisionType);
+
     // ordering ////////////////////////////////////////////////////////////
 
     /**
@@ -180,4 +182,8 @@ public interface DmnDecisionQuery extends Query<DmnDecisionQuery, DmnDecision> {
      */
     DmnDecisionQuery orderByTenantId();
 
+    /**
+     * Order by decision type (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    DmnDecisionQuery orderByDecisionType();
 }

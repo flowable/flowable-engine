@@ -173,4 +173,12 @@
 
     </changeSet>
 
+    <changeSet id="8" author="flowable">
+
+        <addColumn tableName="ACT_DMN_DECISION">
+            <column name="DECISION_TYPE_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

@@ -55,6 +55,7 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected String decisionType;
 
     public DecisionQueryImpl() {
     }
@@ -251,6 +252,12 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
         return this;
     }
 
+    @Override
+    public DmnDecisionQuery decisionType(String decisionType) {
+        this.decisionType = decisionType;
+        return this;
+    }
+
     // sorting ////////////////////////////////////////////
 
     @Override
@@ -286,6 +293,11 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
     @Override
     public DmnDecisionQuery orderByTenantId() {
         return orderBy(DecisionQueryProperty.DECISION_TENANT_ID);
+    }
+
+    @Override
+    public DmnDecisionQuery orderByDecisionType() {
+        return orderBy(DecisionQueryProperty.DECISION_TYPE);
     }
 
     // results ////////////////////////////////////////////

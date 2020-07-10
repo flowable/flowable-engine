@@ -52,4 +52,7 @@ public interface DmnDecision {
     /** The tenant identifier of this definition */
     String getTenantId();
 
+    /** The decision type of this definition */
+    String getDecisionType();
+
 }

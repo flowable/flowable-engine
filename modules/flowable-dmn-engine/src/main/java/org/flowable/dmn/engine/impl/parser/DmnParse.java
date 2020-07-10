@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.flowable.common.engine.impl.util.io.StringStreamSource;
 import org.flowable.common.engine.impl.util.io.UrlStreamSource;
+import org.flowable.dmn.api.DecisionTypes;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.io.ResourceStreamSource;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
@@ -85,6 +86,7 @@ public class DmnParse implements DmnXMLConstants {
             }
 
             if (dmnDefinition != null && dmnDefinition.getDecisions() != null) {
+                // determine decision type based on whether definition contains decision services
                 for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
                     DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
                     decisionEntity.setKey(decisionService.getId());
@@ -92,6 +94,7 @@ public class DmnParse implements DmnXMLConstants {
                     decisionEntity.setResourceName(name);
                     decisionEntity.setDeploymentId(deployment.getId());
                     decisionEntity.setDescription(decisionService.getDescription());
+                    decisionEntity.setDecisionType(DecisionTypes.DECISION_SERVICE);
                     decisions.add(decisionEntity);
                 }
                 if (dmnDefinition.getDecisionServices().isEmpty()) {
@@ -102,6 +105,7 @@ public class DmnParse implements DmnXMLConstants {
                         decisionEntity.setResourceName(name);
                         decisionEntity.setDeploymentId(deployment.getId());
                         decisionEntity.setDescription(decision.getDescription());
+                        decisionEntity.setDecisionType(DecisionTypes.DECISION_TABLE);
                         decisions.add(decisionEntity);
                     }
                 }
