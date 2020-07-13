@@ -7,8 +7,8 @@
   <!-- DECISION DEFINITION INSERT -->
 
   <insert id="insertDecision" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityImpl">
-    insert into ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
-    	RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    insert into ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_,
+    	RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_, DECISION_TYPE_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -17,12 +17,13 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR})
+            #{tenantId, jdbcType=VARCHAR},
+            #{decisionType, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertDecision" parameterType="java.util.List">
     insert into ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
-        RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+        RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_, DECISION_TYPE_)
     values 
     <foreach collection="list" item="decision" index="index" separator=",">
         (#{decision.id, jdbcType=VARCHAR},
@@ -33,7 +34,8 @@
          #{decision.deploymentId, jdbcType=VARCHAR},
          #{decision.resourceName, jdbcType=VARCHAR},
          #{decision.description, jdbcType=VARCHAR},
-         #{decision.tenantId, jdbcType=VARCHAR})
+         #{decision.tenantId, jdbcType=VARCHAR},
+         #{decision.decisionType, jdbcType=VARCHAR})
     </foreach>
   </insert>
   
@@ -41,7 +43,7 @@
     INSERT ALL 
     <foreach collection="list" item="decision" index="index">
         INTO ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
-            RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
+            RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_, DECISION_TYPE_) VALUES
             (#{decision.id, jdbcType=VARCHAR},
              #{decision.category, jdbcType=VARCHAR},
              #{decision.name, jdbcType=VARCHAR},
@@ -50,7 +52,8 @@
              #{decision.deploymentId, jdbcType=VARCHAR},
              #{decision.resourceName, jdbcType=VARCHAR},
              #{decision.description, jdbcType=VARCHAR},
-             #{decision.tenantId, jdbcType=VARCHAR})
+             #{decision.tenantId, jdbcType=VARCHAR},
+             #{decision.decisionType, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual
   </insert>
@@ -87,6 +90,7 @@
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="decisionType" column="DECISION_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- DECISION TABLE SELECT -->
@@ -199,6 +203,9 @@
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="decisionType != null">
+        and RES.DECISION_TYPE_ = #{decisionType}
       </if>
     </where>
   </sql>

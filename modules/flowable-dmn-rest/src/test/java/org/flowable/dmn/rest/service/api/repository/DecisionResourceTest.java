@@ -13,7 +13,6 @@
 package org.flowable.dmn.rest.service.api.repository;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,28 +29,38 @@ import net.javacrumbs.jsonunit.core.Option;
 /**
  * @author Yvo Swillens
  */
-public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
+public class DecisionResourceTest extends BaseSpringDmnRestTestCase {
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
-    public void testGetDecisionTableModel() throws Exception {
+    public void testGetDecision() throws Exception {
 
         DmnDecision decision = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_MODEL, decision.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION, decision.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-
-        // Check "OK" status
-        JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(resultNode).isNotNull();
-        JsonNode firstDecision = resultNode.get("decisions").get(0);
-        assertThat(firstDecision).isNotNull();
-
-        JsonNode decisionTableNode = firstDecision.get("expression");
-        assertThatJson(decisionTableNode)
+        assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + "   id: 'decisionTable'"
-                        + " }");
+                    + "  id: '" + decision.getId() + "',"
+                    + "  url: '" + httpGet.getURI().toString() + "',"
+                    + "  category: " + decision.getCategory() + ","
+                    + "  name: '" + decision.getName() + "',"
+                    + "  key: '" + decision.getKey() + "',"
+                    + "  description: " + decision.getDescription() + ","
+                    + "  version: " + decision.getVersion() + ","
+                    + "  decisionType: '" + decision.getDecisionType() + "',"
+                    + "  deploymentId: '" + decision.getDeploymentId() + "'"
+                    + "  }"
+                );
     }
+
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
+    public void testGetUnexistingDecision() throws Exception {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION, "unexisting"));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
 }

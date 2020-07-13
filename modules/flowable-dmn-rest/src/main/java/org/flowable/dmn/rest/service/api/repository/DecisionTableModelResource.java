@@ -26,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
+ *
+ * @deprecated use {@link DecisionTableModelResource} instead.
  */
+@Deprecated
 @RestController
 @Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
-public class DecisionTableModelResource extends BaseDecisionTableResource {
+public class DecisionTableModelResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision table DMN (definition) model", tags = { "Decision Tables" }, nickname = "getDecisionTableModel")
     @ApiResponses(value = {
@@ -38,7 +41,7 @@ public class DecisionTableModelResource extends BaseDecisionTableResource {
     })
     @GetMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/model", produces = "application/json")
     public DmnDefinition getDmnModelResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId) {
-        DmnDecision decisionTable = getDecisionTableFromRequest(decisionTableId);
+        DmnDecision decisionTable = getDecisionFromRequest(decisionTableId);
         return dmnRepositoryService.getDmnDefinition(decisionTable.getId());
     }
 }

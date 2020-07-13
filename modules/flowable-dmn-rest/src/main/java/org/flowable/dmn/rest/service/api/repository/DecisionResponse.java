@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * @author Yvo Swillens
  */
-public class DecisionTableResponse {
+public class DecisionResponse {
 
     protected String id;
     protected String url;
@@ -31,17 +31,19 @@ public class DecisionTableResponse {
     protected String resourceName;
     protected String deploymentId;
     protected String tenantId;
+    protected String decisionType;
 
-    public DecisionTableResponse(DmnDecision decisionTable) {
-        setId(decisionTable.getId());
-        setCategory(decisionTable.getCategory());
-        setName(decisionTable.getName());
-        setKey(decisionTable.getKey());
-        setDescription(decisionTable.getDescription());
-        setVersion(decisionTable.getVersion());
-        setResourceName(decisionTable.getResourceName());
-        setDeploymentId(decisionTable.getDeploymentId());
-        setTenantId(decisionTable.getTenantId());
+    public DecisionResponse(DmnDecision decision) {
+        setId(decision.getId());
+        setCategory(decision.getCategory());
+        setName(decision.getName());
+        setKey(decision.getKey());
+        setDescription(decision.getDescription());
+        setVersion(decision.getVersion());
+        setResourceName(decision.getResourceName());
+        setDeploymentId(decision.getDeploymentId());
+        setTenantId(decision.getTenantId());
+        setDecisionType(decision.getDecisionType());
     }
 
     @ApiModelProperty(example = "46b0379c-c0a1-11e6-bc93-6ab56fad108a")
@@ -53,7 +55,7 @@ public class DecisionTableResponse {
         this.id = id;
     }
 
-    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a")
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decisions/46b0379c-c0a1-11e6-bc93-6ab56fad108a")
     public String getUrl() {
         return url;
     }
@@ -132,5 +134,13 @@ public class DecisionTableResponse {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @ApiModelProperty(example = "decision_table")
+    public String getDecisionType() {
+        return decisionType;
+    }
+    public void setDecisionType(String decisionType) {
+        this.decisionType = decisionType;
     }
 }

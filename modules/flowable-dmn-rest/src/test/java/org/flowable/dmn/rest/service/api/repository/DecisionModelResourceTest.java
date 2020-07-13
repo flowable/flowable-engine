@@ -30,14 +30,14 @@ import net.javacrumbs.jsonunit.core.Option;
 /**
  * @author Yvo Swillens
  */
-public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
+public class DecisionModelResourceTest extends BaseSpringDmnRestTestCase {
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
-    public void testGetDecisionTableModel() throws Exception {
+    public void testGetDecisionModel() throws Exception {
 
         DmnDecision decision = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_MODEL, decision.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_MODEL, decision.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status

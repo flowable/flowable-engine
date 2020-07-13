@@ -59,6 +59,7 @@ public class FlowableTaskApplicationWithEnabledJmsKafkaAndRabbitTest {
                 "random",
                 "applicationConfig: [classpath:/application.properties]",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
+                "flowableTaskDefaultConfig: [classpath:/flowable-task-default.properties]",
                 "flowable-liquibase-override",
                 "Management Server"
             );

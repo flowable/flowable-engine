@@ -35,6 +35,7 @@ public class DecisionEntityImpl extends AbstractDmnEngineNoRevisionEntity implem
     protected String deploymentId;
     protected String resourceName;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
+    protected String decisionType;
 
     @Override
     public Object getPersistentState() {
@@ -128,8 +129,20 @@ public class DecisionEntityImpl extends AbstractDmnEngineNoRevisionEntity implem
     }
 
     @Override
+    public String getDecisionType() {
+        return decisionType;
+    }
+
+    @Override
+    public void setDecisionType(String decisionType) {
+        this.decisionType = decisionType;
+    }
+
+    @Override
     public String toString() {
         return "DecisionEntity[" + id + "]";
     }
+
+
 
 }

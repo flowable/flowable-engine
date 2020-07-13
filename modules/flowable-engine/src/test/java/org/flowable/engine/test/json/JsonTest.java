@@ -726,6 +726,41 @@ public class JsonTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testJsonArrayAccessByNegativeIndex() {
+        Map<String, Object> vars = new HashMap<>();
+
+        ArrayNode varArray = objectMapper.createArrayNode();
+        ObjectNode varNode = objectMapper.createObjectNode();
+        varNode.put("var", "myValue");
+        varArray.add(varNode);
+        vars.put("myJsonArr", varArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJsonAvailableProcess", vars);
+
+        // Check JSON has been parsed as expected
+        ArrayNode value = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "myJsonArr");
+        assertThat(value).isNotNull();
+        assertThatJson(value)
+                .isEqualTo("[ { "
+                        + "   var: 'myValue'"
+                        + "} ]");
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().active().singleResult();
+        assertThat(task).isNotNull();
+        ArrayNode taskVarArray = objectMapper.createArrayNode();
+        taskVarArray.addObject().put("var", "firstValue");
+        taskVarArray.addObject().put("var", "secondValue");
+        taskVarArray.addObject().put("var", "thirdValue");
+        vars = new HashMap<>();
+        vars.put("myJsonArr", taskVarArray);
+        taskService.complete(task.getId(), vars);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
+    }
+
+    @Test
+    @Deployment
     public void testJsonNumber() {
         Map<String, Object> vars = new HashMap<>();
 

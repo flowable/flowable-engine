@@ -18,7 +18,10 @@ import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -52,5 +55,17 @@ public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
         Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
+    }
+
+    @Bean
+    public WebMvcConfigurer workflow() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+                registry.addViewController("/workflow").setViewName("redirect:/workflow/");
+                registry.addViewController("/workflow/").setViewName("forward:/workflow/index.html");
+            }
+        };
     }
 }

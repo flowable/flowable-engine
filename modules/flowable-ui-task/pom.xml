@@ -17,7 +17,9 @@
         <module>flowable-ui-task-logic</module>
         <module>flowable-ui-task-rest</module>
         <module>flowable-ui-task-conf</module>
+        <module>flowable-ui-task-frontend</module>
         <module>flowable-ui-task-app</module>
+        <module>flowable-spring-boot-starter-ui-task</module>
     </modules>
 
     <dependencyManagement>
@@ -35,6 +37,16 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-ui-task-conf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-task-frontend</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-spring-boot-starter-ui-task</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

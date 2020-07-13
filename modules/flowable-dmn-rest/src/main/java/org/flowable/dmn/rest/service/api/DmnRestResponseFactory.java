@@ -35,7 +35,7 @@ import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceResponse;
 import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceSingleResponse;
 import org.flowable.dmn.rest.service.api.history.HistoricDecisionExecutionResponse;
-import org.flowable.dmn.rest.service.api.repository.DecisionTableResponse;
+import org.flowable.dmn.rest.service.api.repository.DecisionResponse;
 import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 
 /**
@@ -55,22 +55,42 @@ public class DmnRestResponseFactory {
         initializeVariableConverters();
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable) {
-        return createDecisionTableResponse(decisionTable, createUrlBuilder());
+    public DecisionResponse createDecisionTableResponse(DmnDecision decision) {
+        return createDecisionTableResponse(decision, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, DmnRestUrlBuilder urlBuilder) {
-        DecisionTableResponse response = new DecisionTableResponse(decisionTable);
-        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
+    public DecisionResponse createDecisionTableResponse(DmnDecision decision, DmnRestUrlBuilder urlBuilder) {
+        DecisionResponse response = new DecisionResponse(decision);
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decision.getId()));
 
         return response;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecision> decisionTables) {
+    public List<DecisionResponse> createDecisionTableResponseList(List<DmnDecision> decisions) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DecisionTableResponse> responseList = new ArrayList<>(decisionTables.size());
-        for (DmnDecision instance : decisionTables) {
-            responseList.add(createDecisionTableResponse(instance, urlBuilder));
+        List<DecisionResponse> responseList = new ArrayList<>(decisions.size());
+        for (DmnDecision instance : decisions) {
+            responseList.add(createDecisionResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public DecisionResponse createDecisionResponse(DmnDecision decision) {
+        return createDecisionResponse(decision, createUrlBuilder());
+    }
+
+    public DecisionResponse createDecisionResponse(DmnDecision decision, DmnRestUrlBuilder urlBuilder) {
+        DecisionResponse response = new DecisionResponse(decision);
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION, decision.getId()));
+
+        return response;
+    }
+
+    public List<DecisionResponse> createDecisionResponseList(List<DmnDecision> decisions) {
+        DmnRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<DecisionResponse> responseList = new ArrayList<>(decisions.size());
+        for (DmnDecision instance : decisions) {
+            responseList.add(createDecisionResponse(instance, urlBuilder));
         }
         return responseList;
     }
