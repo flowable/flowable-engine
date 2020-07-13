@@ -23,7 +23,7 @@ flowableAdminApp.controller('EventSubscriptionsController', ['$scope', '$rootSco
 	    $scope.selectedEvents = [];
 
 	    var filterConfig = {
-		    	url: '/app/rest/admin/event-subscriptions',
+		    	url: './admin-app/rest/admin/event-subscriptions',
 		    	method: 'GET',
 		    	success: function(data, status, headers, config) {
 		    		if ($scope.definitionCacheLoaded) {

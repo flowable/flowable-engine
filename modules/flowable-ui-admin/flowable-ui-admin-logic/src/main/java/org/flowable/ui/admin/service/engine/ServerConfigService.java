@@ -22,8 +22,6 @@ import org.flowable.ui.admin.dto.ServerConfigRepresentation;
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.flowable.ui.admin.repository.ServerConfigRepository;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -32,17 +30,16 @@ import org.springframework.util.Assert;
  * @author Yvo Swillens
  * @author Filip Hrisafov
  */
-@Service
 public class ServerConfigService extends AbstractEncryptingService {
 
     protected final FlowableAdminAppProperties properties;
 
-    @Autowired
     protected ServerConfigRepository serverConfigRepository;
 
-    public ServerConfigService(FlowableAdminAppProperties properties) {
+    public ServerConfigService(FlowableAdminAppProperties properties, ServerConfigRepository serverConfigRepository) {
         super(properties);
         this.properties = properties;
+        this.serverConfigRepository = serverConfigRepository;
     }
 
     @Transactional

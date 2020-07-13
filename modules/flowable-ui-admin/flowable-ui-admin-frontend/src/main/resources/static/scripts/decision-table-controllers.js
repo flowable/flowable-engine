@@ -79,14 +79,14 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
 
         $scope.executeWhenReady(function () {
             // Load deployment
-            $http({method: 'GET', url: '/app/rest/admin/decision-tables/' + $routeParams.decisionTableId}).
+            $http({method: 'GET', url: './admin-app/rest/admin/decision-tables/' + $routeParams.decisionTableId}).
             success(function (data, status, headers, config) {
                 $scope.decisionTable = data;
 
                 // Load decision executions
                 $http({
                     method: 'GET',
-                    url: '/app/rest/admin/decision-tables/history?decisionKey=' + data.key + '&deploymentId=' + data.deploymentId
+                    url: './admin-app/rest/admin/decision-tables/history?decisionKey=' + data.key + '&deploymentId=' + data.deploymentId
                 }).
                 success(function (executionsData, status, headers, config) {
                     $scope.decisionExecutions = executionsData;
@@ -129,7 +129,7 @@ flowableAdminApp.controller('ShowDecisionTablePopupCtrl',
                 // Load deployment
                 $http({
                     method: 'GET',
-                    url: '/app/rest/admin/decision-tables/' + decisionTable.id + '/editorJson'
+                    url: './admin-app/rest/admin/decision-tables/' + decisionTable.id + '/editorJson'
                 }).
                 success(function (data, status, headers, config) {
                     $scope.popup.currentDecisionTable = data;

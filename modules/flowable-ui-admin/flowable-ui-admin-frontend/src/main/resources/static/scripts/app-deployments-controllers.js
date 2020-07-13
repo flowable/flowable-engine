@@ -26,7 +26,7 @@ flowableAdminApp.controller('AppDeploymentsController', ['$rootScope', '$scope',
 	    $scope.selectedDeployments = [];
 
 	    var filterConfig = {
-	    	url: '/app/rest/admin/app-deployments',
+	    	url: './admin-app/rest/admin/app-deployments',
 	    	method: 'GET',
 	    	success: function(data, status, headers, config) {
 	    		$scope.appDeploymentsData = data;
@@ -134,7 +134,7 @@ flowableAdminApp.controller('AppDeploymentsController', ['$rootScope', '$scope',
         for (var i = 0; i < $files.length; i++) {
             var file = $files[i];
             file.upload = Upload.upload({
-                url: '/app/rest/admin/app-deployments',
+                url: './admin-app/rest/admin/app-deployments',
                 method: 'POST',
                 data: {file: file}
             });

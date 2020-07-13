@@ -12,7 +12,8 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
@@ -27,17 +28,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/app")
 public class CmmnJobClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnJobClientResource.class);

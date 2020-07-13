@@ -26,7 +26,7 @@ flowableAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
         $scope.selectedItem = [];
 
         var filterConfig = {
-            url: '/app/rest/admin/content-items',
+            url: './admin-app/rest/admin/content-items',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.contentItemsData = data;

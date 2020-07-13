@@ -69,7 +69,7 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: '/app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: './admin-app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.APP-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.appDeployment), 'info');
                         $scope.returnToList();
@@ -84,7 +84,7 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: '/app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: './admin-app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.appDeployment = data;
   	    	    }).
@@ -99,7 +99,7 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
   	    	    });
   		
 		    // Load case definitions
-		    $http({method: 'GET', url: '/app/rest/admin/app-definitions?deploymentId=' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: './admin-app/rest/admin/app-definitions?deploymentId=' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.appDefinitions = data;
   	    	    });

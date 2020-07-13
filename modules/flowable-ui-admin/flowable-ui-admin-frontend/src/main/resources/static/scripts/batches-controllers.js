@@ -23,7 +23,7 @@ flowableAdminApp.controller('BatchesController', ['$scope', '$rootScope', '$http
 	    $scope.selectedBatches = [];
 
 	    var filterConfig = {
-		    	url: '/app/rest/admin/batches',
+		    	url: './admin-app/rest/admin/batches',
 		    	method: 'GET',
 		    	success: function(data, status, headers, config) {
 		    		$scope.processQueryResponse(data);

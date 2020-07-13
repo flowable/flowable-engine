@@ -36,7 +36,7 @@ flowableAdminApp.controller('EventSubscriptionController', ['$scope', '$rootScop
             }
 		
 			$http({method: 'POST', 
-				url: '/app/rest/admin/event-subscriptions/' + $scope.eventSubscription.id,
+				url: './admin-app/rest/admin/event-subscriptions/' + $scope.eventSubscription.id,
 				data: dataForPost}).
         	success(function(data, status, headers, config) {
         	  $scope.addAlert($translate.instant('ALERT.EVENT-SUBSCRIPTION.TRIGGERED', $scope.eventSubscription), 'info');
@@ -61,7 +61,7 @@ flowableAdminApp.controller('EventSubscriptionController', ['$scope', '$rootScop
 
 		$scope.loadEventSubscription = function() {
 			$scope.eventSubscription = {};
-			$http({method: 'GET', url: '/app/rest/admin/event-subscriptions/' + $routeParams.eventSubscriptionId}).
+			$http({method: 'GET', url: './admin-app/rest/admin/event-subscriptions/' + $routeParams.eventSubscriptionId}).
 	    	success(function(data, status, headers, config) {
 	            $scope.eventSubscription = data;
 	    	}).

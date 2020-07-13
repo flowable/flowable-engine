@@ -185,7 +185,7 @@ function _zoom(zoomIn)
     }
 }
 
-var modelUrl = './app/rest/admin/case-definitions/' + caseDefinitionId + '/model-json';
+var modelUrl = './admin-app/rest/admin/case-definitions/' + caseDefinitionId + '/model-json';
 
 var request = jQuery.ajax({
     type: 'get',

@@ -79,7 +79,7 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
                 showEditpointConfigModel(selectedServer);
             } else {
                 // load default endpoint configs properties
-                $http({method: 'GET', url: '/app/rest/server-configs/default/'+endpointType}).
+                $http({method: 'GET', url: './admin-app/rest/server-configs/default/'+endpointType}).
                 success(function(defaultServerconfig, status, headers, config) {
                     showEditpointConfigModel(defaultServerconfig);
                 });
@@ -149,7 +149,7 @@ flowableAdminApp.controller('EngineController', ['$rootScope', '$scope', '$http'
         var checkEndpointConfig = function (endpointType) {
             $http({
                 method: 'GET',
-                url: '/app/rest/admin/engine-info/'+endpointType,
+                url: './admin-app/rest/admin/engine-info/'+endpointType,
                 ignoreErrors: true
             }).success(function (data) {
                 $scope.addAlert($translate.instant('ALERT.ENGINE.ENDPOINT-VALID', data), 'info');
@@ -172,7 +172,7 @@ flowableAdminApp.controller('EditEndpointConfigModalInstanceCtrl',
 
             delete $scope.model.error;
 
-            var serverConfigUrl = '/app/rest/server-configs';
+            var serverConfigUrl = './admin-app/rest/server-configs';
             var method = 'PUT';
             if ($scope.model.server && $scope.model.server.id) {
                 serverConfigUrl += '/' + $scope.model.server.id;

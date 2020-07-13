@@ -399,19 +399,19 @@
 	        	if (historyInstanceId != null) {
 	        	   request = $.ajax({
                         type: 'get',
-                        url: './app/rest/admin/process-instances/' + historyInstanceId + '/history-model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+                        url: './admin-app/rest/admin/process-instances/' + historyInstanceId + '/history-model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
                     });
                     
 	        	} else if (instanceId != null) {
 					request = $.ajax({
 					    type: 'get',
-					    url: './app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+					    url: './admin-app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
 					});
 					
 	        	} else {
 					request = $.ajax({
 					    type: 'get',
-					    url: './app/rest/admin/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
+					    url: './admin-app/rest/admin/process-definitions/' + definitionId + '/model-json?nocaching=' + new Date().getTime()
 					});
 	        	}
 	
@@ -475,7 +475,7 @@
 				if (migrationDefinitionId && migrationDefinitionId.length > 0) {
                   migrationRequest = $.ajax({
                         type: 'get',
-                        url: './app/rest/admin/process-definitions/' + migrationDefinitionId + '/model-json?nocaching=' + new Date().getTime()
+                        url: './admin-app/rest/admin/process-definitions/' + migrationDefinitionId + '/model-json?nocaching=' + new Date().getTime()
                   });
                   
                   migrationRequest.success(function(data, textStatus, jqXHR) {
@@ -560,7 +560,7 @@
                             confirm: function () {
                                 $.ajax({
                                     type: 'post',
-                                    url: './app/rest/admin/process-instances/' + instanceId + '/change-state',
+                                    url: './admin-app/rest/admin/process-instances/' + instanceId + '/change-state',
                                     contentType: 'application/json; charset=utf-8',
                                     data: JSON.stringify({
                                         cancelActivityIds: changeStateStartElementIds,
@@ -668,7 +668,7 @@
                                 confirm: function () {
                                     $.ajax({
                                         type: 'post',
-                                        url: './app/rest/admin/process-instances/' + instanceId + '/migrate',
+                                        url: './admin-app/rest/admin/process-instances/' + instanceId + '/migrate',
                                         contentType: 'application/json; charset=utf-8',
                                         data: JSON.stringify(migrationDocumentPayload),
                                         success: function() {
@@ -702,7 +702,7 @@
                                 confirm: function () {
                                     $.ajax({
                                         type: 'post',
-                                        url: './app/rest/admin/process-definitions/' + definitionId + '/batch-migrate',
+                                        url: './admin-app/rest/admin/process-definitions/' + definitionId + '/batch-migrate',
                                         contentType: 'application/json; charset=utf-8',
                                         data: JSON.stringify(migrationDocumentPayload),
                                         success: function() {

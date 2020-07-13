@@ -18,13 +18,13 @@
 
 flowableAdminApp.factory('Account', ['$resource',
     function ($resource) {
-        return $resource('app/rest/account', {}, {
+        return $resource('./admin-app/rest/account', {}, {
         });
     }]);
 
 flowableAdminApp.factory('Sessions', ['$resource',
     function ($resource) {
-        return $resource('app/rest/account/sessions/:series', {}, {
+        return $resource('./admin-app/rest/account/sessions/:series', {}, {
             'get': { method: 'GET', isArray: true}
         });
     }]);
@@ -38,7 +38,7 @@ flowableAdminApp.factory('Metrics', ['$resource',
 
 flowableAdminApp.factory('LogsService', ['$resource',
     function ($resource) {
-        return $resource('app/rest/logs', {}, {
+        return $resource('./admin-app/rest/logs', {}, {
             'findAll': { method: 'GET', isArray: true},
             'changeLevel':  { method: 'PUT'}
         });

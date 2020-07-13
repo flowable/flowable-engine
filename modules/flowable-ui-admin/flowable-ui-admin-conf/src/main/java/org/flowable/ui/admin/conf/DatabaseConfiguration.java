@@ -19,6 +19,8 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.ui.admin.domain.generator.MinimalDataGenerator;
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
+import org.flowable.ui.admin.repository.ServerConfigRepository;
+import org.flowable.ui.admin.service.engine.ServerConfigService;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -99,8 +101,13 @@ public class DatabaseConfiguration {
     }
 
     @Bean(name = "minimalDataGenerator")
-    public MinimalDataGenerator minimalDataGenerator() {
-        return new MinimalDataGenerator();
+    public MinimalDataGenerator minimalDataGenerator(ServerConfigService serverConfigService) {
+        return new MinimalDataGenerator(serverConfigService);
+    }
+
+    @Bean
+    public ServerConfigService serverConfigService(ServerConfigRepository serverConfigRepository) {
+        return new ServerConfigService(env, serverConfigRepository);
     }
 
     private void closeDatabase(Liquibase liquibase) {

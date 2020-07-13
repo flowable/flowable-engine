@@ -12,7 +12,8 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.FormDeploymentService;
@@ -24,16 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/app")
 public class FormDeploymentClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDeploymentClientResource.class);

@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.admin.rest;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
@@ -24,12 +26,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * REST controller for managing the server configs.
@@ -39,7 +38,6 @@ import java.util.List;
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/app")
 public class ServerConfigsResource {
 
     @Autowired

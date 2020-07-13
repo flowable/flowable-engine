@@ -12,9 +12,10 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
@@ -26,18 +27,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Bassam Al-Sarori
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/app")
 public class FormInstancesClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormInstancesClientResource.class);

@@ -49,7 +49,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
         });
 
         $scope.loadUsers = function() {
-        	$http({method: 'GET', url: '/app/rest/users'}).
+        	$http({method: 'GET', url: './admin-app/rest/users'}).
 		        success(function(data, status, headers, config) {
 		        	$scope.usersData = data;
 
@@ -150,7 +150,7 @@ flowableAdminApp.controller('DeleteUserModalInstanceCtrl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'DELETE', url: '/app/rest/users/' + $scope.user.login}).
+	  $http({method: 'DELETE', url: './admin-app/rest/users/' + $scope.user.login}).
     	success(function(data, status, headers, config) {
     		$modalInstance.close(true);
 	  		$scope.status.loading = false;
@@ -183,7 +183,7 @@ flowableAdminApp.controller('EditUserModalInstanceCtrl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'PUT', url: '/app/rest/users/' + $scope.user.login, data: $scope.model}).
+	  $http({method: 'PUT', url: './admin-app/rest/users/' + $scope.user.login, data: $scope.model}).
   	  success(function(data, status, headers, config) {
   		  $modalInstance.close(true);
   		  $scope.status.loading = false;
@@ -216,7 +216,7 @@ flowableAdminApp.controller('ChangePasswordModalInstanceCtrl',
 
 	  $scope.ok = function () {
 		  $scope.status.loading = true;
-		  $http({method: 'PUT', url: '/app/rest/users/' + $scope.user.login + '/change-password', data: $scope.model}).
+		  $http({method: 'PUT', url: './admin-app/rest/users/' + $scope.user.login + '/change-password', data: $scope.model}).
 	  	  success(function(data, status, headers, config) {
 	  		  $modalInstance.close(true);
 	  		  $scope.status.loading = false;
@@ -251,7 +251,7 @@ flowableAdminApp.controller('NewUserModalInstanceCtrl',
 
   $scope.ok = function () {
 	  $scope.status.loading = true;
-	  $http({method: 'POST', url: '/app/rest/users', data: $scope.model, ignoreErrors: true}).
+	  $http({method: 'POST', url: './admin-app/rest/users', data: $scope.model, ignoreErrors: true}).
   	  success(function(data, status, headers, config) {
   		  $modalInstance.close($scope.model);
   		  $scope.status.loading = false;

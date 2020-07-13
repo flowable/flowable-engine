@@ -79,7 +79,7 @@ flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: '/app/rest/admin/deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: './admin-app/rest/admin/deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.DEPLOYMENT.DELETED-DEPLOYMENT', $scope.deployment), 'info');
                         $scope.returnToList();
@@ -94,7 +94,7 @@ flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: '/app/rest/admin/deployments/' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: './admin-app/rest/admin/deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.deployment = data;
   	    	    }).
@@ -109,7 +109,7 @@ flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
   	    	    });
   		
 		    // Load process definitions
-		    $http({method: 'GET', url: '/app/rest/admin/process-definitions?deploymentId=' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: './admin-app/rest/admin/process-definitions?deploymentId=' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.definitions = data;
   	    	    });

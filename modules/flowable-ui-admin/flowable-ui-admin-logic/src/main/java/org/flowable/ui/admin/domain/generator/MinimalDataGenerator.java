@@ -18,7 +18,6 @@ import org.flowable.ui.admin.dto.ServerConfigRepresentation;
 import org.flowable.ui.admin.service.engine.ServerConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -31,8 +30,11 @@ public class MinimalDataGenerator implements ApplicationListener<ContextRefreshe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MinimalDataGenerator.class);
 
-    @Autowired
-    protected ServerConfigService serverConfigService;
+    protected final ServerConfigService serverConfigService;
+
+    public MinimalDataGenerator(ServerConfigService serverConfigService) {
+        this.serverConfigService = serverConfigService;
+    }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

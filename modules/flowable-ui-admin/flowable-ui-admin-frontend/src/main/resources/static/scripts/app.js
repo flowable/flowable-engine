@@ -438,7 +438,7 @@ flowableAdminApp
         		$rootScope.serversLoaded = false;
 
         		$rootScope.loadServerConfig = function(callbackAfterLoad) {
-                    $http({method: 'GET', url: '/app/rest/server-configs'}).
+                    $http({method: 'GET', url: './admin-app/rest/server-configs'}).
                     success(function(data) {
                         if (data.length > 0) {
 
@@ -473,7 +473,7 @@ flowableAdminApp
 
                 };
 
-        		$http.get('/app/rest/account')
+        		$http.get('./admin-app/rest/account')
 		        	.success(function (data, status, headers, config) {
 		              	$rootScope.account = data;
 		               	$rootScope.authenticated = true;
@@ -483,7 +483,7 @@ flowableAdminApp
 	        	$rootScope.loadProcessDefinitionsCache = function() {
                     var promise = $http({
                         method: 'GET',
-                        url: '/app/rest/admin/process-definitions?size=100000000'
+                        url: './admin-app/rest/admin/process-definitions?size=100000000'
                     }).success(function (data, status, headers, config) {
                         return data;
                     }).error(function (data, status, headers, config) {
@@ -496,7 +496,7 @@ flowableAdminApp
 	            $rootScope.loadCaseDefinitionsCache = function() {
                     var promise = $http({
                         method: 'GET',
-                        url: '/app/rest/admin/case-definitions?size=100000000'
+                        url: './admin-app/rest/admin/case-definitions?size=100000000'
                     }).success(function (data, status, headers, config) {
                         return data;
                     }).error(function (data, status, headers, config) {

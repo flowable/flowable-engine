@@ -28,7 +28,7 @@ flowableAdminApp.controller('DecisionTableExecutionsController', ['$rootScope', 
         $scope.selectedDecisionTables = [];
 
         var filterConfig = {
-            url: '/app/rest/admin/decision-tables/history',
+            url: './admin-app/rest/admin/decision-tables/history',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.decisionTableExecutionsData = data;

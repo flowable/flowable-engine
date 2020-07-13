@@ -27,7 +27,7 @@ flowableAdminApp.controller('CmmnTasksController', ['$scope', '$rootScope', '$ht
 		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
-		    	url: '/app/rest/admin/cmmn-tasks',
+		    	url: './admin-app/rest/admin/cmmn-tasks',
 		    	method: 'POST',
 		    	success: function(data, status, headers, config) {
 	                $scope.taskData = data;

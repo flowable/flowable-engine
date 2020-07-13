@@ -29,7 +29,7 @@ flowableAdminApp.controller('CaseInstancesController', ['$rootScope', '$scope', 
 		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
-	    	url: '/app/rest/admin/case-instances',
+	    	url: './admin-app/rest/admin/case-instances',
 	    	method: 'POST',
 	    	success: function(data, status, headers, config) {
 	    		if ($scope.definitionCacheLoaded) {

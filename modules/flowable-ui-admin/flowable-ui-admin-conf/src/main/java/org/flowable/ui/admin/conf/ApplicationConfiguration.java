@@ -12,18 +12,26 @@
  */
 package org.flowable.ui.admin.conf;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
     "org.flowable.ui.admin.repository",
-    "org.flowable.ui.admin.service",
     "org.flowable.ui.admin.security",
-    "org.flowable.ui.admin.conf",
     "org.flowable.ui.common.conf",
     "org.flowable.ui.common.repository",
     "org.flowable.ui.common.service",
@@ -35,6 +43,26 @@ import org.springframework.context.annotation.Import;
     DatabaseConfiguration.class
 })
 @EnableConfigurationProperties(FlowableAdminAppProperties.class)
-public class ApplicationConfiguration {
+public class ApplicationConfiguration implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Bean
+    public ServletRegistrationBean<DispatcherServlet> flowableAdminAppServlet(ObjectProvider<MultipartConfigElement> multipartConfig) {
+        AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        dispatcherServletConfiguration.setParent(applicationContext);
+        dispatcherServletConfiguration.register(DispatcherServletConfiguration.class);
+        DispatcherServlet servlet = new DispatcherServlet(dispatcherServletConfiguration);
+        ServletRegistrationBean<DispatcherServlet> registrationBean = new ServletRegistrationBean<>(servlet, "/admin-app/*");
+        registrationBean.setName("Flowable Admin App");
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.setAsyncSupported(true);
+        multipartConfig.ifAvailable(registrationBean::setMultipartConfig);
+        return registrationBean;
+    }
 }

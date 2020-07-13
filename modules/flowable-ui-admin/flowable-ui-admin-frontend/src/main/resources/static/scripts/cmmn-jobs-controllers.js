@@ -27,7 +27,7 @@ flowableAdminApp.controller('CmmnJobsController', ['$scope', '$rootScope', '$htt
 	    $scope.selectedJobs = [];
 
 	    var filterConfig = {
-		    	url: '/app/rest/admin/cmmn-jobs',
+		    	url: './admin-app/rest/admin/cmmn-jobs',
 		    	method: 'GET',
 		    	success: function(data, status, headers, config) {
 		    		if ($scope.definitionCacheLoaded) {

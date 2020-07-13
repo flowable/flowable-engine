@@ -57,14 +57,14 @@ flowableAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '
             }
             
             // Load submitted form
-            $http({method: 'GET', url: '/app/rest/admin/form-instances/' + $routeParams.formInstanceId}).
+            $http({method: 'GET', url: './admin-app/rest/admin/form-instances/' + $routeParams.formInstanceId}).
             success(function (data, status, headers, config) {
                 $scope.formInstance = data;
 
                 // Load form submitted forms
                 $http({
                     method: 'GET',
-                    url: '/app/rest/admin/form-instances/' + $routeParams.formInstanceId + '/form-field-values/'
+                    url: './admin-app/rest/admin/form-instances/' + $routeParams.formInstanceId + '/form-field-values/'
                 }).
                 success(function (formFieldValuesData, status, headers, config) {
                     $scope.formFieldValues = formFieldValuesData;
@@ -105,7 +105,7 @@ flowableAdminApp.controller('ShowFormRenderPopupCtrl',
                         // Load form
                         $http({
                             method: 'GET',
-                            url: '/app/rest/admin/form-instances/' + form.id
+                            url: './admin-app/rest/admin/form-instances/' + form.id
                         }).
                         success(function (data, status, headers, config) {
                             $scope.popup.currentForm = data.form;
