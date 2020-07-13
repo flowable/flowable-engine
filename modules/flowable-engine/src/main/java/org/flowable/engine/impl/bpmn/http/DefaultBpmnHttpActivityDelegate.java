@@ -101,10 +101,17 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         // Validate request
         validateRequest(request);
 
+        boolean parallelInSameTransaction;
+        if (httpServiceTask.getParallelInSameTransaction() != null) {
+            parallelInSameTransaction = httpServiceTask.getParallelInSameTransaction();
+        } else {
+            parallelInSameTransaction = processEngineConfiguration.getHttpClientConfig().isDefaultParallelInSameTransaction();
+        }
+
         // Prepare request
         ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
 
-        if (!httpServiceTask.isParallelInSameTransaction()) {
+        if (!parallelInSameTransaction) {
             CompletableFuture<ExecutionData> future = new CompletableFuture<>();
 
             try {
