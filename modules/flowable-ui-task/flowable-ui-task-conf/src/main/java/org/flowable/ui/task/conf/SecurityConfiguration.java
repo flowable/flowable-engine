@@ -114,7 +114,6 @@ public class SecurityConfiguration {
                 .antMatchers("/app/rest/runtime/app-definitions").hasAnyAuthority(DefaultPrivileges.ACCESS_TASK, DefaultPrivileges.ACCESS_ADMIN)
                 .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK)
                 .antMatchers("/admin-app/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
-                .antMatchers("/admin/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
                 .antMatchers("/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }
     }
