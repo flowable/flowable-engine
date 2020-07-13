@@ -22,6 +22,7 @@
         <module>flowable-ui-admin-logic</module>
         <module>flowable-ui-admin-rest</module>
         <module>flowable-ui-admin-conf</module>
+        <module>flowable-ui-admin-frontend</module>
         <module>flowable-ui-admin-app</module>
     </modules>
 
@@ -40,6 +41,11 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-ui-admin-conf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-admin-frontend</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
