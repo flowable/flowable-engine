@@ -19,7 +19,7 @@
             "SHOWLICENSE": "License info"
         },
         "TITLE": {
-            "MAIN": "Activiti Administrator",
+            "MAIN": "Flowable Administrator",
             "ACTIONS": "Actions",
             "FILTERS": "Filters"
         },
@@ -208,7 +208,7 @@
             "CREATE-VARIABLE": {
                 "TITLE": "Create Variable",
                 "NAME": "Variable name",
-                "TYPE": "Activiti variable type",
+                "TYPE": "Flowable variable type",
                 "VALUE": "Variable value",
                 "CREATE": "Create"
             },
