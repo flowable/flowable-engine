@@ -37,10 +37,6 @@ public class HttpServiceTask extends ServiceTask {
         this.httpResponseHandler = httpResponseHandler;
     }
 
-    public boolean isParallelInSameTransaction() {
-        return parallelInSameTransaction != null ? parallelInSameTransaction : false;
-    }
-
     public Boolean getParallelInSameTransaction() {
         return parallelInSameTransaction;
     }

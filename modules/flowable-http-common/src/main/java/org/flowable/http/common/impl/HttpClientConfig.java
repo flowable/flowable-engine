@@ -15,6 +15,7 @@ package org.flowable.http.common.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
+import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.client.FlowableHttpClient;
@@ -35,6 +36,11 @@ public class HttpClientConfig {
     protected boolean useSystemProperties = false;
 
     protected FlowableHttpClient httpClient;
+
+    /**
+     * How the Http Task should perform the HTTP requests in case no parallelInSameTransaction is defined in the XML.
+     */
+    protected boolean defaultParallelInSameTransaction = false;
 
     public int getConnectTimeout() {
         return connectTimeout;
@@ -108,6 +114,14 @@ public class HttpClientConfig {
         if (this.useSystemProperties != other.isUseSystemProperties()) {
             setUseSystemProperties(other.isUseSystemProperties());
         }
+
+        if (!Objects.equals(this.httpClient, other.getHttpClient())) {
+            setHttpClient(other.getHttpClient());
+        }
+
+        if (this.defaultParallelInSameTransaction != other.isDefaultParallelInSameTransaction()) {
+            setDefaultParallelInSameTransaction(other.isDefaultParallelInSameTransaction());
+        }
     }
 
     public void setConnectionRequestTimeout(Duration connectionRequestTimeout) {
@@ -142,5 +156,13 @@ public class HttpClientConfig {
                 throw new FlowableException("Failed to determine FlowableHttpClient", e);
             }
         }
+    }
+
+    public boolean isDefaultParallelInSameTransaction() {
+        return defaultParallelInSameTransaction;
+    }
+
+    public void setDefaultParallelInSameTransaction(boolean defaultParallelInSameTransaction) {
+        this.defaultParallelInSameTransaction = defaultParallelInSameTransaction;
     }
 }

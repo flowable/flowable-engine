@@ -117,7 +117,13 @@ public class HttpHeaders implements Map<String, List<String>> {
         for (Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {
-                sb.append(headerName).append(": ").append(headerValue).append('\n');
+                sb.append(headerName);
+                if (headerValue != null) {
+                    sb.append(": ").append(headerValue);
+                } else {
+                    sb.append(":");
+                }
+                sb.append('\n');
             }
         }
 
