@@ -500,7 +500,7 @@ public abstract class AbstractEngineConfiguration {
             logger.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            logger.error("Exception while initializing Database connection", e);
+            throw new RuntimeException("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
