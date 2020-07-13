@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.admin.conf;
+package org.flowable.ui.admin.application;
 
 import javax.annotation.PostConstruct;
 

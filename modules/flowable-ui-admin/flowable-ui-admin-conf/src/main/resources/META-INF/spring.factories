@@ -1,0 +1,4 @@
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    org.flowable.ui.admin.conf.ApplicationConfiguration,\
+    org.flowable.ui.admin.conf.DispatcherServletConfiguration
