@@ -44,7 +44,7 @@ flowableAdminApp.controller('ContentItemController', ['$rootScope', '$scope', '$
             }
 
             // Load submitted form
-            $http({method: 'GET', url: './admin-app/rest/admin/content-items/' + $routeParams.contentItemId}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/content-items/' + $routeParams.contentItemId}).
             success(function (data, status, headers, config) {
                 $scope.contentItem = data;
             }).

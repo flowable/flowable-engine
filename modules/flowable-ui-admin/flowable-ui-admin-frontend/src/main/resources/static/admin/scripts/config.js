@@ -18,8 +18,11 @@
  * Global fixed configuration values for Flowable Admin app.
  * 
  */
+var flowableAdminPathName = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?$/, '$1').replace(/\/$/, '');
 var FlowableAdmin = {};
 FlowableAdmin.Config = {};
+
+FlowableAdmin.Config.adminContextRoot = flowableAdminPathName + "/admin-app/"
 
 // General settings
 FlowableAdmin.Config.alert = {};

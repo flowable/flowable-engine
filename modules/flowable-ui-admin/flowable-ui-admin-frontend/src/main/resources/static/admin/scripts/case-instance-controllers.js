@@ -100,7 +100,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             // Load definition
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-definitions/' + $scope.caseInstance.caseDefinitionId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $scope.caseInstance.caseDefinitionId
             }).success(function (data, status, headers, config) {
                 $scope.definition = data;
             }).error(function (data, status, headers, config) {
@@ -112,7 +112,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             // Load process
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-instances/' + $routeParams.caseInstanceId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $routeParams.caseInstanceId
             }).success(function (data, status, headers, config) {
                 $scope.caseInstance = data;
 
@@ -293,7 +293,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             $scope.tasks = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-instances/' + $scope.caseInstance.id + '/tasks'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $scope.caseInstance.id + '/tasks'
             }).success(function (data, status, headers, config) {
                 $scope.tasks = data;
                 $scope.tabData.tabs[0].info = data.total;
@@ -304,7 +304,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             $scope.variables = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-instances/' + $scope.caseInstance.id + '/variables'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $scope.caseInstance.id + '/variables'
             }).success(function (data, status, headers, config) {
                 $scope.variables = data;
                 $scope.tabData.tabs[1].info = data.total;
@@ -315,7 +315,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             $scope.jobs = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-instances/' + $scope.caseInstance.id + '/jobs'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $scope.caseInstance.id + '/jobs'
             }).success(function (data, status, headers, config) {
                 $scope.jobs = data;
                 $scope.tabData.tabs[3].info = data.total;
@@ -326,7 +326,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             // Load definition
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-definitions/' + $scope.caseInstance.caseDefinitionId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $scope.caseInstance.caseDefinitionId
             }).success(function (data, status, headers, config) {
                 $scope.definition = data;
             }).error(function (data, status, headers, config) {
@@ -337,7 +337,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             // Load decision tables
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-instances/' + $scope.caseInstance.id + '/decision-executions'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $scope.caseInstance.id + '/decision-executions'
             }).success(function (data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[3].info = data.total;
@@ -349,7 +349,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             // Load form instances
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/case-form-instances/' + $scope.caseInstance.id
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-form-instances/' + $scope.caseInstance.id
             }).success(function (response, status, headers, config) {
                 $scope.formInstances = response;
                 $scope.tabData.tabs[4].info = response.total;
@@ -484,7 +484,7 @@ flowableAdminApp.controller('DeleteCaseModalInstanceCtrl',
             }
 
             $http({
-                method: 'POST', url: './admin-app/rest/admin/case-instances/' + $scope.caseInstance.id,
+                method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $scope.caseInstance.id,
                 data: dataForPost
             }).success(function (data, status, headers, config) {
                 $modalInstance.close(true);
@@ -587,7 +587,7 @@ flowableAdminApp.controller('UpdateCaseInstanceVariableCtrl',
 
             $http({
                 method: 'PUT',
-                url: './admin-app/rest/admin/case-instances/' + caseInstanceId + '/variables/' + $scope.updateVariable.name,
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + caseInstanceId + '/variables/' + $scope.updateVariable.name,
                 data: dataForPut
             }).success(function (data, status, headers, config) {
                 $modalInstance.close(true);
@@ -615,7 +615,7 @@ flowableAdminApp.controller('DeleteCaseInstanceVariableCtrl',
             $scope.deleteVariable = function () {
                 $http({
                     method: 'DELETE',
-                    url: './admin-app/rest/admin/case-instances/' + caseInstanceId + '/variables/' + $scope.variable.name
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + caseInstanceId + '/variables/' + $scope.variable.name
                 }).success(function (data, status, headers, config) {
                     $modalInstance.close(true);
                     $scope.status.loading = false;
@@ -683,7 +683,7 @@ flowableAdminApp.controller('AddCaseInstanceVariableCtrl',
 
                 $http({
                     method: 'POST',
-                    url: './admin-app/rest/admin/case-instances/' + caseInstanceId + '/variables',
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + caseInstanceId + '/variables',
                     data: data
                 }).success(function (data, status, headers, config) {
                     $modalInstance.close(true);

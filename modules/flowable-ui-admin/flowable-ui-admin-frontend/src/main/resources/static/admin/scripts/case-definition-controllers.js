@@ -124,7 +124,7 @@ flowableAdminApp.controller('CaseDefinitionController', ['$scope', '$rootScope',
 
     $scope.loadCaseInstances = function() {
       $scope.caseInstances = undefined;
-      $http({method: 'GET', url: './admin-app/rest/admin/case-definitions/' + $scope.definition.id +'/case-instances'}).
+      $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $scope.definition.id +'/case-instances'}).
       success(function(data, status, headers, config) {
         $scope.caseInstances = data;
         $scope.tabData.tabs[0].info = data.total;
@@ -133,7 +133,7 @@ flowableAdminApp.controller('CaseDefinitionController', ['$scope', '$rootScope',
 
         $scope.loadJobs = function() {
             $scope.jobs = undefined;
-            $http({method: 'GET', url: './admin-app/rest/admin/case-definitions/' + $scope.definition.id +'/jobs'}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $scope.definition.id +'/jobs'}).
             success(function(data, status, headers, config) {
                 $scope.jobs = data;
                 $scope.tabData.tabs[1].info = data.total;
@@ -142,7 +142,7 @@ flowableAdminApp.controller('CaseDefinitionController', ['$scope', '$rootScope',
         
         $scope.loadDecisionTables = function() {
             // Load decision tables
-            $http({method: 'GET', url: './admin-app/rest/admin/case-definition-decision-tables/' + $scope.definition.id}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definition-decision-tables/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[2].info = data.length;
@@ -153,7 +153,7 @@ flowableAdminApp.controller('CaseDefinitionController', ['$scope', '$rootScope',
         
         $scope.loadFormDefinitions = function() {
             // Load forms
-            $http({method: 'GET', url: './admin-app/rest/admin/case-definition-form-definitions/' + $scope.definition.id}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definition-form-definitions/' + $scope.definition.id}).
             success(function(data, status, headers, config) {
                 $scope.formDefinitions = data;
                 $scope.tabData.tabs[3].info = data.length;
@@ -164,7 +164,7 @@ flowableAdminApp.controller('CaseDefinitionController', ['$scope', '$rootScope',
 
 		$scope.executeWhenReady(function() {
 		    // Load definition
-		    $http({method: 'GET', url: './admin-app/rest/admin/case-definitions/' + $routeParams.definitionId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $routeParams.definitionId}).
 		    success(function(data, status, headers, config) {
 		        $scope.definition = data;
 		        $scope.loadCaseInstances();
@@ -309,7 +309,7 @@ flowableAdminApp.controller('EditCaseDefinitionCategoryModalCtrl',
         category: $scope.model.category
     };
 
-    $http({method: 'PUT', url: './admin-app/rest/admin/case-definitions/' + $scope.model.id, data: data}).
+    $http({method: 'PUT', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions/' + $scope.model.id, data: data}).
       success(function(data, status, headers, config) {
         $modalInstance.close(data);
         $scope.status.loading = false;

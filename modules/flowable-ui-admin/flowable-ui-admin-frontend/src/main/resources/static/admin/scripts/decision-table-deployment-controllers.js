@@ -77,7 +77,7 @@ flowableAdminApp.controller('DecisionTableDeploymentController', ['$scope', '$ro
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: './admin-app/rest/admin/decision-table-deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/decision-table-deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.DECISION-TABLE-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.deployment), 'info');
                         $scope.returnToList();
@@ -92,7 +92,7 @@ flowableAdminApp.controller('DecisionTableDeploymentController', ['$scope', '$ro
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: './admin-app/rest/admin/decision-table-deployments/' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/decision-table-deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.deployment = data;
   	    	    }).
@@ -107,7 +107,7 @@ flowableAdminApp.controller('DecisionTableDeploymentController', ['$scope', '$ro
   	    	    });
   		
 		    // Load process definitions
-		    $http({method: 'GET', url: './admin-app/rest/admin/decision-tables?deploymentId=' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/decision-tables?deploymentId=' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.decisionTables = data;
   	    	    });

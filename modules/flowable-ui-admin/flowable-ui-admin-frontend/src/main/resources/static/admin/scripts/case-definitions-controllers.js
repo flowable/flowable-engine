@@ -29,7 +29,7 @@ flowableAdminApp.controller('CaseDefinitionsController', ['$rootScope', '$scope'
 	    $scope.selectedDefinitions = [];
 
 	    var filterConfig = {
-	    	url: './admin-app/rest/admin/case-definitions',
+	    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions',
 	    	method: 'GET',
 	    	success: function(data, status, headers, config) {
 	    		$scope.caseDefinitionsData = data;

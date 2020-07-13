@@ -27,7 +27,7 @@ flowableAdminApp.controller('TasksController', ['$scope', '$rootScope', '$http',
 		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
-		    	url: './admin-app/rest/admin/tasks',
+		    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/tasks',
 		    	method: 'POST',
 		    	success: function(data, status, headers, config) {
 	                $scope.taskData = data;

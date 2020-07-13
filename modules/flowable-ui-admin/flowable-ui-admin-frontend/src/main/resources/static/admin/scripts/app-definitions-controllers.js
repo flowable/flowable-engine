@@ -29,7 +29,7 @@ flowableAdminApp.controller('AppDefinitionsController', ['$rootScope', '$scope',
 	    $scope.selectedDefinitions = [];
 
 	    var filterConfig = {
-	    	url: './admin-app/rest/admin/app-definitions',
+	    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions',
 	    	method: 'GET',
 	    	success: function(data, status, headers, config) {
 	    		$scope.appDefinitionsData = data;

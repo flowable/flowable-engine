@@ -77,7 +77,7 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
             
             modalInstance.result.then(function (result) {
                 if (result === true) {
-                    $http({method: 'DELETE', url: './admin-app/rest/admin/cmmn-deployments/' + $routeParams.deploymentId}).
+                    $http({method: 'DELETE', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
                         $scope.addAlert($translate.instant('ALERT.CMMN-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.cmmnDeployment), 'info');
                         $scope.returnToList();
@@ -92,7 +92,7 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: './admin-app/rest/admin/cmmn-deployments/' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.cmmnDeployment = data;
   	    	    }).
@@ -107,7 +107,7 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
   	    	    });
   		
 		    // Load case definitions
-		    $http({method: 'GET', url: './admin-app/rest/admin/case-definitions?deploymentId=' + $routeParams.deploymentId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions?deploymentId=' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.caseDefinitions = data;
   	    	    });

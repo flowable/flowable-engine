@@ -88,7 +88,7 @@ flowableAdminApp.controller('DecisionTableExecutionController', ['$scope', '$roo
             // Load historic execution
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/decision-tables/history/' + $routeParams.executionId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/decision-tables/history/' + $routeParams.executionId
             }).success(function (data, status, headers, config) {
                 $scope.execution = data;
             }).error(function (data, status, headers, config) {
@@ -104,7 +104,7 @@ flowableAdminApp.controller('DecisionTableExecutionController', ['$scope', '$roo
             // Load historic execution audit data
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/decision-tables/history/' + $routeParams.executionId + '/auditdata'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/decision-tables/history/' + $routeParams.executionId + '/auditdata'
             }).success(function (data, status, headers, config) {
                 $scope.auditData = data;
                 $scope.formattedInputVariables = formatInputVariablesInRows(

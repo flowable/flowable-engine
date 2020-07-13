@@ -29,7 +29,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
 
 	    var filterConfig = {
-	    	url: './admin-app/rest/admin/process-instances',
+	    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances',
 	    	method: 'POST',
 	    	success: function(data, status, headers, config) {
 	    		if ($scope.definitionCacheLoaded) {

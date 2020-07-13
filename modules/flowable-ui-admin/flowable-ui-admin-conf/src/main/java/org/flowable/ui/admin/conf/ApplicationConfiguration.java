@@ -25,8 +25,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
@@ -65,4 +69,22 @@ public class ApplicationConfiguration implements ApplicationContextAware {
         multipartConfig.ifAvailable(registrationBean::setMultipartConfig);
         return registrationBean;
     }
+
+    @Bean
+    public WebMvcConfigurer adminApplicationWebMvcConfigurer() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+
+                if (!ClassUtils.isPresent("org.flowable.ui.task.conf.ApplicationConfiguration", getClass().getClassLoader())) {
+                    // If the task application is not present, then the root should be mapped to admin
+                    registry.addViewController("/").setViewName("redirect:/admin/");
+                }
+                registry.addViewController("/admin").setViewName("redirect:/admin/");
+                registry.addViewController("/admin/").setViewName("forward:/admin/index.html");
+            }
+        };
+    }
+
 }

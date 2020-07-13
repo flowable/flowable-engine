@@ -27,7 +27,7 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
 	    $scope.selectedJobs = [];
 
 	    var filterConfig = {
-		    	url: './admin-app/rest/admin/jobs',
+		    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/jobs',
 		    	method: 'GET',
 		    	success: function(data, status, headers, config) {
 		    		if ($scope.definitionCacheLoaded) {

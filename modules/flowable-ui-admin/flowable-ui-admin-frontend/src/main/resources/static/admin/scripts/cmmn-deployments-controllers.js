@@ -26,7 +26,7 @@ flowableAdminApp.controller('CmmnDeploymentsController', ['$rootScope', '$scope'
 	    $scope.selectedDeployments = [];
 
 	    var filterConfig = {
-	    	url: './admin-app/rest/admin/cmmn-deployments',
+	    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-deployments',
 	    	method: 'GET',
 	    	success: function(data, status, headers, config) {
 	    		$scope.cmmnDeploymentsData = data;
@@ -134,7 +134,7 @@ flowableAdminApp.controller('CmmnDeploymentsController', ['$rootScope', '$scope'
         for (var i = 0; i < $files.length; i++) {
             var file = $files[i];
             file.upload = Upload.upload({
-                url: './admin-app/rest/admin/cmmn-deployments',
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-deployments',
                 method: 'POST',
                 data: {file: file}
             });

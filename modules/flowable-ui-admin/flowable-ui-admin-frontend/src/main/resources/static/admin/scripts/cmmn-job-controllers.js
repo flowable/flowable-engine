@@ -32,7 +32,7 @@ flowableAdminApp.controller('CmmnJobController', ['$scope', '$rootScope', '$http
 		};
 
 		$scope.executeJob = function() {
-			$http({method: 'POST', url: './admin-app/rest/admin/cmmn-jobs/' + $scope.job.id}).
+			$http({method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-jobs/' + $scope.job.id}).
         	success(function(data, status, headers, config) {
         	  	$scope.addAlert($translate.instant('ALERT.JOB.EXECUTED', $scope.job), 'info');
         		$scope.returnToList();
@@ -43,7 +43,7 @@ flowableAdminApp.controller('CmmnJobController', ['$scope', '$rootScope', '$http
 		};
 		
 		$scope.moveJob = function() {
-			$http({method: 'POST', url: './admin-app/rest/admin/move-cmmn-jobs/' + $scope.job.id + '?jobType=' + $scope.jobType.param}).
+			$http({method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/move-cmmn-jobs/' + $scope.job.id + '?jobType=' + $scope.jobType.param}).
         	success(function(data, status, headers, config) {
         	  	$scope.addAlert($translate.instant('ALERT.JOB.MOVED', $scope.job), 'info');
         		$scope.returnToList();
@@ -89,13 +89,13 @@ flowableAdminApp.controller('CmmnJobController', ['$scope', '$rootScope', '$http
 
 		$scope.loadJob = function() {
 			$scope.job = {};
-			$http({method: 'GET', url: './admin-app/rest/admin/cmmn-jobs/' + $routeParams.jobId + '?jobType=' + $scope.jobType.param}).
+			$http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-jobs/' + $routeParams.jobId + '?jobType=' + $scope.jobType.param}).
 	    	success(function(data, status, headers, config) {
 	            $scope.job = data;
 
 	            if ($scope.job.exceptionMessage) {
 	            	// Fetch the full stacktrace, associated with this job
-	            	$http({method: 'GET', url: './admin-app/rest/admin/cmmn-jobs/' + $scope.job.id + '/stacktrace?jobType=' + $scope.jobType.param}).
+	            	$http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-jobs/' + $scope.job.id + '/stacktrace?jobType=' + $scope.jobType.param}).
 	            	success(function(data, status, headers, config) {
 	    	            $scope.job.exceptionStack = data;
 	            	});
@@ -128,7 +128,7 @@ flowableAdminApp.controller('DeleteCmmnJobModalInstanceCtrl',
 
 	  $scope.ok = function () {
 		  $scope.status.loading = true;
-		  $http({method: 'DELETE', url: './admin-app/rest/admin/cmmn-jobs/' + $scope.job.id + '?jobType=' + jobType.param}).
+		  $http({method: 'DELETE', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/cmmn-jobs/' + $scope.job.id + '?jobType=' + jobType.param}).
 	    	success(function(data, status, headers, config) {
 	    		$modalInstance.close(true);
 		  		$scope.status.loading = false;

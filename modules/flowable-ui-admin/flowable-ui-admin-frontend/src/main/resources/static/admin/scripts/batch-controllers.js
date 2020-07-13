@@ -50,7 +50,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
             // Load batch
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batches/' + $routeParams.batchId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batches/' + $routeParams.batchId
             }).success(function (data, status, headers, config) {
                 $scope.batch = data;
 
@@ -125,7 +125,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
                 // Load definitions
                 $http({
                     method: 'GET',
-                    url: './admin-app/rest/admin/process-definitions/' + $scope.batch.searchKey
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-definitions/' + $scope.batch.searchKey
                 }).success(function (data, status, headers, config) {
                     $scope.sourceDefinition = data;
                 }).error(function (data, status, headers, config) {
@@ -133,7 +133,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
                 
                 $http({
                     method: 'GET',
-                    url: './admin-app/rest/admin/process-definitions/' + $scope.batch.searchKey2
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-definitions/' + $scope.batch.searchKey2
                 }).success(function (data, status, headers, config) {
                     $scope.targetDefinition = data;
                 }).error(function (data, status, headers, config) {
@@ -145,7 +145,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
             $scope.batchDocument = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batches/' + $scope.batch.id + '/batch-document'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batches/' + $scope.batch.id + '/batch-document'
             }).success(function (data, status, headers, config) {
                 $scope.batchDocument = data;
             });
@@ -155,7 +155,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
             $scope.successParts = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batches/' + $scope.batch.id + '/batch-parts?status=success'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batches/' + $scope.batch.id + '/batch-parts?status=success'
             }).success(function (data, status, headers, config) {
                 $scope.successParts = data;
                 $scope.tabData.tabs[1].info = data.length;
@@ -166,7 +166,7 @@ flowableAdminApp.controller('BatchController', ['$scope', '$rootScope', '$http',
             $scope.failParts = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batches/' + $scope.batch.id + '/batch-parts?status=fail'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batches/' + $scope.batch.id + '/batch-parts?status=fail'
             }).success(function (data, status, headers, config) {
                 $scope.failParts = data;
                 $scope.tabData.tabs[2].info = data.length;
@@ -212,7 +212,7 @@ flowableAdminApp.controller('DeleteBatchModalInstanceCtrl',
             $scope.status.loading = true;
 
             $http({
-                method: 'POST', url: './admin-app/rest/admin/batches/' + $scope.batch.id
+                method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batches/' + $scope.batch.id
                 
             }).success(function (data, status, headers, config) {
                 $modalInstance.close(true);

@@ -26,7 +26,7 @@ flowableAdminApp.controller('FormInstancesController', ['$rootScope', '$scope', 
         $scope.selectedForms = [];
 
         var filterConfig = {
-            url: './admin-app/rest/admin/form-instances',
+            url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/form-instances',
             method: 'GET',
             success: function (data, status, headers, config) {
                 $scope.formInstancesData = data;

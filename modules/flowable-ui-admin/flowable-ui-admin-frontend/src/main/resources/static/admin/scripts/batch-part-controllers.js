@@ -48,7 +48,7 @@ flowableAdminApp.controller('BatchPartController', ['$scope', '$rootScope', '$ht
             // Load batch part
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batch-parts/' + $routeParams.batchPartId
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batch-parts/' + $routeParams.batchPartId
             }).success(function (data, status, headers, config) {
                 $scope.batchPart = data;
 
@@ -72,7 +72,7 @@ flowableAdminApp.controller('BatchPartController', ['$scope', '$rootScope', '$ht
                 // Load definitions
                 $http({
                     method: 'GET',
-                    url: './admin-app/rest/admin/process-definitions/' + $scope.batchPart.searchKey
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-definitions/' + $scope.batchPart.searchKey
                 }).success(function (data, status, headers, config) {
                     $scope.sourceDefinition = data;
                 }).error(function (data, status, headers, config) {
@@ -80,7 +80,7 @@ flowableAdminApp.controller('BatchPartController', ['$scope', '$rootScope', '$ht
                 
                 $http({
                     method: 'GET',
-                    url: './admin-app/rest/admin/process-definitions/' + $scope.batchPart.searchKey2
+                    url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-definitions/' + $scope.batchPart.searchKey2
                 }).success(function (data, status, headers, config) {
                     $scope.targetDefinition = data;
                 }).error(function (data, status, headers, config) {
@@ -92,7 +92,7 @@ flowableAdminApp.controller('BatchPartController', ['$scope', '$rootScope', '$ht
             $scope.batchPartDocument = undefined;
             $http({
                 method: 'GET',
-                url: './admin-app/rest/admin/batch-parts/' + $scope.batchPart.id + '/batch-part-document'
+                url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/batch-parts/' + $scope.batchPart.id + '/batch-part-document'
             }).success(function (data, status, headers, config) {
                 $scope.batchPartDocument = data;
             });

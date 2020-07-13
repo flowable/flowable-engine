@@ -72,7 +72,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
         
         $scope.loadProcessDefinitions = function() {
             $scope.processDefinitions = undefined;
-            $http({method: 'GET', url: './admin-app/rest/admin/app-definitions/' + $scope.definition.id +'/process-definitions?deploymentId=' + $scope.definition.deploymentId}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions/' + $scope.definition.id +'/process-definitions?deploymentId=' + $scope.definition.deploymentId}).
             success(function(data, status, headers, config) {
                 $scope.processDefinitions = data;
                 $scope.tabData.tabs[0].info = data.total;
@@ -81,7 +81,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
     
         $scope.loadCaseDefinitions = function() {
             $scope.caseDefinitions = undefined;
-            $http({method: 'GET', url: './admin-app/rest/admin/app-definitions/' + $scope.definition.id +'/case-definitions?deploymentId=' + $scope.definition.deploymentId}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions/' + $scope.definition.id +'/case-definitions?deploymentId=' + $scope.definition.deploymentId}).
             success(function(data, status, headers, config) {
                 $scope.caseDefinitions = data;
                 $scope.tabData.tabs[1].info = data.total;
@@ -90,7 +90,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
         
         $scope.loadDecisionTables = function() {
             $scope.decisionTables = undefined;
-            $http({method: 'GET', url: './admin-app/rest/admin/app-definitions/'+ $scope.definition.id + '/decision-tables?deploymentId=' + $scope.definition.deploymentId}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions/'+ $scope.definition.id + '/decision-tables?deploymentId=' + $scope.definition.deploymentId}).
             success(function(data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[2].info = data.total;
@@ -101,7 +101,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
         
         $scope.loadFormDefinitions = function() {
             $scope.formDefinitions = undefined;
-            $http({method: 'GET', url: './admin-app/rest/admin/app-definitions/'+ $scope.definition.id + '/form-definitions?deploymentId=' + $scope.definition.deploymentId}).
+            $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions/'+ $scope.definition.id + '/form-definitions?deploymentId=' + $scope.definition.deploymentId}).
             success(function(data, status, headers, config) {
                 $scope.formDefinitions = data;
                 $scope.tabData.tabs[3].info = data.total;
@@ -112,7 +112,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
 
 		$scope.executeWhenReady(function() {
 		    // Load definition
-		    $http({method: 'GET', url: './admin-app/rest/admin/app-definitions/' + $routeParams.definitionId}).
+		    $http({method: 'GET', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/app-definitions/' + $routeParams.definitionId}).
 		    success(function(data, status, headers, config) {
 		        $scope.definition = data;
 		        $scope.loadProcessDefinitions();
