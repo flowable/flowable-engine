@@ -271,6 +271,15 @@
     </annotation>
   </attribute>
 
+  <attribute name="parallelInSameTransaction" type="boolean">
+    <annotation>
+      <documentation>
+        Attribute on an HTTP Task indicating whether the HTTP call should be executed in parallel in the same transaction
+        or it should be done blocking on the same thread.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="expression" type="string">
     <annotation>
       <documentation>
