@@ -43,7 +43,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     "org.flowable.ui.common.security"
 })
 @Import(value = {
-    SecurityConfiguration.class,
     DatabaseConfiguration.class
 })
 @EnableConfigurationProperties(FlowableAdminAppProperties.class)

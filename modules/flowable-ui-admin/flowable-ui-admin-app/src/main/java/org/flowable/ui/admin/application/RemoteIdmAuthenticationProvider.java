@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.admin.security;
+package org.flowable.ui.admin.application;
 
 import java.util.ArrayList;
 import java.util.Collection;

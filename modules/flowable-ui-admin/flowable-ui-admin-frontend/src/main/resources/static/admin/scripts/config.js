@@ -22,7 +22,8 @@ var flowableAdminPathName = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?
 var FlowableAdmin = {};
 FlowableAdmin.Config = {};
 
-FlowableAdmin.Config.adminContextRoot = flowableAdminPathName + "/admin-app/"
+FlowableAdmin.Config.contextRoot = flowableAdminPathName;
+FlowableAdmin.Config.adminContextRoot = flowableAdminPathName + "/admin-app/";
 
 // General settings
 FlowableAdmin.Config.alert = {};

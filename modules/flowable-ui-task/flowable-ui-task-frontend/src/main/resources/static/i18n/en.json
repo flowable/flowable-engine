@@ -75,6 +75,10 @@
             "TITLE": "Task App",
             "DESCRIPTION": "Access your full task list and work on any tasks assigned to you from any process app. Also, start new processes and tasks."
         },
+        "ADMIN": {
+            "TITLE": "Admin App",
+            "DESCRIPTION": "Access the Flowable Admin application."
+        },
         "IDENTITY-MANAGEMENT": {
             "TITLE": "Identity management",
             "TITLE-TENANT-ADMIN": "Identity management",

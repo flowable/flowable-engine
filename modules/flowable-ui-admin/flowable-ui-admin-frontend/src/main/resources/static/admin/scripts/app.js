@@ -582,7 +582,7 @@ flowableAdminApp
 	            $rootScope.logout = function () {
 					$rootScope.authenticated = false;
 					$rootScope.authenticationError = false;
-					$http.get('/app/logout')
+					$http.get(FlowableAdmin.Config.contextRoot + '/app/logout')
 						.success(function (data, status, headers, config) {
 							$rootScope.login = null;
 							$rootScope.authenticated = false;

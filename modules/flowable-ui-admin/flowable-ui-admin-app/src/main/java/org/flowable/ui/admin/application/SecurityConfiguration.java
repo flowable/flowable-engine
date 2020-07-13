@@ -10,12 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.admin.conf;
+package org.flowable.ui.admin.application;
 
 import java.util.Collections;
 
-import org.flowable.ui.admin.security.AjaxLogoutSuccessHandler;
-import org.flowable.ui.admin.security.RemoteIdmAuthenticationProvider;
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.flowable.ui.common.security.ActuatorRequestMatcher;
@@ -31,12 +29,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
     @Bean
     public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
-        registrationBean.addUrlPatterns("/app/*");
+        registrationBean.addUrlPatterns("/admin-app/*");
         registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
         return registrationBean;
     }
@@ -67,23 +67,20 @@ public class SecurityConfiguration {
         @Autowired
         protected FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean;
 
-        @Autowired
-        private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .addFilterBefore(flowableCookieFilterRegistrationBean.getFilter(), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
-                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
                     .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
                     .deleteCookies(CookieConstants.COOKIE_NAME)
                     .and()
                     .csrf()
                     .disable()
                     .authorizeRequests()
-                    .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN);
+                    .antMatchers("/admin-app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN);
         }
     }
 

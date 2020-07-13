@@ -75,6 +75,20 @@ flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                                     fixedUrl: baseUrl + '/workflow/',
                                     pages: ['tasks', 'processes']
                                 });
+                        } else if (app.defaultAppId === 'admin') {
+
+                            defaultApps.push(
+                                {
+                                    id: 'admin',
+                                    titleKey: 'APP.ADMIN.TITLE',
+                                    descriptionKey: 'APP.ADMIN.DESCRIPTION',
+                                    defaultAppId : app.defaultAppId,
+                                    theme: 'theme-2',
+                                    icon: 'icon icon-clock',
+                                    fixedBaseUrl: baseUrl + '/admin/' + '/#/',
+                                    fixedUrl: baseUrl + '/admin/',
+                                    pages: []
+                                });
                         }
 
                     } else {

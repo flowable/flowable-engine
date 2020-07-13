@@ -35,6 +35,7 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
+import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -78,8 +80,25 @@ public class FlowableAppDefinitionService {
     protected ObjectMapper objectMapper;
 
     protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
+    protected static final AppDefinitionRepresentation adminAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("admin");
 
     public ResultListDataRepresentation getAppDefinitions() {
+        List<AppDefinitionRepresentation> resultList = new ArrayList<>();
+
+        if (ClassUtils.isPresent("org.flowable.ui.admin.conf.ApplicationConfiguration", getClass().getClassLoader())
+                && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_ADMIN)) {
+            resultList.add(adminAppDefinitionRepresentation);
+        }
+
+        if (SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_TASK)) {
+            resultList.addAll(getTaskAppList());
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
+    }
+
+    protected List<AppDefinitionRepresentation> getTaskAppList() {
         List<AppDefinitionRepresentation> resultList = new ArrayList<>();
 
         // Default app: tasks (available for all)
@@ -113,8 +132,7 @@ public class FlowableAppDefinitionService {
             }
         }
 
-        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-        return result;
+        return resultList;
     }
 
     public AppDefinitionRepresentation getAppDefinition(String appDefinitionKey) {

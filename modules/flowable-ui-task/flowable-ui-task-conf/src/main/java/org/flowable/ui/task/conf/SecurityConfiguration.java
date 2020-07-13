@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.task.conf;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
@@ -22,7 +23,6 @@ import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.task.properties.FlowableTaskAppProperties;
-import org.flowable.ui.task.security.AjaxLogoutSuccessHandler;
 import org.flowable.ui.task.security.RemoteIdmAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 /**
@@ -61,8 +63,8 @@ public class SecurityConfiguration {
     @Bean
     public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistration(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
-        registrationBean.addUrlPatterns("/app/*");
-        registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
+        registrationBean.addUrlPatterns("/app/*", "/admin-app/*", "/admin/*");
+        registrationBean.setRequiredPrivileges(Arrays.asList(DefaultPrivileges.ACCESS_TASK, DefaultPrivileges.ACCESS_ADMIN));
         return registrationBean;
     }
 
@@ -88,9 +90,6 @@ public class SecurityConfiguration {
         @Autowired
         protected FilterRegistrationBean flowableCookieFilterRegistration;
 
-        @Autowired
-        protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
@@ -100,7 +99,7 @@ public class SecurityConfiguration {
                     .addFilterBefore(flowableCookieFilterRegistration.getFilter(), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
-                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
                     .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
                     .and()
                     .csrf()
@@ -111,7 +110,11 @@ public class SecurityConfiguration {
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
                     .and()
                     .authorizeRequests()
+                .antMatchers("/app/rest/account").hasAnyAuthority(DefaultPrivileges.ACCESS_TASK, DefaultPrivileges.ACCESS_ADMIN)
+                .antMatchers("/app/rest/runtime/app-definitions").hasAnyAuthority(DefaultPrivileges.ACCESS_TASK, DefaultPrivileges.ACCESS_ADMIN)
                 .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK)
+                .antMatchers("/admin-app/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
+                .antMatchers("/admin/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
                 .antMatchers("/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }
     }

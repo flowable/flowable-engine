@@ -160,7 +160,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                     filterCallback.onValidTokenFound(request, response, token);
                 }
             } else {
-                redirectOrSendNotPermitted(request, response, null);
+                redirectToLogin(request, response, null);
                 return; // no need to execute any other filters
             }
         }
@@ -222,16 +222,13 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                 if (user.getAuthorities() == null || user.getAuthorities().size() == 0) {
                     return false;
                 } else {
-                    int matchingPrivileges = 0;
                     for (GrantedAuthority authority : user.getAuthorities()) {
                         if (requiredPrivileges.contains(authority.getAuthority())) {
-                            matchingPrivileges++;
+                            return true;
                         }
                     }
 
-                    if (matchingPrivileges != requiredPrivileges.size()) {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
@@ -241,11 +238,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void redirectOrSendNotPermitted(HttpServletRequest request, HttpServletResponse response, String userId) {
-        if (isRootPath(request)) {
-            redirectToLogin(request, response, userId);
-        } else {
-            sendNotPermitted(request, response);
-        }
+        sendNotPermitted(request, response);
     }
 
     protected void redirectToLogin(HttpServletRequest request, HttpServletResponse response, String userId) {
