@@ -207,6 +207,9 @@
       <if test="decisionType != null">
         and RES.DECISION_TYPE_ = #{decisionType}
       </if>
+      <if test="decisionTypeLike != null">
+        and RES.DECISION_TYPE_ like #{decisionTypeLike}
+      </if>
     </where>
   </sql>
     
