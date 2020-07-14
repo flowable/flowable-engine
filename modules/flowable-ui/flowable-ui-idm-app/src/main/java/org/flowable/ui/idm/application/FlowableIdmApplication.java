@@ -12,20 +12,13 @@
  */
 package org.flowable.ui.idm.application;
 
-import org.flowable.ui.idm.conf.ApplicationConfiguration;
-import org.flowable.ui.idm.servlet.AppDispatcherServletConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Import;
 
 /**
  * @author Filip Hrisafov
  */
-@Import({
-    ApplicationConfiguration.class,
-    AppDispatcherServletConfiguration.class
-})
 @SpringBootApplication(proxyBeanMethods = false)
 public class FlowableIdmApplication extends SpringBootServletInitializer {
 

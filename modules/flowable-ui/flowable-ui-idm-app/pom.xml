@@ -11,16 +11,9 @@
     <packaging>war</packaging>
 
     <dependencies>
-
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate.validator</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-ui-idm</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -69,26 +62,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-conf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-frontend</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-logic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-idm-engine</artifactId>
-        </dependency>
 
         <!-- COMMON dependencies -->
         <dependency>
@@ -127,16 +100,6 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>static/fonts/**</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>static/fonts/**</include>
                 </includes>
             </resource>
         </resources>
