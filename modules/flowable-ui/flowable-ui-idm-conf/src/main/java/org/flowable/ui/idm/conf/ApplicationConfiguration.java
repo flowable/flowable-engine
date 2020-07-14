@@ -23,8 +23,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.lang.NonNull;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
@@ -61,5 +65,23 @@ public class ApplicationConfiguration {
         registrationBean.setAsyncSupported(true);
         return registrationBean;
     }
+
+    @Bean
+    public WebMvcConfigurer adminApplicationWebMvcConfigurer() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+
+                if (!ClassUtils.isPresent("org.flowable.ui.task.conf.ApplicationConfiguration", getClass().getClassLoader())) {
+                    // If the task application is not present, then the root should be mapped to admin
+                    registry.addViewController("/").setViewName("redirect:/idm/");
+                }
+                registry.addViewController("/idm").setViewName("redirect:/idm/");
+                registry.addViewController("/idm/").setViewName("forward:/idm/index.html");
+            }
+        };
+    }
+
 
 }

@@ -38,8 +38,6 @@ flowableApp
     $provide.value('appName', appName);
 
     var ctx = FLOWABLE.CONFIG.webContextRoot;
-    var appResourceRoot = ctx + (ctx && ctx.charAt(ctx.length - 1) !== '/' ? '/' : '');
-    $provide.value('appResourceRoot', appResourceRoot);
 
     // Override caret for bs-select directive
     angular.extend($selectProvider.defaults, {
@@ -87,27 +85,27 @@ flowableApp
         })
         .when('/user-mgmt', {
             controller: 'IdmUserMgmtController',
-            templateUrl: appResourceRoot + 'views/idm-user-mgmt.html',
+            templateUrl: 'views/idm-user-mgmt.html',
             resolve: {
                 verify: authRouteResolver
             }
         })
         .when('/group-mgmt', {
             controller: 'GroupMgmtController',
-            templateUrl: appResourceRoot + 'views/idm-group-mgmt.html',
+            templateUrl: 'views/idm-group-mgmt.html',
             resolve: {
                 verify: authRouteResolver
             }
         })
         .when('/privilege-mgmt', {
             controller: 'PrivilegeMgmtController',
-            templateUrl: appResourceRoot + 'views/idm-privilege-mgmt.html',
+            templateUrl: 'views/idm-privilege-mgmt.html',
             resolve: {
                 verify: authRouteResolver
             }
         })
         .when('/logout', {
-            templateUrl: appResourceRoot + 'views/empty.html',
+            templateUrl: 'views/empty.html',
             controller: 'LogoutController'
         })
         .otherwise({
@@ -227,10 +225,8 @@ flowableApp
             });
         }
     ])
-    .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot',
-        function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot) {
-
-        $rootScope.appResourceRoot = appResourceRoot;
+    .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover',
+        function($rootScope, $timeout, $translate, $location, $http, $window, $popover) {
 
         // Alerts
         $rootScope.alerts = {

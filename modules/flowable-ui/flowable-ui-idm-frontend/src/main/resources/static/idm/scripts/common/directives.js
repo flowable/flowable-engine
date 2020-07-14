@@ -585,10 +585,10 @@ flowableModule.directive('ngDebounce', ['$timeout', function($timeout) {
     }
 }]);
 
-flowableModule.directive('externalContent', ['$parse', '$timeout', 'appResourceRoot', function ($parse, $timeout, appResourceRoot) {
+flowableModule.directive('externalContent', ['$parse', '$timeout', function ($parse, $timeout) {
     var directive = {};
     directive.restrict = 'A';
-    directive.templateUrl = appResourceRoot + '../views/common/templates/external-content-template.html';
+    directive.templateUrl = '../views/common/templates/external-content-template.html';
 
     directive.scope = {
         taskId : '=taskId',
@@ -687,7 +687,7 @@ flowableModule.directive('externalContent', ['$parse', '$timeout', 'appResourceR
 
 
 flowableModule.
-    directive('selectPeoplePopover', ['$rootScope', '$http', '$popover', 'appResourceRoot', 'UserService', '$parse', function($rootScope, $http, $popover, appResourceRoot, UserService, $parse) {
+    directive('selectPeoplePopover', ['$rootScope', '$http', '$popover', 'UserService', '$parse', function($rootScope, $http, $popover, UserService, $parse) {
         var directive = {};
         directive.restrict = 'A';
 
@@ -719,11 +719,11 @@ flowableModule.
             }
 
             if ($scope.ignoreContainer) {
-                $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: 'views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement});
 
             } else {
-                $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-people-popover.html?'  +
+                $scope.popover = $popover($element, {template: 'views/common/popover/select-people-popover.html?'  +
                     Date.now(), placement: placement, container: 'body'});
             }
 
@@ -925,8 +925,8 @@ flowableModule.
     }]);
 
 flowableModule.
-directive('selectGroupPopover', ['$rootScope', '$http', '$popover','appResourceRoot', 'GroupService', '$parse',
-    function($rootScope, $http, $popover, appResourceRoot, GroupService, $parse) {
+directive('selectGroupPopover', ['$rootScope', '$http', '$popover', 'GroupService', '$parse',
+    function($rootScope, $http, $popover, GroupService, $parse) {
 
     var directive = {};
     directive.restrict = 'A';
@@ -954,11 +954,11 @@ directive('selectGroupPopover', ['$rootScope', '$http', '$popover','appResourceR
         }
 
         if ($scope.ignoreContainer) {
-            $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select--group-popover.html?' +
+            $scope.popover = $popover($element, {template: 'views/common/popover/select--group-popover.html?' +
                 Date.now(), placement: placement});
 
         } else {
-            $scope.popover = $popover($element, {template: appResourceRoot + 'views/common/popover/select-group-popover.html?' +
+            $scope.popover = $popover($element, {template: 'views/common/popover/select-group-popover.html?' +
                 Date.now(), placement: placement, container: 'body'});
         }
 

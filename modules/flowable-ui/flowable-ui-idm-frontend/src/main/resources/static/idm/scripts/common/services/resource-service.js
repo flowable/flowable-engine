@@ -13,14 +13,14 @@
 'use strict';
 
 // User service
-flowableModule.service('ResourceService', ['$http', '$q', 'appResourceRoot',
-    function ($http, $q, appResourceRoot) {
+flowableModule.service('ResourceService', ['$http', '$q',
+    function ($http, $q) {
 
         var loadedResources = {};
 
         function loadStylesheet(relativeUrl, cache)
         {
-            var url = appResourceRoot + relativeUrl;
+            var url = relativeUrl;
             if (!cache || !loadedResources[url])
             {
                 if (cache) {
@@ -46,7 +46,7 @@ flowableModule.service('ResourceService', ['$http', '$q', 'appResourceRoot',
 
         function loadScript(relativeUrl, callback, cache)
         {
-            var url = appResourceRoot + relativeUrl;
+            var url = relativeUrl;
             if (cache && loadedResources[url] && callback)
             {
                 callback();
