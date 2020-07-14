@@ -29,7 +29,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "org.flowable.ui.task.service",
         "org.flowable.ui.task.security",
         "org.flowable.ui.task.model.component",
-        "org.flowable.ui.common.conf",
         "org.flowable.ui.common.repository",
         "org.flowable.ui.common.service",
         "org.flowable.ui.common.filter",

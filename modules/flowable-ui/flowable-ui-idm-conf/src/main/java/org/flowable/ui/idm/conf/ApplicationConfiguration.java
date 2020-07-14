@@ -33,7 +33,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
 @ComponentScan(basePackages = {
-    "org.flowable.ui.common.conf",
     "org.flowable.ui.idm.conf",
     "org.flowable.ui.idm.security",
     "org.flowable.ui.idm.idm",

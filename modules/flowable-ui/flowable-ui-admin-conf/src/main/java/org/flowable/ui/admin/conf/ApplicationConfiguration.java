@@ -36,7 +36,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = {
     "org.flowable.ui.admin.repository",
     "org.flowable.ui.admin.security",
-    "org.flowable.ui.common.conf",
     "org.flowable.ui.common.repository",
     "org.flowable.ui.common.service",
     "org.flowable.ui.common.filter",
