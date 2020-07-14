@@ -286,31 +286,31 @@
         "SHELLARG1PACKAGE" : {
           "SHELLARG1" : {
             "TITLE" : "Argument 1",
-            "DESCRIPTION" : "Shell commnad arg 1"
+            "DESCRIPTION" : "Shell command arg 1"
           }
         },
         "SHELLARG2PACKAGE" : {
           "SHELLARG2" : {
             "TITLE" : "Argument 2",
-            "DESCRIPTION" : "Shell commnad arg 2"
+            "DESCRIPTION" : "Shell command arg 2"
           }
         },
         "SHELLARG3PACKAGE" : {
           "SHELLARG3" : {
             "TITLE" : "Argument 3",
-            "DESCRIPTION" : "Shell commnad arg 3"
+            "DESCRIPTION" : "Shell command arg 3"
           }
         },
         "SHELLARG4PACKAGE" : {
           "SHELLARG4" : {
             "TITLE" : "Argument 4",
-            "DESCRIPTION" : "Shell commnad arg 4"
+            "DESCRIPTION" : "Shell command arg 4"
           }
         },
         "SHELLARG5PACKAGE" : {
           "SHELLARG5" : {
             "TITLE" : "Argument 5",
-            "DESCRIPTION" : "Shell commnad arg 5"
+            "DESCRIPTION" : "Shell command arg 5"
           }
         },
         "SHELLWAITPACKAGE" : {
@@ -322,13 +322,13 @@
         "SHELLOUTPUTVARIABLEPACKAGE" : {
           "SHELLOUTPUTVARIABLE" : {
             "TITLE" : "Output variable",
-            "DESCRIPTION" : "Variable to store shell commnad output"
+            "DESCRIPTION" : "Variable to store shell command output"
           }
         },
         "SHELLERRORCODEVARIABLEPACKAGE" : {
           "SHELLERRORCODEVARIABLE" : {
             "TITLE" : "Error code variable",
-            "DESCRIPTION" : "Variable to store shell commnad error code"
+            "DESCRIPTION" : "Variable to store shell command error code"
           }
         },
         "SHELLREDIRECTERRORPACKAGE" : {
@@ -914,7 +914,7 @@
         "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE" : {
           "DECISIONTASKFALLBACKTODEFAULTTENANT" : {
             "TITLE" : "Fallback to default tenant",
-            "DESCRIPTION" : "Find decision definition without tenant when previous attemps to find it with tenant failed."
+            "DESCRIPTION" : "Find decision definition without tenant when previous attempts to find it with tenant failed."
           }
         },
         "INTERRUPTINGPACKAGE" : {
@@ -1144,7 +1144,7 @@
         },
         "CATCHEVENTREGISTRYEVENT" : {
           "TITLE" : "Intermediate event registry catching event",
-          "DESCRIPTION" : "An intermediate catching event waiting to receive an event from the eventregistry"
+          "DESCRIPTION" : "An intermediate catching event waiting to receive an event from the event registry"
         },
         "THROWNONEEVENT" : {
           "TITLE" : "Intermediate none throwing event",
@@ -1180,11 +1180,11 @@
         },
         "POOL" : {
           "TITLE" : "Pool",
-          "DESCRIPTION" : "A pool to stucture the process definition"
+          "DESCRIPTION" : "A pool to structure the process definition"
         },
         "LANE" : {
           "TITLE" : "Lane",
-          "DESCRIPTION" : "A lane to stucture the process definition"
+          "DESCRIPTION" : "A lane to structure the process definition"
         },
         "SEQUENCEFLOW" : {
           "TITLE" : "Sequence flow",
@@ -1456,7 +1456,7 @@
         "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE": {
           "DECISIONTASKFALLBACKTODEFAULTTENANT": {
             "TITLE": "Fallback to default tenant",
-            "DESCRIPTION": "Find decision definition without tenant when previous attemps to find it with tenant failed."
+            "DESCRIPTION": "Find decision definition without tenant when previous attempts to find it with tenant failed."
           }
         },
         "HTTPTASKREQUESTMETHODPACKAGE": {
@@ -1706,7 +1706,7 @@
           },
           "AUTOCOMPLETECONDITION": {
             "TITLE": "Auto complete condition",
-            "DESCRIPTION": "An expression that is resolved to if the stage can automatically complere."
+            "DESCRIPTION": "An expression that is resolved to if the stage can automatically complete."
           }
         },
         "REQUIREDRULEPACKAGE": {
