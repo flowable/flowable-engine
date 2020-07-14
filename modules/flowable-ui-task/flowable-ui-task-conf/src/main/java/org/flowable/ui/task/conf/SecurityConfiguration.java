@@ -13,7 +13,6 @@
 package org.flowable.ui.task.conf;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
