@@ -1,4 +1,3 @@
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    org.flowable.ui.idm.conf.ApplicationConfiguration,\
-    org.flowable.ui.idm.servlet.AppDispatcherServletConfiguration
+    org.flowable.ui.idm.conf.ApplicationConfiguration

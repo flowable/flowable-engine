@@ -120,7 +120,7 @@ flowableApp.
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
                 Upload.upload({
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/profile-picture',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/profile-picture',
                     method: 'POST',
                     file: file
                 }).progress(function(evt) {

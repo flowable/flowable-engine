@@ -156,7 +156,7 @@ flowableApp
             };
 
             $rootScope.restRootUrl = function() {
-                return FLOWABLE.CONFIG.contextRoot;
+                return FLOWABLE.CONFIG.contextIdmRestRoot;
             };
 
             // Needed for auto-height

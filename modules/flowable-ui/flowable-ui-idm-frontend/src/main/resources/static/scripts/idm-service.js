@@ -35,7 +35,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/profile'
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/profile'
                 }
             )
         };
@@ -44,7 +44,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/profile',
+                url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/profile',
                 data: userData
             }).success(function (response, status, headers, config) {
                 if (successCallback) {
@@ -66,7 +66,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/profile-password',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/profile-password',
                     data: {originalPassword: oldPassword, newPassword: newPassword}
                 }
             )
@@ -83,7 +83,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups',
                     params: params
                 }
             )
@@ -97,7 +97,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups',
                     params: params
                 }
             )
@@ -113,7 +113,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId,
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId,
                     params: params
                 }
             )
@@ -138,7 +138,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId + '/users',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId + '/users',
                     params: params
                 }
             )
@@ -150,7 +150,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups',
                     data: createGroupData
                 }
             )
@@ -163,7 +163,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'PUT',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId ,
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId ,
                     data: data
                 }
             )
@@ -173,7 +173,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'DELETE',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId
                 }
             )
         };
@@ -182,7 +182,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId + '/action/activate'
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId + '/action/activate'
                 }
             )
         };
@@ -191,7 +191,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'DELETE',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId + '/members/' + userId
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId + '/members/' + userId
                 }
             )
         };
@@ -200,7 +200,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/groups/' + groupId + '/members/' + userId
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/groups/' + groupId + '/members/' + userId
                 }
             )
         };
@@ -208,14 +208,14 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
         this.getPrivileges = function() {
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges'
+                url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges'
             })
         };
 
         this.getPrivilege = function(privilegeId) {
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges/' + privilegeId
+                url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges/' + privilegeId
             });
         };
 
@@ -223,7 +223,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges/' + privilegeId + '/users',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges/' + privilegeId + '/users',
                     data: { userId : userId}
                 }
             )
@@ -233,7 +233,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'DELETE',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges/' + privilegeId + '/users/' + userId
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges/' + privilegeId + '/users/' + userId
                 }
             )
         };
@@ -242,7 +242,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'POST',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges/' + privilegeId + '/groups',
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges/' + privilegeId + '/groups',
                     data: { groupId : groupId}
                 }
             )
@@ -252,7 +252,7 @@ angular.module('flowableApp').service('IdmService', ['$http', '$q', '$rootScope'
             return httpAsPromise(
                 {
                     method: 'DELETE',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/privileges/' + privilegeId + '/groups/' + groupId
+                    url: FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/admin/privileges/' + privilegeId + '/groups/' + groupId
                 }
             )
         };

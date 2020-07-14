@@ -155,12 +155,12 @@ flowableApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'auth
       return {
         authenticate: function() {
           var deferred = $q.defer();
-          $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/authenticate', {ignoreErrors: true, ignoreAuthModule: 'ignoreAuthModule'})
+          $http.get(FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/authenticate', {ignoreErrors: true, ignoreAuthModule: 'ignoreAuthModule'})
               .success(function (data, status, headers, config) {
 
                   var redirectOnAuthSuccess = $location.search().redirectOnAuthSuccess;
                   if (!redirectOnAuthSuccess) {
-                    var authUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/account';
+                    var authUrl = FLOWABLE.CONFIG.contextIdmRestRoot + '/rest/account';
                     $http.get(authUrl)
                         .success(function (data, status, headers, config) {
                             $rootScope.account = data;

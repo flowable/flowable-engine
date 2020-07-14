@@ -146,8 +146,8 @@ public class SecurityConfiguration {
                     .and()
                     .authorizeRequests()
                     .antMatchers("/*").permitAll()
-                    .antMatchers("/app/rest/authenticate").permitAll()
-                    .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
+                    .antMatchers("/idm-app/rest/authenticate").permitAll()
+                    .antMatchers("/idm-app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
 
             // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)
             CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<>();
