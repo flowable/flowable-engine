@@ -57,7 +57,7 @@ public class DecisionCollectionResource {
         properties.put("version", DecisionQueryProperty.DECISION_VERSION);
         properties.put("deploymentId", DecisionQueryProperty.DECISION_DEPLOYMENT_ID);
         properties.put("tenantId", DecisionQueryProperty.DECISION_TENANT_ID);
-        properties.put("decisionType", DecisionQueryProperty.DECISION_TENANT_ID);
+        properties.put("decisionType", DecisionQueryProperty.DECISION_TYPE);
     }
 
     @Autowired
@@ -84,7 +84,8 @@ public class DecisionCollectionResource {
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest decision versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
             @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return decision with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision with the given tenant ID.", paramType = "query"),
-            @ApiImplicitParam(name = "decisionType", dataType = "string", value = "Only return decision with the given tenant ID.", paramType = "query"),
+            @ApiImplicitParam(name = "decisionType", dataType = "string", value = "Only return decision with the given type.", paramType = "query"),
+            @ApiImplicitParam(name = "decisionTypeLike", dataType = "string", value = "Only return decision like the given type.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name,id,key,category,deploymentId,version,decisionType", paramType = "query"),
     })
     @ApiResponses(value = {
@@ -143,7 +144,10 @@ public class DecisionCollectionResource {
             definitionQuery.decisionTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("decisionType")) {
-            definitionQuery.decisionTenantIdLike(allRequestParams.get("decisionType"));
+            definitionQuery.decisionType(allRequestParams.get("decisionType"));
+        }
+        if (allRequestParams.containsKey("decisionTypeLike")) {
+            definitionQuery.decisionTypeLike(allRequestParams.get("decisionType"));
         }
         
         if (restApiInterceptor != null) {

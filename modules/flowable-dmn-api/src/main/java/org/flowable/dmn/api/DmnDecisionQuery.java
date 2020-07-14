@@ -143,7 +143,15 @@ public interface DmnDecisionQuery extends Query<DmnDecisionQuery, DmnDecision> {
      */
     DmnDecisionQuery decisionWithoutTenantId();
 
+    /**
+     * Only select decisions with the given type.
+     */
     DmnDecisionQuery decisionType(String decisionType);
+
+    /**
+     * Only select decisions like the given type.
+     */
+    DmnDecisionQuery decisionTypeLike(String decisionType);
 
     // ordering ////////////////////////////////////////////////////////////
 
