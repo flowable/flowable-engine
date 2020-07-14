@@ -2,13 +2,13 @@
    "GENERAL": {
         "MAIN-TITLE": "Flowable",
         "ERROR": {
-            "GENERIC": "Sorry, an error occured...",
-            "UNKNOWN": "Sorry, an error occured while performing the requested operation.",
-            "BAD_REQUEST": "An error occured while performing the requested operation",
+            "GENERIC": "Sorry, an error occurred...",
+            "UNKNOWN": "Sorry, an error occurred while performing the requested operation.",
+            "BAD_REQUEST": "An error occurred while performing the requested operation",
             "NOT_FOUND": "The resource you are trying to access does not exist",
             "UNAUTHORIZED": "You should sign in in order to perform the requested operation.",
             "FORBIDDEN": "You are not allowed to perform the requested operation",
-            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation."
+            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occurred while performing the requested operation."
         },
         "ACTION": {
             "LOGOUT": "Sign out",
