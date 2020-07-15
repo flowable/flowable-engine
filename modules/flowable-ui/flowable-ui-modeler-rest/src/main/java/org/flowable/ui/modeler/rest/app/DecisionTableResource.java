@@ -12,7 +12,11 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.model.DecisionTableSaveRepresentation;
@@ -32,16 +36,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author yvoswillens
  * @author erikwinlof
  */
 @RestController
-@RequestMapping("/app/rest/decision-table-models")
+@RequestMapping("/rest/decision-table-models")
 public class DecisionTableResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableResource.class);

@@ -68,17 +68,17 @@ public class ApiModelResource {
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
 
     /**
-     * GET /editor/models/{modelId} -> Get process model
+     * GET /models/{modelId} -> Get process model
      */
-    @GetMapping(value = "/editor/models/{modelId}", produces = "application/json")
+    @GetMapping(value = "/models/{modelId}", produces = "application/json")
     public ModelRepresentation getModel(@PathVariable String modelId) {
         return modelService.getModelRepresentation(modelId);
     }
 
     /**
-     * GET /editor/models/{modelId}/thumbnail -> Get process model thumbnail
+     * GET /models/{modelId}/thumbnail -> Get process model thumbnail
      */
-    @GetMapping(value = "/editor/models/{modelId}/thumbnail", produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/models/{modelId}/thumbnail", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getModelThumbnail(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         return model.getThumbnail();
@@ -87,7 +87,7 @@ public class ApiModelResource {
     /**
      * PUT /rest/models/{modelId} -> update process model properties
      */
-    @PutMapping(value = "/editor/models/{modelId}")
+    @PutMapping(value = "/models/{modelId}")
     public ModelRepresentation updateModel(@PathVariable String modelId, @RequestBody ModelRepresentation updatedModel) {
         // Get model, write-permission required if not a favorite-update
         Model model = modelService.getModel(modelId);
@@ -110,10 +110,10 @@ public class ApiModelResource {
     }
 
     /**
-     * DELETE /editor/models/{modelId} -> delete process model or, as a non-owner, remove the share info link for that user specifically
+     * DELETE /models/{modelId} -> delete process model or, as a non-owner, remove the share info link for that user specifically
      */
     @ResponseStatus(value = HttpStatus.OK)
-    @DeleteMapping(value = "/editor/models/{modelId}")
+    @DeleteMapping(value = "/models/{modelId}")
     public void deleteModel(@PathVariable String modelId) {
 
         // Get model to check if it exists, read-permission required for delete
@@ -129,9 +129,9 @@ public class ApiModelResource {
     }
 
     /**
-     * GET /editor/models/{modelId}/editor/json -> get the JSON model
+     * GET /models/{modelId}/editor/json -> get the JSON model
      */
-    @GetMapping(value = "/editor/models/{modelId}/editor/json", produces = "application/json")
+    @GetMapping(value = "/models/{modelId}/editor/json", produces = "application/json")
     public ObjectNode getModelJSON(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         ObjectNode modelNode = objectMapper.createObjectNode();
@@ -164,9 +164,9 @@ public class ApiModelResource {
     }
 
     /**
-     * POST /editor/models/{modelId}/editor/json -> save the JSON model
+     * POST /models/{modelId}/editor/json -> save the JSON model
      */
-    @PostMapping(value = "/editor/models/{modelId}/editor/json")
+    @PostMapping(value = "/models/{modelId}/editor/json")
     public ModelRepresentation saveModel(@PathVariable String modelId, @RequestBody MultiValueMap<String, String> values) {
 
         // Validation: see if there was another update in the meantime

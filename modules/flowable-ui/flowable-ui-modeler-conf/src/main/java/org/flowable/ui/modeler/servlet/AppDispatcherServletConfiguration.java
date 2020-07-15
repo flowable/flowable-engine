@@ -14,19 +14,24 @@ package org.flowable.ui.modeler.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.ui.modeler.rest.app", "org.flowable.ui.common.rest" })
+@ComponentScan(value = {
+        "org.flowable.ui.modeler.service",
+        "org.flowable.ui.modeler.rest.app",
+        "org.flowable.ui.common.rest"
+})
 @EnableAsync
-public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
+public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
 
@@ -35,22 +40,19 @@ public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
         return new SessionLocaleResolver();
     }
 
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
         LOGGER.debug("Configuring localeChangeInterceptor");
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
-        return localeChangeInterceptor;
     }
 
     @Override
-    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
-        Object[] interceptors = { localeChangeInterceptor() };
-        requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
     }
 }

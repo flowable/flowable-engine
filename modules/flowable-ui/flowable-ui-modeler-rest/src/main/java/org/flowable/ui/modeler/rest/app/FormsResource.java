@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/app/rest/form-models")
+@RequestMapping("/rest/form-models")
 public class FormsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormsResource.class);

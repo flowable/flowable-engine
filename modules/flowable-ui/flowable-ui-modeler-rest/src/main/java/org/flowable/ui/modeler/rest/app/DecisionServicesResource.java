@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/app/rest/decision-service-models")
+@RequestMapping("/rest/decision-service-models")
 public class DecisionServicesResource {
 
     @Autowired

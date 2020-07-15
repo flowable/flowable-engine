@@ -47,19 +47,19 @@ public class ApiModelsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @GetMapping(value = "/editor/models", produces = "application/json")
+    @GetMapping(value = "/models", produces = "application/json")
     public ResultListDataRepresentation getModels(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Integer modelType,
             HttpServletRequest request) {
 
         return modelQueryService.getModels(filter, sort, modelType, request);
     }
 
-    @PostMapping(value = "/editor/import-process-model", produces = "application/json")
+    @PostMapping(value = "/import-process-model", produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importProcessModel(request, file);
     }
 
-    @PostMapping(value = "/editor/models", produces = "application/json")
+    @PostMapping(value = "/models", produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
 

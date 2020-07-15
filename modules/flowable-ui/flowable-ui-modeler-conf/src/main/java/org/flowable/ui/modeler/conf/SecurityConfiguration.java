@@ -21,16 +21,15 @@ import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.flowable.ui.common.service.idm.RemoteIdmServiceImpl;
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.flowable.ui.modeler.security.AjaxLogoutSuccessHandler;
-import org.flowable.ui.modeler.security.RemoteIdmAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -52,9 +51,6 @@ public class SecurityConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     public static final String REST_ENDPOINTS_PREFIX = "/app/rest";
-    
-    @Autowired
-    protected RemoteIdmAuthenticationProvider authenticationProvider;
 
     @Bean
     public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
@@ -63,18 +59,12 @@ public class SecurityConfiguration {
         filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
         return filter;
     }
-    
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) {
 
-        // Default auth (database backed)
-        try {
-            auth.authenticationProvider(authenticationProvider);
-        } catch (Exception e) {
-            LOGGER.error("Could not configure authentication mechanism:", e);
-        }
+    @Bean
+    public RemoteIdmService remoteIdmService(FlowableCommonAppProperties properties) {
+        return new RemoteIdmServiceImpl(properties);
     }
-
+    
     @Configuration
     @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
@@ -138,14 +128,14 @@ public class SecurityConfiguration {
             if (modelerAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
                 } else {
-                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
+                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").authenticated().and().httpBasic();
                     
                 }
                 
             } else {
-                http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").denyAll();
+                http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").denyAll();
                 
             }
             
