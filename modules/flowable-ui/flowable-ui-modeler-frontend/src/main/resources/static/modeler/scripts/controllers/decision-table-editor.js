@@ -18,9 +18,9 @@ var extScope;
 
 angular.module('flowableModeler')
     .controller('DecisionTableEditorController', ['$rootScope', '$scope', '$q', '$translate', '$http', '$timeout', '$location', '$modal', '$route', '$routeParams', 'DecisionTableService',
-        'UtilityService', 'uiGridConstants', 'appResourceRoot', 'hotRegisterer',
+        'UtilityService', 'uiGridConstants', 'hotRegisterer',
         function ($rootScope, $scope, $q, $translate, $http, $timeout, $location, $modal, $route, $routeParams, DecisionTableService,
-                  UtilityService, uiGridConstants, appResourceRoot, hotRegisterer) {
+                  UtilityService, uiGridConstants, hotRegisterer) {
 
             extScope = $scope;
 
@@ -44,9 +44,6 @@ angular.module('flowableModeler')
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
             var dateFormat = 'YYYY-MM-DD';
-
-            // Export name to grid's scope
-            $scope.appResourceRoot = appResourceRoot;
 
             // Model init
             $scope.status = {loading: true};

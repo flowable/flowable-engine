@@ -25,8 +25,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableModelerAppProperties.class)
@@ -63,6 +67,24 @@ public class ApplicationConfiguration {
         registrationBean.setAsyncSupported(true);
         return registrationBean;
     }
+
+    @Bean
+    public WebMvcConfigurer modelerApplicationWebMvcConfigurer() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+
+                if (!ClassUtils.isPresent("org.flowable.ui.task.conf.ApplicationConfiguration", getClass().getClassLoader())) {
+                    // If the task application is not present, then the root should be mapped to admin
+                    registry.addViewController("/").setViewName("redirect:/modeler/");
+                }
+                registry.addViewController("/modeler").setViewName("redirect:/modeler/");
+                registry.addViewController("/modeler/").setViewName("forward:/modeler/index.html");
+            }
+        };
+    }
+
 
     // The services are shared between the api and app rest modules
     @Bean

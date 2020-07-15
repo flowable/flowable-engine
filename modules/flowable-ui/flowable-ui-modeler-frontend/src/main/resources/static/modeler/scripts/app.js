@@ -42,10 +42,6 @@ flowableModeler
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $translateProvider) {
 
-    var appResourceRoot = FLOWABLE.CONFIG.webContextRoot + (FLOWABLE.CONFIG.webContextRoot ? '/' : '');
-    $provide.value('appResourceRoot', appResourceRoot);
-
-
     // Override caret for bs-select directive
   	angular.extend($selectProvider.defaults, {
       caretHtml: '&nbsp;<i class="icon icon-caret-down"></i>'
@@ -53,72 +49,72 @@ flowableModeler
 
     $routeProvider
         .when('/processes', {
-            templateUrl: appResourceRoot + 'views/processes.html',
+            templateUrl: 'views/processes.html',
             controller: 'ProcessesCtrl'
         })
         .when('/processes/:modelId', {
-            templateUrl: appResourceRoot + 'views/process.html',
+            templateUrl: 'views/process.html',
             controller: 'ProcessCtrl'
         })
         .when('/processes/:modelId/history/:modelHistoryId', {
-            templateUrl: appResourceRoot + 'views/process.html',
+            templateUrl: 'views/process.html',
             controller: 'ProcessCtrl'
         })
         .when('/casemodels', {
-            templateUrl: appResourceRoot + 'views/casemodels.html',
+            templateUrl: 'views/casemodels.html',
             controller: 'CaseModelsCtrl'
         })
         .when('/casemodels/:modelId', {
-            templateUrl: appResourceRoot + 'views/casemodel.html',
+            templateUrl: 'views/casemodel.html',
             controller: 'CaseModelCtrl'
         })
         .when('/forms', {
-            templateUrl: appResourceRoot + 'views/forms.html',
+            templateUrl: 'views/forms.html',
             controller: 'FormsCtrl'
         })
         .when('/forms/:modelId', {
-            templateUrl: appResourceRoot + 'views/form.html',
+            templateUrl: 'views/form.html',
             controller: 'FormCtrl'
         })
         .when('/forms/:modelId/history/:modelHistoryId', {
-            templateUrl: appResourceRoot + 'views/form.html',
+            templateUrl: 'views/form.html',
             controller: 'FormCtrl'
         })
         .when('/decisions', {
-            templateUrl: appResourceRoot + 'views/decisions.html',
+            templateUrl: 'views/decisions.html',
             controller: 'DecisionsController',
             resolve: {
                 modelType:()=>4
             }
         })
         .when('/decision-tables', {
-            templateUrl: appResourceRoot + 'views/decisions.html',
+            templateUrl: 'views/decisions.html',
             controller: 'DecisionsController',
             resolve: {
                 modelType:()=>4
             }
         })
         .when('/decision-services', {
-            templateUrl: appResourceRoot + 'views/decisions.html',
+            templateUrl: 'views/decisions.html',
             controller: 'DecisionsController',
             resolve: {
                 modelType:()=>6
             }
         })
         .when('/decision-tables/:modelId', {
-            templateUrl: appResourceRoot + 'views/decision-table.html',
+            templateUrl: 'views/decision-table.html',
             controller: 'DecisionTableDetailsCtrl'
         })
         .when('/decision-tables/:modelId/history/:modelHistoryId', {
-            templateUrl: appResourceRoot + 'views/decision-table.html',
+            templateUrl: 'views/decision-table.html',
             controller: 'DecisionTableDetailsCtrl'
         })
         .when('/apps', {
-            templateUrl: appResourceRoot + 'views/app-definitions.html',
+            templateUrl: 'views/app-definitions.html',
             controller: 'AppDefinitionsCtrl'
         })
         .when('/apps/:modelId', {
-            templateUrl: appResourceRoot + 'views/app-definition.html',
+            templateUrl: 'views/app-definition.html',
             controller: 'AppDefinitionCtrl'
         })
         .when('/apps/:modelId/history/:modelHistoryId', {
@@ -126,31 +122,31 @@ flowableModeler
             controller: 'AppDefinitionCtrl'
         })
         .when('/editor/:modelId', {
-            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            templateUrl: 'editor-app/editor.html',
             controller: 'EditorController'
         })
         .when('/form-editor/:modelId', {
-            templateUrl: appResourceRoot + 'views/form-builder.html',
+            templateUrl: 'views/form-builder.html',
             controller: 'FormBuilderController'
         })
         .when('/case-editor/:modelId', {
-            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            templateUrl: 'editor-app/editor.html',
             controller: 'EditorController'
         })
         .when('/decision-table-editor/:modelId', {
-            templateUrl: appResourceRoot + 'views/decision-table-editor.html',
+            templateUrl: 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'
         })
         .when('/app-editor/:modelId', {
-            templateUrl: appResourceRoot + 'views/app-definition-builder.html',
+            templateUrl: 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
         })
         .when('/decision-service-editor/:modelId', {
-            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            templateUrl: 'editor-app/editor.html',
             controller: 'EditorController'
         })
         .when('/decision-services/:modelId', {
-            templateUrl: appResourceRoot + 'views/decision-service.html',
+            templateUrl: 'views/decision-service.html',
             controller: 'DecisionServiceDetailsCtrl'
         });
 
@@ -182,8 +178,8 @@ flowableModeler
         .determinePreferredLanguage();
 
   }])
-  .run(['$rootScope', '$timeout', '$modal', '$translate', '$location', '$http', '$window', 'appResourceRoot',
-        function($rootScope, $timeout, $modal, $translate, $location, $http, $window, appResourceRoot) {
+  .run(['$rootScope', '$timeout', '$modal', '$translate', '$location', '$http', '$window',
+        function($rootScope, $timeout, $modal, $translate, $location, $http, $window) {
 
             // set angular translate fallback language
             $translate.fallbackLanguage(['en']);
@@ -196,8 +192,6 @@ flowableModeler
             $rootScope.restRootUrl = function() {
                 return FLOWABLE.CONFIG.contextRoot;
             };
-
-          	$rootScope.appResourceRoot = appResourceRoot;
 
             $rootScope.window = {};
             var updateWindowSize = function() {
