@@ -88,6 +88,11 @@
                 <artifactId>flowable-ui-modeler-conf</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-modeler-frontend</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.flowable</groupId>
@@ -161,6 +166,7 @@
                 <module>flowable-ui-modeler-logic</module>
                 <module>flowable-ui-modeler-rest</module>
                 <module>flowable-ui-modeler-conf</module>
+                <module>flowable-ui-modeler-frontend</module>
                 <module>flowable-ui-modeler-app</module>
 
                 <module>flowable-ui-task-logic</module>
