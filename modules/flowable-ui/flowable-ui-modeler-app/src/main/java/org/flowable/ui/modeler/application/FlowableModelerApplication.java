@@ -13,18 +13,13 @@
 package org.flowable.ui.modeler.application;
 
 import org.flowable.ui.common.security.FlowableUiSecurityAutoConfiguration;
-import org.flowable.ui.modeler.conf.ApplicationConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Import;
 
 /**
  * @author Filip Hrisafov
  */
-@Import({
-    ApplicationConfiguration.class
-})
 @SpringBootApplication(proxyBeanMethods = false, exclude = FlowableUiSecurityAutoConfiguration.class)
 public class FlowableModelerApplication extends SpringBootServletInitializer {
 
