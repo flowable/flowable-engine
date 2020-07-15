@@ -25,14 +25,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties(FlowableTaskAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.ui.task.conf",
-        "org.flowable.ui.task.repository",
         "org.flowable.ui.task.service",
-        "org.flowable.ui.task.security",
         "org.flowable.ui.task.model.component",
-        "org.flowable.ui.common.repository",
-        "org.flowable.ui.common.service",
-        "org.flowable.ui.common.filter",
-        "org.flowable.ui.common.security" })
+        "org.flowable.ui.common.repository" })
 @EnableScheduling
 @EnableAsync
 public class ApplicationConfiguration {

@@ -10,28 +10,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.idm.security;
+package org.flowable.ui.common.security;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 /**
- * Spring Security success handler, specialized for Ajax requests.
+ * Returns a 401 error code (Unauthorized) to the client, when Ajax authentication fails.
  */
-@Component
-public class AjaxAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class AjaxAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication)
-            throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException exception) throws IOException, ServletException {
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
     }
 }

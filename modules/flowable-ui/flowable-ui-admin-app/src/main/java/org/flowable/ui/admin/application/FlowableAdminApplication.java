@@ -12,12 +12,9 @@
  */
 package org.flowable.ui.admin.application;
 
-import org.flowable.ui.admin.conf.ApplicationConfiguration;
-import org.flowable.ui.admin.conf.DispatcherServletConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Import;
 
 /**
  * @author Filip Hrisafov

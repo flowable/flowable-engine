@@ -25,6 +25,7 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.impl.deployer.BaseAppModel;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -32,6 +33,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -42,6 +45,7 @@ import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.task.model.runtime.AppDefinitionRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +58,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Service
 @Transactional
-public class FlowableAppDefinitionService {
+public class FlowableAppDefinitionService implements InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableAppDefinitionService.class);
 
@@ -73,22 +77,51 @@ public class FlowableAppDefinitionService {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    @Autowired
+    @Autowired(required = false)
     protected RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    protected IdmIdentityService identityService;
 
     @Autowired
     protected ObjectMapper objectMapper;
 
     protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
-    protected static final AppDefinitionRepresentation adminAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("admin");
+    protected static final AppDefinitionRepresentation adminAppDefinitionRepresentation;
+    protected static final AppDefinitionRepresentation idmAppDefinitionRepresentation;
+
+    static {
+        if (ClassUtils.isPresent("org.flowable.ui.admin.conf.ApplicationConfiguration", null)) {
+            adminAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("admin");
+        } else {
+            adminAppDefinitionRepresentation = null;
+        }
+
+        if (ClassUtils.isPresent("org.flowable.ui.idm.service.GroupServiceImpl", null)) {
+            idmAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("idm");
+        } else {
+            idmAppDefinitionRepresentation = null;
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     public ResultListDataRepresentation getAppDefinitions() {
         List<AppDefinitionRepresentation> resultList = new ArrayList<>();
 
-        if (ClassUtils.isPresent("org.flowable.ui.admin.conf.ApplicationConfiguration", getClass().getClassLoader())
-                && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_ADMIN)) {
+        if (adminAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_ADMIN)) {
             resultList.add(adminAppDefinitionRepresentation);
         }
+
+        if (idmAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_IDM)) {
+            resultList.add(idmAppDefinitionRepresentation);
+        }
+
 
         if (SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_TASK)) {
             resultList.addAll(getTaskAppList());
@@ -120,7 +153,7 @@ public class FlowableAppDefinitionService {
         if (appDefinitionHaveAccessControl) {
             User currentUser = SecurityUtils.getCurrentUserObject();
             String userId = currentUser.getId();
-            List<RemoteGroup> groups = getUserGroups(userId);
+            List<? extends Group> groups = getUserGroups(userId);
 
             List<AppDefinitionRepresentation> appDefinitionList = new ArrayList<>(resultList);
             resultList.clear();
@@ -202,11 +235,17 @@ public class FlowableAppDefinitionService {
         return "Migrated " + deploymentIdMap.size() + " app deployments";
     }
 
-    protected List<RemoteGroup> getUserGroups(String userId) {
-        return remoteIdmService.getUser(userId).getGroups();
+    protected List<? extends Group> getUserGroups(String userId) {
+        if (remoteIdmService != null) {
+            return remoteIdmService.getUser(userId).getGroups();
+        } else if (identityService != null) {
+            return identityService.createGroupQuery().groupMember(userId).list();
+        } else {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
     }
 
-    protected boolean hasAppAccess(AppDefinitionRepresentation appDefinition, String userId, List<RemoteGroup> groups) {
+    protected boolean hasAppAccess(AppDefinitionRepresentation appDefinition, String userId, List<? extends Group> groups) {
         if (CollectionUtils.isEmpty(appDefinition.getUsersAccess()) && CollectionUtils.isEmpty(appDefinition.getGroupsAccess())) {
             return true;
         }
@@ -219,7 +258,7 @@ public class FlowableAppDefinitionService {
 
         if (CollectionUtils.isNotEmpty(appDefinition.getGroupsAccess())) {
             for (String groupId : appDefinition.getGroupsAccess()) {
-                for (RemoteGroup group : groups) {
+                for (Group group : groups) {
                     if (group.getId().equals(groupId)) {
                         return true;
                     }

@@ -12,31 +12,49 @@
  */
 package org.flowable.ui.task.rest.idm;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * REST controller for managing users.
  */
 @RestController
 @RequestMapping("/app")
-public class UserResource {
+public class UserResource implements InitializingBean {
 
-    @Autowired
+    @Autowired(required = false)
     protected RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    protected IdmIdentityService identityService;
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     @GetMapping(value = "/rest/users/{userId}", produces = "application/json")
     public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
-        User user = remoteIdmService.getUser(userId);
+        User user;
+        if (remoteIdmService != null) {
+            user = remoteIdmService.getUser(userId);
+        } else {
+            user = identityService.createUserQuery().userId(userId).singleResult();
+        }
 
         if (user == null) {
             throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");

@@ -10,17 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.task.security;
+package org.flowable.ui.common.security;
 
 /**
- * Constants for Spring Security authorities.
+ * @author Filip Hrisafov
  */
-public final class AuthoritiesConstants {
+public interface SecurityConstants {
 
-    private AuthoritiesConstants() {
-    }
+    int IDM_API_SECURITY_ORDER = 1;
 
-    public static final String ADMIN = "ROLE_ADMIN";
+    int TASK_API_SECURITY_ORDER = 2;
 
-    public static final String USER = "ROLE_USER";
+    int MODELER_API_SECURITY_ORDER = 3;
+
+    int ACTUATOR_SECURITY_ORDER = 5; // Actuator configuration should kick in before the Form Login there should always be http basic for the endpoints
+
+    int FORM_LOGIN_SECURITY_ORDER = 10; // API config first (has Order(1))
+
 }

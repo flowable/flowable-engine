@@ -12,11 +12,17 @@
  */
 package org.flowable.ui.common.model;
 
-public class RemoteToken {
+import java.util.Date;
+
+import org.flowable.idm.api.Token;
+
+public class RemoteToken implements Token {
 
     protected String id;
     protected String value;
     protected String userId;
+    protected Date date;
+
 
     public String getId() {
         return id;
@@ -42,4 +48,53 @@ public class RemoteToken {
         this.userId = userId;
     }
 
+    @Override
+    public String getTokenValue() {
+        return getValue();
+    }
+
+    @Override
+    public void setTokenValue(String tokenValue) {
+        setValue(tokenValue);
+    }
+
+    @Override
+    public Date getTokenDate() {
+        return date;
+    }
+
+    @Override
+    public void setTokenDate(Date tokenDate) {
+        this.date = tokenDate;
+    }
+
+    @Override
+    public String getIpAddress() {
+        return null;
+    }
+
+    @Override
+    public void setIpAddress(String ipAddress) {
+        throw new UnsupportedOperationException("Setting IP address is not supported on a remote token");
+    }
+
+    @Override
+    public String getUserAgent() {
+        return null;
+    }
+
+    @Override
+    public void setUserAgent(String userAgent) {
+        throw new UnsupportedOperationException("Setting User Agent is not supported on a remote token");
+    }
+
+    @Override
+    public String getTokenData() {
+        return null;
+    }
+
+    @Override
+    public void setTokenData(String tokenData) {
+        throw new UnsupportedOperationException("Setting token data is not supported on a remote token");
+    }
 }

@@ -19,8 +19,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.flowable.ui.common.security.FlowableAppUser;
-import org.flowable.ui.idm.cache.UserCache;
-import org.flowable.ui.idm.cache.UserCache.CachedUser;
+import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * This class is called AFTER successful authentication, to populate the user object with additional details The default (no ldap) way of authentication is a bit hidden in Spring Security magic. But
  * basically, the user object is fetched from the db and the hashed password is compared with the hash of the provided password (using the Spring {@link StandardPasswordEncoder}).
  */
-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService, CustomUserDetailService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     @Autowired
     protected UserCache userCache;
@@ -81,33 +80,8 @@ public class UserDetailsService implements org.springframework.security.core.use
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }
 
-        userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
+        userCache.putUser(userFromDatabase.getId(), new UserCache.CachedUser(userFromDatabase, grantedAuthorities));
         return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
-    }
-
-    @Transactional
-    public UserDetails loadByUserId(final String userId) {
-        CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
-        if (cachedUser == null) {
-            throw new UsernameNotFoundException("User " + userId + " was not found in the database");
-        }
-
-        long lastDatabaseCheck = cachedUser.getLastDatabaseCheck();
-        long currentTime = System.currentTimeMillis(); // No need to create a Date object. The Date constructor simply calls this method too!
-
-        if (userValidityPeriod <= 0L || (currentTime - lastDatabaseCheck >= userValidityPeriod)) {
-
-            userCache.invalidate(userId);
-            cachedUser = userCache.getUser(userId, true, true, false); // Fetching it again will refresh data
-
-            cachedUser.setLastDatabaseCheck(currentTime);
-        }
-
-        // The Spring security docs clearly state a new instance must be returned on every invocation
-        User user = cachedUser.getUser();
-        String actualUserId = user.getId();
-
-        return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
     }
 
     public void setUserValidityPeriod(long userValidityPeriod) {

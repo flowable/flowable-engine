@@ -586,6 +586,8 @@ flowableAdminApp
 						.success(function (data, status, headers, config) {
 							$rootScope.login = null;
 							$rootScope.authenticated = false;
+                            $window.location.href = FlowableAdmin.Config.contextRoot;
+                            $window.location.reload();
 						});
 				}; 
 

@@ -27,7 +27,7 @@ public class ApiTokensResource {
     @Autowired
     protected TokenService tokenService;
 
-    @GetMapping(value = "/idm/tokens/{tokenId}", produces = { "application/json" })
+    @GetMapping(value = "/tokens/{tokenId}", produces = { "application/json" })
     public TokenRepresentation getToken(@PathVariable String tokenId) {
         Token token = tokenService.findTokenById(tokenId);
         if (token == null) {

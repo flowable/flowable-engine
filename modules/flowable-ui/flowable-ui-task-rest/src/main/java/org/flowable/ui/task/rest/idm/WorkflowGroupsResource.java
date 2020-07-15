@@ -12,10 +12,15 @@
  */
 package org.flowable.ui.task.rest.idm;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,15 +32,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/app")
-public class WorkflowGroupsResource {
+public class WorkflowGroupsResource implements InitializingBean {
 
-    @Autowired
+    @Autowired(required = false)
     private RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    private IdmIdentityService identityService;
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     @GetMapping(value = "/rest/workflow-groups")
     public ResultListDataRepresentation getGroups(@RequestParam(value = "filter", required = false) String filter) {
-
-        List<? extends Group> matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);
+        List<? extends Group> matchingGroups;
+        if (remoteIdmService != null) {
+            matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);
+        } else {
+            GroupQuery groupQuery = identityService.createGroupQuery();
+            if (StringUtils.isNotEmpty(filter)) {
+                groupQuery.groupNameLikeIgnoreCase("%" + filter + "%");
+            }
+            matchingGroups = groupQuery.orderByGroupName().asc().list();
+        }
         List<GroupRepresentation> groupRepresentations = new ArrayList<>();
         for (Group group : matchingGroups) {
             groupRepresentations.add(new GroupRepresentation(group));

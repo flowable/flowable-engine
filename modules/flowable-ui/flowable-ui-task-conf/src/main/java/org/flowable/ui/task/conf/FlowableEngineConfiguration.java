@@ -14,6 +14,7 @@ package org.flowable.ui.task.conf;
 
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngine;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 public class FlowableEngineConfiguration {
 
     @Bean(name = "clock")
+    @ConditionalOnMissingBean
     public Clock getClock(ProcessEngine processEngine) {
         return processEngine.getProcessEngineConfiguration().getClock();
     }

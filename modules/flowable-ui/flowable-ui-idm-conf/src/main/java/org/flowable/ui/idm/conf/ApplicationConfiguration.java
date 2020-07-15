@@ -12,10 +12,12 @@
  */
 package org.flowable.ui.idm.conf;
 
+import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.ui.common.service.idm.RemoteIdmServiceImpl;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
 import org.flowable.ui.idm.servlet.ApiDispatcherServletConfiguration;
 import org.flowable.ui.idm.servlet.AppDispatcherServletConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
@@ -32,10 +34,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
+@AutoConfigureBefore({
+        FlowableSecurityAutoConfiguration.class,
+})
 @ComponentScan(basePackages = {
     "org.flowable.ui.idm.conf",
     "org.flowable.ui.idm.security",
-    "org.flowable.ui.idm.idm",
     "org.flowable.ui.idm.service"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteIdmServiceImpl.class)})
 public class ApplicationConfiguration {
 
@@ -45,7 +49,7 @@ public class ApplicationConfiguration {
         dispatcherServletConfiguration.setParent(applicationContext);
         dispatcherServletConfiguration.register(ApiDispatcherServletConfiguration.class);
         DispatcherServlet servlet = new DispatcherServlet(dispatcherServletConfiguration);
-        ServletRegistrationBean<DispatcherServlet> registrationBean = new ServletRegistrationBean<>(servlet, "/api/*");
+        ServletRegistrationBean<DispatcherServlet> registrationBean = new ServletRegistrationBean<>(servlet, "/api/idm/*");
         registrationBean.setName("Flowable IDM App API Servlet");
         registrationBean.setLoadOnStartup(1);
         registrationBean.setAsyncSupported(true);
@@ -66,7 +70,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public WebMvcConfigurer adminApplicationWebMvcConfigurer() {
+    public WebMvcConfigurer idmApplicationWebMvcConfigurer() {
         return new WebMvcConfigurer() {
 
             @Override

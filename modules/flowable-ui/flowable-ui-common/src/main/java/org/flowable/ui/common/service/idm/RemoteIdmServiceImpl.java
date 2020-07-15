@@ -15,10 +15,13 @@ package org.flowable.ui.common.service.idm;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -36,14 +39,12 @@ import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-@Service
 public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteIdmServiceImpl.class);
@@ -80,6 +81,10 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
             token.setId(json.get("id").asText());
             token.setValue(json.get("value").asText());
             token.setUserId(json.get("userId").asText());
+            String date = json.path("date").asText(null);
+            if (StringUtils.isNotEmpty(date)) {
+                token.setTokenDate(Date.from(Instant.parse(date)));
+            }
             return token;
         }
         return null;

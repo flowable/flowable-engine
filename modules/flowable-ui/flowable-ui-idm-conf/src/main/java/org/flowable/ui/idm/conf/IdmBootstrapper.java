@@ -39,9 +39,9 @@ import org.springframework.util.Assert;
  * @author Tijs Rademakers
  */
 @Component
-public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
+public class IdmBootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdmBootstrapper.class);
 
     @Autowired
     private IdmIdentityService identityService;

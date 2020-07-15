@@ -29,7 +29,7 @@ import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
 import org.flowable.ui.task.model.component.SimpleContentTypeMapper;
 import org.flowable.ui.task.model.runtime.ContentItemRepresentation;
-import org.flowable.ui.task.service.api.UserCache;
+import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;

@@ -30,7 +30,7 @@ public class ApiGroupsResource {
     @Autowired
     protected GroupService groupService;
 
-    @GetMapping(value = "/idm/groups/{groupId}", produces = {"application/json"})
+    @GetMapping(value = "/groups/{groupId}", produces = {"application/json"})
     public GroupRepresentation getGroupInformation(@PathVariable String groupId) {
         Group group = groupService.getGroup(groupId);
         if (group != null) {
@@ -41,7 +41,7 @@ public class ApiGroupsResource {
         }
     }
 
-    @GetMapping(value = "/idm/groups", produces = {"application/json"})
+    @GetMapping(value = "/groups", produces = {"application/json"})
     public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {
         List<GroupRepresentation> result = new ArrayList<>();
         List<Group> groups = groupService.getGroups(filter);

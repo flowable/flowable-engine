@@ -30,7 +30,7 @@ import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskUpdateRepresentation;
-import org.flowable.ui.task.service.api.UserCache.CachedUser;
+import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

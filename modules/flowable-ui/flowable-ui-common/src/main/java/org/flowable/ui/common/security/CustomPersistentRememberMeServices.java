@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.idm.security;
+package org.flowable.ui.common.security;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -20,25 +20,18 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
-import org.flowable.idm.api.User;
-import org.flowable.ui.common.security.CookieConstants;
-import org.flowable.ui.common.security.FlowableAppUser;
-import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
-import org.flowable.ui.idm.service.PersistentTokenService;
+import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -63,34 +56,26 @@ import org.springframework.util.ReflectionUtils;
  * The main algorithm comes from Spring Security's PersistentTokenBasedRememberMeServices, but this class couldn't be cleanly extended.
  * <p/>
  */
-@Service
-public class CustomPersistentRememberMeServices extends AbstractRememberMeServices implements CustomRememberMeService {
+public class CustomPersistentRememberMeServices extends AbstractRememberMeServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
-    @Autowired
-    private PersistentTokenService persistentTokenService;
-
-    @Autowired
-    private CustomUserDetailService customUserDetailService;
-
-    @Autowired
-    private IdmIdentityService identityService;
+    private final PersistentTokenService persistentTokenService;
 
     private final String tokenDomain;
     private final int tokenMaxAgeInSeconds;
     private final long tokenMaxAgeInMilliseconds;
     private final long tokenRefreshDurationInMilliseconds;
 
-    @Autowired
-    public CustomPersistentRememberMeServices(FlowableIdmAppProperties properties,
-        org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
+    public CustomPersistentRememberMeServices(FlowableCommonAppProperties properties, UserDetailsService userDetailsService,
+            PersistentTokenService persistentTokenService) {
         super(properties.getSecurity().getRememberMeKey(), userDetailsService);
+        this.persistentTokenService = persistentTokenService;
 
         setAlwaysRemember(true);
 
-        FlowableIdmAppProperties.Cookie cookie = properties.getSecurity().getCookie();
-        tokenMaxAgeInSeconds = cookie.getMaxAge();
+        FlowableCommonAppProperties.Cookie cookie = properties.getSecurity().getCookie();
+        tokenMaxAgeInSeconds = (int) cookie.getMaxAge().getSeconds();
         LOGGER.info("Cookie max-age set to {} seconds", tokenMaxAgeInSeconds);
         tokenMaxAgeInMilliseconds = tokenMaxAgeInSeconds * 1000L;
 
@@ -100,9 +85,9 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         }
         tokenDomain = domain;
 
-        int tokenRefreshSeconds = cookie.getRefreshAge();
+        int tokenRefreshSeconds = (int) cookie.getRefreshAge().getSeconds();
         LOGGER.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
-        tokenRefreshDurationInMilliseconds = cookie.getRefreshAge() * 1000L;
+        tokenRefreshDurationInMilliseconds = tokenRefreshSeconds * 1000L;
 
         setCookieName(CookieConstants.COOKIE_NAME);
     }
@@ -111,15 +96,11 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
         String userEmail = successfulAuthentication.getName();
 
-        LOGGER.debug("Creating new persistent login for user {}", userEmail);
-        FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
-
-        Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
+        Token token = createAndInsertPersistentToken(userEmail, request.getRemoteAddr(), request.getHeader("User-Agent"));
         addCookie(token, request, response);
     }
 
     @Override
-    @Transactional
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
 
         Token token = getPersistentToken(cookieTokens);
@@ -132,8 +113,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
                 // Refreshing: creating a new token to be used for subsequent calls
 
-                token = persistentTokenService.createToken(identityService.createUserQuery().userId(token.getUserId()).singleResult(),
-                        request.getRemoteAddr(), request.getHeader("User-Agent"));
+                token = persistentTokenService.createToken(token.getUserId(), request.getRequestURI(), request.getHeader("User-Agent"));
                 addCookie(token, request, response);
 
             } catch (DataAccessException e) {
@@ -143,7 +123,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
         }
 
-        return customUserDetailService.loadByUserId(token.getUserId());
+        return getUserDetailsService().loadUserByUsername(token.getUserId());
     }
 
     /**
@@ -152,7 +132,6 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
      * The standard Spring Security implementations are too basic: they invalidate all tokens for the current user, so when he logs out from one browser, all his other sessions are destroyed.
      */
     @Override
-    @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String rememberMeCookie = extractRememberMeCookie(request);
         if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
@@ -180,7 +159,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         final String presentedSeries = cookieTokens[0];
         final String presentedToken = cookieTokens[1];
 
-        Token token = persistentTokenService.getPersistentToken(presentedSeries);
+        Token token = persistentTokenService.getToken(presentedSeries);
 
         if (token == null) {
             // No series match, so we can't authenticate using this cookie
@@ -193,7 +172,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
             // This could be caused by the opportunity window where the token just has been refreshed, but
             // has not been put into the token cache yet. Invalidate the token and refetch and it the new token value from the db is now returned.
 
-            token = persistentTokenService.getPersistentToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
+            token = persistentTokenService.invalidateCacheEntryAndGetToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
             if (token != null && !presentedToken.equals(token.getTokenValue())) {
 
                 // Token doesn't match series value. Delete this session and throw an exception.
@@ -243,8 +222,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         response.addCookie(cookie);
     }
 
-    @Override
-    public Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent) {
-        return persistentTokenService.createToken(user, remoteAddress, userAgent);
+    public Token createAndInsertPersistentToken(String userId, String remoteAddress, String userAgent) {
+        return persistentTokenService.createToken(userId, remoteAddress, userAgent);
     }
 }

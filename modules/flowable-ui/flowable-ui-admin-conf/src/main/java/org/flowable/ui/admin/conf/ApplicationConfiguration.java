@@ -35,11 +35,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
     "org.flowable.ui.admin.repository",
-    "org.flowable.ui.admin.security",
     "org.flowable.ui.common.repository",
-    "org.flowable.ui.common.service",
-    "org.flowable.ui.common.filter",
-    "org.flowable.ui.common.security"
 })
 @Import(value = {
     DatabaseConfiguration.class

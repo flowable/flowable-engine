@@ -10,32 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.idm.service;
+package org.flowable.ui.common.service.idm.cache;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.api.User;
-import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
-import org.flowable.ui.idm.cache.UserCache;
-import org.flowable.ui.idm.model.UserInformation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * Cache containing User objects to prevent too much DB-traffic (users exist separately from the Flowable tables, they need to be fetched afterward one by one to join with those entities).
@@ -46,21 +35,15 @@ import org.springframework.stereotype.Service;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-@Service
-public class UserCacheImpl implements UserCache {
+public abstract class BaseUserCache implements UserCache {
 
-    @Autowired
-    protected FlowableCommonAppProperties properties;
-
-    protected FlowableLdapProperties ldapProperties;
-
-    @Autowired
-    protected IdmIdentityService identityService;
-
-    @Autowired
-    protected UserService userService;
+    protected final FlowableCommonAppProperties properties;
 
     protected LoadingCache<String, CachedUser> userCache;
+
+    protected BaseUserCache(FlowableCommonAppProperties properties) {
+        this.properties = properties;
+    }
 
     @PostConstruct
     protected void initCache() {
@@ -72,28 +55,13 @@ public class UserCacheImpl implements UserCache {
             .expireAfterAccess(userCacheMaxAge, TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
                     public CachedUser load(final String userId) throws Exception {
-                        User userFromDatabase = null;
-                        if (ldapProperties == null || !ldapProperties.isEnabled()) {
-                            userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(userId.toLowerCase()).singleResult();
-                        } else {
-                            userFromDatabase = identityService.createUserQuery().userId(userId).singleResult();
-                        }
-
-                        if (userFromDatabase == null) {
-                            throw new UsernameNotFoundException("User " + userId + " was not found in the database");
-                        }
-
-                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-                        UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
-                        for (String privilege : userInformation.getPrivileges()) {
-                            grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
-                        }
-
-                        return new CachedUser(userFromDatabase, grantedAuthorities);
+                        return loadUser(userId);
                     }
 
                 });
     }
+
+    protected abstract CachedUser loadUser(String userId);
 
     public void putUser(String userId, CachedUser cachedUser) {
         userCache.put(userId, cachedUser);
@@ -143,10 +111,5 @@ public class UserCacheImpl implements UserCache {
     @Override
     public void invalidate(String userId) {
         userCache.invalidate(userId);
-    }
-
-    @Autowired(required = false)
-    public void setLdapProperties(FlowableLdapProperties ldapProperties) {
-        this.ldapProperties = ldapProperties;
     }
 }

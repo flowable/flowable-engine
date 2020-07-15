@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.idm.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 import org.flowable.idm.api.Token;
@@ -21,7 +22,7 @@ public class TokenRepresentation extends AbstractRepresentation {
 
     protected String id;
     protected String value;
-    protected Date date;
+    protected Instant date;
     protected String userId;
     protected String data;
 
@@ -32,7 +33,9 @@ public class TokenRepresentation extends AbstractRepresentation {
     public TokenRepresentation(Token token) {
         setId(token.getId());
         setValue(token.getTokenValue());
-        setDate(token.getTokenDate());
+        if (token.getTokenDate() != null) {
+            setDate(token.getTokenDate().toInstant());
+        }
         setUserId(token.getUserId());
         setData(token.getTokenData());
     }
@@ -53,11 +56,11 @@ public class TokenRepresentation extends AbstractRepresentation {
         this.value = value;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

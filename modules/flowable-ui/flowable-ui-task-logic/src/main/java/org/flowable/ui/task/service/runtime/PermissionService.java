@@ -40,7 +40,6 @@ import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
-import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,9 +67,6 @@ public class PermissionService {
 
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
-
-    @Autowired
-    protected RemoteIdmService remoteIdmService;
 
     /**
      * Check if the given user is allowed to read the task.

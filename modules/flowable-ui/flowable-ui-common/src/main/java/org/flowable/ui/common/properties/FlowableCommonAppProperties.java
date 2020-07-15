@@ -12,8 +12,12 @@
  */
 package org.flowable.ui.common.properties;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.convert.DurationUnit;
 import org.springframework.util.Assert;
 
 /**
@@ -74,6 +78,12 @@ public class FlowableCommonAppProperties {
     @NestedConfigurationProperty
     private final Admin idmAdmin = new Admin();
 
+    /**
+     * The information for the idm engine based security
+     */
+    @NestedConfigurationProperty
+    private final Security security = new Security();
+
     public String getTenantId() {
         return tenantId;
     }
@@ -128,6 +138,10 @@ public class FlowableCommonAppProperties {
 
     public Admin getIdmAdmin() {
         return idmAdmin;
+    }
+
+    public Security getSecurity() {
+        return security;
     }
 
     public String determineIdmAppUrl() {
@@ -212,6 +226,95 @@ public class FlowableCommonAppProperties {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+    }
+
+    /**
+     * Security properties for the IDM UI App.
+     */
+    public static class Security {
+
+        /**
+         * The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
+         */
+        private String rememberMeKey = "testKey";
+
+        /**
+         * The configuration for the security cookie.
+         */
+        @NestedConfigurationProperty
+        private final Cookie cookie = new Cookie();
+
+        /**
+         * How long should a user be cached before invalidating it in the cache for the cacheable CustomUserDetailsService.
+         */
+        private long userValidityPeriod = 30000L;
+
+        public String getRememberMeKey() {
+            return rememberMeKey;
+        }
+
+        public void setRememberMeKey(String rememberMeKey) {
+            this.rememberMeKey = rememberMeKey;
+        }
+
+        public Cookie getCookie() {
+            return cookie;
+        }
+
+        public long getUserValidityPeriod() {
+            return userValidityPeriod;
+        }
+
+        public void setUserValidityPeriod(long userValidityPeriod) {
+            this.userValidityPeriod = userValidityPeriod;
+        }
+    }
+
+    /**
+     * The configuration for the security remember me cookie.
+     */
+    public static class Cookie {
+
+        /**
+         * The max age of the security cookie. Default is 31 days.
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        private Duration maxAge = Duration.ofDays(31);
+
+        /**
+         * The domain for the cookie.
+         */
+        private String domain;
+
+        /**
+         * The refresh age of the token. Default is 1 day.
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        private Duration refreshAge = Duration.ofDays(1);
+
+        public Duration getMaxAge() {
+            return maxAge;
+        }
+
+        public void setMaxAge(Duration maxAge) {
+            this.maxAge = maxAge;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+
+        public Duration getRefreshAge() {
+            return refreshAge;
+        }
+
+        public void setRefreshAge(Duration refreshAge) {
+            this.refreshAge = refreshAge;
         }
     }
 }

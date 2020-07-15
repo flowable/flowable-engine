@@ -21,25 +21,31 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
-import org.flowable.ui.task.service.api.UserCache;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class FlowableAbstractTaskService {
+public abstract class FlowableAbstractTaskService implements InitializingBean {
 
-    @Autowired
+    @Autowired(required = false)
     protected RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    protected IdmIdentityService identityService;
 
     @Autowired
     protected RepositoryService repositoryService;
@@ -61,6 +67,13 @@ public abstract class FlowableAbstractTaskService {
     
     @Autowired
     protected PermissionService permissionService;
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser) {
         verifyProcessInstanceStartUser(taskRepresentation, task);
@@ -92,12 +105,17 @@ public abstract class FlowableAbstractTaskService {
     }
     
     protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
-        List<RemoteGroup> userGroups = remoteIdmService.getUser(currentUser.getId()).getGroups();
+        List<? extends Group> userGroups;
+        if (remoteIdmService != null) {
+            userGroups = remoteIdmService.getUser(currentUser.getId()).getGroups();
+        } else {
+            userGroups = identityService.createGroupQuery().groupMember(currentUser.getId()).list();
+        }
         taskRepresentation.setMemberOfCandidateGroup(userGroupsMatchTaskCandidateGroups(userGroups, taskIdentityLinks));
     }
     
-    protected boolean userGroupsMatchTaskCandidateGroups(List<RemoteGroup> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
-        for (RemoteGroup group : userGroups) {
+    protected boolean userGroupsMatchTaskCandidateGroups(List<? extends Group> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
+        for (Group group : userGroups) {
             for (HistoricIdentityLink identityLink : taskIdentityLinks) {
                 if (identityLink.getGroupId() != null 
                         && identityLink.getType().equals(IdentityLinkType.CANDIDATE) 

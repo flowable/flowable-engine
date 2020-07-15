@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.admin.application;
+package org.flowable.ui.common.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,20 +18,20 @@ import java.util.Collection;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
 
-@Component
 public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    protected RemoteIdmService remoteIdmService;
+    protected final RemoteIdmService remoteIdmService;
+
+    public RemoteIdmAuthenticationProvider(RemoteIdmService remoteIdmService) {
+        this.remoteIdmService = remoteIdmService;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

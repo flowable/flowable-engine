@@ -28,9 +28,9 @@ import org.springframework.stereotype.Component;
  * @author Tijs Rademakers
  */
 @Component
-public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
+public class TaskBootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskBootstrapper.class);
 
     @Autowired
     private FlowableAppDefinitionService appDefinitionService;

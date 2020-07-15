@@ -89,6 +89,20 @@ flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                                     fixedUrl: baseUrl + '/admin/',
                                     pages: []
                                 });
+                        } else if (app.defaultAppId === 'idm') {
+
+                            defaultApps.push(
+                                {
+                                    id: 'idm',
+                                    titleKey: 'APP.IDM.TITLE',
+                                    descriptionKey: 'APP.IDM.DESCRIPTION',
+                                    defaultAppId : app.defaultAppId,
+                                    theme: 'theme-2',
+                                    icon: 'icon icon-clock',
+                                    fixedBaseUrl: baseUrl + '/idm/' + '/#/',
+                                    fixedUrl: baseUrl + '/idm/',
+                                    pages: []
+                                });
                         }
 
                     } else {

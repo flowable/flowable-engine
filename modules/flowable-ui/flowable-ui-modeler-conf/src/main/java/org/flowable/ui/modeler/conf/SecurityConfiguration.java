@@ -17,9 +17,9 @@ import java.util.Collections;
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
-import org.flowable.ui.common.security.ActuatorRequestMatcher;
 import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.DefaultPrivileges;
+import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.flowable.ui.modeler.security.AjaxLogoutSuccessHandler;
@@ -27,10 +27,6 @@ import org.flowable.ui.modeler.security.RemoteIdmAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.info.InfoEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -80,7 +76,7 @@ public class SecurityConfiguration {
     }
 
     @Configuration
-    @Order(10)
+    @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
         @Autowired
@@ -118,7 +114,7 @@ public class SecurityConfiguration {
     //
 
     @Configuration
-    @Order(1)
+    @Order(SecurityConstants.MODELER_API_SECURITY_ORDER)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected final FlowableRestAppProperties restAppProperties;
@@ -156,30 +152,4 @@ public class SecurityConfiguration {
         }
     }
 
-    //
-    // Actuator
-    //
-
-    @ConditionalOnClass(EndpointRequest.class)
-    @Configuration
-    @Order(5) // Actuator configuration should kick in before the Form Login there should always be http basic for the endpoints
-    public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        protected void configure(HttpSecurity http) throws Exception {
-
-            http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf()
-                .disable();
-
-            http
-                .requestMatcher(new ActuatorRequestMatcher())
-                .authorizeRequests()
-                .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
-                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
-                .and().httpBasic();
-        }
-    }
 }

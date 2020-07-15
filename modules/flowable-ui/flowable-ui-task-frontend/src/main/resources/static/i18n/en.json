@@ -79,6 +79,10 @@
             "TITLE": "Admin App",
             "DESCRIPTION": "Access the Flowable Admin application."
         },
+        "IDM": {
+            "TITLE": "IDM App",
+            "DESCRIPTION": "Access a central place to define users, groups and privileges."
+        },
         "IDENTITY-MANAGEMENT": {
             "TITLE": "Identity management",
             "TITLE-TENANT-ADMIN": "Identity management",
