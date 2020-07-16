@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -127,44 +128,44 @@ public class FlowableModelerApplicationSecurityTest {
         tokenUser.setId("user");
         tokenUser.setUserId("test-user");
         tokenUser.setValue("test-user-value");
+        tokenUser.setTokenDate(new Date());
         tokens.put("user", tokenUser);
 
         RemoteToken tokenAdmin = new RemoteToken();
         tokenAdmin.setId("admin");
         tokenAdmin.setUserId("test-admin");
         tokenAdmin.setValue("test-admin-value");
+        tokenAdmin.setTokenDate(new Date());
         tokens.put("admin", tokenAdmin);
 
         RemoteToken tokenModeler = new RemoteToken();
         tokenModeler.setId("modeler");
         tokenModeler.setUserId("test-modeler");
         tokenModeler.setValue("test-modeler-value");
+        tokenModeler.setTokenDate(new Date());
         tokens.put("modeler", tokenModeler);
 
         RemoteToken tokenRest = new RemoteToken();
         tokenRest.setId("rest");
         tokenRest.setUserId("test-rest");
         tokenRest.setValue("test-rest-value");
+        tokenRest.setTokenDate(new Date());
         tokens.put("rest", tokenRest);
     }
 
     @Test
-    public void nonAuthenticatedUserShouldBeRedirectedToIdm() {
-        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/app/rest/stencil-sets/editor";
+    public void nonAuthenticatedUserShouldBeUnauthorized() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/modeler-app/rest/stencil-sets/editor";
         ResponseEntity<Object> result = restTemplate.getForEntity(stencilsUrl, Object.class);
 
         assertThat(result.getStatusCode())
             .as("GET editor stencil-sets")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + stencilsUrl);
+            .isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void nonAdminUserShouldBeRedirectedToIdm() {
-        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/app/rest/stencil-sets/editor";
+    public void nonAdminUserShouldBeForbidden() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/modeler-app/rest/stencil-sets/editor";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -172,16 +173,12 @@ public class FlowableModelerApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET editor stencil-sets")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + stencilsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void adminUserShouldBeRedirectedToIdm() {
-        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/app/rest/stencil-sets/editor";
+    public void adminUserShouldBeForbidden() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/modeler-app/rest/stencil-sets/editor";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -189,16 +186,12 @@ public class FlowableModelerApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET editor stencil-sets")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + stencilsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void restUserShouldBeRedirectedToIdm() {
-        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/app/rest/stencil-sets/editor";
+    public void restUserShouldBeForbidden() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/modeler-app/rest/stencil-sets/editor";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -206,16 +199,12 @@ public class FlowableModelerApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET editor stencil-sets")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + stencilsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     public void modelerUserShouldBeAbleToAccessStencilSets() {
-        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/app/rest/stencil-sets/editor";
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-modeler/modeler-app/rest/stencil-sets/editor";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);

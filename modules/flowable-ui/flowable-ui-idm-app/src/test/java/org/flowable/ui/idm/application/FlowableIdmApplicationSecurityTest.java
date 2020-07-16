@@ -170,8 +170,8 @@ public class FlowableIdmApplicationSecurityTest {
     }
 
     @Test
-    public void nonAuthenticatedUserShouldBeUnauthotized() {
-        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/app/rest/admin/groups";
+    public void nonAuthenticatedUserShouldBeUnauthorized() {
+        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/idm-app/rest/admin/groups";
         ResponseEntity<Object> result = restTemplate.getForEntity(authenticateUrl, Object.class);
 
         assertThat(result.getStatusCode())
@@ -180,8 +180,8 @@ public class FlowableIdmApplicationSecurityTest {
     }
 
     @Test
-    public void nonIdmUserShouldBeUnauthotized() {
-        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/app/rest/admin/groups";
+    public void nonIdmUserShouldBeForbidden() {
+        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/idm-app/rest/admin/groups";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -189,12 +189,12 @@ public class FlowableIdmApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET App Groups")
-            .isEqualTo(HttpStatus.UNAUTHORIZED);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void adminUserShouldBeUnauthorized() {
-        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/app/rest/admin/groups";
+    public void adminUserShouldBeForbidden() {
+        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/idm-app/rest/admin/groups";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -202,12 +202,12 @@ public class FlowableIdmApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET App Groups")
-            .isEqualTo(HttpStatus.UNAUTHORIZED);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void restUserShouldBeUnauthorized() {
-        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/app/rest/admin/groups";
+    public void restUserShouldBeForbidden() {
+        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/idm-app/rest/admin/groups";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -215,12 +215,12 @@ public class FlowableIdmApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET App Groups")
-            .isEqualTo(HttpStatus.UNAUTHORIZED);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     public void idmUserShouldBeAbleToAccessInternalRestApp() {
-        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/app/rest/admin/groups";
+        String authenticateUrl = "http://localhost:" + serverPort + "/flowable-idm/idm-app/rest/admin/groups";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("idm", "test-idm-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);

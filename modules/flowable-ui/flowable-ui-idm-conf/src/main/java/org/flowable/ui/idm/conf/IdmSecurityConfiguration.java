@@ -17,21 +17,14 @@ import org.flowable.ui.common.properties.FlowableRestAppProperties;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
-import org.flowable.ui.idm.security.CustomDaoAuthenticationProvider;
-import org.flowable.ui.idm.security.CustomLdapAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
@@ -59,24 +52,6 @@ public class IdmSecurityConfiguration {
         org.flowable.ui.idm.security.UserDetailsService userDetailsService = new org.flowable.ui.idm.security.UserDetailsService();
         userDetailsService.setUserValidityPeriod(idmAppProperties.getSecurity().getUserValidityPeriod());
         return userDetailsService;
-    }
-
-    @Bean(name = "dbAuthenticationProvider")
-    @ConditionalOnMissingBean(AuthenticationProvider.class)
-    @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
-    public AuthenticationProvider dbAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
-        CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-        return daoAuthenticationProvider;
-    }
-
-    @Bean(name = "ldapAuthenticationProvider")
-    @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "true")
-    public AuthenticationProvider ldapAuthenticationProvider(UserDetailsService userDetailsService) {
-        CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
-                userDetailsService, identityService);
-        return ldapAuthenticationProvider;
     }
 
     //

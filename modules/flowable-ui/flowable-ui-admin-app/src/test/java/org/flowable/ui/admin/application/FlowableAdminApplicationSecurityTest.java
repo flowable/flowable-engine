@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -117,18 +118,20 @@ public class FlowableAdminApplicationSecurityTest {
         tokenUser.setId("user");
         tokenUser.setUserId("test-user");
         tokenUser.setValue("test-user-value");
+        tokenUser.setTokenDate(new Date());
         tokens.put("user", tokenUser);
 
         RemoteToken tokenAdmin = new RemoteToken();
         tokenAdmin.setId("admin");
         tokenAdmin.setUserId("test-admin");
         tokenAdmin.setValue("test-admin-value");
+        tokenAdmin.setTokenDate(new Date());
         tokens.put("admin", tokenAdmin);
     }
 
     @Test
     public void nonAuthenticatedUserShouldBeRedirectedToIdm() {
-        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/app/rest/server-configs";
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/admin-app/rest/server-configs";
         ResponseEntity<Object> result = restTemplate.getForEntity(configsUrl, Object.class);
 
         assertThat(result.getStatusCode())
@@ -137,12 +140,12 @@ public class FlowableAdminApplicationSecurityTest {
 
         assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
             .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + configsUrl);
+            .isEqualTo("http://localhost:8080/flowable-idm/idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + configsUrl);
     }
 
     @Test
-    public void nonAdminUserShouldBeRedirectedToIdm() {
-        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/app/rest/server-configs";
+    public void nonAdminUserShouldBeForbidden() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/admin-app/rest/server-configs";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -150,16 +153,12 @@ public class FlowableAdminApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET server-configs")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + configsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     public void adminUserShouldBeAbleToAccessServerConfigs() {
-        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/app/rest/server-configs";
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-admin/admin-app/rest/server-configs";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);

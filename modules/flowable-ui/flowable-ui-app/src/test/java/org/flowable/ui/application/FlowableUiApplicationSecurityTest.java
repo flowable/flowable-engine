@@ -14,31 +14,27 @@ package org.flowable.ui.application;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.ui.common.model.RemoteToken;
-import org.flowable.ui.common.model.RemoteUser;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Privilege;
+import org.flowable.idm.api.Token;
+import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.CookieConstants;
 import org.flowable.ui.common.security.DefaultPrivileges;
-import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
@@ -48,6 +44,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Filip Hrisafov
@@ -78,7 +76,7 @@ public class FlowableUiApplicationSecurityTest {
             "mappings",
             "caches",
             "caches-cache",
-            "health-path"
+                "health-path"
         )
     );
 
@@ -88,93 +86,244 @@ public class FlowableUiApplicationSecurityTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @MockBean
-    private RemoteIdmService remoteIdmService;
-
-    private Map<String, RemoteToken> tokens = new HashMap<>();
-    private Map<String, RemoteUser> users = new HashMap<>();
+    @Autowired
+    private IdmIdentityService identityService;
 
     @Before
     public void setUp() {
-        when(remoteIdmService.getToken(anyString()))
-            .thenAnswer((Answer<RemoteToken>) invocation -> tokens.get(invocation.<String>getArgument(0)));
+        User testUser = identityService.newUser("test-user");
+        testUser.setPassword("test");
+        identityService.saveUser(testUser);
 
-        when(remoteIdmService.getUser(anyString()))
-            .thenAnswer((Answer<RemoteUser>) invocation -> users.get(invocation.<String>getArgument(0)));
+        User testAdmin = identityService.newUser("test-admin");
+        testAdmin.setPassword("test");
+        identityService.saveUser(testAdmin);
+        Privilege accessAdminPrivilege = identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_ADMIN).singleResult();
+        identityService.addUserPrivilegeMapping(accessAdminPrivilege.getId(), "test-admin");
 
-        when(remoteIdmService.authenticateUser(anyString(), eq("test")))
-            .thenAnswer((Answer<RemoteUser>) invocation -> users.get(invocation.<String>getArgument(0)));
+        User testTask = identityService.newUser("test-task");
+        testTask.setPassword("test");
+        identityService.saveUser(testTask);
+        Privilege accessTaskPrivilege = identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_TASK).singleResult();
+        identityService.addUserPrivilegeMapping(accessTaskPrivilege.getId(), "test-task");
 
-        RemoteUser testUser = new RemoteUser();
-        testUser.setId("test-user");
-        testUser.setPrivileges(Collections.emptyList());
-        users.put("test-user", testUser);
+        User testModeler = identityService.newUser("test-modeler");
+        testModeler.setPassword("test");
+        identityService.saveUser(testModeler);
+        Privilege accessModelerPrivilege = identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_MODELER).singleResult();
+        identityService.addUserPrivilegeMapping(accessModelerPrivilege.getId(), "test-modeler");
 
-        RemoteUser testAdmin = new RemoteUser();
-        testAdmin.setId("test-admin");
-        testAdmin.setPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
-        users.put("test-admin", testAdmin);
+        User testIdm = identityService.newUser("test-idm");
+        testIdm.setPassword("test");
+        identityService.saveUser(testIdm);
+        Privilege accessIdmPrivilege = identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_IDM).singleResult();
+        identityService.addUserPrivilegeMapping(accessIdmPrivilege.getId(), "test-idm");
 
-        RemoteUser testTask = new RemoteUser();
-        testTask.setId("test-task");
-        testTask.setPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
-        users.put("test-task", testTask);
+        User testRest = identityService.newUser("test-rest");
+        testRest.setPassword("test");
+        identityService.saveUser(testRest);
+        Privilege accessRestPrivilege = identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_REST_API).singleResult();
+        identityService.addUserPrivilegeMapping(accessRestPrivilege.getId(), "test-rest");
 
-        RemoteUser testRest = new RemoteUser();
-        testRest.setId("test-rest");
-        testRest.setPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_REST_API));
-        users.put("test-rest", testRest);
-
-        RemoteToken tokenUser = new RemoteToken();
-        tokenUser.setId("user");
+        Token tokenUser = identityService.newToken("user");
         tokenUser.setUserId("test-user");
-        tokenUser.setValue("test-user-value");
-        tokens.put("user", tokenUser);
+        tokenUser.setTokenValue("test-user-value");
+        tokenUser.setTokenDate(new Date());
+        identityService.saveToken(tokenUser);
 
-        RemoteToken tokenAdmin = new RemoteToken();
-        tokenAdmin.setId("admin");
+        Token tokenAdmin = identityService.newToken("admin");
         tokenAdmin.setUserId("test-admin");
-        tokenAdmin.setValue("test-admin-value");
-        tokens.put("admin", tokenAdmin);
+        tokenAdmin.setTokenValue("test-admin-value");
+        tokenAdmin.setTokenDate(new Date());
+        identityService.saveToken(tokenAdmin);
 
-        RemoteToken tokenTask = new RemoteToken();
-        tokenTask.setId("task");
+        Token tokenTask = identityService.newToken("task");
         tokenTask.setUserId("test-task");
-        tokenTask.setValue("test-task-value");
-        tokens.put("task", tokenTask);
+        tokenTask.setTokenValue("test-task-value");
+        tokenTask.setTokenDate(new Date());
+        identityService.saveToken(tokenTask);
 
-        RemoteToken tokenRest = new RemoteToken();
-        tokenRest.setId("rest");
+        Token tokenModeler = identityService.newToken("modeler");
+        tokenModeler.setUserId("test-modeler");
+        tokenModeler.setTokenValue("test-modeler-value");
+        tokenModeler.setTokenDate(new Date());
+        identityService.saveToken(tokenModeler);
+
+        Token tokenIdm = identityService.newToken("idm");
+        tokenIdm.setUserId("test-idm");
+        tokenIdm.setTokenValue("test-idm-value");
+        tokenIdm.setTokenDate(new Date());
+        identityService.saveToken(tokenIdm);
+
+        Token tokenRest = identityService.newToken("rest");
         tokenRest.setUserId("test-rest");
-        tokenRest.setValue("test-rest-value");
-        tokens.put("rest", tokenRest);
+        tokenRest.setTokenValue("test-rest-value");
+        tokenRest.setTokenDate(new Date());
+        identityService.saveToken(tokenRest);
+    }
+
+    @After
+    public void tearDown() {
+        identityService.deleteUser("test-user");
+        identityService.deleteToken("user");
+        identityService.deleteUser("test-admin");
+        identityService.deleteToken("admin");
+        identityService.deleteUser("test-task");
+        identityService.deleteToken("task");
+        identityService.deleteUser("test-modeler");
+        identityService.deleteToken("modeler");
+        identityService.deleteUser("test-idm");
+        identityService.deleteToken("idm");
+        identityService.deleteUser("test-rest");
+        identityService.deleteToken("rest");
+
     }
 
     @Test
-    public void nonAuthenticatedUserShouldBeRedirectedToIdm() {
+    public void nonAuthenticatedUserShouldBeRedirectedToLogin() {
+        String rootUrl = "http://localhost:" + serverPort + "/flowable-ui/";
+        ResponseEntity<String> result = restTemplate.getForEntity(rootUrl, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.FOUND);
+
+        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
+                .as("redirect location")
+                .isEqualTo("http://localhost:" + serverPort + "/flowable-ui/idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + rootUrl);
+    }
+
+    @Test
+    public void nonAuthenticatedUserShouldBeForbiddenToAccessAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
         ResponseEntity<Object> result = restTemplate.getForEntity(appDefinitionsUrl, Object.class);
 
         assertThat(result.getStatusCode())
-            .as("GET app definitions")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + appDefinitionsUrl);
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void nonTaskUserShouldBeForbidden() {
+    public void nonTaskUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void nonTaskUserShouldBeForbiddenToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void nonTaskUserShouldBeForbiddenToAccessIdmGroups() {
+        String idmGroupsUrl = "http://localhost:" + serverPort + "/flowable-ui/idm-app/rest/admin/groups";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(idmGroupsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void nonTaskUserShouldBeForbiddenToAccessServiceConfigs() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-ui/admin-app/rest/server-configs";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(configsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET server-configs")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void nonTaskUserShouldHaveNoAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
-            .as("GET app definitions")
-            .isEqualTo(HttpStatus.FORBIDDEN);
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.OK);
+
+        String resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{ data: [ ] }");
+    }
+
+    @Test
+    public void adminUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void adminUserShouldBeForbiddenToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void adminUserShouldBeForbiddenToAccessIdmGroups() {
+        String idmGroupsUrl = "http://localhost:" + serverPort + "/flowable-ui/idm-app/rest/admin/groups";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(idmGroupsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void adminUserShouldBeAbleToAccessServiceConfigs() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-ui/admin-app/rest/server-configs";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(configsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET server-configs")
+                .isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -183,7 +332,7 @@ public class FlowableUiApplicationSecurityTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
                 .as("GET app definitions")
@@ -206,16 +355,276 @@ public class FlowableUiApplicationSecurityTest {
     }
 
     @Test
-    public void restUserShouldBeForbidden() {
+    public void taskUserShouldBeAbleToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void taskUserShouldBeForbiddenToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void taskUserShouldBeForbiddenToAccessIdmGroups() {
+        String idmGroupsUrl = "http://localhost:" + serverPort + "/flowable-ui/idm-app/rest/admin/groups";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(idmGroupsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void taskUserShouldBeForbiddenToAccessServiceConfigs() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-ui/admin-app/rest/server-configs";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(configsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET server-configs")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void taskUserShouldBeAllowedToGetAppDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.OK);
+
+        Object resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .isEqualTo("{"
+                        + "  size: 1,"
+                        + "  total: 1,"
+                        + "  start: 0,"
+                        + "  data: ["
+                        + "    { "
+                        + "      defaultAppId: 'tasks', name: null, description: null, theme: null, icon: null, appDefinitionId: null,"
+                        + "      appDefinitionKey: null, tenantId: null, usersAccess: null, groupsAccess: null"
+                        + "    }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    public void modelerUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+
+    @Test
+    public void modelerUserShouldBeAbleToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET editor stencil-sets")
+                .isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void modelerUserShouldBeForbiddenToAccessIdmGroups() {
+        String idmGroupsUrl = "http://localhost:" + serverPort + "/flowable-ui/idm-app/rest/admin/groups";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(idmGroupsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void modelerUserShouldBeForbiddenToAccessServiceConfigs() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-ui/admin-app/rest/server-configs";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(configsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET server-configs")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void modelerUserShouldBeAllowedToGetAppDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("modeler", "test-modeler-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.OK);
+
+        Object resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .isEqualTo("{"
+                        + "  size: 1,"
+                        + "  total: 1,"
+                        + "  start: 0,"
+                        + "  data: ["
+                        + "    { "
+                        + "      defaultAppId: 'modeler', name: null, description: null, theme: null, icon: null, appDefinitionId: null,"
+                        + "      appDefinitionKey: null, tenantId: null, usersAccess: null, groupsAccess: null"
+                        + "    }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    public void idmUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("idm", "test-idm-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void idmUserShouldBeForbiddenToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("idm", "test-idm-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void idmUserShouldBeForbiddenToAccessServiceConfigs() {
+        String configsUrl = "http://localhost:" + serverPort + "/flowable-ui/admin-app/rest/server-configs";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("idm", "test-idm-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(configsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET server-configs")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void idmUserShouldBeAllowedToGetAppDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("idm", "test-idm-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.OK);
+
+        Object resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .isEqualTo("{"
+                        + "  size: 1,"
+                        + "  total: 1,"
+                        + "  start: 0,"
+                        + "  data: ["
+                        + "    { "
+                        + "      defaultAppId: 'idm', name: null, description: null, theme: null, icon: null, appDefinitionId: null,"
+                        + "      appDefinitionKey: null, tenantId: null, usersAccess: null, groupsAccess: null"
+                        + "    }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    public void restUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String caseDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(caseDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void restUserShouldHaveNoAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/app/rest/runtime/app-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
-            .as("GET app definitions")
-            .isEqualTo(HttpStatus.FORBIDDEN);
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.OK);
+
+        String resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{ data: [ ] }");
+    }
+
+    @Test
+    public void restUserShouldBeForbiddenToAccessStencilSets() {
+        String stencilsUrl = "http://localhost:" + serverPort + "/flowable-ui/modeler-app/rest/stencil-sets/editor";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(stencilsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET Stencils")
+                .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -224,7 +633,7 @@ public class FlowableUiApplicationSecurityTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET app definitions")
@@ -234,7 +643,7 @@ public class FlowableUiApplicationSecurityTest {
     @Test
     public void nonAuthenticatedUserShouldNotBeAbleToAccessActuator() {
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.getForEntity(actuatorUrl, Object.class);
+        ResponseEntity<String> entity = restTemplate.getForEntity(actuatorUrl, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -250,7 +659,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.getForEntity(link.getHref(), Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.getForEntity(link.getHref(), String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -260,32 +669,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void nonAuthorizedUserShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-user");
-        assertThat(user).as("test-user").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-user privileges")
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("user");
-
-        assertThat(token)
-            .as("test-user token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-user token user id")
-            .isEqualTo("test-user");
-        assertThat(token.getId())
-            .as("test-user token id")
-            .isEqualTo("user");
-        assertThat(token.getValue())
-            .as("test-user token value")
-            .isEqualTo("test-user-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-user", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -307,7 +695,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -317,32 +705,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void nonAuthorizedUserWithCookieShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-user");
-        assertThat(user).as("test-user").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-user privileges")
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("user");
-
-        assertThat(token)
-            .as("test-user token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-user token user id")
-            .isEqualTo("test-user");
-        assertThat(token.getId())
-            .as("test-user token id")
-            .isEqualTo("user");
-        assertThat(token.getValue())
-            .as("test-user token value")
-            .isEqualTo("test-user-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -358,7 +725,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -368,33 +735,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void taskUserShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-task");
-        assertThat(user).as("test-task").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-task privileges")
-            .contains(DefaultPrivileges.ACCESS_TASK)
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("task");
-
-        assertThat(token)
-            .as("test-task token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-task token user id")
-            .isEqualTo("test-task");
-        assertThat(token.getId())
-            .as("test-task token id")
-            .isEqualTo("task");
-        assertThat(token.getValue())
-            .as("test-task token value")
-            .isEqualTo("test-task-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-task", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -416,7 +761,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -426,33 +771,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void taskUserWithCookieShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-task");
-        assertThat(user).as("test-task").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-task privileges")
-            .contains(DefaultPrivileges.ACCESS_TASK)
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("task");
-
-        assertThat(token)
-            .as("test-task token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-task token user id")
-            .isEqualTo("test-task");
-        assertThat(token.getId())
-            .as("test-task token id")
-            .isEqualTo("task");
-        assertThat(token.getValue())
-            .as("test-task token value")
-            .isEqualTo("test-task-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -468,7 +791,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -478,33 +801,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void restUserShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-rest");
-        assertThat(user).as("test-rest").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-rest privileges")
-            .contains(DefaultPrivileges.ACCESS_REST_API)
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN, DefaultPrivileges.ACCESS_TASK);
-
-        RemoteToken token = tokens.get("rest");
-
-        assertThat(token)
-            .as("test-rest token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-rest token user id")
-            .isEqualTo("test-rest");
-        assertThat(token.getId())
-            .as("test-rest token id")
-            .isEqualTo("rest");
-        assertThat(token.getValue())
-            .as("test-rest token value")
-            .isEqualTo("test-rest-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-rest", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -526,7 +827,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -536,33 +837,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void restUserWithCookieShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-rest");
-        assertThat(user).as("test-rest").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-rest privileges")
-            .contains(DefaultPrivileges.ACCESS_REST_API)
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN, DefaultPrivileges.ACCESS_TASK);
-
-        RemoteToken token = tokens.get("rest");
-
-        assertThat(token)
-            .as("test-rest token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-rest token user id")
-            .isEqualTo("test-rest");
-        assertThat(token.getId())
-            .as("test-rest token id")
-            .isEqualTo("rest");
-        assertThat(token.getValue())
-            .as("test-rest token value")
-            .isEqualTo("test-rest-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -578,7 +857,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -588,32 +867,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void authorizedUserShouldBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-admin");
-        assertThat(user).as("test-admin").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-admin privileges")
-            .contains(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("admin");
-
-        assertThat(token)
-            .as("test-admin token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-admin token user id")
-            .isEqualTo("test-admin");
-        assertThat(token.getId())
-            .as("test-admin token id")
-            .isEqualTo("admin");
-        assertThat(token.getValue())
-            .as("test-admin token value")
-            .isEqualTo("test-admin-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-admin", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -632,7 +890,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -642,32 +900,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void authorizedUserWithCookieShouldNotBeAbleToAccessActuator() {
-        RemoteUser user = users.get("test-admin");
-        assertThat(user).as("test-admin").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-admin privileges")
-            .contains(DefaultPrivileges.ACCESS_ADMIN);
-
-        RemoteToken token = tokens.get("admin");
-
-        assertThat(token)
-            .as("test-admin token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-admin token user id")
-            .isEqualTo("test-admin");
-        assertThat(token.getId())
-            .as("test-admin token id")
-            .isEqualTo("admin");
-        assertThat(token.getValue())
-            .as("test-admin token value")
-            .isEqualTo("test-admin-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String actuatorUrl = "http://localhost:" + serverPort + "/flowable-ui/actuator";
-        ResponseEntity<Object> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> entity = restTemplate.exchange(actuatorUrl, HttpMethod.GET, request, String.class);
 
         assertThat(entity.getStatusCode())
             .as("GET Actuator response status")
@@ -686,7 +923,7 @@ public class FlowableUiApplicationSecurityTest {
                 continue;
             }
 
-            ResponseEntity<Object> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, Object.class);
+            ResponseEntity<String> endpointResponse = restTemplate.exchange(link.getHref(), HttpMethod.GET, request, String.class);
 
             assertThat(endpointResponse.getStatusCode())
                 .as("Endpoint '" + endpoint + "' response status")
@@ -698,7 +935,7 @@ public class FlowableUiApplicationSecurityTest {
     public void nonAuthenticatedShouldNotBeAbleToAccessApi() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
 
-        ResponseEntity<Object> result = restTemplate.getForEntity(processDefinitionsUrl, Object.class);
+        ResponseEntity<String> result = restTemplate.getForEntity(processDefinitionsUrl, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -707,32 +944,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void nonAuthorizedShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-user");
-        assertThat(user).as("test-user").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-user privileges")
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN, DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("user");
-
-        assertThat(token)
-            .as("test-user token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-user token user id")
-            .isEqualTo("test-user");
-        assertThat(token.getId())
-            .as("test-user token id")
-            .isEqualTo("user");
-        assertThat(token.getValue())
-            .as("test-user token value")
-            .isEqualTo("test-user-value");
-
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-user", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -741,32 +957,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void nonAuthorizedUserWithCookieShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-user");
-        assertThat(user).as("test-user").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-user privileges")
-            .doesNotContain(DefaultPrivileges.ACCESS_ADMIN, DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("user");
-
-        assertThat(token)
-            .as("test-user token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-user token user id")
-            .isEqualTo("test-user");
-        assertThat(token.getId())
-            .as("test-user token id")
-            .isEqualTo("user");
-        assertThat(token.getValue())
-            .as("test-user token value")
-            .isEqualTo("test-user-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -775,33 +970,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void taskUserShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-task");
-        assertThat(user).as("test-task").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-task privileges")
-            .contains(DefaultPrivileges.ACCESS_TASK)
-            .doesNotContain(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("task");
-
-        assertThat(token)
-            .as("test-task token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-task token task id")
-            .isEqualTo("test-task");
-        assertThat(token.getId())
-            .as("test-task token id")
-            .isEqualTo("task");
-        assertThat(token.getValue())
-            .as("test-task token value")
-            .isEqualTo("test-task-value");
-
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-task", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -810,33 +983,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void taskUserWithCookieShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-task");
-        assertThat(user).as("test-task").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-task privileges")
-            .contains(DefaultPrivileges.ACCESS_TASK)
-            .doesNotContain(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("task");
-
-        assertThat(token)
-            .as("test-task token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-task token task id")
-            .isEqualTo("test-task");
-        assertThat(token.getId())
-            .as("test-task token id")
-            .isEqualTo("task");
-        assertThat(token.getValue())
-            .as("test-task token value")
-            .isEqualTo("test-task-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("task", "test-task-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -845,33 +996,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void adminUserShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-admin");
-        assertThat(user).as("test-admin").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-admin privileges")
-            .contains(DefaultPrivileges.ACCESS_ADMIN)
-            .doesNotContain(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("admin");
-
-        assertThat(token)
-            .as("test-admin token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-admin token admin id")
-            .isEqualTo("test-admin");
-        assertThat(token.getId())
-            .as("test-admin token id")
-            .isEqualTo("admin");
-        assertThat(token.getValue())
-            .as("test-admin token value")
-            .isEqualTo("test-admin-value");
-
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-admin", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -880,33 +1009,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void adminUserWithCookieShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-admin");
-        assertThat(user).as("test-admin").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-admin privileges")
-            .contains(DefaultPrivileges.ACCESS_ADMIN)
-            .doesNotContain(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("admin");
-
-        assertThat(token)
-            .as("test-admin token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-admin token admin id")
-            .isEqualTo("test-admin");
-        assertThat(token.getId())
-            .as("test-admin token id")
-            .isEqualTo("admin");
-        assertThat(token.getValue())
-            .as("test-admin token value")
-            .isEqualTo("test-admin-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -915,32 +1022,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void restUserShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-rest");
-        assertThat(user).as("test-rest").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-rest privileges")
-            .contains(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("rest");
-
-        assertThat(token)
-            .as("test-rest token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-rest token rest id")
-            .isEqualTo("test-rest");
-        assertThat(token.getId())
-            .as("test-rest token id")
-            .isEqualTo("rest");
-        assertThat(token.getValue())
-            .as("test-rest token value")
-            .isEqualTo("test-rest-value");
-
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorization("test-rest", "test"));
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")
@@ -949,32 +1035,11 @@ public class FlowableUiApplicationSecurityTest {
 
     @Test
     public void restUserWithCookieShouldNotBeAbleToAccessApi() {
-        RemoteUser user = users.get("test-rest");
-        assertThat(user).as("test-rest").isNotNull();
-        assertThat(user.getPrivileges())
-            .as("test-rest privileges")
-            .contains(DefaultPrivileges.ACCESS_REST_API);
-
-        RemoteToken token = tokens.get("rest");
-
-        assertThat(token)
-            .as("test-rest token")
-            .isNotNull();
-        assertThat(token.getUserId())
-            .as("test-rest token rest id")
-            .isEqualTo("test-rest");
-        assertThat(token.getId())
-            .as("test-rest token id")
-            .isEqualTo("rest");
-        assertThat(token.getValue())
-            .as("test-rest token value")
-            .isEqualTo("test-rest-value");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-ui/process-api/repository/process-definitions";
-        ResponseEntity<Object> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, Object.class);
+        ResponseEntity<String> result = restTemplate.exchange(processDefinitionsUrl, HttpMethod.GET, request, String.class);
 
         assertThat(result.getStatusCode())
             .as("GET API Editor models")

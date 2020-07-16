@@ -14,9 +14,11 @@ package org.flowable.ui.common.security;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -26,8 +28,10 @@ import org.springframework.security.config.annotation.web.configurers.ExceptionH
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.PortMapper;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -49,8 +53,7 @@ public class FlowableUiCustomFormLoginConfigurer<H extends HttpSecurityBuilder<H
         AbstractHttpConfigurer<FlowableUiCustomFormLoginConfigurer<H>, H> {
 
     protected UsernamePasswordAuthenticationFilter authenticationFilter;
-    protected AuthenticationFailureHandler failureHandler;
-    protected FlowableLoginUrlAuthenticationEntryPoint authenticationEntryPoint;
+    protected LoginUrlAuthenticationEntryPoint authenticationEntryPoint;
 
     public FlowableUiCustomFormLoginConfigurer() {
         this.authenticationFilter = new UsernamePasswordAuthenticationFilter();
@@ -68,9 +71,11 @@ public class FlowableUiCustomFormLoginConfigurer<H extends HttpSecurityBuilder<H
         AuthenticationEntryPoint authenticationEntryPoint = getAuthenticationEntryPoint(builder.getSharedObject(ApplicationContext.class));
         ExceptionHandlingConfigurer<H> exceptionHandling = builder.getConfigurer(ExceptionHandlingConfigurer.class);
         if (exceptionHandling != null) {
-            exceptionHandling.defaultAuthenticationEntryPointFor(postProcess(authenticationEntryPoint), getAuthenticationEntryPointMatcher(builder));
-            exceptionHandling.defaultAuthenticationEntryPointFor(new Http403ForbiddenEntryPoint(),
-                    new RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest"));
+            LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> entryPoints = new LinkedHashMap<>();
+            entryPoints.put(getAuthenticationEntryPointMatcher(builder), postProcess(authenticationEntryPoint));
+            DelegatingAuthenticationEntryPoint delegatingAuthenticationEntryPoint = new DelegatingAuthenticationEntryPoint(entryPoints);
+            delegatingAuthenticationEntryPoint.setDefaultEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+            exceptionHandling.authenticationEntryPoint(delegatingAuthenticationEntryPoint);
             exceptionHandling.addObjectPostProcessor(new ObjectPostProcessor<ExceptionTranslationFilter>() {
 
                 @Override
@@ -97,7 +102,7 @@ public class FlowableUiCustomFormLoginConfigurer<H extends HttpSecurityBuilder<H
         return new AndRequestMatcher(Arrays.asList(notXRequestedWith, mediaMatcher));
     }
 
-    protected FlowableLoginUrlAuthenticationEntryPoint getAuthenticationEntryPoint(ApplicationContext applicationContext) {
+    protected LoginUrlAuthenticationEntryPoint getAuthenticationEntryPoint(ApplicationContext applicationContext) {
         if (this.authenticationEntryPoint == null) {
             FlowableCommonAppProperties commonAppProperties = applicationContext.getBean(FlowableCommonAppProperties.class);
             String idmAppUrl;

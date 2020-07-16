@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.task.application;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,6 +49,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Filip Hrisafov
@@ -128,44 +132,68 @@ public class FlowableTaskApplicationSecurityTest {
         tokenUser.setId("user");
         tokenUser.setUserId("test-user");
         tokenUser.setValue("test-user-value");
+        tokenUser.setTokenDate(new Date());
         tokens.put("user", tokenUser);
 
         RemoteToken tokenAdmin = new RemoteToken();
         tokenAdmin.setId("admin");
         tokenAdmin.setUserId("test-admin");
         tokenAdmin.setValue("test-admin-value");
+        tokenAdmin.setTokenDate(new Date());
         tokens.put("admin", tokenAdmin);
 
         RemoteToken tokenTask = new RemoteToken();
         tokenTask.setId("task");
         tokenTask.setUserId("test-task");
         tokenTask.setValue("test-task-value");
+        tokenTask.setTokenDate(new Date());
         tokens.put("task", tokenTask);
 
         RemoteToken tokenRest = new RemoteToken();
         tokenRest.setId("rest");
         tokenRest.setUserId("test-rest");
         tokenRest.setValue("test-rest-value");
+        tokenRest.setTokenDate(new Date());
         tokens.put("rest", tokenRest);
     }
 
     @Test
-    public void nonAuthenticatedUserShouldBeRedirectedToIdm() {
+    public void nonAuthenticatedUserShouldBeUnauthorizedToAccessCaseDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/case-definitions";
+        ResponseEntity<Object> result = restTemplate.getForEntity(appDefinitionsUrl, Object.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET case definitions")
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void nonAuthenticatedUserShouldBeUnauthorizedToAccessAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/runtime/app-definitions";
         ResponseEntity<Object> result = restTemplate.getForEntity(appDefinitionsUrl, Object.class);
 
         assertThat(result.getStatusCode())
             .as("GET app definitions")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + appDefinitionsUrl);
+            .isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    public void nonTaskUserShouldBeRedirectedToIdm() {
-        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/runtime/app-definitions";
+    public void nonAuthenticatedUserShouldBeRedirectedToIdm() {
+        String rootUrl = "http://localhost:" + serverPort + "/flowable-task/";
+        ResponseEntity<String> result = restTemplate.getForEntity(rootUrl, String.class);
+
+        assertThat(result.getStatusCode())
+                .as("GET app definitions")
+                .isEqualTo(HttpStatus.FOUND);
+
+        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
+                .as("redirect location")
+                .isEqualTo("http://localhost:8080/flowable-idm/idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + rootUrl);
+    }
+
+    @Test
+    public void nonTaskUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/case-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -173,16 +201,31 @@ public class FlowableTaskApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET app definitions")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + appDefinitionsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void adminUserShouldBeRedirectedToIdm() {
+    public void nonTaskUserShouldHaveNoAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/runtime/app-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("user", "test-user-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+            .as("GET app definitions")
+            .isEqualTo(HttpStatus.OK);
+
+        String resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{ data: [ ] }");
+    }
+
+    @Test
+    public void adminUserShouldBeForbiddenToAccessCaseDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/case-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -190,16 +233,31 @@ public class FlowableTaskApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET app definitions")
-            .isEqualTo(HttpStatus.FOUND);
-
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + appDefinitionsUrl);
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void restUserShouldBeRedirectedToIdm() {
+    public void adminUserShouldHaveNoAppDefinitions() {
         String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/runtime/app-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("admin", "test-admin-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+            .as("GET app definitions")
+            .isEqualTo(HttpStatus.OK);
+
+        String resultBody = result.getBody();
+        assertThat(resultBody).isNotNull();
+        assertThatJson(resultBody)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{ data: [ ] }");
+    }
+
+    @Test
+    public void restUserShouldForbiddenToAccessCaseDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/case-definitions";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -207,11 +265,20 @@ public class FlowableTaskApplicationSecurityTest {
 
         assertThat(result.getStatusCode())
             .as("GET app definitions")
-            .isEqualTo(HttpStatus.FOUND);
+            .isEqualTo(HttpStatus.FORBIDDEN);
+    }
 
-        assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
-            .as("redirect location")
-            .isEqualTo("http://localhost:8080/flowable-idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + appDefinitionsUrl);
+    @Test
+    public void restUserShouldHaveBeForbiddenToAccessAppDefinitions() {
+        String appDefinitionsUrl = "http://localhost:" + serverPort + "/flowable-task/app/rest/case-definitions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, rememberMeCookie("rest", "test-rest-value"));
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> result = restTemplate.exchange(appDefinitionsUrl, HttpMethod.GET, request, String.class);
+
+        assertThat(result.getStatusCode())
+            .as("GET app definitions")
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
