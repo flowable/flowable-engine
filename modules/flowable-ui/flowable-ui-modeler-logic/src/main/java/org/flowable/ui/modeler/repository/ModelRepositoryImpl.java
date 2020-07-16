@@ -21,6 +21,7 @@ import org.flowable.ui.common.tenant.TenantProvider;
 import org.flowable.ui.modeler.domain.Model;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,6 +30,7 @@ public class ModelRepositoryImpl implements ModelRepository {
     private static final String NAMESPACE = "org.flowable.ui.modeler.domain.Model.";
 
     @Autowired
+    @Qualifier("flowableModeler")
     protected SqlSessionTemplate sqlSessionTemplate;
 
     @Autowired

@@ -19,6 +19,7 @@ import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.common.repository.UuidIdGenerator;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +28,7 @@ public class ServerConfigRepositoryImpl implements ServerConfigRepository {
     private static final String NAMESPACE = "org.flowable.ui.admin.domain.ServerConfig.";
 
     @Autowired
+    @Qualifier("flowableAdmin")
     protected SqlSessionTemplate sqlSessionTemplate;
 
     @Autowired

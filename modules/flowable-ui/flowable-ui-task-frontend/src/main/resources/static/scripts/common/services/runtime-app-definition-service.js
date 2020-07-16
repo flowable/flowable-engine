@@ -103,6 +103,20 @@ flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
                                     fixedUrl: baseUrl + '/idm/',
                                     pages: []
                                 });
+                        } else if (app.defaultAppId === 'modeler') {
+
+                            defaultApps.push(
+                                {
+                                    id: 'modeler',
+                                    titleKey: 'APP.MODELER.TITLE',
+                                    descriptionKey: 'APP.MODELER.DESCRIPTION',
+                                    defaultAppId : app.defaultAppId,
+                                    theme: 'theme-2',
+                                    icon: 'icon icon-clock',
+                                    fixedBaseUrl: baseUrl + '/modeler/' + '/#/',
+                                    fixedUrl: baseUrl + '/modeler/',
+                                    pages: []
+                                });
                         }
 
                     } else {

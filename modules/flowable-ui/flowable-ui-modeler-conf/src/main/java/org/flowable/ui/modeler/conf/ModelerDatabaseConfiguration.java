@@ -28,6 +28,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -42,9 +43,9 @@ import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration(proxyBeanMethods = false)
-public class DatabaseConfiguration {
+public class ModelerDatabaseConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelerDatabaseConfiguration.class);
 
     protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
@@ -98,7 +99,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
+    @Qualifier("flowableModeler")
+    public SqlSessionFactory modelerSqlSessionFactory(DataSource dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         String databaseType = initDatabaseType(dataSource);
@@ -126,12 +128,14 @@ public class DatabaseConfiguration {
     }
 
     @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-    public SqlSessionTemplate SqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+    @Qualifier("flowableModeler")
+    public SqlSessionTemplate modelerSqlSessionTemplate(@Qualifier("flowableModeler") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
-    public Liquibase liquibase(DataSource dataSource) {
+    @Qualifier("flowableModeler")
+    public Liquibase modelerLiquibase(DataSource dataSource) {
         LOGGER.info("Configuring Liquibase");
 
         Liquibase liquibase = null;

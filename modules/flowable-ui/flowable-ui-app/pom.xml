@@ -24,6 +24,10 @@
             <artifactId>flowable-spring-boot-starter-ui-idm</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-ui-modeler</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>

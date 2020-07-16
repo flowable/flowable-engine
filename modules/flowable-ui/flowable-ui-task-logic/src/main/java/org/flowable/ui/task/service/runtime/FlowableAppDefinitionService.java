@@ -89,6 +89,7 @@ public class FlowableAppDefinitionService implements InitializingBean {
     protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
     protected static final AppDefinitionRepresentation adminAppDefinitionRepresentation;
     protected static final AppDefinitionRepresentation idmAppDefinitionRepresentation;
+    protected static final AppDefinitionRepresentation modelerAppDefinitionRepresentation;
 
     static {
         if (ClassUtils.isPresent("org.flowable.ui.admin.conf.ApplicationConfiguration", null)) {
@@ -101,6 +102,12 @@ public class FlowableAppDefinitionService implements InitializingBean {
             idmAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("idm");
         } else {
             idmAppDefinitionRepresentation = null;
+        }
+
+        if (ClassUtils.isPresent("org.flowable.ui.modeler.conf.ApplicationConfiguration", null)) {
+            modelerAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("modeler");
+        } else {
+            modelerAppDefinitionRepresentation = null;
         }
     }
 
@@ -122,6 +129,9 @@ public class FlowableAppDefinitionService implements InitializingBean {
             resultList.add(idmAppDefinitionRepresentation);
         }
 
+        if (modelerAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_MODELER)) {
+            resultList.add(modelerAppDefinitionRepresentation);
+        }
 
         if (SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_TASK)) {
             resultList.addAll(getTaskAppList());

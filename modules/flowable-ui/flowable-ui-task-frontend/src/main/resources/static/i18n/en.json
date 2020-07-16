@@ -83,6 +83,10 @@
             "TITLE": "IDM App",
             "DESCRIPTION": "Access a central place to define users, groups and privileges."
         },
+        "MODELER": {
+            "TITLE": "Modeler App",
+            "DESCRIPTION": "Access a central place to model BPMN processes, DMN decision table, Form definitions and create app definitions"
+        },
         "IDENTITY-MANAGEMENT": {
             "TITLE": "Identity management",
             "TITLE-TENANT-ADMIN": "Identity management",

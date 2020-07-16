@@ -15,10 +15,16 @@ package org.flowable.ui.modeler.rest.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,16 +34,36 @@ import org.springframework.web.bind.annotation.RestController;
  * Rest resource for managing groups, used in the editor app.
  */
 @RestController
-public class EditorGroupsResource {
+public class EditorGroupsResource implements InitializingBean {
 
-    @Autowired
+    @Autowired(required = false)
     protected RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    protected IdmIdentityService identityService;
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     @GetMapping(value = "/rest/editor-groups")
     public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
         List<GroupRepresentation> result = new ArrayList<>();
-        List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
-        for (RemoteGroup group : groups) {
+        List<? extends Group> groups;
+        if (remoteIdmService != null) {
+            groups = remoteIdmService.findGroupsByNameFilter(filter);
+        } else {
+            GroupQuery groupQuery = identityService.createGroupQuery();
+            if (StringUtils.isNotEmpty(filter)) {
+                groupQuery.groupNameLikeIgnoreCase("%" + filter + "%");
+            }
+            groups = groupQuery.orderByGroupName().asc().list();
+        }
+
+        for (Group group : groups) {
             result.add(new GroupRepresentation(group));
         }
         return new ResultListDataRepresentation(result);

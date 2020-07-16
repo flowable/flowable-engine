@@ -38,7 +38,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     "org.flowable.ui.common.repository",
 })
 @Import(value = {
-    DatabaseConfiguration.class
+    AdminDatabaseConfiguration.class
 })
 @EnableConfigurationProperties(FlowableAdminAppProperties.class)
 public class ApplicationConfiguration implements ApplicationContextAware {

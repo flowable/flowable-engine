@@ -15,24 +15,51 @@ package org.flowable.ui.modeler.rest.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.idm.api.UserQuery;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class EditorUsersResource {
+public class EditorUsersResource implements InitializingBean {
 
-    @Autowired
+    private static final int MAX_USER_SIZE = 100;
+
+    @Autowired(required = false)
     protected RemoteIdmService remoteIdmService;
+
+    @Autowired(required = false)
+    protected IdmIdentityService identityService;
+
+    @Override
+    public void afterPropertiesSet() {
+        if (remoteIdmService == null && identityService == null) {
+            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
+        }
+    }
 
     @GetMapping(value = "/rest/editor-users")
     public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
-        List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+        List<? extends User> matchingUsers;
+        if (remoteIdmService != null) {
+            matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+        } else {
+            UserQuery userQuery = identityService.createUserQuery();
+            if (StringUtils.isNotEmpty(filter)) {
+                userQuery.userFullNameLikeIgnoreCase("%" + filter + "%");
+            }
+
+            matchingUsers = userQuery.listPage(0, MAX_USER_SIZE);
+        }
         List<UserRepresentation> userRepresentations = new ArrayList<>(matchingUsers.size());
         for (User user : matchingUsers) {
             userRepresentations.add(new UserRepresentation(user));

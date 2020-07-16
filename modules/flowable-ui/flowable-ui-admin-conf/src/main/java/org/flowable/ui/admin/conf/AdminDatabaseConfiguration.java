@@ -27,6 +27,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -41,9 +42,9 @@ import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration(proxyBeanMethods = false)
-public class DatabaseConfiguration {
+public class AdminDatabaseConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminDatabaseConfiguration.class);
 
     protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_ADM_";
 
@@ -54,7 +55,8 @@ public class DatabaseConfiguration {
     private ResourceLoader resourceLoader;
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
+    @Qualifier("flowableAdmin")
+    public SqlSessionFactory adminSqlSessionFactory(DataSource dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
 
@@ -73,11 +75,13 @@ public class DatabaseConfiguration {
     }
 
     @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-    public SqlSessionTemplate SqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+    @Qualifier("flowableAdmin")
+    public SqlSessionTemplate adminSqlSessionTemplate(@Qualifier("flowableAdmin") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 
-    @Bean(name = "liquibase")
+    @Bean(name = "adminLiquibase")
+    @Qualifier("flowableAdmin")
     public Liquibase liquibase(DataSource dataSource) {
         LOGGER.debug("Configuring Liquibase");
 
