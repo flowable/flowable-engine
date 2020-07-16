@@ -57,12 +57,18 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
     protected List<User> executeQuery() {
         if (getId() != null) {
             List<User> result = new ArrayList<>();
-            result.add(findById(getId()));
+            UserEntity user = findById(getId());
+            if (user != null) {
+                result.add(user);
+            }
             return result;
 
         } else if (getIdIgnoreCase() != null) {
             List<User> result = new ArrayList<>();
-            result.add(findById(getIdIgnoreCase()));
+            UserEntity user = findById(getIdIgnoreCase());
+            if (user != null) {
+                result.add(user);
+            }
             return result;
 
         } else if (getFullNameLike() != null) {
@@ -99,8 +105,9 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
 
                     String baseDn = ldapConfigurator.getUserBaseDn() != null ? ldapConfigurator.getUserBaseDn() : ldapConfigurator.getBaseDn();
                     NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
-                    UserEntity user = new UserEntityImpl();
+                    UserEntity user = null;
                     while (namingEnum.hasMore()) { // Should be only one
+                        user = new UserEntityImpl();
                         SearchResult result = (SearchResult) namingEnum.next();
                         mapSearchResultToUser(result, user);
                     }

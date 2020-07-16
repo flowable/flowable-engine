@@ -75,6 +75,28 @@ public class LdapIntegrationTest extends LDAPTestCase {
         assertEquals("fozzie", user.getId());
         assertEquals("Fozzie", user.getFirstName());
         assertEquals("Bear", user.getLastName());
+
+        user = identityService.createUserQuery().userId("non-existing").singleResult();
+        assertNull(user);
+    }
+
+    @Test
+    public void testUserQueryByIdIgnoreCase() {
+        List<User> users = identityService.createUserQuery().userIdIgnoreCase("KERMIT").list();
+        assertEquals(1, users.size());
+
+        User user = users.get(0);
+        assertEquals("kermit", user.getId());
+        assertEquals("Kermit", user.getFirstName());
+        assertEquals("The Frog", user.getLastName());
+
+        user = identityService.createUserQuery().userIdIgnoreCase("FOZZIE").singleResult();
+        assertEquals("fozzie", user.getId());
+        assertEquals("Fozzie", user.getFirstName());
+        assertEquals("Bear", user.getLastName());
+
+        user = identityService.createUserQuery().userIdIgnoreCase("non-existing").singleResult();
+        assertNull(user);
     }
 
     @Test
