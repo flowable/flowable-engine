@@ -358,7 +358,8 @@ flowableApp
         // Call when the user logs out
         $rootScope.$on('event:auth-loginCancelled', function() {
             $rootScope.authenticated = false;
-            $location.path('/login');
+            // Changing the href causes a reload, so no need to do a new reload again
+            $window.location.href = FLOWABLE.CONFIG.contextRoot;
         });
 
         // Call when login fails

@@ -155,6 +155,7 @@ public class FlowableUiSecurityAutoConfiguration {
                     .authorizeRequests()
                     .antMatchers("/app/rest/account").authenticated()
                     .antMatchers("/app/rest/runtime/app-definitions").authenticated()
+                    .antMatchers("/idm-app/rest/authenticate").authenticated()
                     .antMatchers("/app/rest/**", "/workflow/").hasAuthority(DefaultPrivileges.ACCESS_TASK)
                     .antMatchers("/admin-app/**", "/admin/").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
                     .antMatchers("/idm-app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM)

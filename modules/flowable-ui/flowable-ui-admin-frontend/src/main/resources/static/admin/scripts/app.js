@@ -326,8 +326,8 @@ flowableAdminApp
                 if (response.status === 403) {
                     $rootScope.login = null;
                     $rootScope.authenticated = false;
-                    $window.location.href = '/';
-                    $window.location.reload();
+                    // Changing the href causes a reload, so no need to do a new reload again
+                    $window.location.href = FlowableAdmin.Config.contextRoot;
                     return $q.reject(response);
                 }
                 else{
@@ -586,8 +586,8 @@ flowableAdminApp
 						.success(function (data, status, headers, config) {
 							$rootScope.login = null;
 							$rootScope.authenticated = false;
+                            // Changing the href causes a reload, so no need to do a new reload again
                             $window.location.href = FlowableAdmin.Config.contextRoot;
-                            $window.location.reload();
 						});
 				}; 
 

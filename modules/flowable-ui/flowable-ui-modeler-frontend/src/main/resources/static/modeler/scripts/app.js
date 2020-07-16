@@ -359,8 +359,8 @@ flowableModeler
                     .success(function (data, status, headers, config) {
                         $rootScope.login = null;
                         $rootScope.authenticated = false;
-                        $window.location.href = '/';
-                        $window.location.reload();
+                        // Changing the href causes a reload, so no need to do a new reload again
+                        $window.location.href = FLOWABLE.CONFIG.contextRoot;
                     });
             };
         }
