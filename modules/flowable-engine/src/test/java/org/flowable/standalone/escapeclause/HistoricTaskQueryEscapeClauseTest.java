@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
-import org.flowable.common.engine.impl.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,38 +73,59 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         Map<String, Object> vars2 = new HashMap<>();
         vars2.put("var1", "Two_");
 
-        VariableCollectionsContainer variableCollectionsContainerOne = new VariableCollectionsContainerImpl();
-        variableCollectionsContainerOne.setLocalVariables(vars1);
+
+
+        // VariableCollectionsContainer variableCollectionsContainerOne = new VariableCollectionsContainerImpl();
+        // variableCollectionsContainerOne.setLocalVariables(vars1);
 
         task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.setAssignee(task1.getId(), "assignee%");
         taskService.setOwner(task1.getId(), "owner%");
-        taskService.complete(task1.getId(), variableCollectionsContainerOne.getVariablesLocal(),true);
+        // taskService.complete(task1.getId(), variableCollectionsContainerOne.getVariablesLocal(),true);
 
-        VariableCollectionsContainer variableCollectionsContainerTwo = new VariableCollectionsContainerImpl();
-        variableCollectionsContainerTwo.setLocalVariables(vars2);
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder.variablesLocal(vars1);
+        taskCompletionBuilder.taskId(task1.getId());
+        taskCompletionBuilder.complete();
+
+        // VariableCollectionsContainer variableCollectionsContainerTwo = new VariableCollectionsContainerImpl();
+        // variableCollectionsContainerTwo.setLocalVariables(vars2);
 
         task2 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.setAssignee(task2.getId(), "assignee_");
         taskService.setOwner(task2.getId(), "owner_");
-        taskService.complete(task2.getId(), variableCollectionsContainerTwo.getVariablesLocal(),true);
+        //taskService.complete(task2.getId(), variableCollectionsContainerTwo.getVariablesLocal(),true);
 
-        VariableCollectionsContainer variableCollectionsContainerThree = new VariableCollectionsContainerImpl();
-        variableCollectionsContainerThree.setLocalVariables(vars1);
+        taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder.variablesLocal(vars2);
+        taskCompletionBuilder.taskId(task2.getId());
+        taskCompletionBuilder.complete();
+
+        // VariableCollectionsContainer variableCollectionsContainerThree = new VariableCollectionsContainerImpl();
+        // variableCollectionsContainerThree.setLocalVariables(vars1);
 
         task3 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
         taskService.setAssignee(task3.getId(), "assignee%");
         taskService.setOwner(task3.getId(), "owner%");
-        taskService.complete(task3.getId(), variableCollectionsContainerThree.getVariablesLocal(),true);
+        // taskService.complete(task3.getId(), variableCollectionsContainerThree.getVariablesLocal(),true);
 
-        VariableCollectionsContainer variableCollectionsContainerFour = new VariableCollectionsContainerImpl();
-        variableCollectionsContainerFour.setLocalVariables(vars2);
+        taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder.variablesLocal(vars1);
+        taskCompletionBuilder.taskId(task3.getId());
+        taskCompletionBuilder.complete();
+
+        // VariableCollectionsContainer variableCollectionsContainerFour = new VariableCollectionsContainerImpl();
+        // variableCollectionsContainerFour.setLocalVariables(vars2);
 
         task4 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
         taskService.setAssignee(task4.getId(), "assignee_");
         taskService.setOwner(task4.getId(), "owner_");
-        taskService.complete(task4.getId(), variableCollectionsContainerFour.getVariablesLocal(),true);
+        // taskService.complete(task4.getId(), variableCollectionsContainerFour.getVariablesLocal(),true);
 
+        taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder.variablesLocal(vars2);
+        taskCompletionBuilder.taskId(task4.getId());
+        taskCompletionBuilder.complete();
     }
 
     @AfterEach
