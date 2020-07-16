@@ -10,21 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.variable;
+package org.flowable.common.engine.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
+
 /**
  * @author Ievgenii Bespal
  */
-public class ScopedVariableContainerImpl implements ScopedVariableContainer {
+public class VariableCollectionsContainerImpl implements VariableCollectionsContainer {
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
     protected Map<String, Object> transientLocalVariables;
 
-    public ScopedVariableContainerImpl() {
+    public VariableCollectionsContainerImpl() {
         this.variables = new HashMap<>();
         this.variablesLocal = new HashMap<>();
         this.transientVariables = new HashMap<>();

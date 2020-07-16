@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author Ievgenii Bespal
  */
-public interface ScopedVariableContainer {
+public interface VariableCollectionsContainer {
 
     /**
      * Checks whether or not there is a variable defined with the given name.

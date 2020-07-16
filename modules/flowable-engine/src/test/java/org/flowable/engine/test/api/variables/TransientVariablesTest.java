@@ -30,6 +30,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.junit.jupiter.api.Test;
 
@@ -81,10 +82,12 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         transientVars.put("unusedTransientVar", "Hello there");
         transientVars.put("transientVar", "OK");
 
-        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
-        scopedVariableContainerHelper.setTransientVariables(transientVars);
-        scopedVariableContainerHelper.setVariables(persistentVars);
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .transientVariables(transientVars)
+                .variables(persistentVars)
+                .complete();
 
         // Combined var has been set by execution listener
         String combinedVar = (String) runtimeService.getVariable(processInstance.getId(), "combinedVar");
@@ -114,10 +117,13 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         Map<String, Object> transientVars = new HashMap<>();
         transientVars.put("unusedTransientVar", "Hello there");
         transientVars.put("transientVar", "OK");
-        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
-        scopedVariableContainerHelper.setTransientVariables(transientVars);
-        scopedVariableContainerHelper.setVariables(persistentVars);
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .transientVariables(transientVars)
+                .variables(persistentVars)
+                .complete();
 
         // Combined var has been set by execution listener
         String combinedVar = (String) runtimeService.getVariable(processInstance.getId(), "combinedVar");
@@ -269,9 +275,11 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task1");
 
-        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
-        scopedVariableContainerHelper.setTransientVariable("status", 201);
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .transientVariable("status", 201)
+                .complete();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
@@ -279,15 +287,21 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task1");
-        scopedVariableContainerHelper.getTransientVariables().clear();
-        scopedVariableContainerHelper.setTransientVariable("status", 200);
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+
+        taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .transientVariable("status", 200)
+                .complete();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task3");
-        scopedVariableContainerHelper.getTransientVariables().clear();
-        scopedVariableContainerHelper.setTransientVariable("status2", 200);
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+
+        taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .transientVariable("status2", 200)
+                .complete();
     }
 
     /* Service task class for previous tests */

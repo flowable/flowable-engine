@@ -18,22 +18,22 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.task.api.TaskCompletionBuilder;
-import org.flowable.common.engine.api.variable.ScopedVariableContainer;
-import org.flowable.common.engine.api.variable.ScopedVariableContainerImpl;
+import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
+import org.flowable.common.engine.impl.VariableCollectionsContainerImpl;
 
 
 /**
  * @author Ievgenii Bespal
  */
 public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
-    protected final ScopedVariableContainer scopedVariableContainer;
+    protected final VariableCollectionsContainer variableCollectionsContainer;
     protected CommandExecutor commandExecutor;
     protected String taskId;
     protected String formDefinitionId;
     protected String outcome;
 
     protected TaskCompletionBuilderImpl() {
-        this.scopedVariableContainer = new ScopedVariableContainerImpl();
+        this.variableCollectionsContainer = new VariableCollectionsContainerImpl();
     }
 
     public TaskCompletionBuilderImpl(CommandExecutor commandExecutor) {
@@ -43,49 +43,49 @@ public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
 
     @Override
     public TaskCompletionBuilder variables(Map<String, Object> variables) {
-        this.scopedVariableContainer.setVariables(variables);
+        this.variableCollectionsContainer.setVariables(variables);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variablesLocal(Map<String, Object> variablesLocal) {
-        this.scopedVariableContainer.setLocalVariables(variablesLocal);
+        this.variableCollectionsContainer.setLocalVariables(variablesLocal);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariables(Map<String, Object> transientVariables) {
-        this.scopedVariableContainer.setTransientVariables(transientVariables);
+        this.variableCollectionsContainer.setTransientVariables(transientVariables);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariablesLocal(Map<String, Object> transientVariablesLocal) {
-        this.scopedVariableContainer.setTransientLocalVariables(transientVariablesLocal);
+        this.variableCollectionsContainer.setTransientLocalVariables(transientVariablesLocal);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variable(String variableName, Object variableValue) {
-        this.scopedVariableContainer.setVariable(variableName, variableValue);
+        this.variableCollectionsContainer.setVariable(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variableLocal(String variableName, Object variableValue) {
-        this.scopedVariableContainer.setVariableLocal(variableName, variableValue);
+        this.variableCollectionsContainer.setVariableLocal(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariable(String variableName, Object variableValue) {
-        this.scopedVariableContainer.setTransientVariable(variableName, variableValue);
+        this.variableCollectionsContainer.setTransientVariable(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariableLocal(String variableName, Object variableValue) {
-        this.scopedVariableContainer.setTransientVariableLocal(variableName, variableValue);
+        this.variableCollectionsContainer.setTransientVariableLocal(variableName, variableValue);
         return this;
     }
 
@@ -108,11 +108,11 @@ public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
     }
 
     protected void completeTask() {
-        this.commandExecutor.execute(new CompleteTaskCmd(this.taskId, this.scopedVariableContainer));
+        this.commandExecutor.execute(new CompleteTaskCmd(this.taskId, this.variableCollectionsContainer));
     }
 
     protected void completeTaskWithForm() {
-        this.commandExecutor.execute(new CompleteTaskWithFormCmd(this.taskId, formDefinitionId, outcome, this.scopedVariableContainer));
+        this.commandExecutor.execute(new CompleteTaskWithFormCmd(this.taskId, formDefinitionId, outcome, this.variableCollectionsContainer));
     }
 
     @Override

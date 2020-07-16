@@ -64,6 +64,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -1118,11 +1119,13 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Complete first task
-        ScopedVariableContainerHelper scopedVariableContainerHelper = new ScopedVariableContainerHelper();
-        scopedVariableContainerHelper.setVariableLocal("a", 1);
-        scopedVariableContainerHelper.setVariableLocal("b", 1);
 
-        taskService.complete(task.getId(), scopedVariableContainerHelper);
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .variableLocal("a", 1)
+                .variableLocal("b", 1)
+                .complete();
 
         // Verify vars are not stored process instance wide
         assertNull(runtimeService.getVariable(processInstance.getId(), "a"));
