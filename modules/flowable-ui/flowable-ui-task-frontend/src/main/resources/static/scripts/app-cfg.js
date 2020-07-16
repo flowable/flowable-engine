@@ -17,12 +17,14 @@
 
 var FLOWABLE = FLOWABLE || {};
 
-var pathname = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?$/, '$1').replace(/\/$/, '');
+var pathname = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?workflow\/?$/, '$1').replace(/\/$/, '');
+var landingPathName = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?$/, '$1').replace(/\/$/, '');
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : pathname,
 	'webContextRoot' : pathname,
+	'landingContextRoot' : landingPathName,
     'datesLocalization' : false
 };
 

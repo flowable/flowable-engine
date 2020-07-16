@@ -19,7 +19,7 @@ flowableModule.factory('NotPermittedInterceptor', [ '$q', '$window', function($q
         responseError: function ( response ) {
 
             if (response.status === 403) {
-                $window.location.href = FLOWABLE.CONFIG.contextRoot;
+                $window.location.href = FLOWABLE.CONFIG.landingContextRoot;
                 $window.location.reload();
                 return $q.reject(response);
             }

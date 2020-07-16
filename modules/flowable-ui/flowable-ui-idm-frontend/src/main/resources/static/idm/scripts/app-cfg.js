@@ -17,7 +17,7 @@
 
 var FLOWABLE = FLOWABLE || {};
 
-var pathname = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?$/, '$1').replace(/\/$/, '');
+var pathname = window.location.pathname.replace(/^(\/[^\/]*)(\/.*)?idm\/?$/, '$1').replace(/\/$/, '');
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
