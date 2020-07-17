@@ -176,10 +176,8 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
             if (token != null && !presentedToken.equals(token.getTokenValue())) {
 
                 // Token doesn't match series value. Delete this session and throw an exception.
-                if (token != null) {
-                    persistentTokenService.delete(token);
-                }
-                
+                persistentTokenService.delete(token);
+
                 throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
 
             }
