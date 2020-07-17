@@ -342,9 +342,9 @@ flowableApp
                 $window.location.href = redirectUrl;
             } else {
                 var locationPath = $location.path();
-                if (locationPath == '' || locationPath == '#' || locationPath == '/login'
-                    || locationPath.indexOf('/account/activate/') >= 0 || locationPath.indexOf('/account/reset-password/') >= 0) {
-                      
+                if (locationPath === '' || locationPath === '#' || locationPath === '/login') {
+                    $window.location.href = FLOWABLE.CONFIG.contextRoot
+                } else if (locationPath.indexOf('/account/activate/') >= 0 || locationPath.indexOf('/account/reset-password/') >= 0) {
                     $location.path('/');
                 }
             }

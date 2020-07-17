@@ -105,15 +105,14 @@ public class FlowableUiCustomFormLoginConfigurer<H extends HttpSecurityBuilder<H
     protected LoginUrlAuthenticationEntryPoint getAuthenticationEntryPoint(ApplicationContext applicationContext) {
         if (this.authenticationEntryPoint == null) {
             FlowableCommonAppProperties commonAppProperties = applicationContext.getBean(FlowableCommonAppProperties.class);
-            String idmAppUrl;
-            String redirectOnAuthSuccess = commonAppProperties.getRedirectOnAuthSuccess();
             if (ClassUtils.isPresent("org.flowable.ui.idm.service.GroupServiceImpl", getClass().getClassLoader())) {
                 // If the groups service (idm app) is present then it should be redirected to it automatically)
-                idmAppUrl = "/";
+                this.authenticationEntryPoint = postProcess(new LoginUrlAuthenticationEntryPoint("/idm/#/login"));
             } else {
-                idmAppUrl = commonAppProperties.determineIdmAppRedirectUrl();
+                String redirectOnAuthSuccess = commonAppProperties.getRedirectOnAuthSuccess();
+                String idmAppUrl = commonAppProperties.determineIdmAppRedirectUrl();
+                this.authenticationEntryPoint = postProcess(new FlowableLoginUrlAuthenticationEntryPoint(idmAppUrl, redirectOnAuthSuccess));
             }
-            this.authenticationEntryPoint = postProcess(new FlowableLoginUrlAuthenticationEntryPoint(idmAppUrl, redirectOnAuthSuccess));
         }
 
         return this.authenticationEntryPoint;
