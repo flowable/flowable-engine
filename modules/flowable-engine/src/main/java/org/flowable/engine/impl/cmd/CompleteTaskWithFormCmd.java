@@ -17,7 +17,7 @@ import java.util.Map;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
-import org.flowable.common.engine.impl.VariableCollectionsContainerImpl;
+import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;

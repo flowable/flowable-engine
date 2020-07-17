@@ -1119,7 +1119,6 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Complete first task
-
         TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
         taskCompletionBuilder
                 .taskId(task.getId())

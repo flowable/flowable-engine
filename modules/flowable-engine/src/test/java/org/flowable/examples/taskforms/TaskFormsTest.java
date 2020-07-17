@@ -15,12 +15,11 @@ package org.flowable.examples.taskforms;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
-import org.flowable.common.engine.impl.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,9 +71,12 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertNotNull(taskForm);
 
         // Rejecting the task should put the process back to first task
-        VariableCollectionsContainer variableCollectionsContainer = new VariableCollectionsContainerImpl();
-        variableCollectionsContainer.setVariables(CollectionUtil.singletonMap("vacationApproved", "false"));
-        taskService.complete(task.getId(), variableCollectionsContainer.getVariables());
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .variables(CollectionUtil.singletonMap("vacationApproved", "false"))
+                .complete();
+
         task = taskService.createTaskQuery().singleResult();
         assertEquals("Adjust vacation request", task.getName());
     }

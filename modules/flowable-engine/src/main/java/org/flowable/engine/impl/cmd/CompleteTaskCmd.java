@@ -15,7 +15,7 @@ package org.flowable.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
-import org.flowable.common.engine.impl.VariableCollectionsContainerImpl;
+import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.Flowable5Util;
