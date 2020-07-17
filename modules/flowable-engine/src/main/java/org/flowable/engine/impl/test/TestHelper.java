@@ -84,6 +84,10 @@ public abstract class TestHelper {
         return annotationDeploymentSetUp(processEngine, testClass, method, deploymentAnnotation);
     }
 
+    public static String annotationDeploymentSetUp(ProcessEngine processEngine, Method method, Deployment deploymentAnnotation) {
+        return annotationDeploymentSetUp(processEngine, method.getDeclaringClass(), method, deploymentAnnotation);
+    }
+
     public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method, Deployment deploymentAnnotation) {
         String deploymentId = null;
         String methodName = method.getName();

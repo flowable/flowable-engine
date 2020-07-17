@@ -78,7 +78,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
         AnnotationSupport.findAnnotation(context.getTestMethod(), Deployment.class)
             .ifPresent(deployment -> {
                 String deploymentIdFromDeploymentAnnotation = TestHelper
-                    .annotationDeploymentSetUp(processEngine, context.getRequiredTestClass(), context.getRequiredTestMethod(), deployment);
+                    .annotationDeploymentSetUp(processEngine, context.getRequiredTestMethod(), deployment);
                 getStore(context).put(context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY, deploymentIdFromDeploymentAnnotation);
             });
     }
