@@ -15,6 +15,8 @@
     <properties>
       	<!-- Maven build properties -->
   		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- The ui admin app is only in the repo as an example and should not be deployed to maven -->
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
 	<profiles>

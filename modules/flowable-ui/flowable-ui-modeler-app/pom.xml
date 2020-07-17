@@ -10,6 +10,11 @@
     <artifactId>flowable-ui-modeler-app</artifactId>
     <packaging>war</packaging>
 
+    <properties>
+        <!-- The ui modeler app is only in the repo as an example and should not be deployed to maven -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
