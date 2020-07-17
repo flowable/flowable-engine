@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.modeler.conf;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.flowable.ui.modeler.service.FlowableModelQueryService;
 import org.flowable.ui.modeler.service.ModelImageService;
@@ -19,6 +21,7 @@ import org.flowable.ui.modeler.service.ModelServiceImpl;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.flowable.ui.modeler.servlet.ApiDispatcherServletConfiguration;
 import org.flowable.ui.modeler.servlet.AppDispatcherServletConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
@@ -56,7 +59,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public ServletRegistrationBean<DispatcherServlet> modelerAppServlet(ApplicationContext applicationContext) {
+    public ServletRegistrationBean<DispatcherServlet> modelerAppServlet(ApplicationContext applicationContext, ObjectProvider<MultipartConfigElement> multipartConfig) {
         AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         dispatcherServletConfiguration.setParent(applicationContext);
         dispatcherServletConfiguration.register(AppDispatcherServletConfiguration.class);
@@ -65,6 +68,7 @@ public class ApplicationConfiguration {
         registrationBean.setName("Flowable Modeler App Servlet");
         registrationBean.setLoadOnStartup(1);
         registrationBean.setAsyncSupported(true);
+        multipartConfig.ifAvailable(registrationBean::setMultipartConfig);
         return registrationBean;
     }
 
