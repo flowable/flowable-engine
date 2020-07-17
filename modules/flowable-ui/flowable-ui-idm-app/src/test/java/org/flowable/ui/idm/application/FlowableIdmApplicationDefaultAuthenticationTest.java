@@ -15,9 +15,7 @@ package org.flowable.ui.idm.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.ui.common.security.DefaultPrivileges;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

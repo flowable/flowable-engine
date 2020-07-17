@@ -21,7 +21,6 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.model.GroupRepresentation;
-import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.InitializingBean;
