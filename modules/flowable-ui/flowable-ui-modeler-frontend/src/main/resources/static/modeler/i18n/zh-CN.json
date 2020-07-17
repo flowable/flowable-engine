@@ -487,6 +487,12 @@
           "DESCRIPTION" : "指示将响应变量存储为JSON变量而不是String的标志"
         }
       },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
+        }
+      },
       "SKIPEXPRESSIONPACKAGE" : {
         "SKIPEXPRESSION" : {
           "TITLE" : "跳过表达式",
