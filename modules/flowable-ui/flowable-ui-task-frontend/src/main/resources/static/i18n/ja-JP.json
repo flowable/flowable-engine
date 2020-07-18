@@ -1,0 +1,97 @@
+{
+  "GENERAL": {
+    "MAIN-TITLE": "Flowable",
+    "ERROR": {
+      "GENERIC": "申し訳ありませんが、エラーが発生しました。",
+      "UNKNOWN": "申し訳ありませんが、リクエストされた処理の実行中にエラーが発生しました。",
+      "BAD_REQUEST": "リクエストされた処理の実行中にエラーが発生",
+      "NOT_FOUND": "アクセスしようとしたリソースは存在しません",
+      "UNAUTHORIZED": "リクエストされた処理を実行するためにはサインインが必要です。",
+      "FORBIDDEN": "リクエストされた処理は許可されていません",
+      "INTERNAL_SERVER_ERROR": "申し訳ありませんが、リクエストされた処理の実行中に予期せぬエラーが発生しました。"
+    },
+    "ACTION": {
+      "LOGOUT": "サインアウト",
+      "HELP": "クイックスタート",
+      "EDIT-PROFILE": "プロフィールの編集",
+      "SAVE": "保存",
+      "CANCEL": "キャンセル",
+      "CLOSE": "閉じる",
+      "DEPLOY": "デプロイ",
+      "ABOUT": "Flowableについて"
+    }
+  },
+  "LOGIN": {
+    "TITLE": "サインイン",
+    "USERNAME": "ユーザー名",
+    "USERNAME-PLACEHOLDER": "ユーザー名を入力",
+    "PASSWORD": "パスワード",
+    "PASSWORD-PLACEHOLDER": "パスワードを入力",
+    "INVALID-CREDENTIALS": "不正な認証情報",
+    "ACTION": {
+      "CONFIRM": "サインイン"
+    }
+  },
+  "ACCOUNT": {
+    "ACTIVATE": {
+      "TITLE": "アカウントの有効化",
+      "ACTIVATING-MESSAGE": "現在、{{userFullName}}さんのアカウントを有効化しています...",
+      "SUCCESS-MESSAGE": "アカウントが有効化されました。プロセスのデザイン/実行を開始するために、サインインしてください",
+      "FAILURE-MESSAGE": "アカウントが有効化できません。すでに有効化済であるか、リンクが期限切れしています。"
+    },
+    "RESET-PASSWORD-REQUEST": {
+      "MESSAGE": "パスワードを忘れましたか？メールアドレスを入力しパスワードリセットのメールを受信してください。",
+      "TITLE": "パスワードのリセット",
+      "EMAIL": "メールアドレス",
+      "EMAIL-PLACEHOLDER": "メールアドレスを入力してください",
+      "SECURITY-SECTION": "セキュリティチェック",
+      "CONFIRM": "パスワードリセットのリクエスト",
+      "SUCCESS-MESSAGE": "後ほどパスワードリセットのリンクを記載したメールが届きます。",
+      "ERROR": {
+        "UNEXISTING-USER": "入力されたメールアドレスは登録されていません。"
+      }
+    },
+    "RESET-PASSWORD": {
+      "TITLE": "パスワードのリセット",
+      "PASSWORD": "パスワード",
+      "PASSWORD-CONFIRM": "パスワードの確認",
+      "PASSWORD-PLACEHOLDER": "新しいパスワードを入力してください",
+      "PASSWORD-CONFIRM-PLACEHOLDER": "新しいパスワードの確認",
+      "CONFIRM": "パスワードの変更",
+      "LOADING": "パスワードをリセット中",
+      "SUCCESS-MESSAGE": "パスワードが変更されました。",
+      "LOGIN": "今すぐサインイン",
+      "FAILURE-MESSAGE": "パスワードをリセットできません。リセットリンクが不正か期限切れになっています。"
+    }
+  },
+  "APP": {
+    "KICKSTART": {
+      "TITLE": "キックスタートアプリ",
+      "DESCRIPTION": "プロセスモデル、フォーム、アプリ定義を作成し、他の人達とモデルと定義を共有します。"
+    },
+    "TASKS": {
+      "TITLE": "タスクアプリ",
+      "DESCRIPTION": "すべてのタスクの一覧にアクセスし様々なプロセスアプリから割り当てられたタスクの処理をします。新しいプロセスやタスクの開始も可能です。"
+    },
+    "IDENTITY-MANAGEMENT": {
+      "TITLE": "ID管理",
+      "TITLE-TENANT-ADMIN": "ID管理",
+      "DESCRIPTION": "プロフィールを管理: アイコン画像、名前、その他の設定。管理者としてユーザーとグループを管理。",
+      "DESCRIPTION-TENANT-ADMIN": "組織内のユーザーとグループを管理します。"
+    },
+    "CUSTOM-APP": {
+      "TITLE-TASKS": "タスク",
+      "TITLE-PROCESSES": "プロセス"
+    },
+    "POPUP": {
+      "ADD-APP-TITLE": "アプリをランディングページに追加",
+      "ADD-APP-SUMMARY": "ランディングページにアプリを追加します"
+    },
+    "ACTION": {
+      "DELETE": "アプリの削除"
+    },
+    "MESSAGE": {
+      "DELETED": "アプリが削除されました"
+    }
+  }
+}
