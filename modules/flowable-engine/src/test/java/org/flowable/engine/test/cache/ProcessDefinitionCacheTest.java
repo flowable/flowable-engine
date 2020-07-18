@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.cache;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.ProcessEngine;
@@ -60,16 +62,16 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         // verify existence of process definition
         List<ProcessDefinition> processDefinitions = processEngine.getRepositoryService().createProcessDefinitionQuery().list();
 
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
 
         // Start a new Process instance
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitions.get(0).getId());
         String processInstanceId = processInstance.getId();
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // Close the process engine
         processEngine.close();
-        assertNotNull(processEngine.getRuntimeService());
+        assertThat(processEngine.getRuntimeService()).isNotNull();
 
         // Reboot the process engine
         processEngine = new StandaloneProcessEngineConfiguration().setEngineName("reboot-test").setDatabaseSchemaUpdate(org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
@@ -78,7 +80,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         // Check if the existing process instance is still alive
         processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // Complete the task. That will end the process instance
         TaskService taskService = processEngine.getTaskService();
@@ -89,11 +91,11 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         // process definition has re-loaded into the process definition cache
         processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         // Extra check to see if a new process instance can be started as well
         processInstance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitions.get(0).getId());
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // close the process engine
         processEngine.close();
@@ -126,12 +128,12 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         String processDefinitionId = repositoryService2.createProcessDefinitionQuery().singleResult().getId();
         runtimeService2.startProcessInstanceById(processDefinitionId);
         org.flowable.task.api.Task task = taskService2.createTaskQuery().singleResult();
-        assertEquals("original task", task.getName());
+        assertThat(task.getName()).isEqualTo("original task");
 
         // Delete the deployment on second process engine
         repositoryService2.deleteDeployment(deploymentId, true);
-        assertEquals(0, repositoryService2.createDeploymentQuery().count());
-        assertEquals(0, runtimeService2.createProcessInstanceQuery().count());
+        assertThat(repositoryService2.createDeploymentQuery().count()).isZero();
+        assertThat(runtimeService2.createProcessInstanceQuery().count()).isZero();
 
         // deploy a revised version of the process: start->revisedTask->end on first process engine
         //
@@ -146,7 +148,7 @@ public class ProcessDefinitionCacheTest extends AbstractTestCase {
         repositoryService2.createProcessDefinitionQuery().singleResult().getId();
         runtimeService2.startProcessInstanceByKey("oneTaskProcess");
         task = taskService2.createTaskQuery().singleResult();
-        assertEquals("revised task", task.getName());
+        assertThat(task.getName()).isEqualTo("revised task");
 
         // cleanup
         repositoryService1.deleteDeployment(deploymentId, true);

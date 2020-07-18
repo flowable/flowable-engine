@@ -52,6 +52,17 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+    public void deploySingleDecisionTableDecisionQueryWrongType() {
+        DmnDecision decision = repositoryService.createDecisionQuery()
+            .latestVersion()
+            .decisionKey("decision")
+            .decisionTypeLike("%service")
+            .singleResult();
+        assertThat(decision).isNull();
+    }
+
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions_DMN12.dmn")
     public void deploySingleDecisionDMN12() {
         DmnDecision decision = repositoryService.createDecisionQuery()

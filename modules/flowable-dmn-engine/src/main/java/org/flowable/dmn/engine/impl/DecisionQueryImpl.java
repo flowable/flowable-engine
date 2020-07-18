@@ -56,6 +56,7 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String decisionType;
+    protected String decisionTypeLike;
 
     public DecisionQueryImpl() {
     }
@@ -258,6 +259,12 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
         return this;
     }
 
+    @Override
+    public DmnDecisionQuery decisionTypeLike(String decisionTypeLike) {
+        this.decisionTypeLike = decisionTypeLike;
+        return this;
+    }
+
     // sorting ////////////////////////////////////////////
 
     @Override
@@ -400,5 +407,13 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getDecisionType() {
+        return decisionType;
+    }
+
+    public String getDecisionTypeLike() {
+        return decisionTypeLike;
     }
 }

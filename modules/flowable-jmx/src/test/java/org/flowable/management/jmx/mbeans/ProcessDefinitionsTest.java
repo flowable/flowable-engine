@@ -13,8 +13,7 @@
 
 package org.flowable.management.jmx.mbeans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -96,19 +95,19 @@ public class ProcessDefinitionsTest {
         when(processDefinitionQuery.list()).thenReturn(processDefinitionList);
 
         List<List<String>> result = processDefinitionsMBean.getProcessDefinitions();
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(5, result.get(0).size());
-        assertEquals("testId", result.get(0).get(0));
-        assertEquals("testName", result.get(0).get(1));
-        assertEquals("175", result.get(0).get(2));
-        assertEquals("false", result.get(0).get(3));
-        assertEquals("testDescription", result.get(0).get(4));
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).hasSize(5);
+        assertThat(result.get(0).get(0)).isEqualTo("testId");
+        assertThat(result.get(0).get(1)).isEqualTo("testName");
+        assertThat(result.get(0).get(2)).isEqualTo("175");
+        assertThat(result.get(0).get(3)).isEqualTo("false");
+        assertThat(result.get(0).get(4)).isEqualTo("testDescription");
 
         pd.setSuspensionState(2);
 
         result = processDefinitionsMBean.getProcessDefinitions();
-        assertEquals("true", result.get(0).get(3));
+        assertThat(result.get(0).get(3)).isEqualTo("true");
 
     }
 
@@ -124,12 +123,12 @@ public class ProcessDefinitionsTest {
         when(deploymentQuery.list()).thenReturn(deploymentList);
 
         List<List<String>> result = processDefinitionsMBean.getDeployments();
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(3, result.get(0).size());
-        assertEquals("testDeploymentId", result.get(0).get(0));
-        assertEquals("testDeploymentName", result.get(0).get(1));
-        assertEquals("tenantId", result.get(0).get(2));
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).hasSize(3);
+        assertThat(result.get(0).get(0)).isEqualTo("testDeploymentId");
+        assertThat(result.get(0).get(1)).isEqualTo("testDeploymentName");
+        assertThat(result.get(0).get(2)).isEqualTo("tenantId");
 
     }
 
@@ -167,75 +166,75 @@ public class ProcessDefinitionsTest {
     public void testAnnotations() throws MalformedObjectNameException, JMException {
 
         ModelMBean modelBean = assembler.assemble(processDefinitionsMBean, new ObjectName("domain", "key", "value"));
-        assertNotNull(modelBean);
+        assertThat(modelBean).isNotNull();
         MBeanInfo beanInfo = modelBean.getMBeanInfo();
-        assertNotNull(beanInfo);
-        assertNotNull(beanInfo.getOperations());
-        assertEquals(9, beanInfo.getOperations().length);
+        assertThat(beanInfo).isNotNull();
+        assertThat(beanInfo.getOperations()).isNotNull();
+        assertThat(beanInfo.getOperations()).hasSize(9);
         int counter = 0;
 
         for (MBeanOperationInfo op : beanInfo.getOperations()) {
             if (op.getName().equals("deleteDeployment")) {
                 counter++;
-                assertEquals("delete deployment", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("delete deployment");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
             } else if (op.getName().equals("suspendProcessDefinitionById")) {
                 counter++;
-                assertEquals("Suspend given process ID", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("Suspend given process ID");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
             } else if (op.getName().equals("activatedProcessDefinitionById")) {
                 counter++;
-                assertEquals("Activate given process ID", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("Activate given process ID");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
             } else if (op.getName().equals("suspendProcessDefinitionByKey")) {
                 counter++;
-                assertEquals("Suspend given process ID", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("Suspend given process ID");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
             } else if (op.getName().equals("activatedProcessDefinitionByKey")) {
                 counter++;
-                assertEquals("Activate given process ID", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("Activate given process ID");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
             } else if (op.getName().equals("deployProcessDefinition")) {
                 counter++;
-                assertEquals("Deploy Process Definition", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(2, op.getSignature().length);
-                assertEquals("java.lang.String", op.getSignature()[0].getType());
-                assertEquals("java.lang.String", op.getSignature()[1].getType());
+                assertThat(op.getDescription()).isEqualTo("Deploy Process Definition");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(2);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
+                assertThat(op.getSignature()[1].getType()).isEqualTo("java.lang.String");
             }
 
         }
-        assertEquals(6, counter);
+        assertThat(counter).isEqualTo(6);
 
         // check attributes
-        assertNotNull(beanInfo.getAttributes());
-        assertEquals(2, beanInfo.getAttributes().length);
+        assertThat(beanInfo.getAttributes()).isNotNull();
+        assertThat(beanInfo.getAttributes()).hasSize(2);
 
         counter = 0;
 
         for (MBeanAttributeInfo attr : beanInfo.getAttributes()) {
             if (attr.getName().equals("ProcessDefinitions")) {
                 counter++;
-                assertEquals("List of Process definitions", attr.getDescription());
-                assertEquals("java.util.List", attr.getType());
+                assertThat(attr.getDescription()).isEqualTo("List of Process definitions");
+                assertThat(attr.getType()).isEqualTo("java.util.List");
             } else if (attr.getName().equals("Deployments")) {
                 counter++;
-                assertEquals("List of deployed Processes", attr.getDescription());
-                assertEquals("java.util.List", attr.getType());
+                assertThat(attr.getDescription()).isEqualTo("List of deployed Processes");
+                assertThat(attr.getType()).isEqualTo("java.util.List");
             }
 
         }
-        assertEquals(2, counter);
+        assertThat(counter).isEqualTo(2);
     }
 
 }

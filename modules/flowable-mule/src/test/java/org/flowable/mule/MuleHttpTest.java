@@ -12,12 +12,13 @@
  */
 package org.flowable.mule;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -28,15 +29,15 @@ public class MuleHttpTest extends AbstractMuleTest {
 
     @Test
     public void http() throws Exception {
-        Assert.assertTrue(muleContext.isStarted());
+        assertThat(muleContext.isStarted()).isTrue();
 
         ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
         Deployment deployment = processEngine.getRepositoryService().createDeployment().addClasspathResource("org/flowable/mule/testHttp.bpmn20.xml").deploy();
         RuntimeService runtimeService = processEngine.getRuntimeService();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("muleProcess");
-        Assert.assertFalse(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isFalse();
         Object result = runtimeService.getVariable(processInstance.getProcessInstanceId(), "theVariable");
-        Assert.assertEquals(20, result);
+        assertThat(result).isEqualTo(20);
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         processEngine.getHistoryService().deleteHistoricProcessInstance(processInstance.getId());
         processEngine.getRepositoryService().deleteDeployment(deployment.getId());

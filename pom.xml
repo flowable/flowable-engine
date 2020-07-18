@@ -727,11 +727,6 @@
 				<artifactId>flowable-jmx</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-			    <groupId>org.flowable</groupId>
-			    <artifactId>flowable-ui-common</artifactId>
-			    <version>${project.version}</version>
-			</dependency>
             <dependency>
 			    <groupId>org.flowable</groupId>
 			    <artifactId>flowable-groovy-script-static-engine</artifactId>
@@ -1393,12 +1388,7 @@
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-ui-edge</module>
-				<module>modules/flowable-ui-idm</module>
-				<module>modules/flowable-ui-modeler</module>
-				<module>modules/flowable-ui-task</module>
-				<module>modules/flowable-ui-admin</module>
+				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1505,7 +1495,7 @@
                 <module>modules/flowable-http</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-ui</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1648,8 +1638,7 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
-				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-ui-edge</module>
+				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>

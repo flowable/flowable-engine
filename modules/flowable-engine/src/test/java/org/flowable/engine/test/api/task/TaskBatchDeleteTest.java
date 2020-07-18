@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -27,8 +29,8 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
     public void testDeleteTaskWithChildren() throws Exception {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testBatchDeleteOfTask");
-        assertNotNull(processInstance);
-        assertFalse(processInstance.isEnded());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.isEnded()).isFalse();
 
         // Get first task and finish. This should destroy the scope and trigger
         // some deletes, including:
@@ -36,13 +38,13 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         // The task deletes shouldn't be batched in this case, keeping the
         // related entity delete order
         org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskOne").singleResult();
-        assertNotNull(firstTask);
+        assertThat(firstTask).isNotNull();
 
         taskService.complete(firstTask.getId());
 
         // Process should have ended fine
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
     }
 
@@ -51,21 +53,21 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
     public void testDeleteCancelledMultiInstanceTasks() throws Exception {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testBatchDeleteOfTask");
-        assertNotNull(processInstance);
-        assertFalse(processInstance.isEnded());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.isEnded()).isFalse();
 
         org.flowable.task.api.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(4, 1).get(0);
 
         taskService.addCandidateGroup(lastTask.getId(), "sales");
 
         org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(0, 1).get(0);
-        assertNotNull(firstTask);
+        assertThat(firstTask).isNotNull();
 
         taskService.complete(firstTask.getId());
 
         // Process should have ended fine
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
