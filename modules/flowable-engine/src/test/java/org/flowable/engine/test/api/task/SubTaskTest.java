@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,8 +54,8 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         taskService.saveTask(subTaskTwo);
         
         String subTaskId = subTaskOne.getId();
-        assertTrue(taskService.getSubTasks(subTaskId).isEmpty());
-        assertTrue(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list().isEmpty());
+        assertThat(taskService.getSubTasks(subTaskId)).isEmpty();
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list()).isEmpty();
 
         List<Task> subTasks = taskService.getSubTasks(gonzoTaskId);
         Set<String> subTaskNames = new HashSet<>();
@@ -66,7 +68,7 @@ public class SubTaskTest extends PluggableFlowableTestCase {
             expectedSubTaskNames.add("subtask one");
             expectedSubTaskNames.add("subtask two");
 
-            assertEquals(expectedSubTaskNames, subTaskNames);
+            assertThat(subTaskNames).isEqualTo(expectedSubTaskNames);
 
             List<HistoricTaskInstance> historicSubTasks = historyService.createHistoricTaskInstanceQuery().taskParentTaskId(gonzoTaskId).list();
 
@@ -75,7 +77,7 @@ public class SubTaskTest extends PluggableFlowableTestCase {
                 subTaskNames.add(historicSubTask.getName());
             }
 
-            assertEquals(expectedSubTaskNames, subTaskNames);
+            assertThat(subTaskNames).isEqualTo(expectedSubTaskNames);
         }
 
         taskService.deleteTask(gonzoTaskId, true);
@@ -97,11 +99,11 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         subTaskTwo.setParentTaskId(parentTask.getId());
         taskService.saveTask(subTaskTwo);
 
-        assertEquals(2, taskService.getSubTasks(parentTask.getId()).size());
+        assertThat(taskService.getSubTasks(parentTask.getId())).hasSize(2);
         
         if (processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
-            assertEquals(2, countingTaskEntity.getSubTaskCount());
+            assertThat(countingTaskEntity.getSubTaskCount()).isEqualTo(2);
         }
         
         subTaskTwo = taskService.createTaskQuery().taskId(subTaskTwo.getId()).singleResult();
@@ -110,10 +112,10 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         
         if (processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
-            assertEquals(1, countingTaskEntity.getSubTaskCount());
+            assertThat(countingTaskEntity.getSubTaskCount()).isEqualTo(1);
         }
         
-        assertEquals(1, taskService.getSubTasks(parentTask.getId()).size());
+        assertThat(taskService.getSubTasks(parentTask.getId())).hasSize(1);
         taskService.deleteTask(parentTask.getId(), true);
         taskService.deleteTask(subTaskTwo.getId(), true);
     }
@@ -141,23 +143,23 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         taskService.saveTask(subTask2);
 
         List<Task> tasks = taskService.createTaskQuery().taskAssignee("test").list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "none");
 
         tasks = taskService.createTaskQuery().taskAssignee("test").list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
-            assertEquals(3, historicTasks.size());
+            assertThat(historicTasks).hasSize(3);
 
             historyService.deleteHistoricProcessInstance(processInstance.getId());
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
-            assertEquals(0, historicTasks.size());
+            assertThat(historicTasks).isEmpty();
         }
 
         repositoryService.deleteDeployment(deployment.getId(), true);
