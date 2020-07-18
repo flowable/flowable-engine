@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import java.util.Map;
-
 import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;

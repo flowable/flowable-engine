@@ -15,7 +15,6 @@ package org.flowable.editor.language.json.converter;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
