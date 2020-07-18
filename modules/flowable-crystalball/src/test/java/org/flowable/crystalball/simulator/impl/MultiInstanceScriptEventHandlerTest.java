@@ -12,8 +12,7 @@
  */
 package org.flowable.crystalball.simulator.impl;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -36,25 +35,25 @@ public class MultiInstanceScriptEventHandlerTest extends ResourceFlowableTestCas
     public void testSequentialSimulationRun() throws Exception {
         ProcessInstance simulationExperiment = runtimeService.startProcessInstanceByKey("multiInstanceResultVariablesSimulationRun");
         // all simulationManager executions are finished
-        assertEquals(2, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isEqualTo(2);
 
         // simulation run check - process variables has to be set to the value. "Hello worldX!"
         String simulationRunResult = (String) runtimeService.getVariable(simulationExperiment.getProcessInstanceId(), "simulationRunResult-0");
-        assertThat(simulationRunResult, is("Hello world0!"));
+        assertThat(simulationRunResult).isEqualTo("Hello world0!");
         simulationRunResult = (String) runtimeService.getVariable(simulationExperiment.getProcessInstanceId(), "simulationRunResult-1");
-        assertThat(simulationRunResult, is("Hello world1!"));
+        assertThat(simulationRunResult).isEqualTo("Hello world1!");
         simulationRunResult = (String) runtimeService.getVariable(simulationExperiment.getProcessInstanceId(), "simulationRunResult-2");
-        assertThat(simulationRunResult, is("Hello world2!"));
+        assertThat(simulationRunResult).isEqualTo("Hello world2!");
         simulationRunResult = (String) runtimeService.getVariable(simulationExperiment.getProcessInstanceId(), "simulationRunResult-3");
-        assertThat(simulationRunResult, is("Hello world3!"));
+        assertThat(simulationRunResult).isEqualTo("Hello world3!");
         simulationRunResult = (String) runtimeService.getVariable(simulationExperiment.getProcessInstanceId(), "simulationRunResult-4");
-        assertThat(simulationRunResult, is("Hello world4!"));
+        assertThat(simulationRunResult).isEqualTo("Hello world4!");
 
         // process end
         runtimeService.trigger(runtimeService.createExecutionQuery()
                 .onlyChildExecutions().singleResult().getId());
         // no process instance is running
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
 }

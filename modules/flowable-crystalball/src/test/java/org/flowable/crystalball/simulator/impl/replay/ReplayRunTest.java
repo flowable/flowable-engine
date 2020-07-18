@@ -12,7 +12,7 @@
  */
 package org.flowable.crystalball.simulator.impl.replay;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,21 +88,21 @@ public class ReplayRunTest {
         simRun.init(new NoExecutionVariableScope());
 
         // original process is finished - there should not be any running process instance/task
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count());
-        assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count()).isZero();
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("userTask").count()).isZero();
 
         simRun.step();
 
         // replay process was started
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count()).isEqualTo(1);
         // there should be one task
-        assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("userTask").count()).isEqualTo(1);
 
         simRun.step();
 
         // userTask was completed - replay process was finished
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count());
-        assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(USERTASK_PROCESS).count()).isZero();
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("userTask").count()).isZero();
 
         simRun.close();
         processEngine.close();
