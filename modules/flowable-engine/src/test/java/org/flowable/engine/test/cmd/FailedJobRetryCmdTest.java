@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cmd;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
@@ -29,65 +31,65 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
     public void testFailedServiceTask() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
-        assertNotNull(pi);
+        assertThat(pi).isNotNull();
         waitForExecutedJobWithRetriesLeft(4);
 
         stillOneJobWithExceptionAndRetriesLeft();
 
         Job job = fetchJob(pi.getProcessInstanceId());
-        assertNotNull(job);
-        assertNotNull(job.getCorrelationId());
-        assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
+        assertThat(job).isNotNull();
+        assertThat(job.getCorrelationId()).isNotNull();
+        assertThat(job.getProcessInstanceId()).isEqualTo(pi.getProcessInstanceId());
 
         String correlationId = job.getCorrelationId();
 
-        assertEquals(4, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(4);
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(pi.getId()).singleResult();
-        assertEquals("failingServiceTask", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
         waitForExecutedJobWithRetriesLeft(3);
 
         job = refreshJob(job.getId());
-        assertEquals(3, job.getRetries());
-        assertEquals(correlationId, job.getCorrelationId());
+        assertThat(job.getRetries()).isEqualTo(3);
+        assertThat(job.getCorrelationId()).isEqualTo(correlationId);
         stillOneJobWithExceptionAndRetriesLeft();
 
         execution = refreshExecutionEntity(execution.getId());
-        assertEquals("failingServiceTask", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
         waitForExecutedJobWithRetriesLeft(2);
 
         job = refreshJob(job.getId());
-        assertEquals(2, job.getRetries());
-        assertEquals(correlationId, job.getCorrelationId());
+        assertThat(job.getRetries()).isEqualTo(2);
+        assertThat(job.getCorrelationId()).isEqualTo(correlationId);
         stillOneJobWithExceptionAndRetriesLeft();
 
         execution = refreshExecutionEntity(execution.getId());
-        assertEquals("failingServiceTask", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
         waitForExecutedJobWithRetriesLeft(1);
 
         job = refreshJob(job.getId());
-        assertEquals(correlationId, job.getCorrelationId());
-        assertEquals(1, job.getRetries());
+        assertThat(job.getCorrelationId()).isEqualTo(correlationId);
+        assertThat(job.getRetries()).isEqualTo(1);
         stillOneJobWithExceptionAndRetriesLeft();
 
         execution = refreshExecutionEntity(execution.getId());
-        assertEquals("failingServiceTask", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
         waitForExecutedJobWithRetriesLeft(0);
 
         job = managementService.createDeadLetterJobQuery().jobId(job.getId()).singleResult();
-        assertEquals(0, job.getRetries());
-        assertEquals(correlationId, job.getCorrelationId());
-        assertEquals(1, managementService.createDeadLetterJobQuery().withException().count());
-        assertEquals(0, managementService.createJobQuery().count());
-        assertEquals(0, managementService.createTimerJobQuery().count());
-        assertEquals(1, managementService.createDeadLetterJobQuery().count());
+        assertThat(job.getRetries()).isZero();
+        assertThat(job.getCorrelationId()).isEqualTo(correlationId);
+        assertThat(managementService.createDeadLetterJobQuery().withException().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
 
         execution = refreshExecutionEntity(execution.getId());
-        assertEquals("failingServiceTask", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
     }
 
@@ -116,8 +118,8 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
     }
 
     protected void stillOneJobWithExceptionAndRetriesLeft() {
-        assertEquals(1, managementService.createTimerJobQuery().withException().count());
-        assertEquals(1, managementService.createTimerJobQuery().count());
+        assertThat(managementService.createTimerJobQuery().withException().count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
     }
 
     protected Job fetchJob(String processInstanceId) {

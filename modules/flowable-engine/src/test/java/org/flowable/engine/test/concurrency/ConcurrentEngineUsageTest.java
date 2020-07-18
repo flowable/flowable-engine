@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -63,15 +65,15 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                 executor.shutdownNow();
 
             }
-            assertEquals(0, executor.getActiveCount());
+            assertThat(executor.getActiveCount()).isZero();
 
             // Check there are no processes active anymore
-            assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 // Check if all processes and tasks are complete
-                assertEquals(numberOfProcessesPerThread * numberOfThreads, historyService.createHistoricProcessInstanceQuery().finished().count());
-                assertEquals(totalNumberOfTasks, historyService.createHistoricTaskInstanceQuery().finished().count());
+                assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(numberOfProcessesPerThread * numberOfThreads);
+                assertThat(historyService.createHistoricTaskInstanceQuery().finished().count()).isEqualTo(totalNumberOfTasks);
             }
         }
     }
