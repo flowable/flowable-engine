@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.spring.boot.environment.FlowableDefaultPropertiesEnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.core.Ordered;

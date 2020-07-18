@@ -13,7 +13,6 @@
 package org.flowable.ui.idm.model;
 
 import java.time.Instant;
-import java.util.Date;
 
 import org.flowable.idm.api.Token;
 import org.flowable.ui.common.model.AbstractRepresentation;

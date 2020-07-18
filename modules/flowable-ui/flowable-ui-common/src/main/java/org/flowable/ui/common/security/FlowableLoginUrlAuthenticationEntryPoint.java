@@ -15,10 +15,8 @@ package org.flowable.ui.common.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.util.ClassUtils;
 
 /**
  * Special Flowable UI Specific {@link LoginUrlAuthenticationEntryPoint} that allows adding a redirect on auth success dynamically

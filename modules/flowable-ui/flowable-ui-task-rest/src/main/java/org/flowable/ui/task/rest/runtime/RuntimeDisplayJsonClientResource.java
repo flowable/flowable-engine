@@ -21,10 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
@@ -63,13 +59,23 @@ import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
 import org.flowable.ui.task.service.debugger.DebuggerService;
-import org.flowable.ui.task.service.editor.mapper.*;
+import org.flowable.ui.task.service.editor.mapper.EventInfoMapper;
+import org.flowable.ui.task.service.editor.mapper.InfoMapper;
+import org.flowable.ui.task.service.editor.mapper.ReceiveTaskInfoMapper;
+import org.flowable.ui.task.service.editor.mapper.SequenceFlowInfoMapper;
+import org.flowable.ui.task.service.editor.mapper.ServiceTaskInfoMapper;
+import org.flowable.ui.task.service.editor.mapper.UserTaskInfoMapper;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 @RequestMapping("/app")

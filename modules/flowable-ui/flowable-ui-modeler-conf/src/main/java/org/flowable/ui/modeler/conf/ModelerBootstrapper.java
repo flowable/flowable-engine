@@ -20,7 +20,6 @@ import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.flowable.ui.modeler.repository.ModelRepository;
 import org.flowable.ui.modeler.repository.ModelSort;
 import org.flowable.ui.modeler.service.DecisionTableModelConversionUtil;
-import org.flowable.ui.modeler.service.FlowableDecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
