@@ -1681,12 +1681,6 @@
             "DESCRIPTION": "Set the decision reference"
           }
         },
-        "DECISIONTASKDECISIONREFERENCEPACKAGE": {
-          "DECISIONTASKDECISIONREFERENCE": {
-            "TITLE": "Decision reference",
-            "DESCRIPTION": "Set the decision reference"
-          }
-        },
         "IFPARTCONDITIONPACKAGE": {
           "IFPARTCONDITION": {
             "TITLE": "Condition",
