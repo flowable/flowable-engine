@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.escalation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -37,9 +39,9 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("catchEscalationInEmbeddedSubProcess").getId();
 
         // The process will throw an escalation event, which is caught and escalated by a User org.flowable.task.service.Task
-        assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("taskAfterEscalationCatch2").count());
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("taskAfterEscalationCatch2").count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Escalated Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
         taskService.complete(task.getId());
@@ -75,17 +77,17 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         
         // task before in sub process
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
         taskService.complete(task.getId());
         
         task = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         
         Task escalationTask = taskService.createTaskQuery().processInstanceId(procId).singleResult();
-        assertEquals("Escalated Task", escalationTask.getName());
+        assertThat(escalationTask.getName()).isEqualTo("Escalated Task");
         taskService.complete(escalationTask.getId());
         
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(procId).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(procId).count()).isEqualTo(1);
         taskService.complete(task.getId());
         
         assertProcessEnded(procId);
@@ -94,9 +96,9 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
     private void assertThatEscalationHasBeenCaught(String procId) {
         // The process will throw an error event,
         // which is caught and escalated by a User org.flowable.task.service.Task
-        assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).as("No tasks found in task list.").isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Escalated Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the org.flowable.task.service.Task will end the process instance
         taskService.complete(task.getId());

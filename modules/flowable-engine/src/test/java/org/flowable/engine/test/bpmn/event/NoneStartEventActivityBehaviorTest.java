@@ -28,7 +28,7 @@ class NoneStartEventActivityBehaviorTest extends PluggableFlowableTestCase {
     public void asyncStartEvent() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncNoneStartEvent");
 
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count()).isEqualTo(1l);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count()).isEqualTo(1);
         Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(job).isNotNull();
         assertThat(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getActivityId()).isEqualTo("theStart");
