@@ -294,7 +294,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
             new ObjectOutputStream(baos).writeObject(processDefinition);
 
             byte[] bytes = baos.toByteArray();
-            assertThat(bytes.length).isGreaterThan(0);
+            assertThat(bytes).isNotEmpty();
         })
                 .doesNotThrowAnyException();
     }

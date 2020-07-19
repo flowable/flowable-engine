@@ -234,7 +234,6 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Test
     @Deployment
     public void testFailStatusCodes() {
-        ProcessInstance process = null;
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failStatusCodes"))
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("HTTP400");
@@ -562,7 +561,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
             if (key.contains("Headers")) {
-                assertTextPresent((String) vars.get(key), (String) runtimeService.getVariable(processInstanceId, key));
+                assertThat((String) runtimeService.getVariable(processInstanceId, key)).containsSequence((String) vars.get(key));
             } else {
                 assertThat(runtimeService.getVariable(processInstanceId, key)).isEqualTo(vars.get(key));
             }

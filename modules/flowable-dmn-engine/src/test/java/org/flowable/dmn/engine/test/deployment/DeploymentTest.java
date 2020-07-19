@@ -294,13 +294,13 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertThat(deployment).isNotNull();
 
         List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
-        assertThat(decisionServices.size()).isEqualTo(2);
+        assertThat(decisionServices).hasSize(2);
         assertThat(decisionServices)
             .extracting(DmnDecision::getDecisionType)
             .containsExactly("decision_service", "decision_service");
 
         List<DmnDecision> decisionServices2 = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_SERVICE).list();
-        assertThat(decisionServices2.size()).isEqualTo(2);
+        assertThat(decisionServices2).hasSize(2);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertThat(deployment).isNotNull();
 
         List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
-        assertThat(decisionServices.size()).isEqualTo(1);
+        assertThat(decisionServices).hasSize(1);
         assertThat(decisionServices.get(0).getDecisionType()).isEqualTo(DecisionTypes.DECISION_SERVICE);
     }
     

@@ -59,7 +59,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     @Test
     public void decisionKeyDeploymentIdTenantId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, TEST_PARENT_DEPLOYMENT_ID);
-        assertThat(result.get("outputVariable1")).isEqualTo("result2");
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 
 
@@ -67,7 +67,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     public void fallBackDecisionKeyDeploymentIdTenantIdWrongDeploymentId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, "WRONG_PARENT_DEPLOYMENT_ID");
 
-        assertThat(result.get("outputVariable1")).isEqualTo("result2");
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 
     @Test
@@ -98,7 +98,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         try {
             Map<String, Object> result = executeDecision(null, TEST_PARENT_DEPLOYMENT_ID);
 
-            assertThat(result.get("outputVariable1")).isEqualTo("result2");
+            assertThat(result).containsEntry("outputVariable1", "result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }
@@ -107,7 +107,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
     @Test
     public void decisionKeyTenantId() {
         Map<String, Object> result = executeDecision(TEST_TENANT_ID, null);
-        assertThat(result.get("outputVariable1")).isEqualTo("result2");
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 
 
@@ -122,7 +122,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         try {
             Map<String, Object> result = executeDecision(null, "WRONG_PARENT_DEPLOYMENT_ID");
 
-            assertThat(result.get("outputVariable1")).isEqualTo("result2");
+            assertThat(result).containsEntry("outputVariable1", "result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }
@@ -149,7 +149,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
                 .fallbackToDefaultTenant()
                 .executeWithSingleResult();
 
-            assertThat(result.get("outputVariable1")).isEqualTo("result2");
+            assertThat(result).containsEntry("outputVariable1", "result2");
         } finally {
             dmnEngine.getDmnRepositoryService().deleteDeployment(localDeployment.getId());
         }

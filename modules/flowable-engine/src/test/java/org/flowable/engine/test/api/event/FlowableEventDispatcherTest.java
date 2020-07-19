@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -228,12 +229,10 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         dispatcher.addEventListener(secondListener);
 
         FlowableEngineEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
-        try {
+        assertThatCode(() -> {
             dispatcher.dispatchEvent(event);
-            assertThat(secondListener.getEventsReceived()).hasSize(1);
-        } catch (Throwable t) {
-            fail("No exception expected");
-        }
+        }).doesNotThrowAnyException();
+        assertThat(secondListener.getEventsReceived()).hasSize(1);
 
         // Remove listeners
         dispatcher.removeEventListener(listener);
@@ -262,30 +261,30 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // Check with empty null
         FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
         assertThat(types).isNotNull();
-        assertThat(types.length).isZero();
+        assertThat(types).isEmpty();
 
         // Check with empty string
         types = FlowableEngineEventType.getTypesFromString("");
         assertThat(types).isNotNull();
-        assertThat(types.length).isZero();
+        assertThat(types).isEmpty();
 
         // Single value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(1);
+        assertThat(types).hasSize(1);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
 
         // Multiple value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED,ENTITY_DELETED");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(2);
+        assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
 
         // Additional separators should be ignored
         types = FlowableEngineEventType.getTypesFromString(",ENTITY_CREATED,,ENTITY_DELETED,,,");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(2);
+        assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
 

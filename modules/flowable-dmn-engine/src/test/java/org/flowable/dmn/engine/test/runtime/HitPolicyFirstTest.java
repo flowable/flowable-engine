@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
@@ -43,7 +44,10 @@ public class HitPolicyFirstTest {
                 .variable("inputVariable1", 11)
                 .executeWithSingleResult();
 
-        assertThat(result.get("outputVariable1")).isEqualTo("gt 10");
-        assertThat(result.get("outputVariable2")).isEqualTo("result2");
+        assertThat(result)
+                .contains(
+                        entry("outputVariable1", "gt 10"),
+                        entry("outputVariable2", "result2")
+                );
     }
 }

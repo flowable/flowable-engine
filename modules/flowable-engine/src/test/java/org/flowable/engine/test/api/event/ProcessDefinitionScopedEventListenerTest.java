@@ -14,8 +14,6 @@ package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Map;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -31,9 +29,6 @@ import org.junit.jupiter.api.Test;
  * @author Frederik Heremans
  */
 public class ProcessDefinitionScopedEventListenerTest extends PluggableFlowableTestCase {
-
-    protected TestFlowableEventListener testListenerAsBean;
-    protected Map<Object, Object> oldBeans;
 
     /**
      * Test to verify listeners on a process-definition are only called for events related to that definition.

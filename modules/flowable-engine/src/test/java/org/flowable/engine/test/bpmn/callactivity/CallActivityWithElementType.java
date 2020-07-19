@@ -13,6 +13,7 @@
 package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -82,15 +83,12 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessWithUnrecognizedElementType() throws IOException {
-        try {
-            assertThatSubProcessIsCalled(
+        assertThatThrownBy(() -> assertThatSubProcessIsCalled(
                 createCallProcess("unrecognizedElementType", "simpleSubProcess"),
-                Collections.singletonMap("subProcessDefinitionKey", "simpleSubProcess")
-            );
-            fail("Flowable exception expected");
-        } catch (FlowableException e) {
-            assertThat(e).hasMessage("Unrecognized calledElementType [unrecognizedElementType]");
-        }
+                        Collections.singletonMap("subProcessDefinitionKey", "simpleSubProcess")))
+                .as("Flowable exception expected")
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("Unrecognized calledElementType [unrecognizedElementType]");
     }
 
     protected void assertThatSubProcessIsCalled(String deploymentId, Map<String, Object> variables) {

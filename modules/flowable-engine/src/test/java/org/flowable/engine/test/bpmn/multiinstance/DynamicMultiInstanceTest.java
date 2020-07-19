@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.multiinstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -429,14 +430,11 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(procId).list();
             assertThat(tasks).hasSize(8);
-            
-            try {
-                runtimeService.addMultiInstanceExecution("miSubProcess", procId, null);
-                fail("Expected exception because multiple multi instance executions are present");
-            } catch (FlowableException e) {
-                // expected
-            }
-            
+
+            assertThatThrownBy(() -> runtimeService.addMultiInstanceExecution("miSubProcess", procId, null))
+                    .as("Expected exception because multiple multi instance executions are present")
+                    .isInstanceOf(FlowableException.class);
+
             List<Execution> miExecutions = runtimeService.createExecutionQuery().activityId("nesting1").list();
             assertThat(miExecutions).hasSize(4);
             

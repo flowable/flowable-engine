@@ -104,7 +104,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQueryByInvalidNameLike() {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%invalid%");
-        assertNull(query.singleResult());
+        assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
         assertThat(query.count()).isZero();
     }
@@ -261,7 +261,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
                 .extracting(Model::getName, Model::getId)
                 .containsExactly(tuple("my model", modelOneId));
 
-        models = repositoryService.createModelQuery().modelNameLike("%model%").orderByModelName().asc().list();;
+        models = repositoryService.createModelQuery().modelNameLike("%model%").orderByModelName().asc().list();
         assertThat(models)
                 .extracting(Model::getName, Model::getId)
                 .containsExactly(tuple("my model", modelOneId));

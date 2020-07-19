@@ -32,8 +32,6 @@ import org.junit.Test;
  */
 public class CustomConfigRuntimeTest {
 
-    public static final String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
-
     protected static final String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
     protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
 
@@ -58,7 +56,7 @@ public class CustomConfigRuntimeTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
 
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test

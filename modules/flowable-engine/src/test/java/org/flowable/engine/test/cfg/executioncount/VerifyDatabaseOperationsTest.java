@@ -626,7 +626,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseSelects(String commandClass, Object... expectedSelects) {
         CommandStats stats = getStats(commandClass);
 
-        assertThat(stats.getDbSelects()).as("Unexpected number of database selects for " + commandClass + ". ").hasSize(expectedSelects.length / 2);
+        assertThat(stats.getDbSelects())
+                .as("Unexpected number of database selects for " + commandClass + ". ")
+                .hasSize(expectedSelects.length / 2);
 
         for (int i = 0; i < expectedSelects.length; i += 2) {
             String dbSelect = (String) expectedSelects[i];
@@ -640,7 +642,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected void assertDatabaseUpdates(String commandClass, Object... expectedUpdates) {
         CommandStats stats = getStats(commandClass);
-        assertThat(stats.getDbUpdates()).as("Unexpected number of database updates for " + commandClass + ". ").hasSize(expectedUpdates.length / 2);
+        assertThat(stats.getDbUpdates())
+                .as("Unexpected number of database updates for " + commandClass + ". ")
+                .hasSize(expectedUpdates.length / 2);
 
         for (int i = 0; i < expectedUpdates.length; i += 2) {
             String dbUpdate = (String) expectedUpdates[i];
@@ -655,9 +659,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseInserts(String commandClass, Object... expectedInserts) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedInserts.length / 2 != stats.getDbInserts().size()) {
-            Assert.fail("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2);
-        }
+        assertThat(stats.getDbInserts())
+                .as("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2)
+                .hasSize(expectedInserts.length / 2);
 
         for (int i = 0; i < expectedInserts.length; i += 2) {
             String dbInsert = (String) expectedInserts[i];
@@ -672,9 +676,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseDeletes(String commandClass, Object... expectedDeletes) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedDeletes.length / 2 != stats.getDbDeletes().size()) {
-            Assert.fail("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2));
-        }
+        assertThat(stats.getDbDeletes())
+                .as("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2))
+                .hasSize(expectedDeletes.length / 2);
 
         for (int i = 0; i < expectedDeletes.length; i += 2) {
             String dbDelete = (String) expectedDeletes[i];

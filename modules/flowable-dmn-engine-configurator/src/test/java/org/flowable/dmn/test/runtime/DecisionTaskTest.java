@@ -558,7 +558,7 @@ public class DecisionTaskTest {
         Map<String, Object> caseVariables = caseInstance.getCaseVariables();
         Object resultObject = caseVariables.get("DecisionTable");
         assertThat(resultObject).isNull();
-        assertThat(caseVariables.get("testOutput")).isEqualTo(2.0);
+        assertThat(caseVariables).containsEntry("testOutput", 2.0);
         this.cmmnRule.getCmmnEngineConfiguration().setAlwaysUseArraysForDmnMultiHitPolicies(true);
     }
 
@@ -663,7 +663,7 @@ public class DecisionTaskTest {
 
         // Triggering the task should end the case instance
         cmmnRule.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -684,7 +684,7 @@ public class DecisionTaskTest {
 
         // Triggering the task should end the case instance
         cmmnRule.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isZero();
     }
 
     protected void deleteAllDmnDeployments() {

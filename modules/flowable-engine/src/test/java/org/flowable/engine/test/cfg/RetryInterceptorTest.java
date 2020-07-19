@@ -13,6 +13,7 @@
 package org.flowable.engine.test.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,6 @@ import org.flowable.common.engine.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,12 +61,9 @@ public class RetryInterceptorTest {
     @Test
     public void testRetryInterceptor() {
 
-        try {
-            processEngine.getManagementService().executeCommand(new CommandThrowingOptimisticLockingException());
-            Assert.fail("ActivitiException expected.");
-        } catch (FlowableException e) {
-            assertThat(e.getMessage()).contains(retryInterceptor.getNumOfRetries() + " retries failed");
-        }
+        assertThatThrownBy(() -> processEngine.getManagementService().executeCommand(new CommandThrowingOptimisticLockingException()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining(retryInterceptor.getNumOfRetries() + " retries failed");
 
         assertThat(counter.get()).isEqualTo(retryInterceptor.getNumOfRetries() + 1); // +1, we retry 3 times, so one extra for the regular execution
     }

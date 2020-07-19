@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
@@ -44,8 +45,8 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertThat(result.keySet()).hasSize(1);
-        assertThat(result.get("outputVariable1")).isEqualTo("OUTPUT2");
+        assertThat(result)
+                .containsOnly(entry("outputVariable1", "OUTPUT2"));
     }
 
     @Test
@@ -60,9 +61,11 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertThat(result.keySet()).hasSize(2);
-        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
-        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 2");
+        assertThat(result)
+                .containsOnly(
+                        entry("outputVariable1", "REFER"),
+                        entry("outputVariable2", "LEVEL 2")
+                );
     }
 
     @Test
@@ -77,9 +80,11 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertThat(result.keySet()).hasSize(2);
-        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
-        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 1");
+        assertThat(result)
+                .containsOnly(
+                        entry("outputVariable1", "REFER"),
+                        entry("outputVariable2", "LEVEL 1")
+                );
     }
 
     @Test
@@ -94,9 +99,11 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertThat(result.keySet()).hasSize(2);
-        assertThat(result.get("outputVariable1")).isEqualTo("REFER");
-        assertThat(result.get("outputVariable2")).isEqualTo("LEVEL 2");
+        assertThat(result)
+                .containsOnly(
+                        entry("outputVariable1", "REFER"),
+                        entry("outputVariable2", "LEVEL 2")
+                );
     }
 
     @Test
@@ -132,9 +139,11 @@ public class HitPolicyPriorityTest {
 
         assertThat(result.getDecisionResult()).hasSize(1);
         Map<String, Object> outputMap = result.getDecisionResult().iterator().next();
-        assertThat(outputMap.keySet()).hasSize(2);
-        assertThat(outputMap.get("outputVariable1")).isEqualTo("ACCEPT");
-        assertThat(outputMap.get("outputVariable2")).isEqualTo("NONE");
+        assertThat(outputMap)
+                .containsOnly(
+                        entry("outputVariable1", "ACCEPT"),
+                        entry("outputVariable2", "NONE")
+                );
 
         assertThat(result.isFailed()).isFalse();
         assertThat(result.getExceptionMessage()).isNull();
@@ -156,7 +165,7 @@ public class HitPolicyPriorityTest {
                 .variable("inputVariable1", 5)
                 .executeWithSingleResult();
 
-        assertThat(result.keySet()).hasSize(1);
-        assertThat(result.get("outputVariable1")).isEqualTo(20D);
+        assertThat(result)
+                .containsOnly(entry("outputVariable1", 20D));
     }
 }

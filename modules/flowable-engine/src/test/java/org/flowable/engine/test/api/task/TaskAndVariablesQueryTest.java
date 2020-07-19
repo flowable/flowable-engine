@@ -126,7 +126,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().includeTaskLocalVariables().taskCandidateUser("kermit").list();
         assertThat(tasks).hasSize(2);
         assertThat(tasks.get(0).getTaskLocalVariables()).hasSize(2);
-        assertThat(tasks.get(0).getTaskLocalVariables().get("test")).isEqualTo("test");
+        assertThat(tasks.get(0).getTaskLocalVariables()).containsEntry("test", "test");
         assertThat(tasks.get(0).getProcessVariables()).isEmpty();
 
         tasks = taskService.createTaskQuery().includeProcessVariables().taskCandidateUser("kermit").list();
@@ -373,7 +373,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         query1 = query1.endOr();
         org.flowable.task.api.Task task = query1.singleResult();
         assertThat(task.getProcessVariables()).hasSize(2);
-        assertThat(task.getProcessVariables().get("anotherProcessVar")).isEqualTo(123);
+        assertThat(task.getProcessVariables()).containsEntry("anotherProcessVar", 123);
     }
 
     @Test

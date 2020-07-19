@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.multiinstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1760,12 +1761,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.simpleMultiInstanceWithCollectionVariable.bpmn20.xml")
     public void testCollectionVariableMissing() {
-        try {
-            runtimeService.startProcessInstanceByKey("simple_multi");
-            fail("Should have failed with missing collection variable");
-        } catch (FlowableIllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("Variable 'elements' was not found");
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simple_multi"))
+                .as("Should have failed with missing collection variable")
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Variable 'elements' was not found");
     }
 
     @Test
@@ -1774,12 +1773,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         ValueBean valueBean = new ValueBean("test");
         vars.put("elements", valueBean);
-        try {
-            runtimeService.startProcessInstanceByKey("simple_multi", vars);
-            fail("Should have failed with collection variable not a collection");
-        } catch (FlowableIllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("Variable 'elements':" + valueBean + " is not a Collection");
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simple_multi", vars))
+                .as("Should have failed with collection variable not a collection")
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Variable 'elements':" + valueBean + " is not a Collection");
     }
 
     @Test

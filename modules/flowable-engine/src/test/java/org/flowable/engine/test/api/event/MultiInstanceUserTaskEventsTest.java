@@ -223,7 +223,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testMultiInstanceCompleteCondition.bpmn20.xml" })
     public void testMultiInstanceCompleteCondition() throws Exception {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("percentageCompleted", Float.valueOf(.5f));
+        variables.put("percentageCompleted", .5f);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents", variables);
         assertThat(processInstance).isNotNull();
 
@@ -326,7 +326,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testMultiInstanceCompleteCondition.bpmn20.xml" })
     public void testMultiInstanceComplete() throws Exception {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("percentageCompleted", Float.valueOf(2));
+        variables.put("percentageCompleted", 2f);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents", variables);
         assertThat(processInstance).isNotNull();
 

@@ -47,6 +47,6 @@ public class StandaloneRuntimeTest {
                 .variables(inputVariables)
                 .executeWithSingleResult();
 
-        assertThat(result.get("outputVariable1")).isEqualTo("result2");
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 }

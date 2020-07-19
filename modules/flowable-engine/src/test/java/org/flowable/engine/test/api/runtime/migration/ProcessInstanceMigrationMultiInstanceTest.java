@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
@@ -312,7 +313,8 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
                 .containsExactly("seqTasks", procSequentialMultiInst.getId());
         Map<String, Object> miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(0);
+        assertThat(miTaskVars)
+                .contains(entry("loopCounter", 0));
 
         //Complete one...
         completeTask(task);
@@ -518,7 +520,8 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
                 .containsExactly("seqTasks", procSequentialMultiInst.getId());
         Map<String, Object> miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(0);
+        assertThat(miTaskVars)
+                .contains(entry("loopCounter", 0));
 
         //Complete one...
         completeTask(task);
