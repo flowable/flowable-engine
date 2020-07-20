@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
@@ -33,6 +34,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.http.DefaultCmmnHttpActivityDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CasePageTask;
@@ -167,13 +169,23 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
             // Default Http behavior class
             if (theClass == null) {
-                theClass = Class.forName("org.flowable.http.cmmn.impl.CmmnHttpActivityBehaviorImpl");
+                return createDefaultHttpActivityBehaviour(planItem, task);
             }
 
-            return (CmmnActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(theClass, task, true); // CmmnHttpActivityBehaviorImpl only has expression fields
+            return classDelegateFactory.create(theClass.getName(), task.getFieldExtensions());
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
+    protected CmmnActivityBehavior createDefaultHttpActivityBehaviour(PlanItem planItem, ServiceTask serviceTask) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+            return createCmmnClassDelegate(planItem, serviceTask);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+            return createPlanItemDelegateExpressionActivityBehavior(planItem, serviceTask);
+        } else {
+            return classDelegateFactory.create(DefaultCmmnHttpActivityDelegate.class.getName(), serviceTask.getFieldExtensions());
         }
     }
 

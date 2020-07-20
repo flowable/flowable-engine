@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
@@ -156,11 +157,11 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
 
     protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, boolean throwExceptionOnMissingField) {
         Object value = null;
-        if (fieldExtension.getStringValue() != null) {
-            value = fieldExtension.getStringValue();
-        } else if (fieldExtension.getExpression() != null) {
+        if (fieldExtension.getExpression() != null) {
             ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
             value = expressionManager.createExpression(fieldExtension.getExpression());
+        } else {
+            value = new FixedValue(fieldExtension.getStringValue());
         }
 
         ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, throwExceptionOnMissingField);

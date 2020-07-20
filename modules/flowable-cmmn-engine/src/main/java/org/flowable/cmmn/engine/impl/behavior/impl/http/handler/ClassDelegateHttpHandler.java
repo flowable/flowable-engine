@@ -11,17 +11,17 @@
  * limitations under the License.
  */
 
-package org.flowable.http.cmmn.impl.handler;
+package org.flowable.cmmn.engine.impl.behavior.impl.http.handler;
 
-import org.apache.http.client.HttpClient;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.delegate.HttpRequestHandler;
-import org.flowable.http.delegate.HttpResponseHandler;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.api.delegate.HttpRequestHandler;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class ClassDelegateHttpHandler extends CmmnClassDelegate implements HttpR
     }
 
     @Override
-    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, HttpClient client) {
+    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, FlowableHttpClient client) {
         HttpRequestHandler httpRequestHandler = getHttpRequestHandlerInstance();
         httpRequestHandler.handleHttpRequest(execution, httpRequest, client);
     }

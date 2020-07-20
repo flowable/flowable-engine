@@ -21,12 +21,12 @@ import org.flowable.common.engine.api.delegate.Expression;
  */
 public class TestFieldsJavaDelegate implements PlanItemJavaDelegate {
     
-    protected String testValue;
+    protected Expression testValue;
     protected Expression testExpression;
 
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
-        planItemInstance.setVariable("testValue", testValue);
+        planItemInstance.setVariable("testValue", testValue.getValue(planItemInstance));
         planItemInstance.setVariable("testExpression", testExpression.getValue(planItemInstance));
     }
     

@@ -13,9 +13,9 @@
 package org.flowable.http.bpmn.validation;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_HEADERS_INVALID;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_METHOD_INVALID;
+import static org.flowable.http.common.impl.BaseHttpActivityDelegate.HTTP_TASK_REQUEST_FIELD_INVALID;
+import static org.flowable.http.common.impl.BaseHttpActivityDelegate.HTTP_TASK_REQUEST_HEADERS_INVALID;
+import static org.flowable.http.common.impl.BaseHttpActivityDelegate.HTTP_TASK_REQUEST_METHOD_INVALID;
 
 import java.util.HashMap;
 import java.util.Map;

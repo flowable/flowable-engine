@@ -10,23 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.http.cmmn.impl.handler;
+package org.flowable.cmmn.engine.impl.behavior.impl.http.handler;
 
 import java.util.List;
 
-import org.apache.http.client.HttpClient;
+import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.delegate.HttpRequestHandler;
-import org.flowable.http.delegate.HttpResponseHandler;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.api.delegate.HttpRequestHandler;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
 /**
  * @author Tijs Rademakers
@@ -44,7 +44,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
     }
 
     @Override
-    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, HttpClient client) {
+    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, FlowableHttpClient client) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldExtensions);
         if (delegate instanceof HttpRequestHandler) {
             ((HttpRequestHandler) delegate).handleHttpRequest(execution, httpRequest, client);
@@ -79,7 +79,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
 
         if (fieldExtensions != null && fieldExtensions.size() > 0) {
 
-            DelegateExpressionFieldInjectionMode injectionMode = CommandContextUtil.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
+            DelegateExpressionFieldInjectionMode injectionMode = CommandContextUtil.getCmmnEngineConfiguration().getDelegateExpressionFieldInjectionMode();
             if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
                 CmmnClassDelegate.applyFieldExtensions(fieldExtensions, delegate, true);
             } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
