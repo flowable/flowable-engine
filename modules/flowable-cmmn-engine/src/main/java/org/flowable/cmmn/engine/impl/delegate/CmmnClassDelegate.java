@@ -15,12 +15,14 @@ package org.flowable.cmmn.engine.impl.delegate;
 import java.util.List;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemFutureJavaDelegateActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
@@ -74,6 +76,9 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
 
         if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
+
+        } else if (instance instanceof PlanItemFutureJavaDelegate) {
+            return new PlanItemFutureJavaDelegateActivityBehavior((PlanItemFutureJavaDelegate) instance);
 
         } else if (instance instanceof CmmnTriggerableActivityBehavior) {
             return (CmmnTriggerableActivityBehavior) instance;

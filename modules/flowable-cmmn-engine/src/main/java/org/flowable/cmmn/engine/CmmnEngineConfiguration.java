@@ -202,6 +202,7 @@ import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -212,6 +213,7 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -505,6 +507,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected AsyncExecutor asyncExecutor;
     protected AsyncTaskExecutor asyncTaskExecutor;
     protected boolean shutdownAsyncTaskExecutor;
+    protected AsyncTaskInvoker asyncTaskInvoker;
     protected JobManager jobManager;
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
@@ -1853,6 +1856,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
             this.asyncTaskExecutor = defaultAsyncTaskExecutor;
         }
+
+        if (this.asyncTaskInvoker == null) {
+            this.asyncTaskInvoker = new DefaultAsyncTaskInvoker(asyncTaskExecutor);
+        }
     }
 
     public void initAsyncExecutor() {
@@ -3065,6 +3072,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
+    public AsyncTaskInvoker getAsyncTaskInvoker() {
+        return asyncTaskInvoker;
+    }
+
+    public CmmnEngineConfiguration setAsyncTaskInvoker(AsyncTaskInvoker asyncTaskInvoker) {
+        this.asyncTaskInvoker = asyncTaskInvoker;
         return this;
     }
 
