@@ -343,7 +343,12 @@ flowableApp
             } else {
                 var locationPath = $location.path();
                 if (locationPath === '' || locationPath === '#' || locationPath === '/login') {
-                    $window.location.href = FLOWABLE.CONFIG.contextRoot
+                    if (FLOWABLE.CONFIG.contextRoot === '') {
+                        // When running on root (no context root)
+                        $window.location.href = "/";
+                    } else {
+                        $window.location.href = FLOWABLE.CONFIG.contextRoot;
+                    }
                 } else if (locationPath.indexOf('/account/activate/') >= 0 || locationPath.indexOf('/account/reset-password/') >= 0) {
                     $location.path('/');
                 }
