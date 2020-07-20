@@ -506,6 +506,12 @@
           "DESCRIPTION": "レスポンスを文字列ではなくJSON形式で保存するフラグ"
         }
       },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
+        }
+      },
       "SKIPEXPRESSIONPACKAGE": {
         "SKIPEXPRESSION": {
           "TITLE": "式のスキップ",
@@ -1550,6 +1556,12 @@
         "HTTPTASKSAVERESPONSEASJSON": {
           "TITLE": "レスポンスをJSON形式で保存",
           "DESCRIPTION": "レスポンスを文字列ではなくJSON形式で保存するフラグ"
+        }
+      },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
         }
       },
       "EVENTREGISTRYPACKAGE": {

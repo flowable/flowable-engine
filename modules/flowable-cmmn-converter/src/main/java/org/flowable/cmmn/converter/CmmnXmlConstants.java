@@ -75,6 +75,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSION_ELEMENTS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+    String ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
     String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
