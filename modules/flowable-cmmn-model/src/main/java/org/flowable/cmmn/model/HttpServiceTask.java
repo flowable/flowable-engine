@@ -25,6 +25,7 @@ public class HttpServiceTask extends ServiceTask {
 
     protected FlowableHttpRequestHandler httpRequestHandler;
     protected FlowableHttpResponseHandler httpResponseHandler;
+    protected Boolean parallelInSameTransaction;
 
     public FlowableHttpRequestHandler getHttpRequestHandler() {
         return httpRequestHandler;
@@ -42,6 +43,14 @@ public class HttpServiceTask extends ServiceTask {
         this.httpResponseHandler = httpResponseHandler;
     }
 
+    public Boolean getParallelInSameTransaction() {
+        return parallelInSameTransaction;
+    }
+
+    public void setParallelInSameTransaction(Boolean parallelInSameTransaction) {
+        this.parallelInSameTransaction = parallelInSameTransaction;
+    }
+
     @Override
     public HttpServiceTask clone() {
         HttpServiceTask clone = new HttpServiceTask();
@@ -51,6 +60,8 @@ public class HttpServiceTask extends ServiceTask {
 
     public void setValues(HttpServiceTask otherElement) {
         super.setValues(otherElement);
+
+        setParallelInSameTransaction(otherElement.getParallelInSameTransaction());
 
         if (otherElement.getHttpRequestHandler() != null) {
             setHttpRequestHandler(otherElement.getHttpRequestHandler().clone());

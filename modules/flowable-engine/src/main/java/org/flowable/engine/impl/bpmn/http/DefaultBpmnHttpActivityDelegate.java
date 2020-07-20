@@ -56,20 +56,19 @@ import org.slf4j.LoggerFactory;
  * @author Filip Hrisafov
  * @author Joram Barrez
  */
-public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<DefaultBpmnHttpActivityDelegate.ExecutionData> {
+public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate implements FutureJavaDelegate<BaseHttpActivityDelegate.ExecutionData> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBpmnHttpActivityDelegate.class);
-
-    protected FlowableHttpClient httpClient;
 
     public DefaultBpmnHttpActivityDelegate() {
         this(null);
     }
 
     public DefaultBpmnHttpActivityDelegate(FlowableHttpClient httpClient) {
-        this.httpClient = httpClient == null ? createHttpClient() : httpClient;
+        super(httpClient);
     }
 
+    @Override
     protected FlowableHttpClient createHttpClient() {
         HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
         return config.determineHttpClient();
@@ -108,48 +107,24 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             parallelInSameTransaction = processEngineConfiguration.getHttpClientConfig().isDefaultParallelInSameTransaction();
         }
 
-        // Prepare request
-        ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
-
-        if (!parallelInSameTransaction) {
-            CompletableFuture<ExecutionData> future = new CompletableFuture<>();
-
-            try {
-                HttpResponse response = httpRequest.call();
-                future.complete(new ExecutionData(request, response));
-            } catch (Exception ex) {
-                future.complete(new ExecutionData(request, null, ex));
-            }
-            return future;
-        } else if (httpRequest instanceof AsyncExecutableHttpRequest) {
-
-            return ((AsyncExecutableHttpRequest) httpRequest).callAsync()
-                    .handle((response, throwable) -> new ExecutionData(request, response, throwable));
-        }
-        return taskInvoker.submit(() -> {
-            try {
-                return new ExecutionData(request, httpRequest.call());
-            } catch (Exception ex) {
-                return new ExecutionData(request, null, ex);
-            }
-        });
-
+        return prepareAndExecuteRequest(request, parallelInSameTransaction, taskInvoker);
     }
 
     @Override
     public void afterExecution(DelegateExecution execution, ExecutionData result) {
 
-        HttpRequest request = result.request;
-        HttpResponse response = result.response;
+        HttpRequest request = result.getRequest();
+        HttpResponse response = result.getResponse();
 
-        if (result.exception != null) {
+        Throwable resultException = result.getException();
+        if (resultException != null) {
             if (request.isIgnoreErrors()) {
-                LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), result.exception);
-                execution.setVariable(request.getPrefix() + "ErrorMessage", result.exception.getMessage());
+                LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), resultException);
+                execution.setVariable(request.getPrefix() + "ErrorMessage", resultException.getMessage());
                 return;
             }
 
-            sneakyThrow(result.exception);
+            sneakyThrow(resultException);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -235,32 +210,4 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         ErrorPropagation.propagateError("HTTP" + code, (DelegateExecution) container);
     }
 
-    protected static class ExecutionData {
-
-        protected HttpRequest request;
-        protected HttpResponse response;
-        protected Throwable exception;
-
-        public ExecutionData(HttpRequest request, HttpResponse response) {
-            this(request, response, null);
-        }
-
-        public ExecutionData(HttpRequest request, HttpResponse response, Throwable exception) {
-            this.request = request;
-            this.response = response;
-            this.exception = exception;
-        }
-
-        public HttpRequest getRequest() {
-            return request;
-        }
-
-        public HttpResponse getResponse() {
-            return response;
-        }
-
-        public Throwable getException() {
-            return exception;
-        }
-    }
 }

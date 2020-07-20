@@ -14,15 +14,20 @@ package org.flowable.http.common.impl;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
+import org.flowable.http.common.api.client.ExecutableHttpRequest;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -71,6 +76,18 @@ public abstract class BaseHttpActivityDelegate {
     protected Expression saveResponseVariableAsJson;
     // Prefix for the execution variable names (Optional)
     protected Expression resultVariablePrefix;
+
+    protected FlowableHttpClient httpClient;
+
+    public BaseHttpActivityDelegate() {
+        this(null);
+    }
+
+    public BaseHttpActivityDelegate(FlowableHttpClient httpClient) {
+        this.httpClient = httpClient == null ? createHttpClient() : httpClient;
+    }
+
+    protected abstract FlowableHttpClient createHttpClient();
 
     protected HttpRequest createRequest(VariableContainer variableContainer, String prefix) {
         HttpRequest request = new HttpRequest();
@@ -185,9 +202,36 @@ public abstract class BaseHttpActivityDelegate {
         }
     }
 
+    protected CompletableFuture<ExecutionData> prepareAndExecuteRequest(HttpRequest request, boolean parallelInSameTransaction, AsyncTaskInvoker taskInvoker) {
+        ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
+
+        if (!parallelInSameTransaction) {
+            CompletableFuture<ExecutionData> future = new CompletableFuture<>();
+
+            try {
+                HttpResponse response = httpRequest.call();
+                future.complete(new ExecutionData(request, response));
+            } catch (Exception ex) {
+                future.complete(new ExecutionData(request, null, ex));
+            }
+            return future;
+        } else if (httpRequest instanceof AsyncExecutableHttpRequest) {
+
+            return ((AsyncExecutableHttpRequest) httpRequest).callAsync()
+                    .handle((response, throwable) -> new ExecutionData(request, response, throwable));
+        }
+        return taskInvoker.submit(() -> {
+            try {
+                return new ExecutionData(request, httpRequest.call());
+            } catch (Exception ex) {
+                return new ExecutionData(request, null, ex);
+            }
+        });
+    }
+
     // HttpRequest validation
 
-    public void validateRequest(HttpRequest request) throws FlowableException {
+    protected void validateRequest(HttpRequest request) throws FlowableException {
         if (request.getMethod() == null) {
             throw new FlowableException(HTTP_TASK_REQUEST_METHOD_REQUIRED);
         }
@@ -216,4 +260,33 @@ public abstract class BaseHttpActivityDelegate {
     }
 
     protected abstract void propagateError(VariableContainer container, String code);
+
+    public static class ExecutionData {
+
+        protected HttpRequest request;
+        protected HttpResponse response;
+        protected Throwable exception;
+
+        public ExecutionData(HttpRequest request, HttpResponse response) {
+            this(request, response, null);
+        }
+
+        public ExecutionData(HttpRequest request, HttpResponse response, Throwable exception) {
+            this.request = request;
+            this.response = response;
+            this.exception = exception;
+        }
+
+        public HttpRequest getRequest() {
+            return request;
+        }
+
+        public HttpResponse getResponse() {
+            return response;
+        }
+
+        public Throwable getException() {
+            return exception;
+        }
+    }
 }
