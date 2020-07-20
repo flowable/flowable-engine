@@ -43,7 +43,7 @@ public class TaskDueDateTest extends PluggableFlowableTestCase {
      * See https://activiti.atlassian.net/browse/ACT-2089
      */
     @Test
-    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testDueDateSortingWithNulls() {
         Date now = processEngineConfiguration.getClock().getCurrentTime();
 

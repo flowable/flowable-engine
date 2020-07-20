@@ -29,7 +29,7 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
      */
     @Test
     @Deployment
-    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testExclusiveJobs() {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {

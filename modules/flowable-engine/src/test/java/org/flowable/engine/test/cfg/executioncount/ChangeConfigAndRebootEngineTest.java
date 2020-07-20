@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeConfigAndRebootEngineTest.class);

@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class ManagementServiceTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagementServiceTest.class);

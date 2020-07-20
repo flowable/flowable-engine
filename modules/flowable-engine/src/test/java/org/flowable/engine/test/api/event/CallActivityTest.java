@@ -702,7 +702,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
     })
-    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testCallActivityAsyncCompleteRealExecutor() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);

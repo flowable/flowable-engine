@@ -154,7 +154,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> HIDETAIL </if> from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and HIDETAIL.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> HIDETAIL </if> from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and HIDETAIL.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   

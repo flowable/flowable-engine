@@ -207,7 +207,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'" > TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and TSKLOG.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'" > TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and TSKLOG.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TSKLOG.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
@@ -222,7 +222,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.SCOPE_ID_ is not null and TSKLOG.SCOPE_ID_ != '' and TSKLOG.SCOPE_TYPE_ = 'cmmn' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.SCOPE_ID_ is not null and TSKLOG.SCOPE_ID_ != '' and TSKLOG.SCOPE_TYPE_ = 'cmmn' and
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TSKLOG.SCOPE_ID_ = CASEINST.ID_)
   </delete>
   

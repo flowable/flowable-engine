@@ -24,7 +24,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class EndEventTest extends PluggableFlowableTestCase {
 
     // Test case for ACT-1259

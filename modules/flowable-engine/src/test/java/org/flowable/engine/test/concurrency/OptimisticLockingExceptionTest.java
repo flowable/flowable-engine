@@ -34,7 +34,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
 
     @Test

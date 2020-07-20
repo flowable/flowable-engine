@@ -46,7 +46,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected boolean oldIsBulkInsertableValue;
