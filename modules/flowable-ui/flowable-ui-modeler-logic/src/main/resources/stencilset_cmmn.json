@@ -626,7 +626,18 @@
         "description" : "CMMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEASJSONPACKAGE.HTTPTASKSAVERESPONSEASJSON.DESCRIPTION",
         "popular" : true
       } ]
-    }, 
+    },
+    {
+      "name" : "httptaskparallelinsametransactionpackage",
+      "properties" : [ {
+        "id" : "httptaskparallelinsametransaction",
+        "type" : "Boolean",
+        "title" : "CMMN.PROPERTYPACKAGES.HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE.HTTPTASKPARALLELINSAMETRANSACTION.TITLE",
+        "value" : "true",
+        "description" : "CMMN.PROPERTYPACKAGES.HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE.HTTPTASKPARALLELINSAMETRANSACTION.DESCRIPTION",
+        "popular" : true
+      } ]
+    },
     {
       "name" : "eventregistryeventpackage",
       "properties" : [ {
@@ -1305,6 +1316,7 @@
         "httptaskresultvariableprefixpackage",
         "httptasksaveresponseparameterstransientpackage",
         "httptasksaveresponseasjsonpackage",
+        "httptaskparallelinsametransactionpackage",
         "planitemlifecyclelistenerspackage"
       ],
       "hiddenPropertyPackages" : [],
