@@ -50,8 +50,8 @@ import java.lang.annotation.RetentionPolicy;
 public @interface EventDeploymentAnnotation {
 
     /** Specify resources that make up the event definition. */
-    public String[] resources() default {};
+    String[] resources() default {};
     
-    public String tenantId() default "";
+    String tenantId() default "";
 
 }

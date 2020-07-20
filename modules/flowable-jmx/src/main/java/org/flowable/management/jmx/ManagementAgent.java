@@ -85,8 +85,8 @@ public interface ManagementAgent {
      */
     void setMBeanServer(MBeanServer mbeanServer);
 
-    public void findAndRegisterMbeans() throws Exception;
+    void findAndRegisterMbeans() throws Exception;
 
-    public void doStart();
+    void doStart();
 
 }

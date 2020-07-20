@@ -38,8 +38,8 @@ public interface CaseDiagramGenerator {
      * @param customClassLoader
      *            provide a custom classloader for retrieving icon images
      */
-    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType, String activityFontName, String labelFontName, 
-                    String annotationFontName, ClassLoader customClassLoader, double scaleFactor);
+    InputStream generateDiagram(CmmnModel cmmnModel, String imageType, String activityFontName, String labelFontName,
+                                String annotationFontName, ClassLoader customClassLoader, double scaleFactor);
 
     /**
      * Generates a diagram of the given process definition, using the diagram interchange information of the process.
@@ -49,21 +49,21 @@ public interface CaseDiagramGenerator {
      * @param imageType
      *            type of the image to generate.
      */
-    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType);
+    InputStream generateDiagram(CmmnModel cmmnModel, String imageType);
 
-    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType, double scaleFactor);
+    InputStream generateDiagram(CmmnModel cmmnModel, String imageType, double scaleFactor);
 
-    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType, String activityFontName, String labelFontName,
-            String annotationFontName, ClassLoader customClassLoader);
+    InputStream generateDiagram(CmmnModel cmmnModel, String imageType, String activityFontName, String labelFontName,
+                                String annotationFontName, ClassLoader customClassLoader);
 
-    public InputStream generatePngDiagram(CmmnModel cmmnModel);
+    InputStream generatePngDiagram(CmmnModel cmmnModel);
 
-    public InputStream generatePngDiagram(CmmnModel cmmnModel, double scaleFactor);
+    InputStream generatePngDiagram(CmmnModel cmmnModel, double scaleFactor);
 
-    public InputStream generateJpgDiagram(CmmnModel cmmnModel);
+    InputStream generateJpgDiagram(CmmnModel cmmnModel);
 
-    public InputStream generateJpgDiagram(CmmnModel cmmnModel, double scaleFactor);
+    InputStream generateJpgDiagram(CmmnModel cmmnModel, double scaleFactor);
 
-    public BufferedImage generatePngImage(CmmnModel cmmnModel, double scaleFactor);
+    BufferedImage generatePngImage(CmmnModel cmmnModel, double scaleFactor);
 
 }

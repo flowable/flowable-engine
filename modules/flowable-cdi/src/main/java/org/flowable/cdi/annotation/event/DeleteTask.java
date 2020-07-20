@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface DeleteTask {
     /** the id of the task that has been deleted */
-    public String value();
+    String value();
 }
