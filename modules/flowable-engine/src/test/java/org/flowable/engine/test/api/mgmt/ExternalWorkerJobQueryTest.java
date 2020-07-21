@@ -320,7 +320,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getId()).isEqualTo(workerJob.getId());
         assertThat(job.getCorrelationId()).isEqualTo(workerJob.getCorrelationId());
 
-        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult());
+        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult()).isNull();
     }
 
     @Test

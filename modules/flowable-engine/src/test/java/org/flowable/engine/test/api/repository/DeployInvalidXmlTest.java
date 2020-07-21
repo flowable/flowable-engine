@@ -94,12 +94,14 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
         @Override
         public void run() {
             try {
-                String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML).deploy().getId();
-                assertThat(repositoryService.createProcessDefinitionQuery().singleResult()).isEqualTo(1);
-                repositoryService.deleteDeployment(deploymentId, true);
-            } catch (Exception e) {
-                // Exception is expected
-            } finally {
+                assertThatThrownBy(() -> {
+                    String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML).deploy().getId();
+                    assertThat(repositoryService.createProcessDefinitionQuery().singleResult()).isEqualTo(1);
+                    repositoryService.deleteDeployment(deploymentId, true);
+                })
+                        .isInstanceOf(Exception.class);
+            }
+            finally {
                 finished = true;
             }
         }

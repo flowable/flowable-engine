@@ -673,15 +673,11 @@ public class TenancyTest extends PluggableFlowableTestCase {
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", tenantB);
 
         // Shouldn't be able to start proc defs for tenant B
-        try {
-            runtimeService.startProcessInstanceById(procDefIdB);
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(procDefIdB))
+                .isInstanceOf(FlowableException.class);
 
-        try {
-            runtimeService.startProcessInstanceById(procDefIdB2);
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(procDefIdB2))
+                .isInstanceOf(FlowableException.class);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefIdA);
         assertThat(processInstance).isNotNull();
@@ -700,10 +696,8 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
         // Suspending with NO tenant id should give an error, cause they both
         // have tenants
-        try {
-            repositoryService.suspendProcessDefinitionByKey("oneTaskProcess");
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.suspendProcessDefinitionByKey("oneTaskProcess"))
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test

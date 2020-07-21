@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
@@ -45,9 +46,9 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", 10)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test3");
+        assertThat(result).containsEntry("output1", "test3");
         assertThat(result.get("output2").getClass()).isSameAs(Double.class);
-        assertThat(result.get("output2")).isEqualTo(3D);
+        assertThat(result).containsEntry("output2", 3D);
     }
 
     @Test
@@ -61,7 +62,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -75,7 +76,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -89,7 +90,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -103,7 +104,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -117,7 +118,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -129,7 +130,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .executeWithSingleResult();
         assertThat(result).isNotNull();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test1");
+        assertThat(result).containsEntry("output1", "test1");
     }
 
     @Test
@@ -145,7 +146,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -177,11 +178,11 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         assertThat(result).hasSize(3);
         assertThat(result.get(0)).hasSize(1);
-        assertThat(result.get(0).get("output1")).isEqualTo(11d);
+        assertThat(result.get(0)).containsEntry("output1", 11d);
         assertThat(result.get(1)).hasSize(1);
-        assertThat(result.get(1).get("output2")).isEqualTo(11d);
+        assertThat(result.get(1)).containsEntry("output2", 11d);
         assertThat(result.get(2)).hasSize(1);
-        assertThat(result.get(2).get("output3")).isEqualTo(11d);
+        assertThat(result.get(2)).containsEntry("output3", 11d);
     }
 
     @Test
@@ -192,7 +193,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", "blablatest")
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(Double.class);
-        assertThat(result.get("output1")).isEqualTo(5D);
+        assertThat(result).containsEntry("output1", 5D);
     }
 
     @Test
@@ -248,7 +249,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
 
-        assertThat(result.get("output1")).isEqualTo(200D);
+        assertThat(result).containsEntry("output1", 200D);
     }
 
     @Test
@@ -278,7 +279,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", null)
                 .executeWithSingleResult();
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -291,7 +292,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("date", localDate.toDate())
                 .executeWithSingleResult();
-        assertThat(result.get("output1")).isEqualTo("test2");
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -370,8 +371,11 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
 
-        assertThat(result.get("total")).isEqualTo(500D);
-        assertThat(result.get("discount")).isEqualTo(0D);
+        assertThat(result)
+                .containsOnly(
+                        entry("total", 500D),
+                        entry("discount", 0D)
+                );
     }
 
     @Test
@@ -407,6 +411,6 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
 
-        assertThat(result.get("outputVariable1")).isEqualTo("result2");
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 }

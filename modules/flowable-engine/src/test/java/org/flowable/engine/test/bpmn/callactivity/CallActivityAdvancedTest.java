@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -26,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -180,13 +180,10 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
                             .processInstanceIdWithChildren(processInstance.getId())
                             .list();
-            assertThat(childHistoricTasks).hasSize(2);
-            List<String> taskIds = new ArrayList<>();
-            for (HistoricTaskInstance task : childHistoricTasks) {
-                taskIds.add(task.getId());
-            }
-            assertThat(taskIds).contains(taskBeforeSubProcess.getId());
-            assertThat(taskIds).contains(taskInSubProcess.getId());
+
+            assertThat(childHistoricTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsOnly(taskBeforeSubProcess.getId(), taskInSubProcess.getId());
         }
         
         childTask = taskService.createTaskQuery().processInstanceIdWithChildren(execution.getProcessInstanceId()).singleResult();
@@ -1198,7 +1195,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         });
         processEngineConfiguration.setFallbackToDefaultTenant(true);
         try {
-            Assertions.assertThatThrownBy(() -> {
+            assertThatThrownBy(() -> {
                     runtimeService.createProcessInstanceBuilder()
                             .processDefinitionKey("callSimpleSubProcess")
                             .tenantId("someOtherTenant")
@@ -1220,17 +1217,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         tenantId = "defaultFlowable"
     )
     public void testCallSimpleSubProcessWithDefaultTenantFallbackAndEmptyDefaultTenant() {
-        try {
-            runtimeService.createProcessInstanceBuilder()
-                            .processDefinitionKey("callSimpleSubProcess")
-                            .tenantId("someTenant")
-                            .fallbackToDefaultTenant()
-                            .start();
-            fail("Expected process definition not found");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected exception
-        }
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("callSimpleSubProcess")
+                .tenantId("someTenant")
+                .fallbackToDefaultTenant()
+                .start())
+                .as("Expected process definition not found")
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
     
     @Test
@@ -1241,15 +1234,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     public void testCallSimpleSubProcessWithGlobalDefaultTenantFallbackAndEmptyDefaultTenant() {
         processEngineConfiguration.setFallbackToDefaultTenant(true);
         try {
-            runtimeService.createProcessInstanceBuilder()
-                            .processDefinitionKey("callSimpleSubProcess")
-                            .tenantId("someTenant")
-                            .fallbackToDefaultTenant()
-                            .start();
-            fail("Expected process definition not found");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected exception
+            assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("callSimpleSubProcess")
+                    .tenantId("someTenant")
+                    .fallbackToDefaultTenant()
+                    .start())
+                    .as("Expected process definition not found")
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
         } finally {
             processEngineConfiguration.setFallbackToDefaultTenant(false);
         }

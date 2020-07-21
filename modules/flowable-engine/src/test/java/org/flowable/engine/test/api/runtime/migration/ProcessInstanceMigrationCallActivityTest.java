@@ -102,14 +102,10 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEqualTo(Collections.singletonList(
                 "Call activity 'callActivity' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)"));
 
-        try {
-            processInstanceMigrationBuilder.migrate(processInstance.getId());
-            fail("Migration should not be possible");
-        } catch (FlowableException e) {
-            assertTextPresent(
-                    "Call activity 'callActivity' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)",
-                    e.getMessage());
-        }
+        assertThatThrownBy(() -> processInstanceMigrationBuilder.migrate(processInstance.getId()))
+                .as("Migration should not be possible")
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Call activity 'callActivity' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)");
 
         completeProcessInstanceTasks(subProcessInstance.getId());
         completeProcessInstanceTasks(processInstance.getId());

@@ -100,7 +100,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertThat(contentItem.getId()).isNotNull();
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-        ).exists()).isTrue();
+        )).exists();
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
         assertThat(dbContentItem).isNotNull();
@@ -115,7 +115,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-        ).exists()).isFalse();
+        )).doesNotExist();
 
         assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
                 .isInstanceOf(FlowableObjectNotFoundException.class);
@@ -136,7 +136,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertThat(contentItem.getId()).isNotNull();
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-        ).exists()).isTrue();
+        )).exists();
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
         assertThat(dbContentItem).isNotNull();
@@ -151,7 +151,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-        ).exists()).isFalse();
+        )).doesNotExist();
 
         assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
                 .isInstanceOf(FlowableObjectNotFoundException.class);
@@ -194,14 +194,14 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
                 + File.separator + idFolder + File.separator +
                 contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
-        ).exists()).isTrue();
+        )).exists();
     }
 
     protected void assertMissingFile(String typeFolder, String idFolder, String contentStoreId) {
         assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
                 + File.separator + idFolder + File.separator +
                 contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
-        ).exists()).isFalse();
+        )).doesNotExist();
     }
 
     @Test
@@ -240,7 +240,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
         contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
 
-        assertThat(contentService.createContentItemQuery().scopeTypeLike("testScope%").list()).hasSize(0);
+        assertThat(contentService.createContentItemQuery().scopeTypeLike("testScope%").list()).isEmpty();
     }
 
     @Test

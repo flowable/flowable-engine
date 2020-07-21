@@ -519,7 +519,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         assertThat(failedJob).isNotNull();
         assertThat(failedJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(failedJob.getExceptionMessage()).isNotNull();
-        assertTextPresent(EXCEPTION_MESSAGE, failedJob.getExceptionMessage());
+        assertThat(failedJob.getExceptionMessage()).containsSequence(EXCEPTION_MESSAGE);
     }
 
     private void verifyQueryResults(JobQuery query, int countExpected) {

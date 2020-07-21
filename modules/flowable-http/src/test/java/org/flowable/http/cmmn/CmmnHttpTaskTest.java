@@ -161,7 +161,7 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpGetResponseStatusCode")).isEqualTo(302);
+        assertThat(variables).containsEntry("httpGetResponseStatusCode", 302);
     }
 
     @Test

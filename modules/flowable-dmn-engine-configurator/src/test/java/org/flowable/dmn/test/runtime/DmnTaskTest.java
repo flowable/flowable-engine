@@ -55,7 +55,7 @@ public class DmnTaskTest {
                 .variable("testInput", "second")
                 .start();
         Map<String, Object> processVariables = processInstance.getProcessVariables();
-        assertThat(processVariables.get("testOutput")).isEqualTo(2d);
+        assertThat(processVariables).containsEntry("testOutput", 2d);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class DmnTaskTest {
         Map<String, Object> processVariables = processInstance.getProcessVariables();
         Object resultObject = processVariables.get("DecisionTable");
         assertThat(resultObject).isNull();
-        assertThat(processVariables.get("testOutput")).isEqualTo(2.0);
+        assertThat(processVariables).containsEntry("testOutput", 2.0);
 
         processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(true);
     }

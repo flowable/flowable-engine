@@ -154,7 +154,7 @@ public class SpringAutoDeployTest {
         String filePath = "org/flowable/spring/test/autodeployment/simple-case.cmmn";
         String originalCaseFileContent = IoUtil.readFileAsString(filePath);
         String updatedCaseFileContent = originalCaseFileContent.replace("Case 1", "My simple case");
-        assertThat(updatedCaseFileContent.length() > originalCaseFileContent.length()).isTrue();
+        assertThat(updatedCaseFileContent).hasSizeGreaterThan(originalCaseFileContent.length());
         IoUtil.writeStringToFile(updatedCaseFileContent, filePath);
 
         // Classic produced/consumer problem here:
@@ -197,7 +197,7 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createCaseDefinitionQuery().list())
                 .extracting(CaseDefinition::getKey)
                 .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -211,7 +211,7 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createCaseDefinitionQuery().list())
                 .extracting(CaseDefinition::getKey)
                 .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -276,7 +276,7 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createCaseDefinitionQuery().list())
                 .extracting(CaseDefinition::getKey)
                 .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test

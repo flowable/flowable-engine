@@ -55,7 +55,7 @@ public class SpringCustomBeanTest {
             
             // Triggering the task should start the child case instance
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
             
             assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
