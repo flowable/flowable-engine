@@ -29,6 +29,8 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -290,6 +292,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("referenceType", referenceType);
         persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
+    }
+
+    @Override
+    public ReadOnlyDelegateExecution snapshotReadOnly() {
+        return new ReadOnlyDelegateExecutionImpl(this);
     }
 
     // The current flow element, will be filled during operation execution

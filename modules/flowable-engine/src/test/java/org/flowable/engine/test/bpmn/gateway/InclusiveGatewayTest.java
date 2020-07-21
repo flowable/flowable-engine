@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -1140,12 +1141,12 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         MapBasedFlowableFutureJavaDelegate futureDelegate1_1 = new MapBasedFlowableFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
+            public Map<String, Object> execute(ReadOnlyDelegateExecution inputData) {
 
                 try {
 
                     if (delegate2_1Start.await(2, TimeUnit.SECONDS)) {
-                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                         return Collections.singletonMap("counterDelegate1_1", counter.incrementAndGet());
                     }
 
@@ -1166,13 +1167,12 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         MapBasedFlowableFutureJavaDelegate futureDelegate1_2 = new MapBasedFlowableFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
-                assertThat(inputData)
-                        .contains(
-                                entry("counterDelegate1_1", 1)
-                        )
-                        .doesNotContainKeys("counterDelegate1_2", "counterDelegate2_1");
-                AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+            public Map<String, Object> execute(ReadOnlyDelegateExecution inputData) {
+                assertThat(inputData.getVariable("counterDelegate1_1")).isEqualTo(1);
+                assertThat(inputData.hasVariable("counterDelegate1_2")).isFalse();
+                assertThat(inputData.hasVariable("counterDelegate2_1")).isFalse();
+
+                AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                 return Collections.singletonMap("counterDelegate1_2", counter.incrementAndGet());
             }
 
@@ -1186,12 +1186,12 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         MapBasedFlowableFutureJavaDelegate futureDelegate2_1 = new MapBasedFlowableFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
+            public Map<String, Object> execute(ReadOnlyDelegateExecution inputData) {
                 delegate2_1Start.countDown();
 
                 try {
                     if (delegate1_2Done.await(2, TimeUnit.SECONDS)) {
-                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                         return Collections.singletonMap("counterDelegate2_1", counter.incrementAndGet());
                     }
 

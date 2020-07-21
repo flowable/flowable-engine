@@ -75,4 +75,11 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
         return null;
     }
 
+    /**
+     * Create a snapshot read only delegate plan item instance of this delegate plan item instance.
+     *
+     * @return a {@link ReadOnlyDelegatePlanItemInstance}
+     */
+    ReadOnlyDelegatePlanItemInstance snapshotReadOnly();
+
 }

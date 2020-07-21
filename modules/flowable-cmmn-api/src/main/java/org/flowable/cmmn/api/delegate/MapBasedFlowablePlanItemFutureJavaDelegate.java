@@ -12,21 +12,20 @@
  */
 package org.flowable.cmmn.api.delegate;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link FlowablePlanItemFutureJavaDelegate} which has {@link Map} as input and output data.
+ * A {@link FlowablePlanItemFutureJavaDelegate} which has a {@link ReadOnlyDelegatePlanItemInstance} as input and {@link Map} output data.
  * By default this will have a copy {@link DelegatePlanItemInstance#getVariables()} as the input data
  * and will store all data from the output map as variables in the {@link DelegatePlanItemInstance}
  *
  * @author Filip Hrisafov
  */
-public interface MapBasedFlowablePlanItemFutureJavaDelegate extends FlowablePlanItemFutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
+public interface MapBasedFlowablePlanItemFutureJavaDelegate extends FlowablePlanItemFutureJavaDelegate<ReadOnlyDelegatePlanItemInstance, Map<String, Object>> {
 
     @Override
-    default Map<String, Object> prepareExecutionData(DelegatePlanItemInstance planItemInstance) {
-        return new HashMap<>(planItemInstance.getVariables());
+    default ReadOnlyDelegatePlanItemInstance prepareExecutionData(DelegatePlanItemInstance planItemInstance) {
+        return planItemInstance.snapshotReadOnly();
     }
 
     @Override

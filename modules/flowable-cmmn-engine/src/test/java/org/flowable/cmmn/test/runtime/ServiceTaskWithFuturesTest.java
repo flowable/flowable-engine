@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +33,12 @@ import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.FlowablePlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.MapBasedFlowablePlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.javax.el.ELException;
@@ -275,6 +278,68 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ServiceTaskWithFuturesTest.testDelegateExpressionWithFutureJavaDelegate.cmmn", tenantId = "flowable")
+    public void testDelegateExpressionWithMapBasedFutureJavaDelegate() {
+        List<ReadOnlyDelegatePlanItemInstance> delegatePlanItems = new ArrayList<>();
+        MapBasedFlowablePlanItemFutureJavaDelegate bean = inputData -> {
+            delegatePlanItems.add(inputData);
+            return Collections.singletonMap(inputData.getPlanItemDefinitionId(), "done");
+        };
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .tenantId("flowable")
+                .businessKey("test-key")
+                .name("Case name")
+                .variable("testVar", "test")
+                .transientVariable("bean", bean)
+                .transientVariable("counter", new AtomicInteger(0))
+                .start();
+
+        assertThat(caseInstance.getCaseVariables())
+                .contains(
+                        entry("serviceTask1", "done"),
+                        entry("serviceTask2", "done")
+                );
+
+        assertCaseInstanceEnded(caseInstance);
+        assertThat(delegatePlanItems)
+                .extracting(ReadOnlyDelegatePlanItemInstance::getPlanItemDefinitionId)
+                .containsExactly("serviceTask1", "serviceTask2");
+
+        ReadOnlyDelegatePlanItemInstance task1Delegate = delegatePlanItems.get(0);
+        assertThat(task1Delegate.getId()).isNotNull();
+        assertThat(task1Delegate.getCaseInstanceId()).isEqualTo(caseInstance.getId());
+        assertThat(task1Delegate.getCaseDefinitionId()).isNotNull();
+        assertThat(task1Delegate.getCreateTime()).isNotNull();
+        assertThat(task1Delegate.getLastAvailableTime()).isNotNull();
+        assertThat(task1Delegate.getLastStartedTime()).isNotNull();
+        assertThat(task1Delegate.getTenantId()).isEqualTo("flowable");
+        assertThat(task1Delegate.isStage()).isFalse();
+        assertThat(task1Delegate.hasVariable("serviceTask1")).isFalse();
+        assertThat(task1Delegate.hasVariable("serviceTask2")).isFalse();
+        assertThat(task1Delegate.getVariable("testVar")).isEqualTo("test");
+        assertThat(task1Delegate.getPlanItemDefinition()).isInstanceOf(ServiceTask.class);
+        ServiceTask serviceTask1 = (ServiceTask) task1Delegate.getPlanItemDefinition();
+        assertThat(serviceTask1.getId()).isEqualTo("serviceTask1");
+
+        ReadOnlyDelegatePlanItemInstance task2Delegate = delegatePlanItems.get(1);
+        assertThat(task2Delegate.getId()).isNotNull().isNotEqualTo(task1Delegate.getId());
+        assertThat(task2Delegate.getCaseInstanceId()).isEqualTo(caseInstance.getId());
+        assertThat(task2Delegate.getCaseDefinitionId()).isNotNull();
+        assertThat(task2Delegate.getCreateTime()).isNotNull();
+        assertThat(task2Delegate.getLastAvailableTime()).isNotNull();
+        assertThat(task2Delegate.getLastStartedTime()).isNotNull();
+        assertThat(task2Delegate.getTenantId()).isEqualTo("flowable");
+        assertThat(task2Delegate.isStage()).isFalse();
+        assertThat(task2Delegate.hasVariable("serviceTask1")).isFalse();
+        assertThat(task2Delegate.hasVariable("serviceTask2")).isFalse();
+        assertThat(task2Delegate.getVariable("testVar")).isEqualTo("test");
+        assertThat(task2Delegate.getPlanItemDefinition()).isInstanceOf(ServiceTask.class);
+        ServiceTask serviceTask2 = (ServiceTask) task2Delegate.getPlanItemDefinition();
+        assertThat(serviceTask2.getId()).isEqualTo("serviceTask2");
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ServiceTaskWithFuturesTest.testDelegateExpressionWithFutureJavaDelegate.cmmn")
     public void testDelegateExpressionWithJavaDelegate() {
 
@@ -313,12 +378,12 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         MapBasedFlowablePlanItemFutureJavaDelegate futureDelegate1_1 = new MapBasedFlowablePlanItemFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
+            public Map<String, Object> execute(ReadOnlyDelegatePlanItemInstance inputData) {
 
                 try {
 
                     if (delegate2_1Start.await(2, TimeUnit.SECONDS)) {
-                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                         return Collections.singletonMap("counterDelegate1_1", counter.incrementAndGet());
                     }
 
@@ -339,13 +404,11 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         MapBasedFlowablePlanItemFutureJavaDelegate futureDelegate1_2 = new MapBasedFlowablePlanItemFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
-                assertThat(inputData)
-                        .contains(
-                                entry("counterDelegate1_1", 1)
-                        )
-                        .doesNotContainKeys("counterDelegate1_2", "counterDelegate2_1");
-                AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+            public Map<String, Object> execute(ReadOnlyDelegatePlanItemInstance inputData) {
+                assertThat(inputData.getVariable("counterDelegate1_1")).isEqualTo(1);
+                assertThat(inputData.hasVariable("counterDelegate1_2")).isFalse();
+                assertThat(inputData.hasVariable("counterDelegate2_1")).isFalse();
+                AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                 return Collections.singletonMap("counterDelegate1_2", counter.incrementAndGet());
             }
 
@@ -359,12 +422,12 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         MapBasedFlowablePlanItemFutureJavaDelegate futureDelegate2_1 = new MapBasedFlowablePlanItemFutureJavaDelegate() {
 
             @Override
-            public Map<String, Object> execute(Map<String, Object> inputData) {
+            public Map<String, Object> execute(ReadOnlyDelegatePlanItemInstance inputData) {
                 delegate2_1Start.countDown();
 
                 try {
                     if (delegate1_2Done.await(2, TimeUnit.SECONDS)) {
-                        AtomicInteger counter = (AtomicInteger) inputData.get("counter");
+                        AtomicInteger counter = (AtomicInteger) inputData.getVariable("counter");
                         return Collections.singletonMap("counterDelegate2_1", counter.incrementAndGet());
                     }
 
