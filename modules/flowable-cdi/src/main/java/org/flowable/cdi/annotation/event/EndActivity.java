@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface EndActivity {
     /** the id of the activity that is being left / was left */
-    public String value();
+    String value();
 }

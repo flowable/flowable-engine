@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AppDeployment {
 
-    public String[] resources() default {};
+    String[] resources() default {};
 
-    public String tenantId() default "";
+    String tenantId() default "";
     
 }

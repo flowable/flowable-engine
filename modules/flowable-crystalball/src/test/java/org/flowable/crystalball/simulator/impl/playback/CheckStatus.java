@@ -20,6 +20,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface CheckStatus {
 
     /** Specify resources that make up the process definition. */
-    public String methodName() default "";
+    String methodName() default "";
 
 }
