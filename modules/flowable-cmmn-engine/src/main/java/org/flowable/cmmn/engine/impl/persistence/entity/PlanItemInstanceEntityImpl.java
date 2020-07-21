@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.delegate.ReadOnlyDelegatePlanItemInstanceImpl;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
@@ -123,6 +125,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         return persistentState;
     }
     
+    @Override
+    public ReadOnlyDelegatePlanItemInstance snapshotReadOnly() {
+        return new ReadOnlyDelegatePlanItemInstanceImpl(this);
+    }
+
     @Override
     public PlanItem getPlanItem() {
         if (planItem == null) {

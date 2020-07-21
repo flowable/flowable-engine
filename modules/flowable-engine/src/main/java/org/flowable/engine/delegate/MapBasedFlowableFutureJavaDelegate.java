@@ -12,21 +12,20 @@
  */
 package org.flowable.engine.delegate;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link FlowableFutureJavaDelegate} which has {@link Map} as input and output data.
+ * A {@link FlowableFutureJavaDelegate} which has a {@link ReadOnlyDelegateExecution} as input and {@link Map} output data.
  * By default this will have a copy {@link DelegateExecution#getVariables()} as the input data
  * and will store all data from the output map as variables in the {@link DelegateExecution}
  *
  * @author Filip Hrisafov
  */
-public interface MapBasedFlowableFutureJavaDelegate extends FlowableFutureJavaDelegate<Map<String, Object>, Map<String, Object>> {
+public interface MapBasedFlowableFutureJavaDelegate extends FlowableFutureJavaDelegate<ReadOnlyDelegateExecution, Map<String, Object>> {
 
     @Override
-    default Map<String, Object> prepareExecutionData(DelegateExecution execution) {
-        return new HashMap<>(execution.getVariables());
+    default ReadOnlyDelegateExecution prepareExecutionData(DelegateExecution execution) {
+        return execution.snapshotReadOnly();
     }
 
     @Override

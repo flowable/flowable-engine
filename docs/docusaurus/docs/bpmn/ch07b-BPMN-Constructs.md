@@ -1839,7 +1839,9 @@ public class LongRunningJavaDelegate implements FutureJavaDelegate<String> {
 }
 ```
 
-There are also 2 other interfaces that can be used in to simplify your own implementation: *org.flowable.engine.delegate.FlowableFutureJavaDelegate* and *org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate*
+There are also 2 other interfaces that can be used in to simplify your own implementation: 
+* *org.flowable.engine.delegate.FlowableFutureJavaDelegate*, in which the default (or configured) AsyncTaskInvoker will be used, simplifying the logic.
+* *org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate*, which simplifies the passing of input and output further by using a ReadOnlyDelegateExecution and a Map respectively.
 
 The same implementation with the other interfaces looks like:
 
@@ -1870,8 +1872,8 @@ public class LongRunningJavaDelegate implements FlowableFutureJavaDelegate<Strin
 ```java
 public class LongRunningJavaDelegate implements MapBasedFlowableFutureJavaDelegate {
 
-    public Map<String, Object> execute(Map<String, Object> inputData) {
-        // The inputData contains a snapshot of all the variables from the execution
+    public Map<String, Object> execute(ReadOnlyDelegateExecution execution) {
+        // The execution is a read only snapshot of the delegate execution
         // This is running on a new thread. The execution shouldn't be used here.
         // There is also no transaction here. In case a new transaction is needed, then it should be managed by your own services
         // Perform some complex logic that takes some time, e.g. invoking an external service

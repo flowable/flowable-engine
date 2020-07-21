@@ -36,6 +36,8 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
@@ -467,6 +469,11 @@ public class ExecutionImpl implements
      * must be called before memberfield processInstance is used. can be used by subclasses to provide processInstance member field initialization.
      */
     protected void ensureProcessInstanceInitialized() {
+    }
+
+    @Override
+    public ReadOnlyDelegateExecution snapshotReadOnly() {
+        return new ReadOnlyDelegateExecutionImpl(this);
     }
 
     // The current flow element, will be filled during operation execution

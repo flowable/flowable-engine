@@ -31,7 +31,9 @@ public interface PlanItemInstance {
     String getPlanItemDefinitionId();
     String getPlanItemDefinitionType();
     @Deprecated()
-    Date getStartTime();
+    default Date getStartTime() {
+        return getCreateTime();
+    }
     Date getCreateTime();
     Date getLastAvailableTime();
     Date getLastUnavailableTime();
