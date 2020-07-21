@@ -12,6 +12,8 @@
  */
 package org.flowable.crystalball.process;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,7 @@ public class SimulationRunTaskTest extends ResourceFlowableTestCase {
     public void testBasicSimulationRun() {
         runtimeService.startProcessInstanceByKey("basicSimulationRun");
         // all executions are finished
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
 }

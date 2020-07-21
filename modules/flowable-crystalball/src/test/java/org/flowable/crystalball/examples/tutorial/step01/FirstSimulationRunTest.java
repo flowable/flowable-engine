@@ -12,8 +12,7 @@
  */
 package org.flowable.crystalball.examples.tutorial.step01;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
@@ -35,10 +34,10 @@ public class FirstSimulationRunTest extends ResourceFlowableTestCase {
     public void testSimulationRun() {
         runtimeService.startProcessInstanceByKey("basicSimulationRun");
         // all simulationManager executions are finished
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
         // simulation run check (Simulation run has side effect. The counter value is increased)
-        assertThat(Counter.value.get(), is(1l));
+        assertThat(Counter.value.get()).isEqualTo(1);
     }
 
 }

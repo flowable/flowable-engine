@@ -12,10 +12,8 @@
  */
 package org.flowable.crystalball.simulator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -40,9 +38,9 @@ public class SimpleEventCalendarTest {
     @Test
     public void testIsEmpty() throws Exception {
         EventCalendar calendar = new SimpleEventCalendar(clock, comparator);
-        assertTrue(calendar.isEmpty());
+        assertThat(calendar.isEmpty()).isTrue();
         SimulationEvent event = calendar.removeFirstEvent();
-        assertNull(event);
+        assertThat(event).isNull();
     }
 
     @Test
@@ -56,11 +54,11 @@ public class SimpleEventCalendarTest {
         calendar.addEvent(event1);
 
         SimulationEvent event = calendar.removeFirstEvent();
-        assertEquals(event1, event);
+        assertThat(event).isEqualTo(event1);
         event = calendar.removeFirstEvent();
-        assertEquals(event1, event);
+        assertThat(event).isEqualTo(event1);
         event = calendar.removeFirstEvent();
-        assertEquals(event2, event);
+        assertThat(event).isEqualTo(event2);
     }
 
     @Test
@@ -71,8 +69,8 @@ public class SimpleEventCalendarTest {
         calendar.addEvent(event1);
 
         calendar.clear();
-        assertTrue(calendar.isEmpty());
-        assertNull(calendar.removeFirstEvent());
+        assertThat(calendar.isEmpty()).isTrue();
+        assertThat(calendar.removeFirstEvent()).isNull();
     }
 
     @Test(expected = RuntimeException.class)
