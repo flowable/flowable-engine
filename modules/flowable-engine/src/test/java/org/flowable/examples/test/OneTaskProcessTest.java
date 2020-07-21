@@ -14,7 +14,6 @@ package org.flowable.examples.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.core.Is.is;
 
 import java.util.ArrayList;
 import java.util.List;

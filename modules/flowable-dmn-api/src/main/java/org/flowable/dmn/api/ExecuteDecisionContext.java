@@ -14,7 +14,6 @@ package org.flowable.dmn.api;
 
 import java.util.Map;
 
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.model.DmnElement;
 
 public class ExecuteDecisionContext {

@@ -12,8 +12,5 @@
  */
 package org.flowable.dmn.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DmnDiDecisionServiceDividerLine extends DiEdge {
 }

@@ -15,11 +15,8 @@ package org.flowable.dmn.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import org.assertj.core.groups.Tuple;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.GraphicInfo;
-import org.flowable.dmn.model.ItemDefinition;
 import org.junit.jupiter.api.Test;
 
 public class DiagramDiTest extends AbstractConverterTest {
