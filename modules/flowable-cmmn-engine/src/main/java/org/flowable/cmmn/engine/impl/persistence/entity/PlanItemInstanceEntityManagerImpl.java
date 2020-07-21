@@ -50,7 +50,6 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -463,6 +462,21 @@ public class PlanItemInstanceEntityManagerImpl
         }
         
         getDataManager().delete(planItemInstanceEntity);
+    }
+
+    @Override
+    public void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        PlanItemInstanceQuery planItemQuery = new PlanItemInstanceQueryImpl()
+                .caseInstanceId(caseInstanceId)
+                .includeEnded();
+        List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
+        if (planItemInstances != null) {
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+                planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(planItemInstanceEntity);
+            }
+        }
     }
 
     protected CaseInstanceEntityManager getCaseInstanceEntityManager() {

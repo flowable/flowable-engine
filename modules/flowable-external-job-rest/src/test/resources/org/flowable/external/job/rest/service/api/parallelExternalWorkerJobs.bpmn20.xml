@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <process id="externalWorkerJobQueryTest" name="External Worker Job Query Test" isExecutable="true">
+        <startEvent id="theStart"/>
+        <parallelGateway id="gw1"/>
+        <serviceTask id="externalCustomer1" name="Customer Service" flowable:type="external-worker" flowable:topic="customerService"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="gw1"/>
+        <sequenceFlow id="flow2" sourceRef="gw1" targetRef="externalCustomer1"/>
+        <sequenceFlow id="flow3" sourceRef="gw1" targetRef="externalOrder"/>
+        <serviceTask id="externalOrder" name="Order Service" flowable:type="external-worker" flowable:topic="orderService"
+                     flowable:exclusive="false"/>
+        <exclusiveGateway id="gw2"/>
+        <sequenceFlow id="flow4" sourceRef="externalCustomer1" targetRef="gw2"/>
+        <sequenceFlow id="flow5" sourceRef="externalOrder" targetRef="gw2"/>
+        <endEvent id="theEnd"/>
+        <serviceTask id="externalCustomer2" name="Customer Service 2" flowable:type="external-worker" flowable:topic="customer"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flow6" sourceRef="gw2" targetRef="externalCustomer2"/>
+        <sequenceFlow id="flow7" sourceRef="externalCustomer2" targetRef="theEnd"/>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_externalWorkerJobQueryTest">
+        <bpmndi:BPMNPlane bpmnElement="externalWorkerJobQueryTest" id="BPMNPlane_externalWorkerJobQueryTest">
+            <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+                <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="gw1" id="BPMNShape_gw1">
+                <omgdc:Bounds height="40.0" width="40.0" x="175.0" y="158.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="externalCustomer1" id="BPMNShape_externalCustomer1">
+                <omgdc:Bounds height="80.0" width="100.0" x="255.0" y="30.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="externalOrder" id="BPMNShape_externalOrder">
+                <omgdc:Bounds height="80.0" width="100.0" x="260.0" y="285.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="gw2" id="BPMNShape_gw2">
+                <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="158.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+                <omgdc:Bounds height="28.0" width="28.0" x="780.0" y="164.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="externalCustomer2" id="BPMNShape_externalCustomer2">
+                <omgdc:Bounds height="80.0" width="100.0" x="540.0" y="138.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="129.9496588110467" y="178.09285545292158"/>
+                <omgdi:waypoint x="175.375" y="178.375"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+                <omgdi:waypoint x="195.5" y="158.5"/>
+                <omgdi:waypoint x="195.5" y="70.0"/>
+                <omgdi:waypoint x="255.0" y="70.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+                <omgdi:waypoint x="195.5" y="197.443536834925"/>
+                <omgdi:waypoint x="195.5" y="325.0"/>
+                <omgdi:waypoint x="260.0" y="325.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+                <omgdi:waypoint x="354.95000000000005" y="70.0"/>
+                <omgdi:waypoint x="440.5" y="70.0"/>
+                <omgdi:waypoint x="440.5" y="158.5"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+                <omgdi:waypoint x="359.94999999993263" y="325.0"/>
+                <omgdi:waypoint x="444.48983362654405" y="325.0"/>
+                <omgdi:waypoint x="444.48983362654405" y="193.41303899977814"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+                <omgdi:waypoint x="459.5351898101823" y="178.405"/>
+                <omgdi:waypoint x="539.9999999999964" y="178.0047263681592"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+                <omgdi:waypoint x="639.9499999999294" y="178.0"/>
+                <omgdi:waypoint x="780.0" y="178.0"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

@@ -63,7 +63,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(planItem.getId()).isEqualTo("planItem1");
         assertThat(planItem.getName()).isEqualTo("Task");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) planItemDefinition;
         assertThat(humanTask.getId()).isEqualTo("task1");
@@ -83,7 +82,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(taskPlanItem.getId()).isEqualTo("planItem2");
         assertThat(taskPlanItem.getName()).isEqualTo("Task2");
         planItemDefinition = taskPlanItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
         assertThat(humanTask.getId()).isEqualTo("task2");
@@ -103,7 +101,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(milestonePlanItem.getId()).isEqualTo("planItem6");
         assertThat(milestonePlanItem.getName()).isEqualTo("Milestone 1");
         planItemDefinition = milestonePlanItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(Milestone.class);
         Milestone milestone = (Milestone) planItemDefinition;
         assertThat(milestone.getId()).isEqualTo("milestone1");
@@ -144,7 +141,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(stagePlanItem.getId()).isEqualTo("planItem5");
         assertThat(stagePlanItem.getName()).isEqualTo("Child stage");
         planItemDefinition = stagePlanItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(Stage.class);
         Stage stage = (Stage) planItemDefinition;
         assertThat(stage.getId()).isEqualTo("childStage");
@@ -166,7 +162,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(subPlanItem1.getId()).isEqualTo("planItem3");
         assertThat(subPlanItem1.getName()).isEqualTo("Sub task 1");
         planItemDefinition = subPlanItem1.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
         assertThat(humanTask.getId()).isEqualTo("subTask1");
@@ -187,7 +182,6 @@ public class StageConverterTest extends AbstractConverterTest {
         assertThat(subPlanItem2.getId()).isEqualTo("planItem4");
         assertThat(subPlanItem2.getName()).isEqualTo("Sub task 2");
         planItemDefinition = subPlanItem2.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
         assertThat(humanTask.getId()).isEqualTo("subTask2");

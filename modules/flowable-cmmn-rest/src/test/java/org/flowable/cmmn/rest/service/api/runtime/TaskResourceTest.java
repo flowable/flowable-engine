@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Calendar;
 import java.util.List;
@@ -412,22 +413,12 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 assertThat(historicTaskInstance).isNotNull();
                 List<HistoricVariableInstance> updates = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list();
                 assertThat(updates).isNotNull();
-                assertThat(updates).hasSize(2);
-                boolean foundFirst = false;
-                boolean foundSecond = false;
-
-                for (HistoricVariableInstance var : updates) {
-                    if (var.getVariableName().equals("var1")) {
-                        assertThat(var.getValue()).isEqualTo("First value");
-                        foundFirst = true;
-                    } else if (var.getVariableName().equals("var2")) {
-                        assertThat(var.getValue()).isEqualTo("Second value");
-                        foundSecond = true;
-                    }
-                }
-
-                assertThat(foundFirst).isTrue();
-                assertThat(foundSecond).isTrue();
+                assertThat(updates)
+                        .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                        .containsExactlyInAnyOrder(
+                                tuple("var1", "First value"),
+                                tuple("var2", "Second value")
+                        );
             }
 
         } finally {
@@ -510,22 +501,12 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 assertThat(historicTaskInstance).isNotNull();
                 List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list();
                 assertThat(variables).isNotNull();
-                assertThat(variables).hasSize(2);
-                boolean foundFirst = false;
-                boolean foundSecond = false;
-
-                for (HistoricVariableInstance variable : variables) {
-                    if (variable.getVariableName().equals("user")) {
-                        assertThat(variable.getValue()).isEqualTo("First value");
-                        foundFirst = true;
-                    } else if (variable.getVariableName().equals("number")) {
-                        assertThat(variable.getValue()).isEqualTo(789);
-                        foundSecond = true;
-                    }
-                }
-
-                assertThat(foundFirst).isTrue();
-                assertThat(foundSecond).isTrue();
+                assertThat(variables)
+                        .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                        .containsExactlyInAnyOrder(
+                                tuple("user", "First value"),
+                                tuple("number", 789)
+                        );
             }
 
         } finally {
@@ -533,7 +514,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
             for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId());
+                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
             }
         }
     }
@@ -548,7 +529,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.addUserIdentityLink(task.getId(), "newAssignee", IdentityLinkType.CANDIDATE);
 
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
             // Add candidate group
             String taskId = task.getId();
 
@@ -563,7 +544,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isNull();
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
 
             // Claim the task and check result
             requestNode.put("assignee", "newAssignee");
@@ -572,7 +553,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isEqualTo("newAssignee");
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(0L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isZero();
 
             // Claiming with the same user shouldn't cause an exception
             httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -580,7 +561,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isEqualTo("newAssignee");
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(0L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isZero();
 
             // Claiming with another user should cause exception
             requestNode.put("assignee", "anotherUser");
@@ -619,7 +600,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         assertThat(taskId).isNotNull();
 
         // Claim
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isZero();
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
@@ -629,7 +610,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
 
         // Unclaim
         requestNode = objectMapper.createObjectNode();
@@ -638,7 +619,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isZero();
 
         // Claim again
         requestNode = objectMapper.createObjectNode();
@@ -647,7 +628,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
     }
 
     /**

@@ -173,4 +173,5 @@ public class ModelCollectionResource extends BaseModelResource {
         response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createModelResponse(model);
     }
+
 }

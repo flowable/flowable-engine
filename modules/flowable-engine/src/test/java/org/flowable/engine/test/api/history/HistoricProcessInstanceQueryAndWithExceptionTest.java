@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -58,11 +59,12 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
 
             HistoricProcessInstanceQuery queryNoException = historyService.createHistoricProcessInstanceQuery();
             assertThat(queryNoException.count()).isEqualTo(1);
-            assertThat(queryNoException.list()).hasSize(1);
-            assertThat(queryNoException.list().get(0).getId()).isEqualTo(processNoException.getId());
+            assertThat(queryNoException.list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactly(processNoException.getId());
 
             HistoricProcessInstanceQuery queryWithException = historyService.createHistoricProcessInstanceQuery();
-            assertThat(queryWithException.withJobException().count()).isEqualTo(0);
+            assertThat(queryWithException.withJobException().count()).isZero();
             assertThat(queryWithException.withJobException().list()).isEmpty();
 
             ProcessInstance processWithException1 = startProcessInstanceWithFailingJob(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1);
@@ -72,8 +74,9 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertThat(queryWithException.withJobException().count()).isEqualTo(1);
-            assertThat(queryWithException.withJobException().list()).hasSize(1);
-            assertThat(queryWithException.withJobException().list().get(0).getId()).isEqualTo(processWithException1.getId());
+            assertThat(queryNoException.withJobException().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactly(processWithException1.getId());
 
             ProcessInstance processWithException2 = startProcessInstanceWithFailingJob(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2);
             TimerJobQuery jobQuery2 = managementService.createTimerJobQuery().processInstanceId(processWithException2.getId());

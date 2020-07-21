@@ -17,12 +17,12 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
@@ -109,12 +109,12 @@ public class CommandContextUtil {
         return getJobServiceConfiguration(commandContext).getHistoryJobEntityManager();
     }
     
-    public static JobByteArrayEntityManager getJobByteArrayEntityManager() {
+    public static ByteArrayEntityManager getJobByteArrayEntityManager() {
         return getJobByteArrayEntityManager(getCommandContext());
     }
     
-    public static JobByteArrayEntityManager getJobByteArrayEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getJobByteArrayEntityManager();
+    public static ByteArrayEntityManager getJobByteArrayEntityManager(CommandContext commandContext) {
+        return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
     }
     
     public static CommandContext getCommandContext() {

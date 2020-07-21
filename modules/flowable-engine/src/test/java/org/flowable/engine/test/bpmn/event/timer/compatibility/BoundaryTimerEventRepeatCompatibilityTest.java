@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.bpmn.event.timer.compatibility;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -21,6 +24,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.task.api.Task;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -49,17 +53,16 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         runtimeService.setVariable(processInstance.getId(), "EndDateForBoundary", dateStr);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Task A", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsOnly("Task A");
 
         // Test Boundary Events
         // complete will cause timer to be created
-        taskService.complete(task.getId());
+        taskService.complete(tasks.get(0).getId());
 
         List<Job> jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // change the job in old mode (the configuration should not be json in
         // "old mode" but a simple string).
@@ -72,7 +75,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
 
         // a new job must be prepared because there are 10 repeats 2 seconds interval
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         for (int i = 0; i < 9; i++) {
             nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
@@ -81,43 +84,39 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
             // a new job must be prepared because there are 10 repeats 2 seconds interval
 
             jobs = managementService.createTimerJobQuery().list();
-            assertEquals(1, jobs.size());
+            assertThat(jobs).hasSize(1);
         }
 
         nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
-        try {
-            waitForJobExecutorToProcessAllJobs(7000, 100);
-        } catch (Exception ex) {
-            fail("Should not have any other jobs because the endDate is reached");
-        }
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 100); })
+                .as("Should not have any other jobs because the endDate is reached")
+                .doesNotThrowAnyException();
 
         tasks = taskService.createTaskQuery().list();
-        task = tasks.get(0);
-        assertEquals("Task B", task.getName());
-        assertEquals(1, tasks.size());
-        taskService.complete(task.getId());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsOnly("Task B");
+        taskService.complete(tasks.get(0).getId());
 
-        try {
-            waitForJobExecutorToProcessAllJobs(7000, 500);
-        } catch (Exception e) {
-            fail("No jobs should be active here.");
-        }
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 500); })
+                .as("No jobs should be active here.")
+                .doesNotThrowAnyException();
 
         // now All the process instances should be completed
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
 
         // no jobs
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         // no tasks
         tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
 
     }
 

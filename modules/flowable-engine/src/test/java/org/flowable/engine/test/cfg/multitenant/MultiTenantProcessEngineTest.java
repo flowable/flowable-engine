@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.cfg.multitenant;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -186,9 +187,9 @@ public class MultiTenantProcessEngineTest {
     private void assertData(String userId, long nrOfActiveProcessInstances, long nrOfActiveJobs) {
         tenantInfoHolder.setCurrentUserId(userId);
 
-        Assert.assertEquals(nrOfActiveProcessInstances, processEngine.getRuntimeService().createExecutionQuery().onlyProcessInstanceExecutions().count());
-        Assert.assertEquals(nrOfActiveProcessInstances, processEngine.getHistoryService().createHistoricProcessInstanceQuery().unfinished().count());
-        Assert.assertEquals(nrOfActiveJobs, processEngine.getManagementService().createTimerJobQuery().count());
+        assertThat(processEngine.getRuntimeService().createExecutionQuery().onlyProcessInstanceExecutions().count()).isEqualTo(nrOfActiveProcessInstances);
+        assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery().unfinished().count()).isEqualTo(nrOfActiveProcessInstances);
+        assertThat(processEngine.getManagementService().createTimerJobQuery().count()).isEqualTo(nrOfActiveJobs);
 
         tenantInfoHolder.clearCurrentUserId();
         tenantInfoHolder.clearCurrentTenantId();

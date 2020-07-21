@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.DmnDeploymentId;
@@ -54,7 +54,7 @@ class DmnSpringJunitJupiterTest {
     private DmnEngine dmnEngine;
 
     @Autowired
-    private DmnRuleService ruleService;
+    private DmnDecisionService ruleService;
 
     @Autowired
     private DmnRepositoryService dmnRepositoryService;
@@ -124,8 +124,8 @@ class DmnSpringJunitJupiterTest {
         }
 
         @Bean
-        public DmnRuleService dmnRuleService(DmnEngine dmnEngine) {
-            return dmnEngine.getDmnRuleService();
+        public DmnDecisionService dmnRuleService(DmnEngine dmnEngine) {
+            return dmnEngine.getDmnDecisionService();
         }
 
         @Bean

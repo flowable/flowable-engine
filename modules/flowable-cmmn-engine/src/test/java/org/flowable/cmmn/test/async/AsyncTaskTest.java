@@ -150,12 +150,12 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
 
         // Now 3 async jobs should be created for the 3 async human tasks
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(3L);
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
 
         List<Job> jobs = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).list();
         assertThat(jobs).hasSize(3);
         for (Job job : jobs) {
-            assertThat(job.getElementId().startsWith("sid-")).isTrue();
+            assertThat(job.getElementId()).startsWith("sid-");
             assertThat(job.getElementName()).isIn("B", "C", "D");
         }
 
@@ -178,8 +178,8 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
 
         // Evaluation should not complete the case instance when the async task hasn't been processed yet
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSingleAsyncTask").start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
         Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(job).isNotNull();
@@ -209,7 +209,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("A");
         cmmnTaskService.complete(task.getId());
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
         waitForJobExecutorToProcessAllJobs();
         assertCaseInstanceEnded(caseInstance);
@@ -221,7 +221,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateCaseInstance").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Non-async");
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult().getState())
                 .isEqualTo(PlanItemInstanceState.ASYNC_ACTIVE);
 
@@ -230,13 +230,13 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         // Triggering A should async-activate the three tasks after it
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(3L);
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isEqualTo("Non-async");
 
         // Terminating the case should delete also the jobs
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     @Test

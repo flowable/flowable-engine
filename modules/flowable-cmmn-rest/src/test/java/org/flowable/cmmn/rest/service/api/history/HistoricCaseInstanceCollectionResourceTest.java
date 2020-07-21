@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -37,6 +38,8 @@ import org.flowable.task.api.Task;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic case instance query resource.
@@ -107,10 +110,16 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertThat(dataNode).hasSize(3);
-            assertThat(dataNode.get(0).get("id").asText()).isEqualTo(caseInstance.getId());
-            assertThat(dataNode.get(1).get("id").asText()).isEqualTo(caseInstance2.getId());
-            assertThat(dataNode.get(2).get("id").asText()).isEqualTo(caseInstance3.getId());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("["
+                            + "{"
+                            + "   id: '" + caseInstance.getId() + "'"
+                            + "}, {"
+                            + "   id: '" + caseInstance2.getId() + "'"
+                            + "}, {"
+                            + "    id: '" + caseInstance3.getId() + "'"
+                            + "} ]");
 
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
@@ -141,7 +150,6 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             toBeFound.remove(id);
         }
         assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
-
     }
 
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables)

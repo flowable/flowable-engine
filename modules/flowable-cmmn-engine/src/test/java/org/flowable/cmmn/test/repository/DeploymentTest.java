@@ -115,8 +115,7 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         
         String resourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.cmmn";
         String diagramResourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.caseB.png";
-        assertThat(resourceNames.contains(resourceName)).isTrue();
-        assertThat(resourceNames.contains(diagramResourceName)).isTrue();
+        assertThat(resourceNames).contains(resourceName, diagramResourceName);
         
         InputStream inputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), resourceName);
         assertThat(inputStream).isNotNull();

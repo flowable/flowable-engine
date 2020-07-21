@@ -70,6 +70,6 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
             }
         }
 
-        jobServiceConfiguration.getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
+        moveExternalWorkerJobToExecutableJob(jobServiceConfiguration, externalWorkerJob, commandContext);
     }
 }

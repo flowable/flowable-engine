@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.RuleEngineExecutor;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
@@ -65,15 +66,14 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     /**
-     * Executes the given decision table and creates the outcome results
+     * Executes the given decision and creates the outcome results
      *
      * @param decision            the DMN decision
      * @param executeDecisionInfo
      * @return updated execution variables map
      */
     @Override
-    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
-
+    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
         if (decision == null) {
             throw new IllegalArgumentException("no decision provided");
         }
@@ -101,34 +101,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         } finally {
             // end audit trail
             executionContext.getAuditContainer().stopAudit();
-
-            DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-            if (dmnEngineConfiguration.isHistoryEnabled()) {
-                HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager = dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
-                HistoricDecisionExecutionEntity decisionExecutionEntity = historicDecisionExecutionEntityManager.create();
-                decisionExecutionEntity.setDecisionDefinitionId(executeDecisionInfo.getDecisionDefinitionId());
-                decisionExecutionEntity.setDeploymentId(executeDecisionInfo.getDeploymentId());
-                decisionExecutionEntity.setStartTime(executionContext.getAuditContainer().getStartTime());
-                decisionExecutionEntity.setEndTime(executionContext.getAuditContainer().getEndTime());
-                decisionExecutionEntity.setInstanceId(executeDecisionInfo.getInstanceId());
-                decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
-                decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
-                decisionExecutionEntity.setScopeType(executeDecisionInfo.getScopeType());
-                decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
-
-                Boolean failed = executionContext.getAuditContainer().isFailed();
-                if (BooleanUtils.isTrue(failed)) {
-                    decisionExecutionEntity.setFailed(failed.booleanValue());
-                }
-
-                try {
-                    decisionExecutionEntity.setExecutionJson(objectMapper.writeValueAsString(executionContext.getAuditContainer()));
-                } catch (Exception e) {
-                    throw new FlowableException("Error writing execution json", e);
-                }
-
-                historicDecisionExecutionEntityManager.insert(decisionExecutionEntity);
-            }
         }
 
         return executionContext.getAuditContainer();

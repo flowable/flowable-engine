@@ -294,14 +294,14 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         // the second timer job will be fired and no jobs should be remaining
         waitForJobExecutorToProcessAllJobs(2000, 200);
-        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         nowCalendar.add(Calendar.HOUR, 1);
         nowCalendar.add(Calendar.MINUTE, 5);
         testClock.setCurrentTime(nowCalendar.getTime());
         waitForJobExecutorToProcessAllJobs(2000, 200);
 
-        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         checkEventCount(1, FlowableEngineEventType.TIMER_FIRED);
         checkEventContext(filterEvents(FlowableEngineEventType.TIMER_FIRED).get(0), secondTimerInstance);
@@ -519,7 +519,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(7);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.JOB_RETRIES_DECREMENTED);
-        assertThat(((Job) ((FlowableEntityEvent) event).getEntity()).getRetries()).isEqualTo(0);
+        assertThat(((Job) ((FlowableEntityEvent) event).getEntity()).getRetries()).isZero();
         checkEventContext(event, theJob);
     }
 

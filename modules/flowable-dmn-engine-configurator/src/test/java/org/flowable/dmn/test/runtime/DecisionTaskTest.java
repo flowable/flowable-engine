@@ -13,15 +13,10 @@
 package org.flowable.dmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -36,10 +31,13 @@ import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author martin.grofcik
@@ -76,7 +74,7 @@ public class DecisionTaskTest {
     )
     public void testUnknowPropertyUsedInDmn() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("DMN decision table with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
+        this.expectedException.expectMessage("DMN decision with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
         
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
@@ -156,7 +154,7 @@ public class DecisionTaskTest {
     )
     public void testThrowErrorOnNoHit() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("DMN decision table with key decisionTable did not hit any rules for the provided input.");
+        this.expectedException.expectMessage("DMN decision with key decisionTable did not hit any rules for the provided input.");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", true)
@@ -269,15 +267,15 @@ public class DecisionTaskTest {
     )
     public void testUseDmnOutputInEntryCriteria() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
-            .caseDefinitionKey("testRules")
-            .variable("first", "11")
-            .variable("second", "11")
-            .start();
+                .caseDefinitionKey("testRules")
+                .variable("first", "11")
+                .variable("second", "11")
+                .start();
 
         // The entry sentry on the first stage uses the output of the DMN table
         List<Task> tasks = cmmnRule.getCmmnTaskService().createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals("Human task", tasks.get(0).getName());
-        assertEquals("Task One", tasks.get(1).getName());
+        assertThat(tasks.get(0).getName()).isEqualTo("Human task");
+        assertThat(tasks.get(1).getName()).isEqualTo("Task One");
     }
 
     @Test
@@ -296,7 +294,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithFallbackFalse() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision table found without parent deployment id.");
+        this.expectedException.expectMessage("and tenant id: flowable. There was also no fall back decision found without parent deployment id.");
 
         deployDmnTableAssertCaseStarted();
     }
@@ -317,7 +315,7 @@ public class DecisionTaskTest {
     )
     public void testDecisionServiceTaskWithGlobalTenantFallbackNoDefinition() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("There was also no fall back decision table found for default tenant defaultFlowable");
+        this.expectedException.expectMessage("There was also no fall back decision found for default tenant defaultFlowable");
 
         deployDmnTableWithGlobalTenantFallback("otherTenant");
     }
@@ -577,10 +575,10 @@ public class DecisionTaskTest {
         Object resultObject = caseVariables.get("DecisionTable");
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
-        assertThat(result).hasSize(0);
+        assertThat(result).isEmpty();
     }
 
-    // Helper methodes
+    // Helper methods
 
     protected void deployDmnTableAssertCaseStarted() {
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRule.getCmmnRepositoryService().createDeployment().
@@ -590,25 +588,25 @@ public class DecisionTaskTest {
 
         try {
             CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
-                .caseDefinitionKey("myCase")
-                .variable("testVar", "test2")
-                .tenantId("flowable")
-                .start();
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .tenantId("flowable")
+                    .start();
 
             assertResultVariable(caseInstance);
-            
+
             CmmnEngineConfiguration cmmnEngineConfiguration = cmmnRule.getCmmnEngineConfiguration();
             DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) cmmnEngineConfiguration.getEngineConfigurations().get(
-                            EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
-            
+                    EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+
             DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
-                            .createHistoricDecisionExecutionQuery()
-                            .instanceId(caseInstance.getId())
-                            .singleResult();
-            
-            assertNotNull(decisionExecution);
-            assertEquals("flowable", decisionExecution.getTenantId());
-            
+                    .createHistoricDecisionExecutionQuery()
+                    .instanceId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(decisionExecution).isNotNull();
+            assertThat(decisionExecution.getTenantId()).isEqualTo("flowable");
+
         } finally {
             cmmnRule.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
         }
@@ -630,21 +628,21 @@ public class DecisionTaskTest {
 
         try {
             CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
-                .caseDefinitionKey("myCase")
-                .variable("testVar", "test2")
-                .tenantId("flowable")
-                .start();
+                    .caseDefinitionKey("myCase")
+                    .variable("testVar", "test2")
+                    .tenantId("flowable")
+                    .start();
 
             assertResultVariable(caseInstance);
-            
+
             DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
-                            .createHistoricDecisionExecutionQuery()
-                            .instanceId(caseInstance.getId())
-                            .singleResult();
-            
-            assertNotNull(decisionExecution);
-            assertEquals("flowable", decisionExecution.getTenantId());
-            
+                    .createHistoricDecisionExecutionQuery()
+                    .instanceId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(decisionExecution).isNotNull();
+            assertThat(decisionExecution.getTenantId()).isEqualTo("flowable");
+
         } finally {
             dmnEngineConfiguration.setFallbackToDefaultTenant(false);
             dmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
@@ -653,40 +651,40 @@ public class DecisionTaskTest {
     }
 
     protected void assertResultVariable(CaseInstance caseInstance) {
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         PlanItemInstance planItemInstance = cmmnRule.getCmmnRuntimeService().createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
 
-        Assert.assertEquals("executed", cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "resultVar"));
+        assertThat(cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "resultVar")).isEqualTo("executed");
 
         // Triggering the task should end the case instance
         cmmnRule.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
-        Assert.assertEquals(0, cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count());
+        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isEqualTo(0);
 
-        Assert.assertEquals("executed", cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
+        assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("resultVar")
-                .singleResult().getValue());
+                .singleResult().getValue()).isEqualTo("executed");
     }
 
     protected void assertNoResultVariable(CaseInstance caseInstance) {
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         PlanItemInstance planItemInstance = cmmnRule.getCmmnRuntimeService().createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
 
-        Assert.assertNull(cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "resultVar"));
+        assertThat(cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "resultVar")).isNull();
 
         // Triggering the task should end the case instance
         cmmnRule.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
-        Assert.assertEquals(0, cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count());
+        assertThat(cmmnRule.getCmmnRuntimeService().createCaseInstanceQuery().count()).isEqualTo(0);
     }
 
     protected void deleteAllDmnDeployments() {

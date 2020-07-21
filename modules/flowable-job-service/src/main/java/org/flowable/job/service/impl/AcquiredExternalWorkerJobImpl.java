@@ -97,6 +97,11 @@ public class AcquiredExternalWorkerJobImpl implements AcquiredExternalWorkerJob 
     }
 
     @Override
+    public String getCorrelationId() {
+        return job.getCorrelationId();
+    }
+
+    @Override
     public boolean isExclusive() {
         return job.isExclusive();
     }

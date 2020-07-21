@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.executionlistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +39,11 @@ public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
         variableMap.put("customFlowBean", new CustomFlowBean());
         runtimeService.startProcessInstanceByKey("scriptExecutionListenerProcess", variableMap);
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("flow1_activiti_conditions").singleResult();
-        assertNotNull(variable);
-        assertEquals("flow1_activiti_conditions", variable.getVariableName());
+        assertThat(variable).isNotNull();
+        assertThat(variable.getVariableName()).isEqualTo("flow1_activiti_conditions");
         @SuppressWarnings("unchecked")
         List<String> conditions = (List<String>) variable.getValue();
-        assertEquals(2, conditions.size());
-        assertEquals("hello", conditions.get(0));
-        assertEquals("world", conditions.get(1));
+        assertThat(conditions)
+                .containsExactly("hello", "world");
     }
 }

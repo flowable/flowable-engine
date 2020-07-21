@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.nonpublic;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -60,10 +62,10 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
         });
 
         List<EventSubscription> list = newEventSubscriptionQuery().eventName("messageName").list();
-        assertEquals(2, list.size());
+        assertThat(list).hasSize(2);
 
         list = newEventSubscriptionQuery().eventName("messageName2").list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         cleanDb();
 
@@ -93,10 +95,10 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
         });
 
         List<EventSubscription> list = newEventSubscriptionQuery().eventType("signal").list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         list = newEventSubscriptionQuery().eventType("message").list();
-        assertEquals(2, list.size());
+        assertThat(list).hasSize(2);
 
         cleanDb();
 
@@ -129,10 +131,10 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
         });
 
         List<EventSubscription> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         list = newEventSubscriptionQuery().activityId("someActivity").eventType("message").list();
-        assertEquals(2, list.size());
+        assertThat(list).hasSize(2);
 
         cleanDb();
 
@@ -160,13 +162,13 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
         });
 
         List<EventSubscription> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         final EventSubscription entity = list.get(0);
 
         list = newEventSubscriptionQuery().id(entity.getId()).list();
 
-        assertEquals(1, list.size());
+        assertThat(list).hasSize(1);
 
         cleanDb();
 
@@ -182,15 +184,15 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
         // test query by process instance id
         EventSubscription subscription = newEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(subscription);
+        assertThat(subscription).isNotNull();
 
         Execution executionWaitingForSignal = runtimeService.createExecutionQuery().activityId("signalEvent").processInstanceId(processInstance.getId()).singleResult();
 
         // test query by execution id
         EventSubscription signalSubscription = newEventSubscriptionQuery().executionId(executionWaitingForSignal.getId()).singleResult();
-        assertNotNull(signalSubscription);
+        assertThat(signalSubscription).isNotNull();
 
-        assertEquals(signalSubscription, subscription);
+        assertThat(subscription).isEqualTo(signalSubscription);
 
         cleanDb();
 

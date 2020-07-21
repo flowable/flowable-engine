@@ -12,6 +12,8 @@
  */
 package org.flowable.test.spring.executor.jms;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +24,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.flowable.test.spring.executor.jms.config.SpringJmsConfig;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +53,13 @@ public class SpringJmsTest {
 
         // Wait until the process is completely finished
         Awaitility.await().atMost(Duration.ofMinutes(1)).pollInterval(Duration.ofMillis(500)).untilAsserted(
-            () -> Assert.assertEquals(0L, processEngine.getRuntimeService().createProcessInstanceQuery().count()));
+            () -> assertThat(processEngine.getRuntimeService().createProcessInstanceQuery().count()).isZero());
 
         for (String activityName : Arrays.asList("A", "B", "C", "D", "E", "F", "After boundary", "The user task", "G", "G1", "G2", "G3", "H", "I", "J", "K", "L")) {
-            Assert.assertNotNull(processEngine.getHistoryService().createHistoricActivityInstanceQuery().activityName(activityName).singleResult());
+            assertThat(processEngine.getHistoryService().createHistoricActivityInstanceQuery().activityName(activityName).singleResult()).isNotNull();
         }
 
-        Assert.assertNull(((DefaultAsyncJobExecutor) processEngine.getProcessEngineConfiguration().getAsyncExecutor()).getExecutorService());
+        assertThat(((DefaultAsyncJobExecutor) processEngine.getProcessEngineConfiguration().getAsyncExecutor()).getExecutorService()).isNull();
     }
 
 }

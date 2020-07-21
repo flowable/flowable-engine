@@ -217,7 +217,6 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         // Read the serializable from the stream
         ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
         Object readSerializable = stream.readObject();
-        assertThat(readSerializable).isNotNull();
         assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
         assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
@@ -399,7 +398,8 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
-        assertThatJson(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "myVar"))
+                .isEqualTo(tenDaysLater);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -449,7 +449,6 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "binaryVariable");
-        assertThat(variableValue).isNotNull();
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }

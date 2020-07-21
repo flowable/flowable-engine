@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceQuery() {
         // With a clean ProcessEngine, no instances should be available
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isZero();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
@@ -82,7 +83,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceQueryOrderBy() {
         // With a clean ProcessEngine, no instances should be available
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isZero();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -262,14 +263,14 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getDeleteReason()).isEqualTo(DeleteReason.PROCESS_INSTANCE_DELETED);
 
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).notDeleted();
-        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.count()).isZero();
 
         historyService.deleteHistoricProcessInstance(processInstanceId);
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId);
-        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.count()).isZero();
 
         processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
         runtimeService.deleteProcessInstance(processInstanceId, "custom message");
@@ -289,7 +290,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getDeleteReason()).isEqualTo("custom message");
 
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).notDeleted();
-        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -312,7 +313,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(processInstances).hasSize(5);
 
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentId("invalid");
-        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -339,7 +340,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentIdIn(deploymentIds);
-        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -361,7 +362,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(taskInstances).hasSize(5);
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentId("invalid");
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -391,7 +392,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentIdIn(deploymentIds);
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -413,13 +414,13 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(taskInstances).hasSize(5);
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentId("invalid").endOr();
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").deploymentId("invalid").endOr();
         assertThat(taskInstanceQuery.count()).isEqualTo(5);
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("theTask").or().deploymentId("invalid").endOr();
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
                 .or()
@@ -477,7 +478,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
                 .processDefinitionId("invalid")
                 .endOr()
                 .processInstanceBusinessKey("2");
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -508,13 +509,13 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentIdIn(deploymentIds).processDefinitionId("invalid").endOr();
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").deploymentIdIn(deploymentIds).endOr();
         assertThat(taskInstanceQuery.count()).isEqualTo(5);
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("theTask").or().deploymentIdIn(deploymentIds).endOr();
-        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+        assertThat(taskInstanceQuery.count()).isZero();
     }
 
     @Test
@@ -525,9 +526,9 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId())
                 .list();
-        assertThat(tasks).hasSize(1);
-        assertThat(tasks.get(0).getName()).isEqualTo("my task");
-        assertThat(tasks.get(0).getDescription()).isNull();
+        assertThat(tasks)
+                .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getDescription)
+                .containsExactly(tuple("my task", null));
 
         ObjectNode infoNode = dynamicBpmnService.changeLocalizationName("en-GB", "theTask", "My localized name");
         dynamicBpmnService.changeLocalizationDescription("en-GB", "theTask", "My localized description", infoNode);
@@ -535,24 +536,24 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list();
-        assertThat(tasks).hasSize(1);
-        assertThat(tasks.get(0).getName()).isEqualTo("my task");
-        assertThat(tasks.get(0).getDescription()).isNull();
+        assertThat(tasks)
+                .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getDescription)
+                .containsExactly(tuple("my task", null));
 
         tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("en-GB").list();
-        assertThat(tasks).hasSize(1);
-        assertThat(tasks.get(0).getName()).isEqualTo("My localized name");
-        assertThat(tasks.get(0).getDescription()).isEqualTo("My localized description");
+        assertThat(tasks)
+                .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getDescription)
+                .containsExactly(tuple("My localized name", "My localized description"));
 
         tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).listPage(0, 10);
-        assertThat(tasks).hasSize(1);
-        assertThat(tasks.get(0).getName()).isEqualTo("my task");
-        assertThat(tasks.get(0).getDescription()).isNull();
+        assertThat(tasks)
+                .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getDescription)
+                .containsExactly(tuple("my task", null));
 
         tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("en-GB").listPage(0, 10);
-        assertThat(tasks).hasSize(1);
-        assertThat(tasks.get(0).getName()).isEqualTo("My localized name");
-        assertThat(tasks.get(0).getDescription()).isEqualTo("My localized description");
+        assertThat(tasks)
+                .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getDescription)
+                .containsExactly(tuple("My localized name", "My localized description"));
 
         HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId())
                 .singleResult();
@@ -646,29 +647,25 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         // Test GREATER_THAN_OR_EQUAL, should return 3 results
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThanOrEqual("stringVar", "abcdef").count()).isEqualTo(3);
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThanOrEqual("stringVar", "z").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThanOrEqual("stringVar", "z").count()).isZero();
 
         // Test LESS_THAN, should return 2 results
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThan("stringVar", "abcdeg").list();
-        assertThat(processInstances).hasSize(2);
-        List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        List<String> ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
-        ids.removeAll(expectedIds);
-        assertThat(ids).isEmpty();
+        assertThat(processInstances)
+                .extracting(HistoricProcessInstance::getId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThan("stringVar", "abcdef").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThan("stringVar", "abcdef").count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "z").count()).isEqualTo(3);
 
         // Test LESS_THAN_OR_EQUAL
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "abcdef").list();
-        assertThat(processInstances).hasSize(2);
-        expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
-        ids.removeAll(expectedIds);
-        assertThat(ids).isEmpty();
+        assertThat(processInstances)
+                .extracting(HistoricProcessInstance::getId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "z").count()).isEqualTo(3);
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "aa").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "aa").count()).isZero();
 
         // Test LIKE
         resultInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("stringVar", "azert%").singleResult();
@@ -684,7 +681,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(resultInstance.getId()).isEqualTo(processInstance3.getId());
 
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLike("stringVar", "a%").count()).isEqualTo(3);
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLike("stringVar", "%x%").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLike("stringVar", "%x%").count()).isZero();
 
         // Test value-only matching
         resultInstance = historyService.createHistoricProcessInstanceQuery().variableValueEquals("azerty").singleResult();
@@ -692,11 +689,9 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(resultInstance.getId()).isEqualTo(processInstance3.getId());
 
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueEquals("abcdef").list();
-        assertThat(processInstances).hasSize(2);
-        expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
-        ids.removeAll(expectedIds);
-        assertThat(ids).isEmpty();
+        assertThat(processInstances)
+                .extracting(HistoricProcessInstance::getId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
 
         resultInstance = historyService.createHistoricProcessInstanceQuery().variableValueEquals("notmatchinganyvalues").singleResult();
         assertThat(resultInstance).isNull();
@@ -813,7 +808,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(resultInstance).isNotNull();
         assertThat(resultInstance.getId()).isEqualTo(processInstance3.getId());
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThan("dateVar", nextYear.getTime()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThan("dateVar", nextYear.getTime()).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueGreaterThan("dateVar", oneYearAgo.getTime()).count()).isEqualTo(3);
 
         // Test GREATER_THAN_OR_EQUAL
@@ -829,21 +824,18 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         // Test LESS_THAN
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThan("dateVar", nextYear.getTime()).list();
-        assertThat(processInstances).hasSize(2);
+        assertThat(processInstances)
+                .extracting(HistoricProcessInstance::getId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
 
-        List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        List<String> ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
-        ids.removeAll(expectedIds);
-        assertThat(ids).isEmpty();
-
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThan("dateVar", date1).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThan("dateVar", date1).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThan("dateVar", twoYearsLater.getTime()).count()).isEqualTo(3);
 
         // Test LESS_THAN_OR_EQUAL
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("dateVar", nextYear.getTime()).list();
         assertThat(processInstances).hasSize(3);
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("dateVar", oneYearAgo.getTime()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("dateVar", oneYearAgo.getTime()).count()).isZero();
 
         // Test value-only matching
         resultInstance = historyService.createHistoricProcessInstanceQuery().variableValueEquals(nextYear.getTime()).singleResult();
@@ -851,11 +843,9 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(resultInstance.getId()).isEqualTo(processInstance3.getId());
 
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueEquals(date1).list();
-        assertThat(processInstances).hasSize(2);
-        expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
-        ids.removeAll(expectedIds);
-        assertThat(ids).isEmpty();
+        assertThat(processInstances)
+                .extracting(HistoricProcessInstance::getId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
 
         resultInstance = historyService.createHistoricProcessInstanceQuery().variableValueEquals(twoYearsLater.getTime()).singleResult();
         assertThat(resultInstance).isNull();
@@ -925,7 +915,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionName(processDefinitionName).list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionName(processDefinitionName).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionName("invalid").list()).isEmpty();
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionName("invalid").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionName("invalid").count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionName(processDefinitionName).processDefinitionId("invalid").endOr()
                 .list().get(0).getProcessDefinitionName()).isEqualTo(processDefinitionName);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionName(processDefinitionName).processDefinitionId("invalid").endOr()
@@ -946,7 +936,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").list()).isEmpty();
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid")
                 .endOr().list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid")

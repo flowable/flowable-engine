@@ -16,6 +16,7 @@ package org.flowable.variable.service.impl.persistence.entity;
 import java.util.Collection;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -59,7 +60,7 @@ public class VariableInstanceEntityManagerImpl
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, false);
-        VariableByteArrayRef byteArrayRef = entity.getByteArrayRef();
+        ByteArrayRef byteArrayRef = entity.getByteArrayRef();
         if (byteArrayRef != null) {
             byteArrayRef.delete();
         }

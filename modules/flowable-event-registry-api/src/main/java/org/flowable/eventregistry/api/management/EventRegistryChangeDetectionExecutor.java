@@ -23,6 +23,12 @@ public interface EventRegistryChangeDetectionExecutor {
      */
     void initialize();
 
+    /**
+     * Will be called when the engine closes.
+     * Any shutdown logic should be placed here.
+     */
+    void shutdown();
+
     void setEventRegistryChangeDetectionManager(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager);
 
 }

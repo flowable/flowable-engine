@@ -51,6 +51,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setLastAvailableTime(Date availableTime);
 
+    void setLastUnavailableTime(Date unavailableTime);
+
     void setLastEnabledTime(Date enabledTime);
 
     void setLastDisabledTime(Date disabledTime);

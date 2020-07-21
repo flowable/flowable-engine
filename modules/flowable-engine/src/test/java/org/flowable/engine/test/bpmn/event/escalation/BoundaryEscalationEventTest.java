@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.escalation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -29,12 +31,12 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
 
         // After task completion, escalation end event is reached and caught
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("task after catching the escalation", task.getName());
+        assertThat(task.getName()).isEqualTo("task after catching the escalation");
     }
 
     @Test
@@ -43,13 +45,13 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
     public void testCatchEscalationOnCallActivity() {
         String procId = runtimeService.startProcessInstanceByKey("catchEscalationOnCallActivity").getId();
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Task in subprocess", task.getName());
+        assertThat(task.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task will reach the end error event,
         // which is caught on the call activity boundary
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("Escalated Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
         taskService.complete(task.getId());

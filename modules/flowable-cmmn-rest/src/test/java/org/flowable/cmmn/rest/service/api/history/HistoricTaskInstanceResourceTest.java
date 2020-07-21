@@ -73,18 +73,18 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " 'id': '" + task.getId() + "',"
-                            + " 'assignee': '" + task.getAssignee() + "',"
-                            + " 'owner': '" + task.getOwner() + "',"
-                            + " 'formKey': '" + task.getFormKey() + "',"
-                            + " 'description': '" + task.getDescription() + "',"
-                            + " 'name': '" + task.getName() + "',"
-                            + " 'priority': " + task.getPriority() + ","
-                            + " 'parentTaskId': null,"
-                            + " 'tenantId': \"\","
-                            + " 'caseInstanceUrl': '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, task.getScopeId()) + "',"
-                            + " 'caseDefinitionUrl': '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()) + "',"
-                            + " 'url': '" + url + "'"
+                            + " id: '" + task.getId() + "',"
+                            + " assignee: '" + task.getAssignee() + "',"
+                            + " owner: '" + task.getOwner() + "',"
+                            + " formKey: '" + task.getFormKey() + "',"
+                            + " description: '" + task.getDescription() + "',"
+                            + " name: '" + task.getName() + "',"
+                            + " priority: " + task.getPriority() + ","
+                            + " parentTaskId: null,"
+                            + " tenantId: \"\","
+                            + " caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, task.getScopeId()) + "',"
+                            + " caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()) + "',"
+                            + " url: '" + url + "'"
                             + "}");
 
             assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
@@ -126,16 +126,16 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 assertThatJson(responseNode)
                         .when(Option.IGNORING_EXTRA_FIELDS)
                         .isEqualTo("{"
-                                + " 'id': '" + task.getId() + "',"
-                                + " 'assignee': '" + task.getAssignee() + "',"
-                                + " 'owner': '" + task.getOwner() + "',"
-                                + " 'description': '" + task.getDescription() + "',"
-                                + " 'name': '" + task.getName() + "',"
-                                + " 'priority': " + task.getPriority() + ","
-                                + " 'caseInstanceId': null,"
-                                + " 'caseDefinitionId': null,"
-                                + " 'tenantId': \"\","
-                                + " 'url': '" + url + "'"
+                                + " id: '" + task.getId() + "',"
+                                + " assignee: '" + task.getAssignee() + "',"
+                                + " owner: '" + task.getOwner() + "',"
+                                + " description: '" + task.getDescription() + "',"
+                                + " name: '" + task.getName() + "',"
+                                + " priority: " + task.getPriority() + ","
+                                + " caseInstanceId: null,"
+                                + " caseDefinitionId: null,"
+                                + " tenantId: \"\","
+                                + " url: '" + url + "'"
                                 + "}");
 
                 assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
@@ -207,9 +207,9 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 assertThatJson(responseNode)
                         .when(Option.IGNORING_EXTRA_FIELDS)
                         .isEqualTo("{"
-                                + " 'id': '" + formDefinition.getId() + "',"
-                                + " 'key': '" + formDefinition.getKey() + "',"
-                                + " 'name': '" + formDefinition.getName() + "'"
+                                + " id: '" + formDefinition.getId() + "',"
+                                + " key: '" + formDefinition.getKey() + "',"
+                                + " name: '" + formDefinition.getName() + "'"
                                 + "}");
 
                 assertThat(responseNode.get("fields")).hasSize(2);
@@ -227,9 +227,9 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 assertThatJson(responseNode)
                         .when(Option.IGNORING_EXTRA_FIELDS)
                         .isEqualTo("{"
-                                + " 'id': '" + formDefinition.getId() + "',"
-                                + " 'key': '" + formDefinition.getKey() + "',"
-                                + " 'name': '" + formDefinition.getName() + "'"
+                                + " id: '" + formDefinition.getId() + "',"
+                                + " key: '" + formDefinition.getKey() + "',"
+                                + " name: '" + formDefinition.getName() + "'"
                                 + "}");
 
                 assertThat(responseNode.get("fields")).hasSize(2);
@@ -253,7 +253,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
 
                 List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
                 for (FormDeployment formDeployment : formDeployments) {
-                    formRepositoryService.deleteDeployment(formDeployment.getId());
+                    formRepositoryService.deleteDeployment(formDeployment.getId(), true);
                 }
             }
         }

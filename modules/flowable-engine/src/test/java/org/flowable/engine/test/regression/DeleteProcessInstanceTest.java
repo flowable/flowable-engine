@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.regression;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,16 +52,16 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Start the process instance & ensure it's started.
         ProcessInstance instanceUser = runtimeService.startProcessInstanceByKey("DemoPartialDeletion", inputParamsUser);
-        assertNotNull(instanceUser);
+        assertThat(instanceUser).isNotNull();
         LOGGER.info("Process instance (of process model {}) started with id: {}.", instanceUser.getProcessDefinitionId(), instanceUser.getId());
 
         // Assert that the process instance is active.
         Execution executionUser = runtimeService.createExecutionQuery().processInstanceId(instanceUser.getProcessInstanceId()).onlyChildExecutions().singleResult();
-        assertFalse(executionUser.isEnded());
+        assertThat(executionUser.isEnded()).isFalse();
 
         // Assert that a user task is available for claiming.
         org.flowable.task.api.Task taskUser = taskService.createTaskQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
-        assertNotNull(taskUser);
+        assertThat(taskUser).isNotNull();
 
         // Delete the process instance.
         runtimeService.deleteProcessInstance(instanceUser.getId(), null);
@@ -67,7 +70,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
             // Retrieve the HistoricProcessInstance and assert that there is an
             // end time.
             HistoricProcessInstance hInstanceUser = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceUser.getId()).singleResult();
-            assertNotNull(hInstanceUser.getEndTime());
+            assertThat(hInstanceUser.getEndTime()).isNotNull();
             LOGGER.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a org.flowable.task.service.Task Type of \"user\": {}.", hInstanceUser.getEndTime());
             LOGGER.info("Successfully deleted the instance of \"Demo Partial Deletion\" that was started with a org.flowable.task.service.Task Type of \"user\".");
         }
@@ -82,44 +85,37 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Start the process instance & ensure it's started.
         ProcessInstance instanceJava = runtimeService.startProcessInstanceByKey("DemoPartialDeletion", inputParamsJava);
-        assertNotNull(instanceJava);
+        assertThat(instanceJava).isNotNull();
         LOGGER.info("Process instance (of process model {}) started with id: {}.", instanceJava.getProcessDefinitionId(), instanceJava.getId());
 
         // Assert that the process instance is active.
         Execution executionJava = runtimeService.createExecutionQuery().processInstanceId(instanceJava.getProcessInstanceId()).onlyChildExecutions().singleResult();
-        assertFalse(executionJava.isEnded());
+        assertThat(executionJava.isEnded()).isFalse();
 
         // Try to execute job 3 times
         Job jobJava = managementService.createJobQuery().processInstanceId(instanceJava.getId()).singleResult();
-        assertNotNull(jobJava);
+        assertThat(jobJava).isNotNull();
+        String jobId = jobJava.getId();
 
-        try {
-            managementService.executeJob(jobJava.getId());
-            fail("Expected exception");
-        } catch (Exception e) {
-            // expected
-        }
+        assertThatThrownBy(() -> managementService.executeJob(jobId))
+                .isInstanceOf(Exception.class);
 
-        try {
-            managementService.moveTimerToExecutableJob(jobJava.getId());
-            managementService.executeJob(jobJava.getId());
-            fail("Expected exception");
-        } catch (Exception e) {
-            // expected
-        }
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+        })
+                .isInstanceOf(Exception.class);
 
-        try {
-            managementService.moveTimerToExecutableJob(jobJava.getId());
-            managementService.executeJob(jobJava.getId());
-            fail("Expected exception");
-        } catch (Exception e) {
-            // expected
-        }
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+        })
+                .isInstanceOf(Exception.class);
 
         // Assert that there is a failed job.
-        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(instanceJava.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(instanceJava.getId()).count()).isZero();
         jobJava = managementService.createDeadLetterJobQuery().processInstanceId(instanceJava.getId()).singleResult();
-        assertNotNull(jobJava);
+        assertThat(jobJava).isNotNull();
 
         // Delete the process instance.
         runtimeService.deleteProcessInstance(instanceJava.getId(), null);
@@ -128,7 +124,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
             // Retrieve the HistoricProcessInstance and assert that there is no
             // end time.
             HistoricProcessInstance hInstanceJava = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceJava.getId()).singleResult();
-            assertNotNull(hInstanceJava.getEndTime());
+            assertThat(hInstanceJava.getEndTime()).isNotNull();
         }
     }
 

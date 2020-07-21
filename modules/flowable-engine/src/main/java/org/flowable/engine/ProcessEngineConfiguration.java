@@ -93,6 +93,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String mailServerUsername; // by default no name and password are provided, which
     protected String mailServerPassword; // means no authentication for mail server
     protected int mailServerPort = 25;
+    protected int mailServerSSLPort = 465;
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
@@ -285,6 +286,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public int getMailServerSSLPort() {
+        return mailServerSSLPort;
+    }
+
+    public ProcessEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
+        this.mailServerSSLPort = mailServerSSLPort;
         return this;
     }
 

@@ -38,7 +38,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleEnableTask() {
-        //Simple use of the UserEventListener as EntryCriteria of a Task
+        //Simple use of the SignalEventListener as EntryCriteria of a Task
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
@@ -46,12 +46,12 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         //3 PlanItems reachable
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(3);
 
-        //1 User Event Listener
+        //1 Signal Event Listener
         PlanItemInstance listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).singleResult();
         assertThat(listenerInstance).isNotNull();
         assertThat(listenerInstance.getPlanItemDefinitionId()).isEqualTo("eventListener");
-        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         // Verify same result is returned from query
         SignalEventListenerInstance eventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -69,8 +69,6 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createSignalEventListenerInstanceQuery().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createSignalEventListenerInstanceQuery().list()).hasSize(1);
 
-        assertThat(cmmnRuntimeService.createSignalEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
-                .isNotNull();
         assertThat(cmmnRuntimeService.createSignalEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
                 .isNotNull();
 
@@ -97,7 +95,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
 
         // SignalEventListener should be completed
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).count()).isZero();
 
         // Only 2 PlanItems left
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
@@ -135,7 +133,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
                 .planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER).singleResult();
         assertThat(listenerInstance).isNotNull();
         assertThat(listenerInstance.getPlanItemDefinitionId()).isEqualTo("eventListener");
-        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //1 Task on Active state
         PlanItemInstance task = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType("task").singleResult();

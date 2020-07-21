@@ -211,26 +211,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         int matchingVersionIndex = -1;
         int version6120Index = FlowableVersions.getFlowableVersionIndexForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
 
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        boolean isEngineTablePresent = isEngineTablePresent();
-        if (isEngineTablePresent) {
-
-            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
-            dbVersion = dbVersionProperty.getValue();
-
-            matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(dbVersion);
-            isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
-        }
-        
-        boolean isHistoryTablePresent = isHistoryTablePresent();
-        if (isUpgradeNeeded && matchingVersionIndex < version6120Index) {
-            dbSchemaUpgradeUntil6120("engine", matchingVersionIndex);
-            
-            if (isHistoryTablePresent) {
-                dbSchemaUpgradeUntil6120("history", matchingVersionIndex);
-            }
-        }
-        
         // The common schema manager is special and would handle its own locking mechanism
         getCommonSchemaManager().schemaUpdate();
 
@@ -244,6 +224,26 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
 
         try {
+            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
+            boolean isEngineTablePresent = isEngineTablePresent();
+            if (isEngineTablePresent) {
+
+                dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
+                dbVersion = dbVersionProperty.getValue();
+
+                matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(dbVersion);
+                isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
+            }
+
+            boolean isHistoryTablePresent = isHistoryTablePresent();
+            if (isUpgradeNeeded && matchingVersionIndex < version6120Index) {
+                dbSchemaUpgradeUntil6120("engine", matchingVersionIndex);
+
+                if (isHistoryTablePresent) {
+                    dbSchemaUpgradeUntil6120("history", matchingVersionIndex);
+                }
+            }
+
             getIdentityLinkSchemaManager().schemaUpdate();
             getEntityLinkSchemaManager().schemaUpdate();
             getEventSubscriptionSchemaManager().schemaUpdate();
@@ -332,17 +332,17 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         String exceptionMessage = e.getMessage();
         if (e.getMessage() != null) {
             // Matches message returned from H2
-            if ((exceptionMessage.indexOf("Table") != -1) && (exceptionMessage.indexOf("not found") != -1)) {
+            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
                 return true;
             }
 
             // Message returned from MySQL and Oracle
-            if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
+            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
                 return true;
             }
 
             // Message returned from Postgres
-            if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
+            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
                 return true;
             }
         }

@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.variable.EngineRestVariable;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
@@ -51,7 +51,7 @@ public class DmnRuleServiceResource {
     protected DmnRestResponseFactory dmnRestResponseFactory;
 
     @Autowired
-    protected DmnRuleService dmnRuleService;
+    protected DmnDecisionService dmnRuleService;
 
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;

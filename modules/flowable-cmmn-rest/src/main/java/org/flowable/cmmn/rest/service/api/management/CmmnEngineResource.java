@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.management;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,15 +42,15 @@ public class CmmnEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/cmmn-management/engine", produces = "application/json")
-    public CmmnEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessManagementInfo();
         }
         
         CmmnEngine cmmnEngine = CmmnEngines.getDefaultCmmnEngine();
-        CmmnEngineInfoResponse response = new CmmnEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
         response.setName(cmmnEngine.getName());
-        response.setVersion(CmmnEngine.VERSION);
+        response.setVersion(CmmnEngine.class.getPackage().getImplementationVersion());
         return response;
     }
 }

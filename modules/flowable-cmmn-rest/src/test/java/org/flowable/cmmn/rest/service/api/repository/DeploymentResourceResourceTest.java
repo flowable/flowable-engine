@@ -60,10 +60,10 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " 'url': '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName) + "',"
-                            + " 'contentUrl': '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName) + "',"
-                            + " 'mediaType': 'text/xml',"
-                            + " 'type': 'caseDefinition'"
+                            + " url: '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName) + "',"
+                            + " contentUrl: '" + buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName) + "',"
+                            + " mediaType: 'text/xml',"
+                            + " type: 'caseDefinition'"
                             + "}");
 
         } finally {

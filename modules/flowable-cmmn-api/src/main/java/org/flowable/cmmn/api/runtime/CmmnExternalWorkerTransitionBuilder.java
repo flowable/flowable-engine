@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.api.runtime;
 
-import java.time.Duration;
 import java.util.Map;
 
 /**

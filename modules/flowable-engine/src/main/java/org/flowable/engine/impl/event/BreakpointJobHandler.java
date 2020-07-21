@@ -38,6 +38,7 @@ public class BreakpointJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
-        CommandContextUtil.getAgenda(commandContext).planOperation(new ContinueProcessOperation(commandContext, executionEntity, true, false), executionEntity);
+        CommandContextUtil.getAgenda(commandContext).planOperation(new ContinueProcessOperation(
+                commandContext, executionEntity, true, false, null), executionEntity);
     }
 }

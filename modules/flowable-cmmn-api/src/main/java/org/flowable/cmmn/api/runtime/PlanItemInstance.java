@@ -34,6 +34,7 @@ public interface PlanItemInstance {
     Date getStartTime();
     Date getCreateTime();
     Date getLastAvailableTime();
+    Date getLastUnavailableTime();
     Date getLastEnabledTime();
     Date getLastDisabledTime();
     Date getLastStartedTime();

@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CaseLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
@@ -45,6 +46,7 @@ import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
@@ -239,7 +241,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())) {
                 PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil
                     .getPlanItemInstanceEntityManager(commandContext).findById(caseInstanceEntity.getCallbackId());
-                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
+                EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
+                        planItemInstanceEntity.getPlanItemDefinitionId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
             }
         }
 
@@ -255,6 +258,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceStart(caseInstanceEntity);
         
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity));
+        }
+
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
             CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " + 
                             caseInstanceEntity.getId(), caseInstanceEntity);
@@ -416,6 +424,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         caseInstanceEntity.setCaseDefinitionId(caseDefinition.getId());
+        caseInstanceEntity.setCaseDefinitionKey(caseDefinition.getKey());
+        caseInstanceEntity.setCaseDefinitionName(caseDefinition.getName());
+        caseInstanceEntity.setCaseDefinitionVersion(caseDefinition.getVersion());
+        caseInstanceEntity.setCaseDefinitionDeploymentId(caseDefinition.getDeploymentId());
         caseInstanceEntity.setStartTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());

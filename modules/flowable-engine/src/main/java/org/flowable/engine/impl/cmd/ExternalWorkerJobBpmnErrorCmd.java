@@ -71,6 +71,6 @@ public class ExternalWorkerJobBpmnErrorCmd extends AbstractExternalWorkerJobCmd 
             }
         }
 
-        jobServiceConfiguration.getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
+        moveExternalWorkerJobToExecutableJob(jobServiceConfiguration, externalWorkerJob, commandContext);
     }
 }

@@ -37,7 +37,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentResource {
 
     @Autowired
@@ -49,7 +49,7 @@ public class DmnDeploymentResource {
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Get a decision table deployment", tags = { "Deployment" }, nickname = "getDecisionTableDeployment")
+    @ApiOperation(value = "Get a decision deployment", tags = { "Deployment" }, nickname = "getDecisionDeployment")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the deployment was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
@@ -69,7 +69,7 @@ public class DmnDeploymentResource {
         return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
     }
 
-    @ApiOperation(value = "Delete a decision table deployment", tags = { "Deployment" }, nickname = "deleteDecisionTableDeployment")
+    @ApiOperation(value = "Delete a decision deployment", tags = { "Deployment" }, nickname = "deleteDecisionDeployment")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")

@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
@@ -47,7 +48,6 @@ import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayRef;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -326,6 +326,8 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setLockOwner(null);
             jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
             jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
+        } else if (job instanceof TimerJobEntity) {
+            jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
         } else {
             if (job != null) {
                 // It could be a v5 job, so simply unlock it.
@@ -689,6 +691,12 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setRevision(copyFromJob.getRevision());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
+        if (copyFromJob.getCorrelationId() != null) {
+            copyToJob.setCorrelationId(copyFromJob.getCorrelationId());
+        } else {
+            copyToJob.setCorrelationId(jobServiceConfiguration.getIdGenerator().getNextId());
+        }
+
         return copyToJob;
     }
 
@@ -696,15 +704,15 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setId(copyFromJob.getId());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
-            JobByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
+            ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
             copyToJob.setAdvancedJobHandlerConfigurationByteArrayRef(configurationByteArrayRefCopy);
         }
         if (copyFromJob.getExceptionByteArrayRef() != null) {
-            JobByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
+            ByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
             copyToJob.setExceptionByteArrayRef(exceptionByteArrayRefCopy);
         }
         if (copyFromJob.getCustomValuesByteArrayRef() != null) {
-            JobByteArrayRef customValuesByteArrayRefCopy = copyFromJob.getCustomValuesByteArrayRef().copy();
+            ByteArrayRef customValuesByteArrayRefCopy = copyFromJob.getCustomValuesByteArrayRef().copy();
             copyToJob.setCustomValuesByteArrayRef(customValuesByteArrayRefCopy);
         }
         copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());

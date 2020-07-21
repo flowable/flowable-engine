@@ -19,6 +19,7 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
 import org.apache.camel.util.IntrospectionSupport;
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 
@@ -37,6 +38,8 @@ public class FlowableComponent extends DefaultComponent {
 
     protected RepositoryService repositoryService;
 
+    protected ManagementService managementService;
+
     protected boolean copyVariablesToProperties;
 
     protected boolean copyVariablesToBodyAsMap;
@@ -52,6 +55,7 @@ public class FlowableComponent extends DefaultComponent {
         identityService = getByType(context, IdentityService.class);
         runtimeService = getByType(context, RuntimeService.class);
         repositoryService = getByType(context, RepositoryService.class);
+        managementService = getByType(context, ManagementService.class);
     }
 
     private <T> T getByType(CamelContext ctx, Class<T> kls) {
@@ -69,6 +73,7 @@ public class FlowableComponent extends DefaultComponent {
         ae.setIdentityService(identityService);
         ae.setRuntimeService(runtimeService);
         ae.setRepositoryService(repositoryService);
+        ae.setManagementService(managementService);
 
         ae.setCopyVariablesToProperties(this.copyVariablesToProperties);
         ae.setCopyVariablesToBodyAsMap(this.copyVariablesToBodyAsMap);

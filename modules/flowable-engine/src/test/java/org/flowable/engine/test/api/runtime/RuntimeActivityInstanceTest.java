@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -41,46 +44,51 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testActivityInstanceNoop() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("noop").singleResult();
 
-        assertEquals("noop", activityInstance.getActivityId());
-        assertEquals("serviceTask", activityInstance.getActivityType());
-        assertNotNull(activityInstance.getProcessDefinitionId());
-        assertEquals(processInstance.getId(), activityInstance.getProcessInstanceId());
-        assertNotNull(activityInstance.getStartTime());
-        assertNotNull(activityInstance.getEndTime());
-        assertTrue(activityInstance.getDurationInMillis() >= 0);
+        assertThat(activityInstance.getActivityId()).isEqualTo("noop");
+        assertThat(activityInstance.getActivityType()).isEqualTo("serviceTask");
+        assertThat(activityInstance.getProcessDefinitionId()).isNotNull();
+        assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(activityInstance.getStartTime()).isNotNull();
+        assertThat(activityInstance.getEndTime()).isNotNull();
+        assertThat(activityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
+        assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult(), activityInstance);
         }
 
-        this.runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId());
-        assertEquals(0L, runtimeService.createActivityInstanceQuery().activityId("noop").count());
+        String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult().getId();
+        this.runtimeService.trigger(executionId);
+        
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("noop").count()).isZero();
     }
 
     @Test
     @Deployment
     public void testActivityInstanceReceive() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveProcess");
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("receive").singleResult();
 
-        assertEquals("receive", activityInstance.getActivityId());
-        assertEquals("receiveTask", activityInstance.getActivityType());
-        assertNull(activityInstance.getEndTime());
-        assertNull(activityInstance.getDurationInMillis());
-        assertNotNull(activityInstance.getProcessDefinitionId());
-        assertEquals(processInstance.getId(), activityInstance.getProcessInstanceId());
-        assertNotNull(activityInstance.getStartTime());
+        assertThat(activityInstance.getActivityId()).isEqualTo("receive");
+        assertThat(activityInstance.getActivityType()).isEqualTo("receiveTask");
+        assertThat(activityInstance.getEndTime()).isNull();
+        assertThat(activityInstance.getDurationInMillis()).isNull();
+        assertThat(activityInstance.getProcessDefinitionId()).isNotNull();
+        assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(activityInstance.getStartTime()).isNotNull();
+        assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult(), activityInstance);
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
         }
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(processInstance.getId()).singleResult();
@@ -88,13 +96,13 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         activityInstance = runtimeService.createActivityInstanceQuery().activityId("receive").singleResult();
 
-        assertEquals("receive", activityInstance.getActivityId());
-        assertEquals("receiveTask", activityInstance.getActivityType());
-        assertNotNull(activityInstance.getEndTime());
-        assertTrue(activityInstance.getDurationInMillis() >= 0);
-        assertNotNull(activityInstance.getProcessDefinitionId());
-        assertEquals(processInstance.getId(), activityInstance.getProcessInstanceId());
-        assertNotNull(activityInstance.getStartTime());
+        assertThat(activityInstance.getActivityId()).isEqualTo("receive");
+        assertThat(activityInstance.getActivityType()).isEqualTo("receiveTask");
+        assertThat(activityInstance.getEndTime()).isNotNull();
+        assertThat(activityInstance.getDurationInMillis()).isGreaterThanOrEqualTo(0);
+        assertThat(activityInstance.getProcessDefinitionId()).isNotNull();
+        assertThat(activityInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(activityInstance.getStartTime()).isNotNull();
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -103,99 +111,99 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         runtimeService.trigger(execution.getId());
 
-        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
+        assertThat(runtimeService.createActivityInstanceQuery().count()).isZero();
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void testActivityInstanceUnfinished() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstanceQuery activityInstanceQuery = runtimeService.createActivityInstanceQuery();
 
         long finishedActivityInstanceCount = activityInstanceQuery.finished().count();
-        assertEquals("The Start event and sequenceFlow are completed", 2, finishedActivityInstanceCount);
+        assertThat(finishedActivityInstanceCount).as("The Start event and sequenceFlow are completed").isEqualTo(2);
 
         long unfinishedActivityInstanceCount = activityInstanceQuery.unfinished().count();
-        assertEquals("One active (unfinished) User org.flowable.task.service.Task", 1, unfinishedActivityInstanceCount);
+        assertThat(unfinishedActivityInstanceCount).as("One active (unfinished) User org.flowable.task.service.Task").isEqualTo(1);
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void testSequenceFlowActivityInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstance sequenceFlow = runtimeService.createActivityInstanceQuery().activityType("sequenceFlow").singleResult();
-        assertEquals("flow1", sequenceFlow.getActivityId());
-        assertEquals(processInstance.getId(), sequenceFlow.getProcessInstanceId());
-        assertEquals(processInstance.getProcessDefinitionId(), sequenceFlow.getProcessDefinitionId());
-        assertNotNull(sequenceFlow.getExecutionId());
-        assertNotNull(sequenceFlow.getStartTime());
-        assertEquals(sequenceFlow.getStartTime(), sequenceFlow.getEndTime());
-        assertEquals(Long.valueOf(0L), sequenceFlow.getDurationInMillis());
+        assertThat(sequenceFlow.getActivityId()).isEqualTo("flow1");
+        assertThat(sequenceFlow.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(sequenceFlow.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
+        assertThat(sequenceFlow.getExecutionId()).isNotNull();
+        assertThat(sequenceFlow.getStartTime()).isNotNull();
+        assertThat(sequenceFlow.getEndTime()).isEqualTo(sequenceFlow.getStartTime());
+        assertThat(sequenceFlow.getDurationInMillis()).isZero();
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcessWithoutSequenceFlowIds.bpmn20.xml")
     public void testSequenceFlowActivityInstanceWithoutSequenceFlowId() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcessWithoutSequenceFlowIds");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         ActivityInstance sequenceFlow = runtimeService.createActivityInstanceQuery().activityType("sequenceFlow").singleResult();
-        assertEquals("_flow_theStart__theTask", sequenceFlow.getActivityId());
+        assertThat(sequenceFlow.getActivityId()).isEqualTo("_flow_theStart__theTask");
     }
 
     @Test
     @Deployment(resources= "org/flowable/engine/test/api/runtime/RuntimeActivityInstanceTest.testActivityInstanceNoop.bpmn20.xml")
     public void testActivityInstanceQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().activityId("nonExistingActivityId").list().size());
-        assertEquals(1, runtimeService.createActivityInstanceQuery().activityId("noop").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("nonExistingActivityId").list()).isEmpty();
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("noop").list()).hasSize(1);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().activityType("nonExistingActivityType").list().size());
-        assertEquals(1, runtimeService.createActivityInstanceQuery().activityType("serviceTask").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().activityType("nonExistingActivityType").list()).isEmpty();
+        assertThat(runtimeService.createActivityInstanceQuery().activityType("serviceTask").list()).hasSize(1);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().activityName("nonExistingActivityName").list().size());
-        assertEquals(1, runtimeService.createActivityInstanceQuery().activityName("No operation").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().activityName("nonExistingActivityName").list()).isEmpty();
+        assertThat(runtimeService.createActivityInstanceQuery().activityName("No operation").list()).hasSize(1);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().taskAssignee("nonExistingAssignee").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().taskAssignee("nonExistingAssignee").list()).isEmpty();
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list()).isEmpty();
 
-        assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(5);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list()).isEmpty();
 
-        assertEquals(5, runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(5);
 
-        assertEquals(0, runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list()).isEmpty();
 
-        assertEquals(5, runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list()).hasSize(5);
 
-        assertEquals(1, runtimeService.createActivityInstanceQuery().unfinished().list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().unfinished().list()).hasSize(1);
 
-        assertEquals(4, runtimeService.createActivityInstanceQuery().finished().list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().finished().list()).hasSize(4);
 
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().list().get(0);
-        assertEquals(1, runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().activityInstanceId(activityInstance.getId()).list()).hasSize(1);
     }
 
     @Test
     @Deployment
     public void testActivityInstanceForEventsQuery() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("eventProcess");
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         runtimeService.signalEventReceived("signal");
 
         assertThatActivityInstancesAreSame("noop");
@@ -209,7 +217,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(pi.getId()).onlyChildExecutions().singleResult().getId());
 
-        assertEquals(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count(), 0L);
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(pi.getId()).count()).isZero();
     }
 
     protected void assertThatActivityInstancesAreSame(String userTask) {
@@ -229,19 +237,19 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("theTask").singleResult();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals(task.getId(), activityInstance.getTaskId());
-        assertEquals("kermit", activityInstance.getAssignee());
+        assertThat(activityInstance.getTaskId()).isEqualTo(task.getId());
+        assertThat(activityInstance.getAssignee()).isEqualTo("kermit");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/history/calledProcess.bpmn20.xml", "org/flowable/engine/test/history/HistoricActivityInstanceTest.testCallSimpleSubProcess.bpmn20.xml" })
     public void processInstanceEndRemovesAllActivityInstances() {
         runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        assertEquals(runtimeService.createProcessInstanceQuery().count(), 0L);
-        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(runtimeService.createActivityInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -259,7 +267,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
             HistoricProcessInstance oldInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
 
-            assertEquals(oldInstance.getId(), activityInstance.getCalledProcessInstanceId());
+            assertThat(activityInstance.getCalledProcessInstanceId()).isEqualTo(oldInstance.getId());
         }
     }
 
@@ -270,61 +278,49 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         int expectedActivityInstances = 3;
 
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByExecutionId().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().asc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().asc().list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByExecutionId().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().asc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().asc().list()).hasSize(expectedActivityInstances);
 
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByExecutionId().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().desc().list().size());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().desc().list().size());
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByExecutionId().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().desc().list()).hasSize(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().desc().list()).hasSize(expectedActivityInstances);
 
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByExecutionId().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().asc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().asc().count());
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByExecutionId().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().asc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().asc().count()).isEqualTo(expectedActivityInstances);
 
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByExecutionId().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().desc().count());
-        assertEquals(expectedActivityInstances, runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().desc().count());
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceId().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceStartTime().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceEndTime().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByExecutionId().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessDefinitionId().desc().count()).isEqualTo(expectedActivityInstances);
+        assertThat(runtimeService.createActivityInstanceQuery().orderByProcessInstanceId().desc().count()).isEqualTo(expectedActivityInstances);
     }
 
     @Test
     public void testInvalidSorting() {
-        try {
-            runtimeService.createActivityInstanceQuery().asc().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
+        assertThatThrownBy(() -> runtimeService.createActivityInstanceQuery().asc().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        }
+        assertThatThrownBy(() -> runtimeService.createActivityInstanceQuery().desc().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            runtimeService.createActivityInstanceQuery().desc().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-
-        }
-
-        try {
-            runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-
-        }
+        assertThatThrownBy(() -> runtimeService.createActivityInstanceQuery().orderByActivityInstanceDuration().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -333,17 +329,14 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
         // Complete the task with the boundary-event on it
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        // Check if there is NO historic activity instance for a boundary-event that has not triggered
-        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
-
-        assertNull(activityInstance);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         // Now check the history when the boundary-event is fired
         processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
@@ -352,19 +345,20 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         Execution signalExecution = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").singleResult();
         runtimeService.signalEventReceived("alert", signalExecution.getId());
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId())
+                .singleResult();
 
-        assertNotNull(activityInstance);
-        assertNotNull(activityInstance.getStartTime());
-        assertNotNull(activityInstance.getEndTime());
+        assertThat(activityInstance).isNotNull();
+        assertThat(activityInstance.getStartTime()).isNotNull();
+        assertThat(activityInstance.getEndTime()).isNotNull();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertActivityInstancesAreSame(historyService.createHistoricActivityInstanceQuery().activityId("boundary")
-                        .processInstanceId(processInstance.getId()).singleResult(), activityInstance);
+                    .processInstanceId(processInstance.getId()).singleResult(), activityInstance);
         }
     }
 
@@ -373,10 +367,10 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testEventBasedGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
         Execution waitingExecution = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").singleResult();
-        assertNotNull(waitingExecution);
+        assertThat(waitingExecution).isNotNull();
         runtimeService.signalEventReceived("alert", waitingExecution.getId());
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -392,23 +386,25 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoin");
 
         List<org.flowable.task.api.Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasksToComplete.size());
+        assertThat(tasksToComplete).hasSize(2);
 
         // Complete both tasks, second task-complete should end the fork-gateway and set time
         taskService.complete(tasksToComplete.get(0).getId());
         taskService.complete(tasksToComplete.get(1).getId());
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-        List<ActivityInstance> activityInstance = runtimeService.createActivityInstanceQuery().activityId("join").processInstanceId(processInstance.getId()).list();
+        List<ActivityInstance> activityInstance = runtimeService.createActivityInstanceQuery().activityId("join").processInstanceId(processInstance.getId())
+                .list();
 
-        assertNotNull(activityInstance);
+        assertThat(activityInstance).isNotNull();
 
         // History contains 2 entries for parallel join (one for each path
         // arriving in the join), should contain end-time
-        assertEquals(2, activityInstance.size());
-        assertNotNull(activityInstance.get(0).getEndTime());
-        assertNotNull(activityInstance.get(1).getEndTime());
+        assertThat(activityInstance).hasSize(2);
+        assertThat(activityInstance)
+                .flatExtracting(ActivityInstance::getEndTime)
+                .doesNotContainNull();
     }
 
     @Test
@@ -423,27 +419,25 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             Number inputNumber = (Number) taskService.getVariable(task.getId(), "input");
             int input = inputNumber.intValue();
-            assertEquals(i, input);
+            assertThat(input).isEqualTo(i);
             taskService.complete(task.getId(), CollectionUtil.singletonMap("input", input + 1));
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         }
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         // Verify history
         List<ActivityInstance> taskActivityInstances = runtimeService.createActivityInstanceQuery().activityType("userTask").list();
-        assertEquals(10, taskActivityInstances.size());
-        for (ActivityInstance activityInstance : taskActivityInstances) {
-            assertNotNull(activityInstance.getStartTime());
-            assertNotNull(activityInstance.getEndTime());
-        }
+        assertThat(taskActivityInstances).hasSize(10);
+        assertThat(taskActivityInstances)
+                .flatExtracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
+                .doesNotContainNull();
 
         List<ActivityInstance> serviceTaskInstances = runtimeService.createActivityInstanceQuery().activityType("serviceTask").list();
-        assertEquals(15, serviceTaskInstances.size());
-        for (ActivityInstance activityInstance : serviceTaskInstances) {
-            assertNotNull(activityInstance.getStartTime());
-            assertNotNull(activityInstance.getEndTime());
-        }
+        assertThat(serviceTaskInstances).hasSize(15);
+        assertThat(taskActivityInstances)
+                .flatExtracting(ActivityInstance::getEndTime, ActivityInstance::getEndTime)
+                .doesNotContainNull();
     }
 
     @Test
@@ -451,16 +445,21 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     public void testNativeActivityInstanceTest() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
-        assertEquals(3, runtimeService.createNativeActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(ActivityInstanceEntity.class)).count());
-        assertEquals(3, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).list().size());
-        assertEquals(1, runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).listPage(0, 1).size());
+        assertThat(
+                runtimeService.createNativeActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(ActivityInstanceEntity.class))
+                        .count()).isEqualTo(3);
+        assertThat(
+                runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class)).list())
+                .hasSize(3);
+        assertThat(runtimeService.createNativeActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ActivityInstanceEntity.class))
+                .listPage(0, 1)).hasSize(1);
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void upgradeFromHistoryToRuntimeActivities_completeTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -478,7 +477,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void upgradeFromHistoryToRuntimeActivities_changeAssignee() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         
@@ -501,7 +500,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void upgradeFromHistoryToRuntimeActivities_changeOwner() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -514,7 +513,8 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
         taskService.setOwner(task.getId(), "newOwner");
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theTask").count());
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("theTask").count())
+                    .isEqualTo(1);
         }
 
         taskService.complete(task.getId());

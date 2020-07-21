@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cfg.taskcount;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
@@ -28,7 +30,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
@@ -158,11 +160,11 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
                         ValidateTaskRelatedEntityCountCfgCmd.PROPERTY_TASK_RELATED_ENTITY_COUNT);
             }
         });
-        assertEquals(expectedValue, Boolean.parseBoolean(propertyEntity.getValue()));
+        assertThat(Boolean.parseBoolean(propertyEntity.getValue())).isEqualTo(expectedValue);
     }
 
     protected void assertTaskCountFlag(org.flowable.task.api.Task task, boolean enableTaskCountFlag) {
-        assertEquals(((CountingTaskEntity) task).isCountEnabled(), enableTaskCountFlag);
+        assertThat(enableTaskCountFlag).isEqualTo(((CountingTaskEntity) task).isCountEnabled());
     }
 
     protected void finishProcessInstance(ProcessInstance processInstance) {

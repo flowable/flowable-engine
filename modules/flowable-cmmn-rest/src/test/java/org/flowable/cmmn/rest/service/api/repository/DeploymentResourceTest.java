@@ -68,13 +68,14 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
                             + "}");
 
-            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1);
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(deploymentId);
-            assertThat(resources).hasSize(1);
-            assertThat(resources.get(0)).isEqualTo("oneHumanTaskCase.cmmn");
-            assertThat(repositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
+            assertThat(resources)
+                    .containsOnly("oneHumanTaskCase.cmmn");
+
+            assertThat(repositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).count()).isEqualTo(1);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -117,11 +118,9 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                         + " name: '" + existingDeployment.getName() + "',"
                         + " category: null,"
                         + " tenantId: \"\","
-                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "'"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                        + " deploymentTime: '${json-unit.any-string}'"
                         + "}");
-
-        String deployTime = responseNode.get("deploymentTime").textValue();
-        assertThat(deployTime).isNotNull();
     }
 
     /**

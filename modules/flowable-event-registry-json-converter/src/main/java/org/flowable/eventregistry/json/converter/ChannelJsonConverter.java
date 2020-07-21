@@ -14,15 +14,19 @@ package org.flowable.eventregistry.json.converter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionInboundChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.model.JmsOutboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 
@@ -37,14 +41,29 @@ public class ChannelJsonConverter {
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected List<ChannelValidator> validators = new ArrayList<>();
+    protected Map<String, Class<? extends ChannelModel>> channelModelClasses = new HashMap<>();
 
     public ChannelJsonConverter() {
         addValidator(new OutboundChannelModelValidator());
         addValidator(new InboundChannelModelValidator());
+        addDefaultChannelModelClasses();
     }
 
     public ChannelJsonConverter(Collection<ChannelValidator> validators) {
         this.validators = new ArrayList<>(validators);
+        addDefaultChannelModelClasses();
+    }
+
+    protected void addDefaultChannelModelClasses() {
+        addInboundChannelModelClass("jms", JmsInboundChannelModel.class);
+        addInboundChannelModelClass("rabbit", RabbitInboundChannelModel.class);
+        addInboundChannelModelClass("kafka", KafkaInboundChannelModel.class);
+        addInboundChannelModelClass("expression", DelegateExpressionInboundChannelModel.class);
+
+        addOutboundChannelModelClass("jms", JmsOutboundChannelModel.class);
+        addOutboundChannelModelClass("rabbit", RabbitOutboundChannelModel.class);
+        addOutboundChannelModelClass("kafka", KafkaOutboundChannelModel.class);
+        addOutboundChannelModelClass("expression", DelegateExpressionOutboundChannelModel.class);
     }
 
     public ChannelModel convertToChannelModel(String modelJson) {
@@ -68,33 +87,12 @@ public class ChannelJsonConverter {
         String channelType = channelNode.path("channelType").asText(null);
         String type = channelNode.path("type").asText(null);
 
-        Class<? extends ChannelModel> channelClass;
-        if ("outbound".equals(channelType)) {
-            if ("jms".equals(type)) {
-                channelClass = JmsOutboundChannelModel.class;
-            } else if ("rabbit".equals(type)) {
-                channelClass = RabbitOutboundChannelModel.class;
-            } else if ("kafka".equals(type)) {
-                channelClass = KafkaOutboundChannelModel.class;
-            } else if ("expression".equals(type)) {
-                channelClass = DelegateExpressionOutboundChannelModel.class;
-            } else {
-                throw new FlowableEventJsonException("Not supported outbound channel model type was found " + type);
-            }
-        } else {
-            if ("jms".equals(type)) {
-                channelClass = JmsInboundChannelModel.class;
-            } else if ("rabbit".equals(type)) {
-                channelClass = RabbitInboundChannelModel.class;
-            } else if ("kafka".equals(type)) {
-                channelClass = KafkaInboundChannelModel.class;
-            } else if ("expression".equals(type)) {
-                channelClass = DelegateExpressionInboundChannelModel.class;
-            } else {
-                throw new FlowableEventJsonException("Not supported inbound channel model type was found " + type);
-            }
+        Class<? extends ChannelModel> channelClass = channelModelClasses.get(channelType + "-" + type);
+        if (channelClass != null) {
+            return channelClass;
         }
-        return channelClass;
+
+        throw new FlowableEventJsonException("Not supported " + channelType + " channel model type was found " + type);
     }
 
     protected void validateChannel(ChannelModel channelModel) {
@@ -121,5 +119,21 @@ public class ChannelJsonConverter {
 
     public void setValidators(List<ChannelValidator> validators) {
         this.validators = validators;
+    }
+
+    public Map<String, Class<? extends ChannelModel>> getChannelModelClasses() {
+        return channelModelClasses;
+    }
+
+    public void addOutboundChannelModelClass(String type, Class<? extends OutboundChannelModel> channelModelClass) {
+        channelModelClasses.put("outbound-" + type, channelModelClass);
+    }
+
+    public void addInboundChannelModelClass(String type, Class<? extends InboundChannelModel> channelModelClass) {
+        channelModelClasses.put("inbound-" + type, channelModelClass);
+    }
+
+    public void setChannelModelClasses(Map<String, Class<? extends ChannelModel>> channelModelClasses) {
+        this.channelModelClasses = channelModelClasses;
     }
 }

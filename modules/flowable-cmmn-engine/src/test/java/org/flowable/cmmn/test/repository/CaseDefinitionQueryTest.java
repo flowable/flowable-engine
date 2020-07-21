@@ -90,7 +90,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByInvalidDeploymentId() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").list()).isEmpty();
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
@@ -117,7 +117,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByInvalidDeploymentIds() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isZero();
     }
 
     @Test
@@ -151,8 +151,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionId() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId("invalid").count()).isZero();
     }
 
     @Test
@@ -176,8 +176,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByInvalidCaseDefinitionIds() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list()).isEmpty();
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count())
-                .isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count()).isZero();
     }
 
     @Test
@@ -188,8 +187,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionCategory() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategory("invalid").count()).isZero();
     }
 
     @Test
@@ -200,8 +199,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionCategoryLike() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%n").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryLike("invalid%n").count()).isZero();
     }
 
     @Test
@@ -209,8 +208,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").list()).hasSize(4);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("another").count()).isEqualTo(4);
 
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionCategoryNotEquals("http://flowable.org/cmmn").count()).isZero();
     }
 
     @Test
@@ -226,8 +225,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionName() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionName("Case 3").count()).isZero();
     }
 
     @Test
@@ -238,8 +237,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("%2").count()).isEqualTo(1);
 
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").count()).isZero();
     }
 
     @Test
@@ -253,8 +252,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionKey() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("invalid").count()).isZero();
     }
 
     @Test
@@ -268,8 +267,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionKeyLike() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKeyLike("%invalid").count()).isZero();
     }
 
     @Test
@@ -283,8 +282,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersion(4).count()).isZero();
     }
 
     @Test
@@ -292,8 +291,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(2).count()).isEqualTo(1);
 
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThan(3).count()).isZero();
     }
 
     @Test
@@ -304,8 +303,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(3).count()).isEqualTo(1);
 
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionVersionGreaterThanOrEquals(4).count()).isZero();
     }
 
     @Test
@@ -365,8 +364,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionResourceName() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("invalid.cmmn").count()).isZero();
     }
 
     @Test
@@ -380,8 +379,8 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testQueryByInvalidCaseDefinitionResourceNameLike() {
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").list()).hasSize(0);
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").count()).isEqualTo(0);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionResourceNameLike("%invalid%").count()).isZero();
     }
 
     @Test

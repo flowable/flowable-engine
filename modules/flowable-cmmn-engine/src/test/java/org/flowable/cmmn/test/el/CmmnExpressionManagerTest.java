@@ -107,7 +107,7 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
                 .variables(vars)
                 .start();
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("methodExpressionCase").count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("methodExpressionCase").count()).isZero();
     }
 
     @Test

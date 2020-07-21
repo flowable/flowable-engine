@@ -14,10 +14,7 @@ package org.flowable.dmn.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -57,21 +54,23 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
                     .latestVersion()
                     .processDefinitionKey("oneDecisionTaskProcess")
                     .singleResult();
-    
-            assertNotNull(processDefinition);
-            assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
-    
+
+            assertThat(processDefinition).isNotNull();
+            assertThat(processDefinition.getKey()).isEqualTo("oneDecisionTaskProcess");
+
             DmnRepositoryService dmnRepositoryService = DmnEngines.getDefaultDmnEngine().getDmnRepositoryService();
-            DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
+            DmnDecision definition = dmnRepositoryService.createDecisionQuery()
                     .latestVersion()
-                    .decisionTableKey("decision1")
+                    .decisionKey("decision1")
                     .singleResult();
-            assertNotNull(decisionTable);
-            assertEquals("decision1", decisionTable.getKey());
-    
-            List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
-            assertEquals(1l, decisionTableList.size());
-            assertEquals("decision1", decisionTableList.get(0).getKey());
+
+            assertThat(definition).isNotNull();
+            assertThat(definition.getKey()).isEqualTo("decision1");
+
+            List<DmnDecision> decisionsList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+            assertThat(decisionsList)
+                    .extracting(DmnDecision::getKey)
+                    .containsExactly("decision1");
         } finally {
             deleteAllDmnDeployments();
         }
@@ -82,14 +81,16 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             "org/flowable/dmn/engine/test/deployment/simple.dmn" })
     public void testDecisionTaskExecution() {
         try {
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1));
+            ProcessInstance processInstance = runtimeService
+                    .startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1));
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
-                            .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
-            
-            assertEquals("inputVariable1", variables.get(0).getVariableName());
-            assertEquals(1, variables.get(0).getValue());
-            assertEquals("outputVariable1", variables.get(1).getVariableName());
-            assertEquals("result1", variables.get(1).getValue());
+                    .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+            assertThat(variables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactly(
+                            tuple("inputVariable1", 1),
+                            tuple("outputVariable1", "result1")
+                    );
         } finally {
             deleteAllDmnDeployments();
         }
@@ -100,10 +101,9 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             "org/flowable/dmn/engine/test/deployment/simple.dmn" })
     public void testFailedDecisionTask() {
         try {
-            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess");
-            fail("Expected DMN failure due to missing variable");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Unknown property used in expression: #{inputVariable1"));
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess"))
+                    .isInstanceOf(Exception.class)
+                    .hasMessageContaining("Unknown property used in expression: #{inputVariable1");
         } finally {
             deleteAllDmnDeployments();
         }
@@ -114,10 +114,9 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             "org/flowable/dmn/engine/test/deployment/simple.dmn" })
     public void testNoHitsDecisionTask() {
         try {
-            runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2));
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("did not hit any rules for the provided input"));
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 2)))
+                    .isInstanceOf(Exception.class)
+                    .hasMessageContaining("did not hit any rules for the provided input");
         } finally {
             deleteAllDmnDeployments();
         }
@@ -461,23 +460,24 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId(
-                "oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1), "someTenant");
+                    "oneDecisionTaskProcess", Collections.singletonMap("inputVariable1", (Object) 1), "someTenant");
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+                    .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
 
-            assertEquals("inputVariable1", variables.get(0).getVariableName());
-            assertEquals(1, variables.get(0).getValue());
-            assertEquals("outputVariable1", variables.get(1).getVariableName());
-            assertEquals("result1", variables.get(1).getValue());
-            
+            assertThat(variables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactly(
+                            tuple("inputVariable1", 1),
+                            tuple("outputVariable1", "result1")
+                    );
             DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
-                            .createHistoricDecisionExecutionQuery()
-                            .instanceId(processInstance.getId())
-                            .singleResult();
-            
-            assertNotNull(decisionExecution);
-            assertEquals("someTenant", decisionExecution.getTenantId());
-            
+                    .createHistoricDecisionExecutionQuery()
+                    .instanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(decisionExecution).isNotNull();
+            assertThat(decisionExecution.getTenantId()).isEqualTo("someTenant");
+
         } finally {
             dmnEngineConfiguration.setFallbackToDefaultTenant(false);
             dmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
@@ -488,26 +488,28 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
 
     protected void assertDmnProcessExecuted() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId(
-            "oneDecisionTaskProcess",
-            Collections.singletonMap("inputVariable1", (Object) 1),
-            "flowable");
+                "oneDecisionTaskProcess",
+                Collections.singletonMap("inputVariable1", (Object) 1),
+                "flowable");
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
-            .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
+                .processInstanceId(processInstance.getId()).orderByVariableName().asc().list();
 
-        assertEquals("inputVariable1", variables.get(0).getVariableName());
-        assertEquals(1, variables.get(0).getValue());
-        assertEquals("outputVariable1", variables.get(1).getVariableName());
-        assertEquals("result1", variables.get(1).getValue());
-        
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                .containsExactly(
+                        tuple("inputVariable1", 1),
+                        tuple("outputVariable1", "result1")
+                );
+
         DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations().get(
-                        EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+                EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         DmnHistoricDecisionExecution decisionExecution = dmnEngineConfiguration.getDmnHistoryService()
-                        .createHistoricDecisionExecutionQuery()
-                        .instanceId(processInstance.getId())
-                        .singleResult();
-        
-        assertNotNull(decisionExecution);
-        assertEquals("flowable", decisionExecution.getTenantId());
+                .createHistoricDecisionExecutionQuery()
+                .instanceId(processInstance.getId())
+                .singleResult();
+
+        assertThat(decisionExecution).isNotNull();
+        assertThat(decisionExecution.getTenantId()).isEqualTo("flowable");
     }
 
 

@@ -36,8 +36,6 @@ public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
      */
     TaskQuery taskCandidateOrAssigned(String userIdForCandidateAndAssignee);
 
-    TaskQuery taskWithoutDeleteReason();
-
     /** Only select tasks that have no parent (i.e. do not select subtasks). */
     TaskQuery excludeSubtasks();
 

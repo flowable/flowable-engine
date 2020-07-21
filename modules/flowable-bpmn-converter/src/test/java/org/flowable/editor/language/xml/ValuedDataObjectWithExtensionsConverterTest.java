@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -131,13 +129,14 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
-        assertEquals("start1", flowElement.getId());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         // verify the main process data objects
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
-        assertEquals(1, dataObjects.size());
+        assertThat(dataObjects).hasSize(1);
 
         Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -145,82 +144,67 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         }
 
         ValuedDataObject dataObj = objectMap.get("dObj1");
-        assertEquals("dObj1", dataObj.getId());
-        assertEquals("StringTest", dataObj.getName());
-        assertEquals("xsd:string", dataObj.getItemSubjectRef().getStructureRef());
-        assertTrue(dataObj.getValue() instanceof String);
-        assertEquals("Testing123", dataObj.getValue());
+        assertThat(dataObj.getId()).isEqualTo("dObj1");
+        assertThat(dataObj.getName()).isEqualTo("StringTest");
+        assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
+        assertThat(dataObj.getValue()).isEqualTo("Testing123");
 
         /*
          * Verify DataObject attributes extension
          */
         Map<String, String> attributes = getDataObjectAttributes(dataObj);
-        assertEquals(2, attributes.size());
-        for (String key : attributes.keySet()) {
-            if (key.equals("Attr1")) {
-                assertEquals("1", attributes.get(key));
-            } else if (key.equals("Attr2")) {
-                assertEquals("2", attributes.get(key));
-            } else {
-                fail("Unknown key value");
-            }
-        }
+        assertThat(attributes).containsOnly(
+                entry("Attr1", "1"),
+                entry("Attr2", "2")
+        );
 
         /*
          * Verify DataObject localization extension
          */
         Localization localization = getLocalization(dataObj);
-        assertEquals("rbkfn-1", localization.getResourceBundleKeyForName());
-        assertEquals("rbkfd-1", localization.getResourceBundleKeyForDescription());
-        assertEquals("leifn-1", localization.getLabeledEntityIdForName());
-        assertEquals("leifd-1", localization.getLabeledEntityIdForDescription());
+        assertThat(localization.getResourceBundleKeyForName()).isEqualTo("rbkfn-1");
+        assertThat(localization.getResourceBundleKeyForDescription()).isEqualTo("rbkfd-1");
+        assertThat(localization.getLabeledEntityIdForName()).isEqualTo("leifn-1");
+        assertThat(localization.getLabeledEntityIdForDescription()).isEqualTo("leifd-1");
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess1", flowElement.getId());
-        SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(6, subProcess.getFlowElements().size());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getFlowElements()).hasSize(6);
 
-        // verify the sub process data objects
-        dataObjects = subProcess.getDataObjects();
-        assertEquals(1, dataObjects.size());
+                    // verify the sub process data objects
+                    assertThat(subProcess.getDataObjects()).hasSize(1);
+                });
 
         objectMap = new HashMap<>();
-        for (ValuedDataObject valueObj : dataObjects) {
+        for (ValuedDataObject valueObj : ((SubProcess)flowElement).getDataObjects()) {
             objectMap.put(valueObj.getId(), valueObj);
         }
 
         dataObj = objectMap.get("dObj2");
-        assertEquals("dObj2", dataObj.getId());
-        assertEquals("BooleanTest", dataObj.getName());
-        assertEquals("xsd:boolean", dataObj.getItemSubjectRef().getStructureRef());
-        assertTrue(dataObj.getValue() instanceof Boolean);
-        assertEquals(Boolean.TRUE, dataObj.getValue());
+        assertThat(dataObj.getId()).isEqualTo("dObj2");
+        assertThat(dataObj.getName()).isEqualTo("BooleanTest");
+        assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:boolean");
+        assertThat(dataObj.getValue()).isEqualTo(Boolean.TRUE);
 
         /*
          * Verify DataObject attributes extension
          */
         attributes = getDataObjectAttributes(dataObj);
-        assertEquals(2, attributes.size());
-        for (String key : attributes.keySet()) {
-            if (key.equals("Attr3")) {
-                assertEquals("3", attributes.get(key));
-            } else if (key.equals("Attr4")) {
-                assertEquals("4", attributes.get(key));
-            } else {
-                fail("Unknown key value");
-            }
-        }
+        assertThat(attributes).containsOnly(
+                entry("Attr3", "3"),
+                entry("Attr4", "4")
+        );
 
         /*
          * Verify DataObject localization extension
          */
         localization = getLocalization(dataObj);
-        assertEquals("rbkfn-2", localization.getResourceBundleKeyForName());
-        assertEquals("rbkfd-2", localization.getResourceBundleKeyForDescription());
-        assertEquals("leifn-2", localization.getLabeledEntityIdForName());
-        assertEquals("leifd-2", localization.getLabeledEntityIdForDescription());
+        assertThat(localization.getResourceBundleKeyForName()).isEqualTo("rbkfn-2");
+        assertThat(localization.getResourceBundleKeyForDescription()).isEqualTo("rbkfd-2");
+        assertThat(localization.getLabeledEntityIdForName()).isEqualTo("leifn-2");
+        assertThat(localization.getLabeledEntityIdForDescription()).isEqualTo("leifd-2");
     }
 
     protected static String getExtensionValue(String key, ValuedDataObject dataObj) {

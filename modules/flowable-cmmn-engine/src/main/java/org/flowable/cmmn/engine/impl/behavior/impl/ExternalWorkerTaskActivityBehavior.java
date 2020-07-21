@@ -18,6 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
+import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.common.engine.api.FlowableException;
@@ -44,7 +48,21 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
-        String jobTopicExpression = serviceTask.getTopic();
+        CreateCmmnExternalWorkerJobInterceptor interceptor = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                .getCreateCmmnExternalWorkerJobInterceptor();
+
+        CreateCmmnExternalWorkerJobBeforeContext beforeContext = new CreateCmmnExternalWorkerJobBeforeContext(
+                serviceTask,
+                planItemInstanceEntity,
+                getJobCategory(serviceTask),
+                serviceTask.getTopic()
+        );
+
+        if (interceptor != null) {
+            interceptor.beforeCreateExternalWorkerJob(beforeContext);
+        }
+
+        String jobTopicExpression = beforeContext.getJobTopicExpression();
         if (StringUtils.isEmpty(jobTopicExpression)) {
             throw new FlowableException("no topic expression configured");
         }
@@ -62,17 +80,13 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
         job.setJobHandlerType(ExternalWorkerTaskCompleteJobHandler.TYPE);
         job.setExclusive(serviceTask.isExclusive());
 
-        List<ExtensionElement> jobCategoryElements = serviceTask.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+        if (StringUtils.isNotEmpty(beforeContext.getJobCategory())) {
                 Expression categoryExpression = CommandContextUtil.getExpressionManager(commandContext)
-                        .createExpression(jobCategoryElement.getElementText());
+                        .createExpression(beforeContext.getJobCategory());
                 Object categoryValue = categoryExpression.getValue(planItemInstanceEntity);
                 if (categoryValue != null) {
                     job.setCategory(categoryValue.toString());
                 }
-            }
         }
 
         job.setJobType(JobEntity.JOB_TYPE_EXTERNAL_WORKER);
@@ -92,5 +106,23 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
         }
 
         jobService.insertExternalWorkerJob(job);
+
+        if (interceptor != null) {
+            interceptor.afterCreateExternalWorkerJob(new CreateCmmnExternalWorkerJobAfterContext(
+                    serviceTask,
+                    job,
+                    planItemInstanceEntity
+            ));
+        }
     }
+
+    protected String getJobCategory(BaseElement baseElement) {
+        List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
+        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+            return jobCategoryElements.get(0).getElementText();
+        }
+
+        return null;
+    }
+
 }

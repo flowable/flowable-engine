@@ -13,6 +13,7 @@
 package org.flowable.job.api;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,6 +28,34 @@ public interface ExternalWorkerJobAcquireBuilder {
      * @param lockDuration the duration for locking the jobs
      */
     ExternalWorkerJobAcquireBuilder topic(String topic, Duration lockDuration);
+
+    /**
+     * Acquire only jobs which are linked to a process instance.
+     * Cannot be combined with {@link #onlyCmmn()} and {@link #scopeType(String)}
+     */
+    ExternalWorkerJobAcquireBuilder onlyBpmn();
+
+    /**
+     * Acquire only jobs which are linked to a case instance.
+     * Cannot be combined with {@link #onlyBpmn()} and {@link #scopeType(String)}
+     */
+    ExternalWorkerJobAcquireBuilder onlyCmmn();
+
+    /**
+     * Acquire only jobs which are linked to the given scope type.
+     * Cannot be combined with {@link #onlyBpmn()} or {@link #onlyCmmn()}
+     */
+    ExternalWorkerJobAcquireBuilder scopeType(String scopeType);
+
+    /**
+     * Acquire only jobs which are within the given tenant.
+     */
+    ExternalWorkerJobAcquireBuilder tenantId(String tenantId);
+
+    /**
+     * Acquire only jobs where the given user or groups are authorized to execute.
+     */
+    ExternalWorkerJobAcquireBuilder forUserOrGroups(String userId, Collection<String> groups);
 
     /**
      * Acquire and lock the given number of jobs for the given worker id.

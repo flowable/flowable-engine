@@ -13,8 +13,8 @@
 package org.flowable.eventregistry.rest.service.api.repository;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -27,6 +27,8 @@ import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to single an Event Definition resource.
@@ -47,19 +49,21 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(eventDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(eventDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(eventDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(eventDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(eventDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(eventDefinition.getName(), responseNode.get("name").textValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(eventDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, eventDefinition.getDeploymentId())));
-        assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, eventDefinition.getDeploymentId(), eventDefinition.getResourceName())));
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + eventDefinition.getId() + "',"
+                        + "url: '" + httpGet.getURI().toString() + "',"
+                        + "key: '" + eventDefinition.getKey() + "',"
+                        + "version: " + eventDefinition.getVersion() + ","
+                        + "name: '" + eventDefinition.getName() + "',"
+                        + "description: " + eventDefinition.getDescription() + ","
+                        + "deploymentId: '" + eventDefinition.getDeploymentId() + "',"
+                        + "deploymentUrl: '" + SERVER_URL_PREFIX + EventRestUrls
+                        .createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, eventDefinition.getDeploymentId()) + "',"
+                        + "resourceName: '" + eventDefinition.getResourceName() + "',"
+                        + "category: " + eventDefinition.getCategory()
+                        + "}");
     }
 
     /**
@@ -75,16 +79,24 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
     public void testGetEventDefinitionResourceData() throws Exception {
         EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_DEFINITION_RESOURCE_CONTENT, eventDefinition.getId()));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_DEFINITION_RESOURCE_CONTENT, eventDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
+        assertThat(content).isNotNull();
         JsonNode eventNode = objectMapper.readTree(content);
-        assertEquals("myEvent", eventNode.get("key").asText());
-        assertEquals("customerId", eventNode.get("correlationParameters").get(0).get("name").asText());
+        assertThatJson(eventNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .isEqualTo("{"
+                        + "key: 'myEvent',"
+                        + "correlationParameters:"
+                        + " [{"
+                        + "   name: 'customerId'"
+                        + " }]"
+                        + "}");
     }
     
     @EventDeploymentAnnotation(resources = { "simpleEvent.event" })
@@ -97,7 +109,7 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
+        assertThat(content).isNotNull();
         assertThatJson(content)
                 .isEqualTo("{"
                         + "  key: 'myEvent',"

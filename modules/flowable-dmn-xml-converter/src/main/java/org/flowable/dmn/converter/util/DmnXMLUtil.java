@@ -15,19 +15,27 @@ package org.flowable.dmn.converter.util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.converter.child.AllowedValuesParser;
 import org.flowable.dmn.converter.child.BaseChildElementParser;
 import org.flowable.dmn.converter.child.InputClauseParser;
 import org.flowable.dmn.converter.child.InputEntryParser;
 import org.flowable.dmn.converter.child.InputExpressionParser;
+import org.flowable.dmn.converter.child.ItemComponentParser;
 import org.flowable.dmn.converter.child.OutputClauseParser;
 import org.flowable.dmn.converter.child.OutputEntryParser;
 import org.flowable.dmn.converter.child.OutputValuesParser;
-import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.converter.child.RequiredAuthorityParser;
+import org.flowable.dmn.converter.child.RequiredDecisionParser;
+import org.flowable.dmn.converter.child.RequiredInputParser;
+import org.flowable.dmn.converter.child.TypeRefParser;
+import org.flowable.dmn.converter.child.VariableParser;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
@@ -49,6 +57,13 @@ public class DmnXMLUtil implements DmnXMLConstants {
         addGenericParser(new OutputEntryParser());
         addGenericParser(new InputExpressionParser());
         addGenericParser(new OutputValuesParser());
+        addGenericParser(new VariableParser());
+        addGenericParser(new RequiredAuthorityParser());
+        addGenericParser(new RequiredDecisionParser());
+        addGenericParser(new RequiredInputParser());
+        addGenericParser(new AllowedValuesParser());
+        addGenericParser(new ItemComponentParser());
+        addGenericParser(new TypeRefParser());
     }
 
     private static void addGenericParser(BaseChildElementParser parser) {
@@ -56,7 +71,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr,
-            Map<String, BaseChildElementParser> childParsers, DecisionTable decisionTable) throws Exception {
+            Map<String, BaseChildElementParser> childParsers, Decision decision) throws Exception {
 
         Map<String, BaseChildElementParser> localParserMap = new HashMap<>(genericChildParserMap);
         if (childParsers != null) {
@@ -69,7 +84,6 @@ public class DmnXMLUtil implements DmnXMLConstants {
             xtr.next();
 
             if (xtr.isStartElement()) {
-
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = true;
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {
@@ -80,7 +94,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
                         parentElement.addExtensionElement(extensionElement);
                         continue;
                     }
-                    localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decisionTable);
+                    localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decision);
                 } else if (inExtensionElements) {
                     DmnExtensionElement extensionElement = parseExtensionElement(xtr);
                     parentElement.addExtensionElement(extensionElement);
@@ -246,6 +260,19 @@ public class DmnXMLUtil implements DmnXMLConstants {
             }
 
             xtw.writeEndElement();
+        }
+    }
+
+    public static String getUniqueElementId() {
+        return getUniqueElementId(null);
+    }
+
+    public static String getUniqueElementId(String prefix) {
+        UUID uuid = UUID.randomUUID();
+        if (StringUtils.isEmpty(prefix)) {
+            return uuid.toString();
+        } else {
+            return String.format("%s_%s", prefix, uuid.toString());
         }
     }
 }

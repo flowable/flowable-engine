@@ -48,7 +48,7 @@ class FlowableJupiterTest {
         assertThat(task.getName()).isEqualTo("My Task");
 
         taskService.complete(task.getId());
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
         assertThat(processEngine.getName()).as("process engine  name").isEqualTo(ProcessEngines.NAME_DEFAULT);
     }
 
@@ -75,6 +75,6 @@ class FlowableJupiterTest {
         testHelper.waitForJobExecutorToProcessAllJobs(7000L, 500L);
 
         // the job is done
-        assertThat(managementService.createJobQuery().count()).isEqualTo(0);
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 }

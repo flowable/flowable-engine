@@ -13,6 +13,7 @@
 package org.flowable.engine;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.interceptor.MigrationContext;
 
 /**
  * This interface exposes methods needed to manipulate the agenda implementation.
@@ -24,6 +25,8 @@ public interface FlowableEngineAgenda extends Agenda {
     void planContinueProcessOperation(ExecutionEntity execution);
 
     void planContinueProcessSynchronousOperation(ExecutionEntity execution);
+    
+    void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext);
 
     void planContinueProcessInCompensation(ExecutionEntity execution);
 

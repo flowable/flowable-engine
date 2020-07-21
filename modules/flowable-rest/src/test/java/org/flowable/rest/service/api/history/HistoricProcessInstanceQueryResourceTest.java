@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import java.util.HashMap;
 
@@ -32,6 +32,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic process instance query resource.
@@ -173,14 +175,19 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertThat(dataNode).hasSize(2);
-        JsonNode valueNode = dataNode.get(0);
-        assertThat(valueNode.get("id").asText()).isEqualTo(processInstance.getId());
-        assertThat(dataNode.get(1).get("id").asText()).isEqualTo(processInstance2.getId());
-
-        assertThat(valueNode.get("processDefinitionName").asText()).isEqualTo("The One Task Process");
-        assertThat(valueNode.get("processDefinitionDescription").asText()).isEqualTo("One task process description");
-        assertThat(valueNode.has("startTime")).as("has startTime").isTrue();
-        assertThat(valueNode.get("startUserId").textValue()).as("startUserId").isEqualTo(processInstance.getStartUserId());
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "{"
+                        + "    id: '" + processInstance.getId() + "',"
+                        + "    processDefinitionName: 'The One Task Process',"
+                        + "    processDefinitionDescription: 'One task process description',"
+                        + "    startTime: '${json-unit.any-string}',"
+                        + "    startUserId: '" + processInstance.getStartUserId() + "'"
+                        + "},"
+                        + "{"
+                        + "    id: '" + processInstance2.getId() + "'"
+                        + "}"
+                        + "]");
     }
 }

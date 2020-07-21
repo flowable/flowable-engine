@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic process instance query resource.
@@ -116,13 +118,21 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url + "?processDefinitionKey=oneTaskProcess&sort=startTime"), 200);
 
         // Check status and size
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(3, dataNode.size());
-        assertEquals(processInstance.getId(), dataNode.get(0).get("id").asText());
-        assertEquals(processInstance2.getId(), dataNode.get(1).get("id").asText());
-        assertEquals(processInstance3.getId(), dataNode.get(2).get("id").asText());
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("[ {"
+                        + "     id:'" + processInstance.getId() + "'"
+                        + "   },"
+                        + "   {"
+                        + "     id:'" + processInstance2.getId() + "'"
+                        + "   },"
+                        + "   {"
+                        + "     id:'" + processInstance3.getId() + "'"
+                        + "   }"
+                        + "]");
     }
 
     @Override
@@ -133,10 +143,10 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), 200);
 
         // Check status and size
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -145,7 +155,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound.isEmpty()).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isTrue();
     }
 
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String processInstanceId, Map<String, Object> expectedVariables) throws IOException {
@@ -156,22 +166,25 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(1, dataNode.size());
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("[{"
+                        + "  id: '" + processInstanceId + "'"
+                        + "}]");
+
+        // Check expected variables
         JsonNode valueNode = dataNode.get(0);
-        assertEquals(processInstanceId, valueNode.get("id").asText());
+        assertThat(valueNode.get("variables")).hasSize(expectedVariables.size());
 
-        // Check expectec variables
-        assertEquals(expectedVariables.size(), valueNode.get("variables").size());
-
-        for(JsonNode node: valueNode.get("variables")) {
+        for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
             String variableName = variableNode.get("name").textValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
-            assertTrue(expectedVariables.containsKey(variableName));
-            assertEquals(expectedVariables.get(variableName), variableValue);
-            assertEquals(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase(), variableNode.get("type").textValue());
-            assertEquals("local", variableNode.get("scope").textValue());
+            assertThat(expectedVariables).containsKey(variableName);
+            assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
+            assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
+            assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
         }
 
     }

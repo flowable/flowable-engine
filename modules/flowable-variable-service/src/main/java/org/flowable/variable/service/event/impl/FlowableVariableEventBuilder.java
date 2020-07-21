@@ -17,6 +17,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 
 /**
@@ -40,19 +41,24 @@ public class FlowableVariableEventBuilder {
         return newEvent;
     }
 
-    public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, String executionId,
-            String processInstanceId, String processDefinitionId, String scopeId, String scopeType) {
+    public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, VariableInstance variableInstance, Object variableValue,
+            VariableType variableType) {
 
         FlowableVariableEventImpl newEvent = new FlowableVariableEventImpl(type);
-        newEvent.setVariableName(variableName);
+        newEvent.setVariableName(variableInstance.getName());
         newEvent.setVariableValue(variableValue);
         newEvent.setVariableType(variableType);
-        newEvent.setTaskId(taskId);
-        newEvent.setExecutionId(executionId);
-        newEvent.setProcessDefinitionId(processDefinitionId);
-        newEvent.setProcessInstanceId(processInstanceId);
-        newEvent.setScopeId(scopeId);
-        newEvent.setScopeType(scopeType);
+        newEvent.setTaskId(variableInstance.getTaskId());
+        if (variableInstance.getScopeType() == null) {
+            newEvent.setExecutionId(variableInstance.getExecutionId());
+            newEvent.setProcessInstanceId(variableInstance.getProcessInstanceId());
+            newEvent.setProcessDefinitionId(variableInstance.getProcessDefinitionId());
+            newEvent.setExecutionId(variableInstance.getExecutionId());
+        } else {
+            newEvent.setScopeType(variableInstance.getScopeType());
+            newEvent.setScopeId(variableInstance.getScopeId());
+            newEvent.setSubScopeId(variableInstance.getSubScopeId());
+        }
         return newEvent;
     }
 }

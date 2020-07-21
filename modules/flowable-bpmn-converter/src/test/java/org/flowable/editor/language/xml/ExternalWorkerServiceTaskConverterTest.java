@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
@@ -43,15 +41,13 @@ public class ExternalWorkerServiceTaskConverterTest extends AbstractConverterTes
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("externalWorkerServiceTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ExternalWorkerServiceTask);
+        assertThat(flowElement).isInstanceOf(ExternalWorkerServiceTask.class);
+        assertThat(flowElement.getId()).isEqualTo("externalWorkerServiceTask");
+        assertThat(flowElement.getName()).isEqualTo("External worker task");
         ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) flowElement;
-        assertEquals("externalWorkerServiceTask", externalWorkerServiceTask.getId());
-        assertEquals("External worker task", externalWorkerServiceTask.getName());
 
-        assertEquals("topic", externalWorkerServiceTask.getTopic());
-        assertEquals("skipExpression", externalWorkerServiceTask.getSkipExpression());
-        assertTrue(externalWorkerServiceTask.isExclusive());
-
+        assertThat(externalWorkerServiceTask.getTopic()).isEqualTo("topic");
+        assertThat(externalWorkerServiceTask.getSkipExpression()).isEqualTo("skipExpression");
+        assertThat(externalWorkerServiceTask.isExclusive()).isTrue();
     }
 }

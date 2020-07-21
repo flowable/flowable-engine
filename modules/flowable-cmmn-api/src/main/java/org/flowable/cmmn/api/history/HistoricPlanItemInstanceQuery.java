@@ -52,6 +52,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery createdAfter(Date createdAfter);
     HistoricPlanItemInstanceQuery lastAvailableBefore(Date availableBefore);
     HistoricPlanItemInstanceQuery lastAvailableAfter(Date availableAfter);
+    HistoricPlanItemInstanceQuery lastUnavailableBefore(Date unavailableBefore);
+    HistoricPlanItemInstanceQuery lastUnavailableAfter(Date unavailableAfter);
     HistoricPlanItemInstanceQuery lastEnabledBefore(Date enabledBefore);
     HistoricPlanItemInstanceQuery lastEnabledAfter(Date enabledAfter);
     HistoricPlanItemInstanceQuery lastDisabledBefore(Date disabledBefore);

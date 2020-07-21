@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.api.engine.variable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 
@@ -31,8 +33,8 @@ public class QueryVariableTest extends BaseSpringRestTestCase {
         origQueryVariable.setType("type");
         origQueryVariable.setValue("value");
         // Check that the "operation" is valid
-        assertEquals("notEquals", origQueryVariable.getOperation());
-        assertEquals(QueryVariable.QueryVariableOperation.NOT_EQUALS, origQueryVariable.getVariableOperation());
+        assertThat(origQueryVariable.getOperation()).isEqualTo("notEquals");
+        assertThat(origQueryVariable.getVariableOperation()).isEqualTo(QueryVariable.QueryVariableOperation.NOT_EQUALS);
 
         // Serialize
         JsonNode jsonNode = objectMapper.convertValue(origQueryVariable, JsonNode.class);
@@ -40,7 +42,7 @@ public class QueryVariableTest extends BaseSpringRestTestCase {
         // Reconstitute the QueryVariable
         QueryVariable newQueryVariable = objectMapper.convertValue(jsonNode, QueryVariable.class);
         // Recheck the "operation" with the "new" variable
-        assertEquals(QueryVariable.QueryVariableOperation.NOT_EQUALS, newQueryVariable.getVariableOperation());
-        assertEquals("notEquals", newQueryVariable.getOperation());
+        assertThat(newQueryVariable.getVariableOperation()).isEqualTo(QueryVariable.QueryVariableOperation.NOT_EQUALS);
+        assertThat(newQueryVariable.getOperation()).isEqualTo("notEquals");
     }
 }

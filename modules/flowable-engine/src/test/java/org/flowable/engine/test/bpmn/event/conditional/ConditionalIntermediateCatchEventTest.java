@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.conditional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -34,23 +36,23 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBeforeConditionalCatch", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBeforeConditionalCatch");
         
         taskService.complete(task.getId());
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         runtimeService.trigger(execution.getId());
         
-        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         runtimeService.setVariable(processInstance.getId(), "myVar", "test");
         
         runtimeService.trigger(execution.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfterConditionalCatch", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -64,21 +66,21 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBeforeConditionalCatch", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBeforeConditionalCatch");
         
         taskService.complete(task.getId());
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         runtimeService.evaluateConditionalEvents(processInstance.getId());
         
-        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfterConditionalCatch", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());

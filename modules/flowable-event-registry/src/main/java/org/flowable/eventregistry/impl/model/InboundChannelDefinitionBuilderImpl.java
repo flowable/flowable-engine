@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelBuilder {
 
     protected EventRepositoryService eventRepository;
+    protected ChannelJsonConverter channelJsonConverter;
 
     protected InboundChannelModel channelModel;
     protected String deploymentName;
@@ -48,8 +49,9 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
     protected String key;
     protected InboundEventProcessingPipelineBuilder inboundEventProcessingPipelineBuilder;
 
-    public InboundChannelDefinitionBuilderImpl(EventRepositoryService eventRepository) {
+    public InboundChannelDefinitionBuilderImpl(EventRepositoryService eventRepository, ChannelJsonConverter channelJsonConverter) {
         this.eventRepository = eventRepository;
+        this.channelJsonConverter = channelJsonConverter;
     }
 
     @Override
@@ -138,7 +140,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         EventDeployment eventDeployment = eventRepository.createDeployment()
             .name(deploymentName)
-            .addChannelDefinition(resourceName, new ChannelJsonConverter().convertToJson(channelModel))
+            .addChannelDefinition(resourceName, channelJsonConverter.convertToJson(channelModel))
             .category(category)
             .parentDeploymentId(parentDeploymentId)
             .tenantId(deploymentTenantId)

@@ -19,8 +19,8 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**

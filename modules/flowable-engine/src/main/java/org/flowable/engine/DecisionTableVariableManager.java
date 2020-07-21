@@ -22,5 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public interface DecisionTableVariableManager {
 
     void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper);
+    void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper);
 
 }

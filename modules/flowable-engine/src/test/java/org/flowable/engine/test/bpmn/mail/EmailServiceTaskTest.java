@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly").getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
@@ -67,7 +66,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(0, messages.size());
+        assertThat(messages).isEmpty();
 
         assertProcessEnded(procId);
     }
@@ -81,7 +80,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@flowable.org"), null);
@@ -97,7 +96,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@flowable.org"), null);
@@ -114,7 +113,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "activiti@myTenant.com", Collections.singletonList(
@@ -133,7 +132,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@myTenant.com", Collections.singletonList(
@@ -158,7 +157,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList(
@@ -179,7 +178,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList(
@@ -196,18 +195,9 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
         // 3 recipients == 3 emails in wiser with different receivers
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(3, messages.size());
-
-        // sort recipients for easy assertion
-        List<String> recipients = new ArrayList<>();
-        for (WiserMessage message : messages) {
-            recipients.add(message.getEnvelopeReceiver());
-        }
-        Collections.sort(recipients);
-
-        assertEquals("fozzie@activiti.org", recipients.get(0));
-        assertEquals("kermit@activiti.org", recipients.get(1));
-        assertEquals("mispiggy@activiti.org", recipients.get(2));
+        assertThat(messages)
+                .extracting(WiserMessage::getEnvelopeReceiver)
+                .containsExactlyInAnyOrder("fozzie@activiti.org", "kermit@activiti.org", "mispiggy@activiti.org");
     }
 
     @Test
@@ -243,7 +233,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailExpressions", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, subject, "Hello " + recipientName + ", this is an e-mail", sender, Collections.singletonList(
@@ -293,7 +283,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("htmlMail", CollectionUtil.singletonMap("gender", "male"));
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Collections.singletonList(
                 "kermit@activiti.org"), null);
     }
@@ -307,7 +297,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("variableTemplatedMail", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Collections.singletonList(
                 "kermit@activiti.org"), null);
     }
@@ -320,12 +310,12 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachment", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
-        assertEquals(2, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(2);
         String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
-        assertEquals(new AttachmentsBean().getFile().getName(), attachmentFileName);
+        assertThat(attachmentFileName).isEqualTo(new AttachmentsBean().getFile().getName());
     }
 
     @Test
@@ -336,14 +326,14 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachments", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
         File[] files = new AttachmentsBean().getFiles();
-        assertEquals(1 + files.length, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(1 + files.length);
         for (int i = 0; i < files.length; i++) {
             String attachmentFileName = mm.getBodyPart(1 + i).getDataHandler().getName();
-            assertEquals(files[i].getName(), attachmentFileName);
+            assertThat(attachmentFileName).isEqualTo(files[i].getName());
         }
     }
 
@@ -355,14 +345,14 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachmentsByPath", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
         File[] files = new AttachmentsBean().getFiles();
-        assertEquals(1 + files.length, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(1 + files.length);
         for (int i = 0; i < files.length; i++) {
             String attachmentFileName = mm.getBodyPart(1 + i).getDataHandler().getName();
-            assertEquals(files[i].getName(), attachmentFileName);
+            assertThat(attachmentFileName).isEqualTo(files[i].getName());
         }
     }
 
@@ -378,12 +368,12 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailWithDataSourceAttachment", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
-        assertEquals(2, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(2);
         String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
-        assertEquals(fileName, attachmentFileName);
+        assertThat(attachmentFileName).isEqualTo(fileName);
     }
 
     @Test
@@ -394,9 +384,9 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("textMailWithNotExistingFileAttachment", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
-        assertFalse(message.getMimeMessage().getContent() instanceof MimeMultipart);
+        assertThat(message.getMimeMessage().getContent()).isNotExactlyInstanceOf(MimeMultipart.class);
     }
 
     @Test
@@ -408,25 +398,20 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("htmlMailWithFileAttachment", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
-        assertEquals(2, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(2);
         String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
-        assertEquals(new AttachmentsBean().getFile().getName(), attachmentFileName);
+        assertThat(attachmentFileName).isEqualTo(new AttachmentsBean().getFile().getName());
     }
 
     @Test
     @Deployment
     public void testInvalidAddress() throws Exception {
-        try {
-            runtimeService.startProcessInstanceByKey("invalidAddress").getId();
-            fail("An Invalid email address should not execute");
-        } catch (FlowableException e) {
-            // fine
-        } catch (Exception e) {
-            fail("Only a FlowableException is expected here but not: " + e);
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidAddress").getId())
+                .isInstanceOf(FlowableException.class)
+                .as("Only a FlowableException is expected here");
     }
 
     @Test
@@ -434,7 +419,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testInvalidAddressWithoutException() throws Exception {
         String piId = runtimeService.startProcessInstanceByKey("invalidAddressWithoutException").getId();
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertNotNull(historyService.createHistoricVariableInstanceQuery().processInstanceId(piId).variableName("emailError").singleResult());
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(piId).variableName("emailError").singleResult()).isNotNull();
         }
     }
 
@@ -443,7 +428,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testInvalidAddressWithoutExceptionVariableName() throws Exception {
         String piId = runtimeService.startProcessInstanceByKey("invalidAddressWithoutException").getId();
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertNull(historyService.createHistoricVariableInstanceQuery().processInstanceId(piId).variableName("emailError").singleResult());
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(piId).variableName("emailError").singleResult()).isNull();
         }
     }
 
@@ -470,22 +455,22 @@ public class EmailServiceTaskTest extends EmailTestCase {
         try {
             MimeMessage mimeMessage = emailMessage.getMimeMessage();
             if (htmlMail) {
-                assertTrue(mimeMessage.getContentType().contains("multipart/mixed"));
+                assertThat(mimeMessage.getContentType()).contains("multipart/mixed");
             } else {
-                assertTrue(mimeMessage.getContentType().contains("text/plain"));
+                assertThat(mimeMessage.getContentType()).contains("text/plain");
             }
 
-            assertEquals(subject, mimeMessage.getHeader("Subject", null));
-            assertEquals(from, mimeMessage.getHeader("From", null));
-            assertTrue(getMessage(mimeMessage).contains(message));
+            assertThat(mimeMessage.getHeader("Subject", null)).isEqualTo(subject);
+            assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+            assertThat(getMessage(mimeMessage)).contains(message);
 
             for (String t : to) {
-                assertTrue(mimeMessage.getHeader("To", null).contains(t));
+                assertThat(mimeMessage.getHeader("To", null)).contains(t);
             }
 
             if (cc != null) {
                 for (String c : cc) {
-                    assertTrue(mimeMessage.getHeader("Cc", null).contains(c));
+                    assertThat(mimeMessage.getHeader("Cc", null)).contains(c);
                 }
             }
 

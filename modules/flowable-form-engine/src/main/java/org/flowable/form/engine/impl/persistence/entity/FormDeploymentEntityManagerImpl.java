@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
+import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 
@@ -50,10 +52,20 @@ public class FormDeploymentEntityManagerImpl
     }
 
     @Override
-    public void deleteDeployment(String deploymentId) {
+    public void deleteDeployment(String deploymentId, boolean cascade) {
+        if (cascade) {
+            List<FormDefinition> formDefinitions = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
+            deleteFormInstancesForDefinitions(formDefinitions);
+        }
         deleteFormDefinitionsForDeployment(deploymentId);
         getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
+    }
+
+    protected void deleteFormInstancesForDefinitions(List<FormDefinition> formDefinitions) {
+        for (FormDefinition formDefinition : formDefinitions) {
+            getFormInstanceEntityManager().deleteFormInstancesByFormDefinitionId(formDefinition.getId());
+        }
     }
 
     protected void deleteFormDefinitionsForDeployment(String deploymentId) {
@@ -93,4 +105,7 @@ public class FormDeploymentEntityManagerImpl
         return engineConfiguration.getFormDefinitionEntityManager();
     }
 
+    protected FormInstanceEntityManager getFormInstanceEntityManager() {
+        return engineConfiguration.getFormInstanceEntityManager();
+    }
 }

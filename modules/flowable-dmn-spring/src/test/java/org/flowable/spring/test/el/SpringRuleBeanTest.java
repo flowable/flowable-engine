@@ -13,11 +13,13 @@
 
 package org.flowable.spring.test.el;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -31,12 +33,12 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
 
     protected ApplicationContext applicationContext;
     protected DmnRepositoryService repositoryService;
-    protected DmnRuleService ruleService;
+    protected DmnDecisionService ruleService;
 
     protected void createAppContext(String path) {
         this.applicationContext = new ClassPathXmlApplicationContext(path);
         this.repositoryService = applicationContext.getBean(DmnRepositoryService.class);
-        this.ruleService = applicationContext.getBean(DmnRuleService.class);
+        this.ruleService = applicationContext.getBean(DmnDecisionService.class);
     }
 
     @Override
@@ -51,20 +53,20 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
     public void testSimpleRuleBean() {
         createAppContext(CTX_PATH);
         repositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/el/springbean.dmn").deploy();
-        
+
         Map<String, Object> outputVariables = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey("springDecision")
-                        .variable("input1", "John Doe")
-                        .executeWithSingleResult();
-        
-        assertEquals("test1", outputVariables.get("output1"));
-        
+                .decisionKey("springDecision")
+                .variable("input1", "John Doe")
+                .executeWithSingleResult();
+
+        assertThat(outputVariables.get("output1")).isEqualTo("test1");
+
         outputVariables = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey("springDecision")
-                        .variable("input1", "test")
-                        .executeWithSingleResult();
-        
-        assertEquals("test2", outputVariables.get("output1"));
+                .decisionKey("springDecision")
+                .variable("input1", "test")
+                .executeWithSingleResult();
+
+        assertThat(outputVariables.get("output1")).isEqualTo("test2");
     }
 
     // --Helper methods

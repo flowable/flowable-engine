@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.form;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,74 +52,54 @@ public class FormServiceTest extends PluggableFlowableTestCase {
             "org/flowable/examples/taskforms/request.form", "org/flowable/examples/taskforms/adjustRequest.form" })
     public void testGetStartFormByProcessDefinitionId() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         Object startForm = formService.getRenderedStartForm(processDefinition.getId());
-        assertNotNull(startForm);
+        assertThat(startForm).isNotNull();
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetStartFormByProcessDefinitionIdWithoutStartform() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         Object startForm = formService.getRenderedStartForm(processDefinition.getId());
-        assertNull(startForm);
+        assertThat(startForm).isNull();
     }
 
     @Test
     public void testGetStartFormByKeyNullKey() {
-        try {
-            formService.getRenderedStartForm(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            // Exception expected
-        }
+        assertThatThrownBy(() -> formService.getRenderedStartForm(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetStartFormByIdNullId() {
-        try {
-            formService.getRenderedStartForm(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            // Exception expected
-        }
+        assertThatThrownBy(() -> formService.getStartFormKey(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetStartFormByIdUnexistingProcessDefinitionId() {
-        try {
-            formService.getRenderedStartForm("unexistingId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no deployed process definition found with id", ae.getMessage());
-            assertEquals(ProcessDefinition.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> formService.getStartFormKey("unexistingId"))
+                .hasMessageContaining("no deployed process definition found with id")
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
     public void testGetTaskFormNullTaskId() {
-        try {
-            formService.getRenderedTaskForm(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException e) {
-            // Expected Exception
-        }
+        assertThatThrownBy(() -> formService.getRenderedTaskForm(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetTaskFormUnexistingTaskId() {
-        try {
-            formService.getRenderedTaskForm("unexistingtask");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("Task 'unexistingtask' not found", ae.getMessage());
-            assertEquals(org.flowable.task.api.Task.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> formService.getRenderedTaskForm("unexistingtask"))
+                .hasMessage("Task 'unexistingtask' not found")
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
@@ -123,47 +107,47 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     public void testTaskFormPropertyDefaultsAndFormRendering(@DeploymentId String deploymentIdFromDeploymentAnnotation) {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         StartFormData startForm = formService.getStartFormData(procDefId);
-        assertNotNull(startForm);
-        assertEquals(deploymentIdFromDeploymentAnnotation, startForm.getDeploymentId());
-        assertEquals("org/flowable/engine/test/api/form/start.form", startForm.getFormKey());
-        assertEquals(new ArrayList<FormProperty>(), startForm.getFormProperties());
-        assertEquals(procDefId, startForm.getProcessDefinition().getId());
+        assertThat(startForm).isNotNull();
+        assertThat(startForm.getDeploymentId()).isEqualTo(deploymentIdFromDeploymentAnnotation);
+        assertThat(startForm.getFormKey()).isEqualTo("org/flowable/engine/test/api/form/start.form");
+        assertThat(startForm.getFormProperties()).isEqualTo(new ArrayList<FormProperty>());
+        assertThat(startForm.getProcessDefinition().getId()).isEqualTo(procDefId);
 
         Object renderedStartForm = formService.getRenderedStartForm(procDefId);
-        assertEquals("start form content", renderedStartForm);
+        assertThat(renderedStartForm).isEqualTo("start form content");
 
         Map<String, String> properties = new HashMap<>();
         properties.put("room", "5b");
         properties.put("speaker", "Mike");
         String processInstanceId = formService.submitStartFormData(procDefId, properties).getId();
 
-        Map<String, Object> expectedVariables = new HashMap<>();
-        expectedVariables.put("room", "5b");
-        expectedVariables.put("speaker", "Mike");
-
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        assertEquals(expectedVariables, variables);
+        assertThat(variables)
+                .containsOnly(
+                        entry("room", "5b"),
+                        entry("speaker", "Mike")
+                );
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         String taskId = task.getId();
         TaskFormData taskForm = formService.getTaskFormData(taskId);
-        assertEquals(deploymentIdFromDeploymentAnnotation, taskForm.getDeploymentId());
-        assertEquals("org/flowable/engine/test/api/form/task.form", taskForm.getFormKey());
-        assertEquals(new ArrayList<FormProperty>(), taskForm.getFormProperties());
-        assertEquals(taskId, taskForm.getTask().getId());
+        assertThat(taskForm.getDeploymentId()).isEqualTo(deploymentIdFromDeploymentAnnotation);
+        assertThat(taskForm.getFormKey()).isEqualTo("org/flowable/engine/test/api/form/task.form");
+        assertThat(taskForm.getFormProperties()).isEqualTo(new ArrayList<FormProperty>());
+        assertThat(taskForm.getTask().getId()).isEqualTo(taskId);
 
-        assertEquals("Mike is speaking in room 5b", formService.getRenderedTaskForm(taskId));
+        assertThat(formService.getRenderedTaskForm(taskId)).isEqualTo("Mike is speaking in room 5b");
 
         properties = new HashMap<>();
         properties.put("room", "3f");
         formService.submitTaskFormData(taskId, properties);
 
-        expectedVariables = new HashMap<>();
-        expectedVariables.put("room", "3f");
-        expectedVariables.put("speaker", "Mike");
-
         variables = runtimeService.getVariables(processInstanceId);
-        assertEquals(expectedVariables, variables);
+        assertThat(variables)
+                .containsOnly(
+                        entry("room", "3f"),
+                        entry("speaker", "Mike")
+                );
     }
 
     @Test
@@ -182,12 +166,12 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> expectedVariables = new HashMap<>();
         expectedVariables.put("room", "5b");
         expectedVariables.put("SpeakerName", "Mike");
-        expectedVariables.put("duration", 45l);
+        expectedVariables.put("duration", 45L);
         expectedVariables.put("free", Boolean.TRUE);
         expectedVariables.put("double", 45.5d);
 
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        assertEquals(expectedVariables, variables);
+        assertThat(variables).isEqualTo(expectedVariables);
 
         Address address = new Address();
         address.setStreet("broadway");
@@ -200,46 +184,42 @@ public class FormServiceTest extends PluggableFlowableTestCase {
 
         List<FormProperty> formProperties = taskFormData.getFormProperties();
         FormProperty propertyRoom = formProperties.get(0);
-        assertEquals("room", propertyRoom.getId());
-        assertEquals("5b", propertyRoom.getValue());
+        assertThat(propertyRoom.getId()).isEqualTo("room");
+        assertThat(propertyRoom.getValue()).isEqualTo("5b");
 
         FormProperty propertyDuration = formProperties.get(1);
-        assertEquals("duration", propertyDuration.getId());
-        assertEquals("45", propertyDuration.getValue());
+        assertThat(propertyDuration.getId()).isEqualTo("duration");
+        assertThat(propertyDuration.getValue()).isEqualTo("45");
 
         FormProperty propertySpeaker = formProperties.get(2);
-        assertEquals("speaker", propertySpeaker.getId());
-        assertEquals("Mike", propertySpeaker.getValue());
+        assertThat(propertySpeaker.getId()).isEqualTo("speaker");
+        assertThat(propertySpeaker.getValue()).isEqualTo("Mike");
 
         FormProperty propertyStreet = formProperties.get(3);
-        assertEquals("street", propertyStreet.getId());
-        assertEquals("broadway", propertyStreet.getValue());
+        assertThat(propertyStreet.getId()).isEqualTo("street");
+        assertThat(propertyStreet.getValue()).isEqualTo("broadway");
 
         FormProperty propertyFree = formProperties.get(4);
-        assertEquals("free", propertyFree.getId());
-        assertEquals("true", propertyFree.getValue());
+        assertThat(propertyFree.getId()).isEqualTo("free");
+        assertThat(propertyFree.getValue()).isEqualTo("true");
 
         FormProperty propertyDouble = formProperties.get(5);
-        assertEquals("double", propertyDouble.getId());
-        assertEquals("45.5", propertyDouble.getValue());
+        assertThat(propertyDouble.getId()).isEqualTo("double");
+        assertThat(propertyDouble.getValue()).isEqualTo("45.5");
 
-        assertEquals(6, formProperties.size());
+        assertThat(formProperties).hasSize(6);
 
-        try {
-            formService.submitTaskFormData(taskId, new HashMap<>());
-            fail("expected exception about required form property 'street'");
-        } catch (FlowableException e) {
-            // OK
-        }
+        assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<>()))
+                .as("expected exception about required form property 'street'")
+                .isInstanceOf(FlowableException.class);
 
-        try {
-            properties = new HashMap<>();
-            properties.put("speaker", "its not allowed to update speaker!");
-            formService.submitTaskFormData(taskId, properties);
-            fail("expected exception about a non writable form property 'speaker'");
-        } catch (FlowableException e) {
-            // OK
-        }
+        assertThatThrownBy(() -> {
+            Map<String, String> propertiesSpeaker = new HashMap<>();
+            propertiesSpeaker.put("speaker", "its not allowed to update speaker!");
+            formService.submitTaskFormData(taskId, propertiesSpeaker);
+        })
+                .as("expected exception about a non writable form property 'speaker'")
+                .isInstanceOf(FlowableException.class);
 
         properties = new HashMap<>();
         properties.put("street", "rubensstraat");
@@ -248,14 +228,14 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         expectedVariables = new HashMap<>();
         expectedVariables.put("room", "5b");
         expectedVariables.put("SpeakerName", "Mike");
-        expectedVariables.put("duration", 45l);
+        expectedVariables.put("duration", 45L);
         expectedVariables.put("free", Boolean.TRUE);
         expectedVariables.put("double", 45.5d);
 
         variables = runtimeService.getVariables(processInstanceId);
         address = (Address) variables.remove("address");
-        assertEquals("rubensstraat", address.getStreet());
-        assertEquals(expectedVariables, variables);
+        assertThat(address.getStreet()).isEqualTo("rubensstraat");
+        assertThat(variables).isEqualTo(expectedVariables);
     }
 
     @Test
@@ -274,17 +254,17 @@ public class FormServiceTest extends PluggableFlowableTestCase {
 
         List<FormProperty> formProperties = taskFormData.getFormProperties();
         FormProperty propertySpeaker = formProperties.get(0);
-        assertEquals("speaker", propertySpeaker.getId());
-        assertEquals("Mike", propertySpeaker.getValue());
+        assertThat(propertySpeaker.getId()).isEqualTo("speaker");
+        assertThat(propertySpeaker.getValue()).isEqualTo("Mike");
 
-        assertEquals(2, formProperties.size());
+        assertThat(formProperties).hasSize(2);
 
         Map<String, String> properties = new HashMap<>();
         properties.put("street", "Broadway");
         formService.submitTaskFormData(taskId, properties);
 
         address = (Address) runtimeService.getVariable(processInstance.getId(), "address");
-        assertEquals("Broadway", address.getStreet());
+        assertThat(address.getStreet()).isEqualTo("Broadway");
     }
 
     @SuppressWarnings("unchecked")
@@ -294,29 +274,29 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         StartFormData startFormData = formService.getStartFormData(procDefId);
         FormProperty property = startFormData.getFormProperties().get(0);
-        assertEquals("speaker", property.getId());
-        assertNull(property.getValue());
-        assertTrue(property.isReadable());
-        assertTrue(property.isWritable());
-        assertFalse(property.isRequired());
-        assertEquals("string", property.getType().getName());
+        assertThat(property.getId()).isEqualTo("speaker");
+        assertThat(property.getValue()).isNull();
+        assertThat(property.isReadable()).isTrue();
+        assertThat(property.isWritable()).isTrue();
+        assertThat(property.isRequired()).isFalse();
+        assertThat(property.getType().getName()).isEqualTo("string");
 
         property = startFormData.getFormProperties().get(1);
-        assertEquals("start", property.getId());
-        assertNull(property.getValue());
-        assertTrue(property.isReadable());
-        assertTrue(property.isWritable());
-        assertFalse(property.isRequired());
-        assertEquals("date", property.getType().getName());
-        assertEquals("dd-MMM-yyyy", property.getType().getInformation("datePattern"));
+        assertThat(property.getId()).isEqualTo("start");
+        assertThat(property.getValue()).isNull();
+        assertThat(property.isReadable()).isTrue();
+        assertThat(property.isWritable()).isTrue();
+        assertThat(property.isRequired()).isFalse();
+        assertThat(property.getType().getName()).isEqualTo("date");
+        assertThat(property.getType().getInformation("datePattern")).isEqualTo("dd-MMM-yyyy");
 
         property = startFormData.getFormProperties().get(2);
-        assertEquals("direction", property.getId());
-        assertNull(property.getValue());
-        assertTrue(property.isReadable());
-        assertTrue(property.isWritable());
-        assertFalse(property.isRequired());
-        assertEquals("enum", property.getType().getName());
+        assertThat(property.getId()).isEqualTo("direction");
+        assertThat(property.getValue()).isNull();
+        assertThat(property.isReadable()).isTrue();
+        assertThat(property.isWritable()).isTrue();
+        assertThat(property.isRequired()).isFalse();
+        assertThat(property.getType().getName()).isEqualTo("enum");
         Map<String, String> values = (Map<String, String>) property.getType().getInformation("values");
 
         Map<String, String> expectedValues = new LinkedHashMap<>();
@@ -329,21 +309,18 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Iterator<Entry<String, String>> expectedValuesIterator = expectedValues.entrySet().iterator();
         for (Entry<String, String> entry : values.entrySet()) {
             Entry<String, String> expectedEntryAtLocation = expectedValuesIterator.next();
-            assertEquals(expectedEntryAtLocation.getKey(), entry.getKey());
-            assertEquals(expectedEntryAtLocation.getValue(), entry.getValue());
+            assertThat(entry.getKey()).isEqualTo(expectedEntryAtLocation.getKey());
+            assertThat(entry.getValue()).isEqualTo(expectedEntryAtLocation.getValue());
         }
-        assertEquals(expectedValues, values);
+        assertThat(values).isEqualTo(expectedValues);
     }
 
     @Test
     @Deployment
     public void testInvalidFormKeyReference() {
-        try {
-            formService.getRenderedStartForm(repositoryService.createProcessDefinitionQuery().singleResult().getId());
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent("Form with formKey 'IDoNotExist' does not exist", e.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getRenderedStartForm(repositoryService.createProcessDefinitionQuery().singleResult().getId()))
+                .hasMessage("Form with formKey 'IDoNotExist' does not exist")
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
@@ -355,26 +332,20 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
         ProcessInstance processInstance = formService.submitStartFormData(procDefId, "123", properties);
-        assertEquals("123", processInstance.getBusinessKey());
+        assertThat(processInstance.getBusinessKey()).isEqualTo("123");
 
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").singleResult().getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
     public void testGetStartFormKeyEmptyArgument() {
-        try {
-            formService.getStartFormKey(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition id is mandatory, but 'null' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getStartFormKey(null))
+                .hasMessage("The process definition id is mandatory, but 'null' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            formService.getStartFormKey("");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition id is mandatory, but '' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getStartFormKey(""))
+                .hasMessage("The process definition id is mandatory, but '' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -383,38 +354,26 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         String expectedFormKey = formService.getStartFormData(processDefinitionId).getFormKey();
         String actualFormKey = formService.getStartFormKey(processDefinitionId);
-        assertEquals(expectedFormKey, actualFormKey);
+        assertThat(actualFormKey).isEqualTo(expectedFormKey);
     }
 
     @Test
     public void testGetTaskFormKeyEmptyArguments() {
-        try {
-            formService.getTaskFormKey(null, "23");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition id is mandatory, but 'null' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getTaskFormKey( null, "23"))
+                .hasMessage("The process definition id is mandatory, but 'null' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            formService.getTaskFormKey("", "23");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition id is mandatory, but '' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getTaskFormKey( "", "23"))
+                .hasMessage("The process definition id is mandatory, but '' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            formService.getTaskFormKey("42", null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The task definition key is mandatory, but 'null' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getTaskFormKey( "42", null))
+                .hasMessage("The task definition key is mandatory, but 'null' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            formService.getTaskFormKey("42", "");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The task definition key is mandatory, but '' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> formService.getTaskFormKey( "42", ""))
+                .hasMessage("The task definition key is mandatory, but '' has been provided.")
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -423,10 +382,10 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         runtimeService.startProcessInstanceById(processDefinitionId);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         String expectedFormKey = formService.getTaskFormData(task.getId()).getFormKey();
         String actualFormKey = formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
-        assertEquals(expectedFormKey, actualFormKey);
+        assertThat(actualFormKey).isEqualTo(expectedFormKey);
     }
 
     @Test
@@ -434,22 +393,22 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     public void testGetTaskFormKeyWithExpression() {
         runtimeService.startProcessInstanceByKey("FormsProcess", CollectionUtil.singletonMap("dynamicKey", "test"));
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
-        assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
+        assertThat(task).isNotNull();
+        assertThat(formService.getTaskFormData(task.getId()).getFormKey()).isEqualTo("test");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSubmitTaskFormData() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         Map<String, String> properties = new HashMap<>();
         properties.put("room", "5b");
@@ -457,7 +416,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         formService.submitTaskFormData(task.getId(), properties);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
     }
 
@@ -465,15 +424,14 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSaveFormData() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
-        org.flowable.task.api.Task task = null;
-        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
 
         String taskId = task.getId();
 
@@ -486,10 +444,10 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         formService.saveFormData(task.getId(), properties);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(taskId, task.getId());
+        assertThat(task.getId()).isEqualTo(taskId);
 
         Map<String, Object> variables = taskService.getVariables(taskId);
-        assertEquals(expectedVariables, variables);
+        assertThat(variables).isEqualTo(expectedVariables);
 
     }
 }

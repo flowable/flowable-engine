@@ -73,6 +73,9 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     /** Only select jobs for the given plan item instance.  */
     SuspendedJobQuery planItemInstanceId(String planItemInstanceId);
 
+    /** Only select jobs with the given correlationId.  */
+    SuspendedJobQuery correlationId(String correlationId);
+
     /** Only select jobs which have retries left */
     SuspendedJobQuery withRetriesLeft();
 

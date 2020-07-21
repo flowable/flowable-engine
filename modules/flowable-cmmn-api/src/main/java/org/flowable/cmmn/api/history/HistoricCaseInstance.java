@@ -25,6 +25,10 @@ public interface HistoricCaseInstance {
     String getParentId();
     String getBusinessKey();
     String getCaseDefinitionId();
+    String getCaseDefinitionKey();
+    String getCaseDefinitionName();
+    Integer getCaseDefinitionVersion();
+    String getCaseDefinitionDeploymentId();
     String getState();
     Date getStartTime();
     Date getEndTime();

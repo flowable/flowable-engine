@@ -12,9 +12,8 @@
  */
 package org.flowable.engine.configurator.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,35 +50,31 @@ public class ProcessTest extends FlowableAppTestCase {
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
             
             runtimeService.addUserIdentityLink(processInstance.getId(), "anotherUser", IdentityLinkType.STARTER);
             taskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
             
-            assertEquals(2, runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()).size());
-            assertEquals(1, taskService.getIdentityLinksForTask(task.getId()).size());
+            assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
+            assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
             
             taskService.complete(task.getId());
-            
-            try {
-                assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()).size());
-                fail("object not found expected");
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-            
-            try {
-                assertEquals(0, taskService.getIdentityLinksForTask(task.getId()).size());
-                fail("object not found expected");
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-            
-            assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-            
-            
+
+            assertThatThrownBy(() -> runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
+
+            assertThatThrownBy(() -> taskService.getIdentityLinksForTask(task.getId()))
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
+
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
         } finally {
             appRepositoryService.deleteDeployment(deployment.getId(), true);
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
         }
     }
     
@@ -89,6 +84,8 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
+        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
@@ -97,42 +94,41 @@ public class ProcessTest extends FlowableAppTestCase {
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
             
             runtimeService.addUserIdentityLink(processInstance.getId(), "anotherUser", IdentityLinkType.STARTER);
             taskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
             
-            assertEquals(2, runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()).size());
-            assertEquals(1, taskService.getIdentityLinksForTask(task.getId()).size());
+            assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
+            assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
             
-            FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                            .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
             FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertNotNull(formDefinition);
+            assertThat(formDefinition).isNotNull();
             
             Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
             taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
-            
-            try {
-                assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()).size());
-                fail("object not found expected");
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-            
-            try {
-                assertEquals(0, taskService.getIdentityLinksForTask(task.getId()).size());
-                fail("object not found expected");
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-            
-            assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-            
-            
+
+            assertThatThrownBy(() -> runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
+
+            assertThatThrownBy(() -> taskService.getIdentityLinksForTask(task.getId()))
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
+
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
         } finally {
             appRepositoryService.deleteDeployment(deployment.getId(), true);
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+            formEngineConfiguration.getFormRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
 
@@ -142,6 +138,8 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
+        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
@@ -151,28 +149,36 @@ public class ProcessTest extends FlowableAppTestCase {
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
 
             runtimeService.addUserIdentityLink(processInstance.getId(), "anotherUser", IdentityLinkType.STARTER);
             taskService.addUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
 
-            assertEquals(2, runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()).size());
-            assertEquals(1, taskService.getIdentityLinksForTask(task.getId()).size());
+            assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
+            assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
 
-            FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                            .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
             FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("anotherForm").singleResult();
-            assertNotNull(formDefinition);
+            assertThat(formDefinition).isNotNull();
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("anotherInput", "test");
             taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
 
-            assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
 
         } finally {
             appRepositoryService.deleteDeployment(deployment.getId(), true);
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+            formEngineConfiguration.getFormRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
 }

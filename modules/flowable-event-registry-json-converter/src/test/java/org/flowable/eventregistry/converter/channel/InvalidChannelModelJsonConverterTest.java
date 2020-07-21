@@ -12,9 +12,12 @@
  */
 package org.flowable.eventregistry.converter.channel;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.eventregistry.json.converter.FlowableEventJsonException;
+import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -78,6 +81,15 @@ class InvalidChannelModelJsonConverterTest extends AbstractChannelConverterTest 
         assertThatThrownBy(() -> channelConverter.convertToChannelModel(modelJson))
             .isInstanceOf(FlowableEventJsonException.class)
             .hasMessage("The deserializer type is not supported yml for the channel model with key ymlInbound");
+    }
+
+    @Test
+    void inboundChannelWithNullDeserializer() {
+        String modelJson = readJsonToString("org/flowable/eventregistry/converter/channel/inboundChannelWithNullDeserializer.json");
+        ChannelModel model = channelConverter.convertToChannelModel(modelJson);
+        assertThat(model).isInstanceOf(InboundChannelModel.class);
+        InboundChannelModel inboundChannelModel = (InboundChannelModel) model;
+        assertThat(inboundChannelModel.getDeserializerType()).isNull();
     }
 
     @Test

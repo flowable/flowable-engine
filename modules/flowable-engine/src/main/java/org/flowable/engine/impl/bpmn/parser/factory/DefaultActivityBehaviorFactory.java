@@ -91,6 +91,7 @@ import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
@@ -104,6 +105,7 @@ import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ReceiveEventTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SendEventTaskActivityBehavior;
@@ -163,6 +165,11 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public ReceiveTaskActivityBehavior createReceiveTaskActivityBehavior(ReceiveTask receiveTask) {
         return new ReceiveTaskActivityBehavior();
+    }
+
+    @Override
+    public ReceiveEventTaskActivityBehavior createReceiveEventTaskActivityBehavior(ReceiveTask receiveTask, String eventDefinitionKey) {
+        return new ReceiveEventTaskActivityBehavior(eventDefinitionKey);
     }
 
     @Override
@@ -545,6 +552,11 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition) {
         return new IntermediateCatchTimerEventActivityBehavior(timerEventDefinition);
+    }
+
+    @Override
+    public IntermediateCatchEventRegistryEventActivityBehavior createIntermediateCatchEventRegistryEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, String eventDefinitionKey) {
+        return new IntermediateCatchEventRegistryEventActivityBehavior(eventDefinitionKey);
     }
 
     @Override

@@ -58,10 +58,11 @@ public class TaskBlockingExpressionCmmnXmlConverterTest extends AbstractConverte
 
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem1");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertThat(planItemDefinition).isInstanceOfSatisfying(Task.class, task -> {
-            assertThat(task.getBlockingExpression()).isEqualTo("${false}");
-            assertThat(task.isBlocking()).isTrue();
-        });
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(Task.class, task -> {
+                    assertThat(task.getBlockingExpression()).isEqualTo("${false}");
+                    assertThat(task.isBlocking()).isTrue();
+                });
     }
 
 }

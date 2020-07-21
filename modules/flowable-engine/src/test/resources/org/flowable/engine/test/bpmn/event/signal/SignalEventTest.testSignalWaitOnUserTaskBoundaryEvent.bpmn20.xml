@@ -3,48 +3,48 @@
   <signal id="waitsig" name="waitsig" activiti:scope="global"/>
   <process id="signal-wait" name="signal-wait" isExecutable="true">
     <startEvent id="startEvent1"/>
-    <endEvent id="sid-504E639E-F750-4F77-BD20-0D3D4DEE24F5"/>
-    <userTask id="sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105" name="wait 1" activiti:assignee="$INITIATOR"/>
-    <sequenceFlow id="sid-2930FFA5-5225-46B6-A329-D43C7726A526" sourceRef="startEvent1" targetRef="sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105"/>
-    <sequenceFlow id="sid-FCC521C4-C069-495C-B7C1-76325A3CE604" sourceRef="sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105" targetRef="sid-504E639E-F750-4F77-BD20-0D3D4DEE24F5"/>
-    <boundaryEvent id="sid-286FD496-9559-4198-95A7-FE8CF8988F3D" attachedToRef="sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105" cancelActivity="true">
+    <endEvent id="endEvent1"/>
+    <userTask id="taskWait1" name="wait 1" activiti:assignee="$INITIATOR"/>
+    <sequenceFlow id="flow1" sourceRef="startEvent1" targetRef="taskWait1"/>
+    <sequenceFlow id="flow2" sourceRef="taskWait1" targetRef="endEvent1"/>
+    <boundaryEvent id="signalBoundary" attachedToRef="taskWait1" cancelActivity="true">
       <signalEventDefinition signalRef="waitsig"/>
     </boundaryEvent>
-    <userTask id="sid-D4820F7B-8B1A-419C-A0F7-402C22F1B83E" name="Wait2" activiti:assignee="$INITIATOR"/>
-    <sequenceFlow id="sid-3886D73E-A74A-44C6-B25D-32644B0EC603" sourceRef="sid-286FD496-9559-4198-95A7-FE8CF8988F3D" targetRef="sid-D4820F7B-8B1A-419C-A0F7-402C22F1B83E"/>
-    <sequenceFlow id="sid-0F28900D-6739-4123-BD07-1BB9846F9E66" sourceRef="sid-D4820F7B-8B1A-419C-A0F7-402C22F1B83E" targetRef="sid-504E639E-F750-4F77-BD20-0D3D4DEE24F5"/>
+    <userTask id="taskWait2" name="Wait2" activiti:assignee="$INITIATOR"/>
+    <sequenceFlow id="flow3" sourceRef="signalBoundary" targetRef="taskWait2"/>
+    <sequenceFlow id="flow4" sourceRef="taskWait2" targetRef="endEvent1"/>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_signal-wait">
     <bpmndi:BPMNPlane bpmnElement="signal-wait" id="BPMNPlane_signal-wait">
       <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
         <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="150.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-504E639E-F750-4F77-BD20-0D3D4DEE24F5" id="BPMNShape_sid-504E639E-F750-4F77-BD20-0D3D4DEE24F5">
+      <bpmndi:BPMNShape bpmnElement="endEvent1" id="BPMNShape_endEvent1">
         <omgdc:Bounds height="28.0" width="28.0" x="495.0" y="165.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105" id="BPMNShape_sid-26A7FEC4-A372-4770-BCBC-DE32AB2B6105">
+      <bpmndi:BPMNShape bpmnElement="taskWait1" id="BPMNShape_taskWait1">
         <omgdc:Bounds height="80.0" width="100.0" x="165.0" y="360.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-286FD496-9559-4198-95A7-FE8CF8988F3D" id="BPMNShape_sid-286FD496-9559-4198-95A7-FE8CF8988F3D">
+      <bpmndi:BPMNShape bpmnElement="signalBoundary" id="BPMNShape_signalBoundary">
         <omgdc:Bounds height="30.0" width="30.0" x="198.84936991360112" y="425.2720530239607"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-D4820F7B-8B1A-419C-A0F7-402C22F1B83E" id="BPMNShape_sid-D4820F7B-8B1A-419C-A0F7-402C22F1B83E">
+      <bpmndi:BPMNShape bpmnElement="taskWait2" id="BPMNShape_taskWait2">
         <omgdc:Bounds height="80.0" width="100.0" x="387.0" y="470.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="sid-0F28900D-6739-4123-BD07-1BB9846F9E66" id="BPMNEdge_sid-0F28900D-6739-4123-BD07-1BB9846F9E66">
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="445.7009063444109" y="470.0"/>
         <omgdi:waypoint x="506.02426915314163" y="192.6800959765294"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-3886D73E-A74A-44C6-B25D-32644B0EC603" id="BPMNEdge_sid-3886D73E-A74A-44C6-B25D-32644B0EC603">
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
         <omgdi:waypoint x="228.16669059085973" y="444.7457906810595"/>
         <omgdi:waypoint x="387.0" y="494.3764844067341"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-2930FFA5-5225-46B6-A329-D43C7726A526" id="BPMNEdge_sid-2930FFA5-5225-46B6-A329-D43C7726A526">
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="120.0" y="165.0"/>
         <omgdi:waypoint x="215.0" y="165.0"/>
         <omgdi:waypoint x="215.0" y="360.0"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-FCC521C4-C069-495C-B7C1-76325A3CE604" id="BPMNEdge_sid-FCC521C4-C069-495C-B7C1-76325A3CE604">
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="265.0" y="362.4149659863946"/>
         <omgdi:waypoint x="497.8091420177199" y="187.41217555810852"/>
       </bpmndi:BPMNEdge>

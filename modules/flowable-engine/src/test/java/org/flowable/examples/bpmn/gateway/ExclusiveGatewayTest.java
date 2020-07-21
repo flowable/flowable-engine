@@ -12,6 +12,9 @@
  */
 package org.flowable.examples.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,29 +45,25 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         variables.put("input", 1);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Send e-mail for more information", task.getName());
+        assertThat(task.getName()).isEqualTo("Send e-mail for more information");
 
         // Test with input == 2
         variables.put("input", 2);
         pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Check account balance", task.getName());
+        assertThat(task.getName()).isEqualTo("Check account balance");
 
         // Test with input == 3
         variables.put("input", 3);
         pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Call customer", task.getName());
+        assertThat(task.getName()).isEqualTo("Call customer");
 
         // Test with input == 4
         variables.put("input", 4);
-        try {
-            runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
-            fail();
-        } catch (FlowableException e) {
-            // Exception is expected since no outgoing sequence flow matches
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("exclusiveGateway", variables))
+                .as("Exception is expected since no outgoing sequence flow matches")
+                .isInstanceOf(FlowableException.class);
     }
 
 }

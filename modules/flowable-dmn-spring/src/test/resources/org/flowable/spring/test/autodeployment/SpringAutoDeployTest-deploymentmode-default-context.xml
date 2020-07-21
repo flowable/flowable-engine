@@ -31,6 +31,6 @@
     </bean>
 
     <bean id="dmnRepositoryService" factory-bean="dmnEngine" factory-method="getDmnRepositoryService"/>
-    <bean id="dmnRuleService" factory-bean="dmnEngine" factory-method="getDmnRuleService"/>
+    <bean id="dmnRuleService" factory-bean="dmnEngine" factory-method="getDmnDecisionService"/>
 
 </beans>

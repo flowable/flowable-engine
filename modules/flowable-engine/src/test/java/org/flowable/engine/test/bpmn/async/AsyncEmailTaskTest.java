@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -34,12 +36,12 @@ public class AsyncEmailTaskTest extends EmailTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly").getId();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(0, messages.size());
+        assertThat(messages).isEmpty();
 
         waitForJobExecutorToProcessAllJobs(7000L, 25L);
 
         messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
@@ -52,12 +54,12 @@ public class AsyncEmailTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("simpleTextOnly");
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(0, messages.size());
+        assertThat(messages).isEmpty();
 
         waitForJobExecutorToProcessAllJobs(7000L, 25L);
 
         messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList(

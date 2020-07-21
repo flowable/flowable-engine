@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +39,7 @@ import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.delegate.ActivityWithMigrationContextBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -46,6 +47,7 @@ import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
 import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
@@ -53,12 +55,14 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
  */
-public class UserTaskActivityBehavior extends TaskActivityBehavior {
+public class UserTaskActivityBehavior extends TaskActivityBehavior implements ActivityWithMigrationContextBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -72,6 +76,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     @Override
     public void execute(DelegateExecution execution) {
+        execute(execution, null);
+    }
+    
+    @Override
+    public void execute(DelegateExecution execution, MigrationContext migrationContext) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
@@ -104,7 +113,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeTaskCategory = DynamicPropertyUtil.getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
             activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
             activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
-            activeTaskAssignee = DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
+            activeTaskAssignee = getAssigneeValue(userTask, migrationContext, taskElementProperties);
             activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
@@ -117,7 +126,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeTaskCategory = userTask.getCategory();
             activeTaskFormKey = userTask.getFormKey();
             activeTaskSkipExpression = userTask.getSkipExpression();
-            activeTaskAssignee = userTask.getAssignee();
+            activeTaskAssignee = getAssigneeValue(userTask, migrationContext, null);
             activeTaskOwner = userTask.getOwner();
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
@@ -320,18 +329,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(execution);
                 if (value != null) {
-                    List<IdentityLinkEntity> identityLinkEntities = null;
-                    if (value instanceof Collection) {
-                        identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
-                        
-                    } else {
-                        String strValue = value.toString();
-                        if (StringUtils.isNotEmpty(strValue)) {
-                            List<String> candidates = extractCandidates(strValue);
-                            identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
-                        }
-                    }
-                    
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
+
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -354,18 +354,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(execution);
                 if (value != null) {
-                    List<IdentityLinkEntity> identityLinkEntities = null;
-                    if (value instanceof Collection) {
-                        identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
 
-                    } else {
-                        String strValue = value.toString();
-                        if (StringUtils.isNotEmpty(strValue)) {
-                            List<String> candidates = extractCandidates(strValue);
-                            identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
-                        }
-                    }
-                    
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         allIdentityLinkEntities.addAll(identityLinkEntities);
@@ -389,23 +380,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 for (String userIdentityLink : userTask.getCustomUserIdentityLinks().get(customUserIdentityLinkType)) {
                     Expression idExpression = expressionManager.createExpression(userIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    
-                    if (value instanceof Collection) {
-                        Iterator userIdSet = ((Collection) value).iterator();
-                        while (userIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), userIdSet.next().toString(), null, customUserIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
-                        
-                    } else {
-                        List<String> userIds = extractCandidates(value.toString());
-                        for (String userId : userIds) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
+
+                    Collection<String> userIds = extractCandidates(value);
+                    for (String userId : userIds) {
+                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
+                        IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        customIdentityLinkEntities.add(identityLinkEntity);
                     }
                 }
             }
@@ -427,24 +407,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
                     Expression idExpression = expressionManager.createExpression(groupIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    
-                    if (value instanceof Collection) {
-                        Iterator groupIdSet = ((Collection) value).iterator();
-                        while (groupIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), null, groupIdSet.next().toString(), customGroupIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
-                        
-                    } else {
-                        List<String> groupIds = extractCandidates(value.toString());
-                        for (String groupId : groupIds) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), null, groupId, customGroupIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                            customIdentityLinkEntities.add(identityLinkEntity);
-                        }
+                    Collection<String> groupIds = extractCandidates(value);
+                    for (String groupId : groupIds) {
+                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                task.getId(), null, groupId, customGroupIdentityLinkType);
+                        IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        customIdentityLinkEntities.add(identityLinkEntity);
                     }
                 }
             }
@@ -460,13 +428,37 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     }
 
-    /**
-     * Extract a candidate list from a string.
-     *
-     * @param str
-     * @return
-     */
-    protected List<String> extractCandidates(String str) {
-        return Arrays.asList(str.split("[\\s]*,[\\s]*"));
+    protected Collection<String> extractCandidates(Object value) {
+        if (value instanceof Collection) {
+            return (Collection<String>) value;
+        } else if (value instanceof ArrayNode) {
+            ArrayNode valueArrayNode = (ArrayNode) value;
+            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
+            for (JsonNode node : valueArrayNode) {
+                candidates.add(node.asText());
+            }
+
+            return candidates;
+        } else if (value != null) {
+            String str = value.toString();
+            if (StringUtils.isNotEmpty(str)) {
+                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
+            }
+        }
+
+        return Collections.emptyList();
+
+    }
+    
+    protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getAssignee() != null) {
+            return migrationContext.getAssignee();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
+        
+        } else {
+            return userTask.getAssignee();
+        }
     }
 }

@@ -112,8 +112,8 @@ public abstract class AbstractProcessEngineIntegrationTest {
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
         long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
-        assertThat(count).as(createCaseInstanceEndedErrorMessage(caseInstance, count)).isEqualTo(0);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).as("Runtime case instance found").isEqualTo(0);
+        assertThat(count).as(createCaseInstanceEndedErrorMessage(caseInstance, count)).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).as("Runtime case instance found").isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
     }
 

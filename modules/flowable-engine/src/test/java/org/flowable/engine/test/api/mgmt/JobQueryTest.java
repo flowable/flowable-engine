@@ -185,6 +185,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 3);
     }
 
+    @Test
     public void testQueryByInvalidElementName() {
         TimerJobQuery query = managementService.createTimerJobQuery().elementName("unknown");
         verifyQueryResults(query, 0);
@@ -206,6 +207,26 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         Job handlerTypeJob = managementService.createJobQuery().handlerType("test").singleResult();
         assertThat(handlerTypeJob).isNotNull();
+    }
+
+    @Test
+    public void testQueryByCorrelationId() {
+        Job messageJob = managementService.createJobQuery().jobId(messageId).singleResult();
+        assertThat(messageJob).isNotNull();
+
+        Job job = managementService.createJobQuery().correlationId(messageJob.getCorrelationId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getId()).isEqualTo(messageId);
+        assertThat(job.getCorrelationId()).isEqualTo(messageJob.getCorrelationId());
+        assertThat(managementService.createJobQuery().correlationId(job.getCorrelationId()).list()).hasSize(1);
+        assertThat(managementService.createJobQuery().correlationId(job.getCorrelationId()).count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testByInvalidCorrelationId() {
+        assertThat(managementService.createJobQuery().correlationId("invalid").singleResult()).isNull();
+        assertThat(managementService.createJobQuery().correlationId("invalid").list()).isEmpty();
+        assertThat(managementService.createJobQuery().correlationId("invalid").count()).isZero();
     }
 
     @Test

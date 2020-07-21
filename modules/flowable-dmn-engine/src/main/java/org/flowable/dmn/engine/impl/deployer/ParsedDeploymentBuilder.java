@@ -22,7 +22,7 @@ import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.DeploymentSettings;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -43,23 +43,23 @@ public class ParsedDeploymentBuilder {
     }
 
     public ParsedDeployment build() {
-        List<DecisionTableEntity> decisionTables = new ArrayList<>();
-        Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<>();
-        Map<DecisionTableEntity, EngineResource> decisionTablesToResourceMap = new LinkedHashMap<>();
+        List<DecisionEntity> decisions = new ArrayList<>();
+        Map<DecisionEntity, DmnParse> decisionToDmnParseMap = new LinkedHashMap<>();
+        Map<DecisionEntity, EngineResource> decisionToResourceMap = new LinkedHashMap<>();
 
         for (EngineResource resource : deployment.getResources().values()) {
             if (DmnResourceUtil.isDmnResource(resource.getName())) {
                 LOGGER.debug("Processing DMN resource {}", resource.getName());
                 DmnParse parse = createDmnParseFromResource(resource);
-                for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
-                    decisionTables.add(decisionTable);
-                    decisionTablesToDmnParseMap.put(decisionTable, parse);
-                    decisionTablesToResourceMap.put(decisionTable, resource);
+                for (DecisionEntity decision : parse.getDecisions()) {
+                    decisions.add(decision);
+                    decisionToDmnParseMap.put(decision, parse);
+                    decisionToResourceMap.put(decision, resource);
                 }
             }
         }
 
-        return new ParsedDeployment(deployment, decisionTables, decisionTablesToDmnParseMap, decisionTablesToResourceMap);
+        return new ParsedDeployment(deployment, decisions, decisionToDmnParseMap, decisionToResourceMap);
     }
 
     protected DmnParse createDmnParseFromResource(EngineResource resource) {

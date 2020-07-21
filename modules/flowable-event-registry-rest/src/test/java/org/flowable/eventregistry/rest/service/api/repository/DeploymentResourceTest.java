@@ -12,6 +12,9 @@
  */
 package org.flowable.eventregistry.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -27,6 +30,8 @@ import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single Deployment resource.
@@ -50,32 +55,22 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
 
             String newDeploymentId = responseNode.get("id").textValue();
-            String name = responseNode.get("name").textValue();
-            String category = responseNode.get("category").textValue();
-            String deployTime = responseNode.get("deploymentTime").textValue();
-            String url = responseNode.get("url").textValue();
-            String tenantId = responseNode.get("tenantId").textValue();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "url: '" + SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, newDeploymentId) + "',"
+                            + "name: 'simpleEvent',"
+                            + "tenantId: \"\","
+                            + "category: null"
+                            + "}");
 
-            assertEquals("", tenantId);
-
-            assertNotNull(newDeploymentId);
-            assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(newDeploymentId).count());
-
-            assertNotNull(name);
-            assertEquals("simpleEvent", name);
-
-            assertNotNull(url);
-            assertTrue(url.endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, newDeploymentId)));
-
-            // No deployment-category should have been set
-            assertNull(category);
-            assertNotNull(deployTime);
+            assertThat(repositoryService.createDeploymentQuery().deploymentId(newDeploymentId).count()).isEqualTo(1L);
 
             // Check if process is actually deployed in the deployment
             List<String> resources = repositoryService.getDeploymentResourceNames(newDeploymentId);
-            assertEquals(1L, resources.size());
-            assertEquals("simpleEvent.event", resources.get(0));
-            assertEquals(1L, repositoryService.createEventDefinitionQuery().deploymentId(newDeploymentId).count());
+            assertThat(resources)
+                    .containsOnly("simpleEvent.event");
+            assertThat(repositoryService.createEventDefinitionQuery().deploymentId(newDeploymentId).count()).isEqualTo(1L);
 
         } finally {
             // Always cleanup any created deployments, even if the test failed
@@ -107,29 +102,18 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        
+
         closeResponse(response);
 
-        String deploymentId = responseNode.get("id").textValue();
-        String name = responseNode.get("name").textValue();
-        String category = responseNode.get("category").textValue();
-        String deployTime = responseNode.get("deploymentTime").textValue();
-        String url = responseNode.get("url").textValue();
-        String tenantId = responseNode.get("tenantId").textValue();
-
-        assertEquals("", tenantId);
-        assertNotNull(deploymentId);
-        assertEquals(existingDeployment.getId(), deploymentId);
-
-        assertNotNull(name);
-        assertEquals(existingDeployment.getName(), name);
-
-        assertEquals(existingDeployment.getCategory(), category);
-
-        assertNotNull(deployTime);
-
-        assertNotNull(url);
-        assertTrue(url.endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, deploymentId)));
+        String deploymentId = existingDeployment.getId();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "url: '" + SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                        + "name: '" + existingDeployment.getName() + "',"
+                        + "tenantId: \"\","
+                        + "category: " + existingDeployment.getCategory()
+                        + "}");
     }
 
     /**
@@ -155,7 +139,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         existingDeployment = repositoryService.createDeploymentQuery().deploymentId(existingDeployment.getId()).singleResult();
-        assertNull(existingDeployment);
+        assertThat(existingDeployment).isNull();
     }
 
     /**

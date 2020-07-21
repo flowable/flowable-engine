@@ -430,7 +430,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("User Task1 in Parent");
 
         // validate that the variable was copied back when Call Activity finished
-        assertThat("Mary Smith").isEqualTo(runtimeService.getVariable(processInstance.getId(), "Name"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Mary Smith");
 
         // complete user task so that parent process will terminate normally
         taskService.complete(task.getId());
@@ -693,7 +693,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         // Completing ends the process instance
         jobs.forEach(job -> managementService.executeJob(job.getId()));
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
     // Same as testCallActivityAsyncComplete, but now using the real job executor instead of fetching and executing jobs manually
@@ -702,11 +702,11 @@ public class CallActivityTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
     })
-    @DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testCallActivityAsyncCompleteRealExecutor() {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
     @Test

@@ -12,15 +12,19 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Yvo Swillens
@@ -30,22 +34,25 @@ public class DecisionTableResourceTest extends BaseSpringDmnRestTestCase {
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionTable() throws Exception {
 
-        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE, definition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(decisionTable.getId(), responseNode.get("id").textValue());
-        assertEquals(decisionTable.getKey(), responseNode.get("key").textValue());
-        assertEquals(decisionTable.getCategory(), responseNode.get("category").textValue());
-        assertEquals(decisionTable.getVersion(), responseNode.get("version").intValue());
-        assertEquals(decisionTable.getDescription(), responseNode.get("description").textValue());
-        assertEquals(decisionTable.getName(), responseNode.get("name").textValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(decisionTable.getDeploymentId(), responseNode.get("deploymentId").textValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + definition.getId() + "',"
+                        + "  url: '" + httpGet.getURI().toString() + "',"
+                        + "  category: " + definition.getCategory() + ","
+                        + "  name: '" + definition.getName() + "',"
+                        + "  key: '" + definition.getKey() + "',"
+                        + "  description: " + definition.getDescription() + ","
+                        + "  version: " + definition.getVersion() + ","
+                        + "  deploymentId: '" + definition.getDeploymentId() + "'"
+                        + "  }"
+                );
     }
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })

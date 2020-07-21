@@ -13,6 +13,8 @@
 
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.camel.util.FlagJavaDelegate;
@@ -46,7 +48,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
         FlagJavaDelegate.reset();
         runtimeService.startProcessInstanceByKey("mapExceptionProcess");
-        assertTrue(FlagJavaDelegate.isFlagSet());
+        assertThat(FlagJavaDelegate.isFlagSet()).isTrue();
     }
 
     @Test
@@ -61,7 +63,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
         });
         FlagJavaDelegate.reset();
         runtimeService.startProcessInstanceByKey("mapExceptionDefaultProcess");
-        assertTrue(FlagJavaDelegate.isFlagSet());
+        assertThat(FlagJavaDelegate.isFlagSet()).isTrue();
     }
 
     @Test
@@ -76,7 +78,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
         });
         FlagJavaDelegate.reset();
         runtimeService.startProcessInstanceByKey("mapExceptionParentProcess");
-        assertTrue(FlagJavaDelegate.isFlagSet());
+        assertThat(FlagJavaDelegate.isFlagSet()).isTrue();
     }
 
 }

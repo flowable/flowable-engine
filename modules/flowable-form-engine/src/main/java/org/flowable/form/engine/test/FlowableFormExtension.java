@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * You can declare a deployment with the {@link FormDeploymentAnnotation} annotation. This extension will make sure that this deployment gets deployed
- * before the setUp and {@link FormRepositoryService#deleteDeployment(String) deleted} after the tearDown.
+ * before the setUp and {@link FormRepositoryService#deleteDeployment(String, boolean)}  deleted} after the tearDown.
  * The id of the deployment can be accessed by using {@link FormDeploymentId} in a test method.
  * </p>
  *

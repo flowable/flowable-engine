@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -26,14 +28,13 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
 
     @Test
@@ -83,11 +84,11 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
             }
 
             boolean processInstanceEnded = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 0;
-            Assert.assertTrue(processInstanceEnded);
+            assertThat(processInstanceEnded).isTrue();
 
         }
 
-        Assert.assertTrue(optimisticLockingExceptionHappenedOnce);
+        assertThat(optimisticLockingExceptionHappenedOnce).isTrue();
 
     }
 

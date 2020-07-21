@@ -75,13 +75,15 @@ public class EndEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         EndEvent endEvent = (EndEvent) baseElement;
         addEventProperties(endEvent, propertiesNode);
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         EndEvent endEvent = new EndEvent();
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_EVENT_END_ERROR.equals(stencilId)) {

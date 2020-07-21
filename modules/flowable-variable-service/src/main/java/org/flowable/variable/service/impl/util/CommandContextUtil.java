@@ -20,9 +20,9 @@ import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 public class CommandContextUtil {
@@ -55,12 +55,15 @@ public class CommandContextUtil {
         return getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
     }
     
-    public static VariableByteArrayEntityManager getByteArrayEntityManager() {
+    public static ByteArrayEntityManager getByteArrayEntityManager() {
         return getByteArrayEntityManager(getCommandContext());
     }
     
-    public static VariableByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getByteArrayEntityManager();
+    public static ByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
+        if (commandContext != null) {
+            return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
+        }
+        return null;
     }
     
     public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {

@@ -25,6 +25,7 @@ import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
+import org.flowable.external.job.rest.service.api.ExternalJobRestUrls;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.rest.FormRestUrls;
 import org.flowable.idm.engine.IdmEngine;
@@ -51,16 +52,19 @@ import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.idm.IdmEngineRestConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.job.ExternalJobRestConfiguration;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.ProcessEngineRestConfiguration;
 import org.flowable.spring.boot.rest.BaseRestApiConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -99,6 +103,39 @@ public class RestApiAutoConfiguration {
         public ServletRegistrationBean processService(FlowableProcessProperties properties) {
             return registerServlet(properties.getServlet(), ProcessEngineRestConfiguration.class);
         }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(ExternalJobRestUrls.class)
+    @Conditional(ExternalJobRestApiConfiguration.ExternalJobRestCondition.class)
+    @EnableConfigurationProperties(FlowableProcessProperties.class)
+    public static class ExternalJobRestApiConfiguration extends BaseRestApiConfiguration {
+
+        @Bean
+        public ServletRegistrationBean externalJobRestService(FlowableProcessProperties properties) {
+            FlowableServlet servlet = new FlowableServlet("/external-job-api", "Flowable External Job Rest API");
+            FlowableServlet processServlet = properties.getServlet();
+            servlet.setLoadOnStartup(processServlet.getLoadOnStartup());
+            return registerServlet(servlet, ExternalJobRestConfiguration.class);
+        }
+
+        static final class ExternalJobRestCondition extends AnyNestedCondition {
+
+            ExternalJobRestCondition() {
+                super(ConfigurationPhase.REGISTER_BEAN);
+            }
+
+            @ConditionalOnBean(ProcessEngine.class)
+            private static final class ProcessEngineBeanCondition {
+
+            }
+
+            @ConditionalOnBean(CmmnEngine.class)
+            private static final class CmmnEngineBeanCondition {
+
+            }
+        }
+
     }
 
     @Bean

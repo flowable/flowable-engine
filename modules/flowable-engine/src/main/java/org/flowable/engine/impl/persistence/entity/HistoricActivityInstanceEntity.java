@@ -23,6 +23,8 @@ import org.flowable.engine.history.HistoricActivityInstance;
  */
 public interface HistoricActivityInstanceEntity extends HistoricActivityInstance, HistoricScopeInstanceEntity, HasRevision {
 
+    void setTransactionOrder(Integer transactionOrder);
+    
     void setActivityId(String activityId);
 
     void setActivityName(String activityName);

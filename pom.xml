@@ -14,9 +14,9 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.2.6.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.5.RELEASE</spring.framework.version>
-		<spring.security.version>5.2.2.RELEASE</spring.security.version>
+		<spring.boot.version>2.2.7.RELEASE</spring.boot.version>
+		<spring.framework.version>5.2.7.RELEASE</spring.framework.version>
+		<spring.security.version>5.2.5.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.5.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.3.7.RELEASE</spring.kafka.version>
 		<jackson.version>2.10.3</jackson.version>
@@ -28,7 +28,7 @@
 
 		<junit.version>4.13</junit.version>
 		<junit.jupiter.version>5.6.1</junit.jupiter.version>
-		<hikari.version>3.4.2</hikari.version>
+		<hikari.version>3.4.3</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
 		<mockito.version>3.3.3</mockito.version>
@@ -119,7 +119,7 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.6</version>
+				<version>2.7</version>
 			</dependency>
 			<dependency>
 			    <groupId>commons-codec</groupId>
@@ -441,6 +441,11 @@
                 <artifactId>flowable-cmmn-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-external-job-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-form-model</artifactId>
@@ -722,11 +727,6 @@
 				<artifactId>flowable-jmx</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-			    <groupId>org.flowable</groupId>
-			    <artifactId>flowable-ui-common</artifactId>
-			    <version>${project.version}</version>
-			</dependency>
             <dependency>
 			    <groupId>org.flowable</groupId>
 			    <artifactId>flowable-groovy-script-static-engine</artifactId>
@@ -772,7 +772,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.10</version>
+				<version>2.5.12</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -797,12 +797,12 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.4</version>
+				<version>3.5.5</version>
 			</dependency>
 			<dependency>
               <groupId>org.mybatis</groupId>
               <artifactId>mybatis-spring</artifactId>
-              <version>2.0.4</version>
+              <version>2.0.5</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -987,12 +987,12 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.10.5</version>
+				<version>2.10.6</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>28.2-jre</version>
+				<version>29.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -1059,7 +1059,7 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.15.0</version>
+				<version>3.16.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -1351,6 +1351,7 @@
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
                 <module>modules/flowable-cmmn-rest</module>
+				<module>modules/flowable-external-job-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
@@ -1387,12 +1388,7 @@
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-ui-edge</module>
-				<module>modules/flowable-ui-idm</module>
-				<module>modules/flowable-ui-modeler</module>
-				<module>modules/flowable-ui-task</module>
-				<module>modules/flowable-ui-admin</module>
+				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1490,6 +1486,7 @@
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
                 <module>modules/flowable-cmmn-rest</module>
+				<module>modules/flowable-external-job-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1498,7 +1495,7 @@
                 <module>modules/flowable-http</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-ui</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1620,6 +1617,7 @@
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
                 <module>modules/flowable-cmmn-rest</module>
+				<module>modules/flowable-external-job-rest</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>
 				<module>modules/flowable5-spring</module>
@@ -1640,8 +1638,7 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
-				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-ui-edge</module>
+				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1820,6 +1817,7 @@
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
                 <module>modules/flowable-cmmn-rest</module>
+				<module>modules/flowable-external-job-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>

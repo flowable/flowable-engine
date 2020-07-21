@@ -60,16 +60,16 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
 
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem1");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertThat(planItemDefinition).isInstanceOf(CaseTask.class);
-        CaseTask task1 = (CaseTask) planItemDefinition;
-        assertThat(task1.getCaseRefExpression()).isEqualTo("caseDefinitionKey");
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(CaseTask.class, task1 -> {
+                    assertThat(task1.getCaseRefExpression()).isEqualTo("caseDefinitionKey");
+                    assertThat(task1.getFallbackToDefaultTenant()).isTrue();
+                    assertThat(task1.isSameDeployment()).isTrue();
 
-        assertThat(task1.getFallbackToDefaultTenant()).isTrue();
-        assertThat(task1.isSameDeployment()).isTrue();
-
-        assertThat(task1.getInParameters())
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
-                .containsExactly(tuple("testSource", "testTarget"));
+                    assertThat(task1.getInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(tuple("testSource", "testTarget"));
+                });
     }
 
 }

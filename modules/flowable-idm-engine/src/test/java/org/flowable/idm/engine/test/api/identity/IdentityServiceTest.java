@@ -306,7 +306,7 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
     public void testFindUsersByGroupUnexistingGroup() {
         List<User> users = idmIdentityService.createUserQuery().memberOfGroup("unexistinggroup").list();
         assertThat(users).isNotNull();
-        assertThat(users.isEmpty()).isTrue();
+        assertThat(users).isEmpty();
     }
 
     @Test
@@ -327,13 +327,14 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.createMembership(johndoe.getId(), sales.getId());
 
         List<Group> groups = idmIdentityService.createGroupQuery().groupMember(johndoe.getId()).list();
-        assertThat(groups).hasSize(1);
-        assertThat(groups.get(0).getId()).isEqualTo("sales");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("sales");
 
         // Delete the membership and check members of sales group
         idmIdentityService.deleteMembership(johndoe.getId(), sales.getId());
         groups = idmIdentityService.createGroupQuery().groupMember(johndoe.getId()).list();
-        assertThat(groups.isEmpty()).isTrue();
+        assertThat(groups).isEmpty();
 
         idmIdentityService.deleteGroup("sales");
         idmIdentityService.deleteUser("johndoe");

@@ -50,7 +50,6 @@ public class HttpTaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planItem.getId()).isEqualTo("planItem1");
         assertThat(planItem.getName()).isEqualTo("HttpTaskName");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask serviceTask = (ServiceTask) planItemDefinition;
         assertThat(serviceTask.getType()).isEqualTo("http");

@@ -109,7 +109,7 @@ public class ClearProcessInstanceLocksTest extends PluggableFlowableTestCase {
         }
 
         // Clearing the locks should now remove the lock owner and lock time from all process instances
-        processEngineConfiguration.getCommandExecutor().execute(new ClearProcessInstanceLockTimesCmd());
+        processEngineConfiguration.getCommandExecutor().execute(new ClearProcessInstanceLockTimesCmd(processEngineConfiguration.getAsyncExecutor().getLockOwner()));
 
         for (Execution execution : runtimeService.createExecutionQuery().list()) {
             assertThat(((ExecutionEntity) execution).getLockTime()).isNull();

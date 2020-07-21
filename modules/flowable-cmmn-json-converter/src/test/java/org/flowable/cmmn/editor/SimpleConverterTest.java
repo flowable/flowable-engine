@@ -57,7 +57,6 @@ public class SimpleConverterTest extends AbstractConverterTest {
         assertThat(planItem.getId()).isEqualTo("planItem1");
         assertThat(planItem.getName()).isEqualTo("Task B");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertThat(planItemDefinition).isNotNull();
         assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) planItemDefinition;
         assertThat(humanTask.getId()).isEqualTo("task1");

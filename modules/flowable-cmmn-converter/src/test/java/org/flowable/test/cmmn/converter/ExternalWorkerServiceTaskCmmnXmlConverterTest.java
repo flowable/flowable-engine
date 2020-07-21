@@ -13,11 +13,13 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -72,6 +74,14 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConve
         assertThat(taskA.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
         assertThat(taskA.getName()).isEqualTo("A");
         assertThat(taskA.getTopic()).isEqualTo("simple");
+        assertThat(taskA.isAsync()).isFalse();
+        assertThat(taskA.isExclusive()).isFalse();
+        assertThat(taskA.getExtensionElements()).containsOnlyKeys("customValue");
+        assertThat(taskA.getExtensionElements().get("customValue"))
+                .extracting(ExtensionElement::getNamespacePrefix, ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsOnly(
+                        tuple("flowable", "customValue", "test")
+                );
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
@@ -81,6 +91,9 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConve
         assertThat(taskB.getType()).isEqualTo(ExternalWorkerServiceTask.TYPE);
         assertThat(taskB.getName()).isEqualTo("B");
         assertThat(taskB.getTopic()).isNull();
+        assertThat(taskB.isAsync()).isFalse();
+        assertThat(taskB.isExclusive()).isTrue();
+        assertThat(taskB.getExtensionElements()).isEmpty();
     }
 
 }

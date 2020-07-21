@@ -13,8 +13,7 @@
 
 package org.flowable.engine.test.el;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,7 +36,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
     public void testExpressionEvaluationWithoutProcessContext() {
         Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{1 == 1}");
         Object value = expression.getValue(new NoExecutionVariableScope());
-        assertThat(value, Is.<Object>is(true));
+        assertThat(value).isEqualTo(true);
     }
 
     @Test
@@ -52,7 +50,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         Object value = managementService.executeCommand(commandContext ->
             expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
 
-        assertThat(value, Is.is(Integer.MIN_VALUE));
+        assertThat(value).isEqualTo(Integer.MIN_VALUE);
     }
 
     @Test
@@ -66,7 +64,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         Object value = managementService.executeCommand(commandContext ->
             expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
 
-        assertThat(value, Is.is((int) Short.MIN_VALUE));
+        assertThat(value).isEqualTo((int) Short.MIN_VALUE);
     }
 
     @Test
@@ -80,7 +78,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         Object value = managementService.executeCommand(commandContext ->
             expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
 
-        assertThat(value, Is.is(-1.5d));
+        assertThat(value).isEqualTo(-1.5d);
     }
 
     @Test
@@ -94,22 +92,19 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         Object value = managementService.executeCommand(commandContext ->
             expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
 
-        assertThat(value, Is.is(nullValue()));
+        assertThat(value).isNull();
     }
 
     @Test
     @Deployment
     public void testMethodExpressions() {
-        // Process contains 2 service tasks. one containing a method with no
-        // params, the other
-        // contains a method with 2 params. When the process completes without
-        // exception,
-        // test passed.
+        // Process contains 2 service tasks. One containing a method with no params, the other
+        // contains a method with 2 params. When the process completes without exception, test passed.
         Map<String, Object> vars = new HashMap<>();
         vars.put("aString", "abcdefgh");
         runtimeService.startProcessInstanceByKey("methodExpressionProcess", vars);
 
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count()).isZero();
     }
 
     @Test
@@ -122,8 +117,8 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
         // Check of the testMethod has been called with the current execution
         String value = (String) runtimeService.getVariable(processInstance.getId(), "testVar");
-        assertNotNull(value);
-        assertEquals("myValue", value);
+        assertThat(value).isNotNull();
+        assertThat(value).isEqualTo("myValue");
     }
 
     @Test
@@ -137,8 +132,8 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
             // Check if the variable that has been set in service-task is the
             // authenticated user
             String value = (String) runtimeService.getVariable(processInstance.getId(), "theUser");
-            assertNotNull(value);
-            assertEquals("frederik", value);
+            assertThat(value).isNotNull();
+            assertThat(value).isEqualTo("frederik");
         } finally {
             // Cleanup
             Authentication.setAuthenticatedUserId(null);

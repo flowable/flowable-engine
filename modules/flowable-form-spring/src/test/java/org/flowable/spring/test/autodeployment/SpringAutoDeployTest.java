@@ -309,7 +309,7 @@ public class SpringAutoDeployTest {
     private void removeAllDeployments() {
         if (repositoryService != null) {
             for (FormDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-                repositoryService.deleteDeployment(deployment.getId());
+                repositoryService.deleteDeployment(deployment.getId(), true);
             }
         }
     }

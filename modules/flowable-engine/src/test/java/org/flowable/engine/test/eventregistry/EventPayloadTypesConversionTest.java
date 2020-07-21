@@ -190,7 +190,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -220,7 +220,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -253,7 +253,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertThat(outboundXmlEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundXmlEventChannelAdapter.receivedEvents).isEmpty();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundXmlEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -273,7 +273,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertThat(outboundXmlEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundXmlEventChannelAdapter.receivedEvents).isEmpty();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundXmlEventChannelAdapter.receivedEvents).hasSize(1);
 

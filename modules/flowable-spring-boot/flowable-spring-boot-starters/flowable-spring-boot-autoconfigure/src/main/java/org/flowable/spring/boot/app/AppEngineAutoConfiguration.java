@@ -29,6 +29,7 @@ import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
+import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -49,19 +50,22 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableAppProperties.class,
-    FlowableIdmProperties.class
+    FlowableIdmProperties.class,
+    FlowableEventRegistryProperties.class,
 })
 public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public AppEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableAppProperties appProperties,
-        FlowableIdmProperties idmProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+        FlowableIdmProperties idmProperties, FlowableEventRegistryProperties eventProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         super(flowableProperties);
         this.appProperties = appProperties;
         this.idmProperties = idmProperties;
+        this.eventProperties = eventProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
@@ -86,6 +90,9 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configureEngine(conf, dataSource);
 
         conf.setIdGenerator(new StrongUuidGenerator());
+
+        conf.setDisableIdmEngine(!idmProperties.isEnabled());
+        conf.setDisableEventRegistry(!eventProperties.isEnabled());
 
         // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
         List<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = appAutoDeploymentStrategies.getIfAvailable();

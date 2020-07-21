@@ -12,22 +12,15 @@
  */
 package org.flowable.engine.impl.test;
 
-import static org.flowable.engine.impl.test.TestHelper.EMPTY_LINE;
-
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -173,49 +166,23 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb(ProcessEngine processEngine, ExtensionContext context, EnsureCleanDb ensureCleanDb) {
-        logger.debug("verifying that db is clean after test");
-        Set<String> tableNamesExcludedFromDbCleanCheck = new HashSet<>(Arrays.asList(ensureCleanDb.excludeTables()));
-        ManagementService managementService = processEngine.getManagementService();
-        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
-        Map<String, Long> tableCounts = managementService.getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!tableNamesExcludedFromDbCleanCheck.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
-                }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            logger.error(EMPTY_LINE);
-            logger.error(outputMessage.toString());
-
-            logger.info("dropping and recreating db");
-
-            if (ensureCleanDb.dropDb()) {
-                CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-                CommandConfig config = new CommandConfig().transactionNotSupported();
-                commandExecutor.execute(config, new Command<Object>() {
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                context.getDisplayName(),
+                logger,
+                processEngine.getProcessEngineConfiguration(),
+                ensureCleanDb,
+                !context.getExecutionException().isPresent(),
+                new Command<Void>() {
 
                     @Override
-                    public Object execute(CommandContext commandContext) {
+                    public Void execute(CommandContext commandContext) {
                         SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
                         schemaManager.schemaDrop();
                         schemaManager.schemaCreate();
                         return null;
                     }
-                });
-            }
-
-            if (!context.getExecutionException().isPresent()) {
-                throw new AssertionError(outputMessage.toString());
-            }
-        } else {
-            logger.info("database was clean");
-        }
+                }
+        );
     }
 
     protected void removeDeployments(RepositoryService repositoryService) {

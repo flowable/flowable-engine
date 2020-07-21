@@ -177,7 +177,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance.getId()).singleResult();
         assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         assertThat(stagePlanItemInstance.isCompletable()).isTrue();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Making the other task active, should disable the completeable flag again
         cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("nonRequired", true));
@@ -203,7 +203,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
 
         assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance1.getId()))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+                .hasMessage("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
 
         // Completing the one task should mark the stage as completeable 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -214,7 +214,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertThat(stagePlanItemInstance2.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         assertThat(stagePlanItemInstance2.isCompletable()).isTrue();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompletable().singleResult()).isNotNull();
         cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance2.getId());
@@ -317,7 +317,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
 
         // D is required. But B is still active
         cmmnTaskService.complete(tasks.get(1).getId());
-        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
         cmmnTaskService.complete(tasks.get(0).getId());
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 

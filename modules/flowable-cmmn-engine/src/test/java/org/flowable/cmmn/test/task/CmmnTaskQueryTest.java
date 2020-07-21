@@ -122,7 +122,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").list()).hasSize(NR_CASE_INSTANCES);
         
         List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").list();
-        assertThat(caseInstances.size()).isEqualTo(5);
+        assertThat(caseInstances).hasSize(5);
         
         String caseInstanceId = caseInstances.get(0).getId();
         

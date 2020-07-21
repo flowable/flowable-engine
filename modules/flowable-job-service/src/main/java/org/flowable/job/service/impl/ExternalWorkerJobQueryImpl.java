@@ -14,6 +14,7 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -22,9 +23,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
-import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
-import org.flowable.job.api.Job;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
@@ -46,6 +46,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
     protected Date duedateHigherThan;
     protected Date duedateLowerThan;
     protected Date duedateHigherThanOrEqual;
@@ -55,6 +56,8 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected String authorizedUser;
+    protected Collection<String> authorizedGroups;
 
     protected String lockOwner;
     protected boolean onlyLocked;
@@ -201,6 +204,15 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
+    public ExternalWorkerJobQuery correlationId(String correlationId) {
+        if (correlationId == null) {
+            throw new FlowableIllegalArgumentException("Provided correlationId is null");
+        }
+        this.correlationId = correlationId;
+        return this;
+    }
+
+    @Override
     public ExternalWorkerJobQuery executionId(String executionId) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
@@ -272,6 +284,18 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     @Override
     public ExternalWorkerJobQuery jobWithoutTenantId() {
         this.withoutTenantId = true;
+        return this;
+    }
+
+    @Override
+    public ExternalWorkerJobQuery forUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("at least one of userId or groups must be provided");
+        }
+
+        this.authorizedUser = userId;
+        this.authorizedGroups = groups;
+
         return this;
     }
 
@@ -375,6 +399,14 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
         return withoutTenantId;
     }
 
+    public String getAuthorizedUser() {
+        return authorizedUser;
+    }
+
+    public Collection<String> getAuthorizedGroups() {
+        return authorizedGroups;
+    }
+
     public String getId() {
         return id;
     }
@@ -413,6 +445,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
     }
 
     public Date getDuedateHigherThan() {

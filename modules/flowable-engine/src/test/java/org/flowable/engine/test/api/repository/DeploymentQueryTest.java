@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -53,108 +57,93 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQueryNoCriteria() {
         DeploymentQuery query = repositoryService.createDeploymentQuery();
-        assertEquals(2, query.list().size());
-        assertEquals(2, query.count());
+        assertThat(query.list()).hasSize(2);
+        assertThat(query.count()).isEqualTo(2);
 
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
     public void testQueryByDeploymentId() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentOneId);
-        assertNotNull(query.singleResult());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        assertThat(query.singleResult()).isNotNull();
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentId() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId("invalid");
-        assertNull(query.singleResult());
-        assertEquals(0, query.list().size());
-        assertEquals(0, query.count());
+        assertThat(query.singleResult()).isNull();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
 
-        try {
-            repositoryService.createDeploymentQuery().deploymentId(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentId(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByName() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/flowable/engine/test/repository/two.bpmn20.xml");
-        assertNotNull(query.singleResult());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        assertThat(query.singleResult()).isNotNull();
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidName() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("invalid");
-        assertNull(query.singleResult());
-        assertEquals(0, query.list().size());
-        assertEquals(0, query.count());
+        assertThat(query.singleResult()).isNull();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
 
-        try {
-            repositoryService.createDeploymentQuery().deploymentName(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentName(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByNameLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%flowable%");
-        assertEquals(2, query.list().size());
-        assertEquals(2, query.count());
+        assertThat(query.list()).hasSize(2);
+        assertThat(query.count()).isEqualTo(2);
 
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
     public void testQueryByInvalidNameLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("invalid");
-        assertNull(query.singleResult());
-        assertEquals(0, query.list().size());
-        assertEquals(0, query.count());
+        assertThat(query.singleResult()).isNull();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
 
-        try {
-            repositoryService.createDeploymentQuery().deploymentNameLike(null);
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentNameLike(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByNameAndCategory() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentCategory("testCategory").deploymentNameLike("%flowable%");
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
-        assertNotNull(query.singleResult());
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult()).isNotNull();
     }
 
     @Test
     public void testQueryByProcessDefinitionKey() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKey("one");
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
-        assertNotNull(query.singleResult());
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult()).isNotNull();
     }
 
     @Test
     public void testQueryByProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%o%");
-        assertEquals(2, query.list().size());
-        assertEquals(2, query.count());
+        assertThat(query.list()).hasSize(2);
+        assertThat(query.count()).isEqualTo(2);
     }
     
     @Test
@@ -165,8 +154,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
                 .deploy().getId();
 
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentId).processDefinitionKeyLike("%o%");
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
         
         repositoryService.deleteDeployment(deploymentId, true);
     }
@@ -174,47 +163,47 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQueryByInvalidProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("invalid");
-        assertEquals(0, query.list().size());
-        assertEquals(0, query.count());
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
     }
 
     @Test
     public void testVerifyDeploymentProperties() {
         List<Deployment> deployments = repositoryService.createDeploymentQuery().orderByDeploymentName().asc().list();
-
-        Deployment deploymentOne = deployments.get(0);
-        assertEquals("org/flowable/engine/test/repository/one.bpmn20.xml", deploymentOne.getName());
-        assertEquals(deploymentOneId, deploymentOne.getId());
-
-        Deployment deploymentTwo = deployments.get(1);
-        assertEquals("org/flowable/engine/test/repository/two.bpmn20.xml", deploymentTwo.getName());
-        assertEquals(deploymentTwoId, deploymentTwo.getId());
+        assertThat(deployments)
+                .extracting(Deployment::getName, Deployment::getId)
+                .containsExactly(
+                        tuple("org/flowable/engine/test/repository/one.bpmn20.xml", deploymentOneId),
+                        tuple("org/flowable/engine/test/repository/two.bpmn20.xml", deploymentTwoId)
+                );
 
         deployments = repositoryService.createDeploymentQuery().deploymentNameLike("%one%").orderByDeploymentName().asc().list();
+        assertThat(deployments)
+                .extracting(Deployment::getName, Deployment::getId)
+                .containsExactly(
+                        tuple("org/flowable/engine/test/repository/one.bpmn20.xml", deploymentOneId)
+                );
 
-        assertEquals("org/flowable/engine/test/repository/one.bpmn20.xml", deployments.get(0).getName());
-        assertEquals(1, deployments.size());
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentId().asc().list()).hasSize(2);
 
-        assertEquals(2, repositoryService.createDeploymentQuery().orderByDeploymentId().asc().list().size());
-
-        assertEquals(2, repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list().size());
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list()).hasSize(2);
 
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(Deployment.class, false));
-        assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(DeploymentEntity.class, false));
+        assertThat(managementService.getTableName(Deployment.class, false)).isEqualTo("ACT_RE_DEPLOYMENT");
+        assertThat(managementService.getTableName(DeploymentEntity.class, false)).isEqualTo("ACT_RE_DEPLOYMENT");
         String tableName = managementService.getTableName(Deployment.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 
-        assertEquals(2, repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).list().size());
+        assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).list()).hasSize(2);
 
-        assertEquals(1, repositoryService.createNativeDeploymentQuery().sql(baseQuerySql + " where NAME_ = #{name}").parameter("name", "org/flowable/engine/test/repository/one.bpmn20.xml").list().size());
+        assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql + " where NAME_ = #{name}").parameter("name", "org/flowable/engine/test/repository/one.bpmn20.xml").list()).hasSize(1);
 
         // paging
-        assertEquals(2, repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(1, repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(1, 3).size());
+        assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
+        assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(1);
     }
 
 }

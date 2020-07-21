@@ -32,7 +32,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -42,10 +41,11 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -588,12 +588,12 @@ public class CommandContextUtil {
         return (DmnEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
     }
 
-    public static DmnRuleService getDmnRuleService(CommandContext commandContext) {
+    public static DmnDecisionService getDmnRuleService(CommandContext commandContext) {
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(commandContext);
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("Dmn engine is not configured");
         }
-        return dmnEngineConfiguration.getDmnRuleService();
+        return dmnEngineConfiguration.getDmnDecisionService();
     }
 
     public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {

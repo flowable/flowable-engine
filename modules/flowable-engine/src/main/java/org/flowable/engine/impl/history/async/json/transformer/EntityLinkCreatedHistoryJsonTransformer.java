@@ -47,8 +47,10 @@ public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJson
         historicEntityLinkEntity.setLinkType(getStringFromJson(historicalData, HistoryJsonConstants.ENTITY_LINK_TYPE));
         historicEntityLinkEntity.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
         historicEntityLinkEntity.setScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_ID));
+        historicEntityLinkEntity.setSubScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
         historicEntityLinkEntity.setScopeType(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_TYPE));
         historicEntityLinkEntity.setScopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_DEFINITION_ID));
+        historicEntityLinkEntity.setParentElementId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_ELEMENT_ID));
         historicEntityLinkEntity.setReferenceScopeId(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_ID));
         historicEntityLinkEntity.setReferenceScopeType(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_TYPE));
         historicEntityLinkEntity.setReferenceScopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID));

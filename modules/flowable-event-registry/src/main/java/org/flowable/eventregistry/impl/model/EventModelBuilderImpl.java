@@ -30,6 +30,7 @@ import org.flowable.eventregistry.model.EventPayload;
 public class EventModelBuilderImpl implements EventModelBuilder {
 
     protected EventRepositoryServiceImpl eventRepository;
+    protected EventJsonConverter eventJsonConverter;
     
     protected String deploymentName;
     protected String resourceName;
@@ -40,8 +41,9 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     protected String key;
     protected Map<String, EventPayload> eventPayloadDefinitions = new LinkedHashMap<>();
 
-    public EventModelBuilderImpl(EventRepositoryServiceImpl eventRepository) {
+    public EventModelBuilderImpl(EventRepositoryServiceImpl eventRepository, EventJsonConverter eventJsonConverter) {
         this.eventRepository = eventRepository;
+        this.eventJsonConverter = eventJsonConverter;
     }
 
     @Override
@@ -107,7 +109,7 @@ public class EventModelBuilderImpl implements EventModelBuilder {
 
         return eventRepository.createDeployment()
             .name(deploymentName)
-            .addEventDefinition(resourceName, new EventJsonConverter().convertToJson(eventModel))
+            .addEventDefinition(resourceName, eventJsonConverter.convertToJson(eventModel))
             .category(category)
             .parentDeploymentId(parentDeploymentId)
             .tenantId(deploymentTenantId)

@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.test.bpmn.dynamic;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 
@@ -48,8 +47,8 @@ public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implem
         long hrTaskCount = taskService.createTaskQuery().taskCandidateGroup("HR").count();
         long salesTaskCount = taskService.createTaskQuery().taskCandidateGroup("SALES").count();
 
-        assertThat(hrTaskCount, is(1L));
-        assertThat(salesTaskCount, is(1L));
+        assertThat(hrTaskCount).isEqualTo(1);
+        assertThat(salesTaskCount).isEqualTo(1);
     }
 
     @Test
@@ -72,7 +71,7 @@ public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implem
         long hrTaskCount = taskService.createTaskQuery().taskCandidateGroup("HR").count();
         long salesTaskCount = taskService.createTaskQuery().taskCandidateGroup("SALES").count();
 
-        assertThat(hrTaskCount, is(0L));
-        assertThat(salesTaskCount, is(0L));
+        assertThat(hrTaskCount).isZero();
+        assertThat(salesTaskCount).isZero();
     }
 }

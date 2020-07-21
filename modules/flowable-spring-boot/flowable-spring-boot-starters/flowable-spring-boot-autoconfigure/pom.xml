@@ -146,6 +146,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-external-job-rest</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-form-rest</artifactId>
             <optional>true</optional>
             <exclusions>

@@ -23,19 +23,19 @@ import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
@@ -48,7 +48,7 @@ import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -411,11 +411,11 @@ public class CommandContextUtil {
         return dmnRepositoryService;
     }
 
-    public static DmnRuleService getDmnRuleService() {
-        DmnRuleService dmnRuleService = null;
+    public static DmnDecisionService getDmnRuleService() {
+        DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
         if (dmnEngineConfiguration != null) {
-            dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+            dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         }
 
         return dmnRuleService;

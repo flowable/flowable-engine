@@ -28,6 +28,7 @@
             </list>
         </property>
 
-        <property name="enableEventRegistryChangeDetection" value="true" />
+        <property name="enableEventRegistryChangeDetection" value="false" />
+        <property name="enableEventRegistryChangeDetectionAfterEngineCreate" value="false" />
     </bean>
 </beans>

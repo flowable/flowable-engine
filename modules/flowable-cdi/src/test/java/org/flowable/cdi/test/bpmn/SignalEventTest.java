@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.bpmn;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 
@@ -76,11 +76,11 @@ public class SignalEventTest extends CdiFlowableTestCase {
         variables2.put("signalProcessInstanceId", piCatchSignal.getProcessInstanceId());
         ProcessInstance piThrowSignal = runtimeService.startProcessInstanceByKey("throwSignal", variables2);
 
-        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piCatchSignal.getProcessInstanceId()).activityId("receiveTask").count());
-        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piThrowSignal.getProcessInstanceId()).activityId("receiveTask").count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(piCatchSignal.getProcessInstanceId()).activityId("receiveTask").count()).isEqualTo(1);
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(piThrowSignal.getProcessInstanceId()).activityId("receiveTask").count()).isEqualTo(1);
 
-        assertEquals("catchSignal-visited (was catchSignal)", runtimeService.getVariable(piCatchSignal.getId(), "processName"));
-        assertEquals("throwSignal-visited (was throwSignal)", runtimeService.getVariable(piThrowSignal.getId(), "processName"));
+        assertThat(runtimeService.getVariable(piCatchSignal.getId(), "processName")).isEqualTo("catchSignal-visited (was catchSignal)");
+        assertThat(runtimeService.getVariable(piThrowSignal.getId(), "processName")).isEqualTo("throwSignal-visited (was throwSignal)");
 
     }
 

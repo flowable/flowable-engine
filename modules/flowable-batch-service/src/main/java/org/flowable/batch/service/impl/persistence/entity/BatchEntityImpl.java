@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+
 public class BatchEntityImpl extends AbstractBatchServiceEntity implements BatchEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +32,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
     protected String batchSearchKey;
     protected String batchSearchKey2;
     protected String status;
-    protected BatchByteArrayRef batchDocRefId;
+    protected ByteArrayRef batchDocRefId;
     protected String tenantId;
 
     @Override
@@ -110,11 +112,11 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
     }
 
     @Override
-    public BatchByteArrayRef getBatchDocRefId() {
+    public ByteArrayRef getBatchDocRefId() {
         return batchDocRefId;
     }
 
-    public void setBatchDocRefId(BatchByteArrayRef batchDocRefId) {
+    public void setBatchDocRefId(ByteArrayRef batchDocRefId) {
         this.batchDocRefId = batchDocRefId;
     }
 
@@ -144,9 +146,9 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         this.tenantId = tenantId;
     }
 
-    private static BatchByteArrayRef setByteArrayRef(BatchByteArrayRef byteArrayRef, String name, String value) {
+    private static ByteArrayRef setByteArrayRef(ByteArrayRef byteArrayRef, String name, String value) {
         if (byteArrayRef == null) {
-            byteArrayRef = new BatchByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
         byte[] bytes = null;
         if (value != null) {

@@ -13,15 +13,17 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 
 /**
  * Base class for all {@link FlowableEvent} implementations.
  * 
  * @author Frederik Heremans
  */
-public class ActivitiEventImpl implements FlowableEvent {
+public class ActivitiEventImpl implements FlowableEngineEvent {
 
     protected FlowableEngineEventType type;
     protected String executionId;
@@ -80,5 +82,25 @@ public class ActivitiEventImpl implements FlowableEvent {
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return ScopeTypes.BPMN;
+    }
+
+    @Override
+    public String getScopeId() {
+        return processInstanceId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return executionId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return processDefinitionId;
     }
 }

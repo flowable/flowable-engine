@@ -12,9 +12,16 @@
  */
 package org.flowable.engine.impl.webservice;
 
+import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.endpoint.Server;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableExtension;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,10 +44,19 @@ public abstract class AbstractWebServiceTaskTest extends AbstractFlowableTestCas
 
     protected Server server;
 
+    protected ConcurrentMap<QName, URL> originalOverriddenEndpointAddresses;
+
     @BeforeEach
     protected void setUp(WebServiceMock webServiceMock, Server server) {
         this.webServiceMock = webServiceMock;
         this.server = server;
+
+        originalOverriddenEndpointAddresses = new ConcurrentHashMap<>(processEngineConfiguration.getWsOverridenEndpointAddresses());
     }
 
+    @AfterEach
+    void tearDown() {
+        processEngineConfiguration.getWsOverridenEndpointAddresses().clear();
+        processEngineConfiguration.setWsOverridenEndpointAddresses(originalOverriddenEndpointAddresses);
+    }
 }

@@ -7,12 +7,15 @@
    <!-- INSERT HISTORIC ENTITY LINK -->
   
   <insert id="insertHistoricEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
+    	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_)
     values (#{id, jdbcType=VARCHAR},
             #{linkType, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{parentElementId, jdbcType=VARCHAR},
             #{referenceScopeId, jdbcType=VARCHAR},
             #{referenceScopeType, jdbcType=VARCHAR},
             #{referenceScopeDefinitionId, jdbcType=VARCHAR},
@@ -23,14 +26,17 @@
   </insert>
   
   <insert id="bulkInsertHistoricEntityLink" parameterType="java.util.List">
-    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_)
+    insert into ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
+    	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_)
     values 
       <foreach collection="list" item="historicEntityLink" index="index" separator=",">
         (#{historicEntityLink.id, jdbcType=VARCHAR},
          #{historicEntityLink.linkType, jdbcType=VARCHAR},
          #{historicEntityLink.scopeId, jdbcType=VARCHAR},
+         #{historicEntityLink.subScopeId, jdbcType=VARCHAR},
          #{historicEntityLink.scopeType, jdbcType=VARCHAR},
          #{historicEntityLink.scopeDefinitionId, jdbcType=VARCHAR},
+         #{historicEntityLink.parentElementId, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
          #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
@@ -44,12 +50,15 @@
   <insert id="bulkInsertHistoricEntityLink" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="historicEntityLink" index="index">
-        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_) VALUES
+        INTO ${prefix}ACT_HI_ENTITYLINK (ID_, LINK_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
+        	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, CREATE_TIME_, HIERARCHY_TYPE_) VALUES
           (#{historicEntityLink.id, jdbcType=VARCHAR},
            #{historicEntityLink.linkType, jdbcType=VARCHAR},
            #{historicEntityLink.scopeId, jdbcType=VARCHAR},
+           #{historicEntityLink.subScopeId, jdbcType=VARCHAR},
            #{historicEntityLink.scopeType, jdbcType=VARCHAR},
            #{historicEntityLink.scopeDefinitionId, jdbcType=VARCHAR},
+           #{historicEntityLink.parentElementId, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeId, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeType, jdbcType=VARCHAR},
            #{historicEntityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
@@ -96,8 +105,10 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="linkType" column="LINK_TYPE_" jdbcType="VARCHAR" />
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="parentElementId" column="PARENT_ELEMENT_ID_" jdbcType="VARCHAR"/>
     <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -62,7 +63,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").singleResult().getId())
                 .isEqualTo(caseInstance.getId());
@@ -73,7 +74,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("Undefined")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionKey("oneTaskCase")
@@ -107,8 +108,8 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .name("nameTask3")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("taskName%").count()).isEqualTo(2L);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("%TASK3").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("taskName%").count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("%TASK3").count()).isEqualTo(1);
     }
 
     public void getCaseInstanceByCaseDefinitionKeyIncludingVariables() {
@@ -116,7 +117,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().singleResult().getId())
@@ -128,7 +129,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("Undefined")
                 .endOr()
                 .includeCaseVariables().count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionKey("oneTaskCase")
@@ -151,7 +152,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKeys(Collections.singleton("oneTaskCase")).count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKeys(Collections.singleton("oneTaskCase")).count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKeys(Collections.singleton("oneTaskCase")).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKeys(Collections.singleton("oneTaskCase")).singleResult().getId())
@@ -163,7 +164,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKeys(Collections.singleton("oneTaskCase"))
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceId("undefined")
@@ -186,7 +187,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionCategory("http://flowable.org/cmmn").count()).isEqualTo(2L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionCategory("http://flowable.org/cmmn").count()).isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionCategory("http://flowable.org/cmmn").list()).hasSize(2);
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
@@ -195,7 +196,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefined")
                 .endOr()
                 .count())
-                .isEqualTo(2L);
+                .isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionCategory("http://flowable.org/cmmn")
@@ -211,7 +212,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionName("oneTaskCaseName").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionName("oneTaskCaseName").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionName("oneTaskCaseName").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionName("oneTaskCaseName").singleResult().getId())
@@ -223,7 +224,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefined")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionName("oneTaskCaseName")
@@ -246,7 +247,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getId())
@@ -258,7 +259,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionId(caseInstance.getCaseDefinitionId())
@@ -280,7 +281,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionVersion(1).count()).isEqualTo(2L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionVersion(1).count()).isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionVersion(1).list()).hasSize(2);
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
@@ -289,7 +290,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(2L);
+                .isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionVersion(1)
@@ -305,7 +306,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId())
@@ -317,7 +318,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceId(caseInstance.getId())
@@ -341,7 +342,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .businessKey("businessKey")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessKey("businessKey").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessKey("businessKey").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessKey("businessKey").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessKey("businessKey").singleResult().getId())
@@ -353,7 +354,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceBusinessKey("businessKey")
@@ -379,7 +380,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         Calendar todayCal = new GregorianCalendar();
         Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(dateCal.getTime()).count()).isEqualTo(2L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(dateCal.getTime()).count()).isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBefore(dateCal.getTime()).list()).hasSize(2);
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
@@ -388,7 +389,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(2L);
+                .isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .startedBefore(dateCal.getTime())
@@ -406,7 +407,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         Calendar todayCal = new GregorianCalendar();
         Calendar dateCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 1, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_YEAR));
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(dateCal.getTime()).count()).isEqualTo(2L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(dateCal.getTime()).count()).isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedAfter(dateCal.getTime()).list()).hasSize(2);
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
@@ -415,7 +416,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(2L);
+                .isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .startedAfter(dateCal.getTime())
@@ -434,7 +435,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .start();
 
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBy("kermit").count()).isEqualTo(1L);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBy("kermit").count()).isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBy("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().startedBy("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
 
@@ -444,7 +445,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionName("undefinedId")
                     .endOr()
                     .count())
-                    .isEqualTo(1L);
+                    .isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                     .or()
                     .startedBy("kermit")
@@ -471,7 +472,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .callbackId("callBackId")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackId("callBackId").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackId("callBackId").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackId("callBackId").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackId("callBackId").singleResult().getId())
@@ -483,7 +484,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceCallbackId("callBackId")
@@ -507,7 +508,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .callbackType("callBackType")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackType("callBackType").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackType("callBackType").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackType("callBackType").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceCallbackType("callBackType").singleResult().getId())
@@ -519,7 +520,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceCallbackType("callBackType")
@@ -543,7 +544,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .referenceId("testReferenceId")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").singleResult().getId())
@@ -555,7 +556,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefined")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceReferenceId("testReferenceId")
@@ -579,7 +580,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .referenceType("testReferenceType")
                 .start();
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").singleResult().getId())
@@ -591,7 +592,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseInstanceReferenceType("testReferenceType")
@@ -619,7 +620,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         }
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId")
-                .caseInstanceReferenceType("testReferenceType").count()).isEqualTo(5L);
+                .caseInstanceReferenceType("testReferenceType").count()).isEqualTo(5);
     }
 
     @Test
@@ -636,7 +637,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .tenantId("tenantId")
                     .start();
 
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceTenantId("tenantId").count()).isEqualTo(1L);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceTenantId("tenantId").count()).isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceTenantId("tenantId").list().get(0).getId())
                     .isEqualTo(caseInstance.getId());
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceTenantId("tenantId").singleResult().getId())
@@ -648,7 +649,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionName("undefinedId")
                     .endOr()
                     .count())
-                    .isEqualTo(1L);
+                    .isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                     .or()
                     .caseInstanceTenantId("tenantId")
@@ -682,7 +683,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .tenantId("tenantId")
                     .start();
 
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceWithoutTenantId().count()).isEqualTo(1L);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceWithoutTenantId().count()).isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceWithoutTenantId().list().get(0).getId())
                     .isNotEqualTo(caseInstance.getId());
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceWithoutTenantId().singleResult().getId())
@@ -694,7 +695,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionName("undefinedId")
                     .endOr()
                     .count())
-                    .isEqualTo(1L);
+                    .isEqualTo(1);
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                     .or()
                     .caseInstanceWithoutTenantId()
@@ -721,7 +722,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId())
@@ -733,7 +734,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .involvedUser("kermit")
@@ -757,13 +758,13 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", "specialLink");
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId())
                 .isEqualTo(caseInstance.getId());
         
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "wrongType").count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "wrongType").count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -771,7 +772,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -779,7 +780,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -787,7 +788,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("wrongKey")
                 .endOr()
                 .count())
-                .isEqualTo(0L);
+                .isZero();
     }
 
     @Test
@@ -798,7 +799,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId())
@@ -810,7 +811,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .involvedGroups(Collections.singleton("testGroup"))
@@ -835,13 +836,13 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", "specialLink");
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", "extraLink");
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").count()).isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").singleResult().getId())
                 .isEqualTo(caseInstance.getId());
         
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup2", "wrongType").count()).isEqualTo(0L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup2", "wrongType").count()).isZero();
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -849,7 +850,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -857,7 +858,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .endOr()
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
@@ -865,7 +866,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("wrongKey")
                 .endOr()
                 .count())
-                .isEqualTo(0L);
+                .isZero();
     }
 
     @Test
@@ -887,7 +888,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
                 .involvedUser("kermit").count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
                 .involvedUser("kermit").list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
@@ -901,7 +902,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(2L);
+                .isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
@@ -917,7 +918,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(3L);
+                .isEqualTo(3);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
@@ -949,7 +950,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .variableValueEquals("queryVariable", "queryVariableValue")
                 .variableValueEquals("queryVariable2", "queryVariableValue2")
                 .count())
-                .isEqualTo(1L);
+                .isEqualTo(1);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .variableValueEquals("queryVariable", "queryVariableValue")
                 .variableValueEquals("queryVariable2", "queryVariableValue2")
@@ -968,7 +969,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionName("undefinedId")
                 .endOr()
                 .count())
-                .isEqualTo(3L);
+                .isEqualTo(3);
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .variableValueEquals("queryVariable", "queryVariableValue")
@@ -992,7 +993,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         try {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).caseInstanceWithoutTenantId().count())
-                    .isEqualTo(1L);
+                    .isEqualTo(1);
         } finally {
             cmmnRuntimeService.terminateCaseInstance(caseInstance2.getId());
             cmmnHistoryService.deleteHistoricCaseInstance(caseInstance2.getId());
@@ -1028,6 +1029,47 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).locale("pt").singleResult();
         assertThat(caseInstance.getName()).isEqualTo("Caso 1");
+    }
+  
+    @Test
+    public void testQueryCaseInstanceReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(historicCaseInstance.getCaseVariables()).isEmpty();
+    }
+
+    @Test
+    public void testQueryCaseInstanceWithVariablesReturnsCaseDefinitionInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("stringVar", "test")
+                .start();
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
+        assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
+        assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
+        assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
+                entry("stringVar","test")
+        );
     }
 
 }

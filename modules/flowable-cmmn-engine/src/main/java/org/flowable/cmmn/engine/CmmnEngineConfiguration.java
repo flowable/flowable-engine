@@ -32,6 +32,7 @@ import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -98,6 +99,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -112,6 +114,9 @@ import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
 import org.flowable.cmmn.engine.impl.listener.DefaultCmmnListenerFactory;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManager;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManagerImpl;
+import org.flowable.cmmn.engine.impl.migration.CmmnMigrationServiceImpl;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandler;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseHandlers;
@@ -167,7 +172,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemIns
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
@@ -178,7 +182,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilesto
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
@@ -191,6 +194,7 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
+import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
@@ -237,6 +241,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
@@ -325,8 +330,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
     protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
+    protected CmmnMigrationService cmmnMigrationService = new CmmnMigrationServiceImpl(this);
 
-    protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
@@ -361,11 +366,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected CmmnDynamicStateManager dynamicStateManager;
+    protected CaseInstanceMigrationManager caseInstanceMigrationManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
+    protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
 
     protected boolean executeServiceSchemaManagers = true;
@@ -480,6 +487,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String mailServerUsername; // by default no name and password are provided, which
     protected String mailServerPassword; // means no authentication for mail server
     protected int mailServerPort = 25;
+    protected int mailServerSSLPort = 465;
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
@@ -876,6 +884,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCandidateManager();
         initHistoryManager();
         initDynamicStateManager();
+        initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initIdentityLinkInterceptor();
@@ -1051,8 +1060,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     @Override
     public void initCommandInvoker() {
-        if (commandInvoker == null) {
-            commandInvoker = new CmmnCommandInvoker();
+        if (this.commandInvoker == null) {
+            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner);
         }
     }
 
@@ -1091,14 +1100,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
+        initService(cmmnMigrationService);
     }
 
     @Override
     public void initDataManagers() {
         super.initDataManagers();
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
-        }
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisCmmnDeploymentDataManager(this);
         }
@@ -1358,6 +1365,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    public void initCaseInstanceMigrationManager() {
+        if (caseInstanceMigrationManager == null) {
+            caseInstanceMigrationManager = new CaseInstanceMigrationManagerImpl();
+        }
+    }
+
     public void initCaseInstanceCallbacks() {
         if (this.caseInstanceStateChangeCallbacks == null) {
             this.caseInstanceStateChangeCallbacks = new HashMap<>();
@@ -1474,6 +1487,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -1502,6 +1516,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
@@ -1551,6 +1566,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
@@ -1569,6 +1585,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
             this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
     
@@ -1585,6 +1602,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initEventSubscriptionServiceConfiguration() {
         this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
         this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         
@@ -1687,6 +1705,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
         historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer());
 
         historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
         historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
@@ -1710,6 +1730,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
+            this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
             this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
@@ -2030,6 +2051,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
+    public CmmnMigrationService getCmmnMigrationService() {
+        return cmmnMigrationService;
+    }
+
+    public void setCmmnMigrationService(CmmnMigrationService cmmnMigrationService) {
+        this.cmmnMigrationService = cmmnMigrationService;
+    }
+
     public IdmIdentityService getIdmIdentityService() {
         return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
@@ -2041,10 +2071,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setCmmnEngineAgendaFactory(CmmnEngineAgendaFactory cmmnEngineAgendaFactory) {
         this.cmmnEngineAgendaFactory = cmmnEngineAgendaFactory;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
@@ -2268,6 +2294,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CaseInstanceMigrationManager getCaseInstanceMigrationManager() {
+        return caseInstanceMigrationManager;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceMigrationManager(CaseInstanceMigrationManager caseInstanceMigrationManager) {
+        this.caseInstanceMigrationManager = caseInstanceMigrationManager;
+        return this;
+    }
+
     public boolean isEnableSafeCmmnXml() {
         return enableSafeCmmnXml;
     }
@@ -2453,6 +2488,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCreateCasePageTaskInterceptor(CreateCasePageTaskInterceptor createCasePageTaskInterceptor) {
         this.createCasePageTaskInterceptor = createCasePageTaskInterceptor;
+        return this;
+    }
+
+    public CreateCmmnExternalWorkerJobInterceptor getCreateCmmnExternalWorkerJobInterceptor() {
+        return createCmmnExternalWorkerJobInterceptor;
+    }
+
+    public CmmnEngineConfiguration setCreateCmmnExternalWorkerJobInterceptor(CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor) {
+        this.createCmmnExternalWorkerJobInterceptor = createCmmnExternalWorkerJobInterceptor;
         return this;
     }
 
@@ -3587,6 +3631,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public int getMailServerSSLPort() {
+        return mailServerSSLPort;
+    }
+
+    public CmmnEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
+        this.mailServerSSLPort = mailServerSSLPort;
         return this;
     }
 

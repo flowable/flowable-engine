@@ -27,12 +27,19 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -149,7 +156,9 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob).as("No job found for process instance").isNotNull();
         assertThat(asyncJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(asyncJob.getCorrelationId()).isNotNull();
 
+        String correlationId = asyncJob.getCorrelationId();
         final String asyncId = asyncJob.getId();
         assertThatThrownBy(() -> managementService.executeJob(asyncId))
                 .isExactlyInstanceOf(FlowableException.class)
@@ -162,6 +171,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertThat(asyncJob.getRetries()).isEqualTo(2);
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         final String jobId = asyncJob.getId();
         assertThatThrownBy(() -> {
@@ -176,6 +186,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 .singleResult();
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         final String jobId2 = asyncJob.getId();
         assertThatThrownBy(() -> {
@@ -191,6 +202,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         managementService.moveDeadLetterJobToExecutableJob(asyncJob.getId(), 5);
 
@@ -200,6 +212,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertThat(asyncJob.getElementId()).isEqualTo("theScriptTask");
         assertThat(asyncJob.getElementName()).isEqualTo("Execute script");
+        assertThat(asyncJob.getCorrelationId()).isEqualTo(correlationId);
 
         assertThat(asyncJob.getRetries()).isEqualTo(5);
     }
@@ -270,6 +283,36 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // We need to move time at least one hour to make the timer executable
         processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + 7200000L));
 
+        // Move the timer to an executable job
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+
+        // Acquire job by running the acquire command manually
+        AcquireJobsCmd acquireJobsCmd = new AcquireJobsCmd(processEngine.getProcessEngineConfiguration().getAsyncExecutor(), 5,
+                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager());
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(acquireJobsCmd);
+
+        // Try to delete the job. This should fail.
+        assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot delete job when the job is being executed. Try again later.");
+
+        // Clean up
+        managementService.executeJob(timerJob.getId());
+    }
+
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+    public void testDeleteTimerJobThatWasAlreadyAcquired() {
+        processEngineConfiguration.getClock().setCurrentTime(new Date());
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        // We need to move time at least one hour to make the timer executable
+        processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + 7200000L));
+
         // Acquire job by running the acquire command manually
         ProcessEngineImpl processEngineImpl = (ProcessEngineImpl) processEngine;
         AcquireTimerJobsCmd acquireJobsCmd = new AcquireTimerJobsCmd(processEngine.getProcessEngineConfiguration().getAsyncExecutor());
@@ -277,9 +320,9 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         commandExecutor.execute(acquireJobsCmd);
 
         // Try to delete the job. This should fail.
-        assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
-                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-                .hasMessageContaining("No job found with id");
+        assertThatThrownBy(() -> managementService.deleteTimerJob(timerJob.getId()))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot delete timer job when the job is being executed. Try again later.");
 
         // Clean up
         managementService.moveTimerToExecutableJob(timerJob.getId());
@@ -344,5 +387,82 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         } finally {
             processEngineConfiguration.setLockPollRate(initialLockPollRate);
         }
+    }
+
+    @Test
+    void testFindJobByCorrelationId() {
+        Job asyncJob = managementService.executeCommand(context -> {
+            JobEntity job = CommandContextUtil.getJobService(context).createJob();
+            job.setJobType("testAsync");
+            CommandContextUtil.getJobService(context).insertJob(job);
+            return job;
+        });
+
+        Job timerJob = managementService.executeCommand(context -> {
+            TimerJobEntity job = CommandContextUtil.getTimerJobService(context).createTimerJob();
+            job.setJobType("testTimer");
+            CommandContextUtil.getTimerJobService(context).insertTimerJob(job);
+            return job;
+        });
+
+        Job deadLetterJob = managementService.executeCommand(context -> {
+            DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+            job.setJobType("testDeadLetter");
+            CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+            return job;
+        });
+
+        Job suspendedJob = managementService.executeCommand(context -> {
+            SuspendedJobEntity job = CommandContextUtil.getJobServiceConfiguration(context)
+                    .getSuspendedJobEntityManager()
+                    .create();
+            job.setJobType("testSuspended");
+            CommandContextUtil.getJobServiceConfiguration(context)
+                    .getSuspendedJobEntityManager()
+                    .insert(job);
+            return job;
+        });
+
+
+        Job externalWorkerJob = managementService.executeCommand(context -> {
+            ExternalWorkerJobEntity job = CommandContextUtil.getJobService(context).createExternalWorkerJob();
+            job.setJobType("testExternal");
+            CommandContextUtil.getJobService(context).insertExternalWorkerJob(job);
+            return job;
+        });
+
+        Job job = managementService.findJobByCorrelationId(asyncJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testAsync");
+        assertThat(job).isInstanceOf(JobEntity.class);
+
+        job = managementService.findJobByCorrelationId(timerJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testTimer");
+        assertThat(job).isInstanceOf(TimerJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(deadLetterJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testDeadLetter");
+        assertThat(job).isInstanceOf(DeadLetterJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(suspendedJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testSuspended");
+        assertThat(job).isInstanceOf(SuspendedJobEntity.class);
+
+        job = managementService.findJobByCorrelationId(externalWorkerJob.getCorrelationId());
+        assertThat(job).isNotNull();
+        assertThat(job.getJobType()).isEqualTo("testExternal");
+        assertThat(job).isInstanceOf(ExternalWorkerJobEntity.class);
+
+        job = managementService.findJobByCorrelationId("unknown");
+        assertThat(job).isNull();
+
+        managementService.deleteJob(asyncJob.getId());
+        managementService.deleteTimerJob(timerJob.getId());
+        managementService.deleteDeadLetterJob(deadLetterJob.getId());
+        managementService.deleteSuspendedJob(suspendedJob.getId());
+        managementService.deleteExternalWorkerJob(externalWorkerJob.getId());
     }
 }

@@ -32,7 +32,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
                 .variable("activateFirstTask", false)
                 .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
@@ -87,7 +87,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
                 .variable("activateFirstTask", false)
                 .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
@@ -126,7 +126,8 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "task2")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
                 .activatePlanItemDefinitionId("task3")
                 .changeState();
 
@@ -151,7 +152,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
                 .variable("activateFirstTask", false)
                 .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
@@ -187,7 +188,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
                 .variable("activateStage", false)
                 .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult().getState())
                 .isEqualTo(PlanItemInstanceState.AVAILABLE);
@@ -195,6 +196,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
                 .activatePlanItemDefinitionId("task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task2")
                 .changeState();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -229,10 +231,10 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .changePlanItemInstanceToAvailableByPlanItemDefinitionId("task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task1")
                 .changeState();
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())

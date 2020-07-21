@@ -12,14 +12,15 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class StandaloneRuntimeTest {
     @DmnDeployment
     public void ruleUsageExample() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
@@ -45,7 +46,7 @@ public class StandaloneRuntimeTest {
                 .decisionKey("decision1")
                 .variables(inputVariables)
                 .executeWithSingleResult();
-        
-        Assert.assertEquals("result2", result.get("outputVariable1"));
+
+        assertThat(result.get("outputVariable1")).isEqualTo("result2");
     }
 }

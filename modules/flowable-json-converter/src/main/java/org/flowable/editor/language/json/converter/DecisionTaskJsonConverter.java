@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,25 +12,29 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableAwareConverter {
+public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
 
-    protected Map<String, String> decisionTableMap;
+    protected static final String REFERENCE_TYPE_DECISION_TABLE = "decisionTable";
+    protected static final String REFERENCE_TYPE_DECISION_SERVICE = "decisionService";
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
-                                 Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+        Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
@@ -49,53 +53,59 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
 
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);
 
+        String decisionModelKey = null;
+        String referenceType = null;
+
+        // when both decision table and decision service reference are present
+        // decision services reference will prevail
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
-
             String decisionTableId = decisionTableReferenceNode.get("id").asText();
-            if (decisionTableMap != null) {
-                String decisionTableKey = decisionTableMap.get(decisionTableId);
-
-                FieldExtension decisionTableKeyField = new FieldExtension();
-                decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
-                decisionTableKeyField.setStringValue(decisionTableKey);
-                serviceTask.getFieldExtensions().add(decisionTableKeyField);
-            }
+            decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(decisionTableId);
+            referenceType = REFERENCE_TYPE_DECISION_TABLE;
         }
 
-        boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
-        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
-        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
-        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
-        serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+        JsonNode decisionServiceReferenceNode = getProperty(PROPERTY_DECISIONSERVICE_REFERENCE, elementNode);
+        if (decisionServiceReferenceNode != null && decisionServiceReferenceNode.has("id") && !decisionServiceReferenceNode.get("id").isNull()) {
+            String decisionServiceId = decisionServiceReferenceNode.get("id").asText();
+            decisionModelKey = converterContext.getDecisionServiceModelKeyForDecisionServiceModelId(decisionServiceId);
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+        }
 
-        boolean fallbackToDefaultTenant = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, elementNode);
-        FieldExtension fallbackToDefaultTenantField = new FieldExtension();
-        fallbackToDefaultTenantField.setFieldName(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
-        fallbackToDefaultTenantField.setStringValue(fallbackToDefaultTenant ? "true" : "false");
-        serviceTask.getFieldExtensions().add(fallbackToDefaultTenantField);
+        if (decisionModelKey != null) {
+            FieldExtension decisionTableKeyField = new FieldExtension();
+            decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
+            decisionTableKeyField.setStringValue(decisionModelKey);
+            serviceTask.getFieldExtensions().add(decisionTableKeyField);
+            referenceType = REFERENCE_TYPE_DECISION_SERVICE;
+        }
 
-        boolean sameDeployment = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT, elementNode);
-        FieldExtension sameDeploymentField = new FieldExtension();
-        sameDeploymentField.setFieldName(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY);
-        sameDeploymentField.setStringValue(sameDeployment ? "true" : "false");
-        serviceTask.getFieldExtensions().add(sameDeploymentField);
+        addFlowableExtensionElementWithValue(PROPERTY_DECISION_REFERENCE_TYPE, referenceType, serviceTask);
+
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT, PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY);
+        addBooleanField(elementNode, serviceTask, PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT, PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY);
 
         return serviceTask;
     }
 
-    @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
-
+    protected void addBooleanField(JsonNode elementNode, ServiceTask decisionTask, String propertyName, String fieldName) {
+        boolean decisionTableThrowErrorOnNoHitsNode = JsonConverterUtil.getPropertyValueAsBoolean(propertyName, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(fieldName);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        decisionTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
     }
 
     @Override
-    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-        this.decisionTableMap = decisionTableMap;
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
+
     }
 }

@@ -110,6 +110,11 @@ public interface ManagementService {
     HistoryJobQuery createHistoryJobQuery();
 
     /**
+     * Find a job by a correlation id.
+     */
+    Job findJobByCorrelationId(String jobCorrelationId);
+
+    /**
      * Forced synchronous execution of a job (eg. for administration or testing).
      * The job will be executed, even if the process definition and/or the process instance is in suspended state.
      * 
@@ -212,6 +217,14 @@ public interface ManagementService {
      */
     void deleteDeadLetterJob(String jobId);
     
+    /**
+     * Delete the external worker job with the provided id.
+     *
+     * @param jobId id of the external worker job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException when there is no job with the given id.
+     */
+    void deleteExternalWorkerJob(String jobId);
+
     /**
      * Delete the history job with the provided id.
      * 

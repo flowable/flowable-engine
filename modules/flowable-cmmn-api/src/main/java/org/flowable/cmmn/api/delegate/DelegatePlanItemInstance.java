@@ -40,6 +40,7 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setStartTime(Date startTime);
     void setCreateTime(Date createTime);
     void setLastAvailableTime(Date availableTime);
+    void setLastUnavailableTime(Date availableTime);
     void setLastEnabledTime(Date enabledTime);
     void setLastDisabledTime(Date disabledTime);
     void setLastStartedTime(Date startedTime);

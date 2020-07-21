@@ -17,11 +17,9 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.config.AbstractKafkaListenerEndpoint;
 import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.listener.GenericMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter;
 import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.kafka.support.converter.MessageConverter;
 import org.springframework.util.Assert;

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,7 @@ public class JobExecutorFailRetryTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("failedJobRetry");
 
         waitForJobExecutorToProcessAllJobs(1000, 200);
-        assertEquals(1, RetryFailingDelegate.times.size()); // check number of calls of delegate
+        assertThat(RetryFailingDelegate.times).hasSize(1); // check number of calls of delegate
 
         // process throws exception two times, with 6 seconds in between
         RetryFailingDelegate.shallThrow = true; // throw exception in Service delegate
@@ -40,8 +42,8 @@ public class JobExecutorFailRetryTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("failedJobRetry");
 
         executeJobExecutorForTime(14000, 500);
-        assertEquals(2, RetryFailingDelegate.times.size()); // check number of calls of delegate
+        assertThat(RetryFailingDelegate.times).hasSize(2); // check number of calls of delegate
         long timeDiff = RetryFailingDelegate.times.get(1) - RetryFailingDelegate.times.get(0);
-        assertTrue(timeDiff > 6000 && timeDiff < 12000); // check time difference between calls. Just roughly
+        assertThat(timeDiff > 6000 && timeDiff < 12000).isTrue(); // check time difference between calls. Just roughly
     }
 }

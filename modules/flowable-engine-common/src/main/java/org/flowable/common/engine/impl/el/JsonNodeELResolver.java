@@ -192,12 +192,11 @@ public class JsonNodeELResolver extends ELResolver {
                 } else {
                     result = resultNode.toString();
                 }
-                context.setPropertyResolved(true);
 
-            } else if (resultNode != null) {
+            } else {
                 result = resultNode;
-                context.setPropertyResolved(true);
             }
+            context.setPropertyResolved(true);
         }
         return result;
     }
@@ -215,7 +214,14 @@ public class JsonNodeELResolver extends ELResolver {
             }
             return null;
         } else if (property instanceof Number) {
-            return base.get(((Number) property).intValue());
+            int requestedIndex = ((Number) property).intValue();
+            if (requestedIndex >= 0) {
+                return base.get(requestedIndex);
+            } else {
+                // If the requested index is negative then lookup the element from the tail
+                // using plus because requestedIndex is negative so size() + (-1) is the last element
+                return base.get(base.size() + requestedIndex);
+            }
         } else {
             return base.get(property.toString());
         }

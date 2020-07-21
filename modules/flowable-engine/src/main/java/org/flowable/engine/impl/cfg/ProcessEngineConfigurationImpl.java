@@ -88,7 +88,10 @@ import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
@@ -282,8 +285,6 @@ import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
@@ -307,11 +308,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
@@ -325,7 +323,6 @@ import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDat
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisCommentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisDeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventLogEntryDataManager;
@@ -340,6 +337,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceData
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
@@ -462,7 +460,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // DATA MANAGERS /////////////////////////////////////////////////////////////
 
     protected AttachmentDataManager attachmentDataManager;
-    protected ByteArrayDataManager byteArrayDataManager;
     protected CommentDataManager commentDataManager;
     protected DeploymentDataManager deploymentDataManager;
     protected EventLogEntryDataManager eventLogEntryDataManager;
@@ -479,7 +476,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
     protected AttachmentEntityManager attachmentEntityManager;
-    protected ByteArrayEntityManager byteArrayEntityManager;
     protected CommentEntityManager commentEntityManager;
     protected DeploymentEntityManager deploymentEntityManager;
     protected EventLogEntryEntityManager eventLogEntryEntityManager;
@@ -492,7 +488,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
     protected ResourceEntityManager resourceEntityManager;
-    protected TableDataManager tableDataManager;
 
     // Candidate Manager
 
@@ -864,6 +859,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
+    protected CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor;
     protected IdentityLinkInterceptor identityLinkInterceptor;
     protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
     protected ExecutionQueryInterceptor executionQueryInterceptor;
@@ -1113,9 +1109,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             if (enableVerboseExecutionTreeLogging) {
-                commandInvoker = new LoggingExecutionTreeCommandInvoker();
+                this.commandInvoker = new LoggingExecutionTreeCommandInvoker(agendaOperationRunner);
+
             } else {
-                commandInvoker = new CommandInvoker();
+                this.commandInvoker = new CommandInvoker(agendaOperationRunner);
             }
         }
     }
@@ -1249,9 +1246,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (attachmentDataManager == null) {
             attachmentDataManager = new MybatisAttachmentDataManager(this);
         }
-        if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager(this);
-        }
         if (commentDataManager == null) {
             commentDataManager = new MybatisCommentDataManager(this);
         }
@@ -1301,9 +1295,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (attachmentEntityManager == null) {
             attachmentEntityManager = new AttachmentEntityManagerImpl(this, attachmentDataManager);
         }
-        if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(this, byteArrayDataManager);
-        }
         if (commentEntityManager == null) {
             commentEntityManager = new CommentEntityManagerImpl(this, commentDataManager);
         }
@@ -1339,9 +1330,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -1471,6 +1459,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -1499,6 +1488,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
@@ -1517,6 +1507,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
             this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -1533,6 +1524,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventSubscriptionServiceConfiguration() {
         this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
         this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         
@@ -1549,6 +1541,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
@@ -1608,6 +1601,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
+            this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
             this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
@@ -1716,6 +1710,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (batchServiceConfiguration == null) {
             this.batchServiceConfiguration = instantiateBatchServiceConfiguration();
             this.batchServiceConfiguration.setClock(this.clock);
+            this.batchServiceConfiguration.setIdGenerator(this.idGenerator);
             this.batchServiceConfiguration.setObjectMapper(this.objectMapper);
             this.batchServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -2640,7 +2635,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return () -> {
 
             // Async executor will have cleared the jobs lock owner/times, but not yet the process instance lock time/owner
-            commandExecutor.execute(new ClearProcessInstanceLockTimesCmd());
+            if (asyncExecutor != null) {
+                commandExecutor.execute(new ClearProcessInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+            }
 
             commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
         };
@@ -3210,6 +3207,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setCreateUserTaskInterceptor(CreateUserTaskInterceptor createUserTaskInterceptor) {
         this.createUserTaskInterceptor = createUserTaskInterceptor;
+        return this;
+    }
+
+    public CreateExternalWorkerJobInterceptor getCreateExternalWorkerJobInterceptor() {
+        return createExternalWorkerJobInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setCreateExternalWorkerJobInterceptor(CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor) {
+        this.createExternalWorkerJobInterceptor = createExternalWorkerJobInterceptor;
         return this;
     }
 
@@ -3828,10 +3834,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
     public ProcessEngineConfigurationImpl setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
         this.byteArrayDataManager = byteArrayDataManager;
         return this;
@@ -3960,10 +3962,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ByteArrayEntityManager getByteArrayEntityManager() {
-        return byteArrayEntityManager;
-    }
-
     public ProcessEngineConfigurationImpl setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
         this.byteArrayEntityManager = byteArrayEntityManager;
         return this;
@@ -4081,10 +4079,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public ProcessEngineConfigurationImpl setTableDataManager(TableDataManager tableDataManager) {

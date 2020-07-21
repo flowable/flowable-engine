@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -42,7 +43,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         
         cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -62,7 +63,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         
         // Disabling the single plan item will terminate the case
         cmmnRuntimeService.disablePlanItemInstance(planItemInstance.getId());
@@ -81,13 +82,13 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         for (PlanItemInstance planItemInstance : planItemInstances) {
             assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
         }
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         
         PlanItemInstance planItemInstance = planItemInstances.get(0);
         cmmnRuntimeService.disablePlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateDisabled().count()).isEqualTo(1);
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         cmmnRuntimeService.enablePlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(2);
@@ -97,7 +98,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testManualActivationWithSentries() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testManualActivationWithSentries").start();
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
         
@@ -116,7 +117,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(3);
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().count()).isZero();
         
         // Enabling the nested stage activates task D
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().singleResult();
@@ -147,7 +148,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         // Completing task A will exit the enabled stage
         cmmnTaskService.complete(tasks.get(0).getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isZero();
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("C");
@@ -176,7 +177,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testManuallyActivatedServiceTask")
                 .variable("manual", false)
                 .start();
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateEnabled().count()).isZero();
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable")).isEqualTo("test");
     }
     
@@ -187,7 +188,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("manualStage")
                 .start();
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         
         cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
 
@@ -248,7 +249,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.disablePlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only disable a plan item instance which is in state ENABLED");
     }
     
@@ -263,7 +264,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.enablePlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only enable a plan item instance which is in state AVAILABLE or DISABLED");
     }
     
@@ -278,7 +279,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().singleResult();
         assertThatThrownBy(() -> cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId()))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Can only enable a plan item instance which is in state ENABLED");
     }
 
@@ -323,7 +324,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         assertThat(taskC.getName()).isEqualTo("C");
 
         cmmnTaskService.complete(taskC.getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -333,7 +334,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("A").singleResult().getId());
         assertCaseInstanceNotEnded(caseInstance);
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("B").count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("B").count()).isZero();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).singleResult();
         cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
@@ -353,7 +354,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
         assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage one");
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(stagePlanItemInstance.getId()).start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
@@ -368,7 +369,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
         assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage one");
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
             @Override
             public Void execute(CommandContext commandContext) {
@@ -396,7 +397,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage with blocking task");
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(0);
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isZero();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(stagePlanItemInstance.getId()).start();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
             .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(1);
@@ -404,7 +405,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         // Manually complete the stage should throw an exception
         assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId()))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
     }
     
 }

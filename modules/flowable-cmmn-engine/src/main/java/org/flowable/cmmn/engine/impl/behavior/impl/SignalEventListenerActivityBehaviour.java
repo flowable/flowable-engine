@@ -43,33 +43,39 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+
+        // Remove event subscription when moving to a terminal state
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition) || PlanItemTransition.DISMISS.equals(transition)) {
             EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
             List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
             }
+
+        } else if (PlanItemTransition.CREATE.equals(transition)) {
+            String signalName = null;
+            if (StringUtils.isNotEmpty(signalRef)) {
+                Expression signalExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                    .getExpressionManager().createExpression(signalRef);
+                signalName = signalExpression.getValue(planItemInstance).toString();
+            }
+
+            CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                .eventName(signalName)
+                .subScopeId(planItemInstance.getId())
+                .scopeId(planItemInstance.getCaseInstanceId())
+                .scopeDefinitionId(planItemInstance.getCaseDefinitionId())
+                .scopeType(ScopeTypes.CMMN)
+                .tenantId(planItemInstance.getTenantId())
+                .create();
+
         }
     }
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        String signalName = null;
-        if (StringUtils.isNotEmpty(signalRef)) {
-            Expression signalExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                            .getExpressionManager().createExpression(signalRef);
-            signalName = signalExpression.getValue(planItemInstanceEntity).toString();
-        }
-
-        CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                .eventName(signalName)
-                .subScopeId(planItemInstanceEntity.getId())
-                .scopeId(planItemInstanceEntity.getCaseInstanceId())
-                .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
-                .scopeType(ScopeTypes.CMMN)
-                .tenantId(planItemInstanceEntity.getTenantId())
-                .create();
+        // Nothing to do, logic happens on state transition
     }
 
     @Override

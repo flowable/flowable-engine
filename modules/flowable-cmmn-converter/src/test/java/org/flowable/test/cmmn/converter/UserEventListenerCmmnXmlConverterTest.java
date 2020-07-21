@@ -13,6 +13,7 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -48,11 +49,8 @@ public class UserEventListenerCmmnXmlConverterTest extends AbstractConverterTest
         assertThat(humanTasks).hasSize(2);
 
         List<UserEventListener> userEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(UserEventListener.class, true);
-        assertThat(userEventListeners).hasSize(1);
-
-        UserEventListener userEventListener = userEventListeners.get(0);
-        assertThat(userEventListener.getName()).isEqualTo("myUserEventListener");
-        assertThat(userEventListener.getId()).isEqualTo("userActionListener");
-        assertThat(userEventListener.getDocumentation()).isEqualTo("UserEventListener documentation");
+        assertThat(userEventListeners)
+                .extracting(UserEventListener::getName, UserEventListener::getId, UserEventListener::getDocumentation)
+                .containsExactly(tuple("myUserEventListener", "userActionListener", "UserEventListener documentation"));
     }
 }

@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -27,6 +28,7 @@ import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobsByExecutionIdMatcher;
 
 /**
@@ -38,7 +40,8 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     protected JobServiceConfiguration jobServiceConfiguration;
 
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
-    
+    protected SingleCachedEntityMatcher<JobEntity> jobByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
+
     public MybatisJobDataManager() {
         
     }
@@ -85,6 +88,11 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @SuppressWarnings("unchecked")
     public List<JobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
         return getDbSqlSession().selectList("selectJobsByProcessInstanceId", processInstanceId);
+    }
+
+    @Override
+    public JobEntity findJobByCorrelationId(String correlationId) {
+        return getEntity("selectJobByCorrelationId", correlationId, jobByCorrelationIdMatcher, true);
     }
 
     @Override

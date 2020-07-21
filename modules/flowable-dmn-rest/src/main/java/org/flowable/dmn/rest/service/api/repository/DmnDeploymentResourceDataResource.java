@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentResourceDataResource extends BaseDmnDeploymentResourceDataResource {
 
-    @ApiOperation(value = "Get a decision table deployment resource content", tags = {"Deployment" }, nickname = "getDecisionTableDeploymentResource",
+    @ApiOperation(value = "Get a decision deployment resource content", tags = {"Deployment" }, nickname = "getDecisionTableDeploymentResource",
             notes = "The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources mimeType property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both deployment and resource have been found and the resource data has been returned."),

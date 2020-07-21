@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cfg.executioncount;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeConfigAndRebootEngineTest.class);
@@ -116,18 +118,18 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
                         ValidateExecutionRelatedEntityCountCfgCmd.PROPERTY_EXECUTION_RELATED_ENTITY_COUNT);
             }
         });
-        assertEquals(expectedValue, Boolean.parseBoolean(propertyEntity.getValue()));
+        assertThat(Boolean.parseBoolean(propertyEntity.getValue())).isEqualTo(expectedValue);
     }
 
     protected void assertExecutions(ProcessInstance processInstance, boolean expectedCountIsEnabledFlag) {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         for (Execution execution : executions) {
             CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-            assertEquals(expectedCountIsEnabledFlag, countingExecutionEntity.isCountEnabled());
+            assertThat(countingExecutionEntity.isCountEnabled()).isEqualTo(expectedCountIsEnabledFlag);
 
             if (expectedCountIsEnabledFlag && execution.getParentId() != null) {
-                assertEquals(1, countingExecutionEntity.getTaskCount());
+                assertThat(countingExecutionEntity.getTaskCount()).isEqualTo(1);
             }
         }
     }

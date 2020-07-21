@@ -13,17 +13,15 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +60,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         vars.put("basicType", new DummySerializable());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertNotNull(task.getProcessVariables());
+        assertThat(task.getProcessVariables()).isNotNull();
     }
 
     @Test
@@ -76,57 +74,41 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         vars.put("longString", longString.toString());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertNotNull(task.getProcessVariables());
-        assertEquals(longString.toString(), task.getProcessVariables().get("longString"));
+        assertThat(task.getProcessVariables()).isNotNull();
+        assertThat(task.getProcessVariables().get("longString")).isEqualTo(longString.toString());
     }
 
     @Test
     public void testStartProcessInstanceByKeyNullKey() {
-        try {
-            runtimeService.startProcessInstanceByKey(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException e) {
-            // Expected exception
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testStartProcessInstanceByKeyUnexistingKey() {
-        try {
-            runtimeService.startProcessInstanceByKey("unexistingkey");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("No process definition found for key 'unexistingkey'", ae.getMessage());
-            assertEquals(ProcessDefinition.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("unexistingkey"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No process definition found for key 'unexistingkey'");
     }
 
     @Test
     public void testStartProcessInstanceByIdNullId() {
-        try {
-            runtimeService.startProcessInstanceById(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException e) {
-            // Expected exception
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testStartProcessInstanceByIdUnexistingId() {
-        try {
-            runtimeService.startProcessInstanceById("unexistingId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("No process definition found for id = 'unexistingId'", ae.getMessage());
-            assertEquals(ProcessDefinition.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceById("unexistingId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No process definition found for id = 'unexistingId'");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceByIdNullVariables() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess", (Map<String, Object>) null);
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
     }
 
     @Test
@@ -136,26 +118,26 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         // by key
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-        assertNotNull(processInstance);
-        assertEquals("123", processInstance.getBusinessKey());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
 
         // by key with variables
         processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "456", CollectionUtil.singletonMap("var", "value"));
-        assertNotNull(processInstance);
-        assertEquals(2, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("value", runtimeService.getVariable(processInstance.getId(), "var"));
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var")).isEqualTo("value");
 
         // by id
         processInstance = runtimeService.startProcessInstanceById(processDefinition.getId(), "789");
-        assertNotNull(processInstance);
-        assertEquals(3, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
 
         // by id with variables
         processInstance = runtimeService.startProcessInstanceById(processDefinition.getId(), "101123", CollectionUtil.singletonMap("var", "value2"));
-        assertNotNull(processInstance);
-        assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "var"));
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(4);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var")).isEqualTo("value2");
     }
 
     @Test
@@ -167,44 +149,44 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         // by key
         ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("123").start();
-        assertNotNull(processInstance);
-        assertEquals("123", processInstance.getBusinessKey());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
 
         processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
         // by key, with processInstance name with variables
         processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("456").variable("var", "value").name("processName1")
-            .start();
-        assertNotNull(processInstance);
-        assertEquals(2, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("processName1", processInstance.getName());
-        assertEquals("456", processInstance.getBusinessKey());
-        assertEquals("value", runtimeService.getVariable(processInstance.getId(), "var"));
+                .start();
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        assertThat(processInstance.getName()).isEqualTo("processName1");
+        assertThat(processInstance.getBusinessKey()).isEqualTo("456");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var")).isEqualTo("value");
 
         processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
         // by id
         processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("789").start();
-        assertNotNull(processInstance);
-        assertEquals(3, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("789", processInstance.getBusinessKey());
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+        assertThat(processInstance.getBusinessKey()).isEqualTo("789");
 
         processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
         // by id with variables
         processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("101123").variable("var", "value2").start();
-        assertNotNull(processInstance);
-        assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "var"));
-        assertEquals("101123", processInstance.getBusinessKey());
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(4);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var")).isEqualTo("value2");
+        assertThat(processInstance.getBusinessKey()).isEqualTo("101123");
 
         processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
         // by id and processInstance name
         processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("101124").name("processName2").start();
-        assertNotNull(processInstance);
-        assertEquals(5, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("processName2", processInstance.getName());
-        assertEquals("101124", processInstance.getBusinessKey());
+        assertThat(processInstance).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(5);
+        assertThat(processInstance.getName()).isEqualTo("processName2");
+        assertThat(processInstance.getBusinessKey()).isEqualTo("101124");
     }
 
     @Test
@@ -216,15 +198,15 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         // by key
         ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("123").startAsync();
-        assertNotNull(processInstance);
-        assertEquals("123", processInstance.getBusinessKey());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("Process is started, but its execution waits on the job",
-            0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count())
+                .as("Process is started, but its execution waits on the job").isZero();
 
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
-        assertEquals("The task is created from the job execution",
-            1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).as("The task is created from the job execution")
+                .isEqualTo(1);
     }
 
     @Test
@@ -236,15 +218,15 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         // by definitionId
         ProcessInstance processInstance = processInstanceBuilder.processDefinitionId(processDefinition.getId()).businessKey("123").startAsync();
-        assertNotNull(processInstance);
-        assertEquals("123", processInstance.getBusinessKey());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-        assertEquals("Process is started, but its execution waits on the job",
-            0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count())
+                .as("Process is started, but its execution waits on the job").isZero();
 
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
-        assertEquals("The task is created from the job execution",
-            1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).as("The task is created from the job execution")
+                .isEqualTo(1);
     }
 
     @Test
@@ -282,12 +264,12 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").start();
 
-        assertNotNull(processInstance);
-        assertEquals(processDefinition.getDeploymentId(), processInstance.getDeploymentId());
-        assertEquals(processDefinition.getId(), processInstance.getProcessDefinitionId());
-        assertEquals(processDefinition.getKey(), processInstance.getProcessDefinitionKey());
-        assertEquals(processDefinition.getVersion(), processInstance.getProcessDefinitionVersion().intValue());
-        assertEquals(processDefinition.getName(), processInstance.getProcessDefinitionName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+        assertThat(processInstance.getProcessDefinitionKey()).isEqualTo(processDefinition.getKey());
+        assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(processDefinition.getVersion());
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo(processDefinition.getName());
     }
 
     @Test
@@ -300,13 +282,13 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
             ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").businessKey("123").
-                tenantId("flowable").start();
-            assertNotNull(processInstance);
-            assertEquals("123", processInstance.getBusinessKey());
-            assertEquals("flowable", processInstance.getTenantId());
+                    tenantId("flowable").start();
+            assertThat(processInstance).isNotNull();
+            assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+            assertThat(processInstance.getTenantId()).isEqualTo("flowable");
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertThat(task.getTenantId(), is("flowable"));
+            assertThat(task.getTenantId()).isEqualTo("flowable");
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
@@ -323,17 +305,17 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
             ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
-                .businessKey("123")
-                .tenantId("flowable")
-                .overrideProcessDefinitionTenantId("customTenant")
-                .start();
+                    .businessKey("123")
+                    .tenantId("flowable")
+                    .overrideProcessDefinitionTenantId("customTenant")
+                    .start();
 
-            assertNotNull(processInstance);
-            assertEquals("123", processInstance.getBusinessKey());
-            assertEquals("customTenant", processInstance.getTenantId());
+            assertThat(processInstance).isNotNull();
+            assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+            assertThat(processInstance.getTenantId()).isEqualTo("customTenant");
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertThat(task.getTenantId(), is("customTenant"));
+            assertThat(task.getTenantId()).isEqualTo("customTenant");
 
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
@@ -350,16 +332,16 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
             ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
-                .businessKey("123")
-                .overrideProcessDefinitionTenantId("customTenant")
-                .start();
+                    .businessKey("123")
+                    .overrideProcessDefinitionTenantId("customTenant")
+                    .start();
 
-            assertNotNull(processInstance);
-            assertEquals("123", processInstance.getBusinessKey());
-            assertEquals("customTenant", processInstance.getTenantId());
+            assertThat(processInstance).isNotNull();
+            assertThat(processInstance.getBusinessKey()).isEqualTo("123");
+            assertThat(processInstance.getTenantId()).isEqualTo("customTenant");
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertThat(task.getTenantId(), is("customTenant"));
+            assertThat(task.getTenantId()).isEqualTo("customTenant");
 
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
@@ -373,7 +355,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         // Behaviour changed: https://activiti.atlassian.net/browse/ACT-1860
         runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
-        assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count()).isEqualTo(2);
     }
 
     @Test
@@ -386,7 +368,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceWithForm(processDefinition.getId(), null, vars, null);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertNotNull(task.getProcessVariables());
+        assertThat(task.getProcessVariables()).isNotNull();
     }
 
     @Test
@@ -394,7 +376,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartProcessInstanceFormWithoutVariables() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", null, null);
-        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
+        assertThat(runtimeService.getVariables(processInstance.getId())).isEmpty();
     }
 
     @Test
@@ -402,7 +384,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartProcessInstanceFormWithEmptyVariables() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "outcome", new HashMap<>(), null);
-        assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
+        assertThat(runtimeService.getVariables(processInstance.getId())).isEmpty();
     }
 
     // some databases might react strange on having multiple times null for the
@@ -412,39 +394,39 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testMultipleNullBusinessKeys() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNull(processInstance.getBusinessKey());
+        assertThat(processInstance.getBusinessKey()).isNull();
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertEquals(3, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(3);
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
 
         String deleteReason = "testing instance deletion";
         runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isZero();
 
         // test that the delete reason of the process instance shows up as
         // delete reason of the task in history ACT-848
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
-                .singleResult();
+                    .singleResult();
 
-            assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
+            assertThat(historicTaskInstance.getDeleteReason()).isEqualTo(deleteReason);
 
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId())
-                .singleResult();
+                    .singleResult();
 
-            assertNotNull(historicInstance);
-            assertEquals(deleteReason, historicInstance.getDeleteReason());
-            assertNotNull(historicInstance.getEndTime());
+            assertThat(historicInstance).isNotNull();
+            assertThat(historicInstance.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(historicInstance.getEndTime()).isNotNull();
         }
     }
 
@@ -452,40 +434,33 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteProcessInstanceNullReason() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
 
         // Deleting without a reason should be possible
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isZero();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId())
-                .singleResult();
+                    .singleResult();
 
-            assertNotNull(historicInstance);
-            assertEquals(DeleteReason.PROCESS_INSTANCE_DELETED, historicInstance.getDeleteReason());
+            assertThat(historicInstance).isNotNull();
+            assertThat(historicInstance.getDeleteReason()).isEqualTo(DeleteReason.PROCESS_INSTANCE_DELETED);
         }
     }
 
     @Test
     public void testDeleteProcessInstanceUnexistingId() {
-        try {
-            runtimeService.deleteProcessInstance("enexistingInstanceId", null);
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("No process instance found for id", ae.getMessage());
-            assertEquals(ProcessInstance.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.deleteProcessInstance("enexistingInstanceId", null))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No process instance found for id");
     }
 
     @Test
     public void testDeleteProcessInstanceNullId() {
-        try {
-            runtimeService.deleteProcessInstance(null, "test null id delete");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("processInstanceId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.deleteProcessInstance(null, "test null id delete"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("processInstanceId is null");
     }
 
     @Test
@@ -494,29 +469,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         List<String> activities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertNotNull(activities);
-        assertEquals(1, activities.size());
+        assertThat(activities).isNotNull();
+        assertThat(activities).hasSize(1);
     }
 
     @Test
     public void testFindActiveActivityIdsUnexistingExecututionId() {
-        try {
-            runtimeService.getActiveActivityIds("unexistingExecutionId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.getActiveActivityIds("unexistingExecutionId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingExecutionId doesn't exist");
     }
 
     @Test
     public void testFindActiveActivityIdsNullExecututionId() {
-        try {
-            runtimeService.getActiveActivityIds(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.getActiveActivityIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     /**
@@ -528,73 +496,65 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("errorEventSubprocess");
 
         List<String> activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertEquals(5, activeActivities.size());
+        assertThat(activeActivities).hasSize(5);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("ParallelUserTask", "MainUserTask");
 
         org.flowable.task.api.Task parallelUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (!task.getName().equals("ParallelUserTask") && !task.getName().equals("MainUserTask")) {
-                fail("Expected: <ParallelUserTask> or <MainUserTask> but was <" + task.getName() + ">.");
-            }
             if (task.getName().equals("ParallelUserTask")) {
                 parallelUserTask = task;
             }
         }
-        assertNotNull(parallelUserTask);
-
         taskService.complete(parallelUserTask.getId());
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subprocess1WaitBeforeError")
-            .singleResult();
+                .singleResult();
         runtimeService.trigger(execution.getId());
 
         activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertEquals(4, activeActivities.size());
+        assertThat(activeActivities).hasSize(4);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("BeforeError", "MainUserTask");
 
         org.flowable.task.api.Task beforeErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (!task.getName().equals("BeforeError") && !task.getName().equals("MainUserTask")) {
-                fail("Expected: <BeforeError> or <MainUserTask> but was <" + task.getName() + ">.");
-            }
             if (task.getName().equals("BeforeError")) {
                 beforeErrorUserTask = task;
             }
         }
-        assertNotNull(beforeErrorUserTask);
-
         taskService.complete(beforeErrorUserTask.getId());
 
         activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertEquals(2, activeActivities.size());
+        assertThat(activeActivities).hasSize(2);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("AfterError", "MainUserTask");
 
         org.flowable.task.api.Task afterErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (!task.getName().equals("AfterError") && !task.getName().equals("MainUserTask")) {
-                fail("Expected: <AfterError> or <MainUserTask> but was <" + task.getName() + ">.");
-            }
             if (task.getName().equals("AfterError")) {
                 afterErrorUserTask = task;
             }
         }
-        assertNotNull(afterErrorUserTask);
-
         taskService.complete(afterErrorUserTask.getId());
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
-        assertEquals("MainUserTask", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("MainUserTask");
 
         activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertEquals(1, activeActivities.size());
-        assertEquals("MainUserTask", activeActivities.get(0));
+        assertThat(activeActivities)
+                .containsOnly("MainUserTask");
 
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstance.getId());
@@ -602,23 +562,16 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testSignalUnexistingExecututionId() {
-        try {
-            runtimeService.trigger("unexistingExecutionId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.trigger("unexistingExecutionId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingExecutionId doesn't exist");
     }
 
     @Test
     public void testSignalNullExecutionId() {
-        try {
-            runtimeService.trigger(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.trigger(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -634,50 +587,35 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.trigger(execution.getId(), processVariables);
 
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(processVariables, variables);
-
+        assertThat(variables).isEqualTo(processVariables);
     }
 
     @Test
     public void testGetVariablesUnexistingExecutionId() {
-        try {
-            runtimeService.getVariables("unexistingExecutionId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.getVariables("unexistingExecutionId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingExecutionId doesn't exist");
     }
 
     @Test
     public void testGetVariablesNullExecutionId() {
-        try {
-            runtimeService.getVariables(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.getVariables(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
     public void testGetVariableUnexistingExecutionId() {
-        try {
-            runtimeService.getVariables("unexistingExecutionId");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.getVariable("unexistingExecutionId", "var"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingExecutionId doesn't exist");
     }
 
     @Test
     public void testGetVariableNullExecutionId() {
-        try {
-            runtimeService.getVariables(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.getVariable(null, "var"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -685,40 +623,32 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testGetVariableUnexistingVariableName() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Object variableValue = runtimeService.getVariable(processInstance.getId(), "unexistingVariable");
-        assertNull(variableValue);
+        assertThat(variableValue).isNull();
     }
 
     @Test
     public void testSetVariableUnexistingExecutionId() {
-        try {
-            runtimeService.setVariable("unexistingExecutionId", "variableName", "value");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.setVariable("unexistingExecutionId", "variableName", "value"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingExecutionId doesn't exist");
     }
 
     @Test
     public void testSetVariableNullExecutionId() {
-        try {
-            runtimeService.setVariable(null, "variableName", "variableValue");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.setVariable(null, "variableName", "value"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetVariableNullVariableName() {
-        try {
+        assertThatThrownBy(() -> {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.setVariable(processInstance.getId(), null, "variableValue");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("variableName is null", ae.getMessage());
-        }
+        })
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("variableName is null");
     }
 
     @Test
@@ -731,31 +661,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.setVariables(processInstance.getId(), vars);
 
-        assertEquals("value1", runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isEqualTo("value1");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isEqualTo("value2");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testSetVariablesUnexistingExecutionId() {
-        try {
-            runtimeService.setVariables("unexistingexecution", Collections.EMPTY_MAP);
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("execution unexistingexecution doesn't exist", ae.getMessage());
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.setVariables("unexistingexecution", new HashMap<>()))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("execution unexistingexecution doesn't exist");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testSetVariablesNullExecutionId() {
-        try {
-            runtimeService.setVariables(null, Collections.EMPTY_MAP);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.setVariables(null, new HashMap<>()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
@@ -764,7 +685,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
             List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
             for (HistoricDetail currentHistoricDetail : resultSet) {
-                assertTrue(currentHistoricDetail instanceof HistoricDetailVariableInstanceUpdateEntity);
+                assertThat(currentHistoricDetail).isInstanceOf(HistoricDetailVariableInstanceUpdateEntity.class);
                 HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = (HistoricDetailVariableInstanceUpdateEntity) currentHistoricDetail;
 
                 if (historicVariableUpdate.getName().equals(variableName)) {
@@ -778,7 +699,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                 }
             }
 
-            assertTrue(deletedVariableUpdateFound);
+            assertThat(deletedVariableUpdateFound).isTrue();
         }
     }
 
@@ -794,9 +715,9 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         runtimeService.removeVariable(processInstance.getId(), "variable1");
 
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isEqualTo("value2");
 
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
@@ -813,20 +734,17 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         runtimeService.removeVariable(currentTask.getExecutionId(), "variable1");
 
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isEqualTo("value2");
 
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
 
     @Test
     public void testRemoveVariableNullExecutionId() {
-        try {
-            runtimeService.removeVariable(null, "variable");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.removeVariable(null, "variable"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -839,9 +757,9 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         runtimeService.removeVariableLocal(processInstance.getId(), "variable1");
 
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isEqualTo("value2");
 
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
@@ -857,30 +775,27 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task currentTask = taskService.createTaskQuery().singleResult();
         runtimeService.setVariableLocal(currentTask.getExecutionId(), "localVariable", "local value");
 
-        assertEquals("local value", runtimeService.getVariableLocal(currentTask.getExecutionId(), "localVariable"));
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "localVariable")).isEqualTo("local value");
 
         runtimeService.removeVariableLocal(currentTask.getExecutionId(), "localVariable");
 
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "localVariable"));
-        assertNull(runtimeService.getVariableLocal(currentTask.getExecutionId(), "localVariable"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "localVariable")).isNull();
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "localVariable")).isNull();
 
-        assertEquals("value1", runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isEqualTo("value1");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isEqualTo("value2");
 
-        assertEquals("value1", runtimeService.getVariable(currentTask.getExecutionId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(currentTask.getExecutionId(), "variable2"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable1")).isEqualTo("value1");
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable2")).isEqualTo("value2");
 
         checkHistoricVariableUpdateEntity("localVariable", processInstance.getId());
     }
 
     @Test
     public void testRemoveLocalVariableNullExecutionId() {
-        try {
-            runtimeService.removeVariableLocal(null, "variable");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.removeVariableLocal(null, "variable"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -895,13 +810,13 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         runtimeService.removeVariables(processInstance.getId(), vars.keySet());
 
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable2"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable2")).isNull();
 
-        assertEquals("value3", runtimeService.getVariable(processInstance.getId(), "variable3"));
-        assertEquals("value3", runtimeService.getVariableLocal(processInstance.getId(), "variable3"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable3")).isEqualTo("value3");
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable3")).isEqualTo("value3");
 
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
         checkHistoricVariableUpdateEntity("variable2", processInstance.getId());
@@ -921,32 +836,28 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         runtimeService.removeVariables(currentTask.getExecutionId(), vars.keySet());
 
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable1"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "variable2"));
-        assertNull(runtimeService.getVariableLocal(processInstance.getId(), "variable2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable2")).isNull();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable2")).isNull();
 
-        assertEquals("value3", runtimeService.getVariable(processInstance.getId(), "variable3"));
-        assertEquals("value3", runtimeService.getVariableLocal(processInstance.getId(), "variable3"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "variable3")).isEqualTo("value3");
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "variable3")).isEqualTo("value3");
 
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "variable1"));
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "variable2"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable1")).isNull();
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable2")).isNull();
 
-        assertEquals("value3", runtimeService.getVariable(currentTask.getExecutionId(), "variable3"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable3")).isEqualTo("value3");
 
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
         checkHistoricVariableUpdateEntity("variable2", processInstance.getId());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testRemoveVariablesNullExecutionId() {
-        try {
-            runtimeService.removeVariables(null, Collections.EMPTY_LIST);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.removeVariables(null, new HashSet<>()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -966,44 +877,40 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.setVariablesLocal(currentTask.getExecutionId(), varsToDelete);
         runtimeService.setVariableLocal(currentTask.getExecutionId(), "variable6", "value6");
 
-        assertEquals("value3", runtimeService.getVariable(currentTask.getExecutionId(), "variable3"));
-        assertEquals("value3", runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable3"));
-        assertEquals("value4", runtimeService.getVariable(currentTask.getExecutionId(), "variable4"));
-        assertEquals("value4", runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable4"));
-        assertEquals("value5", runtimeService.getVariable(currentTask.getExecutionId(), "variable5"));
-        assertEquals("value5", runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable5"));
-        assertEquals("value6", runtimeService.getVariable(currentTask.getExecutionId(), "variable6"));
-        assertEquals("value6", runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable6"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable3")).isEqualTo("value3");
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable3")).isEqualTo("value3");
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable4")).isEqualTo("value4");
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable4")).isEqualTo("value4");
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable5")).isEqualTo("value5");
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable5")).isEqualTo("value5");
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable6")).isEqualTo("value6");
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable6")).isEqualTo("value6");
 
         runtimeService.removeVariablesLocal(currentTask.getExecutionId(), varsToDelete.keySet());
 
-        assertEquals("value1", runtimeService.getVariable(currentTask.getExecutionId(), "variable1"));
-        assertEquals("value2", runtimeService.getVariable(currentTask.getExecutionId(), "variable2"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable1")).isEqualTo("value1");
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable2")).isEqualTo("value2");
 
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "variable3"));
-        assertNull(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable3"));
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "variable4"));
-        assertNull(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable4"));
-        assertNull(runtimeService.getVariable(currentTask.getExecutionId(), "variable5"));
-        assertNull(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable5"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable3")).isNull();
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable3")).isNull();
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable4")).isNull();
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable4")).isNull();
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable5")).isNull();
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable5")).isNull();
 
-        assertEquals("value6", runtimeService.getVariable(currentTask.getExecutionId(), "variable6"));
-        assertEquals("value6", runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable6"));
+        assertThat(runtimeService.getVariable(currentTask.getExecutionId(), "variable6")).isEqualTo("value6");
+        assertThat(runtimeService.getVariableLocal(currentTask.getExecutionId(), "variable6")).isEqualTo("value6");
 
         checkHistoricVariableUpdateEntity("variable3", processInstance.getId());
         checkHistoricVariableUpdateEntity("variable4", processInstance.getId());
         checkHistoricVariableUpdateEntity("variable5", processInstance.getId());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testRemoveVariablesLocalNullExecutionId() {
-        try {
-            runtimeService.removeVariablesLocal(null, Collections.EMPTY_LIST);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("executionId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.removeVariablesLocal(null, new HashSet<>()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
     }
 
     @Test
@@ -1013,11 +920,11 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         startSignalCatchProcesses();
         // 15, because the signal catch is a scope
-        assertEquals(15, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isEqualTo(15);
         runtimeService.signalEventReceived("alert");
-        assertEquals(9, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isEqualTo(9);
         runtimeService.signalEventReceived("panic");
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
         // //// test signalEventReceived(String, String)
         startSignalCatchProcesses();
@@ -1027,14 +934,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             List<Execution> page = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").listPage(0, 1);
             runtimeService.signalEventReceived("alert", page.get(0).getId());
 
-            assertEquals(executions - 1, runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").count());
+            assertThat(runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").count()).isEqualTo(executions - 1);
         }
 
         for (int executions = 3; executions > 0; executions--) {
             List<Execution> page = runtimeService.createExecutionQuery().signalEventSubscriptionName("panic").listPage(0, 1);
             runtimeService.signalEventReceived("panic", page.get(0).getId());
 
-            assertEquals(executions - 1, runtimeService.createExecutionQuery().signalEventSubscriptionName("panic").count());
+            assertThat(runtimeService.createExecutionQuery().signalEventSubscriptionName("panic").count()).isEqualTo(executions - 1);
         }
 
     }
@@ -1046,44 +953,35 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         startMessageCatchProcesses();
         // 12, because the signal catch is a scope
-        assertEquals(12, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isEqualTo(12);
 
         // signal the executions one at a time:
         for (int executions = 3; executions > 0; executions--) {
             List<Execution> page = runtimeService.createExecutionQuery().messageEventSubscriptionName("alert").listPage(0, 1);
             runtimeService.messageEventReceived("alert", page.get(0).getId());
 
-            assertEquals(executions - 1, runtimeService.createExecutionQuery().messageEventSubscriptionName("alert").count());
+            assertThat(runtimeService.createExecutionQuery().messageEventSubscriptionName("alert").count()).isEqualTo(executions - 1);
         }
 
         for (int executions = 3; executions > 0; executions--) {
             List<Execution> page = runtimeService.createExecutionQuery().messageEventSubscriptionName("panic").listPage(0, 1);
             runtimeService.messageEventReceived("panic", page.get(0).getId());
 
-            assertEquals(executions - 1, runtimeService.createExecutionQuery().messageEventSubscriptionName("panic").count());
+            assertThat(runtimeService.createExecutionQuery().messageEventSubscriptionName("panic").count()).isEqualTo(executions - 1);
         }
 
     }
 
     @Test
     public void testSignalEventReceivedNonExistingExecution() {
-        try {
-            runtimeService.signalEventReceived("alert", "nonexistingExecution");
-            fail("exception expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            // this is good
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.signalEventReceived("alert", "nonexistingExecution"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
     public void testMessageEventReceivedNonExistingExecution() {
-        try {
-            runtimeService.messageEventReceived("alert", "nonexistingExecution");
-            fail("exception expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertEquals(Execution.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.messageEventReceived("alert", "nonexistingExecution"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
@@ -1091,57 +989,48 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testExecutionWaitingForDifferentSignal() {
         runtimeService.startProcessInstanceByKey("catchAlertSignal");
         Execution execution = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").singleResult();
-        try {
-            runtimeService.signalEventReceived("bogusSignal", execution.getId());
-            fail("exception expected");
-        } catch (FlowableException e) {
-            // this is good
-        }
+        assertThatThrownBy(() -> runtimeService.signalEventReceived("bogusSignal", execution.getId()))
+                .isExactlyInstanceOf(FlowableException.class);
+
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetProcessInstanceName() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
-        assertNull(processInstance.getName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getName()).isNull();
 
         // Set the name
         runtimeService.setProcessInstanceName(processInstance.getId(), "New name");
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(processInstance);
-        assertEquals("New name", processInstance.getName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getName()).isEqualTo("New name");
 
         // Set the name to null
         runtimeService.setProcessInstanceName(processInstance.getId(), null);
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(processInstance);
-        assertNull(processInstance.getName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getName()).isNull();
 
         // Set name for unexisting process instance, should fail
-        try {
-            runtimeService.setProcessInstanceName("unexisting", null);
-            fail("Exception expected");
-        } catch (FlowableObjectNotFoundException aonfe) {
-            assertEquals(ProcessInstance.class, aonfe.getObjectClass());
-        }
+        assertThatThrownBy(() -> runtimeService.setProcessInstanceName("unexisting", null))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(processInstance);
-        assertNull(processInstance.getName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getName()).isNull();
 
         // Set name for suspended process instance, should fail
-        runtimeService.suspendProcessInstanceById(processInstance.getId());
-        try {
-            runtimeService.setProcessInstanceName(processInstance.getId(), null);
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            assertEquals("process instance " + processInstance.getId() + " is suspended, cannot set name", ae.getMessage());
-        }
+        String processInstanceId = processInstance.getId();
+        runtimeService.suspendProcessInstanceById(processInstanceId);
+        assertThatThrownBy(() -> runtimeService.setProcessInstanceName(processInstanceId, null))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("process instance " + processInstanceId + " is suspended, cannot set name");
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(processInstance);
-        assertNull(processInstance.getName());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getName()).isNull();
     }
 
     private void startSignalCatchProcesses() {
@@ -1163,7 +1052,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testGetVariableUnexistingVariableNameWithCast() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         String variableValue = runtimeService.getVariable(processInstance.getId(), "unexistingVariable", String.class);
-        assertNull(variableValue);
+        assertThat(variableValue).isNull();
     }
 
     @Test
@@ -1173,7 +1062,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         Boolean variableValue = runtimeService.getVariable(processInstance.getId(), "var1", Boolean.class);
-        assertTrue(variableValue);
+        assertThat(variableValue).isTrue();
     }
 
     @Test
@@ -1191,7 +1080,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testGetVariableLocalUnexistingVariableNameWithCast() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         String variableValue = runtimeService.getVariableLocal(processInstance.getId(), "var1", String.class);
-        assertNull(variableValue);
+        assertThat(variableValue).isNull();
     }
 
     @Test
@@ -1201,7 +1090,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         Boolean variableValue = runtimeService.getVariableLocal(processInstance.getId(), "var1", Boolean.class);
-        assertTrue(variableValue);
+        assertThat(variableValue).isTrue();
     }
 
     @Test
@@ -1226,15 +1115,16 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
             // Verify runtime
-            assertEquals(3, runtimeService.getVariables(processInstance.getId()).size());
-            assertEquals(3, runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3")).size());
-            assertNotNull(runtimeService.getVariable(processInstance.getId(), "var2"));
+            assertThat(runtimeService.getVariables(processInstance.getId())).hasSize(3);
+            assertThat(runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3"))).hasSize(3);
+            assertThat(runtimeService.getVariable(processInstance.getId(), "var2")).isNotNull();
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // Verify history
-            assertEquals(3, historyService.createHistoricVariableInstanceQuery().list().size());
-            assertNotNull(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("var2").singleResult());
+            assertThat(historyService.createHistoricVariableInstanceQuery().list()).hasSize(3);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("var2").singleResult())
+                    .isNotNull();
 
             // Remove one variable
             runtimeService.removeVariable(processInstance.getId(), "var2");
@@ -1242,13 +1132,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // Verify runtime
-            assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());
-            assertEquals(2, runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3")).size());
-            assertNull(runtimeService.getVariable(processInstance.getId(), "var2"));
+            assertThat(runtimeService.getVariables(processInstance.getId())).hasSize(2);
+            assertThat(runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3"))).hasSize(2);
+            assertThat(runtimeService.getVariable(processInstance.getId(), "var2")).isNull();
 
             // Verify history
-            assertEquals(2, historyService.createHistoricVariableInstanceQuery().list().size());
-            assertNull(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("var2").singleResult());
+            assertThat(historyService.createHistoricVariableInstanceQuery().list()).hasSize(2);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("var2").singleResult())
+                    .isNull();
         }
     }
 
@@ -1268,7 +1159,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(noon);
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertEquals(noon, processInstance.getStartTime());
+        assertThat(processInstance.getStartTime()).isEqualTo(noon);
     }
 
     @Test
@@ -1278,7 +1169,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         identityService.setAuthenticatedUserId(authenticatedUser);
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertEquals(authenticatedUser, processInstance.getStartUserId());
+        assertThat(processInstance.getStartUserId()).isEqualTo(authenticatedUser);
     }
 
     @Test
@@ -1286,19 +1177,19 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testNoAuthenticatedStartUserProcessInstance() {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertNull(processInstance.getStartUserId());
+        assertThat(processInstance.getStartUserId()).isNull();
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     public void testAdhocCallbacks() {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").
-            callbackId("nonExistingCase").
-            callbackType(CallbackTypes.CASE_ADHOC_CHILD).
-            start();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
+                .callbackId("nonExistingCase")
+                .callbackType(CallbackTypes.CASE_ADHOC_CHILD)
+                .start();
 
-        assertThat(processInstance.getCallbackId(), is("nonExistingCase"));
-        assertThat(processInstance.getCallbackType(), is(CallbackTypes.CASE_ADHOC_CHILD));
+        assertThat(processInstance.getCallbackId()).isEqualTo("nonExistingCase");
+        assertThat(processInstance.getCallbackType()).isEqualTo(CallbackTypes.CASE_ADHOC_CHILD);
     }
 
     @Test
@@ -1306,26 +1197,25 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").
-            tenantId("flowable").
-            fallbackToDefaultTenant().
-            start();
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .start();
 
-        assertThat(processInstance, is(notNullValue()));
+        assertThat(processInstance).isNotNull();
     }
 
     @Test
     public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant_definitionNotFound() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        assertThatThrownBy(
-            () -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition").
-                tenantId("flowable").
-                fallbackToDefaultTenant().
-                start()
-        ).
-            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
-            hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .start()
+        )
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
     }
 
     @Test
@@ -1335,14 +1225,13 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartByProcessInstanceBuilderWithFallbackToDefaultTenant_definitionNotFoundInNonDefaultTenant() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        assertThatThrownBy(
-            () -> processInstanceBuilder.processDefinitionKey("oneTaskProcess").
-                tenantId("flowable").
-                fallbackToDefaultTenant().
-                start()
-        ).
-            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
-            hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .start()
+        )
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
     }
 
     @Test
@@ -1350,26 +1239,25 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartAsyncWithFallbackToDefaultTenant() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess").
-            tenantId("flowable").
-            fallbackToDefaultTenant().
-            startAsync();
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .startAsync();
 
-        assertThat(processInstance, is(notNullValue()));
+        assertThat(processInstance).isNotNull();
     }
 
     @Test
     public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFound() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        assertThatThrownBy(
-            () -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition").
-                tenantId("flowable").
-                fallbackToDefaultTenant().
-                startAsync()
-        ).
-            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
-            hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionKey("nonExistingDefinition")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .startAsync()
+        )
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'nonExistingDefinition'. Fallback to default tenant was also applied.");
     }
 
     @Test
@@ -1379,14 +1267,13 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartAsyncWithFallbackToDefaultTenant_definitionNotFoundInNonDefaultTenant() {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 
-        assertThatThrownBy(
-            () -> processInstanceBuilder.processDefinitionKey("oneTaskProcess").
-                tenantId("flowable").
-                fallbackToDefaultTenant().
-                startAsync()
-        ).
-            isExactlyInstanceOf(FlowableObjectNotFoundException.class).
-            hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+        assertThatThrownBy(() -> processInstanceBuilder.processDefinitionKey("oneTaskProcess")
+                .tenantId("flowable")
+                .fallbackToDefaultTenant()
+                .startAsync()
+        )
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
     }
 
 }

@@ -29,6 +29,7 @@ public interface ScopeTypes {
     String FORM = "form";
     String PLAN_ITEM = "planItem";
     String TASK = "task";
+    String EXTERNAL_WORKER = "externalWorker";
 
     String CMMN_EXTERNAL_WORKER = "cmmnExternalWorker";
     String BPMN_EXTERNAL_WORKER = "bpmnExternalWorker";

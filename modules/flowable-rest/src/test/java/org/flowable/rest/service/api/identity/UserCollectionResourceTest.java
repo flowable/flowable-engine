@@ -51,14 +51,14 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             user1.setFirstName("Fred");
             user1.setLastName("McDonald");
             user1.setDisplayName("Fred McDonald");
-            user1.setEmail("no-reply@activiti.org");
+            user1.setEmail("no-reply@flowable.org");
             identityService.saveUser(user1);
             savedUsers.add(user1);
 
             User user2 = identityService.newUser("anotherUser");
             user2.setFirstName("Tijs");
             user2.setLastName("Barrez");
-            user2.setEmail("no-reply@alfresco.org");
+            user2.setEmail("no-reply@flowable.com");
             identityService.saveUser(user2);
             savedUsers.add(user2);
 
@@ -89,7 +89,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on email
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?email=no-reply@activiti.org";
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?email=no-reply@flowable.org";
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on firstNameLike
@@ -105,7 +105,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on emailLike
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?emailLike=" + encode("no-reply@activiti.org%");
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?emailLike=" + encode("no-reply@flowable.org%");
             assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on memberOfGroup
@@ -132,7 +132,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("lastName", "Heremans");
             requestNode.put("displayName", "Frederik Heremans");
             requestNode.put("password", "test");
-            requestNode.put("email", "no-reply@activiti.org");
+            requestNode.put("email", "no-reply@flowable.org");
 
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION, "testuser"));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -147,7 +147,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
                             + "firstName: 'Frederik',"
                             + "lastName: 'Heremans',"
                             + "displayName: 'Frederik Heremans',"
-                            + "email: 'no-reply@activiti.org',"
+                            + "email: 'no-reply@flowable.org',"
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "testuser") + "'"
                             + "}");
 
@@ -157,7 +157,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertThat(createdUser.getLastName()).isEqualTo("Heremans");
             assertThat(createdUser.getDisplayName()).isEqualTo("Frederik Heremans");
             assertThat(createdUser.getPassword()).isEqualTo("test");
-            assertThat(createdUser.getEmail()).isEqualTo("no-reply@activiti.org");
+            assertThat(createdUser.getEmail()).isEqualTo("no-reply@flowable.org");
         } finally {
             try {
                 identityService.deleteUser("testuser");
@@ -173,7 +173,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("firstName", "Frederik");
         requestNode.put("lastName", "Heremans");
-        requestNode.put("email", "no-reply@activiti.org");
+        requestNode.put("email", "no-reply@flowable.org");
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION, "unexisting"));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -185,7 +185,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         requestNode.put("id", "kermit");
         requestNode.put("firstName", "Frederik");
         requestNode.put("lastName", "Heremans");
-        requestNode.put("email", "no-reply@activiti.org");
+        requestNode.put("email", "no-reply@flowable.org");
 
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CONFLICT));

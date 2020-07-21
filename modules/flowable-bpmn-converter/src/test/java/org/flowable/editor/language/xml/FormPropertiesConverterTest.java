@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,28 +49,27 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(BpmnModel model) {
-        assertEquals("formPropertiesProcess", model.getMainProcess().getId());
-        assertEquals("User registration", model.getMainProcess().getName());
-        assertTrue(model.getMainProcess().isExecutable());
+        assertThat(model.getMainProcess().getId()).isEqualTo("formPropertiesProcess");
+        assertThat(model.getMainProcess().getName()).isEqualTo("User registration");
+        assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement startFlowElement = model.getMainProcess().getFlowElement("startNode");
-        assertNotNull(startFlowElement);
-        assertTrue(startFlowElement instanceof StartEvent);
+        assertThat(startFlowElement).isInstanceOf(StartEvent.class);
         StartEvent startEvent = (StartEvent) startFlowElement;
 
         for (FormProperty formProperty : startEvent.getFormProperties()) {
-            assertTrue(formProperty.isRequired());
+            assertThat(formProperty.isRequired()).isTrue();
         }
 
         FlowElement userFlowElement = model.getMainProcess().getFlowElement("userTask");
-        assertNotNull(userFlowElement);
-        assertTrue(userFlowElement instanceof UserTask);
+        assertThat(userFlowElement).isNotNull();
+        assertThat(userFlowElement).isInstanceOf(UserTask.class);
         UserTask userTask = (UserTask) userFlowElement;
 
         List<FormProperty> formProperties = userTask.getFormProperties();
 
-        assertNotNull(formProperties);
-        assertEquals("Invalid form properties list: ", 8, formProperties.size());
+        assertThat(formProperties).isNotNull();
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
             if (formProperty.getId().equals("new_property_1")) {
@@ -107,9 +104,9 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
     }
 
     private void checkFormProperty(FormProperty formProperty, boolean shouldBeRequired, boolean shouldBeReadable, boolean shouldBeWritable) {
-        assertEquals(shouldBeRequired, formProperty.isRequired());
-        assertEquals(shouldBeReadable, formProperty.isReadable());
-        assertEquals(shouldBeWritable, formProperty.isWriteable());
+        assertThat(formProperty.isRequired()).isEqualTo(shouldBeRequired);
+        assertThat(formProperty.isReadable()).isEqualTo(shouldBeReadable);
+        assertThat(formProperty.isWriteable()).isEqualTo(shouldBeWritable);
     }
 
     private void checkFormPropertyFormValues(List<Map<String, Object>> formValues) {
@@ -134,6 +131,6 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         expectedFormValues.add(formValue3);
         expectedFormValues.add(formValue4);
 
-        assertEquals(expectedFormValues, formValues);
+        assertThat(formValues).isEqualTo(expectedFormValues);
     }
 }

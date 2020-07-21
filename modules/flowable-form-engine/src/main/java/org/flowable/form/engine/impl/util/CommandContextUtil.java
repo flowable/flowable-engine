@@ -16,12 +16,12 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
-import org.flowable.form.engine.impl.persistence.entity.TableDataManager;
 
 public class CommandContextUtil {
 

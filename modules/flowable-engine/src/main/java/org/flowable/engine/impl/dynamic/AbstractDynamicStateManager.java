@@ -51,6 +51,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -73,11 +74,13 @@ import org.flowable.engine.impl.runtime.MoveActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -259,6 +262,7 @@ public abstract class AbstractDynamicStateManager {
                 currentFlowElement = resolveFlowElementFromBpmnModel(modelOfCallActivity, currentActivityId);
                 newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), activityId);
                 canContainerDirectMigrate = false;
+                
             } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 //The subProcess model is defined in the callActivity of the current processDefinition or the migrateProcessDefinition if defined
                 ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
@@ -289,6 +293,7 @@ public abstract class AbstractDynamicStateManager {
 
                 newFlowElement = resolveFlowElementFromBpmnModel(subProcessModel, activityId);
                 canContainerDirectMigrate = false;
+                
             } else {
                 // Get first execution to get process definition id
                 ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
@@ -380,7 +385,7 @@ public abstract class AbstractDynamicStateManager {
                 ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement().getId(), commandContext);
                 List<ExecutionEntity> moveExecutions = moveExecutionContainer.getExecutions();
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
-                moveExecutionContainer.getNewAssigneeId().ifPresent(subProcessMoveExecutionEntityContainer::setNewAssigneeId);
+                subProcessMoveExecutionEntityContainer.setNewAssigneeId(moveExecutionContainer.getNewAssigneeId());
                 moveExecutions.forEach(executionEntity -> subProcessMoveExecutionEntityContainer.addContinueParentExecution(executionEntity.getId(), callActivityInstanceExecution));
                 newChildExecutions = createEmbeddedSubProcessAndExecutions(moveExecutionContainer.getMoveToFlowElements(), moveExecutions, subProcessMoveExecutionEntityContainer, new ProcessInstanceChangeState(), commandContext);
             }
@@ -416,7 +421,14 @@ public abstract class AbstractDynamicStateManager {
 
             if (!moveExecutionContainer.isDirectExecutionMigration()) {
                 for (ExecutionEntity newChildExecution : newChildExecutions) {
-                    CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
+                    if (moveExecutionContainer.getNewAssigneeId() != null && moveExecutionContainer.hasNewExecutionId(newChildExecution.getId())) {
+                        MigrationContext migrationContext = new MigrationContext();
+                        migrationContext.setAssignee(moveExecutionContainer.getNewAssigneeId());
+                        CommandContextUtil.getAgenda(commandContext).planContinueProcessWithMigrationContextOperation(newChildExecution, migrationContext);
+                        
+                    } else {
+                        CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(newChildExecution);
+                    }
                 }
             }
         }
@@ -540,7 +552,8 @@ public abstract class AbstractDynamicStateManager {
         return null;
     }
 
-    protected List<ExecutionEntity> createEmbeddedSubProcessAndExecutions(Collection<FlowElementMoveEntry> moveToFlowElements, List<ExecutionEntity> movingExecutions, MoveExecutionEntityContainer moveExecutionEntityContainer, ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
+    protected List<ExecutionEntity> createEmbeddedSubProcessAndExecutions(Collection<FlowElementMoveEntry> moveToFlowElements, List<ExecutionEntity> movingExecutions, 
+            MoveExecutionEntityContainer moveExecutionEntityContainer, ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
@@ -594,11 +607,14 @@ public abstract class AbstractDynamicStateManager {
                 } else {
                     newChildExecution = executionEntityManager.createChildExecution(parentExecution);
                     newChildExecution.setCurrentFlowElement(newFlowElement);
+                    moveExecutionEntityContainer.addNewExecutionId(newChildExecution.getId());
                 }
 
                 if (newChildExecution != null) {
-                    if (moveExecutionEntityContainer.getNewAssigneeId().isPresent() && newFlowElement instanceof UserTask) {
-                        handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId().get(), commandContext);
+                    if (moveExecutionEntityContainer.getNewAssigneeId() != null && newFlowElement instanceof UserTask && 
+                            !moveExecutionEntityContainer.hasNewExecutionId(newChildExecution.getId())) {
+                        
+                        handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId(), commandContext);
                     }
 
                     if (newFlowElement instanceof CallActivity) {
@@ -778,6 +794,8 @@ public abstract class AbstractDynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(subProcessDefinition, parentExecution, businessKey, initialActivityId);
+        EntityLinkUtil.createEntityLinks(parentExecution.getProcessInstanceId(), parentExecution.getId(), callActivity.getId(),
+                subProcessInstance.getId(), ScopeTypes.BPMN);
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
@@ -870,7 +888,9 @@ public abstract class AbstractDynamicStateManager {
     protected void handleUserTaskNewAssignee(ExecutionEntity taskExecution, String newAssigneeId, CommandContext commandContext) {
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
         TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
-        TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        if (task != null) {
+            TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        }
     }
 
     protected boolean isEventSubProcessStart(FlowElement flowElement) {

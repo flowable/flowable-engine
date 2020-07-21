@@ -233,6 +233,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         assertTrue(Objects.equals(historicActInst.getActivityType(), activityInstance.getActivityType()));
         assertTrue(Objects.equals(historicActInst.getProcessInstanceId(), activityInstance.getProcessInstanceId()));
         assertTrue(Objects.equals(historicActInst.getAssignee(), activityInstance.getAssignee()));
+        assertTrue(Objects.equals(historicActInst.getTransactionOrder(), activityInstance.getTransactionOrder()));
         assertTrue(Objects.equals(historicActInst.getDurationInMillis(), activityInstance.getDurationInMillis()));
         assertTrue(Objects.equals(historicActInst.getTenantId(), activityInstance.getTenantId()));
         assertTrue(Objects.equals(historicActInst.getDeleteReason(), activityInstance.getDeleteReason()));

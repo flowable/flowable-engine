@@ -44,7 +44,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
             start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
     }
@@ -58,7 +58,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
     }
@@ -72,7 +72,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("").count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("").count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("").list()).isEmpty();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("").singleResult()).isNull();
     }
@@ -85,7 +85,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
             start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("gonzo").count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("gonzo").count()).isZero();
     }
 
     @Test
@@ -134,7 +134,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
             start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId())
@@ -149,7 +149,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
             start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("")).list()).isEmpty();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("")).singleResult()).isNull();
     }
@@ -165,7 +165,7 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())
-        ).count()).isEqualTo(1L);
+        ).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())
         ).list().get(0).getId()).isEqualTo(caseInstance.getId());

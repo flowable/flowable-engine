@@ -1,3 +1,0 @@
-# Auto Configuration Import Filters
-org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
-org.flowable.ui.task.conf.FlowableTaskEventRegistryCondition

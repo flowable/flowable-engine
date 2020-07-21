@@ -13,9 +13,12 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -39,7 +42,11 @@ import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLin
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -169,8 +176,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
             historicEntityLinkEntity.setCreateTime(entityLink.getCreateTime());
             historicEntityLinkEntity.setScopeId(entityLink.getScopeId());
+            historicEntityLinkEntity.setSubScopeId(entityLink.getSubScopeId());
             historicEntityLinkEntity.setScopeType(entityLink.getScopeType());
             historicEntityLinkEntity.setScopeDefinitionId(entityLink.getScopeDefinitionId());
+            historicEntityLinkEntity.setParentElementId(entityLink.getParentElementId());
             historicEntityLinkEntity.setReferenceScopeId(entityLink.getReferenceScopeId());
             historicEntityLinkEntity.setReferenceScopeType(entityLink.getReferenceScopeType());
             historicEntityLinkEntity.setReferenceScopeDefinitionId(entityLink.getReferenceScopeDefinitionId());
@@ -278,6 +287,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity) {
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastUnavailableTime(),
+            h -> h.setLastUnavailableTime(planItemInstanceEntity.getLastUnavailableTime()));
+    }
+
+    @Override
     public void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity) {
         recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastEnabledTime(),
             h -> h.setLastEnabledTime(planItemInstanceEntity.getLastEnabledTime()));
@@ -345,6 +360,41 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                 h.setEndedTime(exitTime);
                 h.setExitTime(exitTime);
             });
+    }
+    
+    @Override
+    public void updateCaseDefinitionIdInHistory(CaseDefinition caseDefinition, CaseInstanceEntity caseInstance) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = CommandContextUtil.getHistoricCaseInstanceEntityManager();
+            HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstance.getId());
+            historicCaseInstance.setCaseDefinitionId(caseDefinition.getId());
+            historicCaseInstanceEntityManager.update(historicCaseInstance);
+    
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
+            taskQuery.caseInstanceId(caseInstance.getId());
+            List<HistoricTaskInstance> historicTasks = historicTaskService.findHistoricTaskInstancesByQueryCriteria(taskQuery);
+            if (historicTasks != null) {
+                for (HistoricTaskInstance historicTaskInstance : historicTasks) {
+                    HistoricTaskInstanceEntity taskEntity = (HistoricTaskInstanceEntity) historicTaskInstance;
+                    taskEntity.setScopeDefinitionId(caseDefinition.getId());
+                    historicTaskService.updateHistoricTask(taskEntity, true);
+                }
+            }
+
+            // because of upgrade runtimeActivity instances can be only subset of historicActivity instances
+            HistoricPlanItemInstanceQueryImpl historicPlanItemQuery = new HistoricPlanItemInstanceQueryImpl();
+            historicPlanItemQuery.planItemInstanceCaseInstanceId(caseInstance.getId());
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = CommandContextUtil.getHistoricPlanItemInstanceEntityManager();
+            List<HistoricPlanItemInstance> historicPlanItems = historicPlanItemInstanceEntityManager.findByCriteria(historicPlanItemQuery);
+            if (historicPlanItems != null) {
+                for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItems) {
+                    HistoricPlanItemInstanceEntity planItemEntity = (HistoricPlanItemInstanceEntity) historicPlanItemInstance;
+                    planItemEntity.setCaseDefinitionId(caseDefinition.getId());
+                    historicPlanItemInstanceEntityManager.update(planItemEntity);
+                }
+            }
+        }
     }
 
     @Override

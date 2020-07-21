@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.TablePageQueryImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngineConfiguration;

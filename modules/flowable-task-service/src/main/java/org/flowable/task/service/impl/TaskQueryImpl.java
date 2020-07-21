@@ -81,7 +81,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    protected boolean withoutDeleteReason;
     protected String processInstanceId;
     protected Collection<String> processInstanceIds;
     protected String executionId;
@@ -647,16 +646,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.withoutTenantId = true;
         } else {
             this.withoutTenantId = true;
-        }
-        return this;
-    }
-
-    @Override
-    public TaskQuery taskWithoutDeleteReason() {
-        if (orActive) {
-            currentOrQueryObject.withoutDeleteReason = true;
-        } else {
-            this.withoutDeleteReason = true;
         }
         return this;
     }
@@ -2109,10 +2098,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getProcessDefinitionKeyLikeIgnoreCase() {
         return processDefinitionKeyLikeIgnoreCase;
-    }
-
-    public boolean isWithoutDeleteReason() {
-        return withoutDeleteReason;
     }
 
     public String getLocale() {

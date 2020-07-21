@@ -21,9 +21,15 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class ClearProcessInstanceLockTimesCmd implements Command<Void> {
 
+    protected String lockOwner;
+
+    public ClearProcessInstanceLockTimesCmd(String lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getExecutionEntityManager(commandContext).clearAllProcessInstanceLockTimes();
+        CommandContextUtil.getExecutionEntityManager(commandContext).clearAllProcessInstanceLockTimes(lockOwner);
         return null;
     }
 

@@ -12,6 +12,8 @@
  */
 package org.flowable.camel.cdi.std;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -23,7 +25,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -64,15 +65,15 @@ public class CdiAsyncPingTest extends StdCamelCdiFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncPingProcess");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
-        Assert.assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
         Thread.sleep(1500);
 
         executionList = runtimeService.createExecutionQuery().list();
-        Assert.assertEquals(0, executionList.size());
+        assertThat(executionList).isEmpty();
 
-        Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
 }

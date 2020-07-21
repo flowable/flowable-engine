@@ -64,6 +64,9 @@ public interface HistoricActivityInstance extends HistoricData {
 
     /** Difference between {@link #getEndTime()} and {@link #getStartTime()}. */
     Long getDurationInMillis();
+    
+    /** Get transaction order value */
+    Integer getTransactionOrder();
 
     /** Returns the delete reason for this activity, if any was set (if completed normally, no delete reason is set) */
     String getDeleteReason();

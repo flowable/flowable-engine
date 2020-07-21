@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +25,11 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
     @Test
     @Deployment
     public void testWebServiceInvocationWithoutDataFlow() throws Exception {
-        assertEquals(-1, webServiceMock.getCount());
+        assertThat(webServiceMock.getCount()).isEqualTo(-1);
 
         processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithoutDataFlow");
         waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-        assertEquals(0, webServiceMock.getCount());
+        assertThat(webServiceMock.getCount()).isZero();
     }
 }

@@ -37,7 +37,8 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task1", "task2")
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
                 .changeState();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
@@ -77,20 +78,20 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("task2", "task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task2")
+                .changeToAvailableStateByPlanItemDefinitionId("eventListener")
                 .changeState();
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(tasks).hasSize(2);
+        assertThat(tasks).hasSize(1);
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").list();
-        assertThat(tasks).hasSize(2);
+        assertThat(tasks).hasSize(1);
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertThat(planItemInstances).hasSize(6);
+        assertThat(planItemInstances).hasSize(4);
 
         int planItem1Found = 0;
-        boolean planItem2TerminatedFound = false;
         boolean planItem2AvailableFound = false;
         boolean planItem3CompletedFound = false;
         boolean planItem3AvailableFound = false;
@@ -100,12 +101,8 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
                 assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
             } else if ("planItem2".equals(planItemInstance.getElementId())) {
-                if (PlanItemInstanceState.TERMINATED.equals(planItemInstance.getState())) {
-                    planItem2TerminatedFound = true;
-                } else {
-                    assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
-                    planItem2AvailableFound = true;
-                }
+                assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+                planItem2AvailableFound = true;
 
             } else if ("planItem3".equals(planItemInstance.getElementId())) {
                 if (PlanItemInstanceState.COMPLETED.equals(planItemInstance.getState())) {
@@ -117,15 +114,13 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
             }
         }
 
-        assertThat(planItem1Found).isEqualTo(2);
-        assertThat(planItem2TerminatedFound).isTrue();
+        assertThat(planItem1Found).isEqualTo(1);
         assertThat(planItem2AvailableFound).isTrue();
         assertThat(planItem3CompletedFound).isTrue();
         assertThat(planItem3AvailableFound).isTrue();
 
         // complete task 1 instances
         cmmnTaskService.complete(tasks.get(0).getId());
-        cmmnTaskService.complete(tasks.get(1).getId());
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
         assertThat(tasks).hasSize(1);
@@ -133,7 +128,7 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").list();
         assertThat(tasks).hasSize(1);
 
-        // complete task 2 instances
+        // complete task 2 instance
         cmmnTaskService.complete(tasks.get(0).getId());
 
         assertCaseInstanceEnded(caseInstance);

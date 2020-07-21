@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
@@ -37,7 +38,6 @@ import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -97,15 +97,15 @@ public class TaskHelper {
             if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getVariableCount() > 0) {
                 
                 Map<String, VariableInstanceEntity> taskVariables = task.getVariableInstanceEntities();
-                ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+                List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
                 for (VariableInstanceEntity variableInstanceEntity : taskVariables.values()) {
                     if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
                         variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
                     }
                 }
                 
-                for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
-                    CommandContextUtil.getVariableServiceConfiguration(commandContext).getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
+                for (ByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                    commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
                 }
                 
                 if (!taskVariables.isEmpty()) {

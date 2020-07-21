@@ -30,6 +30,13 @@ public interface Job extends JobInfo {
     int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
 
     /**
+     * Returns the correlation id of a job.
+     * The same job can be moved around and have its techinical id changed.
+     * This id allows tracking that job.
+     */
+    String getCorrelationId();
+
+    /**
      * Returns the date on which this job is supposed to be processed.
      */
     Date getDuedate();

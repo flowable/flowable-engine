@@ -329,7 +329,15 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * 
      * Note that history (minimum level ACTIVITY) must be enabled to receive this event.
      */
-    HISTORIC_PROCESS_INSTANCE_ENDED;
+    HISTORIC_PROCESS_INSTANCE_ENDED,
+
+    /**
+     * A case instance has been started.
+     * Dispatched when starting a case instance previously created.
+     * The event is dispatched after the associated {@link #ENTITY_INITIALIZED} and the variables have been set.
+     */
+    CASE_STARTED,
+    ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};
 

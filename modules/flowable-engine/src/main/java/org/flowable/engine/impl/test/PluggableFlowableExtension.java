@@ -84,7 +84,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
                 boolean matches = debug ? (commandInterceptor instanceof CommandInvoker) : (commandInterceptor instanceof LoggingExecutionTreeCommandInvoker);
                 if (matches) {
 
-                    CommandInterceptor commandInvoker = debug ? new LoggingExecutionTreeCommandInvoker() : new CommandInvoker();
+                    CommandInterceptor commandInvoker = debug ? newLoggingExecutionTreeCommandInvoker() : new CommandInvoker((commandContext, runnable) -> runnable.run());
                     if (previousCommandInterceptor != null) {
                         previousCommandInterceptor.setNext(commandInvoker);
                     } else {
@@ -106,5 +106,10 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     @Override
     protected ExtensionContext.Store getStore(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE);
+    }
+
+    protected CommandInvoker newLoggingExecutionTreeCommandInvoker() {
+        LoggingExecutionTreeCommandInvoker loggingExecutionTreeCommandInvoker = new LoggingExecutionTreeCommandInvoker((commandContext, runnable) -> runnable.run());
+        return loggingExecutionTreeCommandInvoker;
     }
 }

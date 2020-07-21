@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import flowable.DmnSampleApplication;
 public class DmnSampleApplicationTest {
 
     @Autowired
-    private DmnRuleService ruleService;
+    private DmnDecisionService ruleService;
 
     @Test
     public void contextLoads() {

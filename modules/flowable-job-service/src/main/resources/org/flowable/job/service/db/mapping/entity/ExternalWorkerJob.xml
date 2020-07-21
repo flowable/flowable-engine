@@ -23,6 +23,7 @@
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
         <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+        <result property="correlationId" column="CORRELATION_ID_" jdbcType="VARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -41,6 +42,12 @@
         select * from ${prefix}ACT_RU_EXTERNAL_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
+    <select id="selectExternalWorkerJobByCorrelationId" parameterType="string" resultMap="externalWorkerJobResultMap">
+        select *
+        from ${prefix}ACT_RU_EXTERNAL_JOB
+        where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectExternalWorkerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
@@ -48,6 +55,39 @@
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
             and HANDLER_CFG_ = #{parameter.topic, jdbcType=VARCHAR}
+            <if test="parameter.scopeType != null">
+                <choose>
+                    <when test="parameter.scopeType == 'bpmn'">
+                        and PROCESS_INSTANCE_ID_ is not null
+                    </when>
+                    <otherwise>
+                        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="parameter.tenantId != null">
+                <choose>
+                    <when test="parameter.tenantId != ''">
+                        and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+                    </when>
+                    <otherwise>
+                        and (TENANT_ID_ = '' or TENANT_ID_ is null)
+                    </otherwise>
+                </choose>
+            </if>
+            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
+                <if test="parameter.authorizedUser != null">
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{parameter.authorizedUser})
+                </if>
+                <if test="parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.isEmpty()">
+                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="parameter.authorizedGroups"
+                             open="(" separator="," close=")">
+                        #{group}
+                    </foreach>
+                    )
+                </if>
+            </trim>
             and LOCK_EXP_TIME_ is null
         </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
@@ -162,6 +202,9 @@
             <if test="scopeDefinitionId != null">
                 and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
             </if>
+            <if test="correlationId != null">
+                and RES.CORRELATION_ID_ = #{correlationId}
+            </if>
             <if test="duedateHigherThan != null">
                 and RES.DUEDATE_ &gt; #{duedateHigherThan}
             </if>
@@ -198,6 +241,19 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
+                <if test="authorizedUser != null">
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser})
+                </if>
+                <if test="authorizedGroups != null &amp;&amp; !authorizedGroups.isEmpty()">
+                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="authorizedGroups"
+                             open="(" separator="," close=")">
+                        #{group}
+                    </foreach>
+                    )
+                </if>
+            </trim>
         </where>
     </sql>
 
@@ -265,6 +321,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -291,6 +348,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{correlationId, jdbcType=VARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{exceptionMessage, jdbcType=VARCHAR},
@@ -322,6 +380,7 @@
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -349,6 +408,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -382,6 +442,7 @@
             SUB_SCOPE_ID_, 
             SCOPE_TYPE_, 
             SCOPE_DEFINITION_ID_,
+            CORRELATION_ID_,
             DUEDATE_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
@@ -407,6 +468,7 @@
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.duedate, jdbcType=TIMESTAMP},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
@@ -452,6 +514,9 @@
             </if>
             <if test="originalPersistentState.createTime != createTime">
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="originalPersistentState.correlationId != correlationId">
+                CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},

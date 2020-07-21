@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.test.engine;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.content.engine.ContentEngines;
 import org.junit.Test;
@@ -31,8 +31,8 @@ public class SpringContentEngineTest {
 
     @Test
     public void testGetEngineFromCache() {
-        assertNotNull(ContentEngines.getDefaultContentEngine());
-        assertNotNull(ContentEngines.getContentEngine("default"));
+        assertThat(ContentEngines.getDefaultContentEngine()).isNotNull();
+        assertThat(ContentEngines.getContentEngine("default")).isNotNull();
     }
 
 }

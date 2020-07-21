@@ -14,7 +14,6 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
@@ -192,16 +191,24 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
         return resultList;
     }
     
-    public static String getPropertyFormKey(JsonNode elementNode, Map<String, String> formMap) {
+    public static String getPropertyFormKey(JsonNode elementNode, CmmnJsonConverterContext converterContext) {
         String formKey = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
         if (StringUtils.isNotEmpty(formKey)) {
-            return (formKey);
+            return formKey;
+
         } else {
             JsonNode formReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_FORM_REFERENCE, elementNode);
             if (formReferenceNode != null && formReferenceNode.get("id") != null) {
+                String formModelId = formReferenceNode.get("id").asText();
+                formKey = converterContext.getFormModelKeyForFormModelId(formModelId);
 
-                if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
-                    return formMap.get(formReferenceNode.get("id").asText());
+                if (StringUtils.isNotEmpty(formKey)) {
+                    return formKey;
+                } else {
+                    formKey = formReferenceNode.path("key").asText();
+                    if (StringUtils.isNotEmpty(formKey)) {
+                        return formKey;
+                    }
                 }
             }
         }

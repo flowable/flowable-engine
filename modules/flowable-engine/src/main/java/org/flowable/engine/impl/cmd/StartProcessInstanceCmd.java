@@ -69,6 +69,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String stageInstanceId;
     protected Map<String, Object> startFormVariables;
     protected String outcome;
+    protected Map<String, Object> extraFormVariables;
+    protected FormInfo extraFormInfo;
+    protected String extraFormOutcome;
     protected boolean fallbackToDefaultTenant;
     protected ProcessInstanceHelper processInstanceHelper;
 
@@ -103,6 +106,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.stageInstanceId = processInstanceBuilder.getStageInstanceId();
         this.startFormVariables = processInstanceBuilder.getStartFormVariables();
         this.outcome = processInstanceBuilder.getOutcome();
+        this.extraFormVariables = processInstanceBuilder.getExtraFormVariables();
+        this.extraFormInfo = processInstanceBuilder.getExtraFormInfo();
+        this.extraFormOutcome = processInstanceBuilder.getExtraFormOutcome();
         this.fallbackToDefaultTenant = processInstanceBuilder.isFallbackToDefaultTenant();
     }
 
@@ -113,7 +119,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration);
 
         ProcessInstance processInstance = null;
-        if (hasStartFormData()) {
+        if (hasFormData()) {
             processInstance = handleProcessInstanceWithForm(commandContext, processDefinition, processEngineConfiguration);
         } else {
             processInstance = startProcessInstance(processDefinition);
@@ -161,14 +167,35 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         }
 
+        Map<String, Object> extraFormVariables = null;
+        if (extraFormInfo != null) {
+            FormService formService = CommandContextUtil.getFormService(commandContext);
+            extraFormVariables = formService.getVariablesFromFormSubmission(this.extraFormInfo, this.extraFormVariables, this.extraFormOutcome);
+
+            if (extraFormVariables != null) {
+                if (variables == null) {
+                    variables = new HashMap<>();
+                }
+
+                variables.putAll(extraFormVariables);
+            }
+        }
+
         ProcessInstance processInstance = startProcessInstance(processDefinition);
 
-        if (formInfo != null) {
+        if (processVariables != null) {
+            // processVariables can be non null only if the formInfo was not null
             FormService formService = CommandContextUtil.getFormService(commandContext);
             formService.createFormInstance(startFormVariables, formInfo, null, processInstance.getId(),
                             processInstance.getProcessDefinitionId(), processInstance.getTenantId(), outcome);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
-            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, processInstance.getId(), null, null, variables, processInstance.getTenantId());
+            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, processInstance.getId(), null, null, processVariables, processInstance.getTenantId());
+        }
+
+        if (extraFormVariables != null) {
+            // extraFormVariables can be non null only if the extraFormInfo was not null
+            FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
+            formFieldHandler.handleFormFieldsOnSubmit(extraFormInfo, null, processInstance.getId(), null, null, extraFormVariables, processInstance.getTenantId());
         }
 
         return processInstance;
@@ -213,6 +240,10 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     protected boolean hasStartFormData() {
         return startFormVariables != null || outcome != null;
+    }
+
+    protected boolean hasFormData() {
+        return hasStartFormData() || extraFormInfo != null;
     }
 
     protected ProcessDefinition getProcessDefinition(ProcessEngineConfigurationImpl processEngineConfiguration) {

@@ -13,6 +13,7 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -49,18 +50,16 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
 
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
-        assertThat(cmmnModel.getCases()).hasSize(1);
+        assertThat(cmmnModel.getCases())
+                .extracting(Case::getId, Case::getInitiatorVariableName)
+                .containsExactly(tuple("myCase", "test"));
 
         // Case
         Case caze = cmmnModel.getCases().get(0);
-        assertThat(caze.getId()).isEqualTo("myCase");
-        assertThat(caze.getInitiatorVariableName()).isEqualTo("test");
-        assertThat(caze.getCandidateStarterUsers()).hasSize(2);
-        assertThat(caze.getCandidateStarterUsers().contains("test")).isTrue();
-        assertThat(caze.getCandidateStarterUsers().contains("test2")).isTrue();
-        assertThat(caze.getCandidateStarterGroups()).hasSize(2);
-        assertThat(caze.getCandidateStarterGroups().contains("group")).isTrue();
-        assertThat(caze.getCandidateStarterGroups().contains("group2")).isTrue();
+        assertThat(caze.getCandidateStarterUsers())
+                .containsExactlyInAnyOrder("test", "test2");
+        assertThat(caze.getCandidateStarterGroups())
+                .containsExactlyInAnyOrder("group", "group2");
 
         // Plan model
         Stage planModel = caze.getPlanModel();
@@ -75,9 +74,9 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         for (Sentry sentry : planModel.getSentries()) {
             List<SentryOnPart> onParts = sentry.getOnParts();
             assertThat(onParts)
-                .hasSize(1)
-                .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
-                .doesNotContainNull();
+                    .hasSize(1)
+                    .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
+                    .doesNotContainNull();
         }
 
         // Plan items definitions
@@ -97,8 +96,8 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         int nrOfMileStones = 0;
         for (PlanItem planItem : planItems) {
             assertThat(planItem)
-                .extracting(PlanItem::getId, PlanItem::getDefinitionRef, PlanItem::getPlanItemDefinition) // Verify plan item definition ref is resolved
-                .doesNotContainNull();
+                    .extracting(PlanItem::getId, PlanItem::getDefinitionRef, PlanItem::getPlanItemDefinition) // Verify plan item definition ref is resolved
+                    .doesNotContainNull();
 
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Milestone) {
@@ -108,7 +107,6 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             }
 
             if (!planItem.getId().equals("planItemTaskA")) {
-                assertThat(planItem.getEntryCriteria()).isNotNull();
                 assertThat(planItem.getEntryCriteria()).hasSize(1);
                 assertThat(planItem.getEntryCriteria().get(0).getSentry()).isNotNull(); // Verify if sentry reference is resolved
             }

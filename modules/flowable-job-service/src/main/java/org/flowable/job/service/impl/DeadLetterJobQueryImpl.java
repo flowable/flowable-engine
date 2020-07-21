@@ -46,6 +46,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
@@ -197,6 +198,15 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         }
         subScopeId(planItemInstanceId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery correlationId(String correlationId) {
+        if (correlationId == null) {
+            throw new FlowableIllegalArgumentException("Provided correlationId is null");
+        }
+        this.correlationId = correlationId;
         return this;
     }
 
@@ -447,6 +457,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
     }
 
     public boolean isOnlyTimers() {

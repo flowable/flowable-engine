@@ -49,11 +49,12 @@ public class ProcessAsyncHistoryExecutorTest {
     @Test
     public void asyncHistoryExecutorBeanAvailable() {
         contextRunner.withPropertyValues("flowable.process.async-history.enable=true").run((context -> {
-            assertThat(context).hasSingleBean(ProcessEngine.class);
-            assertThat(context).hasBean("taskExecutor");
-            assertThat(context).hasBean("processAsyncExecutor");
-            assertThat(context).hasBean("asyncHistoryExecutor");
-            
+            assertThat(context)
+                    .hasSingleBean(ProcessEngine.class)
+                    .hasBean("taskExecutor")
+                    .hasBean("processAsyncExecutor")
+                    .hasBean("asyncHistoryExecutor");
+
             AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
             assertThat(processAsyncExecutor).isNotNull();
             AsyncExecutor processAsyncHistoryExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncHistoryExecutor();
@@ -65,12 +66,12 @@ public class ProcessAsyncHistoryExecutorTest {
 
             assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
             assertThat(((SpringAsyncExecutor) processAsyncHistoryExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
-            
+
             assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncExecutorActivate()).isTrue();
             assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncHistoryExecutorActivate()).isTrue();
-            
+
             assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled()).isTrue();
-            
+
         }));
     }
 
@@ -79,10 +80,11 @@ public class ProcessAsyncHistoryExecutorTest {
         contextRunner
             .withPropertyValues("flowable.process.async-history.enable=false")
             .run((context -> {
-                assertThat(context).hasSingleBean(ProcessEngine.class);
-                assertThat(context).hasBean("taskExecutor");
-                assertThat(context).hasBean("processAsyncExecutor");
-                assertThat(context).doesNotHaveBean("asyncHistoryExecutor");
+                assertThat(context)
+                        .hasSingleBean(ProcessEngine.class)
+                        .hasBean("taskExecutor")
+                        .hasBean("processAsyncExecutor")
+                        .doesNotHaveBean("asyncHistoryExecutor");
 
                 AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
                 assertThat(processAsyncExecutor).isNotNull();

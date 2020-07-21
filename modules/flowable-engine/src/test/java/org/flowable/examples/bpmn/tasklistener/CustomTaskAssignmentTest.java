@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,36 +54,36 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCandidateGroupAssignment() {
         runtimeService.startProcessInstanceByKey("customTaskAssignment");
-        assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("management").count());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("management").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser("fozzie").count()).isZero();
     }
 
     @Test
     @Deployment
     public void testCandidateUserAssignment() {
         runtimeService.startProcessInstanceByKey("customTaskAssignment");
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("gonzo").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser("fozzie").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateUser("gonzo").count()).isZero();
     }
 
     @Test
     @Deployment
     public void testAssigneeAssignment() {
         runtimeService.startProcessInstanceByKey("setAssigneeInListener");
-        assertNotNull(taskService.createTaskQuery().taskAssignee("kermit").singleResult());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("fozzie").count());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("gonzo").count());
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().taskAssignee("fozzie").count()).isZero();
+        assertThat(taskService.createTaskQuery().taskAssignee("gonzo").count()).isZero();
     }
 
     @Test
     @Deployment
     public void testOverwriteExistingAssignments() {
         runtimeService.startProcessInstanceByKey("overrideAssigneeInListener");
-        assertNotNull(taskService.createTaskQuery().taskAssignee("kermit").singleResult());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("fozzie").count());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("gonzo").count());
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().taskAssignee("fozzie").count()).isZero();
+        assertThat(taskService.createTaskQuery().taskAssignee("gonzo").count()).isZero();
     }
 
     @Test
@@ -98,9 +100,9 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("customTaskAssignment", variables);
 
         // check task lists
-        assertNotNull(taskService.createTaskQuery().taskAssignee("gonzo").singleResult());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("fozzie").count());
-        assertEquals(0, taskService.createTaskQuery().taskAssignee("kermit").count());
+        assertThat(taskService.createTaskQuery().taskAssignee("gonzo").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().taskAssignee("fozzie").count()).isZero();
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isZero();
     }
 
     @Test
@@ -109,18 +111,18 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("releaseTaskProcess");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         String taskId = task.getId();
 
         // Set assignee to null
         taskService.setAssignee(taskId, null);
 
         task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
 
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        assertNotNull(task);
-        assertNull(task.getAssignee());
+        assertThat(task).isNotNull();
+        assertThat(task.getAssignee()).isNull();
     }
 
 }

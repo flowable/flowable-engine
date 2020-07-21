@@ -51,7 +51,6 @@ public class DataObjectConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(StartEvent.class);
         assertThat(flowElement.getId()).isEqualTo("start1");
 
@@ -98,14 +97,12 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(UserTask.class);
         assertThat(flowElement.getId()).isEqualTo("userTask1");
         UserTask userTask = (UserTask) flowElement;
         assertThat(userTask.getAssignee()).isEqualTo("kermit");
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(SubProcess.class);
         assertThat(flowElement.getId()).isEqualTo("subprocess1");
         SubProcess subProcess = (SubProcess) flowElement;

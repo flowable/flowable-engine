@@ -62,6 +62,11 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     protected List<VariableInstanceEntity> queryVariables;
 
+    protected String caseDefinitionKey;
+    protected String caseDefinitionName;
+    protected Integer caseDefinitionVersion;
+    protected String caseDefinitionDeploymentId;
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -350,5 +355,45 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
         this.queryVariables = queryVariables;
+    }
+
+    @Override
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    @Override
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    @Override
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    @Override
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    @Override
+    public Integer getCaseDefinitionVersion() {
+        return caseDefinitionVersion;
+    }
+
+    @Override
+    public void setCaseDefinitionVersion(Integer caseDefinitionVersion) {
+        this.caseDefinitionVersion = caseDefinitionVersion;
+    }
+
+    @Override
+    public String getCaseDefinitionDeploymentId() {
+        return caseDefinitionDeploymentId;
+    }
+
+    @Override
+    public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
+        this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
     }
 }

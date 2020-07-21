@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -58,6 +59,7 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
+    protected CmmnMigrationService cmmnMigrationService;
 
     protected String deploymentId;
 

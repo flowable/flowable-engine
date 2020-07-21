@@ -180,7 +180,7 @@ public class DeploymentCollectionResource {
         try {
             EventDeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".cmmn.xml") || fileName.endsWith(".cmmn"))) {
+            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".event") || fileName.endsWith(".channel"))) {
 
                 fileName = file.getName();
             }

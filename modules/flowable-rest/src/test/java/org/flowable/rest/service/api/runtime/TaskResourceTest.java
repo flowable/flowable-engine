@@ -46,6 +46,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -94,10 +95,10 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + "executionUrl: '" + buildUrl(RestUrls.URL_EXECUTION, task.getExecutionId()) + "',"
                         + "processInstanceUrl: '" + buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
                         + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
-                        + "url: '" + url + "'"
+                        + "url: '" + url + "',"
+                        + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
+                        + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
                         + "}");
-        assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-        assertThat(getDateFromISOString(responseNode.get("createTime").asText())).isEqualTo(task.getCreateTime());
 
         // Set tenant on deployment
         managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
@@ -154,10 +155,10 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + "processInstanceId: null,"
                             + "processDefinitionId: null,"
                             + "url: '" + url + "',"
-                            + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "'"
+                            + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "',"
+                            + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
                             + "}");
-            assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-            assertThat(getDateFromISOString(responseNode.get("createTime").asText())).isEqualTo(task.getCreateTime());
 
         } finally {
 
@@ -587,8 +588,11 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(valuesBytes).isNotNull();
             JsonNode instanceNode = objectMapper.readTree(valuesBytes);
             JsonNode valuesNode = instanceNode.get("values");
-            assertThat(valuesNode.get("user").asText()).isEqualTo("First value");
-            assertThat(valuesNode.get("number").asInt()).isEqualTo(789);
+            assertThatJson(valuesNode)
+                    .isEqualTo("{"
+                            + "  user: 'First value',"
+                            + "  number: '789'"
+                            + "}");
 
             if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
                 HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
@@ -609,7 +613,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
             for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId());
+                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
             }
         }
     }
@@ -625,7 +629,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.addCandidateUser(task.getId(), "newAssignee");
 
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
             // Add candidate group
             String taskId = task.getId();
 
@@ -640,7 +644,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isNull();
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(1);
 
             // Claim the task and check result
             requestNode.put("assignee", "newAssignee");
@@ -649,7 +653,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isEqualTo("newAssignee");
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(0L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isZero();
 
             // Claiming with the same user should not cause an exception
             httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -657,7 +661,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             assertThat(task).isNotNull();
             assertThat(task.getAssignee()).isEqualTo("newAssignee");
-            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isEqualTo(0L);
+            assertThat(taskService.createTaskQuery().taskCandidateUser("newAssignee").count()).isZero();
 
             // Claiming with another user should cause exception
             requestNode.put("assignee", "anotherUser");
@@ -691,9 +695,11 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
-        assertThat(taskId).isNotNull();
-        System.out.println("******" + dataNode.toPrettyString());
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("[ {"
+                        + "      id: '${json-unit.any-string}'"
+                        + "} ]");
 
         // Claim
         assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isZero();
@@ -701,12 +707,13 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
 
+        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
 
         // Unclaim
         requestNode = objectMapper.createObjectNode();
@@ -725,7 +732,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
-        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskAssignee("kermit").count()).isEqualTo(1);
     }
 
     /**

@@ -37,7 +37,6 @@ public class ELExecutionContext {
     protected boolean forceDMN11;
 
     public void checkExecutionContext(String variableId) {
-
         if (StringUtils.isEmpty(variableId)) {
             throw new IllegalArgumentException("Variable id cannot be empty");
         }

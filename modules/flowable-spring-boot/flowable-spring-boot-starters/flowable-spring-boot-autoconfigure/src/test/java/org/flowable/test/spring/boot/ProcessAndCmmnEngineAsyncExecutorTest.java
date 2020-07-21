@@ -61,11 +61,12 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
     @Test
     public void cmmnAndProcessEngineShouldUseDistinctAsyncExecutorsWithDefaultConfiguration() {
         contextRunner.run((context -> {
-            assertThat(context).hasSingleBean(ProcessEngine.class);
-            assertThat(context).hasSingleBean(CmmnEngine.class);
-            assertThat(context).hasBean("taskExecutor");
-            assertThat(context).hasBean("cmmnAsyncExecutor");
-            assertThat(context).hasBean("processAsyncExecutor");
+            assertThat(context)
+                    .hasSingleBean(ProcessEngine.class)
+                    .hasSingleBean(CmmnEngine.class)
+                    .hasBean("taskExecutor")
+                    .hasBean("cmmnAsyncExecutor")
+                    .hasBean("processAsyncExecutor");
             AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
             AsyncExecutor cmmnAsyncExecutor = context.getBean(CmmnEngine.class).getCmmnEngineConfiguration().getAsyncExecutor();
 

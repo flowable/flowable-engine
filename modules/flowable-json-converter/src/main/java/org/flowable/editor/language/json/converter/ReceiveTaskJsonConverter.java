@@ -14,6 +14,7 @@ package org.flowable.editor.language.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ReceiveTask;
@@ -34,6 +35,7 @@ public class ReceiveTaskJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_TASK_RECEIVE, ReceiveTaskJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_TASK_RECEIVE_EVENT, ReceiveTaskJsonConverter.class);
     }
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -42,17 +44,30 @@ public class ReceiveTaskJsonConverter extends BaseBpmnJsonConverter {
 
     @Override
     protected String getStencilId(BaseElement baseElement) {
+        if (baseElement.getExtensionElements().get("eventType") != null && baseElement.getExtensionElements().get("eventType").size() > 0) {
+            String eventType = baseElement.getExtensionElements().get("eventType").get(0).getElementText();
+            if (StringUtils.isNotEmpty(eventType)) {
+                return STENCIL_TASK_RECEIVE_EVENT;
+            }
+        }
         return STENCIL_TASK_RECEIVE;
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
-
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement, BpmnJsonConverterContext converterContext) {
+        addEventRegistryProperties((FlowElement) baseElement, propertiesNode);
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ReceiveTask task = new ReceiveTask();
+
+        String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
+        if (STENCIL_TASK_RECEIVE_EVENT.equals(stencilId)) {
+            addReceiveEventExtensionElements(elementNode, task);
+        }
+
         return task;
     }
 }

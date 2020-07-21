@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.eventregistry;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -167,23 +168,22 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
     }
 
     private void validateEventSent(ProcessInstance processInstance, String property) throws JsonProcessingException {
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         Job job = managementService.createJobQuery().jobTenantId(processInstance.getTenantId()).singleResult();
         assertThat(job.getTenantId()).isEqualTo(processInstance.getTenantId());
-        assertEquals(AsyncSendEventJobHandler.TYPE, job.getJobHandlerType());
-        assertEquals("sendEventTask", job.getElementId());
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+        assertThat(job.getElementId()).isEqualTo("sendEventTask");
 
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get(property).asText()).isEqualTo("test");
-
         outboundEventChannelAdapter.receivedEvents.clear();
     }
 
@@ -192,7 +192,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         // Model deployed to the default tenant, but event model is in the specific tenants
         deployProcessModel("sendEventWithTrigger.bpmn20.xml", null);
 
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
 
         // One instance in tenant A, one in tenant B
         ProcessInstance instanceA = runtimeService.createProcessInstanceBuilder()
@@ -219,18 +219,23 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         assertThat(eventSubscription.getTenantId()).isEqualTo(TENANT_B);
 
         // Sending
-        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
-        assertThat(managementService.createJobQuery().list()).extracting(Job::getTenantId).containsOnly(TENANT_A, TENANT_B);
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+        assertThat(managementService.createJobQuery().list())
+                .extracting(Job::getTenantId)
+                .containsOnly(TENANT_A, TENANT_B);
         managementService.createJobQuery().list().forEach(job -> managementService.executeJob(job.getId()));
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(2);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
-        assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("customerForTenantA");
-
+        assertThatJson(jsonNode)
+                .isEqualTo("{"
+                        + "   eventProperty: 'customerForTenantA'"
+                        + " }");
         jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(1));
-        assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("customerForTenantB");
+        assertThatJson(jsonNode)
+                .isEqualTo("{"
+                        + "   eventProperty: 'customerForTenantB'"
+                        + " }");
 
         // Triggering
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
@@ -253,9 +258,9 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         assertThat(taskService.createTaskQuery().processInstanceId(instanceB.getId()).singleResult().getName()).isEqualTo("tenantB Task");
 
         // Sending the event again shouldn't do anything, as there are no eventsubscriptions anymore
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
     }
 
     public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {

@@ -50,8 +50,10 @@ public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJson
         historicEntityLinkEntity.setLinkType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ENTITY_LINK_TYPE));
         historicEntityLinkEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
         historicEntityLinkEntity.setScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID));
+        historicEntityLinkEntity.setSubScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID));
         historicEntityLinkEntity.setScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE));
         historicEntityLinkEntity.setScopeDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID));
+        historicEntityLinkEntity.setParentElementId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PARENT_ELEMENT_ID));
         historicEntityLinkEntity.setReferenceScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_ID));
         historicEntityLinkEntity.setReferenceScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_TYPE));
         historicEntityLinkEntity.setReferenceScopeDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REF_SCOPE_DEFINITION_ID));

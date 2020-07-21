@@ -16,16 +16,21 @@ package org.flowable.engine.test.api.mgmt;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.Job;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -67,7 +72,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsOnly(processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().processInstanceId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -84,7 +89,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsOnly(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().processDefinitionId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -114,7 +119,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.singleResult()).isNotNull();
 
         query = managementService.createExternalWorkerJobQuery().executionId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -132,7 +137,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().elementId("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
 
     }
@@ -150,7 +155,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
 
         query = managementService.createExternalWorkerJobQuery().elementName("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -164,7 +169,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.list()).hasSize(2);
 
         query = managementService.createExternalWorkerJobQuery().handlerType("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
     }
 
@@ -220,7 +225,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getExceptionMessage()).isEqualTo("Error message");
 
         query = managementService.createExternalWorkerJobQuery().exceptionMessage("Error");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
@@ -297,9 +302,105 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getLockExpirationTime()).isNotNull();
 
         query = managementService.createExternalWorkerJobQuery().lockOwner("invalid");
-        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryByCorrelationId() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJob workerJob = managementService.createExternalWorkerJobQuery().elementId("externalCustomer1").singleResult();
+        assertThat(workerJob).isNotNull();
+        assertThat(workerJob.getCorrelationId()).isNotNull();
+
+        ExternalWorkerJob job = managementService.createExternalWorkerJobQuery().correlationId(workerJob.getCorrelationId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getId()).isEqualTo(workerJob.getId());
+        assertThat(job.getCorrelationId()).isEqualTo(workerJob.getCorrelationId());
+
+        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult());
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testAcquireForUserOrGroups() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery().list();
+        assertThat(jobs).hasSize(4);
+
+        ExternalWorkerJob onlyUserJob = jobs.get(0);
+        ExternalWorkerJob onlyGroupJob = jobs.get(1);
+        ExternalWorkerJob userAndGroupJob = jobs.get(2);
+
+        addUserIdentityLinkToJob(onlyUserJob, "gonzo");
+        addGroupIdentityLinkToJob(onlyGroupJob, "bears");
+        addGroupIdentityLinkToJob(userAndGroupJob, "frogs");
+        addUserIdentityLinkToJob(userAndGroupJob, "fozzie");
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .forUserOrGroups("kermit", Collections.singleton("muppets"))
+                .list();
+
+        assertThat(jobs).isEmpty();
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .forUserOrGroups("gonzo", Collections.singleton("muppets"))
+                .list();
+
+        assertThat(jobs)
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyUserJob.getId());
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .forUserOrGroups("fozzie", Collections.singleton("bears"))
+                .list();
+
+        assertThat(jobs)
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyGroupJob.getId(), userAndGroupJob.getId());
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .forUserOrGroups(null, Collections.singleton("bears"))
+                .list();
+
+        assertThat(jobs)
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyGroupJob.getId());
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .forUserOrGroups("fozzie", Collections.emptyList())
+                .list();
+
+        assertThat(jobs)
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(userAndGroupJob.getId());
+    }
+
+    protected void addUserIdentityLinkToJob(Job job, String userId) {
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getIdentityLinkService(commandContext)
+                    .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, userId, null, IdentityLinkType.PARTICIPANT);
+
+            return null;
+        });
+    }
+
+    protected void addGroupIdentityLinkToJob(Job job, String groupId) {
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getIdentityLinkService(commandContext)
+                    .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, null, groupId, IdentityLinkType.PARTICIPANT);
+            return null;
+        });
+    }
+
 
 }

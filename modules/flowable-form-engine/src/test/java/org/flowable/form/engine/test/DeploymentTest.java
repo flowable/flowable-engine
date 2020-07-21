@@ -12,17 +12,23 @@
  */
 package org.flowable.form.engine.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormInstance;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class DeploymentTest extends AbstractFlowableFormTest {
 
@@ -50,7 +56,6 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = repositoryService.getFormModelByKey("form1");
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields()).hasSize(1);
         assertThat(formModel.getFields())
             .extracting(FormField::getId, FormField::getName)
             .containsExactly(tuple("input1", "Input1"));
@@ -69,12 +74,11 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         formInfo = repositoryService.getFormModelByKey("form1");
         formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields()).hasSize(1);
         assertThat(formModel.getFields())
             .extracting(FormField::getId, FormField::getName)
             .containsExactly(tuple("input2", "Input2"));
 
-        repositoryService.deleteDeployment(redeployment.getId());
+        repositoryService.deleteDeployment(redeployment.getId(), true);
     }
 
     @Test
@@ -82,8 +86,6 @@ public class DeploymentTest extends AbstractFlowableFormTest {
             "org/flowable/form/engine/test/deployment/form_with_dates.form" })
     public void deploy2Forms() {
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
-        assertThat(formDefinitions).hasSize(2);
-
         assertThat(formDefinitions)
             .extracting(FormDefinition::getName)
             .containsExactly("My date form", "My first form");
@@ -122,8 +124,64 @@ public class DeploymentTest extends AbstractFlowableFormTest {
         
         } finally {
             formEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(false);
-            repositoryService.deleteDeployment(deployment.getId());
-            repositoryService.deleteDeployment(newDeployment.getId());
+            repositoryService.deleteDeployment(deployment.getId(), true);
+            repositoryService.deleteDeployment(newDeployment.getId(), true);
         }
+    }
+
+    @Test
+    public void deleteDeploymentWithCascadeShouldDeleteFormInstances() throws Exception {
+        FormDeployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/form/engine/test/deployment/simple.form")
+                .deploy();
+        FormInfo formInfo = repositoryService.getFormModelByKey("form1");
+
+        Map<String, Object> formValues = new HashMap<>();
+        formValues.put("input1", "test");
+
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
+        assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
+        JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
+
+        assertThat(formService.createFormInstanceQuery().count()).isOne();
+        repositoryService.deleteDeployment(deployment.getId(), true);
+        assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isZero();
+    }
+
+    @Test
+    public void deleteDeploymentWithoutCascadeShouldNotDeleteFormInstances() throws Exception {
+        FormDeployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/form/engine/test/deployment/simple.form")
+                .deploy();
+        FormInfo formInfo = repositoryService.getFormModelByKey("form1");
+
+        Map<String, Object> formValues = new HashMap<>();
+        formValues.put("input1", "test");
+
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null, null, "default");
+        assertThat(formInstance.getFormDefinitionId()).isEqualTo(formInfo.getId());
+        JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
+        assertThatJson(formNode)
+                .isEqualTo("{"
+                        + "   values: {"
+                        + "     input1: 'test'"
+                        + " },"
+                        + " flowable_form_outcome: 'default'"
+                        + "}");
+
+        assertThat(formService.createFormInstanceQuery().count()).isOne();
+
+        repositoryService.deleteDeployment(deployment.getId());
+        assertThat(formService.createFormInstanceQuery().count()).isOne();
+
+        formService.deleteFormInstance(formInstance.getId());
+        assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isZero();
     }
 }

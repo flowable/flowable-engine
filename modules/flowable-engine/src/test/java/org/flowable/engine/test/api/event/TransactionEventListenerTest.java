@@ -65,19 +65,45 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         deployOneTaskTestProcess();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        int expectedCreatedEvents = 11;
+        // Deployment:
+        //  1 Resource, 1 Deployment, 1 ProcessDefinition
+        // Start Process Instance
+        //  1 ProcessInstance, 1 Execution,
+        //  3 ActivityInstance (start, sequenceFlow, task)
+        //  1 Task, 1 EntityLink, 1 IdentityLink
+        int runtimeCreatedEvents = 11;
+        int historyCreatedEvents = 0;
         if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
-            expectedCreatedEvents += 4;
+            // Start Process Instance
+            //  3 HistoricActivityInstance (start, sequenceFlow, task)
+            //  1 HistoricTaskInstance,
+            historyCreatedEvents = 4;
         }
+        int expectedCreatedEvents = runtimeCreatedEvents + historyCreatedEvents;
 
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
-        }
 
-        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSize(expectedCreatedEvents);
-        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSize(expectedCreatedEvents);
-        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name())).hasSize(1);
-        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name())).hasSize(1);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSize(runtimeCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSize(runtimeCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name())).hasSize(1);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name())).hasSize(1);
+
+            TestTransactionEventListener.eventsReceived.clear();
+
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
+
+            // During the async history execution it is possible that some historic jobs are inserted again (to be retried) therefore using hasSizeGreaterThan
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSizeGreaterThanOrEqualTo(historyCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSizeGreaterThanOrEqualTo(historyCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name())).isNull();
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name())).isNull();
+
+        } else {
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSize(expectedCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSize(expectedCreatedEvents);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name())).hasSize(1);
+            assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name())).hasSize(1);
+        }
 
         TestTransactionEventListener.eventsReceived.clear();
 
@@ -95,7 +121,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
     public void testProcessExecutionWithRollback() {
 
         assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // Regular execution, no exception
         runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", false));
