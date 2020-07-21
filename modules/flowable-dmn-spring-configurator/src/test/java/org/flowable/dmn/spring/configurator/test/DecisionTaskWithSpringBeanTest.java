@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.spring.configurator.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ public class DecisionTaskWithSpringBeanTest extends SpringDmnFlowableTestCase {
                         .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         
         DmnDeployment dmnDeployment = dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().singleResult();
-        assertNotNull(dmnDeployment);
+        assertThat(dmnDeployment).isNotNull();
         
         try {
             Map<String, Object> variables = new HashMap<>();
