@@ -30,6 +30,6 @@ import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
  */
 public interface DelegateInterceptor {
 
-    public void handleInvocation(DelegateInvocation invocation);
+    void handleInvocation(DelegateInvocation invocation);
 
 }

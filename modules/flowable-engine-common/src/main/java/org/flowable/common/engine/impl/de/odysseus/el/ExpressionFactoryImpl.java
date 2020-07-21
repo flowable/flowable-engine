@@ -82,7 +82,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 	 * 
 	 * @since 2.2
 	 */
-	public static enum Profile {
+	public enum Profile {
 		/**
 		 * JEE5: none
 		 */

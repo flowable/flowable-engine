@@ -23,7 +23,7 @@ import org.flowable.common.engine.impl.scripting.ScriptingEngines;
  */
 public interface ScriptingEngineAwareEngineConfiguration {
 
-    public ScriptingEngines getScriptingEngines();
+    ScriptingEngines getScriptingEngines();
 
-    public AbstractEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines);
+    AbstractEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines);
 }

@@ -21,7 +21,7 @@ public interface DataObject {
     /**
      * The unique id of this Data Object.
      */
-    public String getId();
+    String getId();
 
     /**
      /**

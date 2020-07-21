@@ -18,5 +18,5 @@ public interface FlowableJobRescheduledEvent extends FlowableEntityEvent {
     /**
      * @return the job id of the original job that was rescheduled
      */
-    public String getRescheduledJobId();
+    String getRescheduledJobId();
 }

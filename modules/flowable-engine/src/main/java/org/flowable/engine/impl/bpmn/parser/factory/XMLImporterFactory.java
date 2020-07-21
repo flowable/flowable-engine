@@ -29,5 +29,5 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public interface XMLImporterFactory {
 
-    public XMLImporter createXMLImporter(Import theImport) throws FlowableException;
+    XMLImporter createXMLImporter(Import theImport) throws FlowableException;
 }
