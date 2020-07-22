@@ -1054,11 +1054,11 @@ assertProcessEnded(procId);
 
         org.flowable.task.api.Task task3 = taskService.createTaskQuery().processDefinitionKey("midProcess").singleResult();
         assertNotNull(task3);
-        taskService.complete(task3.getId(), (Map<String, Object>) null);
+        taskService.complete(task3.getId(), null);
 
         org.flowable.task.api.Task task4 = taskService.createTaskQuery().processDefinitionKey("parentProcess").singleResult();
         assertNotNull(task4);
-        taskService.complete(task4.getId(), (Map<String, Object>) null);
+        taskService.complete(task4.getId(), null);
 
         assertProcessEnded(procId);
     }
