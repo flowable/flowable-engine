@@ -50,4 +50,9 @@ public interface AsyncTaskExecutor {
      * @throws java.util.concurrent.RejectedExecutionException if the given task was not submitted
      */
     <T> CompletableFuture<T> submit(Callable<T> task);
+
+    /**
+     * Potentially shutdown the resources used by the async task executor.
+     */
+    void shutdown();
 }

@@ -230,7 +230,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
     }
 
     protected SpringAsyncTaskExecutor getSpringAsyncTaskExecutor(AsyncExecutor asyncExecutor) {
-        return (SpringAsyncTaskExecutor) ((SpringAsyncExecutor) asyncExecutor).getTaskExecutor();
+        return (SpringAsyncTaskExecutor) asyncExecutor.getTaskExecutor();
     }
 
     @Import({ CmmnTaskExecutorConfiguration.class, ProcessTaskExecutorConfiguration.class })

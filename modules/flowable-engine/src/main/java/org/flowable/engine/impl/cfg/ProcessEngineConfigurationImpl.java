@@ -2229,11 +2229,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncExecutor = defaultAsyncExecutor;
         }
 
-        if (asyncExecutor instanceof DefaultAsyncJobExecutor) {
-            // Task executor
-            if (((DefaultAsyncJobExecutor) asyncExecutor).getTaskExecutor() == null) {
-                ((DefaultAsyncJobExecutor) asyncExecutor).setTaskExecutor(asyncTaskExecutor);
-            }
+        // Task executor
+        if (asyncExecutor.getTaskExecutor() == null) {
+            asyncExecutor.setTaskExecutor(asyncTaskExecutor);
         }
 
         asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
@@ -2327,11 +2325,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (asyncHistoryExecutor != null) {
 
-            if (asyncHistoryExecutor instanceof DefaultAsyncJobExecutor) {
-                // Task executor
-                if (((DefaultAsyncJobExecutor) asyncHistoryExecutor).getTaskExecutor() == null) {
-                    ((DefaultAsyncJobExecutor) asyncHistoryExecutor).setTaskExecutor(asyncHistoryTaskExecutor);
-                }
+            // Task executor
+            if (asyncHistoryExecutor.getTaskExecutor() == null) {
+                asyncHistoryExecutor.setTaskExecutor(asyncHistoryTaskExecutor);
             }
 
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
@@ -2695,13 +2691,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         super.close();
 
         if (asyncTaskExecutor != null && shutdownAsyncTaskExecutor) {
-            // The cast is OK, because the executor was created by this engine configuration
-            ((DefaultAsyncTaskExecutor) asyncTaskExecutor).shutdown();
+            // Only shutdown if it was created by this configuration
+            asyncTaskExecutor.shutdown();
         }
 
         if (asyncHistoryTaskExecutor != null && shutdownAsyncHistoryTaskExecutor) {
-            // The cast is OK, because the executor was created by this engine configuration
-            ((DefaultAsyncTaskExecutor) asyncHistoryTaskExecutor).shutdown();
+            // Only shutdown if it was created by this configuration
+            asyncHistoryTaskExecutor.shutdown();
         }
     }
 

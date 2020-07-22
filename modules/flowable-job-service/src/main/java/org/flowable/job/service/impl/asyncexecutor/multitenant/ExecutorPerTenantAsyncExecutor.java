@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -300,4 +301,22 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         }
     }
 
+    @Override
+    public AsyncTaskExecutor getTaskExecutor() {
+        AsyncExecutor asyncExecutor = determineAsyncExecutor();
+        if (asyncExecutor == null) {
+            return null;
+        }
+        return asyncExecutor.getTaskExecutor();
+    }
+
+    @Override
+    public void setTaskExecutor(AsyncTaskExecutor taskExecutor) {
+        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
+            if (asyncExecutor.getTaskExecutor() == null) {
+                asyncExecutor.setTaskExecutor(taskExecutor);
+            }
+        }
+
+    }
 }

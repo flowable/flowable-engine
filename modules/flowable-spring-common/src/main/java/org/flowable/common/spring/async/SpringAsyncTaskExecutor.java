@@ -44,6 +44,11 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
         return asyncTaskExecutor.submitListenable(task).completable();
     }
 
+    @Override
+    public void shutdown() {
+        // This uses spring resources passed in the constructor, therefore there is nothing to shutdown here
+    }
+
     public AsyncListenableTaskExecutor getAsyncTaskExecutor() {
         return asyncTaskExecutor;
     }
