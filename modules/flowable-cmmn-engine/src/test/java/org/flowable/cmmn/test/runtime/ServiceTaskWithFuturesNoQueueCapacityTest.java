@@ -74,7 +74,7 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
 
         if (this.originalAsyncTaskExecutor != currentAsyncTaskExecutor) {
             // If they are different shut down the current one
-            ((DefaultAsyncTaskExecutor) currentAsyncTaskExecutor).shutdown();
+            currentAsyncTaskExecutor.shutdown();
         }
     }
 

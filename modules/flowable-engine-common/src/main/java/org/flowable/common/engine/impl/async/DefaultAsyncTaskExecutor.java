@@ -127,6 +127,7 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
         }
     }
 
+    @Override
     public void shutdown() {
         if (executorService != null && executorNeedsShutdown) {
             // Ask the thread pool to finish and exit

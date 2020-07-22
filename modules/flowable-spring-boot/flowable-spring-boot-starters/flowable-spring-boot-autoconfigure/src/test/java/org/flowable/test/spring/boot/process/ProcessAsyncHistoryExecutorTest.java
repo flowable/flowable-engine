@@ -125,7 +125,7 @@ public class ProcessAsyncHistoryExecutorTest {
     }
 
     protected SpringAsyncTaskExecutor getSpringAsyncTaskExecutor(AsyncExecutor asyncExecutor) {
-        return (SpringAsyncTaskExecutor) ((SpringAsyncExecutor) asyncExecutor).getTaskExecutor();
+        return (SpringAsyncTaskExecutor) asyncExecutor.getTaskExecutor();
     }
 
 }

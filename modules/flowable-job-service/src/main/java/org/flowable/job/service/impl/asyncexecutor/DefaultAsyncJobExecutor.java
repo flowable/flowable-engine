@@ -294,10 +294,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.unlockOwnedJobs = unlockOwnedJobs;
     }
 
+    @Override
     public AsyncTaskExecutor getTaskExecutor() {
         return taskExecutor;
     }
 
+    @Override
     public void setTaskExecutor(AsyncTaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
     }
