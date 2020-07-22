@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
+import org.flowable.engine.impl.delegate.invocation.FutureJavaDelegateInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -111,12 +113,21 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                                     "Executing service task with java class " + futureJavaDelegate.getClass().getName(), execution);
                 }
 
-                //TODO do we need to use the delegate interceptor?
                 FutureJavaDelegate<Object> futureJavaDelegate = (FutureJavaDelegate<Object>) this.futureJavaDelegate;
 
-                CompletableFuture<Object> future = futureJavaDelegate.execute(execution, processEngineConfiguration.getAsyncTaskInvoker());
+                FutureJavaDelegateInvocation invocation = new FutureJavaDelegateInvocation(futureJavaDelegate, execution,
+                        processEngineConfiguration.getAsyncTaskInvoker());
+                processEngineConfiguration.getDelegateInterceptor().handleInvocation(invocation);
 
-                CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
+                Object invocationResult = invocation.getInvocationResult();
+                if (invocationResult instanceof CompletableFuture) {
+                    CompletableFuture<Object> future = (CompletableFuture<Object>) invocationResult;
+
+                    CommandContextUtil.getAgenda(commandContext).planFutureOperation(future, new FutureJavaDelegateCompleteAction(futureJavaDelegate, execution, loggingSessionEnabled));
+                } else {
+                    throw new FlowableIllegalStateException(
+                            "Invocation result " + invocationResult + " from invocation " + invocation + " was not a CompletableFuture");
+                }
 
             } catch (RuntimeException e) {
                 if (loggingSessionEnabled) {
