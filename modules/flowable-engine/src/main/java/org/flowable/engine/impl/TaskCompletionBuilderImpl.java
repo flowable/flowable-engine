@@ -14,12 +14,12 @@ package org.flowable.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.task.api.TaskCompletionBuilder;
-import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
-import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 
 
 /**
