@@ -24,7 +24,7 @@ public interface DmnEngine extends Engine {
     /**
      * the version of the flowable dmn library
      */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     DmnManagementService getDmnManagementService();
 

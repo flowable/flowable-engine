@@ -22,11 +22,11 @@ public interface FlowableEscalationEvent extends FlowableActivityEvent {
     /**
      * @return the code of the escalation. Returns null, if no specific escalation code has been specified.
      */
-    public String getEscalationCode();
+    String getEscalationCode();
 
     /**
      * @return the name of the escalation. Returns null, if no specific escalation name has been specified.
      */
-    public String getEscalationName();
+    String getEscalationName();
 
 }
