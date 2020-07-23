@@ -239,7 +239,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         Model decisionTableModel = getModel(decisionTableId, true, false);
 
         // convert to new model version
-        decisionTableModel = DecisionTableModelConversionUtil.convertModel(decisionTableModel);
+        DecisionTableModelConversionUtil.convertModel(decisionTableModel);
 
         return decisionTableModel;
     }
