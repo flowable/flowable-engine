@@ -70,7 +70,7 @@ public class ApiModelsResource {
 
         String json = modelService.createModelJson(modelRepresentation);
 
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserId());
         return new ModelRepresentation(newModel);
     }
 

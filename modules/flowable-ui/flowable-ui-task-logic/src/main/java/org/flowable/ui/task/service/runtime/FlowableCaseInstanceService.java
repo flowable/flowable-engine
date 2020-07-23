@@ -113,7 +113,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -124,7 +124,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -156,7 +156,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -188,7 +188,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -212,7 +212,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -267,7 +267,7 @@ public class FlowableCaseInstanceService {
     public ResultListDataRepresentation getCaseInstanceAvailableUserEventListeners(String caseInstanceId) {
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -295,7 +295,7 @@ public class FlowableCaseInstanceService {
     public ResultListDataRepresentation getCaseInstanceCompletedUserEventListeners(String caseInstanceId) {
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -316,7 +316,7 @@ public class FlowableCaseInstanceService {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getAuthenticatedSecurityScope(), caseInstance, caseInstanceId)) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
@@ -379,11 +379,11 @@ public class FlowableCaseInstanceService {
 
     public void deleteCaseInstance(String caseInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
             .caseInstanceId(caseInstanceId)
-            .startedBy(String.valueOf(currentUser.getId())) // Permission
+            .startedBy(currentUserId) // Permission
             .singleResult();
 
         if (caseInstance == null) {

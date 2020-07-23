@@ -34,14 +34,14 @@ import java.io.InputStream;
 public class ProfileServiceImpl extends AbstractIdmService implements ProfileService {
 
     public User updateProfile(String firstName, String lastName, String email) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         // If user is not externally managed, we need the email address for login, so an empty email is not allowed
         if (StringUtils.isEmpty(email)) {
             throw new BadRequestException("Empty email is not allowed");
         }
 
-        User user = identityService.createUserQuery().userId(currentUser.getId()).singleResult();
+        User user = identityService.createUserQuery().userId(currentUserId).singleResult();
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);

@@ -20,15 +20,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Group;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.idm.model.ChangePasswordRepresentation;
+import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.GroupService;
 import org.flowable.ui.idm.service.ProfileService;
+import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,12 +55,22 @@ public class IdmProfileResource {
     @Autowired
     protected GroupService groupService;
 
+    @Autowired
+    protected UserService userService;
+
     @GetMapping(value = "/profile", produces = "application/json")
     public UserRepresentation getProfile() {
-        User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
-        UserRepresentation userRepresentation = new UserRepresentation(user);
-        for (Group group : groupService.getGroupsForUser(user.getId())) {
-            userRepresentation.getGroups().add(new GroupRepresentation(group));
+        UserInformation userInformation = userService.getUserInformation(SecurityUtils.getCurrentUserId());
+        UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());
+        if (userInformation.getGroups() != null) {
+            for (Group group : userInformation.getGroups()) {
+                userRepresentation.getGroups().add(new GroupRepresentation(group));
+            }
+        }
+        if (userInformation.getPrivileges() != null) {
+            for (String privilege : userInformation.getPrivileges()) {
+                userRepresentation.getPrivileges().add(privilege);
+            }
         }
         return userRepresentation;
     }

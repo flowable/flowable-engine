@@ -14,6 +14,7 @@ package org.flowable.ui.task.service.runtime;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.impl.deployer.BaseAppModel;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
-import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -33,18 +33,14 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
-import org.flowable.idm.api.Group;
-import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.DefaultPrivileges;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
-import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.task.model.runtime.AppDefinitionRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Service
 @Transactional
-public class FlowableAppDefinitionService implements InitializingBean {
+public class FlowableAppDefinitionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableAppDefinitionService.class);
 
@@ -75,12 +71,6 @@ public class FlowableAppDefinitionService implements InitializingBean {
     
     @Autowired
     protected FormRepositoryService formRepositoryService;
-
-    @Autowired(required = false)
-    protected RemoteIdmService remoteIdmService;
-
-    @Autowired(required = false)
-    protected IdmIdentityService identityService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -110,37 +100,32 @@ public class FlowableAppDefinitionService implements InitializingBean {
         }
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        if (remoteIdmService == null && identityService == null) {
-            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
-        }
-    }
-
     public ResultListDataRepresentation getAppDefinitions() {
         List<AppDefinitionRepresentation> resultList = new ArrayList<>();
 
-        if (adminAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_ADMIN)) {
+        SecurityScope currentSecurityScope = SecurityUtils.getAuthenticatedSecurityScope();
+
+        if (adminAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_ADMIN)) {
             resultList.add(adminAppDefinitionRepresentation);
         }
 
-        if (idmAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_IDM)) {
+        if (idmAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_IDM)) {
             resultList.add(idmAppDefinitionRepresentation);
         }
 
-        if (modelerAppDefinitionRepresentation != null && SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_MODELER)) {
+        if (modelerAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_MODELER)) {
             resultList.add(modelerAppDefinitionRepresentation);
         }
 
-        if (SecurityUtils.currentUserHasCapability(DefaultPrivileges.ACCESS_TASK)) {
-            resultList.addAll(getTaskAppList());
+        if (currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_TASK)) {
+            resultList.addAll(getTaskAppList(currentSecurityScope));
         }
 
         ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
         return result;
     }
 
-    protected List<AppDefinitionRepresentation> getTaskAppList() {
+    protected List<AppDefinitionRepresentation> getTaskAppList(SecurityScope currentUser) {
         List<AppDefinitionRepresentation> resultList = new ArrayList<>();
 
         // Default app: tasks (available for all)
@@ -160,9 +145,8 @@ public class FlowableAppDefinitionService implements InitializingBean {
         }
 
         if (appDefinitionHaveAccessControl) {
-            User currentUser = SecurityUtils.getCurrentUserObject();
-            String userId = currentUser.getId();
-            List<? extends Group> groups = getUserGroups(userId);
+            String userId = currentUser.getUserId();
+            Collection<String> groups = currentUser.getGroupIds();
 
             List<AppDefinitionRepresentation> appDefinitionList = new ArrayList<>(resultList);
             resultList.clear();
@@ -244,17 +228,7 @@ public class FlowableAppDefinitionService implements InitializingBean {
         return "Migrated " + deploymentIdMap.size() + " app deployments";
     }
 
-    protected List<? extends Group> getUserGroups(String userId) {
-        if (remoteIdmService != null) {
-            return remoteIdmService.getUser(userId).getGroups();
-        } else if (identityService != null) {
-            return identityService.createGroupQuery().groupMember(userId).list();
-        } else {
-            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
-        }
-    }
-
-    protected boolean hasAppAccess(AppDefinitionRepresentation appDefinition, String userId, List<? extends Group> groups) {
+    protected boolean hasAppAccess(AppDefinitionRepresentation appDefinition, String userId, Collection<String> groups) {
         if (CollectionUtils.isEmpty(appDefinition.getUsersAccess()) && CollectionUtils.isEmpty(appDefinition.getGroupsAccess())) {
             return true;
         }
@@ -267,8 +241,8 @@ public class FlowableAppDefinitionService implements InitializingBean {
 
         if (CollectionUtils.isNotEmpty(appDefinition.getGroupsAccess())) {
             for (String groupId : appDefinition.getGroupsAccess()) {
-                for (Group group : groups) {
-                    if (group.getId().equals(groupId)) {
+                for (String group : groups) {
+                    if (group.equals(groupId)) {
                         return true;
                     }
                 }

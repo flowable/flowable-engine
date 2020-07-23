@@ -47,7 +47,7 @@ public class ModelHistoryResource extends AbstractModelHistoryResource {
         ModelHistory modelHistory = modelService.getModelHistory(modelId, modelHistoryId);
 
         if ("useAsNewVersion".equals(action.getAction())) {
-            return modelService.reviveProcessModelHistory(modelHistory, SecurityUtils.getCurrentUserObject(), action.getComment());
+            return modelService.reviveProcessModelHistory(modelHistory, SecurityUtils.getCurrentUserId(), action.getComment());
         } else {
             throw new BadRequestException("Invalid action to execute on model history " + modelHistoryId + ": " + action.getAction());
         }

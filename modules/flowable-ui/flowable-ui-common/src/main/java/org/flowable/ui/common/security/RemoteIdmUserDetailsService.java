@@ -15,10 +15,13 @@ package org.flowable.ui.common.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +49,17 @@ public class RemoteIdmUserDetailsService implements UserDetailsService {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }
 
-        return new FlowableAppUser(user, user.getId(), grantedAuthorities);
+        for (RemoteGroup group : user.getGroups()) {
+            grantedAuthorities.add(SecurityUtils.createGroupAuthority(group.getId()));
+        }
+
+        if (StringUtils.isNotBlank(user.getTenantId())) {
+            grantedAuthorities.add(SecurityUtils.createTenantAuthority(user.getTenantId()));
+        }
+
+        return User.withUsername(user.getId())
+                .password("")
+                .authorities(grantedAuthorities)
+                .build();
     }
 }

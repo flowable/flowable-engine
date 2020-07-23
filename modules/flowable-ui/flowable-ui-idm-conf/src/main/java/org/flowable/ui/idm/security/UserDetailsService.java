@@ -13,14 +13,18 @@
 package org.flowable.ui.idm.security;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.flowable.spring.boot.ldap.FlowableLdapProperties;
-import org.flowable.ui.common.security.FlowableAppUser;
+import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.idm.cache.UserCache;
-import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -74,14 +78,36 @@ public class UserDetailsService implements org.springframework.security.core.use
             throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
         }
 
-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
-        for (String privilege : userInformation.getPrivileges()) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
+        String userId = userFromDatabase.getId();
+        List<Privilege> userPrivileges = identityService.createPrivilegeQuery().userId(userId).list();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        for (Privilege userPrivilege : userPrivileges) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(userPrivilege.getName()));
+        }
+
+        List<Group> groups = identityService.createGroupQuery().groupMember(userId).list();
+        if (!groups.isEmpty()) {
+            List<String> groupIds = new ArrayList<>(groups.size());
+            for (Group group : groups) {
+                grantedAuthorities.add(SecurityUtils.createGroupAuthority(group.getId()));
+                groupIds.add(group.getId());
+            }
+
+            List<Privilege> groupPrivileges = identityService.createPrivilegeQuery().groupIds(groupIds).list();
+            for (Privilege groupPrivilege : groupPrivileges) {
+                grantedAuthorities.add(new SimpleGrantedAuthority(groupPrivilege.getName()));
+            }
+        }
+
+        if (StringUtils.isNotBlank(userFromDatabase.getTenantId())) {
+            grantedAuthorities.add(SecurityUtils.createTenantAuthority(userFromDatabase.getTenantId()));
         }
 
         userCache.putUser(userFromDatabase.getId(), new UserCache.CachedUser(userFromDatabase, grantedAuthorities));
-        return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
+        return org.springframework.security.core.userdetails.User.withUsername(userId)
+                .password(StringUtils.defaultIfBlank(userFromDatabase.getPassword(), ""))
+                .authorities(grantedAuthorities)
+                .build();
     }
 
     public void setUserValidityPeriod(long userValidityPeriod) {

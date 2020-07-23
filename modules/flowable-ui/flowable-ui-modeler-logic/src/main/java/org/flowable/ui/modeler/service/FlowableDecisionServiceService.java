@@ -204,7 +204,7 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
                 modelRepresentation.setName(dmnDefinition.getName());
                 modelRepresentation.setDescription(dmnDefinition.getDescription());
                 modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
-                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserObject());
+                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserId());
                 return new ModelRepresentation(model);
 
             } catch (Exception e) {

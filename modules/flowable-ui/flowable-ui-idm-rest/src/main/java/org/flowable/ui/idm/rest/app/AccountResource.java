@@ -63,7 +63,7 @@ public class AccountResource {
      */
     @GetMapping(value = "/rest/account", produces = "application/json")
     public UserRepresentation getAccount() {
-        String userId = SecurityUtils.getCurrentFlowableAppUser().getUserObject().getId();
+        String userId = SecurityUtils.getCurrentUserId();
         UserInformation userInformation = userService.getUserInformation(userId);
         if (userInformation != null) {
             UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());

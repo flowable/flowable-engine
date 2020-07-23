@@ -56,6 +56,11 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 })
 public class FlowableUiSecurityAutoConfiguration {
 
+    public FlowableUiSecurityAutoConfiguration(ObjectProvider<SecurityScopeProvider> securityScopeProvider) {
+        // Override the default security scope provider if there is such bean
+        SecurityUtils.setSecurityScopeProvider(securityScopeProvider.getIfAvailable(FlowableSecurityScopeProvider::new));
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public RememberMeServices flowableUiRememberMeService(FlowableCommonAppProperties properties, UserDetailsService userDetailsService,

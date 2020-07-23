@@ -27,6 +27,7 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.idm.api.User;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
@@ -81,7 +82,7 @@ public class FlowableProcessInstanceService {
 
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
+        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getAuthenticatedSecurityScope(), processInstance, processInstanceId)) {
             throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
         }
 
@@ -111,7 +112,7 @@ public class FlowableProcessInstanceService {
 
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstance, processInstanceId)) {
+        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getAuthenticatedSecurityScope(), processInstance, processInstanceId)) {
             throw new NotFoundException("Process with id: " + processInstanceId + " does not exist or is not available for this user");
         }
 
@@ -125,7 +126,7 @@ public class FlowableProcessInstanceService {
 
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
 
-        if (!permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), processDefinition)) {
+        if (!permissionService.canStartProcess(SecurityUtils.getAuthenticatedSecurityScope(), processDefinition)) {
             throw new NotPermittedException("User is not listed as potential starter for process definition with id: " + processDefinition.getId());
         }
 
@@ -146,11 +147,11 @@ public class FlowableProcessInstanceService {
 
     public void deleteProcessInstance(String processInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
 
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .startedBy(String.valueOf(currentUser.getId())) // Permission
+                .startedBy(String.valueOf(currentUser.getUserId())) // Permission
                 .singleResult();
 
         if (processInstance == null) {

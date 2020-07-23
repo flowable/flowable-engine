@@ -19,7 +19,6 @@ import java.util.Base64;
 import java.util.List;
 
 import org.flowable.form.model.SimpleFormModel;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
@@ -81,7 +80,7 @@ public class FlowableFormService {
     }
 
     public FormRepresentation saveForm(String formId, FormSaveRepresentation saveRepresentation) {
-        User user = SecurityUtils.getCurrentUserObject();
+        String user = SecurityUtils.getCurrentUserId();
         Model model = modelService.getModel(formId);
 
         String formKey = saveRepresentation.getFormRepresentation().getKey();

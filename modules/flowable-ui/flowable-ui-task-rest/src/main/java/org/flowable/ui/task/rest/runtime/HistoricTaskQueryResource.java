@@ -16,11 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
@@ -58,7 +58,7 @@ public class HistoricTaskQueryResource {
 
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
 
         JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
         if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
