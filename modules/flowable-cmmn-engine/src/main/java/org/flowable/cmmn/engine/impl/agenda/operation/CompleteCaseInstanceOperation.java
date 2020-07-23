@@ -32,7 +32,7 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return CaseInstanceState.COMPLETED;
     }
     
@@ -42,7 +42,7 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     }
     
     @Override
-    protected String getDeleteReason() {
+    public String getDeleteReason() {
         return "cmmn-state-transition-complete-case";
     }
     

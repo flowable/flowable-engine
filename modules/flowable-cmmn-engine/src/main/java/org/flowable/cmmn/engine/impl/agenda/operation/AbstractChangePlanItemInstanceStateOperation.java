@@ -76,7 +76,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         }
     }
 
-    protected boolean isStateNotChanged(String oldState, String newState) {
+    public boolean isStateNotChanged(String oldState, String newState) {
         // if the old and new state are the same, leave the operation as we don't execute any transition
         return oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState();
     }
@@ -101,7 +101,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         return false;
     }
 
-    protected abstract String getOperationName();
+    public abstract String getOperationName();
 
     @Override
     public String toString() {

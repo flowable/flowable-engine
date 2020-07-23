@@ -91,7 +91,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Start plan item]";
     }
     

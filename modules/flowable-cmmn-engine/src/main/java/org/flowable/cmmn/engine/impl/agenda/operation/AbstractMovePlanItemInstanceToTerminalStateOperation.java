@@ -88,7 +88,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     @Override
     protected abstract void internalExecute();
 
-    protected boolean isRepeatingOnDelete(String originalState, String newState) {
+    public boolean isRepeatingOnDelete(String originalState, String newState) {
         
         // If there are no entry criteria and the repetition rule evaluates to true: a new instance needs to be created.
 
@@ -118,7 +118,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         return false;
     }
 
-    protected boolean isWithoutStageOrParentIsNotTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
+    public boolean isWithoutStageOrParentIsNotTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
         return planItemInstanceEntity.getStagePlanItemInstanceEntity() == null
                 || !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity.getStagePlanItemInstanceEntity());
     }
@@ -130,7 +130,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
      * @param planItem the plan item to test
      * @return true, if the plan item has a repetition rule without any conditions like entry criteria or a collection to be based on for repetition
      */
-    protected boolean hasRepetitionRuleAndNoEntryCriteria(PlanItem planItem) {
+    public boolean hasRepetitionRuleAndNoEntryCriteria(PlanItem planItem) {
         return planItem != null
             && planItem.getEntryCriteria().isEmpty()
             && planItem.getItemControl() != null
@@ -138,21 +138,21 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             && !planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
     }
 
-    protected boolean hasRepetitionOnCollection(PlanItem planItem) {
+    public boolean hasRepetitionOnCollection(PlanItem planItem) {
         return planItem != null
             && planItem.getItemControl() != null
             && planItem.getItemControl().getRepetitionRule() != null
             && planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
     }
 
-    protected boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {
+    public boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {
         return planItem != null
             && !planItem.getEntryCriteria().isEmpty()
             && planItem.getItemControl() != null
             && planItem.getItemControl().getRepetitionRule() != null;
     }
 
-    protected boolean isWaitingForRepetitionPlanItemInstanceExists(PlanItemInstanceEntity planItemInstanceEntity) {
+    public boolean isWaitingForRepetitionPlanItemInstanceExists(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemInstanceEntity stagePlanItemInstanceEntity = planItemInstanceEntity.getStagePlanItemInstanceEntity();
         if (stagePlanItemInstanceEntity != null) {
             List<PlanItemInstanceEntity> childPlanItemInstances = stagePlanItemInstanceEntity.getChildPlanItemInstances();
@@ -189,7 +189,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             }
         }
     }
-    
-    protected abstract boolean isEvaluateRepetitionRule();
+
+    public abstract boolean isEvaluateRepetitionRule();
     
 }

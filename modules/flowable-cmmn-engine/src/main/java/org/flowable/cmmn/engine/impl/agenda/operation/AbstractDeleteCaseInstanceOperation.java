@@ -75,7 +75,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
             }
         }
     }
-    
-    protected abstract String getDeleteReason();
+
+    public abstract String getDeleteReason();
     
 }

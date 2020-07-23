@@ -63,7 +63,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Create plan item]";
     }
 

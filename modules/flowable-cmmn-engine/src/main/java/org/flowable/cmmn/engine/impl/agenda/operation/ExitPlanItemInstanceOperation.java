@@ -72,11 +72,11 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     /**
      * @return true, if this plan item is a stage and according the exit sentry exit event type needs to go in complete state instead of terminated
      */
-    protected boolean shouldStageGoIntoCompletedState() {
+    public boolean shouldStageGoIntoCompletedState() {
         return isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType));
     }
 
-    protected boolean shouldPlanItemStayInCurrentState() {
+    public boolean shouldPlanItemStayInCurrentState() {
         return !isStage() && (
             (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) &&
                 (ENABLED.equals(planItemInstanceEntity.getState()) || EVALUATE_STATES.contains(planItemInstanceEntity.getState())))
@@ -135,13 +135,13 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
 
     @Override
-    protected boolean isEvaluateRepetitionRule() {
+    public boolean isEvaluateRepetitionRule() {
         // by default, we don't create new instances for repeatable plan items being terminated, however, if the exit type is set to only terminate active or
         // enabled instances, we might want to immediately create a new instance for repetition, but only, if the current one was terminated, of course
         return (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) || EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType)) && TERMINATED.equals(getNewState());
     }
 
-    protected boolean isStage() {
+    public boolean isStage() {
         if (isStage == null) {
             isStage = isStage(planItemInstanceEntity);
         }
@@ -149,8 +149,32 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Exit plan item]";
     }
 
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    public void setExitCriterionId(String exitCriterionId) {
+        this.exitCriterionId = exitCriterionId;
+    }
+    public String getExitType() {
+        return exitType;
+    }
+    public void setExitType(String exitType) {
+        this.exitType = exitType;
+    }
+    public String getExitEventType() {
+        return exitEventType;
+    }
+    public void setExitEventType(String exitEventType) {
+        this.exitEventType = exitEventType;
+    }
+    public Boolean getStage() {
+        return isStage;
+    }
+    public void setStage(Boolean stage) {
+        isStage = stage;
+    }
 }
