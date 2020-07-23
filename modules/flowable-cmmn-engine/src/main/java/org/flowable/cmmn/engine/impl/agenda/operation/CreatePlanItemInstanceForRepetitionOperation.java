@@ -37,7 +37,7 @@ public class CreatePlanItemInstanceForRepetitionOperation extends CreatePlanItem
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Create plan item for repetition]";
     }
 

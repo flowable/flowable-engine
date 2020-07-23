@@ -46,7 +46,7 @@ public class DismissPlanItemInstanceOperation extends AbstractChangePlanItemInst
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Dismiss plan item]";
     }
 

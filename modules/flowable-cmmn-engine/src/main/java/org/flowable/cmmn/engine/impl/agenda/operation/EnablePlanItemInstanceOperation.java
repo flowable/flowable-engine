@@ -52,7 +52,7 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Enable plan item]";
     }
 

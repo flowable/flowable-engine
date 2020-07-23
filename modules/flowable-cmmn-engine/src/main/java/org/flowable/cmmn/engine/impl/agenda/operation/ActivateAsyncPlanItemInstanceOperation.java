@@ -111,7 +111,7 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Async activate plan item]";
     }
 

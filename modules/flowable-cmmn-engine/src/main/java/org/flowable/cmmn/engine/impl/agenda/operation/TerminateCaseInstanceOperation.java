@@ -78,7 +78,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         // depending on the exit event type, we will end up in the complete state, even though the case was actually terminated / exited
         if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
             return CaseInstanceState.COMPLETED;
@@ -98,8 +98,32 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     }
     
     @Override
-    protected String getDeleteReason() {
+    public String getDeleteReason() {
         return "cmmn-state-transition-terminate-case";
     }
 
+    public boolean isManualTermination() {
+        return manualTermination;
+    }
+    public void setManualTermination(boolean manualTermination) {
+        this.manualTermination = manualTermination;
+    }
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    public void setExitCriterionId(String exitCriterionId) {
+        this.exitCriterionId = exitCriterionId;
+    }
+    public String getExitType() {
+        return exitType;
+    }
+    public void setExitType(String exitType) {
+        this.exitType = exitType;
+    }
+    public String getExitEventType() {
+        return exitEventType;
+    }
+    public void setExitEventType(String exitEventType) {
+        this.exitEventType = exitEventType;
+    }
 }

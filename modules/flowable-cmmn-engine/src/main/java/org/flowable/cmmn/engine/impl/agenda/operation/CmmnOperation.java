@@ -59,14 +59,14 @@ public abstract class CmmnOperation implements Runnable {
             return planItemDefinition.getParentStage();
         }
     }
-    
-    protected boolean isStage(PlanItemInstanceEntity planItemInstanceEntity) {
+
+    public boolean isStage(PlanItemInstanceEntity planItemInstanceEntity) {
         return (planItemInstanceEntity.getPlanItem() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Stage);
     }
-    
-    protected Stage getPlanModel(CaseInstanceEntity caseInstanceEntity) {
+
+    public Stage getPlanModel(CaseInstanceEntity caseInstanceEntity) {
         return CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
     }
     
@@ -122,7 +122,7 @@ public abstract class CmmnOperation implements Runnable {
         return false;
     }
 
-    protected boolean isEventListenerWithAvailableCondition(PlanItem planItem) {
+    public boolean isEventListenerWithAvailableCondition(PlanItem planItem) {
         if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener) {
             EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
             return StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression());

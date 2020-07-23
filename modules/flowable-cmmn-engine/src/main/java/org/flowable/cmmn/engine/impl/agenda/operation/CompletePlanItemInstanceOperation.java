@@ -38,7 +38,7 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
     
     @Override
-    protected boolean isEvaluateRepetitionRule() {
+    public boolean isEvaluateRepetitionRule() {
         return true;
     }
 
@@ -57,7 +57,7 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Complete plan item]";
     }
 

@@ -44,7 +44,7 @@ public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePl
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return null; // Default one is ok.
     }
     
