@@ -149,7 +149,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     
     @Override
     public SuspendedJobQueryImpl subScopeId(String subScopeId) {
-        if (scopeId == null) {
+        if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
         this.subScopeId = subScopeId;
