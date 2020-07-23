@@ -95,6 +95,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof BpmnError) {
                 ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+            } else if (rootCause instanceof FlowableException) {
+                throw (FlowableException) rootCause;
             } else {
                 throw e;
             }

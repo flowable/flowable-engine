@@ -145,7 +145,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     
     @Override
     public TimerJobQueryImpl subScopeId(String subScopeId) {
-        if (scopeId == null) {
+        if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
         this.subScopeId = subScopeId;
