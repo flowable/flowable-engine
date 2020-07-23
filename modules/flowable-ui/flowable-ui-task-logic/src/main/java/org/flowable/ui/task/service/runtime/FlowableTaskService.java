@@ -21,11 +21,11 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.ui.common.model.UserRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
@@ -46,7 +46,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskService.class);
 
     public TaskRepresentation getTask(String taskId) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
         TaskRepresentation rep = null;
@@ -85,7 +85,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
     }
 
     public List<TaskRepresentation> getSubTasks(String taskId) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, taskId);
         
         List<Task> subTasks = this.taskService.getSubTasks(taskId);
@@ -135,7 +135,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             throw new NotFoundException("Task with id: " + taskId + " does not exist");
         }
 
-        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getAuthenticatedSecurityScope(), task.getId());
 
         if (updated.isNameSet()) {
             task.setName(updated.getName());

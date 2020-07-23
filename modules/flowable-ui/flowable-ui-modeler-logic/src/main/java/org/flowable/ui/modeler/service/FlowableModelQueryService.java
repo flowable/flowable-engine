@@ -198,7 +198,7 @@ public class FlowableModelQueryService {
                 model.setName(name);
                 model.setDescription(description);
                 model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
-                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserId());
                 return new ModelRepresentation(newModel);
 
             } catch (BadRequestException e) {
@@ -244,7 +244,7 @@ public class FlowableModelQueryService {
                 model.setName(name);
                 model.setDescription(description);
                 model.setModelType(AbstractModel.MODEL_TYPE_CMMN);
-                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserId());
                 return new ModelRepresentation(newModel);
 
             } catch (BadRequestException e) {

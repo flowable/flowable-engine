@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.idm.api.User;
 import org.flowable.ui.modeler.domain.AbstractModel;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.domain.ModelHistory;
@@ -38,7 +37,7 @@ public interface ModelService {
 
     ModelHistory getModelHistory(String modelId, String modelHistoryId);
 
-    Long getModelCountForUser(User user, int modelTypeApp);
+    Long getModelCountForUser(String userId, int modelTypeApp);
 
     BpmnModel getBpmnModel(AbstractModel model, ConverterContext converterContext);
 
@@ -58,24 +57,24 @@ public interface ModelService {
     
     String createModelJson(ModelRepresentation model);
 
-    Model createModel(ModelRepresentation model, String editorJson, User createdBy);
+    Model createModel(ModelRepresentation model, String editorJson, String createdBy);
 
-    Model createModel(Model newModel, User createdBy);
+    Model createModel(Model newModel, String createdBy);
 
     Model saveModel(Model modelObject);
 
-    Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy);
+    Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, String updatedBy);
 
     Model saveModel(String modelId, String name, String key, String description, String editorJson,
-            boolean newVersion, String newVersionComment, User updatedBy);
+            boolean newVersion, String newVersionComment, String updatedBy);
 
     ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream);
 
-    Model createNewModelVersion(Model modelObject, String comment, User updatedBy);
+    Model createNewModelVersion(Model modelObject, String comment, String updatedBy);
 
-    ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy);
+    ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, String updatedBy);
 
     void deleteModel(String modelId);
 
-    ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment);
+    ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, String userId, String newVersionComment);
 }

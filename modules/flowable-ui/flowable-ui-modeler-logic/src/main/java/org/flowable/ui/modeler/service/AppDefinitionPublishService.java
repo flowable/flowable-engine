@@ -34,7 +34,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.tenant.TenantProvider;
@@ -71,10 +70,10 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
     @Autowired
     protected TenantProvider tenantProvider;
 
-    public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
+    public void publishAppDefinition(String comment, Model appDefinitionModel, String userId) {
 
         // Create new version of the app model
-        modelService.createNewModelVersion(appDefinitionModel, comment, user);
+        modelService.createNewModelVersion(appDefinitionModel, comment, userId);
 
         String deployableZipName = appDefinitionModel.getKey() + ".zip";
 

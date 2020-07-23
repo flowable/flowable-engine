@@ -32,6 +32,7 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.task.model.runtime.ProcessDefinitionRepresentation;
@@ -107,8 +108,9 @@ public class FlowableProcessDefinitionService {
         List<ProcessDefinition> definitions = definitionQuery.list();
 
         List<ProcessDefinition> startableDefinitions = new ArrayList<>();
+        SecurityScope currentUser = SecurityUtils.getCurrentSecurityScope();
         for (ProcessDefinition definition : definitions) {
-            if (SecurityUtils.getCurrentUserObject() == null || permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), definition)) {
+            if (currentUser == null || permissionService.canStartProcess(currentUser, definition)) {
                 startableDefinitions.add(definition);
             }
         }

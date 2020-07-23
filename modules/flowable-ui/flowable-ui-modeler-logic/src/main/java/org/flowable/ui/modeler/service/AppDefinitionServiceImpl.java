@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -128,7 +128,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
 
         AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
 
-        User user = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         Model model = modelService.getModel(modelId);
 
@@ -143,11 +143,11 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
             throw new InternalServerErrorException("App definition could not be saved " + modelId);
         }
 
-        model = modelService.saveModel(model, editorJson, null, false, null, user);
+        model = modelService.saveModel(model, editorJson, null, false, null, currentUserId);
 
         AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(model);
         if (updatedModel.isPublish()) {
-            appDefinitionPublishService.publishAppDefinition(null, model, user);
+            appDefinitionPublishService.publishAppDefinition(null, model, currentUserId);
         } else {
             appDefinition.setDefinition(updatedModel.getAppDefinition().getDefinition());
         }

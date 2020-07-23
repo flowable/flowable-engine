@@ -42,7 +42,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.idm.api.User;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
@@ -82,7 +82,7 @@ public class CaseInstanceDisplayJsonClientResource {
     @GetMapping(value = "/rest/case-instances/{caseInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String caseInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         if (!permissionService.hasReadPermissionOnCase(currentUser, caseInstanceId)) {
             throw new NotPermittedException();
         }
@@ -153,7 +153,7 @@ public class CaseInstanceDisplayJsonClientResource {
     @GetMapping(value = "/rest/case-instances/history/{caseInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String caseInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         if (!permissionService.hasReadPermissionOnCase(currentUser, caseInstanceId)) {
             throw new NotPermittedException();
         }

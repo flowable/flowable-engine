@@ -127,7 +127,7 @@ public class ModelsResource {
 
         String json = modelService.createModelJson(modelRepresentation);
 
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserId());
         return new ModelRepresentation(newModel);
     }
 
@@ -179,12 +179,13 @@ public class ModelsResource {
             }
         }
 
+        String currentUserId = SecurityUtils.getCurrentUserId();
         // create the new model
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, json, currentUserId);
 
         // copy also the thumbnail
         byte[] imageBytes = model.getThumbnail();
-        newModel = modelService.saveModel(newModel, newModel.getModelEditorJson(), imageBytes, false, newModel.getComment(), SecurityUtils.getCurrentUserObject());
+        newModel = modelService.saveModel(newModel, newModel.getModelEditorJson(), imageBytes, false, newModel.getComment(), currentUserId);
 
         return new ModelRepresentation(newModel);
     }

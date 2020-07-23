@@ -51,8 +51,8 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.idm.api.User;
 import org.flowable.job.api.Job;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
@@ -132,7 +132,7 @@ public class RuntimeDisplayJsonClientResource {
     @GetMapping(value = "/rest/process-instances/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String processInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         if (!permissionService.hasReadPermissionOnProcessInstance(currentUser, processInstanceId)) {
             throw new NotPermittedException();
         }
@@ -230,7 +230,7 @@ public class RuntimeDisplayJsonClientResource {
     @GetMapping(value = "/rest/process-instances/history/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String processInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         if (!permissionService.hasReadPermissionOnProcessInstance(currentUser, processInstanceId)) {
             throw new NotPermittedException();
         }

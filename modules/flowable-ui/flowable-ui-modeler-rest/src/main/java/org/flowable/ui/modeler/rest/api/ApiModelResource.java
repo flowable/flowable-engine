@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.ConflictingRequestException;
@@ -183,8 +182,8 @@ public class ApiModelResource {
         }
 
         Model model = modelService.getModel(modelId);
-        User currentUser = SecurityUtils.getCurrentUserObject();
-        boolean currentUserIsOwner = model.getLastUpdatedBy().equals(currentUser.getId());
+        String currentUserId = SecurityUtils.getCurrentUserId();
+        boolean currentUserIsOwner = model.getLastUpdatedBy().equals(currentUserId);
         String resolveAction = values.getFirst("conflictResolveAction");
 
         // If timestamps differ, there is a conflict or a conflict has been resolved by the user
@@ -251,7 +250,7 @@ public class ApiModelResource {
 
         try {
             model = modelService.saveModel(model.getId(), name, key, description, json, newVersion,
-                    newVersionComment, SecurityUtils.getCurrentUserObject());
+                    newVersionComment, SecurityUtils.getCurrentUserId());
             return new ModelRepresentation(model);
 
         } catch (Exception e) {
@@ -265,7 +264,7 @@ public class ApiModelResource {
         model.setName(name);
         model.setDescription(description);
         model.setModelType(modelType);
-        Model newModel = modelService.createModel(model, editorJson, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(model, editorJson, SecurityUtils.getCurrentUserId());
         return new ModelRepresentation(newModel);
     }
 }

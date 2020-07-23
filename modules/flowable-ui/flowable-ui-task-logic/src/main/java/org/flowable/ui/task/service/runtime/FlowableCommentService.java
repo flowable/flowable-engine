@@ -21,9 +21,9 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.task.Comment;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
@@ -54,7 +54,7 @@ public class FlowableCommentService {
 
     public ResultListDataRepresentation getTaskComments(String taskId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         checkReadPermissionOnTask(currentUser, taskId);
         List<Comment> comments = getCommentsForTask(taskId);
 
@@ -79,7 +79,7 @@ public class FlowableCommentService {
         }
 
         // Check read permission and message
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         checkReadPermissionOnTask(currentUser, taskId);
 
         // Create comment
@@ -89,7 +89,7 @@ public class FlowableCommentService {
 
     public ResultListDataRepresentation getProcessInstanceComments(String processInstanceId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         checkReadPermissionOnProcessInstance(currentUser, processInstanceId);
         List<Comment> comments = getCommentsForProcessInstance(processInstanceId);
 
@@ -114,7 +114,7 @@ public class FlowableCommentService {
         }
 
         // Check read permission and message
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         checkReadPermissionOnProcessInstance(currentUser, processInstanceId);
 
         // Create comment
@@ -138,11 +138,11 @@ public class FlowableCommentService {
         return taskService.getProcessInstanceComments(processInstanceId);
     }
 
-    public Comment createComment(String message, User createdBy, String processInstanceId) {
+    public Comment createComment(String message, SecurityScope createdBy, String processInstanceId) {
         return createComment(message, createdBy, null, processInstanceId);
     }
 
-    public Comment createComment(String message, User createdBy, String taskId, String processInstanceId) {
+    public Comment createComment(String message, SecurityScope createdBy, String taskId, String processInstanceId) {
         return taskService.addComment(taskId, processInstanceId, message);
     }
 
@@ -157,18 +157,18 @@ public class FlowableCommentService {
         taskService.deleteComments(null, processInstanceId);
     }
 
-    protected void checkReadPermissionOnTask(User user, String taskId) {
+    protected void checkReadPermissionOnTask(SecurityScope user, String taskId) {
         if (taskId == null) {
             throw new BadRequestException("Task id is required");
         }
-        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
+        permissionService.validateReadPermissionOnTask(user, taskId);
     }
 
-    protected void checkReadPermissionOnProcessInstance(User user, String processInstanceId) {
+    protected void checkReadPermissionOnProcessInstance(SecurityScope user, String processInstanceId) {
         if (processInstanceId == null) {
             throw new BadRequestException("Process instance id is required");
         }
-        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstanceId)) {
+        if (!permissionService.hasReadPermissionOnProcessInstance(user, processInstanceId)) {
             throw new NotPermittedException("You are not permitted to read process instance with id: " + processInstanceId);
         }
     }

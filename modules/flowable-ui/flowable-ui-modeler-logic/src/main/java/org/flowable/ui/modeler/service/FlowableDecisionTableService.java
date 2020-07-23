@@ -35,7 +35,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
@@ -209,7 +208,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
                 modelRepresentation.setName(dmnDefinition.getName());
                 modelRepresentation.setDescription(dmnDefinition.getDescription());
                 modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
-                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserObject());
+                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserId());
                 return new ModelRepresentation(model);
 
             } catch (Exception e) {
@@ -277,7 +276,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
 
     public DecisionTableRepresentation saveDecisionTable(String decisionTableId, DecisionTableSaveRepresentation saveRepresentation) {
 
-        User user = SecurityUtils.getCurrentUserObject();
+        String user = SecurityUtils.getCurrentUserId();
         Model model = getModel(decisionTableId, false, false);
 
         String decisionKey = saveRepresentation.getDecisionTableRepresentation().getKey();

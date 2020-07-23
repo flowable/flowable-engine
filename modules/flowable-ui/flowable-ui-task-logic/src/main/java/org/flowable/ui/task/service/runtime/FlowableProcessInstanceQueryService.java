@@ -26,6 +26,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.task.model.runtime.ProcessInstanceRepresentation;
@@ -67,8 +68,8 @@ public class FlowableProcessInstanceQueryService {
 
         HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
-        instanceQuery.involvedUser(String.valueOf(currentUser.getId()));
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
+        instanceQuery.involvedUser(currentUser.getUserId());
 
         // Process definition
         JsonNode processDefinitionIdNode = requestNode.get("processDefinitionId");
