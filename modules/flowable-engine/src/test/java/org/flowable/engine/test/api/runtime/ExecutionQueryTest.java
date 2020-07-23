@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -1967,7 +1968,7 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
             } else if (execution.getParentId().equals(execution.getProcessInstanceId())) {
                 assertThat(execution.getActivityId()).isEqualTo("embeddedSubprocess");
             } else {
-                fail();
+                fail("Unknown 'getParentID()'");
             }
         }
     }

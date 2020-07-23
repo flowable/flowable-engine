@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Collections;
 import java.util.HashMap;

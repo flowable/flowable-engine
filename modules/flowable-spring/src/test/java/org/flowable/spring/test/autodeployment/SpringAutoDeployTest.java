@@ -15,6 +15,7 @@ package org.flowable.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.net.URISyntaxException;
 import java.sql.Driver;
