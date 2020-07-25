@@ -43,8 +43,8 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .containsExactly("Receive Payment", "Ship Order");
 
         // Completing both tasks will join the concurrent executions
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         tasks = query.list();
         assertThat(tasks)
@@ -66,10 +66,10 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .containsExactly("Task 1", "Task 2", "Task 3");
 
         // Completing the first task should *not* trigger the join
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         // Completing the second task should trigger the first join
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         tasks = query.list();
         assertThat(tasks)
@@ -78,8 +78,8 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // Completing the remaining tasks should trigger the second join and end
         // the process
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         assertProcessEnded(pi.getId());
     }

@@ -78,7 +78,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
         Date startDate = new Date();
         runtimeService.setVariable(pi.getId(), "StartDate", startDate);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertThat(jobQuery.count()).isEqualTo(1);
@@ -100,7 +100,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Task B");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         assertProcessEnded(pi.getProcessInstanceId());
 

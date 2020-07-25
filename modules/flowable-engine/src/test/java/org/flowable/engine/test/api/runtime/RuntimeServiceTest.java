@@ -509,7 +509,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                 parallelUserTask = task;
             }
         }
-        taskService.complete(parallelUserTask.getId());
+        completeTask(parallelUserTask);
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subprocess1WaitBeforeError")
                 .singleResult();
@@ -529,7 +529,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                 beforeErrorUserTask = task;
             }
         }
-        taskService.complete(beforeErrorUserTask.getId());
+        completeTask(beforeErrorUserTask);
 
         activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
         assertThat(activeActivities).hasSize(2);
@@ -545,7 +545,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                 afterErrorUserTask = task;
             }
         }
-        taskService.complete(afterErrorUserTask.getId());
+        completeTask(afterErrorUserTask);
 
         tasks = taskService.createTaskQuery().list();
         assertThat(tasks)
@@ -556,7 +556,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(activeActivities)
                 .containsOnly("MainUserTask");
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 

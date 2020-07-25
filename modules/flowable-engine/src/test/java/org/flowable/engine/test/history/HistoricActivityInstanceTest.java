@@ -376,7 +376,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         // Complete the task with the boundary-event on it
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
@@ -435,8 +435,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(tasksToComplete).hasSize(2);
 
         // Complete both tasks, second task-complete should end the fork-gateway and set time
-        taskService.complete(tasksToComplete.get(0).getId());
-        taskService.complete(tasksToComplete.get(1).getId());
+        completeTask(tasksToComplete.get(0));
+        completeTask(tasksToComplete.get(1));
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 

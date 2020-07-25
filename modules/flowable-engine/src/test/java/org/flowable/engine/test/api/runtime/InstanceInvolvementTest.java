@@ -79,7 +79,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         // "user2" should still be involved with the new process instance even
         // after completing his task
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertInvolvement("user2", instanceId);
 
         // "user3" should be involved after completing a task even without

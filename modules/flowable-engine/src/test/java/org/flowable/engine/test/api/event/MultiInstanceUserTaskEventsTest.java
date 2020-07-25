@@ -152,7 +152,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertThat(userTask1).isNotNull();
 
         // complete task1 so we flow to terminate end
-        taskService.complete(userTask1.getId());
+        completeTask(userTask1);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -290,7 +290,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertThat(tasks).hasSize(2);
         org.flowable.task.api.Task task0 = tasks.get(0);
 
-        taskService.complete(task0.getId());
+        completeTask(task0);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -397,7 +397,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         multiExecutions = runtimeService.createExecutionQuery().activityId("task").list();
         assertThat(multiExecutions).hasSize(2);
 
-        taskService.complete(task0.getId());
+        completeTask(task0);
 
         multiExecutions = runtimeService.createExecutionQuery().activityId("task").list();
         assertThat(multiExecutions).hasSize(1);
@@ -410,7 +410,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         taskEntity = (TaskEntity) entityEvent.getEntity();
         assertThat(taskEntity.getId()).isEqualTo(task0.getId());
 
-        taskService.complete(task1.getId());
+        completeTask(task1);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -819,7 +819,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertThat(userTask1.getName()).isEqualTo("User Task1 in Parent");
 
         // complete task1 in parent so we flow to terminate end
-        taskService.complete(userTask1.getId());
+        completeTask(userTask1);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -982,7 +982,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertThat(userTask1).isNotNull();
 
         // complete task1 so we flow to terminate end
-        taskService.complete(userTask1.getId());
+        completeTask(userTask1);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -1089,7 +1089,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
                 .extracting(Task::getName)
                 .containsExactly("Task A-0");
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -1106,7 +1106,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
                 .extracting(Task::getName)
                 .containsExactly("Task A-1");
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processId).list()).isEmpty();
 

@@ -85,7 +85,7 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // Get JPAEntity Variable by HistoricVariableInstanceQuery
@@ -112,7 +112,7 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
 
         // Finish tasks
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery
@@ -144,7 +144,7 @@ public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
         // Finish tasks
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
             taskService.setVariable(task.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery

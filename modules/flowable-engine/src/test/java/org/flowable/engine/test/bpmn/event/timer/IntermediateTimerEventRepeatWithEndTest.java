@@ -80,7 +80,7 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
                 .containsExactly("Task A");
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task A (endDate not reached but it will be executed according to the expression)
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
@@ -107,7 +107,7 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
                 .containsExactly("Task C");
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task C
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         nextTimeCal.add(Calendar.HOUR, 1); // after 1 hour and 5 minutes the timer event should be executed.
         nextTimeCal.add(Calendar.MINUTE, 5);
         processEngineConfiguration.getClock().setCurrentTime(nextTimeCal.getTime());

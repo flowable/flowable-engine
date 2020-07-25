@@ -119,7 +119,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // attempt to complete the task and get PersistenceException pointing to
         // "referential integrity constraint violation"
-        taskService.complete(task.getId());
+        completeTask(task);
     }
 
     @Test
@@ -155,7 +155,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskCategory(testCategory).count()).isZero();
 
         // Complete task and verify history
-        taskService.complete(task.getId());
+        completeTask(task);
             
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();

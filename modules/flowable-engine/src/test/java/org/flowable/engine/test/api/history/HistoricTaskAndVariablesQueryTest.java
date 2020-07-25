@@ -446,7 +446,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertThat(tasks).hasSize(1);
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            taskService.complete(task.getId());
+            completeTask(task);
 
             assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -731,7 +731,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     public void testQueryVariableExistsForCompletedTasks() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             taskService.createTaskQuery().list().forEach(
-                    task -> taskService.complete(task.getId())
+                    task -> completeTask(task)
             );
             testQueryVariableExists();
         }

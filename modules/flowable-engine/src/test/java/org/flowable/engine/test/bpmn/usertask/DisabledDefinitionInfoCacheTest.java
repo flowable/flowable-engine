@@ -43,7 +43,7 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -55,7 +55,7 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -70,13 +70,13 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
         assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -91,13 +91,13 @@ public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
         assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

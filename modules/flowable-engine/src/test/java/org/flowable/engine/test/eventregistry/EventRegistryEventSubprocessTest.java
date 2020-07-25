@@ -118,7 +118,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(createEventSubscriptionQuery().count()).isZero();
 
@@ -127,13 +127,13 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         // now let's complete the first task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(4);
 
         // complete the second task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -174,7 +174,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         // Complete the user task in the event sub process
         Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         assertThat(eventSubProcessTask).isNotNull();
-        taskService.complete(eventSubProcessTask.getId());
+        completeTask(eventSubProcessTask);
 
         assertThat(runtimeService.createActivityInstanceQuery().list())
             .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
@@ -243,7 +243,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         // now let's complete the task in the event subprocess
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -284,7 +284,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         // Complete the user task in the event sub process
         Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         assertThat(eventSubProcessTask).isNotNull();
-        taskService.complete(eventSubProcessTask.getId());
+        completeTask(eventSubProcessTask);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertThat(historyService.createHistoricActivityInstanceQuery().list())

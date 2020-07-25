@@ -173,7 +173,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
             assertThat(tasks)
                     .extracting(Task::getName)
                     .containsOnly("Task A");
-            taskService.complete(tasks.get(0).getId());
+            completeTask(tasks.get(0));
         }
 
         // now All the process instances should be completed

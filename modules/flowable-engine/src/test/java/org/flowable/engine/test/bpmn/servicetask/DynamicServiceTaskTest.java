@@ -43,13 +43,13 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
         assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -64,13 +64,13 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(0);
         assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -85,7 +85,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -109,7 +109,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -133,7 +133,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -157,7 +157,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()

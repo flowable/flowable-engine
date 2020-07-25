@@ -585,7 +585,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         taskService.deleteGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.suspendProcessInstanceById(oneTaskProcess.getId());
         runtimeService.activateProcessInstanceById(oneTaskProcess.getId());
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(historyService.createHistoricTaskLogEntryQuery().count()).isZero();
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(12l);
@@ -645,7 +645,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertThat(tasks).extracting(Task::getName).containsExactly("Always", "Always");
 
         for (Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
@@ -681,7 +681,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     }
 
     protected void finishOneTaskProcess(Task task) {
-        taskService.complete(task.getId());
+        completeTask(task);
         waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         assertThat(managementService.createHistoryJobQuery().singleResult()).isNull();
     }

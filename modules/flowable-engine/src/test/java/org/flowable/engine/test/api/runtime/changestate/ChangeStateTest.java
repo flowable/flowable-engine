@@ -62,7 +62,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityBackwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -92,11 +92,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -106,7 +106,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionBackwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -135,11 +135,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -175,7 +175,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -210,7 +210,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -264,7 +264,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -314,7 +314,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -328,7 +328,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(timerJob).isNotNull();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -371,11 +371,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -389,7 +389,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(timerJob).isNotNull();
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -431,11 +431,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -499,7 +499,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("thirdTask");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -509,7 +509,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityOutOfSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -547,15 +547,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -565,7 +565,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionOutOfSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -602,15 +602,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -662,11 +662,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -717,11 +717,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -780,11 +780,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -843,11 +843,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -857,7 +857,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityOutOfSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -907,7 +907,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -915,11 +915,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -929,7 +929,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionOutOfSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -978,7 +978,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -986,11 +986,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1044,11 +1044,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1101,11 +1101,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1167,7 +1167,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityOutOfSubProcessTaskWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -1213,11 +1213,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1227,7 +1227,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionOutOfSubProcessTaskWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -1272,11 +1272,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1328,15 +1328,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(4);
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1389,15 +1389,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1455,7 +1455,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1503,15 +1503,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1571,15 +1571,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1626,15 +1626,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1693,15 +1693,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1711,7 +1711,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityIntoNestedSubProcessExecutionFromOuter() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
 
@@ -1747,15 +1747,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1765,7 +1765,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityIntoNestedSubProcessExecutionFromOuterWithDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
 
@@ -1813,15 +1813,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1831,7 +1831,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromOuter() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
 
@@ -1866,15 +1866,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1884,7 +1884,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromOuterWithDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
 
@@ -1934,15 +1934,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1952,11 +1952,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityOutOfNestedSubProcessExecution() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
@@ -1994,11 +1994,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2008,11 +2008,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionOutOfNestedSubProcessExecution() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
@@ -2049,11 +2049,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2063,11 +2063,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityOutOfNestedSubProcessExecutionIntoContainingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
@@ -2104,19 +2104,19 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2126,11 +2126,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionOutOfNestedSubProcessExecutionIntoContainingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
@@ -2166,19 +2166,19 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nestedSubTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTaskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2188,7 +2188,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityFromSubProcessToAnotherSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcesses");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subtask");
@@ -2231,11 +2231,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2245,7 +2245,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionFromSubProcessToAnotherSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcesses");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subtask");
@@ -2287,11 +2287,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         assertThat(iterator.hasNext()).isFalse();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2301,7 +2301,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityForSubProcessWithVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -2369,15 +2369,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
                         "taskBefore"
                 );
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2387,7 +2387,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionForSubProcessWithVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
@@ -2454,15 +2454,15 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
                         "taskBefore"
                 );
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("subTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2491,11 +2491,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(nameDataObject).isNotNull();
         assertThat(nameDataObject.getValue()).isEqualTo("John");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2525,11 +2525,11 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(nameDataObject).isNotNull();
         assertThat(nameDataObject.getValue()).isEqualTo("Joe");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -2581,7 +2581,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
     }
@@ -2633,7 +2633,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
     }
@@ -2648,7 +2648,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeCatchEvent");
 
         //Complete initial task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Process is waiting for event invocation
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2681,7 +2681,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the task once more
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Process is waiting for signal again
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2714,7 +2714,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -2728,7 +2728,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeCatchEvent");
 
         //Complete initial task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Process is waiting for event invocation
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2760,7 +2760,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the task once more
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Process is waiting for signal again
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2792,7 +2792,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -2845,7 +2845,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
     }
@@ -2898,7 +2898,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
     }
@@ -2913,7 +2913,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeCatchEvent");
 
         //Complete initial task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Process is waiting for event invocation
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2946,7 +2946,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the task once more
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Process is waiting for signal again
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2979,7 +2979,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -2993,7 +2993,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeCatchEvent");
 
         //Complete initial task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Process is waiting for event invocation
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -3025,7 +3025,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the task once more
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Process is waiting for signal again
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -3057,7 +3057,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         //Complete the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 

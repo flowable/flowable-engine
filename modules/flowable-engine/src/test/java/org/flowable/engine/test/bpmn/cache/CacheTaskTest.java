@@ -129,7 +129,7 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
 
         Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Map.Entry[] entries = {
                 entry("var1", "Hello"),

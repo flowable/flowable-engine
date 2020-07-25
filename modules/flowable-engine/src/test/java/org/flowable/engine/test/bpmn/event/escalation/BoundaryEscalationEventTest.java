@@ -34,7 +34,7 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("subprocessTask");
 
         // After task completion, escalation end event is reached and caught
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task after catching the escalation");
     }
@@ -49,12 +49,12 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
 
         // Completing the task will reach the end error event,
         // which is caught on the call activity boundary
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 }

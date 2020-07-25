@@ -56,7 +56,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(tasks.get(0).getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
         
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         assertProcessEnded(processInstance.getId());
@@ -88,7 +88,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         assertProcessEnded(processInstance.getId());
     }
@@ -159,7 +159,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         assertProcessEnded(processInstance.getId());  
     }
@@ -190,11 +190,11 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks).hasSize(2);
         assertThat(tasks.get(0).getName()).isEqualTo(taskBuilder.getName());
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("The Task");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -234,7 +234,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         
         assertProcessEnded(processInstance.getId());
@@ -281,17 +281,17 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .containsExactly("five", "four", "one", "three", "two");
 
         for (Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
        
         // now task After B should be available
         Task afterBTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterBTask.getName()).isEqualTo("after B");
-        taskService.complete(afterBTask.getId());
+        completeTask(afterBTask);
 
         Task afterSubProcessTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterSubProcessTask.getName()).isEqualTo("after sub process");
-        taskService.complete(afterSubProcessTask.getId());
+        completeTask(afterSubProcessTask);
         assertProcessEnded(processInstance.getId());
     }
     
@@ -318,7 +318,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         assertProcessEnded(processInstance.getId());
         
@@ -341,7 +341,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
         for (Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         assertProcessEnded(processInstance.getId());
     }
@@ -373,10 +373,10 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .extracting(Task::getName)
                 .containsExactly("five", "four", "one", "task A", "task B", "task C", "task D", "three", "two");
 
-        taskService.complete(taskB.getId());
+        completeTask(taskB);
         Task afterBTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("afterB").singleResult();
         assertThat(afterBTask.getId()).isNotNull();
-        taskService.complete(afterBTask.getId());
+        completeTask(afterBTask);
         
         // first complete the tasks from the original process definition and check that it continues to the next task (After sub process).
         taskService.complete(taskService.createTaskQuery().taskName("task A").singleResult().getId());
@@ -390,7 +390,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
         Task afterSubProcessTask = tasks.get(0);
         assertThat(afterSubProcessTask.getName()).isEqualTo("after sub process");
-        taskService.complete(afterSubProcessTask.getId());
+        completeTask(afterSubProcessTask);
         
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks)
@@ -398,7 +398,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .containsExactly("five", "four", "one", "three", "two");
 
         for (Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertProcessEnded(processInstance.getId());

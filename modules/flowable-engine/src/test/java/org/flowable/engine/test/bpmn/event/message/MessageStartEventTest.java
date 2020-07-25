@@ -114,7 +114,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -127,7 +127,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
         
@@ -142,7 +142,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -179,7 +179,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -192,7 +192,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -211,7 +211,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -224,7 +224,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart2").singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -234,7 +234,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertThat(processInstance.isEnded()).isFalse();
         task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 

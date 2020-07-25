@@ -49,8 +49,7 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
 
         assertThat(this.taskService.createTaskQuery().count()).as("User task has to be created.").isEqualTo(1);
         assertProcessActivityId("The execution is still on the user task.", oneTaskProcess, "theTask");
-        String taskId = this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult().getId();
-        this.taskService.complete(taskId);
+        completeTask(this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult());
 
         assertProcessActivityId("The execution must stop on the end event.", oneTaskProcess, "theEnd");
         triggerBreakPoint();

@@ -368,7 +368,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     public void testProcessCompleted_NoEnd() throws Exception {
         ProcessInstance noEndProcess = this.runtimeService.startProcessInstanceByKey("noEndProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(noEndProcess.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED)).as("ActivitiEventType.PROCESS_COMPLETED was expected 1 time.").hasSize(1);
     }
@@ -492,7 +492,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(processInstance).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<FlowableEvent> processCancelledEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
         assertThat(processCancelledEvents).as("There should be no FlowableEventType.PROCESS_CANCELLED event after process complete.").isEmpty();
@@ -508,7 +508,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(processInstance).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
         assertThat(processTerminatedEvents).as("There should be no FlowableEventType.PROCESS_TERMINATED event after process complete.").isEmpty();
@@ -523,7 +523,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isEqualTo(3);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
         assertThat(processTerminatedEvents)
@@ -559,7 +559,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
@@ -578,7 +578,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventWithBoundary");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTermInnerTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
@@ -598,7 +598,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         // should terminate the called process and continue the parent
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
@@ -656,7 +656,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         // Completing the task will reach the end error event,
         // which is caught on the call activity boundary
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<FlowableEvent> processCompletedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT);
         assertThat(processCompletedEvents)
@@ -669,7 +669,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(pi.getId());
     }
 
@@ -760,7 +760,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         // with the user task, boundary event and intermediate catch event defined in or
         // on subprocess1.
         assertThat(task2).isNotNull();
-        taskService.complete(task2.getId());
+        completeTask(task2);
 
         // Subprocess2 completed and transitioned to terminate end. We expect
         // ACTIVITY_CANCELLED for Subprocess1, task1 defined in subprocess1, boundary event defined on

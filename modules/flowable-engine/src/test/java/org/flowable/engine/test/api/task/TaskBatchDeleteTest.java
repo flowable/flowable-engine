@@ -40,7 +40,7 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskOne").singleResult();
         assertThat(firstTask).isNotNull();
 
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
 
         // Process should have ended fine
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -63,7 +63,7 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(0, 1).get(0);
         assertThat(firstTask).isNotNull();
 
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
 
         // Process should have ended fine
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();

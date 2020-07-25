@@ -112,7 +112,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         Task afterTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");

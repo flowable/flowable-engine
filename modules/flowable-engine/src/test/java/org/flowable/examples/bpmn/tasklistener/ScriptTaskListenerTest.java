@@ -34,7 +34,7 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).as("Name does not match").isEqualTo("All your base are belong to us");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();

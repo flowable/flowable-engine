@@ -35,7 +35,7 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicProcessLocalization");
         String processInstanceId = processInstance.getId();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).list();

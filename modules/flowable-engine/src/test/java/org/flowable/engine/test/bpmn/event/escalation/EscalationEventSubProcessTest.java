@@ -44,7 +44,7 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
 
     }
@@ -64,7 +64,7 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         
         // task in sub process
         Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertThatEscalationHasBeenCaught(procId);
     }
@@ -78,17 +78,17 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         // task before in sub process
         Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
-        taskService.complete(task.getId());
+        completeTask(task);
         
         task = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         
         Task escalationTask = taskService.createTaskQuery().processInstanceId(procId).singleResult();
         assertThat(escalationTask.getName()).isEqualTo("Escalated Task");
-        taskService.complete(escalationTask.getId());
+        completeTask(escalationTask);
         
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(procId).count()).isEqualTo(1);
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(procId);
     }
@@ -101,7 +101,7 @@ public class EscalationEventSubProcessTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the org.flowable.task.service.Task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 

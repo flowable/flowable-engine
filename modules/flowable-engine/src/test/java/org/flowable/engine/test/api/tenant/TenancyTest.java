@@ -560,7 +560,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
             // Complete all tasks
             for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-                taskService.complete(task.getId());
+                completeTask(task);
             }
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);

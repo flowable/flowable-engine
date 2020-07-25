@@ -66,7 +66,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
@@ -115,7 +115,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionList).hasSize(3);
@@ -129,7 +129,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertThat(subProcessExecution.getActivityId()).isEqualTo("runSubProcess");
         assertThat(subProcessExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionList).hasSize(2);
@@ -142,7 +142,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         assertThat(finalTaskExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -202,7 +202,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getExecutionId()).isEqualTo(childExecution.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionList).hasSize(4);
@@ -219,7 +219,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         Execution timerExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("timerEvent").singleResult();
         assertThat(timerExecution).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executionList).hasSize(2);
@@ -232,7 +232,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         assertThat(finalTaskExecution.getParentId()).isEqualTo(rootProcessInstance.getId());
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -277,15 +277,15 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 

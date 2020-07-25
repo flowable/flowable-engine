@@ -70,7 +70,7 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task B (endDate
         // not reached but it will be executed according to the expression)
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         waitForJobExecutorToProcessAllJobs(2000, 500);
         // Expected that job isn't executed because the timer is in t0
@@ -91,7 +91,7 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
                 .containsOnly("Task C");
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task C
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         nextTimeInstant = nextTimeInstant.plus(1, ChronoUnit.HOURS); // after 1H 40 minutes from process start, the timer will trigger because of the endDate
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 

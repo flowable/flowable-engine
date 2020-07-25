@@ -35,7 +35,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
 
         org.flowable.task.api.Task aTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(aTask.getId());
+        completeTask(aTask);
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(bTasks).hasSize(8);
@@ -53,7 +53,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
-        taskService.complete(afterMiTask.getId());
+        completeTask(afterMiTask);
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
@@ -64,7 +64,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
 
         org.flowable.task.api.Task aTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(aTask.getId());
+        completeTask(aTask);
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(bTasks).hasSize(1);
@@ -72,7 +72,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
         assertThat(cTasks).hasSize(1);
-        taskService.complete(cTasks.get(0).getId());
+        completeTask(cTasks.get(0));
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
         assertThat(bTasks).hasSize(1);
@@ -80,7 +80,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
-        taskService.complete(afterMiTask.getId());
+        completeTask(afterMiTask);
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
@@ -91,13 +91,13 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
 
         org.flowable.task.api.Task aTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(aTask.getId());
+        completeTask(aTask);
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(bTasks).hasSize(5);
 
         // Complete one b task to get one C and D
-        taskService.complete(bTasks.get(0).getId());
+        completeTask(bTasks.get(0));
 
         // C and D should now be active
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
@@ -107,11 +107,11 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(tasks.get(5).getName()).isEqualTo("D");
 
         // Completing C should terminate the multi instance
-        taskService.complete(tasks.get(4).getId());
+        completeTask(tasks.get(4));
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
-        taskService.complete(afterMiTask.getId());
+        completeTask(afterMiTask);
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
@@ -122,13 +122,13 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMi");
 
         org.flowable.task.api.Task aTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(aTask.getId());
+        completeTask(aTask);
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(bTasks).hasSize(1);
 
         // Complete one b task to get one C and D
-        taskService.complete(bTasks.get(0).getId());
+        completeTask(bTasks.get(0));
 
         // C and D should now be active
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
@@ -137,11 +137,11 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
                 .containsExactly("C", "D");
 
         // Completing C should terminate the multi instance
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
-        taskService.complete(afterMiTask.getId());
+        completeTask(afterMiTask);
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
@@ -156,7 +156,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         org.flowable.task.api.Task taskA = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(taskA.getName()).isEqualTo("A");
-        taskService.complete(taskA.getId());
+        completeTask(taskA);
 
         // After completing A, four B's should be active (due to the call activity)
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().taskName("B").list();
@@ -164,7 +164,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         // Completing 3 B tasks, giving 3 C's and D's
         for (int i = 0; i < 3; i++) {
-            taskService.complete(bTasks.get(i).getId());
+            completeTask(bTasks.get(i));
         }
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
@@ -173,7 +173,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(dTasks).hasSize(3);
 
         // Completing one of the C tasks should terminate the whole multi instance
-        taskService.complete(cTasks.get(0).getId());
+        completeTask(cTasks.get(0));
 
         List<org.flowable.task.api.Task> afterMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(afterMiTasks)
@@ -191,11 +191,11 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
 
         org.flowable.task.api.Task taskA = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(taskA.getName()).isEqualTo("A");
-        taskService.complete(taskA.getId());
+        completeTask(taskA);
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().taskName("B").list();
         assertThat(bTasks).hasSize(1);
-        taskService.complete(bTasks.get(0).getId());
+        completeTask(bTasks.get(0));
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
         assertThat(cTasks).hasSize(1);
@@ -203,7 +203,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(dTasks).hasSize(1);
 
         // Completing one of the C tasks should terminate the whole multi instance
-        taskService.complete(cTasks.get(0).getId());
+        completeTask(cTasks.get(0));
 
         List<org.flowable.task.api.Task> afterMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(afterMiTasks)
@@ -225,7 +225,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         // Completing a few B's will create a subprocess with some C's
         int nrOfBTasksCompleted = 3;
         for (int i = 0; i < nrOfBTasksCompleted; i++) {
-            taskService.complete(bTasks.get(i).getId());
+            completeTask(bTasks.get(i));
         }
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
@@ -246,13 +246,13 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(afterInnerMiTasks).hasSize(1);
 
         for (org.flowable.task.api.Task aTask : aTasks) {
-            taskService.complete(aTask.getId());
+            completeTask(aTask);
         }
 
         // Finish
         List<org.flowable.task.api.Task> nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         while (nextTasks != null && nextTasks.size() > 0) {
-            taskService.complete(nextTasks.get(0).getId());
+            completeTask(nextTasks.get(0));
             nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
 
@@ -283,7 +283,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
         assertThat(bTasks).hasSize(1);
 
-        taskService.complete(bTasks.get(0).getId());
+        completeTask(bTasks.get(0));
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
         assertThat(bTasks).isEmpty();
 
@@ -301,13 +301,13 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(afterInnerMiTasks).hasSize(1);
 
         for (org.flowable.task.api.Task aTask : aTasks) {
-            taskService.complete(aTask.getId());
+            completeTask(aTask);
         }
 
         // Finish
         List<org.flowable.task.api.Task> nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         while (nextTasks != null && nextTasks.size() > 0) {
-            taskService.complete(nextTasks.get(0).getId());
+            completeTask(nextTasks.get(0));
             nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
 

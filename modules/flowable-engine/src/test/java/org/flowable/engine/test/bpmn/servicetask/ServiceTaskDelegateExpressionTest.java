@@ -94,7 +94,7 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
 
             @Override
             public Void execute(CommandContext commandContext) {
-                taskService.complete(task.getId());
+                completeTask(task);
                 
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
                 

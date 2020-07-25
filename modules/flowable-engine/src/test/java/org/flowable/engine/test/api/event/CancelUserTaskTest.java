@@ -115,7 +115,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
         assertThat(userTask1).isNotNull();
 
         // complete task1 so we flow to terminate end
-        taskService.complete(userTask1.getId());
+        completeTask(userTask1);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);

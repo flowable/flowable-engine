@@ -56,13 +56,12 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Write monthly financial report");
-        String taskId = tasks.get(0).getId();
 
-        taskService.claim(taskId, "fozzie");
+        taskService.claim(tasks.get(0).getId(), "fozzie");
         tasks = taskService.createTaskQuery().taskAssignee("fozzie").list();
 
         assertThat(tasks).hasSize(1);
-        taskService.complete(taskId);
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
         assertThat(tasks).isEmpty();
@@ -70,7 +69,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Verify monthly financial report");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         assertProcessEnded(processInstance.getId());
     }

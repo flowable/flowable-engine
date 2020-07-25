@@ -126,7 +126,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         // Check delete-event on complete
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(listener.getEventsReceived()).hasSize(2);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
@@ -387,7 +387,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             listener.clearEventsReceived();
 
             // Complete task
-            taskService.complete(task.getId());
+            completeTask(task);
             assertThat(listener.getEventsReceived()).hasSize(2);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
             assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);

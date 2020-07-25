@@ -103,7 +103,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
 
             // Completing the task continues the process which leads to calling the
             // subprocess
-            taskService.complete(taskBeforeSubProcess.getId());
+            completeTask(taskBeforeSubProcess);
             Task taskInSubProcess = taskQuery.singleResult();
             assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
         } finally {

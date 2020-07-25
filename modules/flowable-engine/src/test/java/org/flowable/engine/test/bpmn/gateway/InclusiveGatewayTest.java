@@ -101,7 +101,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task partialTask = taskService.createTaskQuery().singleResult();
         assertThat(partialTask.getTaskDefinitionKey()).isEqualTo("partialTask");
 
-        taskService.complete(partialTask.getId());
+        completeTask(partialTask);
 
         org.flowable.task.api.Task fullTask = taskService.createTaskQuery().singleResult();
         assertThat(fullTask.getTaskDefinitionKey()).isEqualTo("theTask");
@@ -132,7 +132,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(firstTasks).hasSize(2);
 
         for (org.flowable.task.api.Task t : firstTasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         // start second round of tasks
@@ -141,7 +141,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         // complete one task
         org.flowable.task.api.Task task = secondTasks.get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executionsAfter = runtimeService.createExecutionQuery().list();
         assertThat(executionsAfter).hasSize(2);
@@ -160,7 +160,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         // Completing last task should finish the process instance
 
         org.flowable.task.api.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(lastTask.getId());
+        completeTask(lastTask);
 
         assertThat(runtimeService.createProcessInstanceQuery().active().count()).isZero();
     }
@@ -309,7 +309,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task C");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(taskService.createTaskQuery().count()).isZero();
         
         assertThat(runtimeService.createExecutionQuery().count())
@@ -331,14 +331,14 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("c").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(processInstance).isNull();
@@ -354,11 +354,11 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getAssignee)
                 .containsExactly("a");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().taskAssignee("c").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(processInstance).isNull();
@@ -379,7 +379,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(task).isNotNull();
         assertThat(task.getName()).isEqualTo("Task1");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -410,27 +410,27 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         // inclusive gateway should wait for the "Task B" and "Task C"
         org.flowable.task.api.Task taskA = taskService.createTaskQuery().taskName("Task A").singleResult();
         assertThat(taskA).isNotNull();
-        taskService.complete(taskA.getId());
+        completeTask(taskA);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // now complete task B and check number of remaining tasks
         // inclusive gateway should wait for "Task C"
         org.flowable.task.api.Task taskB = taskService.createTaskQuery().taskName("Task B").singleResult();
         assertThat(taskB).isNotNull();
-        taskService.complete(taskB.getId());
+        completeTask(taskB);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         // now complete task C. Gateway activates and "Task C" remains
         org.flowable.task.api.Task taskC = taskService.createTaskQuery().taskName("Task C").singleResult();
         assertThat(taskC).isNotNull();
-        taskService.complete(taskC.getId());
+        completeTask(taskC);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         // check that remaining task is in fact task D
         org.flowable.task.api.Task taskD = taskService.createTaskQuery().taskName("Task D").singleResult();
         assertThat(taskD).isNotNull();
         assertThat(taskD.getName()).isEqualTo("Task D");
-        taskService.complete(taskD.getId());
+        completeTask(taskD);
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(processInstance).isNull();
@@ -453,7 +453,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask1");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         varMap = new HashMap<>();
@@ -461,8 +461,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwDirectSequenceFlow", varMap);
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(2);
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         varMap = new HashMap<>();
@@ -481,7 +481,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask1");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         varMap = new HashMap<>();
@@ -490,8 +490,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(2);
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         varMap = new HashMap<>();
@@ -566,7 +566,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(getInactiveExecutionsInActivityId("inclusiveGw")).hasSize(2);
 
         // Completing C of PI 1 should not trigger C
-        taskService.complete(taskCInPi1.getId());
+        completeTask(taskCInPi1);
 
         // Verify structure after complete.
         // Before bugfix: in BOTH process instances the inactive execution was removed (result was 0)
@@ -579,7 +579,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         while (tasks.size() > 0) {
             for (org.flowable.task.api.Task task : tasks) {
-                taskService.complete(task.getId());
+                completeTask(task);
             }
             tasks = taskService.createTaskQuery().list();
         }
@@ -729,7 +729,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
         //Finish the process
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
@@ -796,7 +796,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         //Last task of this multiInstance subProcess instance
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("postForkTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //The next sequence should start
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -823,7 +823,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         //last task of the sequence
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("postForkTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Last Sequence
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -833,7 +833,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         tasks.forEach(this::completeTask);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("postForkTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //last task of the process, after the multiInstance subProcess
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -842,7 +842,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
         //Finish the process
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
@@ -1107,7 +1107,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
         //Finish the process
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

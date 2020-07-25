@@ -127,7 +127,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Subprocess execution is created
         Execution execution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
@@ -173,7 +173,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task subTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
         assertThat(subTask).isNotNull();
 
-        taskService.complete(subTask.getId());
+        completeTask(subTask);
 
         assertThat(listener.getEventsReceived()).hasSize(10);
 
@@ -291,7 +291,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         Execution executionWithSignalEvent = runtimeService.createExecutionQuery().activityId("shipOrder").singleResult();
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(listener.getEventsReceived()).hasSize(2);
 
         assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableSignalEvent.class);
@@ -414,7 +414,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Wait");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Only a message events should be present, no signal-event, since the event-subprocess is
         // not signaled, but executed instead
@@ -458,7 +458,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertThat(task).isNotNull();
 
         // Complete task, next a compensation event will be thrown
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(listener.getEventsReceived()).hasSize(1);
 
@@ -705,7 +705,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("User Task");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(listener.getEventsReceived()).hasSize(2);
 
@@ -812,7 +812,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertThat(executionWithMessage).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(listener.getEventsReceived()).hasSize(2);
 

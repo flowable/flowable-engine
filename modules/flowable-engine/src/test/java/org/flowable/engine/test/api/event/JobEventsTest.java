@@ -324,7 +324,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         checkEventCount(1, FlowableEngineEventType.JOB_CANCELED);
     }
@@ -568,7 +568,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Outside Task");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 

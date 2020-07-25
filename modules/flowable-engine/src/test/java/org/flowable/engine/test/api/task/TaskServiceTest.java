@@ -1095,7 +1095,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(task.getDueDate()).isNotNull();
 
         // Complete task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
@@ -2024,7 +2024,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getFormKey()).isEqualTo("first-form.json");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getFormKey()).isEqualTo("form-abc.json");

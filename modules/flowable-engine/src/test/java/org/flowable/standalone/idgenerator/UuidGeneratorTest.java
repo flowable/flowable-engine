@@ -62,7 +62,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
 
                     List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
                     for (org.flowable.task.api.Task task : tasks) {
-                        taskService.complete(task.getId());
+                        completeTask(task);
                     }
 
                     tasksFound = taskService.createTaskQuery().count() > 0;

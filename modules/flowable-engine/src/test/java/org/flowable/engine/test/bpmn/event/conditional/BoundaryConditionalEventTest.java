@@ -54,7 +54,7 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
     
@@ -71,7 +71,7 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
         assertThat(execution).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(processInstance.getId());
     }
@@ -106,12 +106,12 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfterConditionalCatch").list();
         assertThat(tasks).hasSize(2);
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("subprocessTask");
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(processInstance.getId());
     }
@@ -129,7 +129,7 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
         assertThat(execution).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(processInstance.getId());
     }
@@ -166,12 +166,12 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfterConditionalCatch").list();
         assertThat(tasks).hasSize(2);
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("subprocessTask");
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(processInstance.getId());
     }

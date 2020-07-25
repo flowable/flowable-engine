@@ -64,7 +64,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("The famous task");
         assertThat(task.getAssignee()).isEqualTo("kermit");
 
-        taskService.complete(task.getId());
+        completeTask(task);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(tasks.get(1).getName()).isEqualTo("Task b");
 
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
@@ -113,7 +113,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(tasks.get(3).getName()).isEqualTo("Task c");
 
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
@@ -178,7 +178,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Task after timer");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
@@ -193,7 +193,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("The famous task");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(managementService.createTimerJobQuery().count()).isZero();
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
@@ -220,7 +220,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         // Completing them both should complete the process instance
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
@@ -235,7 +235,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().orderByTaskName().desc().list(); // Not the desc() here: org.flowable.task.service.Task B, org.flowable.task.service.Task A will be the result (task b being associated with the child execution)
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
@@ -250,7 +250,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(processInstance.isEnded()).isFalse();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks).hasSize(3);
@@ -259,13 +259,13 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(tasks.get(2).getName()).isEqualTo("C");
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         // 2 conditions are true for input = 20
         runtimeService.startProcessInstanceByKey("testConditions", CollectionUtil.singletonMap("input", 20));
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks).hasSize(2);
@@ -273,20 +273,20 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(tasks.get(1).getName()).isEqualTo("C");
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         // 1 condition is true for input = 200
         runtimeService.startProcessInstanceByKey("testConditions", CollectionUtil.singletonMap("input", 200));
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks).hasSize(1);
         assertThat(tasks.get(0).getName()).isEqualTo("C");
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
     }
     
@@ -340,7 +340,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         // Completing all tasks in this order should give the engine a bit
         // exercise (parent executions first)
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
@@ -362,7 +362,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(2);
 
         // Completing A
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -370,7 +370,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
 
         // Completing B should end the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertThat(managementService.createTimerJobQuery().count()).isZero();
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
@@ -383,7 +383,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(2);
 
         // Completing B
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -448,21 +448,21 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
 
         org.flowable.task.api.Task taskC = taskService.createTaskQuery().taskName("C").singleResult();
-        taskService.complete(taskC.getId());
+        completeTask(taskC);
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("A", "B", "E");
 
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("D", "E");
 
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
         // Use case 2 (tricky):
@@ -477,8 +477,8 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("A", "B", "C");
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         // C should still be open
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
@@ -488,15 +488,15 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         // If C is now completed, the inclusive gateway should also be completed
         // and D and E should be open tasks
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("D", "E");
 
         // Completing them should just end the process instance
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 

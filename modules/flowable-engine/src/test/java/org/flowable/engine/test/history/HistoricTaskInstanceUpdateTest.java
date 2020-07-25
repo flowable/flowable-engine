@@ -40,7 +40,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
         task.setAssignee("gonzo");
         taskService.saveTask(task);
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
@@ -62,7 +62,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
         task.setAssignee(null);
         taskService.saveTask(task);
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         

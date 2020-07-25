@@ -184,7 +184,7 @@ public class StartTimerEventRepeatWithEndTest extends PluggableFlowableTestCase 
             assertThat(tasks)
                     .extracting(Task::getName)
                     .containsExactly("Task A");
-            taskService.complete(tasks.get(0).getId());
+            completeTask(tasks.get(0));
         }
 
         // now All the process instances should be completed

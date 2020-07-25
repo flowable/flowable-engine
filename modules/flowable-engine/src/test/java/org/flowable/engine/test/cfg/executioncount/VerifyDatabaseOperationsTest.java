@@ -320,7 +320,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "CompleteTaskCmd");
@@ -392,7 +392,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-02.bpmn20.xml", "process-usertask-02", false);
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "CompleteTaskCmd");
@@ -448,7 +448,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             taskService.removeVariablesLocal(task.getId(), vars.keySet());
             taskService.removeVariablesLocal(task.getId(), vars.keySet());
 
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "SetTaskVariablesCmd", "RemoveTaskVariablesCmd",
@@ -471,7 +471,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             taskService.claim(task.getId(), "firstUser");
             taskService.unclaim(task.getId());
 
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "ClaimTaskCmd", "CompleteTaskCmd");
@@ -505,7 +505,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             taskService.deleteCandidateUser(task.getId(), "user03");
             taskService.deleteCandidateUser(task.getId(), "user04");
 
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
@@ -561,7 +561,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             taskService.deleteCandidateGroup(task.getId(), "group03");
             taskService.deleteCandidateGroup(task.getId(), "group04");
 
-            taskService.complete(task.getId());
+            completeTask(task);
             stopProfiling();
 
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",

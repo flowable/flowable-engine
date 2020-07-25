@@ -54,7 +54,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // Transition take executionListener will set 2 variables
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
 
@@ -66,7 +66,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // First usertask uses a method-expression as executionListener:
         // ${myPojo.myMethod(execution.eventName)}
@@ -76,7 +76,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -155,7 +155,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         RecorderExecutionListener.clear();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 

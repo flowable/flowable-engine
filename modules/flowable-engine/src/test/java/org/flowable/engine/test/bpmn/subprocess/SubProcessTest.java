@@ -66,7 +66,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
@@ -138,8 +138,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertThat(taskAfterTimer2.getName()).isEqualTo("Task after timer 2");
 
         // Completing the two tasks should end the process instance
-        taskService.complete(taskAfterTimer1.getId());
-        taskService.complete(taskAfterTimer2.getId());
+        completeTask(taskAfterTimer1);
+        completeTask(taskAfterTimer2);
         assertProcessEnded(pi.getId());
     }
 
@@ -161,11 +161,11 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After completing the task in the subprocess,
         // both subprocesses are destroyed and the task after the subprocess should be active
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
         org.flowable.task.api.Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(taskAfterSubProcesses).isNotNull();
         assertThat(taskAfterSubProcesses.getName()).isEqualTo("Task after subprocesses");
-        taskService.complete(taskAfterSubProcesses.getId());
+        completeTask(taskAfterSubProcesses);
 
         assertProcessEnded(pi.getId());
     }
@@ -192,7 +192,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // Completing the escalated task, destroys the outer scope and activates
         // the task after the subprocess
-        taskService.complete(escalationTask.getId());
+        completeTask(escalationTask);
         org.flowable.task.api.Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocesses");
     }
@@ -211,7 +211,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // After completing the task in the subprocess,
         // both subprocesses are destroyed and the task after the subprocess
         // should be active
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
         org.flowable.task.api.Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(taskAfterSubProcesses.getName()).isEqualTo("Task after subprocesses");
     }
@@ -232,8 +232,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // Completing both tasks, should destroy the subprocess and activate the
         // task after the subprocess
-        taskService.complete(taskA.getId());
-        taskService.complete(taskB.getId());
+        completeTask(taskA);
+        completeTask(taskB);
         org.flowable.task.api.Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after sub process");
     }
@@ -262,7 +262,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertThat(taskAfterTimer.getName()).isEqualTo("Task after timer");
 
         // Completing the task after the timer ends the process instance
-        taskService.complete(taskAfterTimer.getId());
+        completeTask(taskAfterTimer);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -280,13 +280,13 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // Completing both tasks should active the tasks outside the
         // subprocesses
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskQuery.list();
         assertThat(tasks.get(0).getName()).isEqualTo("Task after subprocess A");
         assertThat(tasks.get(1).getName()).isEqualTo("Task in subprocess B");
 
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         tasks = taskQuery.list();
 
@@ -294,8 +294,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertThat(tasks.get(1).getName()).isEqualTo("Task after subprocess B");
 
         // Completing these tasks should end the process
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         assertProcessEnded(pi.getId());
     }
@@ -314,14 +314,14 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertThat(taskB.getName()).isEqualTo("Task in subprocess B");
 
         // Completing both tasks should active the tasks outside the subprocesses
-        taskService.complete(taskA.getId());
-        taskService.complete(taskB.getId());
+        completeTask(taskA);
+        completeTask(taskB);
 
         org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
         // Completing this task should end the process
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertProcessEnded(pi.getId());
     }
 
@@ -352,7 +352,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertThat(taskAfterTimer.getName()).isEqualTo("Task after timer");
 
         // Completing the task should end the process instance
-        taskService.complete(taskAfterTimer.getId());
+        completeTask(taskAfterTimer);
         assertProcessEnded(pi.getId());
     }
 
@@ -411,7 +411,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After completing the task in the main process, the subprocess scope
         // initiates
-        taskService.complete(currentTask.getId());
+        completeTask(currentTask);
 
         // get subprocess task
         currentTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -428,7 +428,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
                 );
 
         // After completing the task in the subprocess, the subprocess scope is destroyed and the main process continues
-        taskService.complete(currentTask.getId());
+        completeTask(currentTask);
 
         // verify main process scoped variables
         variables = runtimeService.getVariables(pi.getId());
@@ -448,7 +448,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         currentTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(currentTask.getName()).isEqualTo("Complete Task B");
 
-        taskService.complete(currentTask.getId());
+        completeTask(currentTask);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
     }
 
@@ -469,7 +469,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         String variable = (String) runtimeService.getVariable(task.getExecutionId(), "counter");
         assertThat(variable).isEqualTo("one");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job secondJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(secondJob.getId()).isNotSameAs(job.getId());
@@ -477,7 +477,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat((String) runtimeService.getVariable(task.getExecutionId(), "counter")).isEqualTo("two");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job thirdJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(thirdJob.getId()).isNotSameAs(secondJob.getId());
@@ -485,7 +485,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat((String) runtimeService.getVariable(task.getExecutionId(), "counter")).isEqualTo("three");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -504,7 +504,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         jobs.forEach(job -> managementService.executeJob(job.getId()));
 
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
-        taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().forEach(task -> taskService.complete(task.getId()));
+        taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().forEach(task -> completeTask(task));
 
         assertProcessEnded(processInstance.getId());
     }

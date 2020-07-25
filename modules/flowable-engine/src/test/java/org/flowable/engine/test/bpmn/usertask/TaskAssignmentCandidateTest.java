@@ -53,13 +53,13 @@ public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getTaskDefinitionKey)
                 .containsExactly("theTask");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery().taskCandidateGroup("accounting").list();
         assertThat(tasks)
                 .extracting(Task::getTaskDefinitionKey)
                 .containsExactly("theOtherTask");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
     }
 
 }

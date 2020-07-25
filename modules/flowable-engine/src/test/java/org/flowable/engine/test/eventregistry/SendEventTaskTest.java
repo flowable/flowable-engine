@@ -123,7 +123,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
@@ -153,7 +153,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNull();
@@ -185,7 +185,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
@@ -216,7 +216,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNotNull();
@@ -264,7 +264,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
@@ -294,7 +294,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNotNull();
@@ -341,7 +341,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNotNull();

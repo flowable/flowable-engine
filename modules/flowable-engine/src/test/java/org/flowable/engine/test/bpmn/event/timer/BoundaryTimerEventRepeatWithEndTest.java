@@ -65,7 +65,7 @@ public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCa
 
         // Test Boundary Events
         // complete will cause timer to be created
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         List<Job> jobs = managementService.createTimerJobQuery().list();
         assertThat(jobs).hasSize(1);
@@ -104,7 +104,7 @@ public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCa
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Task B");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         jobs = managementService.createTimerJobQuery().list();
         assertThat(jobs).isEmpty();

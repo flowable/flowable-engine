@@ -39,7 +39,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("A");
-        taskService.complete(task.getId());
+        completeTask(task);
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -70,7 +70,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("A");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Delete process instance with custom delete reason
         String customDeleteReason = "custom delete reason";
@@ -106,7 +106,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         while (!tasks.isEmpty()) {
             for (org.flowable.task.api.Task task : tasks) {
-                taskService.complete(task.getId());
+                completeTask(task);
             }
             tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
@@ -179,7 +179,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("A");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Timer firing should delete all tasks
         Job timerJob = managementService.createTimerJobQuery().singleResult();

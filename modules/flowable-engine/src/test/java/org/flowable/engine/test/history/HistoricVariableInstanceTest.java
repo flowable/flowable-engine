@@ -696,7 +696,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             // there are now 3 historic variables, so the following does not work
             assertThat(getHistoricVariable("secondVar").getValue()).isEqualTo("789");
 
-            taskService.complete(task.getId());
+            completeTask(task);
 
             assertProcessEnded(processInstance.getId());
         }

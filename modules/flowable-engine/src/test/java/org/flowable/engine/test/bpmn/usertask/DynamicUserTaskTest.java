@@ -42,7 +42,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getAssignee()).isEqualTo("test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -54,7 +54,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getAssignee()).isEqualTo("test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -68,7 +68,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getOwner()).isEqualTo("ownerTest");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -80,7 +80,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getOwner()).isEqualTo("ownerTest2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -103,7 +103,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
             }
         }
         assertThat(candidateUserTestFound).isFalse();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -124,7 +124,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
             }
         }
         assertThat(candidateUserTestFound).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinitionId);
         dynamicBpmnService.changeUserTaskCandidateUser("task1", "test2", false, infoNode);
@@ -147,7 +147,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         }
         assertThat(candidateUserTestFound).isTrue();
         assertThat(candidateUserTest2Found).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -170,7 +170,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
             }
         }
         assertThat(candidateGroupTestFound).isFalse();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -191,7 +191,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
             }
         }
         assertThat(candidateGroupTestFound).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinitionId);
         dynamicBpmnService.changeUserTaskCandidateGroup("task1", "test2", false, infoNode);
@@ -214,7 +214,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         }
         assertThat(candidateGroupTestFound).isTrue();
         assertThat(candidateGroupTest2Found).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -243,7 +243,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         }
         assertThat(candidateUserTestFound).isFalse();
         assertThat(candidateGroupTestFound).isFalse();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -271,7 +271,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         }
         assertThat(candidateUserTestFound).isTrue();
         assertThat(candidateGroupTestFound).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinitionId);
         dynamicBpmnService.changeUserTaskCandidateGroup("task1", "test2", false, infoNode);
@@ -305,7 +305,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         assertThat(candidateUserTestFound2).isTrue();
         assertThat(candidateGroupTestFound).isTrue();
         assertThat(candidateGroupTest2Found).isTrue();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -320,7 +320,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isNull();
         assertThat(task.getDescription()).isNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -334,7 +334,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task name test");
         assertThat(task.getDescription()).isEqualTo("Task description test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -349,7 +349,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getPriority()).isEqualTo(50);
         assertThat(task.getCategory()).isNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -363,7 +363,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getPriority()).isEqualTo(99);
         assertThat(task.getCategory()).isEqualTo("categoryTest");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -377,7 +377,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -389,7 +389,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -405,7 +405,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -419,7 +419,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

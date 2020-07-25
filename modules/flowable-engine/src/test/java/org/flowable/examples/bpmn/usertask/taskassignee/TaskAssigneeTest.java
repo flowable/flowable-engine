@@ -44,7 +44,7 @@ public class TaskAssigneeTest extends PluggableFlowableTestCase {
                 .containsExactly(tuple("Schedule meeting", "Schedule an engineering meeting for next week with the new hire."));
 
         // Complete task. Process is now finished
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         // assert if the process instance completed
         assertProcessEnded(processInstance.getId());
     }

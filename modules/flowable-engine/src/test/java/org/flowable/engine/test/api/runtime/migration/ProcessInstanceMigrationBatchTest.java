@@ -307,7 +307,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         // Set the instances to fail in a state where they won't map properly during validation and migration
         for (String processInstanceId : failedInstances) {
             Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // Deploy second version of the process

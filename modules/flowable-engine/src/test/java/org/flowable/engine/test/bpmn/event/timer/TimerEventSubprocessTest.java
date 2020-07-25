@@ -47,7 +47,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         // if we trigger the usertask, the process terminates and the timer job is removed:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -62,7 +62,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("eventSubProcessTask");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -82,7 +82,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         // if we trigger the usertask, the process terminates and the event subscription is removed:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
@@ -97,14 +97,14 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // we still have 3 executions:
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         // now let's complete the task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -120,7 +120,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -128,7 +128,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -161,7 +161,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -170,13 +170,13 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's complete the first task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(4);
 
         // complete the second task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -201,7 +201,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's complete the task in the event subprocess
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -221,7 +221,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(2);
@@ -244,22 +244,22 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -278,7 +278,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(2);
@@ -286,14 +286,14 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(1);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -311,7 +311,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
@@ -330,14 +330,14 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
@@ -349,12 +349,12 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -374,7 +374,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(2);
@@ -392,12 +392,12 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -417,7 +417,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(2);
@@ -440,7 +440,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // done!
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -480,7 +480,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         // Complete the user task in the event sub process
         Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
         assertThat(eventSubProcessTask).isNotNull();
-        taskService.complete(eventSubProcessTask.getId());
+        completeTask(eventSubProcessTask);
 
         assertThat(runtimeService.createActivityInstanceQuery().list())
             .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)

@@ -126,7 +126,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
                 .containsExactly(FlowableEngineEventType.VARIABLE_CREATED);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(listener.getEventsReceived()).hasSize(2);
         assertThat(listener.getEventsReceived().get(1).getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);

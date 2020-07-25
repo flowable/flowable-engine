@@ -54,7 +54,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // 2nd. case: complete the user task cancels the message subscription
@@ -63,7 +63,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
         assertThat(execution).isNull();
@@ -71,7 +71,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
     }
@@ -114,7 +114,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage_1");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // ///////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
         assertThat(execution1).isNull();
@@ -134,7 +134,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
@@ -169,7 +169,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage_1");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertProcessEnded(processInstance.getId());
 
         // /////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // as long as tasks exists, the message subscriptions exist
         for (int i = 0; i < userTasks.size() - 1; i++) {
             org.flowable.task.api.Task task = userTasks.get(i);
-            taskService.complete(task.getId());
+            completeTask(task);
 
             execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
             assertThat(execution1).isNotNull();
@@ -206,7 +206,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // only one task left
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // after last task is completed, no message subscriptions left
         execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
@@ -218,7 +218,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -247,7 +247,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // /////////////////////////////////////////////////
@@ -257,7 +257,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
         assertThat(execution).isNull();
@@ -265,7 +265,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
@@ -295,7 +295,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // ///////////////////////////////////////////////////////////
         // first case: we complete the inner usertask.
 
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
@@ -310,7 +310,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(execution).isNotNull();
 
         // now complete the second usertask
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // now the outer event subscription is cancelled as well
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
@@ -321,7 +321,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterSubprocess");
 
         // now complete the outer usertask
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // ///////////////////////////////////////////////////////////
         // second case: we signal the inner message event
@@ -344,7 +344,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(execution).isNotNull();
 
         // now complete the second usertask
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // now the outer event subscription is cancelled as well
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
@@ -355,7 +355,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterSubprocess");
 
         // now complete the outer usertask
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // ///////////////////////////////////////////////////////////
         // third case: we signal the outer message event
@@ -378,7 +378,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(execution).isNull();
 
         // now complete the second usertask
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // and we are done
 
@@ -404,7 +404,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage_one");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // 2nd. case: message two received cancels the task
@@ -419,7 +419,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage_two");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         // 3rd. case: complete the user task cancels the message subscription
@@ -428,7 +428,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         executionMessageOne = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_one").singleResult();
         assertThat(executionMessageOne).isNull();
@@ -439,7 +439,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterSubProcess");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
     }
@@ -483,7 +483,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterOuterMessageBoundary");
 
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // and we are done
 
@@ -531,13 +531,13 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // Verify and complete the first task
         userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // ///////////////////////////////////
         // Complete the after timer task
         userTask = taskService.createTaskQuery().taskDefinitionKey("taskTimer").singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // Timer job of boundary event of task should be deleted and timer job
         // of task timer boundary event should be created.
@@ -564,7 +564,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         // ///////////////////////////////////
         // Complete the first task (again).
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
@@ -605,19 +605,19 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         final List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskDefinitionKey("taskAfterTaskTimer").list();
         assertThat(tasks).hasSize(2);
 
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         // ///////////////////////////////////
         // Complete the second task
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // ///////////////////////////////////
         // Complete the third task
         userTask = taskService.createTaskQuery().singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTaskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // ///////////////////////////////////
         // We should be done at this point

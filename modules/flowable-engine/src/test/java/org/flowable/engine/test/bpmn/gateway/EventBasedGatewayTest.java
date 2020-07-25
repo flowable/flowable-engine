@@ -54,7 +54,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("afterSignal").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -85,7 +85,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -123,7 +123,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("afterMessage").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 

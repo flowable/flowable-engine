@@ -59,7 +59,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
 
         // Test Boundary Events
         // complete will cause timer to be created
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         List<Job> jobs = managementService.createTimerJobQuery().list();
         assertThat(jobs).hasSize(1);
@@ -98,7 +98,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsOnly("Task B");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 500); })
                 .as("No jobs should be active here.")

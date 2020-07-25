@@ -91,21 +91,21 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .containsExactly("Task 0");
 
         // Completing task 0 will create org.flowable.task.service.Task A and B
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = query.list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Task A", "Task B");
 
         // Completing task A should not trigger any new tasks
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = query.list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Task B");
 
         // Completing task B creates tasks B1 and B2
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = query.list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -113,8 +113,8 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // Completing B1 and B2 will activate both joins, and process reaches
         // task C
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
         tasks = query.list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -139,7 +139,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // we complete the task from the parent process, the root execution is
         // recycled, the task in the sub process is still there
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
         tasks = query.list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -147,7 +147,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // we end the task in the sub process and the sub process instance end
         // is propagated to the parent process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertThat(taskService.createTaskQuery().count()).isZero();
 
         // There is a QA config without history, so we cannot work with this:
@@ -238,7 +238,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 return subs.get(0).getExecutionId();
             }
         });
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery()
                 .processInstanceId(processInstance.getProcessInstanceId())
@@ -246,7 +246,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .list();
         assertThat(tasks).hasSize(1);
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
         assertThat(tasks).hasSize(1);

@@ -45,7 +45,7 @@ public class HistoryManagerInvocationsTest extends CustomConfigurationFlowableTe
     public void testSingleTaskCreateAndComplete() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionId(deployOneTaskTestProcess()).start();
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         verify(mockHistoryManager, times(1)).recordTaskCreated(any(), any());
         verify(mockHistoryManager, times(1)).recordTaskEnd(any(), any(), any(), any());

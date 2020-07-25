@@ -49,7 +49,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // making the tx succeed:
         taskService.setVariable(task.getId(), "confirmed", true);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // now the process instance execution is sitting in the 'afterSuccess' task
         // -> has left the transaction using the "normal" sequence flow
@@ -98,7 +98,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // making the tx fail:
         taskService.setVariable(task.getId(), "confirmed", false);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // now the process instance execution is sitting in the 'afterCancellation' task
         // -> has left the transaction using the cancel boundary event
@@ -145,7 +145,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // making the tx fail:
         taskService.setVariable(task.getId(), "confirmed", false);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // now the process instance execution is sitting in the 'afterCancellation' task
         // -> has left the transaction using the cancel boundary event
@@ -191,7 +191,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // making the tx fail:
         taskService.setVariable(taskInner.getId(), "confirmed", false);
-        taskService.complete(taskInner.getId());
+        completeTask(taskInner);
 
         // now the process instance execution is sitting in the
         // 'afterInnerCancellation' task
@@ -217,7 +217,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         }
 
         // complete the task in the outer tx
-        taskService.complete(taskOuter.getId());
+        completeTask(taskOuter);
 
         // end the process instance (signal the execution still sitting in afterInnerCancellation)
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("afterInnerCancellation").singleResult().getId());
@@ -244,7 +244,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertThat(taskOuter).isNotNull();
 
         // making the outer tx fail (invokes cancel end event)
-        taskService.complete(taskOuter.getId());
+        completeTask(taskOuter);
 
         // now the process instance is sitting in 'afterOuterCancellation'
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
@@ -292,7 +292,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // canceling one instance triggers compensation for all other instances:
         taskService.setVariable(task.getId(), "confirmed", false);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(createEventSubscriptionQuery().count()).isZero();
 
@@ -321,7 +321,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         for (org.flowable.task.api.Task task : tasks) {
             taskService.setVariable(task.getId(), "confirmed", true);
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // now complete the inner receive tasks
@@ -376,7 +376,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.setVariable(task.getId(), "confirmed", false);
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
 
@@ -387,7 +387,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().singleResult();
         taskService.setVariable(task.getId(), "confirmed", true);
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

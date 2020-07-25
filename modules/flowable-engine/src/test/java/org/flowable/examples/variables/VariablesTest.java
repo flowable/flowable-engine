@@ -192,7 +192,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(newValue).isEqualTo("a value");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
     }
 
     @Test
@@ -1904,7 +1904,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(resultVar).isEqualTo("434");
 
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // If no variable is given, no variable should be set and script test should throw exception
         processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");

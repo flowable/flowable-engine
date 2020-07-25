@@ -46,7 +46,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("subprocessTask");
 
         // After task completion, error end event is reached and caught
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task after catching the error");
     }
@@ -81,7 +81,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
                 .containsExactly("Inner subprocess task 1", "Inner subprocess task 2");
 
         // Completing task 2, will cause the end error event to throw error with code 123
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
         taskService.createTaskQuery().list();
         org.flowable.task.api.Task taskAfterError = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterError.getName()).isEqualTo("task outside subprocess");
@@ -106,10 +106,10 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("task A", "task B");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task D");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
 
         // Completing task B will lead to task C
@@ -118,17 +118,17 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("task A", "task B");
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("task A", "task C");
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task A");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task D");
     }
@@ -154,7 +154,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId(), CollectionUtil.singletonMap("input", 2));
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("task after catch");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 
@@ -192,12 +192,12 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // Completing the task will reach the end error event,
         // which is caught on the call activity boundary
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
     
@@ -209,7 +209,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("specificErrorTask");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(procId);
     }
@@ -222,7 +222,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("emptyErrorTask");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(procId);
     }
@@ -235,7 +235,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("specificErrorTask");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(procId);
     }
@@ -248,7 +248,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("emptyErrorTask");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(procId);
     }
@@ -261,7 +261,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task will reach the end error event, which is never caught in the process
-        assertThatThrownBy(() -> taskService.complete(task.getId()))
+        assertThatThrownBy(() -> completeTask(task))
                 .isExactlyInstanceOf(BpmnError.class)
                 .hasMessage("No catching boundary event found for error with errorCode 'myError', neither in same process nor in parent process");
     }
@@ -275,7 +275,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task will reach the end error event, which is never caught in the process
-        assertThatThrownBy(() -> taskService.complete(task.getId()))
+        assertThatThrownBy(() -> completeTask(task))
                 .isExactlyInstanceOf(BpmnError.class)
                 .hasMessage("No catching boundary event found for error with errorCode 'myError', neither in same process nor in parent process");
     }
@@ -290,12 +290,12 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // Completing the task will reach the end error event,
         // which is caught on the call activity boundary
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 
@@ -308,13 +308,13 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Task in subprocess");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 
@@ -480,7 +480,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 

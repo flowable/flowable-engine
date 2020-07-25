@@ -47,11 +47,11 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         // task 1 has committed listener
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // task 2 has rolled-back listener
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
         assertThat(currentTasks)
@@ -77,17 +77,17 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         // task 1 has before-commit listener
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // task 2 has rolled-back listener
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // task 3 has rolled-back listener
         task = taskService.createTaskQuery().singleResult();
 
         try {
-            taskService.complete(task.getId());
+            completeTask(task);
         } catch (Exception ex) {
 
         }
@@ -113,11 +113,11 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         // task 1 has committed listener
         Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // task 2 has committed listener
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
         assertThat(currentTasks)
@@ -155,7 +155,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("secondTransactionDependentTaskListenerProcess");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(secondProcessInstance.getId());
 
@@ -184,7 +184,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
         assertThat(currentTasks)

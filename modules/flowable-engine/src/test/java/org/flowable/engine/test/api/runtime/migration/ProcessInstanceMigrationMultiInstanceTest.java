@@ -103,7 +103,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(0);
 
         //Complete one instance...
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Next instance in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -125,9 +125,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Complete this and the last
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Out of the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -216,7 +216,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).extracting(aTask -> taskService.getVariable(aTask.getId(), "loopCounter")).isNotNull();
 
         //Complete one instance...
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         //Next instance in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -580,7 +580,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).extracting(aTask -> taskService.getVariable(aTask.getId(), "loopCounter")).isNotNull();
 
         //Complete one instance...
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         //Next instance in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -744,7 +744,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(0);
 
         //Complete one instance...
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Next instance in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -766,9 +766,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Complete this and the last
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Out of the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

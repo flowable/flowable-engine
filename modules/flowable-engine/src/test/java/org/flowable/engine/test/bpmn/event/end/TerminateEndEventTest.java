@@ -90,7 +90,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isEqualTo(3);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -108,7 +108,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         
@@ -122,7 +122,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -144,7 +144,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isEqualTo(4);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -163,11 +163,11 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Completing the task -> terminal end event -> subprocess ends
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -185,7 +185,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Completing the task -> terminal end event -> all ends (terminate all)
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -209,7 +209,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(subProcessInstance).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -233,7 +233,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId())
                 .taskDefinitionKey("preTerminateEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -295,7 +295,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(tasks).hasSize(5);
 
         for (int i = 0; i < 5; i++) {
-            taskService.complete(tasks.get(i).getId());
+            completeTask(tasks.get(i));
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count()).isGreaterThan(0);
         }
 
@@ -350,7 +350,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -399,7 +399,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Complete sub process task that leads to a terminate end event
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTermInnerTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // 'preEndInnerTask' task in subprocess should have been terminated, only outerTask should exist
         assertThat(taskService.createTaskQuery().processInstanceId(pi.getId()).count()).isEqualTo(1);
@@ -409,7 +409,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // complete outerTask
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("outerTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -426,7 +426,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Complete sub process task that leads to a terminate end event
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTermInnerTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -441,7 +441,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -464,7 +464,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(tasks).hasSize(2);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("User Task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -482,14 +482,14 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntitiesCount).isEqualTo(9);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionEntitiesCount = runtimeService.createExecutionQuery().count();
         assertThat(executionEntitiesCount).isEqualTo(8);
 
         tasks = taskService.createTaskQuery().list();
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         assertProcessEnded(pi.getId());
@@ -502,13 +502,13 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("User Task").list();
         assertThat(tasks).hasSize(3);
 
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
 
         assertProcessEnded(pi.getId());
@@ -534,7 +534,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // WHEN - complete -> terminate end event
         org.flowable.task.api.Task preTerminate = taskService.createTaskQuery().taskName("preTerminate").singleResult();
-        taskService.complete(preTerminate.getId());
+        completeTask(preTerminate);
 
         // THEN - super process is not finished together
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count()).isEqualTo(1);
@@ -549,7 +549,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -569,7 +569,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(serviceTaskInvokedCount2).isEqualTo(3);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // last task remaining
         assertProcessEnded(pi.getId());
@@ -597,7 +597,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -616,7 +616,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -645,7 +645,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -666,7 +666,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         int bTasksCompleted = 0;
         for (org.flowable.task.api.Task bTask : bTasks) {
 
-            taskService.complete(bTask.getId());
+            completeTask(bTask);
             bTasksCompleted++;
 
             aTasks = taskService.createTaskQuery().taskName("A").list();
@@ -676,7 +676,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("After call activity");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
@@ -700,7 +700,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
             org.flowable.task.api.Task bTask = taskService.createTaskQuery().taskName("B").singleResult();
 
-            taskService.complete(bTask.getId());
+            completeTask(bTask);
             
             HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000, 200);
 
@@ -716,7 +716,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("After call activity");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
@@ -747,7 +747,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertThat(executionEntities).isGreaterThan(0);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -774,25 +774,25 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
                 .containsExactly("A", "B", "D", "E", "F");
 
         // Completing E should finish the lower subprocess and make 'H' active
-        taskService.complete(tasks.get(3).getId());
+        completeTask(tasks.get(3));
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("H").singleResult();
         assertThat(task).isNotNull();
 
         // Completing A should make C active
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").singleResult();
         assertThat(task).isNotNull();
 
         // Completing C should make I active
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("I").singleResult();
         assertThat(task).isNotNull();
 
         // Completing I and B should make G active
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("G").singleResult();
         assertThat(task).isNull();
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("G").singleResult();
         assertThat(task).isNotNull();
     }
@@ -804,7 +804,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("E").singleResult();
 
         // Completing E leads to a terminate end event with terminate all set to true
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -816,9 +816,9 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("A").singleResult();
 
         // Completing A and C leads to a terminate end event with terminate all set to true
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -836,7 +836,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Completing these should lead to task I being active
         for (org.flowable.task.api.Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("I").singleResult();
@@ -848,7 +848,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Completing these should make H active
         for (org.flowable.task.api.Task t : tasks) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("H").singleResult();
         assertThat(task).isNotNull();
@@ -865,7 +865,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         for (int i = 0; i < 7; i++) {
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").singleResult();
             assertThat(task).isNotNull();
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // I should be active now
@@ -880,7 +880,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("F").singleResult().getId());
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("E").singleResult();
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("H").singleResult()).isNotNull();
@@ -891,7 +891,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     public void testTerminateNestedMiSubprocessesTerminateAll1() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("E").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -902,7 +902,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
         taskService.complete(taskService.createTaskQuery().taskName("A").singleResult().getId());
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -912,7 +912,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     public void testTerminateNestedMiSubprocessesTerminateAll3() { // Same as 1, but sequential Multi-Instance
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("E").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -923,7 +923,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestTerminateNestedMiSubprocesses");
         taskService.complete(taskService.createTaskQuery().taskName("A").singleResult().getId());
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("C").list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -938,20 +938,20 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
                 Arrays.asList("B", "B", "B", "B", "Before A", "Before A", "Before A", "Before A", "Before B", "Before C"));
 
         // Completing 'before c'
-        taskService.complete(tasks.get(9).getId());
+        completeTask(tasks.get(9));
         tasks = assertTaskNames(processInstance,
                 Arrays.asList("After C", "B", "B", "B", "B", "Before A", "Before A", "Before A", "Before A", "Before B"));
 
         // Completing 'before A' of one instance
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("task_subprocess_1").singleResult();
         assertThat(task).isNull();
-        taskService.complete(tasks.get(5).getId());
+        completeTask(tasks.get(5));
 
         // Multi instance call activity is sequential, so expecting 5 more times the same task
         for (int i = 0; i < 6; i++) {
             task = taskService.createTaskQuery().taskName("subprocess1_task").singleResult();
             assertThat(task).isNotNull();
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         tasks = assertTaskNames(processInstance,
@@ -969,7 +969,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
                 Arrays.asList("B", "B", "B", "B", "Before A", "Before A", "Before A", "Before A", "Before B", "Before C"));
 
         // Completing 'Before B' should lead to process instance termination
-        taskService.complete(tasks.get(8).getId());
+        completeTask(tasks.get(8));
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
 
@@ -977,7 +977,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("TestNestedCallActivities");
         tasks = assertTaskNames(processInstance,
                 Arrays.asList("B", "B", "B", "B", "Before A", "Before A", "Before A", "Before A", "Before B", "Before C"));
-        taskService.complete(tasks.get(9).getId());
+        completeTask(tasks.get(9));
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
 
@@ -985,10 +985,10 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("TestNestedCallActivities");
         tasks = assertTaskNames(processInstance,
                 Arrays.asList("B", "B", "B", "B", "Before A", "Before A", "Before A", "Before A", "Before B", "Before C"));
-        taskService.complete(tasks.get(5).getId());
+        completeTask(tasks.get(5));
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("subprocess1_task").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
 

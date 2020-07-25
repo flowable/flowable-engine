@@ -163,7 +163,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         // Completing first task will change the description
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "greeting")).isEqualTo("Hello from The Process");
         assertThat(runtimeService.getVariable(processInstance.getId(), "shortName")).isEqualTo("Act");
@@ -177,7 +177,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         // Completing first task will change the description
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "greeting2")).isEqualTo("Write meeting notes");
     }
@@ -190,7 +190,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         // Set assignee and complete task
         taskService.setAssignee(task.getId(), "kermit");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Verify the all-listener has received all events
         String eventsReceived = (String) runtimeService.getVariable(task.getProcessInstanceId(), "events");
@@ -215,7 +215,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertThat(TaskDeleteListener.getCurrentMessages()).isEmpty();
         assertThat(TaskSimpleCompleteListener.getCurrentMessages()).isEmpty();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().list();
 

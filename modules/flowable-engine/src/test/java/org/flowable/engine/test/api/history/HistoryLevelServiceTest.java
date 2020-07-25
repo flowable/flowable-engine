@@ -56,7 +56,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         taskService.setDueDate(task.getId(), new Date());
         taskService.setVariable(task.getId(), "var1", "test");
         taskService.setVariableLocal(task.getId(), "localVar1", "test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -90,7 +90,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         taskService.setDueDate(task.getId(), dueDateValue);
         taskService.setVariable(task.getId(), "var1", "test");
         taskService.setVariableLocal(task.getId(), "localVar1", "test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -139,7 +139,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         taskService.setDueDate(task.getId(), dueDateCalendar.getTime());
         taskService.setVariable(task.getId(), "var1", "test");
         taskService.setVariableLocal(task.getId(), "localVar1", "test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -196,7 +196,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         taskService.setDueDate(task.getId(), dueDateValue);
         taskService.setVariable(task.getId(), "var1", "test");
         taskService.setVariableLocal(task.getId(), "localVar1", "test2");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 

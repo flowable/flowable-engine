@@ -82,7 +82,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         // user completes the task (yes! he must be almost as fast as me)
         Date twentyFiveSecsAfterNoon = new Date(noon.getTime() + 25 * 1000);
         processEngineConfiguration.getClock().setCurrentTime(twentyFiveSecsAfterNoon);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
@@ -348,12 +348,12 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // First complete process instance 2
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().processInstanceId(processInstance2.getId()).list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         // Then process instance 1
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);

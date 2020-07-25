@@ -71,7 +71,7 @@ public class SendInternalEventTaskTest extends FlowableEventRegistryBpmnTestCase
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(runtimeService.createProcessInstanceQuery().list())
                 .extracting(ProcessInstance::getProcessDefinitionKey)
@@ -111,7 +111,7 @@ public class SendInternalEventTaskTest extends FlowableEventRegistryBpmnTestCase
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();

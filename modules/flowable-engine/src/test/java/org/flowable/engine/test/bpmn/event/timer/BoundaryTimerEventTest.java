@@ -906,7 +906,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().taskName("Reminder Task").list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
 

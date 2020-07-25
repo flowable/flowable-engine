@@ -49,7 +49,7 @@ public class EventSubProcessWithBoundaryEventsTest extends PluggableFlowableTest
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskInEventSubProcess");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -73,7 +73,7 @@ public class EventSubProcessWithBoundaryEventsTest extends PluggableFlowableTest
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskInEventSubProcess");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -97,7 +97,7 @@ public class EventSubProcessWithBoundaryEventsTest extends PluggableFlowableTest
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskInEventSubProcess");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -110,7 +110,7 @@ public class EventSubProcessWithBoundaryEventsTest extends PluggableFlowableTest
         Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterSubProcessBoundary");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

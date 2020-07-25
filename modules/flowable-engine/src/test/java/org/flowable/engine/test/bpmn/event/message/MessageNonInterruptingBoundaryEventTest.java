@@ -51,7 +51,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
         userTask = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessage").singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         // send a message a second time
@@ -65,14 +65,14 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
         userTask = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessage").singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterMessage");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         // now complete the user task with the message boundary event
         userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertThat(userTask).isNotNull();
 
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         // event subscription removed
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
@@ -81,7 +81,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
         userTask = taskService.createTaskQuery().taskDefinitionKey("taskAfterTask").singleResult();
         assertThat(userTask).isNotNull();
 
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
@@ -91,7 +91,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
 
         userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertThat(userTask).isNotNull();
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
 
         execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
         assertThat(execution).isNull();
@@ -99,7 +99,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
         userTask = taskService.createTaskQuery().taskDefinitionKey("taskAfterTask").singleResult();
         assertThat(userTask).isNotNull();
         assertThat(userTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
-        taskService.complete(userTask.getId());
+        completeTask(userTask);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 

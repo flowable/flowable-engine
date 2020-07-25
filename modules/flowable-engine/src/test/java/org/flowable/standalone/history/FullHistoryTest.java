@@ -409,7 +409,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // end process instance
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
         // check for historic process variables set
@@ -574,7 +574,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // end process instance
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
         assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(2);
@@ -824,7 +824,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         taskService.setVariableLocal(task.getId(), "anotherTaskVar", "value");
 
         // Finish the task, this end the process-instance
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
@@ -1287,7 +1287,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(executionId).taskName("my task").singleResult();
 
         runtimeService.setVariable(executionId, variableName, entity);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<HistoricDetail> variableUpdates = historyService.createHistoricDetailQuery().processInstanceId(executionId).variableUpdates().list();
 
@@ -1313,7 +1313,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         taskService.setVariableLocal(task.getId(), "binaryTaskVariable", (Object) "It is I, le binary".getBytes());
 
         // Complete task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Query task, including processVariables
         HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeProcessVariables().singleResult();
@@ -1343,7 +1343,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertThat(task).isNotNull();
 
         // Complete task to end process
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Query task, including processVariables
         HistoricProcessInstance historicProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId())

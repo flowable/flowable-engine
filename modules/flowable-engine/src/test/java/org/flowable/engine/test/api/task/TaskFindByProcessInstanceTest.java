@@ -75,7 +75,7 @@ class TaskFindByProcessInstanceTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery()
             .processInstanceId(processInstance.getId())
             .singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertThat(taskService.createTaskQuery()
             .processInstanceId(processInstance.getId())

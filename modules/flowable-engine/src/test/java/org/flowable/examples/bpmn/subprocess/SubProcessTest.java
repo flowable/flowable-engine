@@ -45,8 +45,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // Completing both the tasks finishes the subprocess and enables the
         // task after the subprocess
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         org.flowable.task.api.Task writeReportTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(writeReportTask.getName()).isEqualTo("Write report");

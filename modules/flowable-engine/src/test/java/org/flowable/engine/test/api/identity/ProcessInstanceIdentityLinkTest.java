@@ -34,11 +34,11 @@ public class ProcessInstanceIdentityLinkTest extends PluggableFlowableTestCase {
         // There are two tasks
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         identityService.setAuthenticatedUserId("kermit");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         identityService.setAuthenticatedUserId(null);
 
         assertProcessEnded(processInstance.getId());

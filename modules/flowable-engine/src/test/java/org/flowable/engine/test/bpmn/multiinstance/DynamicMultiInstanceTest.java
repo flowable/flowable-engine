@@ -53,23 +53,23 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             
             runtimeService.addMultiInstanceExecution("miTasks", procId, null);
             
-            taskService.complete(task.getId());
+            completeTask(task);
     
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_1");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_2");
-            taskService.complete(task.getId());
+            completeTask(task);
             
             // another mi execution was added
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_3");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
@@ -94,12 +94,12 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             runtimeService.setVariable(procId, "taskUserList", userList);
             runtimeService.addMultiInstanceExecution("miTasks", procId, CollectionUtil.singletonMap("taskUser", "hr"));
 
-            taskService.complete(task.getId());
+            completeTask(task);
 
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("hr");
-            taskService.complete(task.getId());
+            completeTask(task);
 
             assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
@@ -121,12 +121,12 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_0");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_1");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
@@ -148,12 +148,12 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_1");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             task = taskService.createTaskQuery().singleResult();
             assertThat(task.getName()).isEqualTo("My Task");
             assertThat(task.getAssignee()).isEqualTo("kermit_2");
-            taskService.complete(task.getId());
+            completeTask(task);
     
             assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
@@ -178,10 +178,10 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                     .extracting(Task::getName)
                     .containsExactly("My Task 0", "My Task 1", "My Task 2", "My Task 3");
 
-            taskService.complete(tasks.get(0).getId());
-            taskService.complete(tasks.get(1).getId());
-            taskService.complete(tasks.get(2).getId());
-            taskService.complete(tasks.get(3).getId());
+            completeTask(tasks.get(0));
+            completeTask(tasks.get(1));
+            completeTask(tasks.get(2));
+            completeTask(tasks.get(3));
             assertProcessEnded(procId);
         }
     }
@@ -204,8 +204,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                     .extracting(Task::getName)
                     .containsExactly("My Task 0", "My Task 2");
     
-            taskService.complete(tasks.get(0).getId());
-            taskService.complete(tasks.get(1).getId());
+            completeTask(tasks.get(0));
+            completeTask(tasks.get(1));
             assertProcessEnded(procId);
         }
     }
@@ -227,9 +227,9 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(tasks).hasSize(6);
         
             // Completing 3 tasks will not yet trigger completion condition
-            taskService.complete(tasks.get(0).getId());
-            taskService.complete(tasks.get(1).getId());
-            taskService.complete(tasks.get(2).getId());
+            completeTask(tasks.get(0));
+            completeTask(tasks.get(1));
+            completeTask(tasks.get(2));
             
             assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
             
@@ -237,7 +237,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(newTask).isNotNull();
             
             // Completing task will trigger completion condition
-            taskService.complete(newTask.getId());
+            completeTask(newTask);
             
             assertThat(taskService.createTaskQuery().count()).isZero();
             assertProcessEnded(procId);
@@ -260,7 +260,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(tasks).hasSize(16);
             
             for (int i = 0; i < 16; i++) {
-                taskService.complete(tasks.get(i).getId());
+                completeTask(tasks.get(i));
             }
             
             assertProcessEnded(procId);
@@ -293,7 +293,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(tasks).hasSize(12);
             
             for (int i = 0; i < 12; i++) {
-                taskService.complete(tasks.get(i).getId());
+                completeTask(tasks.get(i));
             }
             
             assertProcessEnded(procId);
@@ -315,8 +315,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                         .extracting(Task::getName)
                         .containsExactly("task one", "task two");
     
-                taskService.complete(tasks.get(0).getId());
-                taskService.complete(tasks.get(1).getId());
+                completeTask(tasks.get(0));
+                completeTask(tasks.get(1));
             }
     
             assertProcessEnded(procId);
@@ -351,8 +351,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                         .extracting(Task::getName)
                         .containsExactly("task one", "task two");
     
-                taskService.complete(tasks.get(0).getId());
-                taskService.complete(tasks.get(1).getId());
+                completeTask(tasks.get(0));
+                completeTask(tasks.get(1));
             }
     
             assertProcessEnded(procId);
@@ -387,8 +387,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                         .extracting(Task::getName)
                         .containsExactly("task one", "task two");
     
-                taskService.complete(tasks.get(0).getId());
-                taskService.complete(tasks.get(1).getId());
+                completeTask(tasks.get(0));
+                completeTask(tasks.get(1));
             }
     
             assertProcessEnded(procId);
@@ -414,8 +414,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                         .extracting(Task::getName)
                         .containsExactly("task one", "task two");
     
-                taskService.complete(tasks.get(0).getId());
-                taskService.complete(tasks.get(1).getId());
+                completeTask(tasks.get(0));
+                completeTask(tasks.get(1));
             }
     
             assertProcessEnded(procId);
@@ -449,7 +449,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(tasks).hasSize(11);
             
             for (org.flowable.task.api.Task task : tasks) {
-                taskService.complete(task.getId());
+                completeTask(task);
             }
             
             assertProcessEnded(procId);

@@ -63,7 +63,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
 
         // Finish tasks
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);

@@ -170,7 +170,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
     private void validateEventSent(ProcessInstance processInstance, String property) throws JsonProcessingException {
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job job = managementService.createJobQuery().jobTenantId(processInstance.getTenantId()).singleResult();
         assertThat(job.getTenantId()).isEqualTo(processInstance.getTenantId());

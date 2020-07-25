@@ -53,7 +53,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         assertThat(testListenerBean).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Check if the listener (defined as bean) received events (only creation, not other events)
         assertThat(testListenerBean.getEventsReceived()).isNotEmpty();

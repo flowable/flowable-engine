@@ -86,7 +86,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-            taskService.complete(task.getId());
+            completeTask(task);
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
             }
@@ -143,7 +143,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-            taskService.complete(task.getId());
+            completeTask(task);
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
@@ -184,7 +184,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.complete(task.getId());
+                completeTask(task);
             }
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -247,7 +247,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 for (int i = 0; i < 10; i++) {
                     Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                     taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                    taskService.complete(task.getId());
+                    completeTask(task);
                 }
 
                 if (processEngineConfiguration.isAsyncHistoryEnabled()) {

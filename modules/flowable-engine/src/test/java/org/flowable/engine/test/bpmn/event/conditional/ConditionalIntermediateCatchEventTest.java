@@ -38,7 +38,7 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBeforeConditionalCatch");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
         assertThat(execution).isNotNull();
@@ -54,7 +54,7 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
     
@@ -68,7 +68,7 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBeforeConditionalCatch");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
         assertThat(execution).isNotNull();
@@ -82,7 +82,7 @@ public class ConditionalIntermediateCatchEventTest extends PluggableFlowableTest
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 }

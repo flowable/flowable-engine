@@ -34,7 +34,7 @@ public class WatchDogAgendaTest extends ResourceFlowableTestCase {
     public void testWatchDogWithOneTaskProcess() {
         this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task task = this.taskService.createTaskQuery().singleResult();
-        this.taskService.complete(task.getId());
+        this.completeTask(task);
         assertThat(this.runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 

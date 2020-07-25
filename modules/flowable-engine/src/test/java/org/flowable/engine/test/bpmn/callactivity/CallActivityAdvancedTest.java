@@ -82,7 +82,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Execution parentExecution = runtimeService.createExecutionQuery().executionId(childTask.getExecutionId()).singleResult();
 
         // Completing the task continues the process which leads to calling the subprocess
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskInSubProcess = taskQuery.singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
         Execution execution = runtimeService.createExecutionQuery().executionId(taskInSubProcess.getExecutionId()).singleResult();
@@ -190,7 +190,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(childTask.getId()).isEqualTo(taskInSubProcess.getId());
 
         // Completing the task in the subprocess, finishes the subprocess
-        taskService.complete(taskInSubProcess.getId());
+        completeTask(taskInSubProcess);
         Task taskAfterSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
         
@@ -198,7 +198,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(childTask.getId()).isEqualTo(taskAfterSubProcess.getId());
 
         // Completing this task end the process instance
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertProcessEnded(processInstance.getId());
 
         // Validate subprocess history
@@ -362,13 +362,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(childTask.getId()).isEqualTo(taskBeforeSubProcess.getId());
 
         // Completing the task continues the process which leads to calling the subprocess
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskBeforeSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskBeforeSubProcessInSubProcess.getName()).isEqualTo("Task before subprocess");
         assertThat(taskBeforeSubProcessInSubProcess.getId()).isNotEqualTo(taskBeforeSubProcess.getId());
 
         // Completing the task continues the process which leads to calling the last subprocess
-        taskService.complete(taskBeforeSubProcessInSubProcess.getId());
+        completeTask(taskBeforeSubProcessInSubProcess);
         Task taskInLastSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskInLastSubProcess.getName()).isEqualTo("Task in subprocess");
 
@@ -466,12 +466,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         }
 
         // Completing the task in the second subprocess, finishes the second subprocess
-        taskService.complete(taskInLastSubProcess.getId());
+        completeTask(taskInLastSubProcess);
         Task taskAfterSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcessInSubProcess.getName()).isEqualTo("Task after subprocess");
 
-        // Completing this task finishes the first subproces
-        taskService.complete(taskAfterSubProcessInSubProcess.getId());
+        // Completing this task finishes the first subprocess
+        completeTask(taskAfterSubProcessInSubProcess);
         Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
@@ -499,7 +499,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 );
 
         // Completing this task end the process instance
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertProcessEnded(rootInstanceId);
 
         // Validate subprocess history entity links
@@ -636,17 +636,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // Completing the task continues the process which leads to calling the
         // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskInSubProcess = taskQuery.singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task in the subprocess, finishes the subprocess
-        taskService.complete(taskInSubProcess.getId());
+        completeTask(taskInSubProcess);
         Task taskAfterSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
         // Completing this task end the process instance
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -665,7 +665,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task in subprocess");
 
         // Completing this task ends the subprocess which leads to the end of the whole process instance
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         assertProcessEnded(processInstance.getId());
         assertThat(runtimeService.createExecutionQuery().list()).isEmpty();
     }
@@ -686,11 +686,11 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task taskA = tasks.get(0);
         Task taskB = tasks.get(1);
         // Completing the first task should not end the subprocess
-        taskService.complete(taskA.getId());
+        completeTask(taskA);
         assertThat(taskQuery.list()).hasSize(1);
 
         // Completing the second task should end the subprocess and end the whole process instance
-        taskService.complete(taskB.getId());
+        completeTask(taskB);
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
@@ -712,17 +712,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // Completing the task continues the process which leads to calling the
         // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskInSubProcess = taskQuery.singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task in the subprocess, finishes the subprocess
-        taskService.complete(taskInSubProcess.getId());
+        completeTask(taskInSubProcess);
         Task taskAfterSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
         // Completing this task end the process instance
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
 
         // SECOND sub process calls simpleSubProcess2
 
@@ -734,17 +734,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // Completing the task continues the process which leads to calling the
         // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess2");
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         taskInSubProcess = taskQuery.singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess 2");
 
         // Completing the task in the subprocess, finishes the subprocess
-        taskService.complete(taskInSubProcess.getId());
+        completeTask(taskInSubProcess);
         taskAfterSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
         // Completing this task end the process instance
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -769,7 +769,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(escalatedTask.getName()).isEqualTo("Escalated Task");
 
         // Completing the task ends the complete process
-        taskService.complete(escalatedTask.getId());
+        completeTask(escalatedTask);
         assertThat(runtimeService.createExecutionQuery().list()).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -808,7 +808,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // Completing this task ends the subprocess which leads to a task in the
         // super process
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
 
         // one task in the subprocess should be active after starting the
         // process instance
@@ -832,7 +832,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(taskInSecondSubProcess.getId(), "y")).isEqualTo(10l);
 
         // Completing this task ends the subprocess which leads to a task in the super process
-        taskService.complete(taskInSecondSubProcess.getId());
+        completeTask(taskInSecondSubProcess);
 
         // one task in the subprocess should be active after starting the process instance
         Task taskAfterSecondSubProcess = taskQuery.singleResult();
@@ -841,7 +841,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(taskAfterSecondSubProcess.getId(), "z")).isEqualTo(15l);
 
         // and end last task in Super process
-        taskService.complete(taskAfterSecondSubProcess.getId());
+        completeTask(taskAfterSecondSubProcess);
 
         assertProcessEnded(processInstance.getId());
         assertThat(runtimeService.createExecutionQuery().list()).isEmpty();
@@ -916,7 +916,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
         // Completing the task continues the process which leads to calling the subprocess
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
 
         ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
 
@@ -937,7 +937,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
         Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
         
@@ -949,7 +949,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskAfterSubProcess).isNotNull();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
         
-        taskService.complete(taskAfterSubProcess.getId());
+        completeTask(taskAfterSubProcess);
         assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
     
@@ -962,7 +962,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
         Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
-        taskService.complete(taskBeforeSubProcess.getId());
+        completeTask(taskBeforeSubProcess);
         Task taskInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
 
@@ -1073,7 +1073,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             assertThat(taskInSubProcess.getTenantId()).isEqualTo("someTenant");
     
             // Completing the task in the subprocess, finishes the subprocess
-            taskService.complete(taskInSubProcess.getId());
+            completeTask(taskInSubProcess);
             assertProcessEnded(processInstance.getId());
             
         } finally {
@@ -1103,7 +1103,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
             assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
             assertThat(taskBeforeSubProcess.getTenantId()).isEqualTo("someTenant");
-            taskService.complete(taskBeforeSubProcess.getId());
+            completeTask(taskBeforeSubProcess);
             
             Task taskInSubProcess = taskService.createTaskQuery().singleResult();
             assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
@@ -1117,7 +1117,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             assertThat(taskAfterSubProcess).isNotNull();
             assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
             
-            taskService.complete(taskAfterSubProcess.getId());
+            completeTask(taskAfterSubProcess);
             
             assertProcessEnded(processInstance.getId());
             
@@ -1155,7 +1155,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
             assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
             assertThat(taskBeforeSubProcess.getTenantId()).isEqualTo("someTenant");
-            taskService.complete(taskBeforeSubProcess.getId());
+            completeTask(taskBeforeSubProcess);
 
             Task taskInSubProcess = taskService.createTaskQuery().singleResult();
             assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
@@ -1169,7 +1169,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             assertThat(taskAfterSubProcess).isNotNull();
             assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
-            taskService.complete(taskAfterSubProcess.getId());
+            completeTask(taskAfterSubProcess);
 
             assertProcessEnded(processInstance.getId());
 
@@ -1263,21 +1263,21 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job secondJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(secondJob.getId()).isNotSameAs(job.getId());
         managementService.executeJob(secondJob.getId());
 
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         Job thirdJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(thirdJob.getId()).isNotSameAs(secondJob.getId());
         managementService.executeJob(thirdJob.getId());
 
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1342,7 +1342,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskInSubProcess.getTenantId()).isEqualTo("flowable");
 
         // Completing the task in the subprocess, finishes the processes
-        taskService.complete(taskInSubProcess.getId());
+        completeTask(taskInSubProcess);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 

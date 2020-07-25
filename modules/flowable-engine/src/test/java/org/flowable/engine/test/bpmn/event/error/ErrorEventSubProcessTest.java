@@ -58,7 +58,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
 
     }
@@ -159,7 +159,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         // Complete the user task in the event sub process
         Task eventSubProcessTask = taskService.createTaskQuery().singleResult();
         assertThat(eventSubProcessTask).isNotNull();
-        taskService.complete(eventSubProcessTask.getId());
+        completeTask(eventSubProcessTask);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertThat(historyService.createHistoricActivityInstanceQuery().list())
@@ -239,7 +239,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the org.flowable.task.service.Task will end the process instance
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(procId);
     }
 

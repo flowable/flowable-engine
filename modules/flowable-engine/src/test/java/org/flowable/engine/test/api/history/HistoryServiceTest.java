@@ -71,7 +71,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         // Complete the task and check if the size is count 1
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -87,7 +87,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -122,7 +122,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
@@ -970,7 +970,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 

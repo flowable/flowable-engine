@@ -43,7 +43,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertThat(taskService.createTaskQuery().list()).isEmpty();
 
         Map<String, Object> variables2 = new HashMap<>();
@@ -52,7 +52,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables2);
         List<org.flowable.task.api.Task> tasks2 = taskService.createTaskQuery().list();
         assertThat(tasks2).hasSize(1);
-        taskService.complete(tasks2.get(0).getId());
+        completeTask(tasks2.get(0));
         assertThat(taskService.createTaskQuery().list()).isEmpty();
 
         Map<String, Object> variables3 = new HashMap<>();
@@ -103,7 +103,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         assertThat(eventListener.getCompletedEvents()).isEmpty();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(1);
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertThat(eventListener.getCompletedEvents()).hasSize(1);
         assertThat(taskService.createTaskQuery().list()).isEmpty();
         

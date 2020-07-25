@@ -169,7 +169,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Completing should end the process instance
         task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
@@ -194,7 +194,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // Finish process
         while (taskService.createTaskQuery().count() > 0) {
             for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-                taskService.complete(task.getId());
+                completeTask(task);
             }
         }
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
@@ -352,7 +352,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // to create separate tests for each of them.
 
         // Completing the task should fail
-        assertThatThrownBy(() -> taskService.complete(task.getId()))
+        assertThatThrownBy(() -> completeTask(task))
                 .as("It is not allowed to complete a task of a suspended process instance")
                 .isExactlyInstanceOf(FlowableException.class);
 

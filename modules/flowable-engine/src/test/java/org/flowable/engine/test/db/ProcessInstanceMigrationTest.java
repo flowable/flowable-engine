@@ -261,7 +261,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             }
 
             // continue
-            taskService.complete(task.getId());
+            completeTask(task);
 
             assertProcessEnded(pi.getId());
 

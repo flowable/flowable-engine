@@ -99,10 +99,9 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactly("Pay out expenses");
-        taskId = tasks.get(0).getId();
 
         // Completing the task ends the process
-        taskService.complete(taskId);
+        completeTask(tasks.get(0));
 
         assertProcessEnded(processInstance.getId());
     }
@@ -149,7 +148,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskAssignee(KERMIT).count()).isZero();
 
         // Completing the task ends the process
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         assertProcessEnded(processInstance.getId());
     }

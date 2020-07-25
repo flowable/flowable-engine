@@ -272,7 +272,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task taskAfterAbort = taskService.createTaskQuery().taskAssignee("gonzo").singleResult();
         assertThat(taskAfterAbort).isNotNull();
-        taskService.complete(taskAfterAbort.getId());
+        completeTask(taskAfterAbort);
 
         runtimeService.startProcessInstanceByKey("throwSignal");
 
@@ -472,13 +472,13 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         
         Task beforeThrowTask = taskService.createTaskQuery().processInstanceId(throwingProcessInstance.getId()).singleResult();
         assertThat(beforeThrowTask.getTaskDefinitionKey()).isEqualTo("beforeThrowTask");
-        taskService.complete(beforeThrowTask.getId());
+        completeTask(beforeThrowTask);
         
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(throwingProcessInstance.getId()).count()).isZero();
         
         Task afterSignalReceiveTask = taskService.createTaskQuery().processInstanceId(processInstanceCatch.getId()).singleResult();
         assertThat(afterSignalReceiveTask.getTaskDefinitionKey()).isEqualTo("userTaskAfterSignalCatch");
-        taskService.complete(afterSignalReceiveTask.getId());
+        completeTask(afterSignalReceiveTask);
         
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceCatch.getId()).count()).isZero();
     }
@@ -720,7 +720,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("usertask1").singleResult();
         taskService.claim(task.getId(), "user");
-        taskService.complete(task.getId());
+        completeTask(task);
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // trigger history comment handling when necessary
@@ -915,7 +915,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         // create the file
         FileExistsMock.getInstance().touchFile();
         
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // trigger history comment handling when necessary

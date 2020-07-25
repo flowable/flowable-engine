@@ -145,7 +145,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
         String executionId = task.getExecutionId();
@@ -230,7 +230,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
         String executionId = task.getExecutionId();
@@ -257,7 +257,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
         String executionId = task.getExecutionId();
@@ -364,7 +364,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
         String executionId = task.getExecutionId();

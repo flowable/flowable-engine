@@ -57,7 +57,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Provide new sales lead");
 
         // After completing the task, the review subprocess will be active
-        taskService.complete(task.getId());
+        completeTask(task);
         org.flowable.task.api.Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
         assertThat(ratingTask.getName()).isEqualTo("Review customer rating");
         org.flowable.task.api.Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
@@ -75,14 +75,14 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // Providing more details (ie. completing the task), will activate the
         // subprocess again
-        taskService.complete(provideDetailsTask.getId());
+        completeTask(provideDetailsTask);
         List<org.flowable.task.api.Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(reviewTasks)
                 .extracting(Task::getName)
                 .containsExactly("Review customer rating", "Review profitability");
 
         // Completing both tasks normally ends the process
-        taskService.complete(reviewTasks.get(0).getId());
+        completeTask(reviewTasks.get(0));
         variables.put("notEnoughInformation", false);
         taskService.complete(reviewTasks.get(1).getId(), variables);
         assertProcessEnded(procId);

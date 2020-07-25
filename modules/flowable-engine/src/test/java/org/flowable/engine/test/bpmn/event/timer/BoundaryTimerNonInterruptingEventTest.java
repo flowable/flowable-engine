@@ -69,7 +69,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
                 .containsExactly("First Task", "Escalation Task 1");
 
         // complete the task and end the forked execution
-        taskService.complete(taskList.get(1).getId());
+        completeTask(taskList.get(1));
 
         // but we still have the original executions
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
@@ -90,14 +90,14 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
                 .containsExactly("First Task", "Escalation Task 2");
 
         // This time we end the main task
-        taskService.complete(taskList.get(0).getId());
+        completeTask(taskList.get(0));
 
         // but we still have the escalation task
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().singleResult();
         assertThat(escalationTask.getName()).isEqualTo("Escalation Task 2");
 
-        taskService.complete(escalationTask.getId());
+        completeTask(escalationTask);
 
         // now we are really done :-)
         assertProcessEnded(pi.getId());
@@ -129,7 +129,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // end the first
-        taskService.complete(task1.getId());
+        completeTask(task1);
 
         // we now have one task left
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
@@ -137,7 +137,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertThat(task2.getName()).isEqualTo("Escalation Task");
 
         // complete the task, the parallel gateway should fire
-        taskService.complete(task2.getId());
+        completeTask(task2);
 
         // and the process has ended
         assertProcessEnded(pi.getId());
@@ -156,12 +156,12 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // Complete task that was reached by non interrupting timer
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // Complete other tasks
         for (org.flowable.task.api.Task t : taskService.createTaskQuery().list()) {
-            taskService.complete(t.getId());
+            completeTask(t);
         }
         assertProcessEnded(procId);
     }
@@ -180,14 +180,14 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // Complete 2 tasks that will trigger the join
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("firstTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("secondTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         // Finally, complete the task that was created due to the timer
         task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(procId);
     }
@@ -213,7 +213,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstanceId).count()).isEqualTo(1);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         moveByMinutes(60);
         assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(2000, 100); })
@@ -244,8 +244,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         List<org.flowable.task.api.Task> tasks = tq.list();
 
-        taskService.complete(tasks.get(0).getId());
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(0));
+        completeTask(tasks.get(1));
 
         assertProcessEnded(id);
     }
@@ -301,18 +301,18 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // Complete 4 tasks that will trigger the join
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("sub1task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("sub2task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("sub2task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         // Finally, complete the task that was created due to the timer
         task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(procId);
     }
@@ -329,18 +329,18 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertThat(taskService.createTaskQuery().count()).isEqualTo(5);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("sub1task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete the task that was created due to the timer
         task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().taskDefinitionKey("sub2task1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         task = taskService.createTaskQuery().taskDefinitionKey("sub2task2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(taskService.createTaskQuery().count()).isZero();
 
         assertProcessEnded(procId);

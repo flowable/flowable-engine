@@ -46,7 +46,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         assertThat(task).isNotNull();
 
         // Completing the task will cause a bulk delete of 4001 entities
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // Check if process is gone
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();

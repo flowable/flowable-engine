@@ -123,7 +123,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertThat(task.getName()).isEqualTo("task not left");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         ObjectNode infoNode = dynamicBpmnService.changeSequenceFlowCondition("flow1", "${input == 'right'}");
         dynamicBpmnService.changeSequenceFlowCondition("flow2", "${input != 'right'}", infoNode);
@@ -134,7 +134,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertThat(task.getName()).isEqualTo("task left");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         variables = CollectionUtil.singletonMap("input", "right2");
         pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
@@ -142,6 +142,6 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertThat(task.getName()).isEqualTo("task not left");
-        taskService.complete(task.getId());
+        completeTask(task);
     }
 }

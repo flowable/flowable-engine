@@ -116,7 +116,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Mary Smith");
 
         // complete user task so that external subprocess will flow to terminate end
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -126,7 +126,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Mary Smith");
 
         // complete user task so that parent process will terminate normally
-        taskService.complete(task.getId());
+        completeTask(task);
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
@@ -423,7 +423,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariable(subprocessInstance.getId(), "FullName")).isEqualTo("Mary Smith");
 
         // complete user task so that external subprocess will flow to terminate end
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -433,7 +433,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariable(processInstance.getId(), "Name")).isEqualTo("Mary Smith");
 
         // complete user task so that parent process will terminate normally
-        taskService.complete(task.getId());
+        completeTask(task);
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
@@ -720,15 +720,15 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("One");
 
         // Completing the task should trigger the event subprocess
-        taskService.complete(task.getId());
+        completeTask(task);
         Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
         assertThat(subOneTask).isNotNull();
-        taskService.complete(subOneTask.getId());
+        completeTask(subOneTask);
 
         // Complete the last task
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Two");
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -743,10 +743,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("One");
 
         // Completing the task should trigger the event subprocess. This interupts the main flow.
-        taskService.complete(task.getId());
+        completeTask(task);
         Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
         assertThat(subOneTask).isNotNull();
-        taskService.complete(subOneTask.getId());
+        completeTask(subOneTask);
 
         assertProcessEnded(processInstance.getId());
     }

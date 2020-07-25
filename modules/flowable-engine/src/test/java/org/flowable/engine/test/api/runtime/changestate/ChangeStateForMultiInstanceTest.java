@@ -93,7 +93,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
                 .containsExactly("seqTasks");
         assertThat(taskService.getVariable(tasks.get(0).getId(), "loopCounter")).isEqualTo(0);
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Second in the loop
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -115,9 +115,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(tasks.get(0).getId(), "loopCounter")).isEqualTo(1);
 
         //Complete second and third
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //After the MI
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -135,7 +135,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
         //Complete the process
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -157,7 +157,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("seqTasks");
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Second in the loop
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -174,7 +174,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nextTask");
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -197,7 +197,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("seqTasks");
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Second in the loop
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -215,7 +215,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nextTask");
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -264,7 +264,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //        assertThat(taskService.getVariable(tasks.get(0).getId(), "loopCounter")).isNotNull()
 
         //Complete one execution
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         //Confirm new state
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -306,7 +306,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
 
         //Complete the process
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -325,7 +325,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(activeParallelTasks).hasSize(3);
 
         //Complete one of the tasks
-        taskService.complete(activeParallelTasks.get(1).getId());
+        completeTask(activeParallelTasks.get(1));
         parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(parallelExecutions).hasSize(4);
         activeParallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
@@ -340,7 +340,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(parallelExecutions).hasSize(1);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nextTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -360,7 +360,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(activeParallelTasks).hasSize(3);
 
         //Complete one of the tasks
-        taskService.complete(activeParallelTasks.get(1).getId());
+        completeTask(activeParallelTasks.get(1));
         parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(parallelExecutions).hasSize(4);
         activeParallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
@@ -376,7 +376,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(parallelExecutions).hasSize(1);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("nextTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -412,7 +412,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the parallel subProcesses "subTask2"
         Task task = taskService.createTaskQuery().executionId(subTask2Executions.get(0).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(executionsCount).isEqualTo(5);
@@ -440,7 +440,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the rest of the SubProcesses
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(2);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //There's no multiInstance anymore
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -448,7 +448,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -486,7 +486,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the parallel subProcesses "subTask2"
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //There's no multiInstance anymore
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -494,7 +494,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         Task task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -514,7 +514,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Start the nested subProcesses by completing the first task of the outer subProcess
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
         // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
@@ -549,7 +549,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the outer subProcesses
         Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -582,7 +582,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete all the nestedSubTask2
         tasks = taskService.createTaskQuery().taskDefinitionKey("nestedSubTask2").list();
         assertThat(tasks).hasSize(8);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //Nested subProcesses have completed, only outer subProcess remain
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -595,14 +595,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the outer subProcesses
         tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -622,7 +622,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Start the nested subProcesses by completing the first task of the outer subProcess
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
         // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
@@ -673,7 +673,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete all the nestedSubTask2
         tasks = taskService.createTaskQuery().taskDefinitionKey("nestedSubTask2").list();
         assertThat(tasks).hasSize(9);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //Nested subProcesses have completed, only outer subProcess remain
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -686,14 +686,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the outer subProcesses
         tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
 
         Task task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -715,7 +715,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the Tasks
         Task task = taskService.createTaskQuery().executionId(subTask1Executions.get(1).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(executionsCount).isEqualTo(7);
@@ -746,7 +746,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -768,7 +768,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the Tasks
         Task task = taskService.createTaskQuery().executionId(subTask1Executions.get(1).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(executionsCount).isEqualTo(7);
@@ -791,7 +791,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -811,7 +811,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Start the nested subProcesses by completing the first task of the outer subProcess
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
         // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
@@ -844,7 +844,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the nested subProcesses
         Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -884,14 +884,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the outer subProcesses
         tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -911,7 +911,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Start the nested subProcesses by completing the first task of the outer subProcess
         List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
         // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
@@ -944,7 +944,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete one of the nested subProcesses
         Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
@@ -975,14 +975,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete the outer subProcesses
         tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
         assertThat(tasks).hasSize(3);
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
 
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1041,7 +1041,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Complete one of the tasks
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(5);
@@ -1054,14 +1054,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Finish the rest since we cannot move out of a multiInstance subProcess
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1120,7 +1120,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Complete one of the tasks
-        taskService.complete(tasks.get(1).getId());
+        completeTask(tasks.get(1));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(5);
@@ -1133,14 +1133,14 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Finish the rest since we cannot move out of a multiInstance subProcess
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertThat(totalChildExecutions).isEqualTo(1);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1187,7 +1187,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Finish the remaining subProcesses tasks
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //Only one execution and task remaining
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1197,7 +1197,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
         //Complete the process
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1293,7 +1293,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         //Complete remaining task3, the next inline test needs the task to be completed too
         for (Task t : tasks) {
             if (t.getTaskDefinitionKey().equals("taskInclusive3")) {
-                taskService.complete(t.getId());
+                completeTask(t);
             }
         }
 
@@ -1334,7 +1334,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         tasks.forEach(t -> assertThat(t.getTaskDefinitionKey()).isEqualTo("postForkTask"));
 
         //Finish the remaining subProcesses tasks
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(t -> completeTask(t));
 
         //Only one execution and task remaining
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1344,7 +1344,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
 
         //Complete the process
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 

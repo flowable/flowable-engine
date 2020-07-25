@@ -321,7 +321,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).list();
         for (Task task : tasks) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
@@ -737,7 +737,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().processFinished().count()).isZero();
 
         // Finished and running task on running process should be available
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
@@ -746,7 +746,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         // 2 finished tasks are found for finished process after completing last task of process
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
@@ -840,7 +840,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(foundCustom).isTrue();
 
         // Now complete the task and check if links are still there
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
@@ -888,7 +888,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
             runtimeService.setVariable(task.getExecutionId(), "procVar", i);
         }
 
-        taskService.complete(task.getId());
+        completeTask(task);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         

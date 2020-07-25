@@ -481,8 +481,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // and no more job
         assertThat(managementService.createJobQuery().count()).isZero();
 
-        String taskId = taskService.createTaskQuery().singleResult().getId();
-        taskService.complete(taskId);
+        completeTask(taskService.createTaskQuery().singleResult());
 
     }
 

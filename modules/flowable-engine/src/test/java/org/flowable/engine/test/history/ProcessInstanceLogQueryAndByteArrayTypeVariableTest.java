@@ -59,7 +59,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
         // Finish tasks
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
     }
 

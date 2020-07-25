@@ -135,12 +135,12 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id")); //AutoMapped by Id
 
         //The first process version only had one activity, there should be a second activity in the process now
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().list();
         assertThat(tasks)
                 .extracting(Task::getTaskDefinitionKey)
                 .containsExactly("userTask2Id");
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -197,11 +197,11 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         // complete intermediate task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete final task
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstanceToMigrate.getId());
     }
@@ -259,11 +259,11 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         // complete intermediate task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete final task
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstanceToMigrate.getId());
     }
@@ -327,19 +327,19 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         // complete before task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete parallel task 1
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).list().get(0);
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete parallel task 2
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete final task
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstanceToMigrate.getId());
     }
@@ -407,11 +407,11 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         // complete sub task
-        taskService.complete(task.getId());
+        completeTask(task);
 
         // complete final task
         task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstanceToMigrate.getId());
     }
@@ -487,13 +487,13 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id"));
 
         //This new process definition has two activities
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().list();
         assertThat(tasks)
                 .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -575,7 +575,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
 
         //This new process definition has two activities, but we have mapped to the last activity explicitly
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
 
     }
@@ -620,7 +620,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
 
         //We want to migrate from the next activity
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         tasks = taskService.createTaskQuery().list();
         assertThat(tasks)
                 .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
@@ -648,7 +648,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id"));
 
         //This new process version only have one activity
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -735,13 +735,13 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         //The first process version only had one activity, there should be a second activity in the process now
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         tasksAfter = taskService.createTaskQuery().list();
         assertThat(tasksAfter)
                 .extracting(Task::getTaskDefinitionKey)
                 .containsExactly("userTask2Id");
 
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -832,13 +832,13 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         //The first process version only had one activity, there should be a second activity in the process now
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         tasksAfter = taskService.createTaskQuery().list();
         assertThat(tasksAfter)
                 .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
                 .containsExactly(tuple(version2ProcessDef.getId(), "userTask2Id"));
 
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1187,13 +1187,13 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         //The first process version only had one activity, there should be a second activity in the process now
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         tasksAfter = taskService.createTaskQuery().list();
         assertThat(tasksAfter)
                 .extracting(Task::getTaskDefinitionKey)
                 .containsExactly("userTask2Id");
 
-        taskService.complete(tasksAfter.get(0).getId());
+        completeTask(tasksAfter.get(0));
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1344,7 +1344,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
@@ -1408,7 +1408,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
@@ -1743,7 +1743,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("taskBefore");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         //Confirm the state to migrate
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

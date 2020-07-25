@@ -87,7 +87,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         // Verify events
@@ -121,11 +121,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive()).isFalse();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -137,7 +137,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -182,7 +182,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(1);
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -196,7 +196,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -217,7 +217,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -230,7 +230,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -243,7 +243,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         for (Task t : tasks) {
             if (t.getTaskDefinitionKey().equals("task1")) {
-                taskService.complete(t.getId());
+                completeTask(t);
             }
         }
 
@@ -266,7 +266,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -279,7 +279,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -301,7 +301,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(1);
@@ -309,7 +309,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -322,7 +322,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -333,7 +333,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -357,7 +357,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -393,7 +393,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -407,11 +407,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive()).isFalse();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -423,7 +423,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -444,7 +444,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(1);
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -458,7 +458,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -480,7 +480,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -493,7 +493,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -506,7 +506,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         for (Task t : tasks) {
             if (t.getTaskDefinitionKey().equals("task1")) {
-                taskService.complete(t.getId());
+                completeTask(t);
             }
         }
 
@@ -530,7 +530,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -543,7 +543,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -565,7 +565,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(1);
@@ -573,7 +573,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -586,7 +586,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -597,7 +597,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -622,7 +622,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -655,7 +655,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -669,11 +669,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive()).isFalse();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -685,7 +685,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -709,7 +709,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -723,7 +723,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -744,7 +744,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -757,7 +757,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -770,7 +770,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         for (Task t : tasks) {
             if (t.getTaskDefinitionKey().equals("task1")) {
-                taskService.complete(t.getId());
+                completeTask(t);
             }
         }
 
@@ -793,7 +793,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -806,7 +806,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -829,7 +829,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(1);
@@ -837,7 +837,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -850,7 +850,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -861,7 +861,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -885,7 +885,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -918,7 +918,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -932,11 +932,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         assertThat(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive()).isFalse();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -948,7 +948,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -969,7 +969,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(1);
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -983,7 +983,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -1005,7 +1005,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1018,7 +1018,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -1031,7 +1031,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         for (Task t : tasks) {
             if (t.getTaskDefinitionKey().equals("task1")) {
-                taskService.complete(t.getId());
+                completeTask(t);
             }
         }
 
@@ -1055,7 +1055,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1068,7 +1068,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -1090,7 +1090,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(1);
@@ -1098,7 +1098,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1111,7 +1111,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -1122,7 +1122,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
-            taskService.complete(task1.get().getId());
+            completeTask(task1.get());
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1146,7 +1146,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1174,7 +1174,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
         assertThat(parallelJoinExecution).isNotPresent();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
@@ -1186,11 +1186,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(parallelJoinExecution).isPresent();
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1202,7 +1202,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -1224,7 +1224,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(1);
 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1236,7 +1236,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -1264,7 +1264,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(subProcessExecution).isNotNull();
         assertThat(runtimeService.getVariableLocal(subProcessExecutionId, "subProcessVar")).isEqualTo("test");
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(1);
@@ -1272,11 +1272,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(3);
 
-        taskService.complete(tasks.get(0).getId());
+        completeTask(tasks.get(0));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1307,13 +1307,13 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(parallelJoinExecution).isNotPresent();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -1326,7 +1326,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
@@ -1335,11 +1335,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(tasks).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1353,14 +1353,14 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
@@ -1387,7 +1387,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }
@@ -1401,14 +1401,14 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
-        taskService.complete(task.getId());
+        completeTask(task);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
@@ -1433,10 +1433,10 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(5);
@@ -1446,17 +1446,17 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(((ExecutionEntity) inclusiveJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
-        taskService.complete(task.getId());
+        completeTask(task);
 
         assertProcessEnded(processInstance.getId());
     }

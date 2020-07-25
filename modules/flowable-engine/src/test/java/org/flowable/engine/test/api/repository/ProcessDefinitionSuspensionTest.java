@@ -166,7 +166,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         // Process should be able to continue
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
@@ -195,7 +195,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // Verify all process instances can't be continued
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            assertThatThrownBy(() -> taskService.complete(task.getId()))
+            assertThatThrownBy(() -> completeTask(task))
                     .as("A suspended task shouldn't be able to be continued")
                     .isInstanceOf(FlowableException.class);
         }
@@ -208,7 +208,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
 
         // Verify that all process instances can be completed
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
-            taskService.complete(task.getId());
+            completeTask(task);
         }
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
         assertThat(runtimeService.createProcessInstanceQuery().suspended().count()).isZero();

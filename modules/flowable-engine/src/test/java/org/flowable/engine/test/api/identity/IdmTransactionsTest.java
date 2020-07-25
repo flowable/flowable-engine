@@ -59,7 +59,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("testProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
-        taskService.complete(task.getId());
+        completeTask(task);
         assertThat(identityService.createUserQuery().list()).hasSize(1);
 
     }
@@ -75,7 +75,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Completing the task throws an exception
-        assertThatThrownBy(() -> taskService.complete(task.getId()));
+        assertThatThrownBy(() -> completeTask(task));
 
         // Should have rolled back to task
         assertThat(taskService.createTaskQuery().singleResult()).isNotNull();

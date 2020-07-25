@@ -91,7 +91,7 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
         assertTaskCountFlag(firstTask, false);
 
         // complete the first task, move to the next one
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
 
         // second task created with the new flag (true)
         org.flowable.task.api.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -117,7 +117,7 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
         assertTaskCountFlag(firstTask, false);
 
         // complete the first task, move to the next one
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
 
         // second task created with flag false
         org.flowable.task.api.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -141,7 +141,7 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
         assertTaskCountFlag(firstTask, enableTaskCountFlag);
 
         // The second task should have the same count flag
-        taskService.complete(firstTask.getId());
+        completeTask(firstTask);
         org.flowable.task.api.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertTaskCountFlag(secondTask, enableTaskCountFlag);
 
@@ -169,7 +169,7 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
 
     protected void finishProcessInstance(ProcessInstance processInstance) {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        completeTask(task);
         assertProcessEnded(processInstance.getId());
     }
 }

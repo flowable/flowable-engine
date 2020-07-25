@@ -88,7 +88,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
     }
 
     /**
@@ -150,7 +150,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         assertThat(result)
                 .contains("subProcessLocalVariable", "helloWorld", "mainProcessLocalVariable");
 
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
     }
 
     @Test
@@ -200,7 +200,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends
-        taskService.complete(subProcessTask.getId());
+        completeTask(subProcessTask);
 
         List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 
@@ -232,7 +232,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
 
         // finish process
         for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
-            taskService.complete(subProcTask.getId());
+            completeTask(subProcTask);
         }
     }
 
