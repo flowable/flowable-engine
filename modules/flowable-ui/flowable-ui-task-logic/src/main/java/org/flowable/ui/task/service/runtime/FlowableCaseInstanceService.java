@@ -38,14 +38,14 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
+import org.flowable.ui.common.service.idm.cache.UserCache;
+import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
 import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.CreateCaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.MilestoneRepresentation;
 import org.flowable.ui.task.model.runtime.PlanItemInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.StageRepresentation;
 import org.flowable.ui.task.model.runtime.UserEventListenerRepresentation;
-import org.flowable.ui.common.service.idm.cache.UserCache;
-import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,14 +192,12 @@ public class FlowableCaseInstanceService {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
         }
 
-        List<HistoricPlanItemInstance> milestones = new ArrayList<>();
-
         //Available
-        milestones.addAll(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-            .planItemInstanceCaseInstanceId(caseInstance.getId())
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.MILESTONE)
-            .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
-            .list());
+        List<HistoricPlanItemInstance> milestones = new ArrayList<>(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId())
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.MILESTONE)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .list());
 
         List<MilestoneRepresentation> milestoneRepresentations = milestones.stream()
             .map(p -> new MilestoneRepresentation(p.getName(), p.getState(), p.getCreateTime()))
