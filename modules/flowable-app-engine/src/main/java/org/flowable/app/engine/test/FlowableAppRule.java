@@ -59,7 +59,7 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * <p>
- * The FlowableRule also lets you {@link FlowableAppRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine in
+ * The FlowableAppRule also lets you {@link #setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine in
  * order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>
