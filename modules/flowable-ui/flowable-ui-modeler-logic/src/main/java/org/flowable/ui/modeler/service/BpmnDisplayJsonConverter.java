@@ -173,7 +173,7 @@ public class BpmnDisplayJsonConverter {
 
         for (FlowElement element : elementList) {
             // ignore data objects in visual representation
-            if (DataObject.class.isInstance(element)) {
+            if (element instanceof DataObject) {
                 continue;
 
             } else if (element instanceof SequenceFlow) {
