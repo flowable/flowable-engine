@@ -250,6 +250,16 @@ public class FlowableCommonAppProperties {
          */
         private long userValidityPeriod = 30000L;
 
+        /**
+         * The type of the security for the UI Apps.
+         */
+        private String type = "idm";
+
+        /**
+         * The OAuth2 configuration.
+         */
+        private final OAuth2 oAuth2 = new OAuth2();
+
         public String getRememberMeKey() {
             return rememberMeKey;
         }
@@ -268,6 +278,50 @@ public class FlowableCommonAppProperties {
 
         public void setUserValidityPeriod(long userValidityPeriod) {
             this.userValidityPeriod = userValidityPeriod;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public OAuth2 getOAuth2() {
+            return oAuth2;
+        }
+    }
+
+    /**
+     * Security properties for the OAuth2 configuration.
+     */
+    public static class OAuth2 {
+
+        /**
+         * The attribute that contains the authorities that should be mapped for the authenticated user.
+         */
+        private String authoritiesAttribute;
+
+        /**
+         * The attribute that contains the groups for the authenticated user.
+         */
+        private String groupsAttribute;
+
+        public String getAuthoritiesAttribute() {
+            return authoritiesAttribute;
+        }
+
+        public void setAuthoritiesAttribute(String authoritiesAttribute) {
+            this.authoritiesAttribute = authoritiesAttribute;
+        }
+
+        public String getGroupsAttribute() {
+            return groupsAttribute;
+        }
+
+        public void setGroupsAttribute(String groupsAttribute) {
+            this.groupsAttribute = groupsAttribute;
         }
     }
 

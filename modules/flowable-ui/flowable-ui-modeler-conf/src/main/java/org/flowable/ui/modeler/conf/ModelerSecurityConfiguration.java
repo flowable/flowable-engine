@@ -13,6 +13,7 @@
 package org.flowable.ui.modeler.conf;
 
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
+import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
@@ -44,11 +45,13 @@ public class ModelerSecurityConfiguration {
 
         protected final FlowableRestAppProperties restAppProperties;
         protected final FlowableModelerAppProperties modelerAppProperties;
+        protected final ApiHttpSecurityCustomizer apiHttpSecurityCustomizer;
 
         public ModelerApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
-            FlowableModelerAppProperties modelerAppProperties) {
+                FlowableModelerAppProperties modelerAppProperties, ApiHttpSecurityCustomizer apiHttpSecurityCustomizer) {
             this.restAppProperties = restAppProperties;
             this.modelerAppProperties = modelerAppProperties;
+            this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -63,11 +66,13 @@ public class ModelerSecurityConfiguration {
             if (modelerAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").authenticated().and().httpBasic();
+                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").authenticated();
                     
                 }
+
+                apiHttpSecurityCustomizer.customize(http);
                 
             } else {
                 http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").denyAll();

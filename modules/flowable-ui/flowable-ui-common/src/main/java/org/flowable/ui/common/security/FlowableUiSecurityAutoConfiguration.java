@@ -16,6 +16,8 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
+import org.flowable.ui.common.rest.idm.CurrentUserProvider;
+import org.flowable.ui.common.rest.idm.OAuth2CurrentUserProvider;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.common.service.idm.RemoteIdmServiceImpl;
 import org.flowable.ui.common.service.idm.cache.RemoteIdmUserCache;
@@ -30,14 +32,23 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -53,8 +64,34 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 })
 @AutoConfigureBefore({
         FlowableSecurityAutoConfiguration.class,
+        OAuth2ClientAutoConfiguration.class,
 })
 public class FlowableUiSecurityAutoConfiguration {
+
+    private static final Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> DEFAULT_AUTHORIZE_REQUESTS = requests -> {
+        requests.antMatchers("/app/rest/account").authenticated()
+                .antMatchers("/app/rest/runtime/app-definitions").authenticated()
+                .antMatchers("/idm-app/rest/authenticate").authenticated()
+                .antMatchers("/idm-app/rest/account").authenticated()
+                .antMatchers("/app/rest/**", "/workflow/").hasAuthority(DefaultPrivileges.ACCESS_TASK)
+                .antMatchers("/admin-app/**", "/admin/").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
+                .antMatchers("/idm-app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM)
+                .antMatchers("/modeler-app/**", "/modeler/").hasAuthority(DefaultPrivileges.ACCESS_MODELER)
+                .antMatchers("/").authenticated()
+                .antMatchers("/app/authentication").permitAll()
+                .antMatchers("/idm").permitAll();
+    };
+
+    private static final Customizer<LogoutConfigurer<HttpSecurity>> DEFAULT_LOGOUT = logout -> {
+        logout.logoutUrl("/app/logout")
+                .permitAll();
+    };
+
+    private static final Customizer<HeadersConfigurer<HttpSecurity>> DEFAULT_HEADERS = headers -> {
+        headers.frameOptions()
+                .sameOrigin()
+                .addHeaderWriter(new XXssProtectionHeaderWriter());
+    };
 
     public FlowableUiSecurityAutoConfiguration(ObjectProvider<SecurityScopeProvider> securityScopeProvider) {
         // Override the default security scope provider if there is such bean
@@ -115,6 +152,7 @@ public class FlowableUiSecurityAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
+    @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "idm", matchIfMissing = true)
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
         @Autowired
@@ -141,38 +179,85 @@ public class FlowableUiSecurityAutoConfiguration {
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                    .logout()
-                    .logoutUrl("/app/logout")
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                    .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-                    .permitAll()
-                    .and()
+                    .logout(logout -> {
+                        DEFAULT_LOGOUT.customize(logout);
+                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                        logout.addLogoutHandler(new ClearFlowableCookieLogoutHandler());
+                    })
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
-                    .headers()
-                    .frameOptions()
-                    .sameOrigin()
-                    .addHeaderWriter(new XXssProtectionHeaderWriter())
-                    .and()
+                    .headers(DEFAULT_HEADERS)
                     // Never persist the security context
                     .securityContext().securityContextRepository(new NullSecurityContextRepository())
                     .and()
-                    .authorizeRequests()
-                    .antMatchers("/app/rest/account").authenticated()
-                    .antMatchers("/app/rest/runtime/app-definitions").authenticated()
-                    .antMatchers("/idm-app/rest/authenticate").authenticated()
-                    .antMatchers("/idm-app/rest/account").authenticated()
-                    .antMatchers("/app/rest/**", "/workflow/").hasAuthority(DefaultPrivileges.ACCESS_TASK)
-                    .antMatchers("/admin-app/**", "/admin/").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
-                    .antMatchers("/idm-app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM)
-                    .antMatchers("/modeler-app/**", "/modeler/").hasAuthority(DefaultPrivileges.ACCESS_MODELER)
-                    .antMatchers("/").authenticated()
-                    .antMatchers("/app/authentication").permitAll()
-                    .antMatchers("/idm").permitAll()
+                    .authorizeRequests(DEFAULT_AUTHORIZE_REQUESTS)
             ;
 
             http.formLogin().disable();
             http.apply(new FlowableUiCustomFormLoginConfigurer<>());
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
+    @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "oauth2")
+    public static class OAuthWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+        protected final FlowableCommonAppProperties commonAppProperties;
+
+        public OAuthWebSecurityConfigurerAdapter(FlowableCommonAppProperties commonAppProperties) {
+            this.commonAppProperties = commonAppProperties;
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            // Do not disable session, otherwise OAuth does not work
+            http
+                    .logout(logout -> {
+                        DEFAULT_LOGOUT.customize(logout);
+                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                    })
+                    .csrf()
+                    .disable() // Disabled, cause enabling it will cause sessions
+                    .headers(DEFAULT_HEADERS)
+                    .authorizeRequests(DEFAULT_AUTHORIZE_REQUESTS);
+
+            http.oauth2Login();
+            http.oauth2Client();
+        }
+
+        @Bean
+        public GrantedAuthoritiesMapper keycloakAuthoritiesMapper() {
+            FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
+            String authoritiesAttribute = oAuth2.getAuthoritiesAttribute();
+            String groupsAttribute = oAuth2.getGroupsAttribute();
+            return new FlowableOAuth2GrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute);
+        }
+
+        @Bean
+        @ConditionalOnClass(Jwt.class)
+        @ConditionalOnMissingBean
+        public ApiHttpSecurityCustomizer jwtApiHttpSecurityCustomizer() {
+            JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+            FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
+            String authoritiesAttribute = oAuth2.getAuthoritiesAttribute();
+            String groupsAttribute = oAuth2.getGroupsAttribute();
+            converter.setJwtGrantedAuthoritiesConverter(new FlowableJwtGrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute));
+
+            return new JwtApiHttpSecurityCustomizer(converter);
+        }
+
+        @Bean
+        @ConditionalOnMissingClass("org.springframework.security.oauth2.jwt.Jwt")
+        @ConditionalOnMissingBean
+        public ApiHttpSecurityCustomizer defaultApiHttpSecurityCustomizer() {
+            return new DefaultApiHttpSecurityCustomizer();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean(name = "oauth2CurrentUserProvider")
+        public CurrentUserProvider oauth2CurrentUserProvider() {
+            return new OAuth2CurrentUserProvider();
         }
     }
 
@@ -184,6 +269,12 @@ public class FlowableUiSecurityAutoConfiguration {
     @ConditionalOnClass(EndpointRequest.class)
     @Order(SecurityConstants.ACTUATOR_SECURITY_ORDER)
     public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        protected final ApiHttpSecurityCustomizer apiHttpSecurityCustomizer;
+
+        public ActuatorWebSecurityConfigurationAdapter(ApiHttpSecurityCustomizer apiHttpSecurityCustomizer) {
+            this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
+        }
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -198,8 +289,16 @@ public class FlowableUiSecurityAutoConfiguration {
                     .requestMatcher(new ActuatorRequestMatcher())
                     .authorizeRequests()
                     .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
-                    .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
-                    .and().httpBasic();
+                    .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN);
+
+            apiHttpSecurityCustomizer.customize(http);
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "idm", matchIfMissing = true)
+    public ApiHttpSecurityCustomizer defaultApiHttpSecurityCustomizer() {
+        return new DefaultApiHttpSecurityCustomizer();
     }
 }

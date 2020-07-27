@@ -14,6 +14,7 @@ package org.flowable.ui.idm.conf;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
+import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
@@ -64,11 +65,13 @@ public class IdmSecurityConfiguration {
 
         protected final FlowableRestAppProperties restAppProperties;
         protected final FlowableIdmAppProperties idmAppProperties;
+        protected final ApiHttpSecurityCustomizer apiHttpSecurityCustomizer;
 
         public IdmApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
-            FlowableIdmAppProperties idmAppProperties) {
+                FlowableIdmAppProperties idmAppProperties, ApiHttpSecurityCustomizer apiHttpSecurityCustomizer) {
             this.restAppProperties = restAppProperties;
             this.idmAppProperties = idmAppProperties;
+            this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -83,11 +86,13 @@ public class IdmSecurityConfiguration {
             if (idmAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").authenticated().and().httpBasic();
+                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").authenticated();
                     
                 }
+
+                apiHttpSecurityCustomizer.customize(http);
                 
             } else {
                 http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").denyAll();
