@@ -68,7 +68,6 @@ public class UserTaskConverterTest extends AbstractConverterTest {
 
         assertThat(userTask.getCandidateUsers())
                 .containsOnly("kermit", "fozzie");
-        ;
         assertThat(userTask.getCandidateGroups())
                 .containsOnly("management", "sales");
 
