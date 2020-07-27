@@ -140,13 +140,7 @@ flowableApp
         $rootScope.logout = function () {
             $rootScope.authenticated = false;
             $rootScope.authenticationError = false;
-            $http.get(FLOWABLE.CONFIG.landingContextRoot + '/app/logout')
-                .success(function (data, status, headers, config) {
-                    $rootScope.login = null;
-                    $rootScope.authenticated = false;
-                    // Changing the href causes a reload, so no need to do a new reload again
-                    $window.location.href = FLOWABLE.CONFIG.landingContextRoot;
-                });
+            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/app/logout';
         };
 
         $http.get(FLOWABLE.CONFIG.landingContextRoot + '/app/rest/account')

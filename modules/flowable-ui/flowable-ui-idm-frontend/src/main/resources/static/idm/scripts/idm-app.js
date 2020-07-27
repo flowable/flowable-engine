@@ -315,7 +315,8 @@ flowableApp
         updateWindowSize();
 
         $rootScope.logout = function() {
-            AuthenticationSharedService.logout();
+            // Changing the href causes a reload, so no need to do a new reload again
+            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/app/logout';
         };
 
         // Call when the 401 response is returned by the client
