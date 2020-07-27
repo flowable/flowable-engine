@@ -35,6 +35,10 @@ public class UserRepresentation extends AbstractRepresentation {
 
     }
 
+    public UserRepresentation(String userId) {
+        setId(userId);
+    }
+
     public UserRepresentation(User user) {
         setId(user.getId());
         setFirstName(user.getFirstName());

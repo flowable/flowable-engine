@@ -14,6 +14,8 @@ package org.flowable.ui.task.rest.runtime;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -94,9 +96,13 @@ public class HistoricTaskQueryResource {
             for (HistoricTaskInstance task : tasks) {
                 representation = new TaskRepresentation(task);
 
-                CachedUser cachedUser = userCache.getUser(task.getAssignee());
-                if (cachedUser != null && cachedUser.getUser() != null) {
-                    representation.setAssignee(new UserRepresentation(cachedUser.getUser()));
+                if (StringUtils.isNotBlank(task.getAssignee())) {
+                    CachedUser cachedUser = userCache.getUser(task.getAssignee());
+                    if (cachedUser != null && cachedUser.getUser() != null) {
+                        representation.setAssignee(new UserRepresentation(cachedUser.getUser()));
+                    } else {
+                        representation.setAssignee(new UserRepresentation(task.getAssignee()));
+                    }
                 }
 
                 result.add(representation);

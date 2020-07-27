@@ -86,7 +86,7 @@
                     </div>
                     <div class="detail">
                         <span ng-if="task.assignee.id">
-                            {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                            {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee | username}}
                         </span>
                         <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
                         </span>

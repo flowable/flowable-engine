@@ -52,7 +52,7 @@
                         </div>
                         <div class="summary">
                              <span ng-if="processInstance.startedBy">
-                             	{{'PROCESS.MESSAGE.STARTED-BY' | translate}} {{processInstance.startedBy.firstName && processInstance.startedBy.firstName != 'null' ? processInstance.startedBy.firstName : ''}} {{processInstance.startedBy.lastName && processInstance.startedBy.lastName != 'null' ? processInstance.startedBy.lastName : ''}}
+                             	{{'PROCESS.MESSAGE.STARTED-BY' | translate}} {{processInstance.startedBy | username}}
                             </span>
                         </div>
                         <div class="detail">
