@@ -47,6 +47,8 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -83,8 +85,7 @@ public class FlowableUiSecurityAutoConfiguration {
     };
 
     private static final Customizer<LogoutConfigurer<HttpSecurity>> DEFAULT_LOGOUT = logout -> {
-        logout.logoutUrl("/app/logout")
-                .permitAll();
+        logout.logoutUrl("/app/logout");
     };
 
     private static final Customizer<HeadersConfigurer<HttpSecurity>> DEFAULT_HEADERS = headers -> {
@@ -181,7 +182,7 @@ public class FlowableUiSecurityAutoConfiguration {
                     .and()
                     .logout(logout -> {
                         DEFAULT_LOGOUT.customize(logout);
-                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                        logout.logoutSuccessUrl("/");
                         logout.addLogoutHandler(new ClearFlowableCookieLogoutHandler());
                     })
                     .csrf()
@@ -215,7 +216,10 @@ public class FlowableUiSecurityAutoConfiguration {
             http
                     .logout(logout -> {
                         DEFAULT_LOGOUT.customize(logout);
-                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                        OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
+                                getApplicationContext().getBean(ClientRegistrationRepository.class));
+                        logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+                        logout.logoutSuccessHandler(logoutSuccessHandler);
                     })
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
