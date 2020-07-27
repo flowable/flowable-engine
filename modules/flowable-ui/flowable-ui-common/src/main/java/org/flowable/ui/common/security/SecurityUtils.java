@@ -13,6 +13,7 @@
 package org.flowable.ui.common.security;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -57,9 +58,13 @@ public class SecurityUtils {
     public static SecurityScope getCurrentSecurityScope() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         if (securityContext != null && securityContext.getAuthentication() != null) {
-            return securityScopeProvider.getSecurityScope(securityContext.getAuthentication());
+            return getSecurityScope(securityContext.getAuthentication());
         }
         return null;
+    }
+
+    public static SecurityScope getSecurityScope(Authentication authentication) {
+        return securityScopeProvider.getSecurityScope(authentication);
     }
 
     public static SecurityScope getAuthenticatedSecurityScope() {

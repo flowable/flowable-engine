@@ -117,5 +117,20 @@
         "replacement": "flowable.common.app.cache-users.max-age"
       }
     }
+  ],
+  "hints": [
+    {
+      "name": "flowable.common.app.security.type",
+      "values": [
+        {
+          "value": "idm",
+          "description": "Use Flowable IDM app as security for the UI apps."
+        },
+        {
+          "value": "oauth2",
+          "description": "Use OAuth2 as security for the UI apps."
+        }
+      ]
+    }
   ]
 }

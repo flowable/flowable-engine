@@ -13,6 +13,7 @@
 package org.flowable.ui.task.conf;
 
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
+import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.task.properties.FlowableTaskAppProperties;
@@ -42,11 +43,13 @@ public class TaskSecurityConfiguration {
 
         protected final FlowableRestAppProperties restAppProperties;
         protected final FlowableTaskAppProperties taskAppProperties;
+        protected final ApiHttpSecurityCustomizer apiHttpSecurityCustomizer;
 
         public TaskApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
-            FlowableTaskAppProperties taskAppProperties) {
+                FlowableTaskAppProperties taskAppProperties, ApiHttpSecurityCustomizer apiHttpSecurityCustomizer) {
             this.restAppProperties = restAppProperties;
             this.taskAppProperties = taskAppProperties;
+            this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -58,11 +61,13 @@ public class TaskSecurityConfiguration {
             if (taskAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").authenticated().and().httpBasic();
+                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").authenticated();
                     
                 }
+
+                apiHttpSecurityCustomizer.customize(http);
                 
             } else {
                 http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").denyAll();
