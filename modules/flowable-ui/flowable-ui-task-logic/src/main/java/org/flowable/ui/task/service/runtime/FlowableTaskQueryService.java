@@ -386,6 +386,8 @@ public class FlowableTaskQueryService {
                     if (cachedUser != null && cachedUser.getUser() != null) {
                         User assignee = cachedUser.getUser();
                         taskRepresentation.setAssignee(new UserRepresentation(assignee));
+                    } else {
+                        taskRepresentation.setAssignee(new UserRepresentation(task.getAssignee()));
                     }
                 }
 

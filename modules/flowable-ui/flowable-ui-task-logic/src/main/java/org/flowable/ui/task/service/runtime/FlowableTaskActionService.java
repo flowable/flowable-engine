@@ -225,6 +225,8 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
             CachedUser cachedUser = userCache.getUser(task.getAssignee());
             if (cachedUser != null && cachedUser.getUser() != null) {
                 rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
+            } else {
+                rep.setAssignee(new UserRepresentation(task.getAssignee()));
             }
         }
     }
@@ -239,6 +241,8 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
                 CachedUser cachedUser = userCache.getUser(link.getUserId());
                 if (cachedUser != null && cachedUser.getUser() != null) {
                     result.add(new UserRepresentation(cachedUser.getUser()));
+                } else {
+                    result.add(new UserRepresentation(link.getUserId()));
                 }
             }
         }

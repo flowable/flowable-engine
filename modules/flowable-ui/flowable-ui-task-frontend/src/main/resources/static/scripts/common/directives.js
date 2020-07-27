@@ -263,7 +263,7 @@ flowableModule
 flowableModule
     .directive('userName', function() {
         var directive = {};
-        directive.template = '{{user.firstName && user.firstName != "null" ? user.firstName : ""}} {{user.lastName && user.lastName != "null" ? user.lastName : ""}} {{ (user.email && !user.firstName && !user.lastName) && user.email || ""}}';
+        directive.template = '{{user | username}}';
         directive.scope = {
             user: "=userName"
         };

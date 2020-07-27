@@ -52,7 +52,7 @@
                         </div>
                         <div class="summary">
                              <span ng-if="caseInstance.startedBy">
-                             	{{'CASE.MESSAGE.STARTED-BY' | translate}} {{caseInstance.startedBy.firstName && caseInstance.startedBy.firstName != 'null' ? caseInstance.startedBy.firstName : ''}} {{caseInstance.startedBy.lastName && caseInstance.startedBy.lastName != 'null' ? caseInstance.startedBy.lastName : ''}}
+                             	{{'CASE.MESSAGE.STARTED-BY' | translate}} {{caseInstance.startedBy | username}}
                             </span>
                         </div>
                         <div class="detail">
