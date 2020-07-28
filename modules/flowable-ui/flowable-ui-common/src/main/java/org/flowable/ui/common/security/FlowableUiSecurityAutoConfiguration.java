@@ -12,6 +12,9 @@
  */
 package org.flowable.ui.common.security;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
@@ -37,7 +40,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAu
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -47,12 +49,12 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
@@ -204,10 +206,15 @@ public class FlowableUiSecurityAutoConfiguration {
     @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "oauth2")
     public static class OAuthWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-        protected final FlowableCommonAppProperties commonAppProperties;
+        private static final Pattern PASSWORD_ALGORITHM_PATTERN = Pattern.compile("^\\{.+}.*$");
 
-        public OAuthWebSecurityConfigurerAdapter(FlowableCommonAppProperties commonAppProperties) {
+        protected final FlowableCommonAppProperties commonAppProperties;
+        protected final ObjectProvider<PasswordEncoder> passwordEncoder;
+
+        public OAuthWebSecurityConfigurerAdapter(FlowableCommonAppProperties commonAppProperties,
+                ObjectProvider<PasswordEncoder> passwordEncoder) {
             this.commonAppProperties = commonAppProperties;
+            this.passwordEncoder = passwordEncoder;
         }
 
         @Override
@@ -241,27 +248,52 @@ public class FlowableUiSecurityAutoConfiguration {
         @Bean
         @ConditionalOnClass(Jwt.class)
         @ConditionalOnMissingBean
-        public ApiHttpSecurityCustomizer jwtApiHttpSecurityCustomizer() {
+        public ApiHttpSecurityCustomizer delegatingApiHttpSecurityCustomizer() {
             JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
             FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
             String authoritiesAttribute = oAuth2.getAuthoritiesAttribute();
             String groupsAttribute = oAuth2.getGroupsAttribute();
             converter.setJwtGrantedAuthoritiesConverter(new FlowableJwtGrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute));
 
-            return new JwtApiHttpSecurityCustomizer(converter);
+            JwtApiHttpSecurityCustomizer jwtApiHttpSecurityCustomizer = new JwtApiHttpSecurityCustomizer(converter);
+
+            String username = commonAppProperties.getIdmAdmin().getUser();
+            String password = commonAppProperties.getIdmAdmin().getPassword();
+            FixUserApiHttpSecurityCustomizer fixUserApiHttpSecurityCustomizer = new FixUserApiHttpSecurityCustomizer(username, deducePassword(password));
+            return new DelegatingApiHttpSecurityCustomizer(
+                    Arrays.asList(
+                            fixUserApiHttpSecurityCustomizer,
+                            jwtApiHttpSecurityCustomizer
+                    )
+            );
         }
 
         @Bean
         @ConditionalOnMissingClass("org.springframework.security.oauth2.jwt.Jwt")
         @ConditionalOnMissingBean
-        public ApiHttpSecurityCustomizer defaultApiHttpSecurityCustomizer() {
-            return new DefaultApiHttpSecurityCustomizer();
+        public ApiHttpSecurityCustomizer fixUserApiHttpSecurityCustomizer() {
+            String username = commonAppProperties.getIdmAdmin().getUser();
+            String password = commonAppProperties.getIdmAdmin().getPassword();
+            return new FixUserApiHttpSecurityCustomizer(username, deducePassword(password));
         }
 
         @Bean
         @ConditionalOnMissingBean(name = "oauth2CurrentUserProvider")
         public CurrentUserProvider oauth2CurrentUserProvider() {
             return new OAuth2CurrentUserProvider();
+        }
+
+        protected String deducePassword(String password) {
+            PasswordEncoder passwordEncoder = this.passwordEncoder.getIfAvailable();
+            if (PASSWORD_ALGORITHM_PATTERN.matcher(password).matches()) {
+                return password;
+            }
+
+            if (passwordEncoder != null) {
+                return passwordEncoder.encode(password);
+            }
+
+            return password;
         }
     }
 
