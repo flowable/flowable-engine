@@ -19,7 +19,7 @@ public class EventSubscriptionsBySubScopeIdMatcher extends CachedEntityMatcherAd
 
     @Override
     public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-        return eventSubscriptionEntity.getSubScopeId() != null && eventSubscriptionEntity.getSubScopeId().equals((String) parameter);
+        return eventSubscriptionEntity.getSubScopeId() != null && eventSubscriptionEntity.getSubScopeId().equals(parameter);
     }
 
 }

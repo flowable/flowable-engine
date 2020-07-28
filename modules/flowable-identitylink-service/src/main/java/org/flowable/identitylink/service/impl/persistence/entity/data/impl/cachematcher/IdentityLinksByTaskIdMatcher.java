@@ -22,7 +22,7 @@ public class IdentityLinksByTaskIdMatcher extends CachedEntityMatcherAdapter<Ide
 
     @Override
     public boolean isRetained(IdentityLinkEntity entity, Object parameter) {
-        return entity.getTaskId() != null && entity.getTaskId().equals((String) parameter);
+        return entity.getTaskId() != null && entity.getTaskId().equals(parameter);
     }
 
 }

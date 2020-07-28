@@ -23,7 +23,7 @@ public class HistoricVariableInstanceByTaskIdMatcher extends CachedEntityMatcher
     @Override
     public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
         return historicVariableInstanceEntity.getTaskId() != null
-                && historicVariableInstanceEntity.getTaskId().equals((String) parameter);
+                && historicVariableInstanceEntity.getTaskId().equals(parameter);
     }
 
 }

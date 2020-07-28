@@ -23,7 +23,7 @@ public class VariableInstanceByExecutionIdMatcher extends CachedEntityMatcherAda
     @Override
     public boolean isRetained(VariableInstanceEntity variableInstanceEntity, Object parameter) {
         return variableInstanceEntity.getExecutionId() != null
-                && variableInstanceEntity.getExecutionId().equals((String) parameter);
+                && variableInstanceEntity.getExecutionId().equals(parameter);
     }
 
 }
