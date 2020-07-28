@@ -149,6 +149,10 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
+        // Need to be set before planning the complete operation
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
+        handleOutParameters(planItemInstance, caseInstance, cmmnEngineConfiguration.getProcessInstanceService());
 
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
@@ -161,13 +165,6 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             // The process task plan item will be deleted by the regular TerminatePlanItemOperation
             if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
                 deleteProcessInstance(commandContext, planItemInstance);
-
-            } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-
-                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-
-                CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
-                handleOutParameters(planItemInstance, caseInstance, cmmnEngineConfiguration.getProcessInstanceService());
 
             }
         }

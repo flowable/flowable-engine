@@ -168,6 +168,16 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
+        // Need to be set before planning the complete operation
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
+        handleOutParameters(
+            planItemInstance,
+            caseInstance,
+            cmmnEngineConfiguration.getCmmnRuntimeService(),
+            cmmnEngineConfiguration);
+
         // Triggering the plan item (as opposed to a regular complete) terminates the case instance
         CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
@@ -180,17 +190,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                 // The plan item will be deleted by the regular TerminatePlanItemOperation
                 CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
 
-            } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-                CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-                CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-                handleOutParameters(
-                    planItemInstance,
-                    caseInstance,
-                    cmmnEngineConfiguration.getCmmnRuntimeService(),
-                    cmmnEngineConfiguration);
             }
-
         }
     }
 
