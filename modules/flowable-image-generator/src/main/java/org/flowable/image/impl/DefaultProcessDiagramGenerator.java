@@ -550,19 +550,19 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(),drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.emptyList(),drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
             String labelFontName, String annotationFontName, ClassLoader customClassLoader,boolean drawSequenceFlowNameWithNoLabelDI) {
 
-        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
+        return generateDiagram(bpmnModel, imageType, Collections.emptyList(), Collections.emptyList(),
                 activityFontName, labelFontName, annotationFontName, customClassLoader, 1.0,drawSequenceFlowNameWithNoLabelDI);
     }
 
@@ -570,7 +570,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
             String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
 
-        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
+        return generateDiagram(bpmnModel, imageType, Collections.emptyList(), Collections.emptyList(),
                 activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
@@ -581,7 +581,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, "png", Collections.emptyList(), Collections.emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
@@ -591,7 +591,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, "jpg", Collections.<String>emptyList(), Collections.<String>emptyList(),drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, "jpg", Collections.emptyList(), Collections.emptyList(),drawSequenceFlowNameWithNoLabelDI);
     }
 
     public BufferedImage generateImage(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,
@@ -609,7 +609,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor) {
-        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,false);
+        return generateImage(bpmnModel, "png", Collections.emptyList(), Collections.emptyList(), scaleFactor,false);
     }
 
     protected DefaultProcessDiagramCanvas generateProcessDiagram(BpmnModel bpmnModel, String imageType,

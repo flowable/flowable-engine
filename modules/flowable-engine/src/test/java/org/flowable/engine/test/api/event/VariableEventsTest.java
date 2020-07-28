@@ -186,7 +186,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testProcessInstanceVariableEventsOnCallActivity() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callVariableProcess",
-                Collections.<String, Object>singletonMap("parentVar1", "parentVar1Value"));
+                Collections.singletonMap("parentVar1", "parentVar1Value"));
         assertThat(processInstance).isNotNull();
 
         assertThat(listener.getEventsReceived()).hasSize(6);

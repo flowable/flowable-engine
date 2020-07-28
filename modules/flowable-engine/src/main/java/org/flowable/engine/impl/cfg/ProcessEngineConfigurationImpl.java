@@ -1132,7 +1132,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
-        return Collections.<CommandInterceptor>singletonList(new BpmnOverrideContextInterceptor());
+        return Collections.singletonList(new BpmnOverrideContextInterceptor());
     }
     // services
     // /////////////////////////////////////////////////////////////////

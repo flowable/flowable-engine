@@ -1402,9 +1402,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initDefaultCaseInstanceCallbacks() {
         this.caseInstanceStateChangeCallbacks.put(CallbackTypes.PLAN_ITEM_CHILD_CASE,
-                Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
+                Collections.singletonList(new ChildCaseInstanceStateChangeCallback()));
         this.caseInstanceStateChangeCallbacks.put(CallbackTypes.EXECUTION_CHILD_CASE,
-                Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildBpmnCaseInstanceStateChangeCallback()));
+                Collections.singletonList(new ChildBpmnCaseInstanceStateChangeCallback()));
     }
 
     protected void initScriptingEngines() {

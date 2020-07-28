@@ -662,7 +662,7 @@ public class ExecutionEntityManagerImpl
 
     protected List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity, Collection<String> executionIdsToExclude) {
         List<ExecutionEntity> childExecutions = new ArrayList<>();
-        collectChildren(executionEntity, childExecutions, executionIdsToExclude != null ? executionIdsToExclude : Collections.<String>emptyList());
+        collectChildren(executionEntity, childExecutions, executionIdsToExclude != null ? executionIdsToExclude : Collections.emptyList());
         return childExecutions;
     }
 
