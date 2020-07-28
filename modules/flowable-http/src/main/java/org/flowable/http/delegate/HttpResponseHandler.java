@@ -21,7 +21,13 @@ import org.flowable.http.HttpResponse;
 /**
  * @author Tijs Rademakers
  */
-public interface HttpResponseHandler extends Serializable {
+@Deprecated
+public interface HttpResponseHandler extends Serializable, org.flowable.http.common.api.delegate.HttpResponseHandler {
+
+    @Override
+    default void handleHttpResponse(VariableContainer execution, org.flowable.http.common.api.HttpResponse httpResponse) {
+        handleHttpResponse(execution, HttpResponse.fromApiHttpResponse(httpResponse));
+    }
 
     void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse);
 }

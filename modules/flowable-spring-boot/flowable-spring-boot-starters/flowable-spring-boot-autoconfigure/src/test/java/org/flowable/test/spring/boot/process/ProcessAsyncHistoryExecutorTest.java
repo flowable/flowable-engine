@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -64,8 +65,8 @@ public class ProcessAsyncHistoryExecutorTest {
 
             TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
 
-            assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
-            assertThat(((SpringAsyncExecutor) processAsyncHistoryExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
+            assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor()).isSameAs(taskExecutorBean);
+            assertThat(getSpringAsyncTaskExecutor(processAsyncHistoryExecutor).getAsyncTaskExecutor()).isSameAs(taskExecutorBean);
 
             assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncExecutorActivate()).isTrue();
             assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncHistoryExecutorActivate()).isTrue();
@@ -95,7 +96,7 @@ public class ProcessAsyncHistoryExecutorTest {
 
                 TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
 
-                assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
+                assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor()).isSameAs(taskExecutorBean);
 
                 assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncExecutorActivate()).isTrue();
                 assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncHistoryExecutorActivate()).isTrue();
@@ -121,6 +122,10 @@ public class ProcessAsyncHistoryExecutorTest {
                     .isFalse();
 
             }));
+    }
+
+    protected SpringAsyncTaskExecutor getSpringAsyncTaskExecutor(AsyncExecutor asyncExecutor) {
+        return (SpringAsyncTaskExecutor) asyncExecutor.getTaskExecutor();
     }
 
 }

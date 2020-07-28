@@ -133,6 +133,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             convertSendEventServiceTaskXMLProperties((SendEventServiceTask) serviceTask, model, xtr);
         } else if (serviceTask instanceof ExternalWorkerServiceTask) {
             convertExternalWorkerTaskXMLProperties((ExternalWorkerServiceTask) serviceTask, model, xtr);
+        } else if (serviceTask instanceof HttpServiceTask) {
+            convertHttpServiceTaskXMLProperties((HttpServiceTask) serviceTask, model, xtr);
         } else {
             parseChildElements(getXMLElementName(), serviceTask, model, xtr);
         }
@@ -151,6 +153,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else if (element instanceof ExternalWorkerServiceTask) {
             writeExternalTaskAdditionalAttributes((ExternalWorkerServiceTask) element, model, xtw);
+        } else if (element instanceof HttpServiceTask) {
+            writeHttpServiceTaskAdditionalAttributes((HttpServiceTask) element, model, xtw);
         } else {
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
 
@@ -212,6 +216,16 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(externalWorkerTask.getSkipExpression())) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, externalWorkerTask.getSkipExpression(), xtw);
         }
+    }
+
+
+    protected void writeHttpServiceTaskAdditionalAttributes(HttpServiceTask httpServiceTask, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+
+        if (httpServiceTask.getParallelInSameTransaction() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION, httpServiceTask.getParallelInSameTransaction().toString(), xtw);
+        }
+
+        writeServiceTaskAdditionalAttributes(httpServiceTask, xtw);
     }
 
     protected void writeServiceTaskAdditionalAttributes(ServiceTask element, XMLStreamWriter xtw) throws Exception {
@@ -389,6 +403,16 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         externalWorkerServiceTask.setTopic(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, xtr));
 
         parseChildElements(getXMLElementName(), externalWorkerServiceTask, bpmnModel, xtr);
+    }
+
+    protected void convertHttpServiceTaskXMLProperties(HttpServiceTask httpServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
+        String parallelInSameTransaction = BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION, xtr);
+
+        if (StringUtils.isNotEmpty(parallelInSameTransaction)) {
+            httpServiceTask.setParallelInSameTransaction(Boolean.parseBoolean(parallelInSameTransaction));
+        }
+
+        parseChildElements(getXMLElementName(), httpServiceTask, bpmnModel, xtr);
     }
     
     protected boolean writeCustomProperties(ServiceTask serviceTask, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {

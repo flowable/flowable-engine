@@ -179,6 +179,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
+    String PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION = "httptaskparallelinsametransaction";
 
     String PROPERTY_MAILTASK_HEADERS = "mailtaskheaders";
     String PROPERTY_MAILTASK_TO = "mailtaskto";

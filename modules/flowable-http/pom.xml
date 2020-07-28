@@ -109,6 +109,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-http-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
@@ -119,12 +123,12 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-engine</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
          <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

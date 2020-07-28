@@ -98,6 +98,11 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             }
 
         } else {
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing operation {}", runnable.getClass());
+            }
+
             runnable.run();
         }
     }

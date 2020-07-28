@@ -668,6 +668,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-http-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-crystalball</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -1120,7 +1125,8 @@
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>
 		<module>modules/flowable-spring-security</module>
-	</modules>
+        <module>modules/flowable-http-common</module>
+    </modules>
 
 	<build>
 		<plugins>
@@ -1380,6 +1386,7 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
+				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-cdi</module>
@@ -1493,6 +1500,7 @@
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
                 <module>modules/flowable-http</module>
+                <module>modules/flowable-http-common</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui</module>
@@ -1631,6 +1639,7 @@
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
+				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-ldap</module>

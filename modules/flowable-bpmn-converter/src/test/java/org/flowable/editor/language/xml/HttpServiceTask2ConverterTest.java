@@ -47,6 +47,7 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
                 .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
                     assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
                     assertThat(httpServiceTask.getName()).isEqualTo("Service task");
+                    assertThat(httpServiceTask.getParallelInSameTransaction()).isNull();
                     assertThat(httpServiceTask.getFieldExtensions()).isEmpty();
                     assertThat(httpServiceTask.getHttpRequestHandler())
                             .extracting(FlowableHttpRequestHandler::getImplementationType, FlowableHttpRequestHandler::getImplementation)

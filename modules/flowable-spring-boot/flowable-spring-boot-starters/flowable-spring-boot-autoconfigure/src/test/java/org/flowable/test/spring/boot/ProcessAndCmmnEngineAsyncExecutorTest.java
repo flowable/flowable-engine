@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.persistence.EntityManagerFactory;
 
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -38,6 +39,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 /**
@@ -82,10 +85,10 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
             TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
 
-            assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor())
+            assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor())
                 .as("Process Async Task Executor")
                 .isSameAs(taskExecutorBean);
-            assertThat(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor())
+            assertThat(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor())
                 .as("Cmmn Async Task Executor")
                 .isSameAs(taskExecutorBean);
         }));
@@ -105,12 +108,12 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
                 TaskExecutor cmmnTaskExecutorBean = context.getBean("cmmnTaskExecutor", TaskExecutor.class);
                 TaskExecutor processTaskExecutorBean = context.getBean("processTaskExecutor", TaskExecutor.class);
 
-                assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor())
                     .as("Process Async Task Executor")
                     .isSameAs(processTaskExecutorBean)
-                    .isNotSameAs(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor());
+                    .isNotSameAs(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor());
 
-                assertThat(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor())
                     .as("Cmmn Async Task Executor")
                     .isSameAs(cmmnTaskExecutorBean);
             }));
@@ -133,14 +136,14 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
                 TaskExecutor cmmnTaskExecutorBean = context.getBean("cmmnTaskExecutor", TaskExecutor.class);
                 TaskExecutor processTaskExecutorBean = context.getBean("processTaskExecutor", TaskExecutor.class);
 
-                assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor())
                     .as("Process Async Task Executor")
                     .isSameAs(processTaskExecutorBean)
-                    .isNotSameAs(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor())
+                    .isNotSameAs(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor())
                     .as("Process Async Task Executor with primary")
                     .isNotSameAs(primaryTaskExecutorBean);
 
-                assertThat(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor())
                     .as("Cmmn Async Task Executor")
                     .isSameAs(cmmnTaskExecutorBean)
                     .as("Cmmn Async Task Executor with primary")
@@ -160,17 +163,17 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
                     .hasBean("primaryTaskExecutor")
                     .hasBean("processTaskExecutor");
 
-                TaskExecutor prmiaryTaskExecutorBean = context.getBean("primaryTaskExecutor", TaskExecutor.class);
+                TaskExecutor primaryTaskExecutorBean = context.getBean("primaryTaskExecutor", TaskExecutor.class);
                 TaskExecutor processTaskExecutorBean = context.getBean("processTaskExecutor", TaskExecutor.class);
 
-                assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(processAsyncExecutor).getAsyncTaskExecutor())
                     .as("Process Async Task Executor")
                     .isSameAs(processTaskExecutorBean)
-                    .isNotSameAs(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor());
+                    .isNotSameAs(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor());
 
-                assertThat(((SpringAsyncExecutor) cmmnAsyncExecutor).getTaskExecutor())
+                assertThat(getSpringAsyncTaskExecutor(cmmnAsyncExecutor).getAsyncTaskExecutor())
                     .as("Cmmn Async Task Executor")
-                    .isSameAs(prmiaryTaskExecutorBean);
+                    .isSameAs(primaryTaskExecutorBean);
             }));
     }
 
@@ -226,6 +229,10 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
             }));
     }
 
+    protected SpringAsyncTaskExecutor getSpringAsyncTaskExecutor(AsyncExecutor asyncExecutor) {
+        return (SpringAsyncTaskExecutor) asyncExecutor.getTaskExecutor();
+    }
+
     @Import({ CmmnTaskExecutorConfiguration.class, ProcessTaskExecutorConfiguration.class })
     @Configuration(proxyBeanMethods = false)
     static class DedicatedTaskExecutorsConfiguration {
@@ -237,9 +244,8 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Cmmn
         @Bean
-        public TaskExecutor cmmnTaskExecutor() {
-            return task -> {
-            };
+        public AsyncListenableTaskExecutor cmmnTaskExecutor() {
+            return new SimpleAsyncTaskExecutor();
         }
     }
 
@@ -248,9 +254,8 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Process
         @Bean
-        public TaskExecutor processTaskExecutor() {
-            return task -> {
-            };
+        public AsyncListenableTaskExecutor processTaskExecutor() {
+            return new SimpleAsyncTaskExecutor();
         }
     }
 
@@ -259,9 +264,8 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Primary
         @Bean
-        public TaskExecutor primaryTaskExecutor() {
-            return task -> {
-            };
+        public AsyncListenableTaskExecutor primaryTaskExecutor() {
+            return new SimpleAsyncTaskExecutor();
         }
     }
 

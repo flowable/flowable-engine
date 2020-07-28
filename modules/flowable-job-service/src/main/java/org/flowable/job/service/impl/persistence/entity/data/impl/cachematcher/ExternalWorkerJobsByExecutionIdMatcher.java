@@ -22,7 +22,7 @@ public class ExternalWorkerJobsByExecutionIdMatcher extends CachedEntityMatcherA
 
     @Override
     public boolean isRetained(ExternalWorkerJobEntity jobEntity, Object parameter) {
-        return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals((String) parameter);
+        return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals(parameter);
     }
 
 }

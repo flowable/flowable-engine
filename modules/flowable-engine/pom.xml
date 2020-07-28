@@ -103,6 +103,10 @@
             <artifactId>flowable-content-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-http-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
         </dependency>
@@ -255,6 +259,11 @@
         <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit-assertj</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
 

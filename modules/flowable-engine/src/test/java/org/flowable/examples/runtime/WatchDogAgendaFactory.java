@@ -12,6 +12,9 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
@@ -47,8 +50,8 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public Runnable peekOperation() {
-            return agenda.peekOperation();
+        public <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction) {
+            agenda.planFutureOperation(future, completeAction);
         }
 
         @Override

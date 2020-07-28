@@ -64,6 +64,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
 import org.slf4j.Logger;
@@ -1361,6 +1363,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         persistentState.put("suspensionState", this.suspensionState);
         persistentState.put("cachedEntityState", this.cachedEntityState);
         return persistentState;
+    }
+
+    @Override
+    public ReadOnlyDelegateExecution snapshotReadOnly() {
+        return new ReadOnlyDelegateExecutionImpl(this);
     }
 
     // The current flow element, will be filled during operation execution
