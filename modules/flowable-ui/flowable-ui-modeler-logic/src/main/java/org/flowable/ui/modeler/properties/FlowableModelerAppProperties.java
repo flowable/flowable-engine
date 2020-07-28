@@ -28,12 +28,6 @@ public class FlowableModelerAppProperties {
     private boolean restEnabled = true;
 
     /**
-     * The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
-     * Default url for the Flowable Task application is http://localhost:8080/flowable-task/app-api
-     */
-    private String deploymentApiUrl = "http://localhost:8080/flowable-task/app-api";
-
-    /**
      * The prefix for the database tables.
      */
     private String dataSourcePrefix = "";
@@ -49,14 +43,6 @@ public class FlowableModelerAppProperties {
 
     public void setRestEnabled(boolean restEnabled) {
         this.restEnabled = restEnabled;
-    }
-
-    public String getDeploymentApiUrl() {
-        return deploymentApiUrl;
-    }
-
-    public void setDeploymentApiUrl(String deploymentApiUrl) {
-        this.deploymentApiUrl = deploymentApiUrl;
     }
 
     public String getDataSourcePrefix() {

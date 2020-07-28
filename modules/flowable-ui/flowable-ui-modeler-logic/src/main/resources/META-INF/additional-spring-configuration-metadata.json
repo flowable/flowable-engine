@@ -14,8 +14,7 @@
       "type": "java.lang.String",
       "deprecation": {
         "level": "error",
-        "reason": "Using Modeler App Auto configuration.",
-        "replacement": "flowable.modeler.app.deployment-api-url"
+        "reason": "Property is not used anymore."
       }
     },
     {
@@ -26,6 +25,15 @@
         "reason": "Using Modeler App Auto Configuration properties.",
         "replacement": "flowable.modeler.app.data-source-prefix"
       }
+    },
+    {
+      "name": "flowable.modeler.app.deployment-api-url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Property is not used anymore."
+      }
     }
+
   ]
 }
