@@ -1406,7 +1406,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         for (int i = 0; i < details.size(); i++) {
             if (i != 3) {
                 assertThat(((HistoricVariableUpdate) details.get(i)).getValue()).isNotNull();
-            } else if (i == 3) {
+            } else {
                 assertThat(((HistoricVariableUpdate) details.get(i)).getValue()).isNull();
             }
         }

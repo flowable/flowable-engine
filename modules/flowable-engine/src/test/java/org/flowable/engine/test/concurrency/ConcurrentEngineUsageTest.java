@@ -147,11 +147,9 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                     retryStartProcess(drivingUser);
                     finishTask = true;
 
-                    if (numberOfProcesses == 0) {
-                        // Make sure while-loop doesn't stop when processes are
-                        // all started
-                        tasksAvailable = taskService.createTaskQuery().taskAssignee(drivingUser).count() > 0;
-                    }
+                    // Make sure while-loop doesn't stop when processes are all started
+                    tasksAvailable = taskService.createTaskQuery().taskAssignee(drivingUser).count() > 0;
+
                     numberOfProcesses = numberOfProcesses - 1;
                 } else {
                     // Finish a task

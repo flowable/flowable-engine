@@ -131,7 +131,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
                         }
                     }
 
-                    if (errors == null || errors.isEmpty()) {
+                    if (errors.isEmpty()) {
                         assertDatabaseEmpty(method);
                     }
 
