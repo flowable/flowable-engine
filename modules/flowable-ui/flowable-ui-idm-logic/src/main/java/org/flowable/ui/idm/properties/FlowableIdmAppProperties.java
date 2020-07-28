@@ -45,6 +45,12 @@ public class FlowableIdmAppProperties {
     @NestedConfigurationProperty
     private final Security security = new Security();
 
+    /**
+     * The IDM app keycloak configuration
+     */
+    @NestedConfigurationProperty
+    private final Keycloak keycloak = new Keycloak();
+
     public boolean isRestEnabled() {
         return restEnabled;
     }
@@ -67,6 +73,10 @@ public class FlowableIdmAppProperties {
 
     public Security getSecurity() {
         return security;
+    }
+
+    public Keycloak getKeycloak() {
+        return keycloak;
     }
 
     public static class Admin {
@@ -222,6 +232,87 @@ public class FlowableIdmAppProperties {
 
         public void setRefreshAge(int refreshAge) {
             this.refreshAge = refreshAge;
+        }
+    }
+
+    public static class Keycloak {
+
+        /**
+         * Whether the keyloak idm service should be enabled
+         */
+        private boolean enabled = false;
+
+        /**
+         * The keycloak server location.
+         */
+        private String server;
+
+        /**
+         * The realm for the authentication.
+         */
+        private String authenticationRealm = "master";
+
+        /**
+         * The username for the authentication.
+         */
+        private String authenticationUser = "admin";
+
+        /**
+         * The password for the authentication.
+         */
+        private String authenticationPassword;
+
+        /**
+         * The realm where the users / groups are located.
+         */
+        private String realm;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getServer() {
+            return server;
+        }
+
+        public void setServer(String server) {
+            this.server = server;
+        }
+
+        public String getAuthenticationRealm() {
+            return authenticationRealm;
+        }
+
+        public void setAuthenticationRealm(String authenticationRealm) {
+            this.authenticationRealm = authenticationRealm;
+        }
+
+        public String getAuthenticationUser() {
+            return authenticationUser;
+        }
+
+        public void setAuthenticationUser(String authenticationUser) {
+            this.authenticationUser = authenticationUser;
+        }
+
+        public String getAuthenticationPassword() {
+            return authenticationPassword;
+        }
+
+        public void setAuthenticationPassword(String authenticationPassword) {
+            this.authenticationPassword = authenticationPassword;
+        }
+
+        public String getRealm() {
+            return realm;
+        }
+
+        public void setRealm(String realm) {
+            this.realm = realm;
         }
     }
 }
