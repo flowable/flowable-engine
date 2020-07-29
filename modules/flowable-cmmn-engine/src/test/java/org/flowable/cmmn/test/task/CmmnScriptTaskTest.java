@@ -121,7 +121,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                         HistoricVariableInstance::getVariableTypeName,
                         HistoricVariableInstance::getValue)
                 .containsExactly("aInt", "integer", 5);
-        ;
 
         HistoricVariableInstance planItemScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() != null).findFirst().get();
         assertThat(planItemScopeVariable)
