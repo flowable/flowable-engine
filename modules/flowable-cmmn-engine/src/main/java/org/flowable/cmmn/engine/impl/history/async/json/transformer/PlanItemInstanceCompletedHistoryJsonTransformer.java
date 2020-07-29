@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * @author Joram Barrez
+ * @deprecated
  */
 @Deprecated
 public class PlanItemInstanceCompletedHistoryJsonTransformer extends AbstractNeedsHistoricPlanItemInstanceHistoryJsonTransformer {

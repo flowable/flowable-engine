@@ -18,6 +18,8 @@ import org.flowable.http.common.api.HttpHeaders;
 
 /**
  * @author Harsha Teja Kanna.
+ *
+ * @deprecated
  */
 @Deprecated
 public class HttpRequest extends org.flowable.http.common.api.HttpRequest {

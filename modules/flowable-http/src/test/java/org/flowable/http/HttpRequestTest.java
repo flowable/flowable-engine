@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
+ *
+ * @deprecated
  */
 @Deprecated
 class HttpRequestTest {

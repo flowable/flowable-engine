@@ -56,7 +56,7 @@ public abstract class AbstractPaginateList<RES, REQ> {
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
      * @param properties
      *
-     * @deprecated user {@link PaginateListUtil#paginateList(Map, Query, String, Map, ListProcessor)} instead
+     * @deprecated use {@link PaginateListUtil#paginateList(Map, Query, String, Map, ListProcessor)} instead
      */
     @Deprecated
     public DataResponse<RES> paginateList(Map<String, String> requestParams, Query<?, REQ> query, String defaultSort, Map<String, QueryProperty> properties) {

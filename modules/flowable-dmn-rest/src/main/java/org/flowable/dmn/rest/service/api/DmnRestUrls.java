@@ -38,7 +38,7 @@ public final class DmnRestUrls {
     /**
      * URL template for a decision table collection: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
      *
-     * @deprecated use {@link URL_DECISION_COLLECTION} instead.
+     * @deprecated use {@link #URL_DECISION_COLLECTION} instead.
      */
     @Deprecated
     public static final String[] URL_DECISION_TABLE_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE };
@@ -46,7 +46,7 @@ public final class DmnRestUrls {
     /**
      * URL template for a single decision table: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
      *
-     * @deprecated use {@link URL_DECISION} instead.
+     * @deprecated use {@link #URL_DECISION} instead.
      */
     @Deprecated
     public static final String[] URL_DECISION_TABLE = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}" };
@@ -54,7 +54,7 @@ public final class DmnRestUrls {
     /**
      * URL template for a single decision table model: <i>/dmn-repository/decision-tables/{0:decisionTableId}/model</i>
      *
-     * @deprecated use {@link URL_DECISION_MODEL} instead.
+     * @deprecated use {@link #URL_DECISION_MODEL} instead.
      */
     @Deprecated
     public static final String[] URL_DECISION_TABLE_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}", SEGMENT_DECISION_MODEL };
@@ -62,7 +62,7 @@ public final class DmnRestUrls {
     /**
      * URL template for the resource of a single decision table: <i>/dmn-repository/decision-tables/{0:decisionId}/resourcedata</i>
      *
-     * @deprecated use {@link URL_DECISION_RESOURCE_CONTENT} instead.
+     * @deprecated use {@link #URL_DECISION_RESOURCE_CONTENT} instead.
      */
     @Deprecated
     public static final String[] URL_DECISION_TABLE_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT };
