@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.ByteArrayOutputStream;

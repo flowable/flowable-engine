@@ -14,6 +14,7 @@ package org.flowable.engine.test.regression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.List;
 

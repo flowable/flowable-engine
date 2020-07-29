@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,7 +100,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
                 return;
             }
         }
-        fail();
+        fail("checkVariable() failed");
     }
 
     @Test

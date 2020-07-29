@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -211,7 +212,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
                 return;
             }
         }
-        fail();
+        fail("checkVariable failed");
     }
 
     @Test
