@@ -184,11 +184,9 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
         }
-        PreparedStatement statement = null;
-        try {
-            
-            statement = getDbSqlSession().getSqlSession().getConnection()
-                    .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?");
+        try (PreparedStatement statement = getDbSqlSession().getSqlSession().getConnection()
+                .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?")) {
+
             statement.setString(1, propertyName);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -199,13 +197,6 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         } catch (SQLException e) {
             logger.error("Could not get property from table {}", tableName, e);
             return null;
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                }
-            }
         }
     }
     
