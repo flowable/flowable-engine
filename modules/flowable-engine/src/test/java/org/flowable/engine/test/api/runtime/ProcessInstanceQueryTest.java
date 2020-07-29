@@ -144,7 +144,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.<String>emptySet()))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.emptySet()))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
@@ -342,7 +342,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(Collections.<String>emptySet()))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(Collections.emptySet()))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
