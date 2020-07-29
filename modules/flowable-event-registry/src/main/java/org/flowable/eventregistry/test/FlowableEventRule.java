@@ -54,13 +54,7 @@ import org.junit.runners.model.Statement;
  * You can declare a deployment with the {@link EventDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
  * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
  * </p>
- * 
- * <p>
- * The FlowableRule also lets you {@link FlowableEventRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine
- * in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
- * time rather then the time that was set during a test method.
- * </p>
- * 
+ *
  * @author Tijs Rademakers
  */
 public class FlowableEventRule implements TestRule {
