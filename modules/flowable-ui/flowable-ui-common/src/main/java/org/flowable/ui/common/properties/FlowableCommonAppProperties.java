@@ -14,6 +14,7 @@ package org.flowable.ui.common.properties;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -308,6 +309,36 @@ public class FlowableCommonAppProperties {
          */
         private String groupsAttribute;
 
+        /**
+         * The default authorities that should be added to every user.
+         */
+        private Collection<String> defaultAuthorities;
+
+        /**
+         * The default groups that should be added to every user.
+         */
+        private Collection<String> defaultGroups;
+
+        /**
+         * The key of the attribute that holds the first name of the user.
+         */
+        private String firstNameAttribute;
+
+        /**
+         * The key of the attribute that holds the last name of the user.
+         */
+        private String lastNameAttribute;
+
+        /**
+         * The key of the attribute that holds the full of the user.
+         */
+        private String fullNameAttribute;
+
+        /**
+         * The key of the attribute that holds the email of the user.
+         */
+        private String emailAttribute;
+
         public String getAuthoritiesAttribute() {
             return authoritiesAttribute;
         }
@@ -322,6 +353,54 @@ public class FlowableCommonAppProperties {
 
         public void setGroupsAttribute(String groupsAttribute) {
             this.groupsAttribute = groupsAttribute;
+        }
+
+        public Collection<String> getDefaultAuthorities() {
+            return defaultAuthorities;
+        }
+
+        public void setDefaultAuthorities(Collection<String> defaultAuthorities) {
+            this.defaultAuthorities = defaultAuthorities;
+        }
+
+        public Collection<String> getDefaultGroups() {
+            return defaultGroups;
+        }
+
+        public void setDefaultGroups(Collection<String> defaultGroups) {
+            this.defaultGroups = defaultGroups;
+        }
+
+        public String getFirstNameAttribute() {
+            return firstNameAttribute;
+        }
+
+        public void setFirstNameAttribute(String firstNameAttribute) {
+            this.firstNameAttribute = firstNameAttribute;
+        }
+
+        public String getLastNameAttribute() {
+            return lastNameAttribute;
+        }
+
+        public void setLastNameAttribute(String lastNameAttribute) {
+            this.lastNameAttribute = lastNameAttribute;
+        }
+
+        public String getFullNameAttribute() {
+            return fullNameAttribute;
+        }
+
+        public void setFullNameAttribute(String fullNameAttribute) {
+            this.fullNameAttribute = fullNameAttribute;
+        }
+
+        public String getEmailAttribute() {
+            return emailAttribute;
+        }
+
+        public void setEmailAttribute(String emailAttribute) {
+            this.emailAttribute = emailAttribute;
         }
     }
 

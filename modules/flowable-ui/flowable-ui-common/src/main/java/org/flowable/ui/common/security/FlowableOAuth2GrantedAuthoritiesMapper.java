@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,10 +37,25 @@ public class FlowableOAuth2GrantedAuthoritiesMapper implements GrantedAuthoritie
 
     protected final String authoritiesAttribute;
     protected final String groupsAttribute;
+    protected final Collection<GrantedAuthority> defaultAuthorities;
 
-    public FlowableOAuth2GrantedAuthoritiesMapper(String authoritiesAttribute, String groupsAttribute) {
+    public FlowableOAuth2GrantedAuthoritiesMapper(String authoritiesAttribute, String groupsAttribute,
+            Collection<String> defaultAuthorities, Collection<String> defaultGroups) {
         this.authoritiesAttribute = authoritiesAttribute;
         this.groupsAttribute = groupsAttribute;
+        this.defaultAuthorities = new LinkedHashSet<>();
+        if (defaultAuthorities != null) {
+            for (String defaultAuthority : defaultAuthorities) {
+                this.defaultAuthorities.add(new SimpleGrantedAuthority(defaultAuthority));
+            }
+        }
+
+        if (defaultGroups != null) {
+            for (String defaultGroup : defaultGroups) {
+                this.defaultAuthorities.add(SecurityUtils.createGroupAuthority(defaultGroup));
+            }
+
+        }
     }
 
     @Override
@@ -84,6 +100,8 @@ public class FlowableOAuth2GrantedAuthoritiesMapper implements GrantedAuthoritie
                 }
             }
         }
+
+        newAuthorities.addAll(defaultAuthorities);
 
         return newAuthorities;
     }
