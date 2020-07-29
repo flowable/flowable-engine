@@ -21,6 +21,36 @@
     <modules>
         <module>flowable-ui-common</module>
 
+        <module>flowable-ui-admin-logic</module>
+        <module>flowable-ui-admin-rest</module>
+        <module>flowable-ui-admin-conf</module>
+        <module>flowable-ui-admin-frontend</module>
+        <module>flowable-ui-admin-app</module>
+
+        <module>flowable-ui-idm-logic</module>
+        <module>flowable-ui-idm-rest</module>
+        <module>flowable-ui-idm-conf</module>
+        <module>flowable-ui-idm-frontend</module>
+        <module>flowable-ui-idm-app</module>
+
+        <module>flowable-ui-modeler-logic</module>
+        <module>flowable-ui-modeler-rest</module>
+        <module>flowable-ui-modeler-conf</module>
+        <module>flowable-ui-modeler-frontend</module>
+        <module>flowable-ui-modeler-app</module>
+
+        <module>flowable-ui-task-logic</module>
+        <module>flowable-ui-task-rest</module>
+        <module>flowable-ui-task-conf</module>
+        <module>flowable-ui-task-frontend</module>
+        <module>flowable-ui-task-app</module>
+
+        <module>flowable-spring-boot-starter-ui-admin</module>
+        <module>flowable-spring-boot-starter-ui-idm</module>
+        <module>flowable-spring-boot-starter-ui-modeler</module>
+        <module>flowable-spring-boot-starter-ui-task</module>
+
+        <module>flowable-ui-app</module>
     </modules>
 
     <dependencyManagement>
@@ -152,41 +182,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>deploy</id>
-            <modules>
-                <module>flowable-ui-admin-logic</module>
-                <module>flowable-ui-admin-rest</module>
-                <module>flowable-ui-admin-conf</module>
-                <module>flowable-ui-admin-frontend</module>
-                <module>flowable-ui-admin-app</module>
-
-                <module>flowable-ui-idm-logic</module>
-                <module>flowable-ui-idm-rest</module>
-                <module>flowable-ui-idm-conf</module>
-                <module>flowable-ui-idm-frontend</module>
-                <module>flowable-ui-idm-app</module>
-
-                <module>flowable-ui-modeler-logic</module>
-                <module>flowable-ui-modeler-rest</module>
-                <module>flowable-ui-modeler-conf</module>
-                <module>flowable-ui-modeler-frontend</module>
-                <module>flowable-ui-modeler-app</module>
-
-                <module>flowable-ui-task-logic</module>
-                <module>flowable-ui-task-rest</module>
-                <module>flowable-ui-task-conf</module>
-                <module>flowable-ui-task-frontend</module>
-                <module>flowable-ui-task-app</module>
-
-                <module>flowable-spring-boot-starter-ui-admin</module>
-                <module>flowable-spring-boot-starter-ui-idm</module>
-                <module>flowable-spring-boot-starter-ui-modeler</module>
-                <module>flowable-spring-boot-starter-ui-task</module>
-
-                <module>flowable-ui-app</module>
-            </modules>
         </profile>
     </profiles>
 </project>

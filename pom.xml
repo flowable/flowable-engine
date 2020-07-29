@@ -1503,7 +1503,6 @@
                 <module>modules/flowable-http-common</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1647,7 +1646,6 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
-				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>

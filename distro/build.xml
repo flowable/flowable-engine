@@ -42,7 +42,7 @@
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro,deploy${nodocs.profile} -Dgpg.skip=true -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 	</target>
 
