@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.editor.constants.DmnJsonConstants;
+import org.flowable.dmn.editor.constants.DmnStencilConstants;
 import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
@@ -47,8 +49,6 @@ import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.dmn.model.UnaryTests;
-import org.flowable.dmn.editor.constants.DmnJsonConstants;
-import org.flowable.dmn.editor.constants.DmnStencilConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -738,10 +738,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
                             processDecisionTable(decisionTableNode, decisionTable);
                         } catch (Exception ex) {
-                            LOGGER.error("Error while parsing decision table editor JSON: " + decisionTableEditorJson);
+                            LOGGER.error("Error while parsing decision table editor JSON: {}", decisionTableEditorJson);
                         }
                     } else {
-                        LOGGER.warn("Could not find decision table for key: " + decisionTableKey);
+                        LOGGER.warn("Could not find decision table for key: {}", decisionTableKey);
                     }
                 }
             }
