@@ -15,6 +15,7 @@ package org.flowable.ui.common.security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
@@ -35,11 +36,25 @@ public class FlowableJwtGrantedAuthoritiesMapper implements Converter<Jwt, Colle
 
     protected final String authoritiesAttribute;
     protected final String groupsAttribute;
+    protected final Collection<GrantedAuthority> defaultAuthorities;
     protected JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
 
-    public FlowableJwtGrantedAuthoritiesMapper(String authoritiesAttribute, String groupsAttribute) {
+    public FlowableJwtGrantedAuthoritiesMapper(String authoritiesAttribute, String groupsAttribute, Collection<String> defaultAuthorities,
+            Collection<String> defaultGroups) {
         this.authoritiesAttribute = authoritiesAttribute;
         this.groupsAttribute = groupsAttribute;
+        this.defaultAuthorities = new LinkedHashSet<>();
+        if (defaultAuthorities != null) {
+            for (String defaultAuthority : defaultAuthorities) {
+                this.defaultAuthorities.add(new SimpleGrantedAuthority(defaultAuthority));
+            }
+        }
+
+        if (defaultGroups != null) {
+            for (String defaultGroup : defaultGroups) {
+                this.defaultAuthorities.add(SecurityUtils.createGroupAuthority(defaultGroup));
+            }
+        }
     }
 
     @Override
@@ -62,6 +77,8 @@ public class FlowableJwtGrantedAuthoritiesMapper implements Converter<Jwt, Colle
             }
 
         }
+
+        authorities.addAll(defaultAuthorities);
         return authorities;
     }
 

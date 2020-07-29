@@ -13,6 +13,7 @@
 package org.flowable.ui.common.security;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.flowable.idm.api.IdmIdentityService;
@@ -37,6 +38,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -242,7 +244,9 @@ public class FlowableUiSecurityAutoConfiguration {
             FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
             String authoritiesAttribute = oAuth2.getAuthoritiesAttribute();
             String groupsAttribute = oAuth2.getGroupsAttribute();
-            return new FlowableOAuth2GrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute);
+            Collection<String> defaultAuthorities = oAuth2.getDefaultAuthorities();
+            Collection<String> defaultGroups = oAuth2.getDefaultGroups();
+            return new FlowableOAuth2GrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute, defaultAuthorities, defaultGroups);
         }
 
         @Bean
@@ -253,7 +257,9 @@ public class FlowableUiSecurityAutoConfiguration {
             FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
             String authoritiesAttribute = oAuth2.getAuthoritiesAttribute();
             String groupsAttribute = oAuth2.getGroupsAttribute();
-            converter.setJwtGrantedAuthoritiesConverter(new FlowableJwtGrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute));
+            Collection<String> defaultAuthorities = oAuth2.getDefaultAuthorities();
+            Collection<String> defaultGroups = oAuth2.getDefaultGroups();
+            converter.setJwtGrantedAuthoritiesConverter(new FlowableJwtGrantedAuthoritiesMapper(authoritiesAttribute, groupsAttribute, defaultAuthorities, defaultGroups));
 
             JwtApiHttpSecurityCustomizer jwtApiHttpSecurityCustomizer = new JwtApiHttpSecurityCustomizer(converter);
 
@@ -280,7 +286,16 @@ public class FlowableUiSecurityAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean(name = "oauth2CurrentUserProvider")
         public CurrentUserProvider oauth2CurrentUserProvider() {
-            return new OAuth2CurrentUserProvider();
+            FlowableCommonAppProperties.OAuth2 oAuth2 = commonAppProperties.getSecurity().getOAuth2();
+            OAuth2CurrentUserProvider currentUserProvider = new OAuth2CurrentUserProvider();
+
+            PropertyMapper mapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+            mapper.from(oAuth2.getFirstNameAttribute()).to(currentUserProvider::setFirstNameKey);
+            mapper.from(oAuth2.getLastNameAttribute()).to(currentUserProvider::setLastNameKey);
+            mapper.from(oAuth2.getFullNameAttribute()).to(currentUserProvider::setFullNameKey);
+            mapper.from(oAuth2.getEmailAttribute()).to(currentUserProvider::setEmailKey);
+
+            return currentUserProvider;
         }
 
         protected String deducePassword(String password) {
