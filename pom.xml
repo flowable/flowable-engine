@@ -19,6 +19,7 @@
 		<spring.security.version>5.3.3.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.7.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.5.2.RELEASE</spring.kafka.version>
+		<reactor-netty.version>0.9.10.RELEASE</reactor-netty.version>
 		<jackson.version>2.11.0</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
@@ -912,6 +913,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
+				<artifactId>spring-webflux</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
@@ -1023,6 +1029,12 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.projectreactor.netty</groupId>
+				<artifactId>reactor-netty</artifactId>
+				<version>${reactor-netty.version}</version>
 			</dependency>
 
 			<dependency>
