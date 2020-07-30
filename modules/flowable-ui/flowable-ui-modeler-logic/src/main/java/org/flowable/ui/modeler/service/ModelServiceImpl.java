@@ -127,7 +127,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<AbstractModel> getModelsByModelType(Integer modelType) {
-        return new ArrayList<AbstractModel>(modelRepository.findByModelType(modelType, ModelSort.NAME_ASC));
+        return new ArrayList<>(modelRepository.findByModelType(modelType, ModelSort.NAME_ASC));
     }
 
     @Override

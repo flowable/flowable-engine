@@ -1912,7 +1912,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processId).singleResult();
         String taskId = task.getId();
         try {
-            assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<String, String>()))
+            assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<>()))
                     .isExactlyInstanceOf(FlowableException.class);
         } finally {
             runtimeService.deleteProcessInstance(processId, "intentional exception in script task");

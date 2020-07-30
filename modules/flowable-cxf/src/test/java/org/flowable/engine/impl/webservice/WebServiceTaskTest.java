@@ -162,7 +162,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         values.add(32);
         values.add(43);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("values", values);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonArrayVariableMultiInstanceLoop",
                 initVariables);
@@ -189,7 +189,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         values.add(2);
         values.add(3);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("values", values);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonArrayVariableDirectInvocation",
                 initVariables);
@@ -217,7 +217,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         values.add(23);
         values.add(34);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("bean", valuesObj);
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("jsonBeanWithArrayVariableMultiInstanceLoop", initVariables);
@@ -245,7 +245,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         values.add(22);
         values.add(33);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("bean", valuesObj);
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("jsonBeanWithArrayVariableDirectInvocation", initVariables);
@@ -271,7 +271,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         valuesObj.put("value1", 111);
         valuesObj.put("value2", 222);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("bean", valuesObj);
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("jsonBeanVariableInvocationByAttribute",
@@ -300,7 +300,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         valuesObj.put("arg2", 2222);
         argsObj.set("args", valuesObj);
 
-        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        final Map<String, Object> initVariables = new HashMap<>();
         initVariables.put("bean", argsObj);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonBeanVariableDirectInvocation",
                 initVariables);
