@@ -67,7 +67,7 @@ public class AbstractModelBpmnResource {
         try {
             encodedName = "UTF-8''" + URLEncoder.encode(name, "UTF-8");
         } catch (Exception e) {
-            LOGGER.warn("Failed to encode name " + name);
+            LOGGER.warn("Failed to encode name {}", name);
         }
 
         String contentDispositionValue = "attachment; filename=" + name;
