@@ -24,7 +24,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.flowable.test.spring.executor.jms.config.SpringJmsConfig;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

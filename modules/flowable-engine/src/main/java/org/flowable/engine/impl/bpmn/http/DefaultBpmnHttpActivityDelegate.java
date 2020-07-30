@@ -43,8 +43,6 @@ import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
-import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
-import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.api.delegate.HttpRequestHandler;
 import org.flowable.http.common.api.delegate.HttpResponseHandler;

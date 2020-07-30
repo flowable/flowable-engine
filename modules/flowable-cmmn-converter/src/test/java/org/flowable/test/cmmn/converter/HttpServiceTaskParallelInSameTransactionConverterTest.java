@@ -13,16 +13,9 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.List;
-
-import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ExtensionElement;
-import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
-import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.junit.Test;
