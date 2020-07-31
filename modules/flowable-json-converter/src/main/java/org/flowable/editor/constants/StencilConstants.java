@@ -126,8 +126,10 @@ public interface StencilConstants {
     final String PROPERTY_MESSAGE_ITEM_REF = "message_item_ref";
 
     final String PROPERTY_MESSAGEREF = "messageref";
+    final String PROPERTY_MESSAGEEXPRESSION = "messageexpression";
 
     final String PROPERTY_SIGNALREF = "signalref";
+    final String PROPERTY_SIGNALEXPRESSION = "signalexpression";
     
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 

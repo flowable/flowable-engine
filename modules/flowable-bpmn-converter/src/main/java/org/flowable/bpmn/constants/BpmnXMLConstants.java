@@ -72,8 +72,6 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_ORDERING = "ordering";
     public static final String ATTRIBUTE_CANCEL_REMAINING_INSTANCES = "cancelRemainingInstances";
     public static final String ELEMENT_COMPLETION_CONDITION = "completionCondition";
-    public static final String ATTRIBUTE_MESSAGE_EXPRESSION = "messageExpression";
-    public static final String ATTRIBUTE_SIGNAL_EXPRESSION = "signalExpression";
 
     public static final String ELEMENT_DATA_STATE = "dataState";
 
@@ -287,9 +285,11 @@ public interface BpmnXMLConstants {
     
     public static final String ELEMENT_EVENT_MESSAGEDEFINITION = "messageEventDefinition";
     public static final String ATTRIBUTE_MESSAGE_REF = "messageRef";
+    public static final String ATTRIBUTE_MESSAGE_EXPRESSION = "messageExpression";
     
     public static final String ELEMENT_EVENT_SIGNALDEFINITION = "signalEventDefinition";
     public static final String ATTRIBUTE_SIGNAL_REF = "signalRef";
+    public static final String ATTRIBUTE_SIGNAL_EXPRESSION = "signalExpression";
     public static final String ATTRIBUTE_SCOPE = "scope";
     
     public static final String ELEMENT_EVENT_TIMERDEFINITION = "timerEventDefinition";

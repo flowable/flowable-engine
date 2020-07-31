@@ -712,14 +712,26 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
             } else if (eventDefinition instanceof SignalEventDefinition) {
                 SignalEventDefinition signalDefinition = (SignalEventDefinition) eventDefinition;
-                if (StringUtils.isNotEmpty(signalDefinition.getSignalRef())) {
-                    propertiesNode.put(PROPERTY_SIGNALREF, signalDefinition.getSignalRef());
+
+                String signalRef = signalDefinition.getSignalRef();
+                if (StringUtils.isNotEmpty(signalRef)) {
+                    propertiesNode.put(PROPERTY_SIGNALREF, signalRef);
+                }
+                String signalExpression = signalDefinition.getSignalExpression();
+                if (StringUtils.isNotEmpty(signalExpression)) {
+                    propertiesNode.put(PROPERTY_SIGNALEXPRESSION, signalExpression);
                 }
 
             } else if (eventDefinition instanceof MessageEventDefinition) {
                 MessageEventDefinition messageDefinition = (MessageEventDefinition) eventDefinition;
-                if (StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
-                    propertiesNode.put(PROPERTY_MESSAGEREF, messageDefinition.getMessageRef());
+
+                String messageRef = messageDefinition.getMessageRef();
+                if (StringUtils.isNotEmpty(messageRef)) {
+                    propertiesNode.put(PROPERTY_MESSAGEREF, messageRef);
+                }
+                String messageExpression = messageDefinition.getMessageExpression();
+                if (StringUtils.isNotEmpty(messageExpression)) {
+                    propertiesNode.put(PROPERTY_MESSAGEEXPRESSION, messageExpression);
                 }
                 
             } else if (eventDefinition instanceof ConditionalEventDefinition) {
@@ -848,13 +860,23 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected void convertJsonToSignalDefinition(JsonNode objectNode, Event event) {
-        String signalRef = getPropertyValueAsString(PROPERTY_SIGNALREF, objectNode);
         SignalEventDefinition eventDefinition = new SignalEventDefinition();
-        eventDefinition.setSignalRef(signalRef);
+
+        String signalRef = getPropertyValueAsString(PROPERTY_SIGNALREF, objectNode);
+        if (StringUtils.isNotEmpty(signalRef)) {
+            eventDefinition.setSignalRef(signalRef);
+        }
+
+        String signalExpression = getPropertyValueAsString(PROPERTY_SIGNALEXPRESSION, objectNode);
+        if (StringUtils.isNotEmpty(signalExpression)) {
+            eventDefinition.setSignalExpression(signalExpression);
+        }
+
         boolean isAsync = getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, objectNode);
         if (isAsync) {
             eventDefinition.setAsync(isAsync);
         }
+
         event.getEventDefinitions().add(eventDefinition);
     }
 
@@ -866,9 +888,18 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected void convertJsonToMessageDefinition(JsonNode objectNode, Event event) {
-        String messageRef = getPropertyValueAsString(PROPERTY_MESSAGEREF, objectNode);
         MessageEventDefinition eventDefinition = new MessageEventDefinition();
-        eventDefinition.setMessageRef(messageRef);
+
+        String messageRef = getPropertyValueAsString(PROPERTY_MESSAGEREF, objectNode);
+        if (StringUtils.isNotEmpty(messageRef)) {
+            eventDefinition.setMessageRef(messageRef);
+        }
+
+        String messageExpression = getPropertyValueAsString(PROPERTY_MESSAGEEXPRESSION, objectNode);
+        if (StringUtils.isNotEmpty(messageExpression)) {
+            eventDefinition.setMessageExpression(messageExpression);
+        }
+
         event.getEventDefinitions().add(eventDefinition);
     }
     

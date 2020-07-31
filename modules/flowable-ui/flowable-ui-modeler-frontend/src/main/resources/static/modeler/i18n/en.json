@@ -706,10 +706,22 @@
             "DESCRIPTION" : "Define the message name."
           }
         },
+        "MESSAGEEXPRESSIONPACKAGE" : {
+          "MESSAGEEXPRESSION" : {
+            "TITLE" : "Message expression",
+            "DESCRIPTION" : "Resolves the message event at runtime based on an expression."
+          }
+        },
         "SIGNALREFPACKAGE" : {
           "SIGNALREF" : {
             "TITLE" : "Signal reference",
             "DESCRIPTION" : "Define the signal name."
+          }
+        },
+        "SIGNALEXPRESSIONPACKAGE" : {
+          "SIGNALEXPRESSION" : {
+            "TITLE" : "Signal expression",
+            "DESCRIPTION" : "Resolves the signal event at runtime based on an expression."
           }
         },
         "ERRORREFPACKAGE" : {
