@@ -366,13 +366,7 @@ flowableModeler
             var fixedUrlPart = '/editor/';
 
             $rootScope.backToLanding = function() {
-                var baseUrl = $location.absUrl();
-                var index = baseUrl.indexOf(fixedUrlPart);
-                if (index >= 0) {
-                    baseUrl = baseUrl.substring(0, index);
-                    baseUrl += '/';
-                }
-                $window.location.href = baseUrl;
+                $window.location.href = FLOWABLE.CONFIG.contextRoot;
             };
         }])
 

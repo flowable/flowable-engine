@@ -16,6 +16,7 @@
     },
     "ACTION": {
       "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
       "RETURN-TO-LIST": "全定義の表示",
       "CANCEL": "キャンセル",
       "CLOSE": "閉じる",

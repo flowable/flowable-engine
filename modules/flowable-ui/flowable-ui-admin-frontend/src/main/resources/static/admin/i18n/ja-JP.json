@@ -4,6 +4,7 @@
     "NO": "いいえ",
     "ACTION": {
       "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
       "DISMISS-ALERT": "クリックしてメッセージを消す",
       "RETURN-TO-LIST": "一覧に戻る",
       "SHOW-RESULTS": "{{size}} 件の結果",

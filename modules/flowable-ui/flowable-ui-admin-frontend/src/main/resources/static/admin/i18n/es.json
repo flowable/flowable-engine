@@ -4,6 +4,7 @@
         "NO": "No",
         "ACTION": {
             "LOGOUT": "Salir",
+            "DASHBOARD": "Dashboard",
             "DISMISS-ALERT": "Clic para descartar este mensaje",
             "RETURN-TO-LIST": "Regresar a la lista",
             "SHOW-RESULTS": "Mostrar {{size}} resultados",

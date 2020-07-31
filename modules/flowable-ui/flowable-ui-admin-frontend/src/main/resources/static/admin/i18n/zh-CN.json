@@ -4,6 +4,7 @@
         "NO": "否",
         "ACTION": {
             "LOGOUT": "退出",
+            "DASHBOARD": "Dashboard",
             "DISMISS-ALERT": "单击此处可删除此消息",
             "RETURN-TO-LIST": "返回列表",
             "SHOW-RESULTS": "显示{{size}}结果集",

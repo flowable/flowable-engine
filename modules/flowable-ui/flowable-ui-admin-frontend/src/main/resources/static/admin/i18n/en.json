@@ -4,6 +4,7 @@
         "NO": "No",
         "ACTION": {
             "LOGOUT": "Sign out",
+            "DASHBOARD": "Dashboard",
             "DISMISS-ALERT": "Click to dismiss this message",
             "RETURN-TO-LIST": "Return to list",
             "SHOW-RESULTS": "Show {{size}} results",

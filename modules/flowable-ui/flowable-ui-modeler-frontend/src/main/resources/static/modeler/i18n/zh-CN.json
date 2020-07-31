@@ -16,6 +16,7 @@
     },
     "ACTION": {
       "LOGOUT": "退出",
+      "DASHBOARD": "Dashboard",
       "RETURN-TO-LIST": "显示所有定义",
       "CANCEL": "取消",
       "CLOSE": "关闭",

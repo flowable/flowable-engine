@@ -374,13 +374,7 @@ flowableApp
         });
 
         $rootScope.backToLanding = function() {
-            var baseUrl = $location.absUrl();
-            var index = baseUrl.indexOf('/#');
-            if (index >= 0) {
-                baseUrl = baseUrl.substring(0, index);
-                baseUrl += '/';
-            }
-            $window.location.href = baseUrl;
+            $window.location.href = FLOWABLE.CONFIG.contextRoot;
         };
 }])
 	

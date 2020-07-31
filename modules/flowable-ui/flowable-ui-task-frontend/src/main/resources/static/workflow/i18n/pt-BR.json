@@ -32,6 +32,7 @@
     },
     "ACTION":{
       "LOGOUT":"Sair",
+      "DASHBOARD": "Dashboard",
       "ADD-COMMENT":"Adicionar comentário",
       "SAVE":"Salvar",
       "CANCEL":"Cancelar",

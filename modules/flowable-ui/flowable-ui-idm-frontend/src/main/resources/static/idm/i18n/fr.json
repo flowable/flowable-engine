@@ -12,6 +12,7 @@
         },
         "ACTION": {
             "LOGOUT": "Déconnexion",
+            "DASHBOARD": "Dashboard",
             "HELP": "Prise en main",
             "EDIT-PROFILE": "Editer profil",
             "SAVE": "Sauver",

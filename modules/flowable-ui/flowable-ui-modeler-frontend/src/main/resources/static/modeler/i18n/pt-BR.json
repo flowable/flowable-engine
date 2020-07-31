@@ -15,6 +15,7 @@
     },
     "ACTION":{
       "LOGOUT":"Sair",
+      "DASHBOARD": "Dashboard",
       "RETURN-TO-LIST":"Mostrar todas as definições",
       "CANCEL":"Cancelar",
       "CLOSE":"Fechar",

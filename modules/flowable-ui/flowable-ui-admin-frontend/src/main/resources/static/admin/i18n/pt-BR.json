@@ -4,6 +4,7 @@
     "NO":"Não",
     "ACTION":{
       "LOGOUT":"Sair",
+      "DASHBOARD": "Dashboard",
       "DISMISS-ALERT":"Clique para ignorar esta mensagem",
       "RETURN-TO-LIST":"Retornar à Lista",
       "SHOW-RESULTS":"Mostrar {{'GENERAL.RESULT-SIZES.' + resultSize.toString() | translate}} resultados",

@@ -586,6 +586,10 @@ flowableAdminApp
                     $window.location.href = FlowableAdmin.Config.contextRoot + '/app/logout';
 				};
 
+                $rootScope.backToLanding = function() {
+                    $window.location.href = FlowableAdmin.Config.contextRoot;
+                };
+
 	            $rootScope.executeWhenReady = function(callback) {
 	                if ($rootScope.activeServers) {
 	                    callback();

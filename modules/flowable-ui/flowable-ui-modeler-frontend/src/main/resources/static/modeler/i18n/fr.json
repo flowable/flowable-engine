@@ -16,6 +16,7 @@
         },
         "ACTION": {
             "LOGOUT": "Déconnexion",
+            "DASHBOARD": "Dashboard",
             "RETURN-TO-LIST": "Afficher toutes les définitions",
             "CANCEL": "Annuler",
             "CLOSE": "Fermer",
