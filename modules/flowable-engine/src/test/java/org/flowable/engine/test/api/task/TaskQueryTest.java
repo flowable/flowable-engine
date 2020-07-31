@@ -3569,6 +3569,64 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(task.getDescription()).isEqualTo("My 'en' localized description");
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testNullHandlingOrder() {
+        ProcessInstance firstProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task firstTask = taskService.createTaskQuery().processInstanceId(firstProcessInstance.getId()).singleResult();
+        Task secondTask = taskService.createTaskQuery().processInstanceId(secondProcessInstance.getId()).singleResult();
+
+        taskService.setDueDate(secondTask.getId(), new Date());
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .processDefinitionKey("oneTaskProcess")
+                .orderByDueDateNullsLast()
+                .asc()
+                .listPage(0, 10);
+
+        // The order has to be exactly like defined, since we are testing the nulls last functionality
+        assertThat(tasks)
+                .extracting(Task::getId)
+                .containsExactly(secondTask.getId(), firstTask.getId());
+
+        tasks = taskService.createTaskQuery()
+                .processDefinitionKey("oneTaskProcess")
+                .orderByDueDateNullsFirst()
+                .asc()
+                .listPage(0, 10);
+
+        // The order has to be exactly like defined, since we are testing the nulls last functionality
+        assertThat(tasks)
+                .extracting(Task::getId)
+                .containsExactly(firstTask.getId(), secondTask.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processDefinitionKey("oneTaskProcess")
+                    .orderByDueDateNullsLast()
+                    .asc()
+                    .listPage(0, 10);
+
+            // The order has to be exactly like defined, since we are testing the nulls last functionality
+            assertThat(historicTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactly(secondTask.getId(), firstTask.getId());
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .processDefinitionKey("oneTaskProcess")
+                    .orderByDueDateNullsFirst()
+                    .asc()
+                    .listPage(0, 10);
+
+            // The order has to be exactly like defined, since we are testing the nulls last functionality
+            assertThat(historicTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactly(firstTask.getId(), secondTask.getId());
+        }
+    }
+
     /**
      * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks where gonzo is assignee - 2 tasks assigned to management group - 2 tasks assigned to accountancy group - 1 task
      * assigned to both the management and accountancy group
