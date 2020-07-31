@@ -165,7 +165,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         return runtimeService.getStageOverview(caseInstanceId);
     }
 
-    @ApiOperation(value = "Migrate case instance", tags = { "Process Instances" }, notes = "")
+    @ApiOperation(value = "Migrate case instance", tags = { "Case Instances" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and migration was executed."),
             @ApiResponse(code = 409, message = "Indicates the requested case instance action cannot be executed since the case-instance is already activated/suspended."),
