@@ -15,13 +15,13 @@ package org.activiti.engine.test.cfg;
 
 import java.util.List;
 
+import org.activiti.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 
