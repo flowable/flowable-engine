@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolve
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.spring.el.ApplicationContextElResolver;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.springframework.context.ApplicationContext;
 

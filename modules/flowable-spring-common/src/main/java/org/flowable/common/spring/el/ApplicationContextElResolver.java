@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.app.spring;
+package org.flowable.common.spring.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
@@ -22,6 +22,8 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * @author Tom Baeyens
+ * @author Frederik Heremans
  * @author Tijs Rademakers
  * @author Joram Barrez
  */

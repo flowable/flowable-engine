@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.spring.el.ApplicationContextElResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
