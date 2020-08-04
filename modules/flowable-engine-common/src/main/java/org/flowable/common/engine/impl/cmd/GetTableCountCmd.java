@@ -10,14 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.cmd;
+package org.flowable.common.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -28,6 +27,6 @@ public class GetTableCountCmd implements Command<Map<String, Long>>, Serializabl
 
     @Override
     public Map<String, Long> execute(CommandContext commandContext) {
-        return CommandContextUtil.getTableDataManager(commandContext).getTableCount();
+        return commandContext.getCurrentEngineConfiguration().getTableDataManager().getTableCount();
     }
 }
