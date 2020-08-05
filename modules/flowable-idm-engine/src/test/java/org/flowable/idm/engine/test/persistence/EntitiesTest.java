@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.engine.test.persistence;
+package org.flowable.idm.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -24,10 +24,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.db.EntityDependencyOrder;
-import org.flowable.app.engine.impl.db.EntityToTableMap;
-import org.junit.Test;
+import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,39 +34,6 @@ import org.w3c.dom.NodeList;
  * @author Joram Barrez
  */
 public class EntitiesTest {
-
-    @Test
-    public void verifyMappedEntitiesExist() {
-        Set<String> mappedResources = getEngineEntityMappingResources();
-        assertThat(mappedResources.size()).isPositive();
-        for (String mappedResource : mappedResources) {
-            getAndAssertEntityInterfaceClass(mappedResource);
-            getAndAssertEntityImplClass(mappedResource);
-        }
-    }
-
-    @Test
-    public void verifyEntitiesInEntityDependencyOrder() {
-        Set<String> mappedResources = getEngineEntityMappingResources();
-        for (String mappedResource : mappedResources) {
-            assertThat(EntityDependencyOrder.INSERT_ORDER)
-                    .as("No insert entry in EntityDependencyOrder for " + mappedResource)
-                    .contains(getAndAssertEntityImplClass(mappedResource));
-            assertThat(EntityDependencyOrder.DELETE_ORDER)
-                    .as("No delete entry in EntityDependencyOrder for " + mappedResource)
-                    .contains(getAndAssertEntityImplClass(mappedResource));
-        }
-    }
-    
-    @Test
-    public void verifyEntitiesInTableDataManager() {
-        Set<String> mappedResources = getEngineEntityMappingResources();
-        for (String mappedResource : mappedResources) {
-            assertThat(EntityToTableMap.entityToTableNameMap)
-                    .as("No entry in TableDataManagerImpl for " + mappedResource)
-                    .containsKey(getAndAssertEntityInterfaceClass(mappedResource));
-        }
-    }
 
     @Test
     public void verifyVersionInsertHasSpaceAfterNumber() throws Exception {
@@ -88,40 +53,6 @@ public class EntitiesTest {
                 }
             }
         }
-    }
-
-    protected Class getAndAssertEntityInterfaceClass(String mappedResource) {
-        try {
-            Class c = Class.forName("org.flowable.app.engine.impl.persistence.entity." + mappedResource + "Entity");
-            assertThat(c).isNotNull();
-            return c;
-        } catch (Exception e) {
-            throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
-        }
-    }
-
-    protected Class getAndAssertEntityImplClass(String mappedResource) {
-        try {
-            Class c = Class.forName("org.flowable.app.engine.impl.persistence.entity." + mappedResource + "EntityImpl");
-            assertThat(c).isNotNull();
-            return c;
-        } catch (Exception e) {
-            throw new AssertionError("Entity interface class for " + mappedResource + " not found", e);
-        }
-    }
-
-    protected Set<String> getEngineEntityMappingResources() {
-        return getResources((nodeList, resources) -> {
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                if (resource.startsWith("org/flowable/app") && !resource.contains("common.xml")) {
-                    resource = resource.replaceAll("org/flowable/app/db/mapping/entity/", "");
-                    resource = resource.replaceAll(".xml", "");
-                    resources.add(resource);
-                }
-            }
-        });
     }
 
     protected Set<String> getAllMappedEntityResources() {
@@ -145,7 +76,7 @@ public class EntitiesTest {
             docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document document = docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(AppEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE));
+            Document document = docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(IdmEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE));
 
             Set<String> resources = new HashSet<>();
             NodeList nodeList = document.getElementsByTagName("mapper");

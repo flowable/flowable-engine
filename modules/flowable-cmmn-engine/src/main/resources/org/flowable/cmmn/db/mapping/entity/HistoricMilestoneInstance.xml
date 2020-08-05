@@ -8,8 +8,7 @@
         insert into ${prefix}ACT_CMMN_HI_MIL_INST (ID_, REV_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) 
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{name ,jdbcType=VARCHAR},
+            1, #{name ,jdbcType=VARCHAR},
             #{timeStamp ,jdbcType=TIMESTAMP},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
@@ -25,8 +24,7 @@
       <foreach collection="list" item="milestone" index="index" separator=",">
         (
             #{milestone.id ,jdbcType=VARCHAR},
-            1,
-            #{milestone.name ,jdbcType=VARCHAR},
+            1, #{milestone.name ,jdbcType=VARCHAR},
             #{milestone.timeStamp ,jdbcType=TIMESTAMP},
             #{milestone.caseInstanceId ,jdbcType=VARCHAR},
             #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
@@ -42,8 +40,7 @@
         into ${prefix}ACT_CMMN_HI_MIL_INST (ID_, REV_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) VALUES
             (
                 #{milestone.id ,jdbcType=VARCHAR},
-                1,
-                #{milestone.name ,jdbcType=VARCHAR},
+                1, #{milestone.name ,jdbcType=VARCHAR},
                 #{milestone.timeStamp ,jdbcType=TIMESTAMP},
                 #{milestone.caseInstanceId ,jdbcType=VARCHAR},
                 #{milestone.caseDefinitionId ,jdbcType=VARCHAR},

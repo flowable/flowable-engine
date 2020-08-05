@@ -24,8 +24,7 @@
     insert into ${prefix}ACT_HI_ATTACHMENT (ID_, REV_, USER_ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TIME_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
-      #{userId ,jdbcType=VARCHAR},
+      1, #{userId ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
       #{description ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -42,8 +41,7 @@
     values 
       <foreach collection="list" item="attachment" index="index" separator=","> 
         (#{attachment.id ,jdbcType=VARCHAR},
-         1,
-         #{attachment.userId ,jdbcType=VARCHAR},
+         1, #{attachment.userId ,jdbcType=VARCHAR},
          #{attachment.name ,jdbcType=VARCHAR},
          #{attachment.description ,jdbcType=VARCHAR},
          #{attachment.type ,jdbcType=VARCHAR},
@@ -60,8 +58,7 @@
       <foreach collection="list" item="attachment" index="index"> 
         INTO ${prefix}ACT_HI_ATTACHMENT (ID_, REV_, USER_ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TIME_) VALUES 
           (#{attachment.id ,jdbcType=VARCHAR},
-           1,
-           #{attachment.userId ,jdbcType=VARCHAR},
+           1, #{attachment.userId ,jdbcType=VARCHAR},
            #{attachment.name ,jdbcType=VARCHAR},
            #{attachment.description ,jdbcType=VARCHAR},
            #{attachment.type ,jdbcType=VARCHAR},

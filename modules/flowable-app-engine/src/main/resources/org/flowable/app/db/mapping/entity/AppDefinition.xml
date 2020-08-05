@@ -7,8 +7,7 @@
   <insert id="insertAppDefinition" parameterType="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
     insert into ${prefix}ACT_APP_APPDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -23,8 +22,7 @@
     VALUES 
       <foreach collection="list" item="appDefinition" index="index" separator=","> 
         (#{appDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{appDefinition.category, jdbcType=VARCHAR},
+         1, #{appDefinition.category, jdbcType=VARCHAR},
          #{appDefinition.name, jdbcType=VARCHAR},
          #{appDefinition.key, jdbcType=VARCHAR}, 
          #{appDefinition.version, jdbcType=INTEGER},
@@ -41,8 +39,7 @@
       INTO ${prefix}ACT_APP_APPDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DESCRIPTION_, TENANT_ID_) VALUES 
         (#{appDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{appDefinition.category, jdbcType=VARCHAR},
+         1, #{appDefinition.category, jdbcType=VARCHAR},
          #{appDefinition.name, jdbcType=VARCHAR},
          #{appDefinition.key, jdbcType=VARCHAR}, 
          #{appDefinition.version, jdbcType=INTEGER},

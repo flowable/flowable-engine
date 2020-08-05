@@ -43,8 +43,7 @@
         REFERENCE_TYPE_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{processInstanceId, jdbcType=VARCHAR},
+        1, #{processInstanceId, jdbcType=VARCHAR},
         #{businessKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
@@ -89,8 +88,7 @@
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
            #{historicProcessInstance.id ,jdbcType=VARCHAR},
-           1,
-           #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
+           1, #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
            #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
            #{historicProcessInstance.startTime, jdbcType=TIMESTAMP},
@@ -137,8 +135,7 @@
           ) VALUES 
               (
                #{historicProcessInstance.id ,jdbcType=VARCHAR},
-               1,
-               #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
+               1, #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
                #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
                #{historicProcessInstance.startTime, jdbcType=TIMESTAMP},

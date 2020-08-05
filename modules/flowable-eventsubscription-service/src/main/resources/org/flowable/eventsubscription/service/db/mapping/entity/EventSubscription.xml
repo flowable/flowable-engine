@@ -357,8 +357,7 @@
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
-            'message',
+            1, 'message',
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -395,8 +394,7 @@
     values 
       <foreach collection="list" item="messageEventSubscription" index="index" separator=",">
           (#{messageEventSubscription.id, jdbcType=VARCHAR},
-           1,
-           #{messageEventSubscription.eventType, jdbcType=VARCHAR},
+           1, #{messageEventSubscription.eventType, jdbcType=VARCHAR},
            #{messageEventSubscription.eventName, jdbcType=VARCHAR},
            #{messageEventSubscription.executionId, jdbcType=VARCHAR},
            #{messageEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -433,8 +431,7 @@
             TENANT_ID_
           ) VALUES 
           (#{messageEventSubscription.id, jdbcType=VARCHAR},
-           1,
-           #{messageEventSubscription.eventType, jdbcType=VARCHAR},
+           1, #{messageEventSubscription.eventType, jdbcType=VARCHAR},
            #{messageEventSubscription.eventName, jdbcType=VARCHAR},
            #{messageEventSubscription.executionId, jdbcType=VARCHAR},
            #{messageEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -519,8 +516,7 @@
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
-            'signal',
+            1, 'signal',
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -557,8 +553,7 @@
     values 
       <foreach collection="list" item="signalEventSubscription" index="index" separator=",">
         (#{signalEventSubscription.id, jdbcType=VARCHAR},
-         1,
-         #{signalEventSubscription.eventType, jdbcType=VARCHAR},
+         1, #{signalEventSubscription.eventType, jdbcType=VARCHAR},
          #{signalEventSubscription.eventName, jdbcType=VARCHAR},
          #{signalEventSubscription.executionId, jdbcType=VARCHAR},
          #{signalEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -596,8 +591,7 @@
           )
           VALUES 
           (#{signalEventSubscription.id, jdbcType=VARCHAR},
-           1,
-           #{signalEventSubscription.eventType, jdbcType=VARCHAR},
+           1, #{signalEventSubscription.eventType, jdbcType=VARCHAR},
            #{signalEventSubscription.eventName, jdbcType=VARCHAR},
            #{signalEventSubscription.executionId, jdbcType=VARCHAR},
            #{signalEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -679,8 +673,7 @@
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
-            'compensate',
+            1, 'compensate',
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -717,8 +710,7 @@
     values 
       <foreach collection="list" item="compensateEventSubscription" index="index" separator=",">
         (#{compensateEventSubscription.id, jdbcType=VARCHAR},
-         1,
-         #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
+         1, #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
          #{compensateEventSubscription.eventName, jdbcType=VARCHAR},
          #{compensateEventSubscription.executionId, jdbcType=VARCHAR},
          #{compensateEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -756,8 +748,7 @@
         )
         VALUES
         (#{compensateEventSubscription.id, jdbcType=VARCHAR},
-         1,
-         #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
+         1, #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
          #{compensateEventSubscription.eventName, jdbcType=VARCHAR},
          #{compensateEventSubscription.executionId, jdbcType=VARCHAR},
          #{compensateEventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -839,8 +830,7 @@
            	TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
-            1,
-            #{eventType, jdbcType=VARCHAR},
+            1, #{eventType, jdbcType=VARCHAR},
             #{eventName, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -877,8 +867,7 @@
         values
         <foreach collection="list" item="eventSubscription" index="index" separator=",">
             (#{eventSubscription.id, jdbcType=VARCHAR},
-            1,
-            #{eventSubscription.eventType, jdbcType=VARCHAR},
+            1, #{eventSubscription.eventType, jdbcType=VARCHAR},
             #{eventSubscription.eventName, jdbcType=VARCHAR},
             #{eventSubscription.executionId, jdbcType=VARCHAR},
             #{eventSubscription.processInstanceId, jdbcType=VARCHAR},
@@ -916,8 +905,7 @@
             )
             VALUES
             (#{eventSubscription.id, jdbcType=VARCHAR},
-            1,
-            #{eventSubscription.eventType, jdbcType=VARCHAR},
+            1, #{eventSubscription.eventType, jdbcType=VARCHAR},
             #{eventSubscription.eventName, jdbcType=VARCHAR},
             #{eventSubscription.executionId, jdbcType=VARCHAR},
             #{eventSubscription.processInstanceId, jdbcType=VARCHAR},

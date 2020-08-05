@@ -27,8 +27,7 @@
                       PROPAGATED_STAGE_INST_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
                       IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     values (#{id, jdbcType=VARCHAR},
-            1,
-            #{name, jdbcType=VARCHAR},
+            1, #{name, jdbcType=VARCHAR},
             #{parentTaskId, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{priority, jdbcType=INTEGER},
@@ -67,8 +66,7 @@
     VALUES
       <foreach collection="list" item="task" index="index" separator=",">
         (#{task.id, jdbcType=VARCHAR},
-         1,
-         #{task.name, jdbcType=VARCHAR},
+         1, #{task.name, jdbcType=VARCHAR},
          #{task.parentTaskId, jdbcType=VARCHAR},
          #{task.description, jdbcType=VARCHAR},
          #{task.priority, jdbcType=INTEGER},
@@ -108,8 +106,7 @@
               DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
               IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_) VALUES
         (#{task.id, jdbcType=VARCHAR},
-         1,
-         #{task.name, jdbcType=VARCHAR},
+         1, #{task.name, jdbcType=VARCHAR},
          #{task.parentTaskId, jdbcType=VARCHAR},
          #{task.description, jdbcType=VARCHAR},
          #{task.priority, jdbcType=INTEGER},

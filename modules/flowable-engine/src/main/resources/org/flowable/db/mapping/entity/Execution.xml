@@ -14,8 +14,7 @@
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_)
     values (
       #{id ,jdbcType=VARCHAR},
-      1,
-      #{processInstanceId, jdbcType=VARCHAR},
+      1, #{processInstanceId, jdbcType=VARCHAR},
       #{businessKey, jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
@@ -60,8 +59,7 @@
     values
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id ,jdbcType=VARCHAR},
-         1,
-         #{execution.processInstanceId, jdbcType=VARCHAR},
+         1, #{execution.processInstanceId, jdbcType=VARCHAR},
          #{execution.businessKey, jdbcType=VARCHAR},
          #{execution.processDefinitionId ,jdbcType=VARCHAR},
          #{execution.activityId ,jdbcType=VARCHAR},
@@ -108,8 +106,7 @@
                                         CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_) VALUES
             (
              #{execution.id ,jdbcType=VARCHAR},
-             1,
-             #{execution.processInstanceId, jdbcType=VARCHAR},
+             1, #{execution.processInstanceId, jdbcType=VARCHAR},
              #{execution.businessKey, jdbcType=VARCHAR},
              #{execution.processDefinitionId ,jdbcType=VARCHAR},
              #{execution.activityId ,jdbcType=VARCHAR},

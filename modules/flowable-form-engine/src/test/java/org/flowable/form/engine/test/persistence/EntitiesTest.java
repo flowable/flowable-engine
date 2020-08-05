@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.engine.test.persistence;
+package org.flowable.form.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -24,9 +24,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.db.EntityDependencyOrder;
-import org.flowable.app.engine.impl.db.EntityToTableMap;
+import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.impl.db.EntityDependencyOrder;
+import org.flowable.form.engine.impl.db.EntityToTableMap;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -59,7 +59,7 @@ public class EntitiesTest {
                     .contains(getAndAssertEntityImplClass(mappedResource));
         }
     }
-    
+
     @Test
     public void verifyEntitiesInTableDataManager() {
         Set<String> mappedResources = getEngineEntityMappingResources();
@@ -92,7 +92,7 @@ public class EntitiesTest {
 
     protected Class getAndAssertEntityInterfaceClass(String mappedResource) {
         try {
-            Class c = Class.forName("org.flowable.app.engine.impl.persistence.entity." + mappedResource + "Entity");
+            Class c = Class.forName("org.flowable.form.engine.impl.persistence.entity." + mappedResource + "Entity");
             assertThat(c).isNotNull();
             return c;
         } catch (Exception e) {
@@ -102,7 +102,7 @@ public class EntitiesTest {
 
     protected Class getAndAssertEntityImplClass(String mappedResource) {
         try {
-            Class c = Class.forName("org.flowable.app.engine.impl.persistence.entity." + mappedResource + "EntityImpl");
+            Class c = Class.forName("org.flowable.form.engine.impl.persistence.entity." + mappedResource + "EntityImpl");
             assertThat(c).isNotNull();
             return c;
         } catch (Exception e) {
@@ -115,8 +115,8 @@ public class EntitiesTest {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                if (resource.startsWith("org/flowable/app") && !resource.contains("common.xml")) {
-                    resource = resource.replaceAll("org/flowable/app/db/mapping/entity/", "");
+                if (resource.startsWith("org/flowable/form/db/mapping/entity/") && !resource.contains("common.xml")) {
+                    resource = resource.replaceAll("org/flowable/form/db/mapping/entity/", "");
                     resource = resource.replaceAll(".xml", "");
                     resources.add(resource);
                 }
@@ -145,7 +145,7 @@ public class EntitiesTest {
             docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document document = docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(AppEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE));
+            Document document = docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(FormEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE));
 
             Set<String> resources = new HashSet<>();
             NodeList nodeList = document.getElementsByTagName("mapper");

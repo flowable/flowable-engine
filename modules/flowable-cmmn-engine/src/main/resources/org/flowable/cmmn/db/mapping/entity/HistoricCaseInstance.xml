@@ -8,8 +8,7 @@
         insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{name ,jdbcType=VARCHAR},
+            1, #{name ,jdbcType=VARCHAR},
             #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{businessKey ,jdbcType=VARCHAR},
@@ -31,8 +30,7 @@
         <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
             (
                 #{historicCaseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{historicCaseInstance.name ,jdbcType=VARCHAR},
+                1, #{historicCaseInstance.name ,jdbcType=VARCHAR},
                 #{historicCaseInstance.parentId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.businessKey ,jdbcType=VARCHAR},
@@ -55,8 +53,7 @@
             into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
             (
                 #{historicCaseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{historicCaseInstance.name ,jdbcType=VARCHAR},
+                1, #{historicCaseInstance.name ,jdbcType=VARCHAR},
                 #{historicCaseInstance.parentId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.businessKey ,jdbcType=VARCHAR},
