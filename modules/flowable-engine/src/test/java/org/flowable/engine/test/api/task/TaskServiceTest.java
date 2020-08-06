@@ -1095,14 +1095,11 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                 .hasMessage("Form engine is not initialized");
 
         assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("Form engine is not initialized");
+                .isInstanceOf(FlowableIllegalArgumentException.class);
         assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, Collections.EMPTY_MAP))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("Form engine is not initialized");
+                .isInstanceOf(FlowableIllegalArgumentException.class);
         assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, false))
-                .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("Form engine is not initialized");
+                .isInstanceOf(FlowableIllegalArgumentException.class);
 
         taskService.complete(task.getId());
     }
