@@ -13,9 +13,11 @@
 package org.flowable.examples.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
@@ -43,6 +45,7 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
 
         assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableA")).isNotNull();
         assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableB")).isNotNull();
+        assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableZ")).isNull();
 
         dataObjects = runtimeService.getDataObjects(subProcess1.getId());
         assertThat(dataObjects).hasSize(3);
@@ -54,6 +57,18 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableA")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableB")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableC")).isNotNull();
+        assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableZ")).isNull();
+
+        assertThatThrownBy(() -> runtimeService.getDataObject(null, "VariableA"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
+        assertThatThrownBy(() -> runtimeService.getDataObject(subProcess1.getId(), null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("dataObjectName is null");
+
+        assertThatThrownBy(() -> runtimeService.getDataObjects(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("executionId is null");
 
         dataObjects = runtimeService.getDataObjects(subProcess2.getId());
         assertThat(dataObjects).hasSize(4);
@@ -67,6 +82,7 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableB")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableC")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableD")).isNotNull();
+        assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableZ")).isNull();
 
         dataObjects = taskService.getDataObjects(task.getId());
         assertThat(dataObjects).hasSize(4);
@@ -80,5 +96,13 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
         assertThat(taskService.getDataObject(task.getId(), "VariableB")).isNotNull();
         assertThat(taskService.getDataObject(task.getId(), "VariableC")).isNotNull();
         assertThat(taskService.getDataObject(task.getId(), "VariableD")).isNotNull();
+        assertThat(taskService.getDataObject(task.getId(), "VariableZ")).isNull();
+
+        assertThatThrownBy(() -> taskService.getDataObject(null, "VariableA"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("taskId is null");
+        assertThatThrownBy(() -> taskService.getDataObject(task.getId(), null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("variableName is null");
     }
 }

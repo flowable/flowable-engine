@@ -56,7 +56,7 @@ public class JobBaseResource {
     
     protected void validateJob(Job job, String jobId) {
         if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deadletter job with id '" + jobId + "'.", Job.class);
+            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
         
         if (restApiInterceptor != null) {
