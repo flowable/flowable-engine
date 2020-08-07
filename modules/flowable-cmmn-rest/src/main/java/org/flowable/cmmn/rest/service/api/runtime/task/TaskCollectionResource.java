@@ -75,6 +75,10 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
             @ApiImplicitParam(name = "createdOn", dataType = "string",format = "date-time", value = "Only return tasks which are created on the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string",format = "date-time", value = "Only return tasks which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string",format = "date-time", value = "Only return tasks which are created after the given date.", paramType = "query"),
@@ -198,6 +202,22 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         if (requestParams.containsKey("caseInstanceIdWithChildren")) {
             request.setCaseInstanceIdWithChildren(requestParams.get("caseInstanceIdWithChildren"));
+        }
+
+        if (requestParams.containsKey("planItemInstanceId")) {
+            request.setPlanItemInstanceId(requestParams.get("planItemInstanceId"));
+        }
+
+        if (requestParams.containsKey("scopeId")) {
+            request.setScopeId(requestParams.get("scopeId"));
+        }
+
+        if (requestParams.containsKey("subScopeId")) {
+            request.setSubScopeId(requestParams.get("subScopeId"));
+        }
+
+        if (requestParams.containsKey("scopeType")) {
+            request.setScopeType(requestParams.get("scopeType"));
         }
 
         if (requestParams.containsKey("createdOn")) {
