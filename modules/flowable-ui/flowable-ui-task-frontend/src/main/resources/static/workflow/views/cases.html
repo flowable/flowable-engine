@@ -86,29 +86,25 @@
             </div>
         </div>
 
-        <div>
+        <div class="nothing-to-see" ng-if="root.caseDefinitions.length == 0">
+            <span>{{'CASE.MESSAGE.NO-CASE-DEFINITIONS' | translate}}</span>
+        </div>
 
-            <div class="nothing-to-see" ng-if="root.caseDefinitions.length == 0">
-                <span>{{'CASE.MESSAGE.NO-CASE-DEFINITIONS' | translate}}</span>
-            </div>
-
-            <div class="list-wrapper">
-                <ul class="full-list">
-                    <li ng-repeat="definition in root.caseDefinitions"
-                        ng-class="{'active' : newCaseInstance.caseDefinitionId == definition.id}"
-                        ng-click="selectCaseDefinition(definition)">
-                        <div>
-                            <div class="title">
-                                {{definition.name}}
-                            </div>
-                            <div class="summary">
-                                {{definition.description}}
-                            </div>
+        <div class="list-wrapper">
+            <ul class="full-list">
+                <li ng-repeat="definition in root.caseDefinitions"
+                    ng-class="{'active' : newCaseInstance.caseDefinitionId == definition.id}"
+                    ng-click="selectCaseDefinition(definition)">
+                    <div>
+                        <div class="title">
+                            {{definition.name}}
                         </div>
-                    </li>
-                </ul>
-            </div>
-
+                        <div class="summary">
+                            {{definition.description}}
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
 
     </div>
