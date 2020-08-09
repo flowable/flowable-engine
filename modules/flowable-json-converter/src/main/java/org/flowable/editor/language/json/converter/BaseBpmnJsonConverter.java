@@ -222,6 +222,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     }
                 }
             }
+            
+        } else if (baseElement instanceof Gateway) {
+            Gateway gateway = (Gateway) baseElement;
+            propertiesNode.put(PROPERTY_ASYNCHRONOUS, gateway.isAsynchronous());
+            propertiesNode.put(PROPERTY_EXCLUSIVE, !gateway.isNotExclusive());
         }
 
         if (baseElement instanceof FlowElement) {
