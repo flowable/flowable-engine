@@ -13,7 +13,6 @@
 package org.flowable.idm.engine.test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.flowable.idm.api.IdmIdentityService;

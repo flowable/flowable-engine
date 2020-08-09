@@ -13,15 +13,10 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowableHttpRequestHandler;
-import org.flowable.bpmn.model.FlowableHttpResponseHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
-import org.flowable.bpmn.model.ImplementationType;
 import org.junit.Test;
 
 public class HttpServiceTaskWithParallelInSameTransactionConverterTest extends AbstractConverterTest {

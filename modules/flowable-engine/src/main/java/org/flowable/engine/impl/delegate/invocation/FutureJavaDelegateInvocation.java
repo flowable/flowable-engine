@@ -15,7 +15,6 @@ package org.flowable.engine.impl.delegate.invocation;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FutureJavaDelegate;
-import org.flowable.engine.delegate.JavaDelegate;
 
 /**
  * Class handling invocations of FutureJavaDelegates

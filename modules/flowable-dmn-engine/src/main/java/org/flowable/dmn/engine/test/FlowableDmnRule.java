@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
