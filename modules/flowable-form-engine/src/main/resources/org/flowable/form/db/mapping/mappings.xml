@@ -21,9 +21,9 @@
 
     <!-- Engine mappers -->
     <mapper resource="org/flowable/form/db/mapping/common.xml" />
-    <mapper resource="org/flowable/form/db/mapping/entity/Deployment.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/FormDeployment.xml" />
     <mapper resource="org/flowable/form/db/mapping/entity/FormDefinition.xml" />
-    <mapper resource="org/flowable/form/db/mapping/entity/Resource.xml" />
+    <mapper resource="org/flowable/form/db/mapping/entity/FormResource.xml" />
     <mapper resource="org/flowable/form/db/mapping/entity/FormInstance.xml" />
   </mappers>
 </configuration>

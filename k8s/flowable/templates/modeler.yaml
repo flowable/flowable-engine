@@ -118,5 +118,5 @@ data:
   FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.host.external }}/{{ .Values.idm.ingressPath }}/
   FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.host.external }}/{{ .Values.modeler.ingressPath }}/
   FLOWABLE_COMMON_APP_IDM-ADMIN_USER: {{ .Values.idm.admin.username }}
-  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: xt{{ .Values.idm.admin.password }}
+  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: {{ .Values.idm.admin.password }}
 {{- end }}

@@ -11,8 +11,7 @@
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{name ,jdbcType=VARCHAR},
+            1, #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{derivedCaseDefinitionId ,jdbcType=VARCHAR},
@@ -55,8 +54,7 @@
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
             (
             #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
+            1, #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
@@ -100,8 +98,7 @@
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
+                1, #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},

@@ -52,8 +52,7 @@
         LAST_UPDATED_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{taskDefinitionId, jdbcType=VARCHAR},
+        1, #{taskDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -115,8 +114,7 @@
       ) values
         <foreach collection="list" item="historicTask" index="index" separator=",">
           (#{historicTask.id ,jdbcType=VARCHAR},
-           1,
-           #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
+           1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processInstanceId, jdbcType=VARCHAR},
            #{historicTask.executionId, jdbcType=VARCHAR},
@@ -179,8 +177,7 @@
             LAST_UPDATED_TIME_
           ) VALUES
             (#{historicTask.id ,jdbcType=VARCHAR},
-             1,
-             #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
+             1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processInstanceId, jdbcType=VARCHAR},
              #{historicTask.executionId, jdbcType=VARCHAR},

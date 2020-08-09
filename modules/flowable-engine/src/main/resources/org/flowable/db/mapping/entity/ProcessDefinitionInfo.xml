@@ -10,8 +10,7 @@
     insert into ${prefix}ACT_PROCDEF_INFO(ID_, PROC_DEF_ID_, REV_, INFO_JSON_ID_)
     values(#{id, jdbcType=VARCHAR}, 
            #{processDefinitionId, jdbcType=VARCHAR},
-           1,
-           #{infoJsonId, jdbcType=VARCHAR})
+           1, #{infoJsonId, jdbcType=VARCHAR})
   </insert>
 
   <insert id="bulkInsertProcessDefinitionInfo" parameterType="java.util.List">
@@ -20,8 +19,7 @@
       <foreach collection="list" item="processDefinitionInfo" index="index" separator=","> 
         (#{processDefinitionInfo.id, jdbcType=VARCHAR}, 
          #{processDefinitionInfo.processDefinitionId, jdbcType=VARCHAR},
-         1,
-         #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
+         1, #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
      </foreach>
   </insert>
 
@@ -31,8 +29,7 @@
         INTO ${prefix}ACT_PROCDEF_INFO(ID_, PROC_DEF_ID_, REV_, INFO_JSON_ID_) VALUES 
           (#{processDefinitionInfo.id, jdbcType=VARCHAR}, 
            #{processDefinitionInfo.processDefinitionId, jdbcType=VARCHAR},
-           1,
-           #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
+           1, #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
      </foreach>
     SELECT * FROM dual
   </insert>

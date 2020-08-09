@@ -17,8 +17,8 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -37,7 +37,7 @@ import org.flowable.common.engine.api.FlowableException;
 public class TenantAwareDataSource implements DataSource {
 
     protected TenantInfoHolder tenantInfoHolder;
-    protected Map<Object, DataSource> dataSources = new HashMap<>();
+    protected Map<Object, DataSource> dataSources = new ConcurrentHashMap<>();
 
     public TenantAwareDataSource(TenantInfoHolder tenantInfoHolder) {
         this.tenantInfoHolder = tenantInfoHolder;

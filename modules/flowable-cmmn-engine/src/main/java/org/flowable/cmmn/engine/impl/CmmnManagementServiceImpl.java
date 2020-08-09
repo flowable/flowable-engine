@@ -18,12 +18,12 @@ import java.util.Map;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -70,7 +70,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public Map<String, Long> getTableCounts() {
-        return commandExecutor.execute(new GetTableCountsCmd());
+        return commandExecutor.execute(new GetTableCountCmd());
     }
 
     @Override

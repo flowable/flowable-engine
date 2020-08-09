@@ -7,8 +7,7 @@
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{parentId ,jdbcType=VARCHAR},
+            1, #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{businessKey ,jdbcType=VARCHAR},
             #{name ,jdbcType=VARCHAR},
@@ -30,8 +29,7 @@
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
                 #{caseInstance.name ,jdbcType=VARCHAR},
@@ -54,8 +52,7 @@
             into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
                 #{caseInstance.name ,jdbcType=VARCHAR},

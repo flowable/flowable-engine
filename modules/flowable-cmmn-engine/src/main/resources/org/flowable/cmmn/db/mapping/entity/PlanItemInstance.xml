@@ -12,8 +12,7 @@
               VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{caseDefinitionId ,jdbcType=VARCHAR},
+            1, #{caseDefinitionId ,jdbcType=VARCHAR},
             #{derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{stageInstanceId ,jdbcType=VARCHAR},
@@ -59,8 +58,7 @@
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
         	#{planItemInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            1, #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
             #{planItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
             #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
@@ -107,8 +105,7 @@
                                                       EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                1, #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{planItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
                 #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
