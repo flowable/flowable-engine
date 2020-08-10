@@ -1226,7 +1226,7 @@ When multiple rules are valid the service will respond with a 500 code.
     }
 
 <table>
-<caption>Execute a single resultdecision - Response codes</caption>
+<caption>Execute a single result decision - Response codes</caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
