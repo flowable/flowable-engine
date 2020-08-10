@@ -28,6 +28,7 @@ import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -160,6 +161,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
             ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
             @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
+            ObjectProvider<FlowableHttpClient> flowableHttpClient,
             ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -225,6 +227,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
         conf.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
         conf.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
+        conf.getHttpClientConfig().setHttpClient(flowableHttpClient.getIfAvailable());
 
         conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());

@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -136,6 +137,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
         @Cmmn ObjectProvider<AsyncListenableTaskExecutor> cmmnTaskExecutor,
         @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
+        ObjectProvider<FlowableHttpClient> flowableHttpClient,
         ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
@@ -186,6 +188,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
         configuration.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
         configuration.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
+        configuration.getHttpClientConfig().setHttpClient(flowableHttpClient.getIfAvailable());
 
         //TODO Can it have different then the Process engine?
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
