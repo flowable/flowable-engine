@@ -342,7 +342,7 @@ Your CustomServiceTask will result in a normal ServiceTask in the BPMN output of
 
 -   javaDelegateExpression maps to flowable:delegateExpression in the BPMN output. Specify an expression to a class that implements JavaDelegate.
 
-The user’s property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your CustomServiceTask. For more information, consult [this part](bpmn/ch07b-BPMN-Constructs.md#field-injection) of the userguide. Note that from version 5.11.0 of the Designer, you can use the Expression interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression, and this expression will then be injected into an Expression property in the JavaDelegate implementation class.
+The user’s property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your CustomServiceTask. For more information, consult [this part](bpmn/ch07b-BPMN-Constructs.md#field-injection) of the user guide. Note that from version 5.11.0 of the Designer, you can use the Expression interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression, and this expression will then be injected into an Expression property in the JavaDelegate implementation class.
 
 > **Note**
 >

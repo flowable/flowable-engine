@@ -463,7 +463,7 @@ It’s possible to support additional variable-types with a custom JSON represen
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Deployments
 
