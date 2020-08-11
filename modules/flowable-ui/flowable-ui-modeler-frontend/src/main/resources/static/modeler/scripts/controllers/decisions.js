@@ -167,7 +167,7 @@ angular.module('flowableModeler')
             if (decision) {
                 $rootScope.editorHistory = [];
                 if (decision.modelType === 4) {
-                    $location.url("/decision-table-editor/" + eFncodeURIComponent(decision.id));
+                    $location.url("/decision-table-editor/" + encodeURIComponent(decision.id));
                 } else if (decision.modelType === 6) {
                     $location.url("/decision-service-editor/" + encodeURIComponent(decision.id));
                 }
