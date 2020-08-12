@@ -206,7 +206,7 @@ public class ModelServiceImpl implements ModelService {
         } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DECISION_TABLE).equals(model.getModelType())) {
             try {
                 DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
-
+                decisionTableDefinition.setModelVersion("3");
                 String decisionTableDefinitionKey = model.getName().replaceAll(" ", "");
                 decisionTableDefinition.setKey(decisionTableDefinitionKey);
 
