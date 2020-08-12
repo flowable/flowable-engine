@@ -23,6 +23,7 @@ import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverterContext;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.editor.converter.DmnJsonConverterContext;
 import org.flowable.editor.language.json.converter.BpmnJsonConverterContext;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.serviceapi.ModelService;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Joram Barrez
  */
-public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConverterContext {
+public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConverterContext, DmnJsonConverterContext {
 
     protected ModelService modelService;
     protected ObjectMapper objectMapper;
@@ -382,9 +383,13 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     public Map<String, String> getFormKeyToJsonStringMap() {
         return formKeyToJsonStringMap;
     }
+
+    @Override
     public Map<String, String> getDecisionTableKeyToJsonStringMap() {
         return decisionTableKeyToJsonStringMap;
     }
+
+    @Override
     public Map<String, String> getDecisionServiceKeyToJsonStringMap() {
         return decisionServiceKeyToJsonStringMap;
     }

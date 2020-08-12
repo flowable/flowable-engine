@@ -105,7 +105,6 @@ public class AppDefinitionImportService {
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                             converterContext.addFormModel(childModel);
-
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
@@ -125,7 +124,6 @@ public class AppDefinitionImportService {
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                             converterContext.addFormModel(childModel);
-
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {

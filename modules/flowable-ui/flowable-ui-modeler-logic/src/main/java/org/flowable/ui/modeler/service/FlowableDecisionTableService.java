@@ -33,6 +33,8 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverterContext;
+import org.flowable.dmn.editor.converter.StandaloneDmnConverterContext;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -133,21 +135,23 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
     }
 
     public void exportDefinition(HttpServletResponse response, String decisionId) {
+        ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
         List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
         Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
             .collect(Collectors.toMap(
                 AbstractModel::getKey,
                 AbstractModel::getModelEditorJson
             ));
+        converterContext.getDecisionTableKeyToJsonStringMap().putAll(decisionTableEditorJSON);
 
-        exportDefinition(response, getModel(decisionId, true, false), decisionTableEditorJSON);
+        exportDefinition(response, getModel(decisionId, true, false), converterContext);
     }
 
     protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel) {
-        exportDefinition(response, definitionModel, Collections.emptyMap());
+        exportDefinition(response, definitionModel, new StandaloneDmnConverterContext());
     }
 
-    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, Map<String, String> decisionTablesEditorJson) {
+    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, DmnJsonConverterContext converterContext) {
         try {
 
             JsonNode editorJsonNode = objectMapper.readTree(definitionModel.getModelEditorJson());
@@ -159,7 +163,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/xml");
 
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), decisionTablesEditorJson);
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), converterContext);
             byte[] xmlBytes = dmnXmlConverter.convertToXML(dmnDefinition);
 
             BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
