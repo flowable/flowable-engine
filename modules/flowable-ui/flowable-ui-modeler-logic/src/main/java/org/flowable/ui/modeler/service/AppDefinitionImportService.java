@@ -113,6 +113,11 @@ public class AppDefinitionImportService {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
                             converterContext.addDecisionServiceModel(childModel);
+
+                            List<Model> referencedDecisionTableChildModels = modelRepository.findByParentModelId(childModel.getId());
+                            for (Model decisionTableChildModel : referencedDecisionTableChildModels) {
+                                converterContext.addDecisionTableModel(decisionTableChildModel);
+                            }
                         }
                     }
 
@@ -132,6 +137,11 @@ public class AppDefinitionImportService {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
                             converterContext.addDecisionServiceModel(childModel);
+
+                            List<Model> referencedDecisionTableChildModels = modelRepository.findByParentModelId(childModel.getId());
+                            for (Model decisionTableChildModel : referencedDecisionTableChildModels) {
+                                converterContext.addDecisionTableModel(decisionTableChildModel);
+                            }
                         }
                     }
 
@@ -360,11 +370,14 @@ public class AppDefinitionImportService {
                 throw new InternalServerErrorException("Error reading decision service json for " + decisionServiceKey);
             }
 
+            // remove modelId from import json
+            // and update decision table references
+            decisionServiceModelNode.remove("modelId");
             DmnJsonConverterUtil.updateDecisionTableModelReferences(decisionServiceModelNode, converterContext);
             String updatedDecisionServiceJson = decisionServiceModelNode.toString();
 
             Model existingModel = converterContext.getDecisionServiceModelByKey(decisionServiceModel.getKey());
-            Model updatedDecisionServiceModel = null;
+            Model updatedDecisionServiceModel;
             if (existingModel != null) {
                 byte[] imageBytes = null;
                 if (thumbnailMap.containsKey(decisionServiceKey)) {
