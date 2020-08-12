@@ -303,6 +303,18 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         decisionNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         propertiesNode.put(PROPERTY_NAME, decision.getName());
 
+        if (converterContext != null && converterContext.getDecisionTableModelInfoForDecisionTableModelKey(decision.getId()) != null) {
+            Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(decision.getId());
+            ObjectNode modelRefNode = propertiesNode.putObject(PROPERTY_DECISION_TABLE_REFERENCE);
+            modelRefNode.put("id", modelInfo.get("id"));
+            modelRefNode.put("name", modelInfo.get("name"));
+            modelRefNode.put("key", decision.getId());
+
+        } else {
+            ObjectNode modelRefNode = propertiesNode.putObject(PROPERTY_DECISION_TABLE_REFERENCE);
+            modelRefNode.put("key", decision.getId());
+        }
+
         ArrayNode outgoingNodeArray = objectMapper.createArrayNode();
         decisionNode.set(EDITOR_OUTGOING, outgoingNodeArray);
 
@@ -760,9 +772,9 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 }
             }
 
-            if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("name") && !decisionTableReferenceNode.get("name").isNull()) {
-                decision.setName(DmnJsonConverterUtil.getValueAsString(PROPERTY_NAME, decisionTableReferenceNode));
-            }
+//            if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("name") && !decisionTableReferenceNode.get("name").isNull()) {
+//                decision.setName(DmnJsonConverterUtil.getValueAsString(PROPERTY_NAME, decisionTableReferenceNode));
+//            }
 
             if (targetRefMap.containsKey(decisionChildNode.get("resourceId").asText())) {
                 JsonNode informationRequirementNode = targetRefMap.get(decisionChildNode.get("resourceId").asText());

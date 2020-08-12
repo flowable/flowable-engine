@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverterUtil;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.ui.common.security.SecurityUtils;
@@ -50,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
@@ -71,6 +74,7 @@ public class AppDefinitionImportService {
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
     protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+    protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
 
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, MultipartFile file) {
         try {
@@ -345,11 +349,19 @@ public class AppDefinitionImportService {
 
         String currentUserId = SecurityUtils.getCurrentUserId();
         for (String decisionServiceKey : decisionServicesMap.keySet()) {
-
             Model decisionServiceModel = createModelObject(decisionServicesMap.get(decisionServiceKey), Model.MODEL_TYPE_DECISION_SERVICE);
 
-            // migrate to new version
             String oldDecisionServiceId = decisionServiceModel.getId();
+            ObjectNode decisionServiceModelNode;
+            try {
+                decisionServiceModelNode = (ObjectNode) objectMapper.readTree(decisionServiceModel.getModelEditorJson());
+            } catch (Exception e) {
+                LOGGER.error("Error reading decision service json for {}", decisionServiceKey, e);
+                throw new InternalServerErrorException("Error reading decision service json for " + decisionServiceKey);
+            }
+
+            DmnJsonConverterUtil.updateDecisionTableModelReferences(decisionServiceModelNode, converterContext);
+            String updatedDecisionServiceJson = decisionServiceModelNode.toString();
 
             Model existingModel = converterContext.getDecisionServiceModelByKey(decisionServiceModel.getKey());
             Model updatedDecisionServiceModel = null;
@@ -358,11 +370,14 @@ public class AppDefinitionImportService {
                 if (thumbnailMap.containsKey(decisionServiceKey)) {
                     imageBytes = thumbnailMap.get(decisionServiceKey);
                 }
-                updatedDecisionServiceModel = modelService.saveModel(existingModel, decisionServiceModel.getModelEditorJson(), imageBytes,
+                existingModel.setModelEditorJson(updatedDecisionServiceJson);
+                updatedDecisionServiceModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes,
                     true, "App definition import", currentUserId);
 
             } else {
                 decisionServiceModel.setId(null);
+                decisionServiceModel.setModelEditorJson(updatedDecisionServiceJson);
+
                 updatedDecisionServiceModel = modelService.createModel(decisionServiceModel, currentUserId);
 
                 if (thumbnailMap.containsKey(decisionServiceKey)) {
