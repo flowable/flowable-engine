@@ -18,7 +18,9 @@ import static org.assertj.core.data.Offset.offset;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
@@ -619,14 +622,15 @@ public class DmnJsonConverterTest {
         String testDecJsonResource4 = readJsonToString(JSON_RESOURCE_9);
         String testDecJsonResource5 = readJsonToString(JSON_RESOURCE_10);
 
-        Map<String, String> decisionTableMap = new HashMap<>();
+        DmnJsonConverterContext converterContext = new StandaloneTestDmnConverterContext();
+        Map<String, String> decisionTableMap = converterContext.getDecisionTableKeyToJsonStringMap();
         decisionTableMap.put("decTable1", testDecJsonResource1);
         decisionTableMap.put("decTable2", testDecJsonResource2);
         decisionTableMap.put("decTable3", testDecJsonResource3);
         decisionTableMap.put("ComplexExpression", testDecJsonResource4);
         decisionTableMap.put("decTable4", testDecJsonResource5);
 
-        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", decisionTableMap);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", converterContext);
 
         assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
 
@@ -637,8 +641,23 @@ public class DmnJsonConverterTest {
 
         assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
 
-        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
-        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+        assertThat(decisionService.getOutputDecisions())
+            .extracting(DmnElementReference::getParsedId)
+            .containsOnly("decision1", "decision2");
+
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(outputDecisionRef.getParsedId())).isNotNull();
+        });
+
+        assertThat(decisionService.getEncapsulatedDecisions())
+            .extracting(DmnElementReference::getParsedId)
+            .containsOnly("decision3", "decision4");
+
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(encapsulatedDecisionRef.getParsedId())).isNotNull();
+        });
 
         dmnDefinition.getDecisions().forEach(decision -> assertThat(decision.getExpression()).isNotNull());
 
@@ -662,8 +681,14 @@ public class DmnJsonConverterTest {
 
         assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
 
-        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
-        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(outputDecisionRef.getParsedId())).isNotNull();
+        });
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(encapsulatedDecisionRef.getParsedId())).isNotNull();
+        });
 
         dmnDefinition.getDecisions().forEach(decision -> assertThat(decision.getExpression()).isNull());
     }
@@ -683,8 +708,14 @@ public class DmnJsonConverterTest {
 
         assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
 
-        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
-        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(outputDecisionRef.getParsedId())).isNotNull();
+        });
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(encapsulatedDecisionRef.getParsedId())).isNotNull();
+        });
 
         JsonNode decisionServiceJson = new DmnJsonConverter().convertToJson(dmnDefinition);
 
@@ -701,8 +732,14 @@ public class DmnJsonConverterTest {
 
         DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
 
-        decisionService.getOutputDecisions().forEach(outputDecisionRef -> assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull());
-        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull());
+        decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(outputDecisionRef.getParsedId())).isNotNull();
+        });
+        decisionService.getEncapsulatedDecisions().forEach(encapsulatedDecisionRef -> {
+            assertThat(dmnDefinition.getDecisionById(encapsulatedDecisionRef.getParsedId())).isNotNull();
+            assertThat(dmnDefinition.getGraphicInfo(encapsulatedDecisionRef.getParsedId())).isNotNull();
+        });
 
         JsonNode decisionServiceJson = new DmnJsonConverter().convertToJson(dmnDefinition);
 
