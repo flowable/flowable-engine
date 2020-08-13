@@ -2037,14 +2037,16 @@
         }
     },
 
-    "DECISION-TABLES-LIST": {
+    "DECISIONS-LIST": {
         "TITLE": "Decisions",
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION": {
             "CREATE-DECISION-SERVICE": "Create Decision Service",
             "CREATE": "Create Decision Table",
-            "IMPORT": "Import Decision Table",
-            "CREATE-INLINE": "Create a new decision table now!",
+            "IMPORT-DECISION-TABLE": "Import Decision Table",
+            "IMPORT-DECISION-SERVICE": "Import Decision Service",
+            "CREATE-DECISION-TABLES-INLINE": "Create a new decision table now!",
+            "CREATE-DECISION-SERVICES-INLINE": "Create a new decision service now!",
             "SHOW-MORE": "Show more..."
         },
 
@@ -2287,7 +2289,15 @@
       "DESCRIPTION": "Description",
       "POPUP": {
         "CREATE-TITLE": "Create a new decision service",
-        "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time."
+        "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time.",
+        "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
+        "IMPORT-TITLE": "Import a DMN decision service model",
+        "IMPORT": {
+          "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
+          "CANCEL-UPLOAD": "Cancel the upload",
+          "ERROR": "Error while processing the DMN XML file",
+          "NO-DROP": "Drag and drop not supported"
+        }
       }
     },
     "DECISION-TABLE": {
@@ -2341,7 +2351,7 @@
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
             "SAVE-DECISION-TABLE-TITLE": "Save decision table",
             "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
-          	"IMPORT-TITLE": "Import a DMN model",
+          	"IMPORT-TITLE": "Import a DMN decision table model",
 	        "IMPORT": {
 	            "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
 	            "CANCEL-UPLOAD": "Cancel the upload",

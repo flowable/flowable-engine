@@ -376,23 +376,26 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     public ObjectNode convertDecisionTableToJson(DmnDefinition definition) {
-        ObjectNode modelNode = objectMapper.createObjectNode();
-
         Decision firstDecision = definition.getDecisions().get(0);
-        DecisionTable decisionTable = (DecisionTable) firstDecision.getExpression();
+        return convertDecisionDecisionTableToJson(firstDecision, definition.getId(), definition.getName(), definition.getDescription());
+    }
 
-        modelNode.put("id", definition.getId());
-        modelNode.put("key", firstDecision.getId());
-        modelNode.put("name", definition.getName());
+    public ObjectNode convertDecisionDecisionTableToJson(Decision decision, String id, String name, String description) {
+        ObjectNode modelNode = objectMapper.createObjectNode();
+        DecisionTable decisionTable = (DecisionTable) decision.getExpression();
+
+        modelNode.put("id", id);
+        modelNode.put("key", decision.getId());
+        modelNode.put("name", name);
         modelNode.put("version", MODEL_VERSION);
-        modelNode.put("description", definition.getDescription());
+        modelNode.put("description", description);
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
 
         if (decisionTable.getAggregation() != null) {
             modelNode.put("collectOperator", decisionTable.getAggregation().name());
         }
 
-        if (firstDecision.isForceDMN11()) {
+        if (decision.isForceDMN11()) {
             modelNode.put("forceDMN11", true);
         }
 

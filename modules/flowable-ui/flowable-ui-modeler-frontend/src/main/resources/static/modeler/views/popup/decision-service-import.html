@@ -1,4 +1,3 @@
-
 <div class="modal" ng-controller="ImportDecisionServiceModelCtrl">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -7,14 +6,14 @@
             		<div class="pull-right">
                         <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL' | translate}}</a>
                     </div>
-            		<h2>{{'DECISION-TABLE.POPUP.IMPORT-TITLE' | translate}}</h2>
+            		<h2>{{'DECISION-SERVICE.POPUP.IMPORT-TITLE' | translate}}</h2>
             	</div>
             </div>
             <div class="modal-body">
 
                 <p>
                     <i class="glyphicon glyphicon-info-sign"></i>
-                    {{'DECISION-TABLE.POPUP.IMPORT-DESCRIPTION' | translate}}
+                    {{'DECISION-SERVICE.POPUP.IMPORT-DESCRIPTION' | translate}}
                 </p>
                 <!--[if IE 9]>
 
@@ -25,10 +24,10 @@
                          ngf-drop="onFileSelect($files)"
                          ngf-drag-over-class="dragover"
                          ng-show="dropSupported">
-                        {{'DECISION-TABLE.POPUP.IMPORT.DROPZONE' | translate}}
+                        {{'DECISION-SERVICE.POPUP.IMPORT.DROPZONE' | translate}}
                     </div>
                     <div ngf-drop-available="dropSupported=true"
-                         ng-show="!dropSupported">{{'DECISION-TABLE.POPUP.IMPORT.NO-DROP' | translate}}</div>
+                         ng-show="!dropSupported">{{'DECISION-SERVICE.POPUP.IMPORT.NO-DROP' | translate}}</div>
                     <div class="graph-wrapper" ng-show="status.loading" style="margin: 10px 0 10px 0">
                         <div class="graph-bar" ng-style="{width: model.uploadProgress + '%'}"></div>
                     </div>
@@ -36,7 +35,7 @@
                             ng-click="upload.abort()"
                             ng-disabled="!status.loading"
                             style="margin-bottom: 20px">
-                        {{'DECISION-TABLE.POPUP.IMPORT.CANCEL-UPLOAD' | translate}}
+                        {{'DECISION-SERVICE.POPUP.IMPORT.CANCEL-UPLOAD' | translate}}
                     </button>
 
                 </div>
@@ -49,10 +48,10 @@
                          ngf-drop ngf-change="onFileSelect($files)"
                          ngf-drag-over-class="dragover"
                          ng-show="dropSupported">
-                        {{'DECISION-TABLE.POPUP.IMPORT.DROPZONE' | translate}}
+                        {{'DECISION-SERVICE.POPUP.IMPORT.DROPZONE' | translate}}
                     </div>
                     <div ngf-drop-available="dropSupported=true"
-                         ng-show="!dropSupported">{{'DECISION-TABLE.POPUP.IMPORT.NO-DROP' | translate}}</div>
+                         ng-show="!dropSupported">{{'DECISION-SERVICE.POPUP.IMPORT.NO-DROP' | translate}}</div>
                     <div class="graph-wrapper" ng-show="status.loading" style="margin: 10px 0 10px 0">
                         <div class="graph-bar" ng-style="{width: model.uploadProgress + '%'}"></div>
                     </div>
@@ -60,7 +59,7 @@
                             ng-click="upload.abort()"
                             ng-disabled="!status.loading"
                             style="margin-bottom: 20px">
-                        {{'DECISION-TABLE.POPUP.IMPORT.CANCEL-UPLOAD' | translate}}
+                        {{'DECISION-SERVICE.POPUP.IMPORT.CANCEL-UPLOAD' | translate}}
                     </button>
                 </div>
 
@@ -71,7 +70,7 @@
                 <div class="modal-footer">
                     <loading></loading>
                     <div class="pull-right modeler-processes-error" ng-if="model.error">
-                        <span>{{'DECISION-TABLE.POPUP.IMPORT.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
+                        <span>{{'DECISION-SERVICE.POPUP.IMPORT.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
                     </div>
                 </div>
             </div>

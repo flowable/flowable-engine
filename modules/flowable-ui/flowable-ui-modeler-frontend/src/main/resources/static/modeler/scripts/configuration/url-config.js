@@ -182,6 +182,14 @@ FLOWABLE.APP_URL = {
         return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/decision-service-models';
     },
 
+    getDecisionServiceImportUrl: function () {
+        return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/import-decision-service-model';
+    },
+
+    getDecisionServiceTextImportUrl: function () {
+        return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/import-decision-service-model/text';
+    },
+
     /* FORM MODEL URLS */
 
     getFormModelsUrl: function () {

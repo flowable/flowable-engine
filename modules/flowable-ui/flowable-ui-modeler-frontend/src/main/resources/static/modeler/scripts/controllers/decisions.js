@@ -57,6 +57,12 @@ angular.module('flowableModeler')
             }, $modal, $scope);
         };
 
+        $scope.importDecisionService = function () {
+            _internalCreateModal({
+                template: 'views/popup/decision-service-import.html?version=' + Date.now()
+            }, $modal, $scope);
+        };
+
         $scope.loadDecisionTables = function () {
             $scope.model.loading = true;
 
@@ -121,6 +127,14 @@ angular.module('flowableModeler')
                 timeoutFilter();
             }
         };
+
+        $scope.createDecision = function () {
+            if ($scope.model.activeFilter.type === "decision-services") {
+                return $scope.createDecisionService();
+            } else {
+                return $scope.createDecisionTable();
+            }
+        }
 
         $scope.createDecisionTable = function () {
             $rootScope.currentKickstartModel = undefined;
@@ -363,6 +377,58 @@ angular.module('flowableModeler')
                     $scope.model.loading = false;
 
                     $location.path("/decision-table-editor/" + data.id);
+                    $scope.$hide();
+
+                }).error(function (data, status, headers, config) {
+
+                    if (data && data.message) {
+                        $scope.model.errorMessage = data.message;
+                    }
+
+                    $scope.model.error = true;
+                    $scope.model.loading = false;
+                });
+            }
+        };
+
+        $scope.cancel = function () {
+            if (!$scope.model.loading) {
+                $scope.$hide();
+            }
+        };
+    }]);
+
+angular.module('flowableModeler')
+    .controller('ImportDecisionServiceModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
+
+        $scope.model = {
+            loading: false
+        };
+
+        $scope.onFileSelect = function ($files, isIE) {
+
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+
+                var url;
+                if (isIE) {
+                    url = FLOWABLE.APP_URL.getDecisionServiceTextImportUrl();
+                } else {
+                    url = FLOWABLE.APP_URL.getDecisionServiceImportUrl();
+                }
+
+                Upload.upload({
+                    url: url,
+                    method: 'POST',
+                    file: file
+                }).progress(function (evt) {
+                    $scope.model.loading = true;
+                    $scope.model.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+
+                }).success(function (data, status, headers, config) {
+                    $scope.model.loading = false;
+
+                    $location.path("/decision-service-editor/" + data.id);
                     $scope.$hide();
 
                 }).error(function (data, status, headers, config) {
