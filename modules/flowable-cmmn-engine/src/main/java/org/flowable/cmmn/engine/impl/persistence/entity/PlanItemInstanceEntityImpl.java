@@ -32,6 +32,7 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -86,7 +87,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
-    
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -482,7 +483,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
     }
-    
+
+    @Override
+    public List<VariableAggregation> getVariableAggregations() {
+        return null;
+    }
+
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         // TODO

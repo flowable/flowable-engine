@@ -41,6 +41,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -213,7 +214,16 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             variableInstance.setProcessDefinitionId(this.processDefinitionId);
         }
     }
-    
+
+    @Override
+    public List<VariableAggregation> getVariableAggregations() {
+        VariableScopeImpl parentVariableScope = getParentVariableScope();
+        if (parentVariableScope != null) {
+            return parentVariableScope.getVariableAggregations();
+        }
+        return null;
+    }
+
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         // TODO
@@ -674,20 +684,20 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         
         return null;
     }
-    
+
     protected TaskServiceConfiguration getTaskServiceConfiguration() {
         return (TaskServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
-    
+
     protected IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return (IdentityLinkServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
     }
-    
+
     @Override
     protected VariableServiceConfiguration getVariableServiceConfiguration() {
         return (VariableServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
-    
+
     protected AbstractEngineConfiguration getTaskEngineConfiguration() {
         Map<String, AbstractEngineConfiguration> engineConfigurations = CommandContextUtil.getCommandContext().getEngineConfigurations();
         AbstractEngineConfiguration engineConfiguration = null;
@@ -699,7 +709,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
                 engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
             }
         }
-        
+
         return engineConfiguration;
     }
 

@@ -27,6 +27,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -37,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
-    
+
     protected String businessKey;
     protected String name;
     protected String parentId;
@@ -278,7 +279,12 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
     }
-    
+
+    @Override
+    public List<VariableAggregation> getVariableAggregations() {
+        return null;
+    }
+
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
