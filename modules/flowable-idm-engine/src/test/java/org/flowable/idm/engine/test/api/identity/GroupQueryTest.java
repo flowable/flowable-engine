@@ -84,6 +84,9 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupId(null).list())
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupIds(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -135,6 +138,9 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%SHoW%");
         verifyQueryResults(query, 1);
+
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test

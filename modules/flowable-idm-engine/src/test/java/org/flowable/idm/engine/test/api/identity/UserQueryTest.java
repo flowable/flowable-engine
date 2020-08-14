@@ -87,12 +87,18 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         assertThatThrownBy(() -> idmIdentityService.createUserQuery().userId(null).singleResult())
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userIds(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByIdIgnoreCase() {
         UserQuery query = idmIdentityService.createUserQuery().userIdIgnoreCase("KErmit");
         verifyQueryResults(query, 1);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userIdIgnoreCase(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -138,6 +144,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userFirstNameLikeIgnoreCase("KEr%");
         verifyQueryResults(query, 1);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userFirstNameLikeIgnoreCase(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -174,6 +183,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userLastNameLikeIgnoreCase("%Ea%");
         verifyQueryResults(query, 2);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userLastNameLikeIgnoreCase(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -186,6 +198,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userFullNameLike("%e%");
         verifyQueryResults(query, 3);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userFullNameLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -198,6 +213,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%E%");
         verifyQueryResults(query, 3);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -240,6 +258,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userDisplayNameLike("%ea%");
         verifyQueryResults(query, 2);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userDisplayNameLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -249,6 +270,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase("%Ea%");
         verifyQueryResults(query, 2);
+
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
