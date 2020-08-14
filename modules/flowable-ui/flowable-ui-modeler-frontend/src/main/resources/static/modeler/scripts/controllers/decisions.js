@@ -347,6 +347,63 @@ angular.module('flowableModeler')
         }]);
 
 angular.module('flowableModeler')
+    .controller('DuplicateDecisionServiceCtrl', ['$rootScope', '$scope', '$http',
+        function ($rootScope, $scope, $http) {
+
+            $scope.model = {
+                loading: false,
+                decisionService: {
+                    id: '',
+                    name: '',
+                    description: '',
+                    modelType: null
+                }
+            };
+
+            if ($scope.originalModel) {
+                //clone the model
+                $scope.model.decisionService.name = $scope.originalModel.decisionService.name;
+                $scope.model.decisionService.key = $scope.originalModel.decisionService.key;
+                $scope.model.decisionService.description = $scope.originalModel.decisionService.description;
+                $scope.model.decisionService.modelType = $scope.originalModel.decisionService.modelType;
+                $scope.model.decisionService.id = $scope.originalModel.decisionService.id;
+            }
+
+            $scope.ok = function () {
+
+                if (!$scope.model.decisionService.name || $scope.model.decisionService.name.length == 0) {
+                    return;
+                }
+
+                $scope.model.loading = true;
+
+                $http({
+                    method: 'POST',
+                    url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.decisionService.id),
+                    data: $scope.model.decisionService
+                }).success(function (data, status, headers, config) {
+                    $scope.$hide();
+                    $scope.model.loading = false;
+
+                    if ($scope.duplicateDecisionServiceCallback) {
+                        $scope.duplicateDecisionServiceCallback(data);
+                        $scope.duplicateDecisionServiceCallback = undefined;
+                    }
+
+                }).error(function (data, status, headers, config) {
+                    $scope.model.loading = false;
+                    $scope.model.errorMessage = data.message;
+                });
+            };
+
+            $scope.cancel = function () {
+                if (!$scope.model.loading) {
+                    $scope.$hide();
+                }
+            };
+        }]);
+
+angular.module('flowableModeler')
     .controller('ImportDecisionTableModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
         $scope.model = {

@@ -2287,9 +2287,34 @@
       "NAME": "Decision service name",
       "KEY": "Decision service key",
       "DESCRIPTION": "Description",
+      "ACTION": {
+        "DETAILS": "Show details",
+        "EDIT": "Modify model properties",
+        "SHARE": "Share this decision service",
+        "DELETE": "Delete this decision service",
+        "ADD-COMMENT": "+ Add comment",
+        "CREATE-CONFIRM": "Create new decision service",
+        "OPEN-IN-EDITOR": "Decision Service Editor",
+        "EXPORT": "Export decision service",
+        "DELETE-CONFIRM": "Delete decision service",
+        "USE-AS-NEW-VERSION": "Use as new version",
+        "FAVORITE": "Favorite this decision service",
+        "DUPLICATE": "Duplicate this decision service",
+        "DUPLICATE-CONFIRM": "Duplicate the decision service"
+      },
+      "DETAILS": {
+        "HISTORY-TITLE": "History",
+        "COMMENTS-TITLE": "Comments",
+        "LAST-UPDATED-BY": "Last updated by {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+        "CREATED-BY": "Created by {{createdBy}}"
+      },
       "POPUP": {
         "CREATE-TITLE": "Create a new decision service",
         "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time.",
+        "DUPLICATE-TITLE": "Duplicate decision service",
+        "DUPLICATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time.",
+        "DELETE-TITLE": "Delete decision service",
+        "DELETE-DESCRIPTION": "Are you sure you want to delete the decision service \"{{name}}\"?",
         "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
         "IMPORT-TITLE": "Import a DMN decision service model",
         "IMPORT": {

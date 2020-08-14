@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,19 +11,19 @@
  * limitations under the License.
  */
 var NORMAL_STROKE = 1;
-var SEQUENCEFLOW_STROKE = 1.5;
 var ASSOCIATION_STROKE = 2;
 var TASK_STROKE = 1;
 var TASK_HIGHLIGHT_STROKE = 2;
-var CALL_ACTIVITY_STROKE = 2;
-var ENDEVENT_STROKE = 3;
+var DECISION_SERVICE_STROKE = 3;
 
-var COMPLETED_COLOR= "#2632aa";
+var COMPLETED_COLOR = "#2632aa";
 var TEXT_COLOR= "#373e48";
 var CURRENT_COLOR= "#017501";
+var AVAILABLE_COLOR = "#e3da82";
 var HOVER_COLOR= "#666666";
 var ACTIVITY_STROKE_COLOR = "#bbbbbb";
 var ACTIVITY_FILL_COLOR = "#f9f9f9";
+var WHITE_FILL_COLOR = "#ffffff";
 var MAIN_STROKE_COLOR = "#585858";
 
 var TEXT_PADDING = 3;
@@ -47,46 +47,17 @@ var viewBoxHeight;
 var canvasWidth;
 var canvasHeight;
 
-var modelDiv = jQuery('#bpmnModel');
+var modelDiv = jQuery('#dmnModel');
 var modelId = modelDiv.attr('data-model-id');
 var historyModelId = modelDiv.attr('data-history-id');
-var processDefinitionId = modelDiv.attr('data-process-definition-id');
+var decisionDefinitionId = modelDiv.attr('data-decision-definition-id');
 var modelType = modelDiv.attr('data-model-type');
-
-// Support for custom background colors for activities
-var customActivityColors = modelDiv.attr('data-activity-color-mapping');
-if (customActivityColors !== null && customActivityColors !== undefined && customActivityColors.length > 0) {
-    // Stored on the attribute as a string
-    customActivityColors = JSON.parse(customActivityColors);
-}
-
-var customActivityToolTips = modelDiv.attr('data-activity-tooltips');
-if (customActivityToolTips !== null && customActivityToolTips !== undefined && customActivityToolTips.length > 0) {
-    // Stored on the attribute as a string
-    customActivityToolTips = JSON.parse(customActivityToolTips);
-}
-
-// Support for custom opacity for activity backgrounds
-var customActivityBackgroundOpacity = modelDiv.attr('data-activity-opacity');
 
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
 
 function _showTip(htmlNode, element)
 {
-
-    // Custom tooltip
-    var documentation = undefined;
-    if (customActivityToolTips) {
-        if (customActivityToolTips[element.name]) {
-            documentation = customActivityToolTips[element.name];
-        } else if (customActivityToolTips[element.id]) {
-            documentation = customActivityToolTips[element.id];
-        } else {
-            documentation = ''; // Show nothing if custom tool tips are enabled
-        }
-    }
-
     // Default tooltip, no custom tool tip set
     if (documentation === undefined) {
         var documentation = "";
@@ -130,21 +101,21 @@ function _showTip(htmlNode, element)
         position: {
             my: 'top left',
             at: 'bottom center',
-            viewport: jQuery('#bpmnModel')
+            viewport: jQuery('#dmnModel')
         },
         hide: {
             fixed: true, delay: 500,
             event: 'click mouseleave'
         },
         style: {
-            classes: 'ui-tooltip-kisbpm-bpmn'
+            classes: 'ui-tooltip-flowable-cmmn'
         }
     });
 }
 
 function _addHoverLogic(element, type, defaultColor)
 {
-    var strokeColor = _bpmnGetColor(element, defaultColor);
+    var strokeColor = _dmnGetColor(element, defaultColor);
     var topBodyRect = null;
     if (type === "rect")
     {
@@ -188,10 +159,12 @@ function _addHoverLogic(element, type, defaultColor)
 
     topBodyRect.mouseover(function() {
         paper.getById(element.id).attr({"stroke":HOVER_COLOR});
+        paper.getById("divider_"+element.id) != undefined ? paper.getById("divider_"+element.id).attr({"stroke":HOVER_COLOR}) : '';
     });
 
     topBodyRect.mouseout(function() {
         paper.getById(element.id).attr({"stroke":strokeColor});
+        paper.getById("divider_"+element.id) != undefined ? paper.getById("divider_"+element.id).attr({"stroke":strokeColor}) : '';
     });
 }
 
@@ -218,20 +191,15 @@ function _zoom(zoomIn)
 }
 
 var modelUrl;
-if (modelType == 'runtime') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.APP_URL.getProcessInstanceModelJsonHistoryUrl(historyModelId);
-	} else {
-    	modelUrl = FLOWABLE.APP_URL.getProcessInstanceModelJsonUrl(modelId);
-	}
+if (modelType == 'decision-service') {
+    // modelUrl = FLOWABLE.APP_URL.getDgetCaseDefinitionModelJsonUrl(caseDefinitionId);
+    modelUrl = './app/rest/admin/decisions/decision-service/' + decisionDefinitionId + '/model-json';
 } else if (modelType == 'design') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.APP_URL.getModelHistoryModelJsonUrl(modelId, historyModelId);
-	} else {
-    	modelUrl = FLOWABLE.APP_URL.getModelModelJsonUrl(modelId);
-	}
-} else if (modelType == 'process-definition') {
-    modelUrl = FLOWABLE.APP_URL.getProcessDefinitionModelJsonUrl(processDefinitionId);
+    if (historyModelId) {
+        modelUrl = FLOWABLE.APP_URL.getModelHistoryModelJsonUrl(modelId, historyModelId);
+    } else {
+        modelUrl = FLOWABLE.APP_URL.getModelModelJsonUrl(modelId);
+    }
 }
 
 var request = jQuery.ajax({
@@ -240,23 +208,22 @@ var request = jQuery.ajax({
 });
 
 request.success(function(data, textStatus, jqXHR) {
-
     if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
 
     INITIAL_CANVAS_WIDTH = data.diagramWidth;
-
+    
     if (modelType == 'design') {
     	INITIAL_CANVAS_WIDTH += 20;
     } else {
         INITIAL_CANVAS_WIDTH += 30;
     }
-
+    
     INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
     canvasWidth = INITIAL_CANVAS_WIDTH;
     canvasHeight = INITIAL_CANVAS_HEIGHT;
     viewBoxWidth = INITIAL_CANVAS_WIDTH;
     viewBoxHeight = INITIAL_CANVAS_HEIGHT;
-
+    
     if (modelType == 'design') {
     	var headerBarHeight = 170;
     	var offsetY = 0;
@@ -269,23 +236,14 @@ request.success(function(data, textStatus, jqXHR) {
         	offsetY = 50;
     	}
 
-    	jQuery('#bpmnModel').css('marginTop', offsetY);
+    	jQuery('#dmnModel').css('marginTop', offsetY);
     }
 
-    jQuery('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
-    jQuery('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
-    paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
+    jQuery('#dmnModel').width(INITIAL_CANVAS_WIDTH);
+    jQuery('#dmnModel').height('100%');
+    paper = Raphael(document.getElementById('dmnModel'), canvasWidth, canvasHeight);
     paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
     paper.renderfix();
-
-    if (data.pools)
-    {
-        for (var i = 0; i < data.pools.length; i++)
-        {
-            var pool = data.pools[i];
-            _drawPool(pool);
-        }
-    }
 
     var modelElements = data.elements;
     for (var i = 0; i < modelElements.length; i++)
@@ -302,11 +260,7 @@ request.success(function(data, textStatus, jqXHR) {
         for (var i = 0; i < data.flows.length; i++)
         {
             var flow = data.flows[i];
-            if (flow.type === 'sequenceFlow') {
-                _drawFlow(flow);
-            } else if (flow.type === 'association') {
-                _drawAssociation(flow);
-            }
+            _drawInformationRequirement(flow);
         }
     }
 });
