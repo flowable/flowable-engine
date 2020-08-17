@@ -39,8 +39,6 @@
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
 
-		<spotify.docker.plugin.version>1.4.10</spotify.docker.plugin.version>
-
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
@@ -1201,11 +1199,6 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>${spotify.docker.plugin.version}</version>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
