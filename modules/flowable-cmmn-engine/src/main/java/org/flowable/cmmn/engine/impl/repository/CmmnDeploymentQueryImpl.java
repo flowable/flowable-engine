@@ -189,7 +189,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
     }
 
     @Override
-    public CmmnDeploymentQuery orderByDeploymenTime() {
+    public CmmnDeploymentQuery orderByDeploymentTime() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOY_TIME);
     }
 

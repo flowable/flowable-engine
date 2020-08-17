@@ -147,10 +147,10 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().list()).hasSize(2);
         assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().count()).isEqualTo(2);
 
-        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list()).hasSize(2);
-        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().count()).isEqualTo(2);
-        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list()).hasSize(2);
-        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentTime().asc().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentTime().desc().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentTime().desc().count()).isEqualTo(2);
 
         assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list()).hasSize(2);
         assertThat(cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().count()).isEqualTo(2);

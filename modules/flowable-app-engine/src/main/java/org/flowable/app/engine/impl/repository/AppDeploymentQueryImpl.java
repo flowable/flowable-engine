@@ -159,7 +159,7 @@ public class AppDeploymentQueryImpl extends AbstractQuery<AppDeploymentQuery, Ap
     }
 
     @Override
-    public AppDeploymentQuery orderByDeploymenTime() {
+    public AppDeploymentQuery orderByDeploymentTime() {
         return orderBy(AppDeploymentQueryProperty.DEPLOY_TIME);
     }
 

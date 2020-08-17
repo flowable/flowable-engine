@@ -56,7 +56,10 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
 
             List<DmnDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || DmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(CommandContextUtil.getDmnEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(CommandContextUtil.getDmnEngineConfiguration().getCommandExecutor())
+                        .deploymentName(deployment.getName())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
@@ -64,18 +67,16 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
                 List<DmnDeployment> deploymentList = CommandContextUtil.getDmnEngineConfiguration().getDmnRepositoryService().createDeploymentQuery()
                         .deploymentName(deployment.getName())
                         .deploymentTenantId(deployment.getTenantId())
-                        .orderByDeploymentId()
-                        .desc()
-                        .list();
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            DmnDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
+                DmnDeploymentEntity existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
 
                 Map<String, EngineResource> resourceMap = new HashMap<>();
                 List<DmnResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
@@ -83,10 +84,10 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
                 }
                 existingDeployment.setResources(resourceMap);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 

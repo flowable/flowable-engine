@@ -50,28 +50,29 @@ public class DeployCmd implements Command<CmmnDeployment> {
             if (deployment.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<CmmnDeployment> deploymentEntities = new CmmnDeploymentQueryImpl(cmmnEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
-                        .orderByDeploymenTime().desc()
+                        .orderByDeploymentTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
                 
             } else {
-                List<CmmnDeployment> deploymentList = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<CmmnDeployment> deploymentList = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            CmmnDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (CmmnDeploymentEntity) existingDeployments.get(0);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                CmmnDeploymentEntity existingDeployment = (CmmnDeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
         
