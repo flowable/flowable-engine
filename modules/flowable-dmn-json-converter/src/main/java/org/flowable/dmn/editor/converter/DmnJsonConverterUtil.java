@@ -463,6 +463,18 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         return getDmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISION_TABLE_REFERENCE, allowedStencilTypes);
     }
 
+    public static void updateDecisionTableModelReferences(ObjectNode decisionServiceObjectNode, DmnJsonConverterContext converterContext) {
+        List<JsonNode> decisionTableNodes = DmnJsonConverterUtil.filterOutJsonNodes(DmnJsonConverterUtil.getDmnModelDecisionTableReferences(decisionServiceObjectNode));
+        decisionTableNodes.forEach(decisionNode -> {
+            String decisionTableKey = decisionNode.get("key").asText();
+            Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(decisionTableKey);
+            if (modelInfo != null) {
+                ((ObjectNode) decisionNode).put("id", modelInfo.get("id"));
+            }
+        });
+
+    }
+
     protected static void internalGetDmnChildShapePropertyValues(JsonNode editorJsonNode, String propertyName,
         List<String> allowedStencilTypes, List<JsonLookupResult> result) {
 

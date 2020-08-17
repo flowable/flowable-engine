@@ -30,6 +30,9 @@ angular.module('flowableModeler')
         } else if ($scope.model.decisionTable) {
             model = $scope.model.decisionTable;
             popupType = 'DECISION-TABLE';
+        } else if ($scope.model.decisionService) {
+            model = $scope.model.decisionService;
+            popupType = 'DECISION-SERVICE';
         } else {
             model = $scope.model.app;
             popupType = 'APP';
@@ -72,8 +75,10 @@ angular.module('flowableModeler')
     				} else if ($scope.model.form) {
     					$scope.model.form = data;
     				} else if ($scope.model.decisionTable) {
-    					$scope.model.decisionTable = data;
-    				} else {
+                        $scope.model.decisionTable = data;
+                    } else if ($scope.model.decisionService) {
+                        $scope.model.decisionService = data;
+                    } else {
     					$scope.model.app = data;
     				}
 
@@ -89,6 +94,8 @@ angular.module('flowableModeler')
                         $location.path("/decision-tables/" +  $scope.popup.id);
                     } else if (popupType === 'CASE') {
                         $location.path("/casemodels/" +  $scope.popup.id);
+                    } else if (popupType === 'DECISION-SERVICE') {
+                        $location.path("/decision-services/" +  $scope.popup.id);
                     } else {
                         $location.path("/processes/" +  $scope.popup.id);
                     }
@@ -124,6 +131,9 @@ angular.module('flowableModeler')
         } else if ($scope.model.decisionTable) {
             model = $scope.model.decisionTable;
             popupType = 'DECISION-TABLE';
+        } else if ($scope.model.decisionService) {
+            model = $scope.model.decisionService;
+            popupType = 'DECISION-SERVICE';
         } else {
             model = $scope.model.app;
             popupType = 'APP';
@@ -193,6 +203,9 @@ angular.module('flowableModeler')
     } else if ($scope.model.decisionTable) {
         model = $scope.model.decisionTable;
         popupType = 'DECISION-TABLE';
+    } else if ($scope.model.decisionService) {
+        model = $scope.model.decisionService;
+        popupType = 'DECISION-SERVICE';
     } else {
         model = $scope.model.app;
         popupType = 'APP';
@@ -224,6 +237,8 @@ angular.module('flowableModeler')
                         $location.path("/apps/" +  $scope.popup.latestModelId);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.latestModelId);
+                    } else if (popupType === 'DECISION-SERVICE') {
+                        $location.path("/decision-services/" +  $scope.popup.latestModelId);
                     } else if (popupType === 'CASE') {
                         $location.path("/casemodels/" +  $scope.popup.latestModelId);
                     } else {

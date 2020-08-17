@@ -95,7 +95,6 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
             var decisionTableDefinition = angular.copy($rootScope.currentDecisionTable);
 
             data.decisionTableRepresentation.decisionTableDefinition = decisionTableDefinition;
-            decisionTableDefinition.modelVersion = '2';
             decisionTableDefinition.key = key;
             decisionTableDefinition.rules = angular.copy($rootScope.currentDecisionTableRules);
 

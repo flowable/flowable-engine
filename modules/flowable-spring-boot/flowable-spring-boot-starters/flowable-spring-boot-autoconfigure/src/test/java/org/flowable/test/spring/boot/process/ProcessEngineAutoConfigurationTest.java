@@ -44,6 +44,8 @@ import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
@@ -97,6 +99,7 @@ public class ProcessEngineAutoConfigurationTest {
             "flowable.http.requestRetryLimit=1",
             "flowable.http.disableCertVerify=true"
         ).run(context -> {
+            assertThat(context).doesNotHaveBean(FlowableHttpClient.class);
             ProcessEngine processEngine = context.getBean(ProcessEngine.class);
             HttpClientConfig httpClientConfig = processEngine.getProcessEngineConfiguration().getHttpClientConfig();
 
@@ -106,6 +109,7 @@ public class ProcessEngineAutoConfigurationTest {
             assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
             assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
             assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+            assertThat(httpClientConfig.getHttpClient()).isNull();
 
             deleteDeployments(processEngine);
         });
@@ -439,6 +443,39 @@ public class ProcessEngineAutoConfigurationTest {
         });
     }
 
+    @Test
+    public void processEngineWithCustomHttpClient() {
+        contextRunner.withUserConfiguration(CustomHttpClientConfiguration.class)
+                .run(context -> {
+                    assertThat(context)
+                            .as("Process engine").hasSingleBean(ProcessEngine.class)
+                            .as("Http Client").hasSingleBean(FlowableHttpClient.class);
+
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                    ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+                    assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
+                            .isEqualTo(context.getBean(FlowableHttpClient.class));
+                });
+    }
+
+    @Test
+    public void processEngineWithCustomAsyncHttpClient() {
+        contextRunner.withUserConfiguration(CustomAsyncHttpClientConfiguration.class)
+                .run(context -> {
+                    assertThat(context)
+                            .as("Process engine").hasSingleBean(ProcessEngine.class)
+                            .as("Http Client").hasSingleBean(FlowableAsyncHttpClient.class);
+
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                    ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+                    assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
+                            .isEqualTo(context.getBean(FlowableAsyncHttpClient.class));
+                });
+    }
+
+
     private void assertAllServicesPresent(ApplicationContext context, ProcessEngine processEngine) {
         List<Method> methods = Stream.of(ProcessEngine.class.getDeclaredMethods())
             .filter(method -> !(method.getReturnType().equals(void.class) || method.getName().equals("getName"))).collect(Collectors.toList());
@@ -555,6 +592,24 @@ public class ProcessEngineAutoConfigurationTest {
         @Order(10)
         public TestProcessEngineAutoDeploymentStrategy testProcessEngineAutoDeploymentStrategy() {
             return new TestProcessEngineAutoDeploymentStrategy();
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomHttpClientConfiguration {
+
+        @Bean
+        public FlowableHttpClient customHttpClient() {
+            return request -> null;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomAsyncHttpClientConfiguration {
+
+        @Bean
+        public FlowableAsyncHttpClient customAsyncHttpClient() {
+            return request -> null;
         }
     }
 

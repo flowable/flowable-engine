@@ -86,7 +86,7 @@ class HttpHeadersTest {
 
         assertThat(headers)
                 .containsOnly(
-                        entry("Test-NoValue", Collections.singletonList(null))
+                        entry("Test-NoValue", Collections.singletonList(""))
                 );
         assertThat(headers.formatAsString()).isEqualTo("Test-NoValue:");
     }

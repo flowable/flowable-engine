@@ -323,9 +323,13 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response assertions
         Map<String, Object> response = new HashMap<>();
         response.put("get500ResponseStatusCode", 500);
-        response.put("get500ResponseReason", "Server Error");
+        response.put("get500ResponseReason", get500ResponseReason());
         assertKeysEquals(process.getId(), response);
         continueProcess(process);
+    }
+
+    protected String get500ResponseReason() {
+        return "Server Error";
     }
 
     @Test

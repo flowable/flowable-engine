@@ -12,21 +12,67 @@
  */
 package org.flowable.http.common.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpClientConfig {
 
+    protected static final boolean isApacheHttpComponentsPresent;
+    protected static final boolean isSpringWebClientPresent;
+    protected static final boolean isReactorHttpClientPresent;
+
+    static {
+        ClassLoader loader = HttpClientConfig.class.getClassLoader();
+        boolean httpClientBuilderPresent = false;
+        try {
+            Class.forName("org.apache.http.impl.client.HttpClientBuilder", false, loader);
+            httpClientBuilderPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+
+        isApacheHttpComponentsPresent = httpClientBuilderPresent;
+
+        boolean springWebClientBuilderPresent = false;
+        try {
+            Class.forName("org.springframework.web.reactive.function.client.WebClient", false, loader);
+            springWebClientBuilderPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+        isSpringWebClientPresent = springWebClientBuilderPresent;
+
+        boolean reactorHttpClientPresent = false;
+        try {
+            Class.forName("reactor.netty.http.client.HttpClient", false, loader);
+            reactorHttpClientPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+
+        isReactorHttpClientPresent = reactorHttpClientPresent;
+    }
+
     // request settings
+    /**
+     * The maximum time to wait for connecting to a server.
+     * This occurs only when starting the TCP connection.
+     * This usually happens if the remote machine does not answer.
+     * This means that the server has been shut down, you used the wrong IP/DNS name, wrong port or the network connection to the server is down.
+     */
     protected int connectTimeout = 5000;
+
+    /**
+     * The maximum time the connection is idle (i.e. no data is received).
+     * A socket timeout is dedicated to monitor the continuous incoming data flow.
+     * If the data flow is interrupted for the specified timeout the connection is regarded as stalled/broken.
+     * Of course this only works with connections where data is received all the time.
+     */
     protected int socketTimeout = 5000;
     protected int connectionRequestTimeout = 5000;
     protected int requestRetryLimit = 3;
@@ -147,14 +193,15 @@ public class HttpClientConfig {
     public FlowableHttpClient determineHttpClient() {
         if (httpClient != null) {
             return httpClient;
+        } else if (isApacheHttpComponentsPresent) {
+            // Backwards compatibility, if apache HTTP Components is present then it has priority
+            this.httpClient = new ApacheHttpComponentsFlowableHttpClient(this);
+            return this.httpClient;
+        } else if (isSpringWebClientPresent && isReactorHttpClientPresent) {
+            this.httpClient = new SpringWebClientFlowableHttpClient(this);
+            return httpClient;
         } else {
-            try {
-                Constructor<?> constructor = Class.forName("org.flowable.http.client.ApacheHttpComponentsFlowableHttpClient")
-                        .getConstructor(HttpClientConfig.class);
-                return (FlowableHttpClient) constructor.newInstance(this);
-            } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                throw new FlowableException("Failed to determine FlowableHttpClient", e);
-            }
+            throw new FlowableException("Failed to determine FlowableHttpClient");
         }
     }
 

@@ -238,7 +238,7 @@ public class BaseAppDefinitionService {
                 for (Model decisionServiceModel : allDecisionServiceModels) {
                     try {
                         JsonNode decisionServiceNode = objectMapper.readTree(decisionServiceModel.getModelEditorJson());
-                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), decisionTableEditorJSONs);
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), converterContext);
                         byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
                         deployableAssets.put("dmn-" + decisionServiceModel.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {

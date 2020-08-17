@@ -1,0 +1,44 @@
+<div class="modal" ng-controller="DuplicateDecisionServiceCtrl">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header"><h2>{{'DECISION-SERVICE.POPUP.DUPLICATE-TITLE' | translate}}</h2></div>
+			<div class="modal-body">
+				<p>{{'DECISION-SERVICE.POPUP.DUPLICATE-DESCRIPTION' | translate}}</p>
+				<div ng-if="model.errorMessage && model.errorMessage.length > 0" class="alert error" style="font-size: 14px; margin-top:20px">
+                  <div class="popup-error" style="font-size: 14px">
+                    <span class="glyphicon glyphicon-remove-circle"></span>
+                    <span>{{model.errorMessage}}</span>
+                  </div>
+                </div>
+				<div class="form-group">
+				    <label for="newDecisionServiceName">{{'DECISION-SERVICE.NAME' | translate}}</label>
+				    <input ng-disabled="model.loading" type="text" class="form-control"
+			               id="newDecisionServiceName" ng-model="model.decisionService.name" ui-keypress="{13:'ok()'}" auto-focus editor-input-check>
+				</div>
+				<div class="form-group">
+                    <label for="newDecisionServiceKey">{{'DECISION-SERVICE.KEY' | translate}}</label>
+                    <input ng-disabled="model.loading" type="text" class="form-control"
+                           id="newDecisionServiceKey" ng-model="model.decisionService.key" editor-input-check>
+                </div>
+				<div class="form-group">
+				    <label for="newDecisionServiceDescription">{{'DECISION-SERVICE.DESCRIPTION' | translate}}</label>
+					<textarea ng-disabled="model.loading" class="form-control" id="newDecisionServiceDescription" rows="5" ng-model="model.decisionService.description"></textarea>
+				</div>
+			</div>
+			
+			<div class="modal-footer">
+				<div class="pull-right">
+					<button type="button" class="btn btn-sm btn-default" ng-click="cancel()" ng-disabled="model.loading">
+						{{'GENERAL.ACTION.CANCEL' | translate}}
+					</button>
+					<button type="button" class="btn btn-sm btn-default" ng-click="ok()"ng-disabled="model.loading || !model.decisionService.name">
+						{{'DECISION-SERVICE.ACTION.DUPLICATE-CONFIRM' | translate}}
+					</button>
+				</div>
+				<div class="loading pull-right" ng-show="model.loading">
+					<div class="l1"></div><div class="l2"></div><div class="l2"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -75,7 +75,7 @@ This bean is then used to construct the EventRegistryEngine. There are multiple 
 ## Plug into Process Engine
 
 The Event Registry is automatically booted when starting the process engine. So there's no additional configuration needed to start the event registry when already using the process engine.
-The process engine uses a default EventRegistryEngineConfigurator to start the event registry. This default configurator can be overriden by setting an eventRegistryConfigurator in the process engine configuration.
+The process engine uses a default EventRegistryEngineConfigurator to start the event registry. This default configurator can be overridden by setting an eventRegistryConfigurator in the process engine configuration.
 
 It's also possible to disable the event registry in the process engine configuration with the disableEventRegistry property.
 

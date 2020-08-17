@@ -13,12 +13,11 @@
 package org.flowable.http.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,8 +46,6 @@ class HttpClientConfigTest {
     void determineHttpClientWhenNotSet() {
         HttpClientConfig config = new HttpClientConfig();
 
-        assertThatThrownBy(config::determineHttpClient)
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Failed to determine FlowableHttpClient");
+        assertThat(config.determineHttpClient()).isInstanceOf(ApacheHttpComponentsFlowableHttpClient.class);
     }
 }

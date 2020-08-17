@@ -277,7 +277,7 @@ Paging and order parameters can be added as query-string in the URL (for example
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Event Registry Deployments
 

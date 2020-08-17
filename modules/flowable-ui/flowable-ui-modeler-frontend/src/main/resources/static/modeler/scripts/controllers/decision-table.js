@@ -16,7 +16,7 @@
 var extScope;
 
 angular.module('flowableModeler')
-    .controller('DecisionServiceDetailsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', 'DecisionTableService', 'hotRegisterer',
+    .controller('DecisionTableDetailsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', 'DecisionTableService', 'hotRegisterer',
         function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $timeout, $popover, DecisionTableService, hotRegisterer) {
 
             extScope = $scope;

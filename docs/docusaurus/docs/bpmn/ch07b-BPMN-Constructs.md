@@ -2880,7 +2880,7 @@ For example, requestUrl is saved as 'task7RequestUrl' for task with id 'task7'.<
 <tr class="odd">
 <td><p>parallelInSameTransaction</p></td>
 <td><p>-</p></td>
-<td><p>If resolves to true, the HTTP call will be done on a different thread and thus making it possible to execute more HTTP tasks in parallel. This is usefull when parallel gateways are used and there are multiple HTTP tasks in the parallel flows.</p></td>
+<td><p>If resolves to true, the HTTP call will be done on a different thread and thus making it possible to execute more HTTP tasks in parallel. This is useful when parallel gateways are used and there are multiple HTTP tasks in the parallel flows.</p></td>
 </tr>
 <tr class="even">
 <td><p>httpActivityBehaviorClass</p></td>

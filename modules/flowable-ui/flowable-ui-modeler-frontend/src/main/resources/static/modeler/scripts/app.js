@@ -148,6 +148,10 @@ flowableModeler
         .when('/decision-services/:modelId', {
             templateUrl: 'views/decision-service.html',
             controller: 'DecisionServiceDetailsCtrl'
+        })
+        .when('/decision-services/:modelId/history/:modelHistoryId', {
+            templateUrl: 'views/decision-service.html',
+            controller: 'DecisionServiceDetailsCtrl'
         });
 
         if (FLOWABLE.CONFIG.appDefaultRoute) {

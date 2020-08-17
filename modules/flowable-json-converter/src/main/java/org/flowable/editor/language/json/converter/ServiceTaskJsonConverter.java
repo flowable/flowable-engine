@@ -83,18 +83,24 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
 
         } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-
-                String decisionModelKey = converterContext.getDecisionTableModelKeyForDecisionTableModelId(fieldExtension.getStringValue());
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) && decisionModelKey != null) {
-
-                    ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
-                    propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
-
-                    Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(fieldExtension.getStringValue());
-                    decisionReferenceNode.put("id", modelInfo.get("id"));
-                    decisionReferenceNode.put("name", modelInfo.get("name"));
-                    decisionReferenceNode.put("key", modelInfo.get("key"));
-
+                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {
+                    Map<String, String> decisionServiceModelInfo = converterContext.getDecisionServiceModelInfoForDecisionServiceModelKey(fieldExtension.getStringValue());
+                    if (decisionServiceModelInfo != null) {
+                        ObjectNode decisionServiceReferenceNode = objectMapper.createObjectNode();
+                        propertiesNode.set(PROPERTY_DECISIONSERVICE_REFERENCE, decisionServiceReferenceNode);
+                        decisionServiceReferenceNode.put("id", decisionServiceModelInfo.get("id"));
+                        decisionServiceReferenceNode.put("name", decisionServiceModelInfo.get("name"));
+                        decisionServiceReferenceNode.put("key", decisionServiceModelInfo.get("key"));
+                    } else {
+                        Map<String, String> decisionTableModelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(fieldExtension.getStringValue());
+                        if (decisionTableModelInfo != null) {
+                            ObjectNode decisionTableReferenceNode = objectMapper.createObjectNode();
+                            propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionTableReferenceNode);
+                            decisionTableReferenceNode.put("id", decisionTableModelInfo.get("id"));
+                            decisionTableReferenceNode.put("name", decisionTableModelInfo.get("name"));
+                            decisionTableReferenceNode.put("key", decisionTableModelInfo.get("key"));
+                        }
+                    }
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
                             BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));

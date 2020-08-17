@@ -148,7 +148,7 @@ public class HttpHeaders implements Map<String, List<String>> {
                         if (line.length() > colonIndex + 2) {
                             headers.add(headerName, StringUtils.strip(line.substring(colonIndex + 1)));
                         } else {
-                            headers.add(headerName, null);
+                            headers.add(headerName, "");
                         }
                         line = reader.readLine();
 
