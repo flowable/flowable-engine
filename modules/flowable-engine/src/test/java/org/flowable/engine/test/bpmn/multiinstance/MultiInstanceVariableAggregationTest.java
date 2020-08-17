@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -50,6 +51,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("description", "description task 0");
         taskService.complete(tasks.get(0).getId(), variables, true);
 
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
         variables.put("approved", true);
         variables.put("description", "description task 1");
         taskService.complete(tasks.get(1).getId(), variables, true);
@@ -57,6 +60,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("approved", false);
         variables.put("description", "description task 2");
         taskService.complete(tasks.get(2).getId(), variables, true);
+
+        assertVariablesNotVisibleForAnyExecution(processInstance);
 
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
@@ -85,6 +90,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("description", "a");
         taskService.complete(task.getId(), variables, true);
 
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         variables.put("approved", false);
         variables.put("description", "b");
@@ -100,6 +107,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("description", "d");
         taskService.complete(task.getId(), variables, true);
 
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
@@ -111,6 +120,19 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "{ approved : true, description : 'c' },"
                     + "{ approved : true, description : 'd' }"
                     + "]]");
+    }
+
+    protected void assertVariablesNotVisibleForAnyExecution(ProcessInstance processInstance) {
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "approved")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "description")).isNull();
+
+        // Gathered variables shouldn't be visible for any execution
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        for (Execution execution : executions) {
+            assertThat(runtimeService.getVariable(execution.getId(), "approved")).isNull();
+            assertThat(runtimeService.getVariable(execution.getId(), "description")).isNull();
+        }
     }
 
 }
