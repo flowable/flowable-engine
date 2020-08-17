@@ -19,11 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -120,6 +124,37 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "{ approved : true, description : 'c' },"
                     + "{ approved : true, description : 'd' }"
                     + "]]");
+    }
+
+    @Test
+    @Deployment
+    public void testDeleteProcessInstanceBeforeAggregationFinished() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables, true);
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+        // The aggregated variables should be deleted now too
+
+        List<VariableInstanceEntity> variableInstanceEntities = managementService.executeCommand(new Command<List<VariableInstanceEntity>>() {
+
+            @Override
+            public List<VariableInstanceEntity> execute(CommandContext commandContext) {
+                return CommandContextUtil.getVariableService().createInternalVariableInstanceQuery().list();
+            }
+        });
+        assertThat(variableInstanceEntities).isEmpty();
+
     }
 
     protected void assertVariablesNotVisibleForAnyExecution(ProcessInstance processInstance) {
