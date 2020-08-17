@@ -490,6 +490,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
+    public String getVariableAggregationScopeId() {
+        return null;
+    }
+
+    @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         // TODO
     }

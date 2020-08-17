@@ -225,6 +225,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
 
     @Override
+    public String getVariableAggregationScopeId() {
+        return getParentVariableScope().getVariableAggregationScopeId();
+    }
+
+    @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         // TODO
     }

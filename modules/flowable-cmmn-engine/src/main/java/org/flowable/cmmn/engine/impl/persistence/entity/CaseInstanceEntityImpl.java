@@ -286,6 +286,11 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
+    public String getVariableAggregationScopeId() {
+        return null;
+    }
+
+    @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
     }

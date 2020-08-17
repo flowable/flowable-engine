@@ -694,6 +694,21 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public String getVariableAggregationScopeId() {
+        //  Variable gathering is currently only supported when using multi-instance.
+        // Hence why the multi-instance root execution is searched and returned.
+        ExecutionEntity multiInstanceRootExecution = this;
+        while (multiInstanceRootExecution != null) {
+            if (multiInstanceRootExecution.isMultiInstanceRoot()) {
+                return multiInstanceRootExecution.getId();
+            }
+            multiInstanceRootExecution = multiInstanceRootExecution.getParent();
+        }
+
+        return null;
+    }
+
+    @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         BpmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
     }

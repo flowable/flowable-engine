@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -36,14 +36,23 @@ import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -941,8 +950,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         return variableInstance;
     }
 
-    public abstract List<VariableAggregation> getVariableAggregations();
-
     protected void handleVariableAggregations(VariableInstance variableInstance) {
 
         List<VariableAggregation> variableAggregations = getVariableAggregations();
@@ -950,45 +957,92 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             return;
         }
 
-        List<VariableAggregation> matchingVariableAggregations = variableAggregations
+        Optional<VariableAggregation> matchingVariableAggregation = variableAggregations
             .stream()
             .filter(variableAggregation -> variableInstance.getName().equals(variableAggregation.getSource()))
-            .collect(Collectors.toList());
+            .findFirst();
+        if (matchingVariableAggregation.isPresent()) {
 
-        for (VariableAggregation variableAggregation : matchingVariableAggregations) {
+            VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
+            VariableService variableService = variableServiceConfiguration.getVariableService();
+            VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
+            VariableType jsonVariableType = variableTypes.getVariableType(JsonType.TYPE_NAME);
 
-            String targetArrayNodeVariableName = variableAggregation.getTargetArrayVariable();
-            if (StringUtils.isNotEmpty(targetArrayNodeVariableName)) {
+            // Copy of variable should not be associated with original instance nor with the current executionId/scopeId,
+            // as these variables should not be returned in the regular variable queries.
+            //
+            // The subScopeId needs to be set to the parent that does the variable aggregation,
+            // because the variables need to be deleted when the instance would be deleted without doing the aggregation.
+            VariableInstanceEntity variableInstanceCopy = variableService
+                .createVariableInstance(variableInstance.getName(), jsonVariableType);
+            variableInstanceCopy.setSubScopeId(getVariableAggregationScopeId());
+            variableInstanceCopy.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
 
-                Object targetVariable = getVariable(targetArrayNodeVariableName);
+            // The variable value is stored as an ObjectNode instead of the actual value.
+            // The reason for this is:
+            // - it gets stored as json on the actual gathering anyway
+            // - this way extra metadata can be stored (e.g. the instance count of a multi-instance)
+            ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
+            ObjectNode objectNode = objectMapper.createObjectNode();
 
-                ArrayNode targetArrayNode = (ArrayNode) targetVariable;
-                if (targetVariable == null) {
-                    ObjectMapper objectMapper = CommandContextUtil.getVariableServiceConfiguration().getObjectMapper();
-                    targetArrayNode = objectMapper.createArrayNode();
-                    setVariable(targetArrayNodeVariableName, targetArrayNode);
-                }
+            objectNode.put("type", variableInstance.getTypeName());
+            objectNode.put("variableScopeId", getId());
 
-                if (StringUtils.isNotEmpty(variableAggregation.getTarget())) {
-
-                    // TODO: need to know which element we're currently at ...
-                    // TODO: alternatively: only do it on complete?
-                    // TODO: would need to have the special variable type?
-
-                    Object value = variableInstance.getValue();
-                    if (value != null) {
-                        // TODO: other types need to be serialized too
-                        targetArrayNode.add(value.toString());
-                    } else {
-                        // Adding null?
-                        targetArrayNode.addNull();
-                    }
-                }
-
+            if (StringType.TYPE_NAME.equals(variableInstance.getTypeName()) || LongStringType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (String) variableInstance.getValue());
+            } else if (BooleanType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (Boolean) variableInstance.getValue());
+            } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (Short) variableInstance.getValue());
+            } else if (IntegerType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (Integer) variableInstance.getValue());
+            } else if (LongType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (Long) variableInstance.getValue());
+            } else if (DoubleType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (Double) variableInstance.getValue());
+            } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.put("value", (String) variableInstance.getValue());
+            } else if (NullType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                objectNode.putNull("value");
             }
 
+            /*
+
+            TODO: other types. What about
+            TODO: or move toJson to VariabeType interface? Or always conversion from/to string? Add serialization to variabletype?
+
+             variableTypes.addType(new NullType());
+            variableTypes.addType(new DateType());
+            variableTypes.addType(new InstantType());
+            variableTypes.addType(new LocalDateType());
+            variableTypes.addType(new LocalDateTimeType());
+            variableTypes.addType(new JodaDateType());
+            variableTypes.addType(new JodaDateTimeType());
+            variableTypes.addType(new UUIDType());
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            // longJsonType only needed for reading purposes
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new AggregatedVariableType());
+            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            if (customPostVariableTypes != null) {
+                for (VariableType customVariableType : customPostVariableTypes) {
+                    variableTypes.addType(customVariableType);
+                }
+            }
+             */
+
+            variableInstanceCopy.setValue(objectNode);
+
+            variableService.insertVariableInstance(variableInstanceCopy);
+
         }
+
     }
+
+    public abstract List<VariableAggregation> getVariableAggregations();
+
+    public abstract String getVariableAggregationScopeId();
 
     /*
      * Transient variables

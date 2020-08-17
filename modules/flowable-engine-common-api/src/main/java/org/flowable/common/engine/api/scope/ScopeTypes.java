@@ -30,10 +30,11 @@ public interface ScopeTypes {
     String PLAN_ITEM = "planItem";
     String TASK = "task";
     String EXTERNAL_WORKER = "externalWorker";
+    String VARIABLE_AGGREGATION = "variableAggregation";
 
     String CMMN_EXTERNAL_WORKER = "cmmnExternalWorker";
     String BPMN_EXTERNAL_WORKER = "bpmnExternalWorker";
 
-    Collection<String> CMMN_DEPENDENT = new HashSet<>(Arrays.asList(CMMN, CMMN_EXTERNAL_WORKER));
-    Collection<String> BPMN_DEPENDENT = new HashSet<>(Arrays.asList(BPMN_EXTERNAL_WORKER));
+    Collection<String> CMMN_DEPENDENT = new HashSet<>(Arrays.asList(CMMN, CMMN_EXTERNAL_WORKER, VARIABLE_AGGREGATION));
+    Collection<String> BPMN_DEPENDENT = new HashSet<>(Arrays.asList(BPMN_EXTERNAL_WORKER, VARIABLE_AGGREGATION));
 }

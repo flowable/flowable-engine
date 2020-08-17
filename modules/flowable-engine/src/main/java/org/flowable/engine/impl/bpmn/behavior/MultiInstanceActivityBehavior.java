@@ -16,9 +16,12 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -31,6 +34,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
@@ -52,10 +56,16 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -135,7 +145,79 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
+        gatherVariables(execution);
         cleanupMiRoot(execution);
+    }
+
+    protected void gatherVariables(DelegateExecution execution) {
+
+        VariableScopeImpl variableScope = (VariableScopeImpl) execution;
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
+        // Gathered variables are stored on the multi instance root execution
+        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
+            .subScopeId(getMultiInstanceRootExecution(execution).getId())
+            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .list();
+        if (variableInstances == null || variableInstances.isEmpty()) {
+            return;
+        }
+
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+        Map<String, ArrayNode> arrayVariables = new HashMap<>();
+        List<VariableAggregation> variableAggregations = variableScope.getVariableAggregations();
+        for (VariableInstanceEntity variableInstance : variableInstances) {
+
+            ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
+
+            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
+                .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
+                .collect(Collectors.toList());
+
+            for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
+
+                // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
+                // This might be ok when the moment of aggregation is set/documented to the moment of completion?
+                String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
+                ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
+                if (arrayNodeVariable == null) {
+                    arrayNodeVariable =  objectMapper.createArrayNode();
+                    arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
+                }
+
+                // Check if another variable was already added before
+                ObjectNode variableObjectNode= null;
+                for (JsonNode existingVariableNode : arrayNodeVariable) {
+                    String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
+                    if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
+                        variableObjectNode = (ObjectNode) existingVariableNode;
+                        break;
+                    }
+                }
+
+                if (variableObjectNode == null) {
+                    variableObjectNode = objectMapper.createObjectNode();
+                    variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
+                    arrayNodeVariable.add(variableObjectNode);
+                }
+
+                variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
+
+            }
+
+        }
+
+        for (String arrayVariableName : arrayVariables.keySet()) {
+            ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
+
+            for (JsonNode arrayVariableElement : arrayVariable) {
+                ((ObjectNode) arrayVariableElement).remove("variableScopeId");
+            }
+
+            execution.setVariable(arrayVariableName, arrayVariable);
+        }
+
     }
 
     protected void cleanupMiRoot(DelegateExecution execution) {
