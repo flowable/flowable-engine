@@ -147,10 +147,10 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().list()).hasSize(2);
         assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentId().desc().count()).isEqualTo(2);
         
-        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list()).hasSize(2);
-        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymenTime().asc().count()).isEqualTo(2);
-        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list()).hasSize(2);
-        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymenTime().desc().count()).isEqualTo(2);
+        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list()).hasSize(2);
+        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentTime().asc().count()).isEqualTo(2);
+        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentTime().desc().list()).hasSize(2);
+        assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentTime().desc().count()).isEqualTo(2);
         
         assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list()).hasSize(2);
         assertThat(appRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().count()).isEqualTo(2);

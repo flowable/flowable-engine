@@ -54,22 +54,28 @@ public class DeployCmd<T> implements Command<EventDeployment>, Serializable {
 
             List<EventDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || EventRegistryEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                List<EventDeployment> deploymentEntities = new EventDeploymentQueryImpl(CommandContextUtil.getEventRegistryConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                List<EventDeployment> deploymentEntities = new EventDeploymentQueryImpl(CommandContextUtil.getEventRegistryConfiguration().getCommandExecutor())
+                        .deploymentName(deployment.getName())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
+                
             } else {
-                List<EventDeployment> deploymentList = CommandContextUtil.getEventRegistryConfiguration().getEventRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<EventDeployment> deploymentList = CommandContextUtil.getEventRegistryConfiguration().getEventRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            EventDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (EventDeploymentEntity) existingDeployments.get(0);
+                EventDeploymentEntity existingDeployment = (EventDeploymentEntity) existingDeployments.get(0);
 
                 Map<String, EventResourceEntity> resourceMap = new HashMap<>();
                 List<EventResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
@@ -77,10 +83,10 @@ public class DeployCmd<T> implements Command<EventDeployment>, Serializable {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
                 }
                 existingDeployment.setResources(resourceMap);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 

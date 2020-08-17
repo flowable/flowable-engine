@@ -109,7 +109,7 @@ public interface AppDeploymentQuery extends Query<AppDeploymentQuery, AppDeploym
     /**
      * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
-    AppDeploymentQuery orderByDeploymenTime();
+    AppDeploymentQuery orderByDeploymentTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

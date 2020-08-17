@@ -89,21 +89,22 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
                 }
                 
             } else {
-                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentTime().desc().list();
+                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            DeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (DeploymentEntity) existingDeployments.get(0);
-            }
-
-            if (existingDeployment != null && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                DeploymentEntity existingDeployment = (DeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 

@@ -105,7 +105,7 @@ public interface DmnDeploymentQuery extends Query<DmnDeploymentQuery, DmnDeploym
     /**
      * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
-    DmnDeploymentQuery orderByDeploymenTime();
+    DmnDeploymentQuery orderByDeploymentTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

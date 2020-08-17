@@ -168,7 +168,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     }
 
     @Override
-    public DmnDeploymentQuery orderByDeploymenTime() {
+    public DmnDeploymentQuery orderByDeploymentTime() {
         return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
     }
 
