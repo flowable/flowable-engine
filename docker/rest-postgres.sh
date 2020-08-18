@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_COMPOSE_FILE="../modules/flowable-app-rest/src/main/docker/docker-compose.yml"
+DOCKER_COMPOSE_FILE="config/rest-postgres.yml"
 
 if [ -z "$1" ]
 then

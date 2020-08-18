@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_COMPOSE_FILE="../modules/flowable-ui-idm/flowable-ui-idm-app/src/main/docker/docker-compose.yml"
+DOCKER_COMPOSE_FILE="config/ui-postgres.yml"
 
 if [ -z "$1" ]
 then
@@ -30,4 +30,7 @@ then
 elif [ $1 == info ]
 then
   docker-compose -f $DOCKER_COMPOSE_FILE logs --follow
+else
+  echo -e "Usage: \n${0##*/} start \n${0##*/} stop \n${0##*/} info"
+  exit 1
 fi
