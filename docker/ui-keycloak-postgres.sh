@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_COMPOSE_FILE="config/rest-idm-admin-postgres.yml"
+DOCKER_COMPOSE_FILE="config/ui-keycloak-postgres.yml"
 
 if [ -z "$1" ]
 then
