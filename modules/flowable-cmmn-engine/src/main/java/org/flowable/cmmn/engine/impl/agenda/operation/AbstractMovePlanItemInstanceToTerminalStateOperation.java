@@ -12,11 +12,15 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
@@ -25,7 +29,17 @@ import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
@@ -75,6 +89,12 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
                     }
                 }
+
+            } else if (planItemInstanceEntity.getPlanItemDefinition() != null
+                    && planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions() != null
+                    && !planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty()) {
+                gatherVariables(planItemInstanceEntity);
+
             }
 
             removeSentryRelatedData();
@@ -188,6 +208,90 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
             }
         }
+    }
+
+    protected void gatherVariables(PlanItemInstanceEntity planItemInstanceEntity) {
+
+        VariableScopeImpl variableScope = (VariableScopeImpl) planItemInstanceEntity;
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
+        List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+            .findByCaseInstanceIdAndPlanItemId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        if (planItemInstances == null || planItemInstances.isEmpty()) {
+            return;
+        }
+
+        // All instances should be in the terminal state to apply the variable gathering
+        for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+            if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
+                return;
+            }
+        }
+
+        // Gathered variables are stored on finished the plan item instances
+        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
+            .subScopeIds(planItemInstances.stream().map(PlanItemInstanceEntity::getId).collect(Collectors.toList()))
+            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .list();
+        if (variableInstances == null || variableInstances.isEmpty()) {
+            return;
+        }
+
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+        Map<String, ArrayNode> arrayVariables = new HashMap<>();
+        List<VariableAggregation> variableAggregations = variableScope.getVariableAggregations();
+        for (VariableInstanceEntity variableInstance : variableInstances) {
+
+            ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
+
+            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
+                .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
+                .collect(Collectors.toList());
+
+            for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
+
+                // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
+                // This might be ok when the moment of aggregation is set/documented to the moment of completion?
+                String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
+                ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
+                if (arrayNodeVariable == null) {
+                    arrayNodeVariable =  objectMapper.createArrayNode();
+                    arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
+                }
+
+                // Check if another variable was already added before
+                ObjectNode variableObjectNode= null;
+                for (JsonNode existingVariableNode : arrayNodeVariable) {
+                    String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
+                    if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
+                        variableObjectNode = (ObjectNode) existingVariableNode;
+                        break;
+                    }
+                }
+
+                if (variableObjectNode == null) {
+                    variableObjectNode = objectMapper.createObjectNode();
+                    variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
+                    arrayNodeVariable.add(variableObjectNode);
+                }
+
+                variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
+
+            }
+
+        }
+
+        for (String arrayVariableName : arrayVariables.keySet()) {
+            ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
+
+            for (JsonNode arrayVariableElement : arrayVariable) {
+                ((ObjectNode) arrayVariableElement).remove("variableScopeId");
+            }
+
+            planItemInstanceEntity.setVariable(arrayVariableName, arrayVariable);
+        }
+
     }
 
     public abstract boolean isEvaluateRepetitionRule();

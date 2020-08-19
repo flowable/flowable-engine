@@ -159,6 +159,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
     protected void assertVariablesNotVisibleForAnyExecution(ProcessInstance processInstance) {
 
+        assertThat(runtimeService.getVariable(processInstance.getId(), "nrOfLoops")).isNotNull();
+
         assertThat(runtimeService.getVariable(processInstance.getId(), "approved")).isNull();
         assertThat(runtimeService.getVariable(processInstance.getId(), "description")).isNull();
 

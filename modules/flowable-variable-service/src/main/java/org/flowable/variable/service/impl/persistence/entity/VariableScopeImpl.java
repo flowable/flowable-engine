@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -975,8 +976,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             // because the variables need to be deleted when the instance would be deleted without doing the aggregation.
             VariableInstanceEntity variableInstanceCopy = variableService
                 .createVariableInstance(variableInstance.getName(), jsonVariableType);
-            variableInstanceCopy.setSubScopeId(getVariableAggregationScopeId());
             variableInstanceCopy.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
+
+            Pair<String, String> variableAggregationScopeInfo = getVariableAggregationScopeInfo();
+            if (variableAggregationScopeInfo != null) {
+                variableInstanceCopy.setScopeId(variableAggregationScopeInfo.getLeft());
+                variableInstanceCopy.setSubScopeId(variableAggregationScopeInfo.getRight());
+            }
 
             // The variable value is stored as an ObjectNode instead of the actual value.
             // The reason for this is:
@@ -1042,7 +1048,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     public abstract List<VariableAggregation> getVariableAggregations();
 
-    public abstract String getVariableAggregationScopeId();
+    public abstract Pair<String, String> getVariableAggregationScopeInfo();
 
     /*
      * Transient variables

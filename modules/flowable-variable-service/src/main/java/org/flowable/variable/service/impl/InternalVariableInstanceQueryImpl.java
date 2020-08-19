@@ -44,7 +44,9 @@ public class InternalVariableInstanceQueryImpl
     protected Collection<String> executionIds;
     protected boolean withoutTaskId;
     protected String scopeId;
+    protected Collection<String> scopeIds;
     protected String subScopeId;
+    protected Collection<String> subScopeIds;
     protected boolean withoutSubScopeId;
     protected String scopeType;
     protected Collection<String> scopeTypes;
@@ -133,6 +135,12 @@ public class InternalVariableInstanceQueryImpl
     }
 
     @Override
+    public InternalVariableInstanceQuery scopeIds(Collection<String> scopeIds) {
+        this.scopeIds = scopeIds;
+        return this;
+    }
+
+    @Override
     public InternalVariableInstanceQuery subScopeId(String subScopeId) {
         if (StringUtils.isEmpty(subScopeId)) {
             throw new FlowableIllegalArgumentException("subScopeId is empty");
@@ -143,6 +151,16 @@ public class InternalVariableInstanceQueryImpl
         }
 
         this.subScopeId = subScopeId;
+        return this;
+    }
+
+    @Override
+    public InternalVariableInstanceQuery subScopeIds(Collection<String> subScopeIds) {
+        if (withoutSubScopeId) {
+            throw new FlowableIllegalArgumentException("Cannot combine subScopeIds with withoutSubScopeId in the same query");
+        }
+
+        this.subScopeIds = subScopeIds;
         return this;
     }
 
@@ -227,8 +245,16 @@ public class InternalVariableInstanceQueryImpl
         return scopeId;
     }
 
+    public Collection<String> getScopeIds() {
+        return scopeIds;
+    }
+
     public String getSubScopeId() {
         return subScopeId;
+    }
+
+    public Collection<String> getSubScopeIds() {
+        return subScopeIds;
     }
 
     public boolean isWithoutSubScopeId() {
@@ -258,8 +284,8 @@ public class InternalVariableInstanceQueryImpl
     }
 
     @Override
-    public boolean isRetained(Collection<VariableInstanceEntity> databaseEntities, Collection<CachedEntity> cachedEntities, VariableInstanceEntity entity,
-            Object param) {
+    public boolean isRetained(Collection<VariableInstanceEntity> databaseEntities, Collection<CachedEntity> cachedEntities,
+            VariableInstanceEntity entity, Object param) {
         return isRetained(entity, (InternalVariableInstanceQueryImpl) param);
     }
 
@@ -278,6 +304,10 @@ public class InternalVariableInstanceQueryImpl
             return false;
         }
 
+        if (param.scopeIds != null && !param.scopeIds.contains(entity.getScopeId())) {
+            return false;
+        }
+
         if (param.taskId != null && !param.taskId.equals(entity.getTaskId())) {
             return false;
         }
@@ -291,6 +321,10 @@ public class InternalVariableInstanceQueryImpl
         }
 
         if (param.subScopeId != null && !param.subScopeId.equals(entity.getSubScopeId())) {
+            return false;
+        }
+
+        if (param.subScopeIds != null && !param.subScopeIds.contains(entity.getSubScopeId())) {
             return false;
         }
 

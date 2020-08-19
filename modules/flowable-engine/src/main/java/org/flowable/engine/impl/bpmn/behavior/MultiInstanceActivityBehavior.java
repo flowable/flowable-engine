@@ -145,7 +145,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
-        gatherVariables(execution);
+        if (execution.getCurrentFlowElement() instanceof FlowNode
+                && ((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions() != null
+                && !((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions().isEmpty()) {
+            gatherVariables(execution);
+        }
         cleanupMiRoot(execution);
     }
 

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -225,8 +226,8 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
 
     @Override
-    public String getVariableAggregationScopeId() {
-        return getParentVariableScope().getVariableAggregationScopeId();
+    public Pair<String, String> getVariableAggregationScopeInfo() {
+        return getParentVariableScope().getVariableAggregationScopeInfo();
     }
 
     @Override

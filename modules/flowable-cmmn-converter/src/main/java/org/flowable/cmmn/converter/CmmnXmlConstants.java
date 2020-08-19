@@ -198,6 +198,10 @@ public interface CmmnXmlConstants {
     String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
 
+    String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
+    String ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE = "targetArrayVariable";
+    String ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE_EXPRESSION = "targetArrayVariableExpression";
+
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";

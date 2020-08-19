@@ -19,7 +19,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -30,7 +33,10 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -486,12 +492,64 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     public List<VariableAggregation> getVariableAggregations() {
-        return null;
+        PlanItemDefinition planItemDefinition = getPlanItemDefinition();
+        if (planItemDefinition.getVariableAggregationDefinitions() != null)  {
+            return planItemDefinition.getVariableAggregationDefinitions().stream()
+                .map(variableAggregationDefinition -> {
+
+                    String targetArrayVariable = null;
+                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariableExpression())) {
+                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
+                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetArrayVariableExpression());
+                        Object value = expression.getValue(this);
+                        if (value != null) {
+                            targetArrayVariable = value.toString();
+                        }
+
+                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariable())) {
+                        targetArrayVariable = variableAggregationDefinition.getTargetArrayVariable();
+
+                    }
+
+                    String source = null;
+                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getSourceExpression())) {
+                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
+                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getSourceExpression());
+                        Object value = expression.getValue(this);
+                        if (value != null) {
+                            source = value.toString();
+                        }
+
+                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getSource())) {
+                        source = variableAggregationDefinition.getSource();
+
+                    }
+
+                    String target = null;
+                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetExpression())) {
+                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
+                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetExpression());
+                        Object value = expression.getValue(this);
+                        if (value != null) {
+                            target = value.toString();
+                        }
+
+                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTarget())) {
+                        target = variableAggregationDefinition.getTarget();
+
+                    }
+
+                    return new VariableAggregation(targetArrayVariable, source, target);
+
+                })
+                .collect(Collectors.toList());
+        }
+        return  null;
     }
 
     @Override
-    public String getVariableAggregationScopeId() {
-        return null;
+    public Pair<String, String> getVariableAggregationScopeInfo() {
+        return Pair.of(getCaseInstanceId(), getId());
     }
 
     @Override

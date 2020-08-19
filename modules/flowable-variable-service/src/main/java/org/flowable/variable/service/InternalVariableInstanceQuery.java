@@ -59,6 +59,11 @@ public interface InternalVariableInstanceQuery {
     InternalVariableInstanceQuery withoutTaskId();
 
     /**
+     * Query variables with the given scope ids.
+     */
+    InternalVariableInstanceQuery scopeIds(Collection<String> scopeIds);
+
+    /**
      * Query variables with the given scope id.
      */
     InternalVariableInstanceQuery scopeId(String scopeId);
@@ -68,6 +73,12 @@ public interface InternalVariableInstanceQuery {
      * Cannot be used together with {@link #withoutSubScopeId()}
      */
     InternalVariableInstanceQuery subScopeId(String subScopeId);
+
+    /**
+     * Query variables with the given sub scope ids.
+     * Cannot be used together with {@link #withoutSubScopeId()}
+     */
+    InternalVariableInstanceQuery subScopeIds(Collection<String> subScopeIds);
 
     /**
      * Query variables without a sub scope id.

@@ -40,19 +40,19 @@ public class VariableAggregationDefinitionParser extends BaseChildElementParser 
         }
 
         FlowNode flowNode = (FlowNode) parentElement;
-        VariableAggregationDefinition variableAggregationDefiinition = new VariableAggregationDefinition();
+        VariableAggregationDefinition variableAggregationDefinition = new VariableAggregationDefinition();
 
         if (flowNode.getVariableAggregationDefinitions() == null) {
             flowNode.setVariableAggregationDefinitions(new ArrayList<>());
         }
-        flowNode.getVariableAggregationDefinitions().add(variableAggregationDefiinition);
+        flowNode.getVariableAggregationDefinitions().add(variableAggregationDefinition);
 
-        variableAggregationDefiinition.setTargetArrayVariable(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE));
-        variableAggregationDefiinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE_EXPRESSION));
-        variableAggregationDefiinition.setSource(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE));
-        variableAggregationDefiinition.setSourceExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION));
-        variableAggregationDefiinition.setTarget(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET));
-        variableAggregationDefiinition.setTargetExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+        variableAggregationDefinition.setTargetArrayVariable(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE));
+        variableAggregationDefinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE_EXPRESSION));
+        variableAggregationDefinition.setSource(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE));
+        variableAggregationDefinition.setSourceExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION));
+        variableAggregationDefinition.setTarget(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET));
+        variableAggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
     }
 
 }

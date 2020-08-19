@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.FlowableListener;
@@ -694,13 +695,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
-    public String getVariableAggregationScopeId() {
+    public Pair<String, String> getVariableAggregationScopeInfo() {
         //  Variable gathering is currently only supported when using multi-instance.
         // Hence why the multi-instance root execution is searched and returned.
         ExecutionEntity multiInstanceRootExecution = this;
         while (multiInstanceRootExecution != null) {
             if (multiInstanceRootExecution.isMultiInstanceRoot()) {
-                return multiInstanceRootExecution.getId();
+                return Pair.of(multiInstanceRootExecution.getProcessInstanceId(), multiInstanceRootExecution.getId());
             }
             multiInstanceRootExecution = multiInstanceRootExecution.getParent();
         }

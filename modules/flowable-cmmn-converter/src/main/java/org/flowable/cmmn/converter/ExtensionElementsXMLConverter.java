@@ -18,6 +18,8 @@ import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_DELEGATE_EX
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
 
+import java.util.ArrayList;
+
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamReader;
 
@@ -44,8 +46,10 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +112,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
                     } else if (CmmnXmlConstants.ELEMENT_EVENT_TYPE.equals(xtr.getLocalName())) {
                         readEventType(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_VARIABLE_AGGREGATION.equals(xtr.getLocalName())) {
+                        readVariableAggregationDefinition(xtr, conversionHelper);
 
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
@@ -367,6 +374,30 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             LOGGER.warn("Unsupported eventType detected for element {}", currentCmmnElement);
 
         }
+    }
+
+    protected void readVariableAggregationDefinition(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+
+        if (currentCmmnElement instanceof PlanItemDefinition) {
+            PlanItemDefinition planItemDefinition = (PlanItemDefinition) currentCmmnElement;
+
+            VariableAggregationDefinition variableAggregationDefinition = new VariableAggregationDefinition();
+
+            if (planItemDefinition.getVariableAggregationDefinitions() == null) {
+                planItemDefinition.setVariableAggregationDefinitions(new ArrayList<>());
+            }
+            planItemDefinition.getVariableAggregationDefinitions().add(variableAggregationDefinition);
+
+            variableAggregationDefinition.setTargetArrayVariable(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE));
+            variableAggregationDefinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE_EXPRESSION));
+            variableAggregationDefinition.setSource(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE));
+            variableAggregationDefinition.setSourceExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION));
+            variableAggregationDefinition.setTarget(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET));
+            variableAggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+
+        }
+
     }
 
     protected void readCommonXmlInfo(BaseElement baseElement, XMLStreamReader xtr) {
