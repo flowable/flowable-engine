@@ -23,7 +23,7 @@ login/password: `admin/test`
 
 In order to be able to redirect both Docker containers and client browser to the same authentication provider (Keyclock) uri `keycloak.flowable.org` must be added as an alias to the Docker host hostname.
 
-For local development this can be done by modifying the `/etc/hostname`;
+For local development this can be done by modifying the `/etc/hosts`;
 
 ```
 127.0.0.1	localhost keycloak.flowable.org
