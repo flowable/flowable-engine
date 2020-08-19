@@ -26,6 +26,7 @@
         <camel.version>2.25.0</camel.version>
 		<cxf.version>3.3.6</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
+		<jib-maven-plugin.version>1.6.1</jib-maven-plugin.version>
 
 		<junit.version>4.13</junit.version>
 		<junit.jupiter.version>5.6.2</junit.jupiter.version>
@@ -37,8 +38,6 @@
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
-
-		<spotify.docker.plugin.version>1.4.10</spotify.docker.plugin.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -1201,11 +1200,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>${spotify.docker.plugin.version}</version>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven.deploy.plugin.version}</version>
@@ -1320,6 +1314,11 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>1.6.0</version>
+				</plugin>
+				<plugin>
+					<groupId>com.google.cloud.tools</groupId>
+					<artifactId>jib-maven-plugin</artifactId>
+					<version>${jib-maven-plugin.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
