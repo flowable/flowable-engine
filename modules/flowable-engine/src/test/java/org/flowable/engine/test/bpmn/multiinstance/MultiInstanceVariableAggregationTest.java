@@ -116,7 +116,6 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ approved : false, description : 'a' },"

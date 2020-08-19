@@ -71,7 +71,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ approved : false, description : 'description task 0' },"

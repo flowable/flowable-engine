@@ -972,7 +972,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             // Copy of variable should not be associated with original instance nor with the current executionId/scopeId,
             // as these variables should not be returned in the regular variable queries.
             //
-            // The subScopeId needs to be set to the parent that does the variable aggregation,
+            // The subScopeId needs to be set to the actual scope that does the variable aggregation,
             // because the variables need to be deleted when the instance would be deleted without doing the aggregation.
             VariableInstanceEntity variableInstanceCopy = variableService
                 .createVariableInstance(variableInstance.getName(), jsonVariableType);
@@ -987,7 +987,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             // The variable value is stored as an ObjectNode instead of the actual value.
             // The reason for this is:
             // - it gets stored as json on the actual gathering anyway
-            // - this way extra metadata can be stored (e.g. the instance count of a multi-instance)
+            // - this way extra metadata can be stored
             ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
 
@@ -1014,7 +1014,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
             /*
 
-            TODO: other types. What about
+            TODO: other types. 
             TODO: or move toJson to VariabeType interface? Or always conversion from/to string? Add serialization to variabletype?
 
              variableTypes.addType(new NullType());
