@@ -756,7 +756,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("key") && !decisionTableReferenceNode.get("key").isNull()) {
 
                 String decisionTableKey = decisionTableReferenceNode.get("key").asText();
-                if (converterContext != null) {
+                if (converterContext != null && converterContext.getDecisionTableKeyToJsonStringMap() != null) {
                     String decisionTableEditorJson = converterContext.getDecisionTableKeyToJsonStringMap().get(decisionTableKey);
                     if (StringUtils.isNotEmpty(decisionTableEditorJson)) {
                         try {
@@ -774,10 +774,6 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                     }
                 }
             }
-
-//            if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("name") && !decisionTableReferenceNode.get("name").isNull()) {
-//                decision.setName(DmnJsonConverterUtil.getValueAsString(PROPERTY_NAME, decisionTableReferenceNode));
-//            }
 
             if (targetRefMap.containsKey(decisionChildNode.get("resourceId").asText())) {
                 JsonNode informationRequirementNode = targetRefMap.get(decisionChildNode.get("resourceId").asText());
