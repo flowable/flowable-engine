@@ -33,16 +33,46 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class DmnJsonConverterUtilTest {
 
-    private static final String JSON_RESOURCE_1 = "org/flowable/dmn/editor/converter/decisiontable_regression_model_v2.json";
+    private static final String JSON_RESOURCE_1 = "org/flowable/dmn/editor/converter/decisiontable_regression_model_v1.json";
+    private static final String JSON_RESOURCE_2 = "org/flowable/dmn/editor/converter/decisiontable_regression_model_v2.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Test
-    public void migrateV2ToV3() {
+    public void migrateV1ToV3() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_1);
 
-        testJsonResource = new DmnJsonConverterUtil().migrateModelV3(testJsonResource, OBJECT_MAPPER);
+        boolean wasMigrated = new DmnJsonConverterUtil().migrateModelV3(testJsonResource, OBJECT_MAPPER);
 
+        assertThat(wasMigrated).isTrue();
+        assertThat(testJsonResource.get("modelVersion").asText()).isEqualTo("3");
+
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText()).isEqualTo("== \"TEST\"");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getText()).isEqualTo("== 100");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(2).getInputEntry().getText()).isEqualTo("== true");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getText()).isEqualTo("== date:toDate('2017-06-01')");
+
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText()).isEqualTo("!= \"TEST\"");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getText()).isEqualTo("!= 100");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(2).getInputEntry().getText()).isEqualTo("== false");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getText()).isEqualTo("!= date:toDate('2017-06-01')");
+
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText()).isEqualTo("-");
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(1).getInputEntry().getText()).isEqualTo("-");
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(2).getInputEntry().getText()).isEqualTo("-");
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getText()).isEqualTo("-");
+    }
+
+    @Test
+    public void migrateV2ToV3() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_2);
+
+        boolean wasMigrated = new DmnJsonConverterUtil().migrateModelV3(testJsonResource, OBJECT_MAPPER);
+
+        assertThat(wasMigrated).isTrue();
         assertThat(testJsonResource.get("modelVersion").asText()).isEqualTo("3");
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());

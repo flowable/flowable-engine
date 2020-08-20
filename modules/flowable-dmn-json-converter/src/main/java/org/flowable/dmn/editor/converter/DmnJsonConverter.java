@@ -866,7 +866,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
     protected void processDecisionTableDecision(JsonNode modelNode, DmnDefinition definition) {
         // check and migrate model
-        modelNode = DmnJsonConverterUtil.migrateModel(modelNode, objectMapper);
+        DmnJsonConverterUtil.migrateModel(modelNode, objectMapper);
 
         definition.setName(DmnJsonConverterUtil.getValueAsString("name", modelNode));
 
