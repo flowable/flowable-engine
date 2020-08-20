@@ -124,14 +124,13 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
             Collection<Model> allDecisionServiceModels = converterContext.getAllDecisionServiceModels();
 
-            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
-            if (!allDecisionTableModels.isEmpty()) {
-                decisionTableEditorJSONs = allDecisionTableModels.stream()
-                    .collect(Collectors.toMap(
-                        AbstractModel::getKey,
-                        AbstractModel::getModelEditorJson
-                    ));
-            }
+            allDecisionTableModels
+                    .forEach(decisionTableModel ->
+                            converterContext.getDecisionTableKeyToJsonStringMap().put(
+                                    decisionTableModel.getKey(),
+                                    decisionTableModel.getModelEditorJson()
+                            )
+                    );
 
             createDecisionTableZipEntries(allDecisionTableModels, converterContext, zipOutputStream);
             createDecisionServiceZipEntries(allDecisionServiceModels, converterContext, zipOutputStream);

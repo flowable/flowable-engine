@@ -224,14 +224,13 @@ public class BaseAppDefinitionService {
 
             Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
 
-            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
-            if (allDecisionTableModels.size() > 0) {
-                decisionTableEditorJSONs = allDecisionTableModels.stream()
-                    .collect(Collectors.toMap(
-                        AbstractModel::getKey,
-                        AbstractModel::getModelEditorJson
-                    ));
-            }
+            allDecisionTableModels
+                    .forEach(decisionTableModel ->
+                            converterContext.getDecisionTableKeyToJsonStringMap().put(
+                                    decisionTableModel.getKey(),
+                                    decisionTableModel.getModelEditorJson()
+                            )
+                    );
 
             Collection<Model> allDecisionServiceModels = converterContext.getAllDecisionServiceModels();
             if (allDecisionServiceModels.size() > 0) {
