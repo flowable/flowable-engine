@@ -1433,7 +1433,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 addSessionFactory(sessionFactory);
             }
         }
-
+        if (isUsingRelationalDatabase()) {
+            initDbSqlSessionFactoryEntitySettings();
+        }
     }
 
     @Override
