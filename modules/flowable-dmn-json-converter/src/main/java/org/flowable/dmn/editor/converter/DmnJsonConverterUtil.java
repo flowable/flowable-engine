@@ -62,10 +62,14 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         return propertyValue;
     }
 
-    public static JsonNode migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+    public static boolean migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+
+        boolean wasMigrated = false;
 
         // check if model is version 1
         if ((decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) && decisionTableNode.has("name")) {
+            wasMigrated = true;
+
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model with name {} found with version < v2; migrating to v3", modelName);
 
@@ -198,18 +202,20 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
                 decisionTableObjectNode.replace("rules", newRuleNodes);
             }
 
-            LOGGER.info("Decision table model {} migrated to v2", modelName);
+            LOGGER.info("Decision table model {} migrated to v3", modelName);
         }
 
-        return decisionTableNode;
+        return wasMigrated;
     }
 
-    public static JsonNode migrateModelV3(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+    public static boolean migrateModelV3(JsonNode decisionTableNode, ObjectMapper objectMapper) {
         // migrate to v2
-        decisionTableNode = migrateModel(decisionTableNode, objectMapper);
+        boolean wasMigrated = migrateModel(decisionTableNode, objectMapper);
 
         // migrate to v3
         if (decisionTableNode.has("modelVersion") && decisionTableNode.get("modelVersion").asText().equals("2") && decisionTableNode.has("name")) {
+            wasMigrated = true;
+
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model {} found with version v2; migrating to v3", modelName);
 
@@ -266,7 +272,7 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
             LOGGER.info("Decision table model {} migrated to v3", modelName);
         }
 
-        return decisionTableNode;
+        return wasMigrated;
     }
 
     public static String determineExpressionType(String expressionValue) {

@@ -56,6 +56,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     protected Map<String, Model> caseKeyToModelMap = new HashMap<>();
     protected Map<String, Model> formKeyToModelMap = new HashMap<>();
     protected Map<String, Model> decisionTableKeyToModelMap = new HashMap<>();
+    protected Map<String, Model> referencedDecisionTableKeyToModelMap = new HashMap<>();
     protected Map<String, Model> decisionServiceKeyToModelMap = new HashMap<>();
 
     // Thumbnails part of the app
@@ -234,7 +235,26 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         addDecisionTableModel(model, null);
     }
 
+    public void addReferencedDecisionTableModel(Model model) {
+        this.referencedDecisionTableKeyToModelMap.put(model.getKey(), model);
+        this.decisionTableIdToModelMap.put(model.getId(), model);
+    }
+
     public void addDecisionTableModel(Model model, String ... oldDecisionTableModelIds) {
+        this.decisionTableKeyToModelMap.put(model.getKey(), model);
+        this.decisionTableIdToModelMap.put(model.getId(), model);
+
+        if (oldDecisionTableModelIds != null) {
+            for (String oldDecisionTableModelId : oldDecisionTableModelIds) {
+                this.decisionTableIdToModelMap.put(oldDecisionTableModelId, model);
+            }
+        }
+
+        // For decision models there is no 'unresolved' key handling needed,
+        // as the import of decisions always happens before the model referencing them
+    }
+
+    public void addReferencedDecisionTableModel(Model model, String ... oldDecisionTableModelIds) {
         this.decisionTableKeyToModelMap.put(model.getKey(), model);
         this.decisionTableIdToModelMap.put(model.getId(), model);
 
@@ -360,6 +380,10 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
 
     public Collection<Model> getAllDecisionTableModels() {
         return decisionTableKeyToModelMap.values();
+    }
+
+    public Collection<Model> getAllReferencedDecisionTableModels() {
+        return referencedDecisionTableKeyToModelMap.values();
     }
 
     public Collection<Model> getAllDecisionServiceModels() {

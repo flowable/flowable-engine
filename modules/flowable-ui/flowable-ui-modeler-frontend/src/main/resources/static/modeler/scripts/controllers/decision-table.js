@@ -77,7 +77,7 @@ angular.module('flowableModeler')
                 $http({method: 'GET', url: url}).
                     success(function(data, status, headers, config) {
                         $scope.model.decisionTable = data;
-                        $scope.model.decisionTableDownloadUrl = decisionTableUrl + '/export-decision-service?version=' + Date.now();
+                        $scope.model.decisionTableDownloadUrl = decisionTableUrl + '/export?version=' + Date.now();
                         $scope.loadVersions();
 
                     }).error(function(data, status, headers, config) {

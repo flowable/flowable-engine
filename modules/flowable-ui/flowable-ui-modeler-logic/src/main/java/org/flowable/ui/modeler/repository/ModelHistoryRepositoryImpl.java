@@ -58,9 +58,9 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
 
     @Override
     public void save(ModelHistory modelHistory) {
-        modelHistory.setTenantId(tenantProvider.getTenantId());
         if (modelHistory.getId() == null) {
             modelHistory.setId(idGenerator.generateId());
+            modelHistory.setTenantId(tenantProvider.getTenantId());
             sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
         } else {
             sqlSessionTemplate.update(NAMESPACE + "updateModelHistory", modelHistory);

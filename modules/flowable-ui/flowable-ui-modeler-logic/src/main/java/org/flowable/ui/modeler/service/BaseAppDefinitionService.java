@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -223,15 +222,26 @@ public class BaseAppDefinitionService {
             }
 
             Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
-
-            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
             if (allDecisionTableModels.size() > 0) {
-                decisionTableEditorJSONs = allDecisionTableModels.stream()
-                    .collect(Collectors.toMap(
-                        AbstractModel::getKey,
-                        AbstractModel::getModelEditorJson
-                    ));
+                for (Model decisionTableModel : allDecisionTableModels) {
+                    try {
+                        JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId());
+                        byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+                        deployableAssets.put("dmn-" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
+                    } catch (Exception e) {
+                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableModel.getName()));
+                    }
+                }
             }
+
+            converterContext.getAllReferencedDecisionTableModels()
+                    .forEach(decisionTableModel ->
+                            converterContext.getDecisionTableKeyToJsonStringMap().put(
+                                    decisionTableModel.getKey(),
+                                    decisionTableModel.getModelEditorJson()
+                            )
+                    );
 
             Collection<Model> allDecisionServiceModels = converterContext.getAllDecisionServiceModels();
             if (allDecisionServiceModels.size() > 0) {
@@ -297,7 +307,7 @@ public class BaseAppDefinitionService {
                 List<Model> referencedDecisionTableModels = modelRepository.findByParentModelId(childModel.getId());
                 referencedDecisionTableModels.stream()
                     .filter(refModel -> Model.MODEL_TYPE_DECISION_TABLE == refModel.getModelType())
-                    .forEach(converterContext::addDecisionTableModel);
+                    .forEach(converterContext::addReferencedDecisionTableModel);
 
             } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
                 converterContext.addCaseModel(childModel);

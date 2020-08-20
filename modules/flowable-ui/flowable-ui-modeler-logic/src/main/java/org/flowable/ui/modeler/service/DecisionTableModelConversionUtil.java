@@ -49,14 +49,14 @@ public class DecisionTableModelConversionUtil {
         return decisionTableModel;
     }
 
-    public static Model convertModelToV3(Model decisionTableModel) {
-
+    public static boolean convertModelToV3(Model decisionTableModel) {
+        boolean wasMigrated = false;
         if (StringUtils.isNotEmpty(decisionTableModel.getModelEditorJson())) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
-                DmnJsonConverterUtil.migrateModelV3(decisionTableNode, objectMapper);
+                wasMigrated = DmnJsonConverterUtil.migrateModelV3(decisionTableNode, objectMapper);
 
                 // replace editor json
                 decisionTableModel.setModelEditorJson(decisionTableNode.toString());
@@ -66,6 +66,6 @@ public class DecisionTableModelConversionUtil {
             }
         }
 
-        return decisionTableModel;
+        return wasMigrated;
     }
 }
