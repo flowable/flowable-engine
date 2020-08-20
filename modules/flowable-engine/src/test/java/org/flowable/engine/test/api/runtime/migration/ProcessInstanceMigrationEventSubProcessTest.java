@@ -869,6 +869,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
                         tuple("boundaryEvent", "timerBound"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
                         tuple("userTask", "parallelTask")
                 );
@@ -892,6 +893,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("startEvent", "processStart"),
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
 
@@ -946,6 +948,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
                         tuple("boundaryEvent", "timerBound"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
 
                         // After migration
@@ -970,6 +973,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                             tuple("startEvent", "processStart"),
                             tuple("sequenceFlow", "flow1"),
                             tuple("userTask", "processTask"),
+                            tuple("boundaryEvent", "timerBound"),
                             tuple("boundaryEvent", "timerBound"),
                             tuple("sequenceFlow", "flow3"),
 
@@ -1040,6 +1044,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
                         tuple("boundaryEvent", "timerBound"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
                         tuple("userTask", "parallelTask")
                 );
@@ -1063,6 +1068,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("startEvent", "processStart"),
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
 
@@ -1100,6 +1106,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                         tuple("sequenceFlow", "flow1"),
                         tuple("userTask", "processTask"),
                         tuple("boundaryEvent", "timerBound"),
+                        tuple("boundaryEvent", "timerBound"),
                         tuple("sequenceFlow", "flow3"),
 
                         // After migration
@@ -1136,6 +1143,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                             tuple("startEvent", "processStart"),
                             tuple("sequenceFlow", "flow1"),
                             tuple("userTask", "processTask"),
+                            tuple("boundaryEvent", "timerBound"),
                             tuple("boundaryEvent", "timerBound"),
                             tuple("sequenceFlow", "flow3"),
 
