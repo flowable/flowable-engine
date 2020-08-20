@@ -19,10 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -128,23 +125,6 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         getModel(modelHistory.getModelId(), true, false);
 
         exportDefinition(response, modelHistory);
-    }
-
-    public void exportDecisionTableHistory(HttpServletResponse response, String decisionTableId) {
-        exportDefinition(response, getModel(decisionTableId, true, false));
-    }
-
-    public void exportDefinition(HttpServletResponse response, String decisionId) {
-        ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
-        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
-        Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
-            .collect(Collectors.toMap(
-                AbstractModel::getKey,
-                AbstractModel::getModelEditorJson
-            ));
-        converterContext.getDecisionTableKeyToJsonStringMap().putAll(decisionTableEditorJSON);
-
-        exportDefinition(response, getModel(decisionId, true, false), converterContext);
     }
 
     protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel) {

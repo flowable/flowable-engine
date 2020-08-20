@@ -42,10 +42,7 @@ angular.module('flowableModeler')
 
                     $scope.loadVersions();
 
-                    $scope.model.bpmn20DownloadUrl = $routeParams.modelHistoryId == undefined ?
-                        FLOWABLE.APP_URL.getModelBpmn20ExportUrl($routeParams.modelId) :
-                        FLOWABLE.APP_URL.getModelHistoryBpmn20ExportUrl($routeParams.modelId, $routeParams.modelHistoryId);
-
+                    $scope.model.decisionDownloadUrl = FLOWABLE.APP_URL.getDmnModelDownloadUrl($routeParams.modelId, $routeParams.modelHistoryId);
 
                     $rootScope.$on('$routeChangeStart', function (event, next, current) {
                         jQuery('.qtip').qtip('destroy', true);

@@ -12,10 +12,12 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -23,7 +25,7 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.modeler.service.FlowableDecisionServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,13 +33,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/decision-service-models")
 public class DecisionServicesResource {
 
     @Autowired
     protected FlowableDecisionServiceService decisionServiceService;
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "/rest/decision-service-models", produces = "application/json")
     public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filter = null;
@@ -51,4 +52,21 @@ public class DecisionServicesResource {
         }
         return decisionServiceService.getDecisionServices(filter);
     }
+
+    /**
+     * GET /rest/decision-service-models/{decisionServiceModelId}/dmn -> Get DMN xml
+     */
+    @GetMapping(value = "/rest/decision-service-models/{decisionServiceModelId}/dmn")
+    public void getDecisionServiceModelDmnXml(HttpServletResponse response, @PathVariable String decisionServiceModelId) throws IOException {
+        decisionServiceService.exportDecisionService(response, decisionServiceModelId);
+    }
+
+    /**
+     * GET /rest/decision-service-models/{decisionServiceModelId}/history/{decisionServiceModelHistoryId}/dmn -> Get DMN xml
+     */
+    @GetMapping(value = "/rest/decision-service-models/{decisionServiceModelId}/history/{decisionServiceModelHistoryId}/dmn")
+    public void getDecisionServiceModeDmnXml(HttpServletResponse response, @PathVariable String decisionServiceModelId, @PathVariable String decisionServiceModelHistoryId) throws IOException {
+        decisionServiceService.exportHistoricDecisionService(response, decisionServiceModelId, decisionServiceModelHistoryId);
+    }
+
 }

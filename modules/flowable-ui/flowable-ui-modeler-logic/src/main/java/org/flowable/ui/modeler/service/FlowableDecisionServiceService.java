@@ -18,9 +18,9 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
 import org.flowable.dmn.editor.converter.DmnJsonConverterContext;
-import org.flowable.dmn.editor.converter.StandaloneDmnConverterContext;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -112,40 +111,33 @@ public class FlowableDecisionServiceService extends BaseFlowableModelService {
         return result;
     }
 
-    public void exportDecisionTable(HttpServletResponse response, String decisionServiceId) {
-        exportDefinition(response, getModel(decisionServiceId, true, false));
+    public void exportDecisionService(HttpServletResponse response, String decisionServiceId) {
+        exportDecisionServiceDefinition(response, getModel(decisionServiceId, true, false));
     }
 
-    public void exportHistoricDecisionTable(HttpServletResponse response, String modelHistoryId) {
+    public void exportHistoricDecisionService(HttpServletResponse response, String modelId, String modelHistoryId) {
         // Get the historic model
-        ModelHistory modelHistory = modelHistoryRepository.get(modelHistoryId);
+        ModelHistory modelHistory = modelService.getModelHistory(modelId, modelHistoryId);
 
         // Load model and check we have read rights
         getModel(modelHistory.getModelId(), true, false);
 
-        exportDefinition(response, modelHistory);
+        exportDecisionServiceDefinition(response, modelHistory);
     }
 
-    public void exportDecisionServiceHistory(HttpServletResponse response, String decisionServiceId) {
-        exportDefinition(response, getModel(decisionServiceId, true, false));
+    protected void exportDecisionServiceDefinition(HttpServletResponse response, AbstractModel definitionModel) {
+        ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
+        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
+        Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
+                .collect(Collectors.toMap(
+                        AbstractModel::getKey,
+                        AbstractModel::getModelEditorJson
+                ));
+        converterContext.getDecisionTableKeyToJsonStringMap().putAll(decisionTableEditorJSON);
+        exportDecisionServiceDefinition(response, definitionModel, converterContext);
     }
 
-    public void exportDefinition(HttpServletResponse response, String decisionServiceId) {
-        List<Model> decisionServiceModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_SERVICE, ModelSort.MODIFIED_DESC);
-//        Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
-//            .collect(Collectors.toMap(
-//                AbstractModel::getKey,
-//                AbstractModel::getModelEditorJson
-//            ));
-//
-//        exportDefinition(response, getModel(decisionId, true, false), decisionTableEditorJSON);
-    }
-
-    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel) {
-        exportDefinition(response, definitionModel, new StandaloneDmnConverterContext());
-    }
-
-    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, DmnJsonConverterContext converterContext) {
+    protected void exportDecisionServiceDefinition(HttpServletResponse response, AbstractModel definitionModel, DmnJsonConverterContext converterContext) {
         try {
 
             JsonNode editorJsonNode = objectMapper.readTree(definitionModel.getModelEditorJson());
