@@ -1,41 +1,41 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flowable-idm
+  name: flowable-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: flowable-idm
+      app: flowable-ui
   template:
     metadata:
       labels:
-        app: flowable-idm
+        app: flowable-ui
     spec:
       containers:
-        - name: flowable-idm
-          image: flowable/flowable-idm:latest
+        - name: flowable-ui
+          image: flowable/flowable-ui:latest
           ports:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: flowable-idm-config
-          # resources:
-          #   requests:
-          #     memory: 400Mi
-          #   limits:
-          #     memory: 600Mi
-          #     cpu: 500m
+                name: flowable-ui-config
+          resources:
+            requests:
+              memory: 400Mi
+            limits:
+              memory: 600Mi
+              cpu: 500m
       restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: flowable-idm
+  name: flowable-ui
 spec:
   type: NodePort
   selector:
-    app: flowable-idm
+    app: flowable-ui
   ports:
     - name: http
       protocol: TCP
@@ -45,5 +45,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flowable-idm-config
+  name: flowable-ui-config
 data:
+  FLOWABLE_COMMON_APP_IDM-ADMIN_USER: admin
+  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: test

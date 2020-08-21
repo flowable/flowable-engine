@@ -121,6 +121,4 @@ data:
   SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
   FLOWABLE_REST_APP_ADMIN_USER-ID: {{ .Values.rest.admin.username }}
   FLOWABLE_REST_APP_ADMIN_PASSWORD: {{ .Values.rest.admin.password }}
-  FLOWABLE_REST_APP_ADMIN_FIRST-NAME: Rest
-  FLOWABLE_REST_APP_ADMIN_LAST-NAME: Admin
 {{- end }}
