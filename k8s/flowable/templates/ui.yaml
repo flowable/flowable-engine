@@ -31,7 +31,7 @@ spec:
         - containerPort: 8080
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: {{ .Values.ui.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
@@ -40,7 +40,7 @@ spec:
           timeoutSeconds: 5
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            path:  {{ .Values.ui.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
@@ -99,7 +99,7 @@ metadata:
   name: {{ include "flowable.template" . }}-configmap
 data:
   JAVA_OPTS: "{{ .Values.ui.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
-  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.ui.contextUrl | quote }}
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.ui.contextPath | quote }}
   SERVER_SERVLET_SESSION_TIMEOUT: 1h
   {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}

@@ -2,7 +2,7 @@
 
 *see the README.md for all Flowable Helm chart configuration options*
 
-*if you have a Kubernetes context active skip to part*
+*if you have a GKE clust and configured Kubernetes context active skip to part `Deploy Nginx Ingress`*
 
 ## Install prerequisites
 ### Install Brew 
@@ -70,7 +70,7 @@ use the `external-ip` value in the next step(s)
 Deploys Flowabe Helm chart with Flowable REST active
 
 ```console
-helm install flowable-6.6.0 flowable/ --set flowable.host.external=<external-ip> --set flowable.ui.enabled=false --set flowable.rest.enabled=true
+helm install flowable-6.6.0 flowable/ --set host.external=<external-ip> --set ui.enabled=false --set rest.enabled=true
 ```
 
 ### Check pod(s) status

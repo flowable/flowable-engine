@@ -27,12 +27,12 @@ ingress:
 
 # Enable either Flowable UI or Flowable REST
 ui:
-  enabled: false
+  enabled: true
   replicas: 1
   service:
     name: flowable-ui
-  contextUrl: /
-  ingressPath: flowable-ui
+  contextPath: /flowable-ui
+  ingressPath: /
   image:
     repository: flowable/flowable-ui
     tag: 6.6.0-SNAPSHOT
@@ -55,12 +55,12 @@ ui:
 
 # Enable either Flowable UI or Flowable REST
 rest:
-  enabled: true
+  enabled: false
   replicas: 1
   service:
     name: flowable-rest
-  contextUrl: /
-  ingressPath: flowable-rest
+  contextPath: /flowable-rest
+  ingressPath: /
   image:
     repository: flowable/flowable-rest
     tag: 6.6.0-SNAPSHOT

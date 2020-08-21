@@ -61,13 +61,13 @@ Template default Ingress rules
 {{- define "flowable.ingressRules" -}}
     paths:
     {{- if .Values.ui.enabled  }}
-      - path: /{{ .Values.ui.ingressPath }}\/?(.*)
+      - path: {{ .Values.ui.ingressPath }}
         backend:
           serviceName: {{ .Values.ui.service.name }}
           servicePort: 8080
     {{- end }}
     {{- if .Values.rest.enabled }}
-      - path: /{{ .Values.rest.ingressPath }}/?(.*)
+      - path: {{ .Values.rest.ingressPath }}
         backend:
           serviceName: {{ .Values.rest.service.name }}
           servicePort: 8080

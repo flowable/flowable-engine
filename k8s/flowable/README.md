@@ -45,7 +45,7 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `ui.enabled`                                | Enables Flowable UI (either enable Flowable UI or Flowable REST)                                                  | `false`                        |
 | `ui.replicas`                               | Number of replicated pods                                                                                             | `1`                           |
 | `ui.service.name`                           | Kubernetes service name                                                                                               | `flowable-ui`               |
-| `ui.contextUrl`                             | Tomcat servlet mapping                                                                                                | `/`                           |
+| `ui.contextPath`                             | Tomcat servlet mapping                                                                                                | `/`                           |
 | `ui.ingressPath`                            | Ingress path mapping                                                                                                  | `flowable-ui`               |
 | `ui.image.repository`                       | Docker image name                                                                                                     | `flowable/flowable-ui`      |
 | `ui.image.tag`                              | Docker tag name                                                                                                       | `latest`                      |
@@ -59,7 +59,7 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `rest.enabled`                                | Enables Flowable REST (either enable Flowable UI or Flowable REST)                                                  | `true`                       |
 | `rest.replicas`                               | Number of replicated pods                                                                                             | `1`                           |
 | `rest.service.name`                           | Kubernetes service name                                                                                               | `flowable-rest`               |
-| `rest.contextUrl`                             | Tomcat servlet mapping                                                                                                | `/`                           |
+| `rest.contextPath`                             | Tomcat servlet mapping                                                                                                | `/`                           |
 | `rest.ingressPath`                            | Ingress path mapping                                                                                                  | `flowable-rest`               |
 | `rest.image.repository`                       | Docker image name                                                                                                     | `flowable/flowable-rest`      |
 | `rest.image.tag`                              | Docker tag name                                                                                                       | `latest`                      |
