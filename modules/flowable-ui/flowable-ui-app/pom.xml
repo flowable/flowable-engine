@@ -335,10 +335,7 @@
                                 <image>flowable/flowable-jre:11.0.7</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui</image>
-                                <tags>
-                                    <tag>${project.version}</tag>
-                                </tags>
+                                <image>flowable/flowable-ui:${project.version}</image>
                             </to>
                         </configuration>
                         <executions>
@@ -380,11 +377,8 @@
                                 <image>flowable/flowable-jre:11.0.7</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui</image>
-                                <tags>
-                                    <tag>${project.version}</tag>
-                                    <tag>latest</tag>
-                                </tags>
+                                <image>flowable/flowable-ui:${project.version}</image>
+                                <image>flowable/flowable-ui:latest</image>
                             </to>
                         </configuration>
                         <executions>
