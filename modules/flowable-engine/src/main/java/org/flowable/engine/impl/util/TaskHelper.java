@@ -18,7 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -185,6 +188,23 @@ public class TaskHelper {
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity);
             }
+
+            if (taskEntity.getProcessDefinitionId() != null) {
+                FlowElement flowElement = ProcessDefinitionUtil.getProcess(taskEntity.getProcessDefinitionId())
+                    .getFlowElement(taskEntity.getTaskDefinitionKey(), true);
+                if (flowElement instanceof UserTask) {
+                    UserTask userTask = (UserTask) flowElement;
+
+                    String assigneeVariableName = userTask.getAssigneeVariableName();
+                    if (StringUtils.isNotEmpty(assigneeVariableName)) {
+                        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+                        Expression expression = expressionManager.createExpression(assigneeVariableName);
+
+                        // TODO: needs to be configurable local/instance and transient/non-transient
+                        taskEntity.setVariableLocal(expression.getValue(taskEntity).toString(), assignee);
+                    }
+                }
+            }
         }
     }
 
@@ -196,6 +216,23 @@ public class TaskHelper {
             processEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskOwner(taskEntity, owner);
             if (taskEntity.getId() != null) {
                 addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
+            }
+
+            if (taskEntity.getProcessDefinitionId() != null) {
+                FlowElement flowElement = ProcessDefinitionUtil.getProcess(taskEntity.getProcessDefinitionId())
+                    .getFlowElement(taskEntity.getTaskDefinitionKey(), true);
+                if (flowElement instanceof UserTask) {
+                    UserTask userTask = (UserTask) flowElement;
+
+                    String ownerVariableName = userTask.getOwnerVariableName();
+                    if (StringUtils.isNotEmpty(ownerVariableName)) {
+                        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+                        Expression expression = expressionManager.createExpression(ownerVariableName);
+
+                        // TODO: needs to be configurable local/instance and transient/non-transient
+                        taskEntity.setVariableLocal(expression.getValue(taskEntity).toString(), owner);
+                    }
+                }
             }
         }
     }
@@ -281,7 +318,7 @@ public class TaskHelper {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        
+
         // Delete all entities related to the task entities
         for (TaskEntity taskEntity : taskEntities) {
             internalDeleteTask(taskEntity, deleteReason, false, false, true, true);
@@ -455,7 +492,7 @@ public class TaskHelper {
             }
 
             deleteTask(task, deleteReason, cascade, true, true);
-            
+
         } else if (cascade) {
             deleteHistoricTask(taskId);
             deleteHistoricTaskEventLogEntries(taskId);
@@ -536,7 +573,7 @@ public class TaskHelper {
 
     public static boolean isFormFieldValidationEnabled(VariableContainer variableContainer,
             ProcessEngineConfigurationImpl processEngineConfiguration, String formFieldValidationExpression) {
-        
+
         if (StringUtils.isNotEmpty(formFieldValidationExpression)) {
             Boolean formFieldValidation = getBoolean(formFieldValidationExpression);
             if (formFieldValidation != null) {

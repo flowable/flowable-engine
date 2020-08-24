@@ -29,6 +29,8 @@ public class HumanTask extends Task {
     protected String dueDate;
     protected String category;
     protected String taskIdVariableName;
+    protected String assigneeVariableName;
+    protected String ownerVariableName;
     protected List<String> candidateUsers = new ArrayList<>();
     protected List<String> candidateGroups = new ArrayList<>();
     protected List<FlowableListener> taskListeners = new ArrayList<>();
@@ -103,6 +105,22 @@ public class HumanTask extends Task {
 
     public void setTaskIdVariableName(String taskIdVariableName) {
         this.taskIdVariableName = taskIdVariableName;
+    }
+
+    public String getAssigneeVariableName() {
+        return assigneeVariableName;
+    }
+
+    public void setAssigneeVariableName(String assigneeVariableName) {
+        this.assigneeVariableName = assigneeVariableName;
+    }
+
+    public String getOwnerVariableName() {
+        return ownerVariableName;
+    }
+
+    public void setOwnerVariableName(String ownerVariableName) {
+        this.ownerVariableName = ownerVariableName;
     }
 
     public List<String> getCandidateUsers() {

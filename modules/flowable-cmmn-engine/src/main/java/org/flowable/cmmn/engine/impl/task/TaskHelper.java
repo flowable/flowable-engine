@@ -18,7 +18,12 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -116,7 +121,7 @@ public class TaskHelper {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
                 deleteHistoricTaskLogEntries(task.getId(), cmmnEngineConfiguration);
             } else {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason, 
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason,
                         cmmnEngineConfiguration.getClock().getCurrentTime());
             }
 
@@ -135,6 +140,24 @@ public class TaskHelper {
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity, cmmnEngineConfiguration);
             }
+
+            if (taskEntity.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
+                Case theCase = CaseDefinitionUtil.getCase(taskEntity.getScopeDefinitionId());
+                PlanItemDefinition planItemDefinition = theCase.getPlanModel()
+                    .findPlanItemDefinitionInStageOrDownwards(taskEntity.getTaskDefinitionKey());
+                if (planItemDefinition instanceof HumanTask) {
+                    HumanTask humanTask = (HumanTask) planItemDefinition;
+
+                    String assigneeVariableName = humanTask.getAssigneeVariableName();
+                    if (StringUtils.isNotEmpty(assigneeVariableName)) {
+                        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+                        Expression expression = expressionManager.createExpression(assigneeVariableName);
+
+                        // TODO: needs to be configurable local/instance and transient/non-transient
+                        taskEntity.setVariableLocal(expression.getValue(taskEntity).toString(), assignee);
+                    }
+                }
+            }
         }
     }
     
@@ -146,6 +169,24 @@ public class TaskHelper {
 
             if (taskEntity.getId() != null) {
                 addOwnerIdentityLink(taskEntity, cmmnEngineConfiguration);
+            }
+
+            if (taskEntity.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
+                Case theCase = CaseDefinitionUtil.getCase(taskEntity.getScopeDefinitionId());
+                PlanItemDefinition planItemDefinition = theCase.getPlanModel()
+                    .findPlanItemDefinitionInStageOrDownwards(taskEntity.getTaskDefinitionKey());
+                if (planItemDefinition instanceof HumanTask) {
+                    HumanTask humanTask = (HumanTask) planItemDefinition;
+
+                    String ownerVariableName = humanTask.getOwnerVariableName();
+                    if (StringUtils.isNotEmpty(ownerVariableName)) {
+                        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+                        Expression expression = expressionManager.createExpression(ownerVariableName);
+
+                        // TODO: needs to be configurable local/instance and transient/non-transient
+                        taskEntity.setVariableLocal(expression.getValue(taskEntity).toString(), owner);
+                    }
+                }
             }
         }
     }

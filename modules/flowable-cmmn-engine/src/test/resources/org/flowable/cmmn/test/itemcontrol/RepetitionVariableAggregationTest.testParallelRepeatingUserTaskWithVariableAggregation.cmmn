@@ -19,8 +19,9 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="humanTask1" name="Task A" flowable:assignee="${initiator}"></humanTask>
-            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}">
+            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:assigneeVariableName="taskAssignee">
                 <extensionElements>
+                    <flowable:variableAggregation targetArrayVariable="reviews" source="taskAssignee" target="userId" />
                     <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved"/>
                     <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description"/>
                 </extensionElements>

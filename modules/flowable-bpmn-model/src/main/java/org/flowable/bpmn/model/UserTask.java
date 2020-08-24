@@ -40,6 +40,8 @@ public class UserTask extends Task {
     protected String skipExpression;
     protected String validateFormFields;
     protected String taskIdVariableName;
+    protected String assigneeVariableName;
+    protected String ownerVariableName;
 
     protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<>();
     protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<>();
@@ -222,6 +224,22 @@ public class UserTask extends Task {
 
     public void setTaskIdVariableName(String taskIdVariableName) {
         this.taskIdVariableName = taskIdVariableName;
+    }
+
+    public String getAssigneeVariableName() {
+        return assigneeVariableName;
+    }
+
+    public void setAssigneeVariableName(String assigneeVariableName) {
+        this.assigneeVariableName = assigneeVariableName;
+    }
+
+    public String getOwnerVariableName() {
+        return ownerVariableName;
+    }
+
+    public void setOwnerVariableName(String ownerVariableName) {
+        this.ownerVariableName = ownerVariableName;
     }
 
     @Override

@@ -17,8 +17,9 @@
 
             <planItem id="planItem2" name="My Task 2" definitionRef="humanTask2" />
 
-            <humanTask id="humanTask1" name="My Task">
+            <humanTask id="humanTask1" name="My Task" flowable:assigneeVariableName="taskAssignee">
                 <extensionElements>
+                    <flowable:variableAggregation targetArrayVariable="reviews" source="taskAssignee" target="userId" />
                     <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved"/>
                     <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description"/>
                 </extensionElements>

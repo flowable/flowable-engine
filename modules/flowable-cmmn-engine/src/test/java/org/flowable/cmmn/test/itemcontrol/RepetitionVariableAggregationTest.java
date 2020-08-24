@@ -50,6 +50,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         variables.put("approved", false);
         variables.put("description", "description task 0");
         cmmnTaskService.setVariablesLocal(task.getId(), variables);
+        cmmnTaskService.setAssignee(task.getId(), "userOne");
         cmmnTaskService.complete(task.getId());
 
         assertVariablesNotVisible(caseInstance);
@@ -58,12 +59,14 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         variables.put("approved", true);
         variables.put("description", "description task 1");
         cmmnTaskService.setVariablesLocal(task.getId(), variables);
+        cmmnTaskService.setAssignee(task.getId(), "userTwo");
         cmmnTaskService.complete(task.getId());
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
         variables.put("approved", false);
         variables.put("description", "description task 2");
         cmmnTaskService.setVariablesLocal(task.getId(), variables);
+        cmmnTaskService.setAssignee(task.getId(), "userThree");
         cmmnTaskService.complete(task.getId());
 
         assertVariablesNotVisible(caseInstance);
@@ -73,9 +76,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         assertThatJson(reviews)
             .isEqualTo(
                 "["
-                    + "{ approved : false, description : 'description task 0' },"
-                    + "{ approved : true, description : 'description task 1' },"
-                    + "{ approved : false, description : 'description task 2' }"
+                    + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
+                    + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                    + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
                     + "]]");
 
     }
@@ -99,6 +102,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         variables.put("approved", true);
         variables.put("description", "description task 3");
         cmmnTaskService.setVariablesLocal(tasks.get(3).getId(), variables);
+        cmmnTaskService.setAssignee(tasks.get(3).getId(), "userThree");
         cmmnTaskService.complete(tasks.get(3).getId());
 
         assertVariablesNotVisible(caseInstance);
@@ -106,16 +110,19 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         variables.put("approved", true);
         variables.put("description", "description task 1");
         cmmnTaskService.setVariablesLocal(tasks.get(1).getId(), variables);
+        cmmnTaskService.setAssignee(tasks.get(1).getId(), "userOne");
         cmmnTaskService.complete(tasks.get(1).getId());
 
         variables.put("approved", false);
         variables.put("description", "description task 2");
         cmmnTaskService.setVariablesLocal(tasks.get(2).getId(), variables);
+        cmmnTaskService.setAssignee(tasks.get(2).getId(), "userTwo");
         cmmnTaskService.complete(tasks.get(2).getId());
 
         variables.put("approved", false);
         variables.put("description", "description task 0");
         cmmnTaskService.setVariablesLocal(tasks.get(0).getId(), variables);
+        cmmnTaskService.setAssignee(tasks.get(0).getId(), "userZero");
         cmmnTaskService.complete(tasks.get(0).getId());
 
         assertVariablesNotVisible(caseInstance);
@@ -126,10 +133,10 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
-                    + "{ approved : false, description : 'description task 0' },"
-                    + "{ approved : true, description : 'description task 1' },"
-                    + "{ approved : false, description : 'description task 2' },"
-                    + "{ approved : true, description : 'description task 3' }"
+                    + "{ userId: 'userZero', approved : false, description : 'description task 0' },"
+                    + "{ userId: 'userOne', approved : true, description : 'description task 1' },"
+                    + "{ userId: 'userTwo', approved : false, description : 'description task 2' },"
+                    + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
                     + "]]");
 
     }

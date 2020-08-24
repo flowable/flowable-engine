@@ -50,6 +50,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
 
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", true);
         variables.put("description", "description task 0");
@@ -73,9 +77,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
-                + "{ approved : true, description : 'description task 0' },"
-                + "{ approved : true, description : 'description task 1' },"
-                + "{ approved : false, description : 'description task 2' }"
+                + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
                 + "]]");
     }
 
@@ -92,6 +96,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", false);
         variables.put("description", "a");
+        taskService.setAssignee(task.getId(), "userOne");
         taskService.complete(task.getId(), variables, true);
 
         assertVariablesNotVisibleForAnyExecution(processInstance);
@@ -99,16 +104,19 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         variables.put("approved", false);
         variables.put("description", "b");
+        taskService.setAssignee(task.getId(), "userTwo");
         taskService.complete(task.getId(), variables, true);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         variables.put("approved", true);
         variables.put("description", "c");
+        taskService.setAssignee(task.getId(), "userThree");
         taskService.complete(task.getId(), variables, true);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         variables.put("approved", true);
         variables.put("description", "d");
+        taskService.setAssignee(task.getId(), "userFour");
         taskService.complete(task.getId(), variables, true);
 
         assertVariablesNotVisibleForAnyExecution(processInstance);
@@ -118,10 +126,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertThatJson(reviews)
             .isEqualTo(
                 "["
-                    + "{ approved : false, description : 'a' },"
-                    + "{ approved : false, description : 'b' },"
-                    + "{ approved : true, description : 'c' },"
-                    + "{ approved : true, description : 'd' }"
+                    + "{ userId: 'userOne', approved : false, description : 'a' },"
+                    + "{ userId: 'userTwo', approved : false, description : 'b' },"
+                    + "{ userId: 'userThree', approved : true, description : 'c' },"
+                    + "{ userId: 'userFour', approved : true, description : 'd' }"
                     + "]]");
     }
 

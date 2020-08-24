@@ -178,6 +178,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
     String ATTRIBUTE_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
+    String ATTRIBUTE_ASSIGNEE_VARIABLE_NAME = "assigneeVariableName";
+    String ATTRIBUTE_OWNER_VARIABLE_NAME = "ownerVariableName";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
     String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";
