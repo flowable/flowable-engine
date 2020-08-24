@@ -31,6 +31,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -116,7 +117,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     public ProcessInstance execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
-        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration);
+        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration, commandContext);
 
         ProcessInstance processInstance = null;
         if (hasFormData()) {
@@ -246,13 +247,17 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         return hasStartFormData() || extraFormInfo != null;
     }
 
-    protected ProcessDefinition getProcessDefinition(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    protected ProcessDefinition getProcessDefinition(ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
         ProcessDefinitionEntityManager processDefinitionEntityManager = processEngineConfiguration.getProcessDefinitionEntityManager();
 
         // Find the process definition
         ProcessDefinition processDefinition = null;
         if (processDefinitionId != null) {
-            processDefinition = processDefinitionEntityManager.findById(processDefinitionId);
+            processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager.findById(processDefinitionId);
+            }
             if (processDefinition == null) {
                 throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
             }
@@ -260,8 +265,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
 
             if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
+                processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+                if (processDefinition == null) {
+                    processDefinition = processDefinitionEntityManager
+                            .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
+                }
             }
 
             if (processDefinition == null) {
@@ -275,8 +283,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
 
             if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
+                processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+                if (processDefinition == null) {
+                    processDefinition = processDefinitionEntityManager
+                            .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
+                }
             }
 
             if (processDefinition == null) {
