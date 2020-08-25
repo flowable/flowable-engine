@@ -12,10 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -33,14 +30,8 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
@@ -94,7 +85,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             } else if (planItemInstanceEntity.getPlanItemDefinition() != null
                     && planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions() != null
                     && !planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty()) {
-                gatherVariables(planItemInstanceEntity);
+                aggregateVariables(planItemInstanceEntity);
 
             }
 
@@ -211,9 +202,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
     }
 
-    protected void gatherVariables(PlanItemInstanceEntity planItemInstanceEntity) {
-
-        VariableScopeImpl variableScope = (VariableScopeImpl) planItemInstanceEntity;
+    protected void aggregateVariables(PlanItemInstanceEntity planItemInstanceEntity) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
@@ -239,88 +228,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
-        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
-        Map<String, ArrayNode> arrayVariables = new HashMap<>();
-        List<VariableAggregation> variableAggregations = variableScope.getVariableAggregations();
-        for (VariableInstanceEntity variableInstance : variableInstances) {
-
-            ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
-
-            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
-                .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
-                .collect(Collectors.toList());
-
-            for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
-
-                // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
-                // This might be ok when the moment of aggregation is set/documented to the moment of completion?
-                String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
-                ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
-                if (arrayNodeVariable == null) {
-                    arrayNodeVariable =  objectMapper.createArrayNode();
-                    arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
-                }
-
-                ObjectNode variableObjectNode= null;
-                long variableTimestamp = variableValue.get("timestamp").asLong();
-
-                // Check if another variable with same variableScopeId was already added before
-                for (JsonNode existingVariableNode : arrayNodeVariable) {
-                    String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
-                    if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
-                        variableObjectNode = (ObjectNode) existingVariableNode;
-                        break;
-                    }
-                }
-
-                if (variableObjectNode == null) {
-                    variableObjectNode = objectMapper.createObjectNode();
-                    variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
-                    variableObjectNode.put("timestamp", variableTimestamp);
-                    arrayNodeVariable.add(variableObjectNode);
-                } else {
-                    long existingTimestamp = variableObjectNode.get("timestamp").asLong();
-                    if (variableTimestamp > existingTimestamp) {
-                        variableObjectNode.put("timestamp", variableTimestamp);
-                    }
-
-                }
-
-                variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
-
-            }
-
-        }
-
-        // Sort objectNodes and remove metadata
-        // TODO: sort is only really needed for sequential MI
-        for (String arrayVariableName : arrayVariables.keySet()) {
-            ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
-
-            List<ObjectNode> list = new ArrayList<>(arrayVariable.size());
-            for (JsonNode jsonNode : arrayVariable) {
-                list.add((ObjectNode) jsonNode);
-            }
-
-            // Sort
-            list.sort((jsonNode1, jsonNode2) -> {
-                Long timestamp1 = jsonNode1.get("timestamp").asLong();
-                Long timestamp2 = jsonNode2.get("timestamp").asLong();
-                return timestamp1.compareTo(timestamp2);
-            });
-
-            // Add back to original list and remove metadata
-            arrayVariable.removeAll();
-            for (ObjectNode objectNode : list) {
-                objectNode.remove("variableScopeId");
-                objectNode.remove("timestamp");
-
-                arrayVariable.add(objectNode);
-            }
-
-            planItemInstanceEntity.setVariable(arrayVariableName, arrayVariable);
-        }
-
+        ((VariableScopeImpl) planItemInstanceEntity).aggregateGatheredVariables(variableInstances);
     }
 
     public abstract boolean isEvaluateRepetitionRule();

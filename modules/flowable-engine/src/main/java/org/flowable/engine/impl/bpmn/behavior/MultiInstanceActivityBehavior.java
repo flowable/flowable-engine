@@ -16,12 +16,9 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -57,15 +54,12 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -148,14 +142,12 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         if (execution.getCurrentFlowElement() instanceof FlowNode
                 && ((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions() != null
                 && !((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions().isEmpty()) {
-            gatherVariables(execution);
+            aggregateVariables(execution);
         }
         cleanupMiRoot(execution);
     }
 
-    protected void gatherVariables(DelegateExecution execution) {
-
-        VariableScopeImpl variableScope = (VariableScopeImpl) execution;
+    protected void aggregateVariables(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
         // Gathered variables are stored on the multi instance root execution
@@ -168,94 +160,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             return;
         }
 
-        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
-        Map<String, ArrayNode> arrayVariables = new HashMap<>();
-        List<VariableAggregation> variableAggregations = variableScope.getVariableAggregations();
-        for (VariableInstanceEntity variableInstance : variableInstances) {
-
-            ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
-
-            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
-                .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
-                .collect(Collectors.toList());
-
-            // For all matching aggregations defined in the model, a target arrayNode variable is created.
-            // All stored single-value variables are merged into this arrayNode, using the 'variableScopeId'
-            // as correlation identifier to know which values belong together.
-            for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
-
-                // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
-                // This might be ok when the moment of aggregation is set/documented to the moment of completion?
-                String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
-                ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
-                if (arrayNodeVariable == null) {
-                    arrayNodeVariable =  objectMapper.createArrayNode();
-                    arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
-                }
-
-                ObjectNode variableObjectNode= null;
-                long variableTimestamp = variableValue.get("timestamp").asLong();
-
-                // Check if another variable with same variableScopeId was already added before
-                for (JsonNode existingVariableNode : arrayNodeVariable) {
-                    String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
-                    if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
-                        variableObjectNode = (ObjectNode) existingVariableNode;
-                        break;
-                    }
-                }
-
-                // If such variable isn't created yet, create it.
-                if (variableObjectNode == null) {
-                    variableObjectNode = objectMapper.createObjectNode();
-                    variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
-                    variableObjectNode.put("timestamp", variableTimestamp);
-                    arrayNodeVariable.add(variableObjectNode);
-
-                } else {
-                    long existingTimestamp = variableObjectNode.get("timestamp").asLong();
-                    if (variableTimestamp > existingTimestamp) {
-                        variableObjectNode.put("timestamp", variableTimestamp);
-                    }
-
-                }
-
-                // The value is set to what is defined in the target of the aggregation definition
-                variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
-
-            }
-
-        }
-
-        // Sort objectNodes and remove metadata
-        // TODO: sort is only really needed for sequential MI
-        for (String arrayVariableName : arrayVariables.keySet()) {
-            ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
-
-            List<ObjectNode> list = new ArrayList<>(arrayVariable.size());
-            for (JsonNode jsonNode : arrayVariable) {
-                list.add((ObjectNode) jsonNode);
-            }
-
-            // Sort
-            list.sort((jsonNode1, jsonNode2) -> {
-                Long timestamp1 = jsonNode1.get("timestamp").asLong();
-                Long timestamp2 = jsonNode2.get("timestamp").asLong();
-                return timestamp1.compareTo(timestamp2);
-            });
-
-            // Add back to original list and remove metadata
-            arrayVariable.removeAll();
-            for (ObjectNode objectNode : list) {
-                objectNode.remove("variableScopeId");
-                objectNode.remove("timestamp");
-
-                arrayVariable.add(objectNode);
-            }
-
-            execution.setVariable(arrayVariableName, arrayVariable);
-        }
-
+        ((VariableScopeImpl) execution).aggregateGatheredVariables(variableInstances);
     }
 
     protected void cleanupMiRoot(DelegateExecution execution) {
