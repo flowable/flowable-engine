@@ -179,6 +179,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
                 .collect(Collectors.toList());
 
+            // For all matching aggregations defined in the model, a target arrayNode variable is created.
+            // All stored single-value variables are merged into this arrayNode, using the 'variableScopeId'
+            // as correlation identifier to know which values belong together.
             for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
 
                 // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
@@ -190,8 +193,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                     arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
                 }
 
-                // Check if another variable was already added before
                 ObjectNode variableObjectNode= null;
+                long variableTimestamp = variableValue.get("timestamp").asLong();
+
+                // Check if another variable with same variableScopeId was already added before
                 for (JsonNode existingVariableNode : arrayNodeVariable) {
                     String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
                     if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
@@ -200,23 +205,52 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                     }
                 }
 
+                // If such variable isn't created yet, create it.
                 if (variableObjectNode == null) {
                     variableObjectNode = objectMapper.createObjectNode();
                     variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
+                    variableObjectNode.put("timestamp", variableTimestamp);
                     arrayNodeVariable.add(variableObjectNode);
+
+                } else {
+                    long existingTimestamp = variableObjectNode.get("timestamp").asLong();
+                    if (variableTimestamp > existingTimestamp) {
+                        variableObjectNode.put("timestamp", variableTimestamp);
+                    }
+
                 }
 
+                // The value is set to what is defined in the target of the aggregation definition
                 variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
 
             }
 
         }
 
+        // Sort objectNodes and remove metadata
+        // TODO: sort is only really needed for sequential MI
         for (String arrayVariableName : arrayVariables.keySet()) {
             ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
 
-            for (JsonNode arrayVariableElement : arrayVariable) {
-                ((ObjectNode) arrayVariableElement).remove("variableScopeId");
+            List<ObjectNode> list = new ArrayList<>(arrayVariable.size());
+            for (JsonNode jsonNode : arrayVariable) {
+                list.add((ObjectNode) jsonNode);
+            }
+
+            // Sort
+            list.sort((jsonNode1, jsonNode2) -> {
+                Long timestamp1 = jsonNode1.get("timestamp").asLong();
+                Long timestamp2 = jsonNode2.get("timestamp").asLong();
+                return timestamp1.compareTo(timestamp2);
+            });
+
+            // Add back to original list and remove metadata
+            arrayVariable.removeAll();
+            for (ObjectNode objectNode : list) {
+                objectNode.remove("variableScopeId");
+                objectNode.remove("timestamp");
+
+                arrayVariable.add(objectNode);
             }
 
             execution.setVariable(arrayVariableName, arrayVariable);

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -260,8 +261,10 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                     arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
                 }
 
-                // Check if another variable was already added before
                 ObjectNode variableObjectNode= null;
+                long variableTimestamp = variableValue.get("timestamp").asLong();
+
+                // Check if another variable with same variableScopeId was already added before
                 for (JsonNode existingVariableNode : arrayNodeVariable) {
                     String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
                     if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
@@ -273,7 +276,14 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 if (variableObjectNode == null) {
                     variableObjectNode = objectMapper.createObjectNode();
                     variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
+                    variableObjectNode.put("timestamp", variableTimestamp);
                     arrayNodeVariable.add(variableObjectNode);
+                } else {
+                    long existingTimestamp = variableObjectNode.get("timestamp").asLong();
+                    if (variableTimestamp > existingTimestamp) {
+                        variableObjectNode.put("timestamp", variableTimestamp);
+                    }
+
                 }
 
                 variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
@@ -282,11 +292,30 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         }
 
+        // Sort objectNodes and remove metadata
+        // TODO: sort is only really needed for sequential MI
         for (String arrayVariableName : arrayVariables.keySet()) {
             ArrayNode arrayVariable = arrayVariables.get(arrayVariableName);
 
-            for (JsonNode arrayVariableElement : arrayVariable) {
-                ((ObjectNode) arrayVariableElement).remove("variableScopeId");
+            List<ObjectNode> list = new ArrayList<>(arrayVariable.size());
+            for (JsonNode jsonNode : arrayVariable) {
+                list.add((ObjectNode) jsonNode);
+            }
+
+            // Sort
+            list.sort((jsonNode1, jsonNode2) -> {
+                Long timestamp1 = jsonNode1.get("timestamp").asLong();
+                Long timestamp2 = jsonNode2.get("timestamp").asLong();
+                return timestamp1.compareTo(timestamp2);
+            });
+
+            // Add back to original list and remove metadata
+            arrayVariable.removeAll();
+            for (ObjectNode objectNode : list) {
+                objectNode.remove("variableScopeId");
+                objectNode.remove("timestamp");
+
+                arrayVariable.add(objectNode);
             }
 
             planItemInstanceEntity.setVariable(arrayVariableName, arrayVariable);
