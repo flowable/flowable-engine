@@ -89,13 +89,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (caseInstanceBuilder.getCaseDefinitionId() != null) {
             String caseDefinitionId = caseInstanceBuilder.getCaseDefinitionId();
-            CaseDefinitionEntityManager definitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
-            if (caseDefinitionId != null) {
-                caseDefinition = definitionEntityManager.findById(caseDefinitionId);
-                if (caseDefinition == null) {
-                    throw new FlowableObjectNotFoundException("No case definition found for id " + caseDefinitionId, CaseDefinition.class);
-                }
-            }
+            CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
+            caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseDefinitionId);
 
         } else if (caseInstanceBuilder.getCaseDefinitionKey() != null) {
             String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
