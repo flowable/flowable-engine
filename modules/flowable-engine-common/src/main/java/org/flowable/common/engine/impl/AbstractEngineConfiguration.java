@@ -728,6 +728,11 @@ public abstract class AbstractEngineConfiguration {
             }
             
             commandContextFactory.setSessionFactories(sessionFactories);
+            
+        } else {
+            if (usingRelationalDatabase) {
+                initDbSqlSessionFactoryEntitySettings();
+            }
         }
 
         if (customSessionFactories != null) {
