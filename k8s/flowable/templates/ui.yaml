@@ -1,4 +1,4 @@
-{{- if .Values.idm.enabled }}
+{{- if .Values.ui.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +6,7 @@ metadata:
   labels:
     {{ include "flowable.defaultlabels" . }}
 spec:
-  replicas: {{ .Values.idm.replicas }}
+  replicas: {{ .Values.ui.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "flowable.template" . }}
@@ -25,26 +25,26 @@ spec:
       {{- end }}
       containers:
       - name: {{ include "flowable.template" . }}
-        image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag }}"
-        imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
+        image: "{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}"
+        imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
         ports:
         - containerPort: 8080
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: {{ .Values.ui.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
-              value: Basic: {{-  printf "%s:%s" .Values.idm.admin.username .Values.idm.admin.password | b64enc }}
+              value: Basic: {{-  printf "%s:%s" .Values.ui.admin.username .Values.ui.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 5
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            path:  {{ .Values.ui.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
-              value: Basic: {{-  printf "%s:%s" .Values.idm.admin.username .Values.idm.admin.password | b64enc }}
+              value: Basic: {{-  printf "%s:%s" .Values.ui.admin.username .Values.ui.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 10
           failureThreshold: 10
@@ -53,7 +53,7 @@ spec:
             name: {{ include "flowable.template" . }}-configmap
         volumeMounts:
         resources:
-{{ toYaml .Values.idm.resources | indent 10 }}
+{{ toYaml .Values.ui.resources | indent 10 }}
       {{- if .Values.cloudSql.enabled }}
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
@@ -79,7 +79,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.idm.service.name }}
+  name: {{ .Values.ui.service.name }}
   labels:
     {{ include "flowable.defaultlabels" . }}
 spec:
@@ -98,8 +98,8 @@ kind: ConfigMap
 metadata:
   name: {{ include "flowable.template" . }}-configmap
 data:
-  JAVA_OPTS: "{{ .Values.idm.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
-  SERVER_SERVLET_CONTEXT-PATH: {{ .Values.idm.contextUrl | quote }}
+  JAVA_OPTS: "{{ .Values.ui.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.ui.contextPath | quote }}
   SERVER_SERVLET_SESSION_TIMEOUT: 1h
   {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
@@ -110,7 +110,9 @@ data:
   {{- else if .Values.cloudSql.enabled }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
   SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/{{ .Values.database.name }}
-  {{- end }}  
+  {{- end }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.database.username }}
   SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
+  FLOWABLE_COMMON_APP_IDM-ADMIN_USER: {{ .Values.ui.idm.admin.username }}
+  FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: {{ .Values.ui.idm.admin.password }}
 {{- end }}

@@ -25,40 +25,17 @@ ingress:
   # name here
   #clusterIssuer: "letsencrypt-prod"
 
-idm:
+# Enable either Flowable UI or Flowable REST
+ui:
   enabled: true
   replicas: 1
   service:
-    name: flowable-idm
-  contextUrl: /
-  ingressPath: flowable-idm
+    name: flowable-ui
+  contextPath: /flowable-ui
+  ingressPath: /
   image:
-    repository: flowable/flowable-idm
-    tag: latest
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "512Mi"
-  javaOpts: "-Xms512m -Xmx512m"
-  admin:
-    username: admin
-    password: test
-
-# Enable either Flowable Task or Flowable REST
-task:
-  enabled: true
-  replicas: 1
-  service:
-    name: flowable-task
-  contextUrl: /
-  ingressPath: flowable-task
-  image:
-    repository: flowable/flowable-task
-    tag: latest
+    repository: flowable/flowable-ui
+    tag: 6.6.0-SNAPSHOT
     pullPolicy: Always
   resources:
     requests:
@@ -71,18 +48,22 @@ task:
   admin:
     username: admin
     password: test
+  idm:
+    admin:
+      username: admin
+      password: test
 
-# Enable either Flowable Task or Flowable REST
+# Enable either Flowable UI or Flowable REST
 rest:
   enabled: false
   replicas: 1
   service:
     name: flowable-rest
-  contextUrl: /
-  ingressPath: flowable-rest
+  contextPath: /flowable-rest
+  ingressPath: /
   image:
     repository: flowable/flowable-rest
-    tag: latest
+    tag: 6.6.0-SNAPSHOT
     pullPolicy: Always
   resources:
     requests:
@@ -94,52 +75,6 @@ rest:
   javaOpts: "-Xmx1g -Xms1g"
   admin:
     username: rest-admin
-    password: test
-
-modeler:
-  enabled: true
-  replicas: 1
-  service:
-    name: flowable-modeler
-  contextUrl: /
-  ingressPath: flowable-modeler
-  image:
-    repository: flowable/flowable-modeler
-    tag: latest
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "512Mi"
-  javaOpts: "-Xms512m -Xmx512m"
-  admin:
-    username: admin
-    password: test
-
-admin:
-  enabled: true
-  replicas: 1
-  service:
-    name: flowable-admin
-  contextUrl: /
-  ingressPath: flowable-admin
-  image:
-    repository: flowable/flowable-admin
-    tag: latest
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "512Mi"
-  javaOpts: "-Xms512m -Xmx512m"
-  admin:
-    username: admin
     password: test
 
 # NGINX Ingress controller https://github.com/kubernetes/ingress-nginx

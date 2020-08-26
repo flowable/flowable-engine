@@ -652,10 +652,7 @@
                                 <image>flowable/flowable-jre:11.0.7</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-rest</image>
-                                <tags>
-                                    <tag>${project.version}</tag>
-                                </tags>
+                                <image>flowable/flowable-rest:${project.version}</image>
                             </to>
                         </configuration>
                         <executions>
@@ -697,11 +694,8 @@
                                 <image>flowable/flowable-jre:11.0.7</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-rest</image>
-                                <tags>
-                                    <tag>${project.version}</tag>
-                                    <tag>latest</tag>
-                                </tags>
+                                <image>flowable/flowable-rest:${project.version}</image>
+                                <image>flowable/flowable-rest:latest</image>
                             </to>
                         </configuration>
                         <executions>

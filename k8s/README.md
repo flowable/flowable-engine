@@ -1,5 +1,7 @@
 # Flowable Kubernetes
 
+*mind: HELM 2 was used below*
+
 Flowable HELM chart is located in the *flowable* folder. 
 The Kubernetes configuration files are located in the *resources* folder.
 
