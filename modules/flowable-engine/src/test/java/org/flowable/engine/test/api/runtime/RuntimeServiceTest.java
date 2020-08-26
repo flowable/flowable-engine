@@ -101,7 +101,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartProcessInstanceByIdUnexistingId() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceById("unexistingId"))
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-                .hasMessageContaining("No process definition found for id = 'unexistingId'");
+                .hasMessageContaining("no deployed process definition found with id 'unexistingId'");
     }
 
     @Test
@@ -253,7 +253,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         assertThatThrownBy(() -> processInstanceBuilder.processDefinitionId("nonExistingDefinitionId").startAsync())
             .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-            .hasMessage("No process definition found for id = 'nonExistingDefinitionId'");
+            .hasMessage("no deployed process definition found with id 'nonExistingDefinitionId'");
     }
 
     @Test
