@@ -159,8 +159,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     protected void stopExecutingAsyncJobs() {
         if (taskExecutor != null && shutdownTaskExecutor) {
-            // The cast is safe because shutdownTaskExecutor can only be true if we created it
-            ((DefaultAsyncTaskExecutor) taskExecutor).start();
+            taskExecutor.shutdown();
             taskExecutor = null;
         }
     }
