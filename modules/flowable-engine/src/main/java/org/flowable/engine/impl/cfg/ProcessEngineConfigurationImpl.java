@@ -1398,6 +1398,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             commandContextFactory.setSessionFactories(sessionFactories);
 
         } else {
+            if (usingRelationalDatabase) {
+                initDbSqlSessionFactoryEntitySettings();
+            }
+            
             if (isAsyncHistoryEnabled) {
                 if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
                     initAsyncHistorySessionFactory();
