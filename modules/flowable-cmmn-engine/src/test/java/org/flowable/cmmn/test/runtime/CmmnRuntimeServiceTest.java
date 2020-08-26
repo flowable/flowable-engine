@@ -175,7 +175,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     public void createCaseInstanceAsyncWithNonExistingDefId() {
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId("nonExistingDefinition").startAsync())
                 .isInstanceOf(FlowableObjectNotFoundException.class)
-                .hasMessage("No case definition found for id nonExistingDefinition");
+                .hasMessage("no deployed case definition found with id 'nonExistingDefinition'");
     }
 
     @Test
