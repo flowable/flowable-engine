@@ -1,6 +1,6 @@
 ---
 id: ch09-ProcessInstanceMigration
-title: Process Instance Migration (Experimental)
+title: Process Instance Migration
 ---
 
 When process definitions are updated with new versions, the question arises what should be done with already running process instances that are using older versions of the process definition.
