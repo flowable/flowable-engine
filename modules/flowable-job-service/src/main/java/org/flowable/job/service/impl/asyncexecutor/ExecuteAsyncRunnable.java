@@ -25,7 +25,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
+import org.flowable.job.service.impl.cmd.ExecuteAsyncRunnableJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -128,7 +128,7 @@ public class ExecuteAsyncRunnable implements Runnable {
             jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
                 @Override
                 public Void execute(CommandContext commandContext) {
-                    new ExecuteAsyncJobCmd(jobId, jobEntityManager).execute(commandContext);
+                    new ExecuteAsyncRunnableJobCmd(jobId, jobEntityManager, jobServiceConfiguration).execute(commandContext);
                     if (unlock) {
                         // Part of the same transaction to avoid a race condition with the
                         // potentially new jobs (wrt process instance locking) that are created 
