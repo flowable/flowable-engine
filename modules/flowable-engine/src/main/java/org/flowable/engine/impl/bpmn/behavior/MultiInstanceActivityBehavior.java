@@ -57,6 +57,7 @@ import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+import org.flowable.variable.service.impl.util.VariableAggregationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,7 +168,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             return;
         }
 
-        variableScope.aggregateVariablesForOneInstance(variableInstances);
+        VariableAggregationUtil.aggregateVariablesForOneInstance(execution.getProcessInstanceId(), variableAggregationScopeInfo.getGatheredVariableScopeId(),
+            ((VariableScopeImpl) execution).getVariableAggregations(), variableInstances);
     }
 
     /**
@@ -186,7 +188,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             return;
         }
 
-        ((VariableScopeImpl) execution).aggregateVariablesOfAllInstances(variableInstances);
+        VariableAggregationUtil.aggregateVariablesOfAllInstances(execution, variableInstances);
     }
 
     protected void cleanupMiRoot(DelegateExecution execution) {

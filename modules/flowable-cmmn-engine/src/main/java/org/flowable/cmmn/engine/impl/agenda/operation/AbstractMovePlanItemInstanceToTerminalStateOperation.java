@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+import org.flowable.variable.service.impl.util.VariableAggregationUtil;
 
 /**
  * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
@@ -224,7 +225,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
-        ((VariableScopeImpl) planItemInstanceEntity).aggregateVariablesForOneInstance(variableInstances);
+        VariableAggregationUtil.aggregateVariablesForOneInstance(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
+            ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregations(), variableInstances);
     }
 
     protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {
@@ -253,7 +255,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
-        ((VariableScopeImpl) planItemInstanceEntity).aggregateVariablesOfAllInstances(variableInstances);
+        VariableAggregationUtil.aggregateVariablesOfAllInstances(planItemInstanceEntity, variableInstances);
     }
 
     public abstract boolean isEvaluateRepetitionRule();
