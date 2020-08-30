@@ -226,7 +226,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
 
         VariableAggregationUtil.aggregateVariablesForOneInstance(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
-            ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregations(), variableInstances);
+            ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregationInfo().getVariableAggregations(), variableInstances);
     }
 
     protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {

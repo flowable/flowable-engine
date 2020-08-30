@@ -27,8 +27,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
-import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
+import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -282,12 +281,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
-    public List<VariableAggregation> getVariableAggregations() {
-        return null;
-    }
-
-    @Override
-    public VariableAggregationScopeInfo getVariableAggregationScopeInfo() {
+    public VariableAggregationInfo getVariableAggregationInfo() {
         return null;
     }
 

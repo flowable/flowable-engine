@@ -38,7 +38,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
-import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
+import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -491,10 +491,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    public List<VariableAggregation> getVariableAggregations() {
+    public VariableAggregationInfo getVariableAggregationInfo() {
         PlanItemDefinition planItemDefinition = getPlanItemDefinition();
         if (planItemDefinition.getVariableAggregationDefinitions() != null)  {
-            return planItemDefinition.getVariableAggregationDefinitions().stream()
+
+            List<VariableAggregation> variableAggregations = planItemDefinition.getVariableAggregationDefinitions().stream()
                 .map(variableAggregationDefinition -> {
 
                     String targetArrayVariable = null;
@@ -543,13 +544,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
                 })
                 .collect(Collectors.toList());
+
+            return new VariableAggregationInfo(variableAggregations, getId(), getId());
         }
         return  null;
-    }
-
-    @Override
-    public VariableAggregationScopeInfo getVariableAggregationScopeInfo() {
-        return new VariableAggregationScopeInfo(this.getId(), this.getId());
     }
 
     @Override

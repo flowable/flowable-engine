@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class ExecutionGraphUtil {
@@ -162,6 +163,32 @@ public class ExecutionGraphUtil {
             }
         }
         return false;
+    }
+
+    public static DelegateExecution getMultiInstanceRootExecution(ExecutionEntity execution) {
+        ExecutionEntity multiInstanceRootExecution = null;
+        ExecutionEntity currentExecution = execution;
+        while (currentExecution != null && multiInstanceRootExecution == null && currentExecution.getParentId() != null) {
+            if (currentExecution.isMultiInstanceRoot()) {
+                multiInstanceRootExecution = currentExecution;
+            } else {
+                currentExecution = currentExecution.getParent();
+            }
+        }
+        return multiInstanceRootExecution;
+    }
+
+    public static DelegateExecution getParentInstanceExecutionInMultiInstance(ExecutionEntity execution) {
+        ExecutionEntity instanceExecution = null;
+        ExecutionEntity currentExecution = execution;
+        while (currentExecution != null && instanceExecution == null && currentExecution.getParentId() != null) {
+            if (currentExecution.getParent().isMultiInstanceRoot()) {
+                instanceExecution = currentExecution;
+            } else {
+                currentExecution = currentExecution.getParent();
+            }
+        }
+        return instanceExecution;
     }
 
 }

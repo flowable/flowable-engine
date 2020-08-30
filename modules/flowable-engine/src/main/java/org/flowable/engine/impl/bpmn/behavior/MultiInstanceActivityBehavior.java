@@ -52,9 +52,10 @@ import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
+import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.flowable.variable.service.impl.util.VariableAggregationUtil;
@@ -155,21 +156,21 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected void aggregateVariablesOfOneInstance(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
-        VariableScopeImpl variableScope = (VariableScopeImpl) execution;
-        VariableAggregationScopeInfo variableAggregationScopeInfo = variableScope.getVariableAggregationScopeInfo();
+        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) execution).getVariableAggregationInfo();
 
-        // Gathered variables are stored on the multi instance root execution
+        // Gathered variables for one instance are stored on the instance execution (child of multi instance root execution)
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(variableAggregationScopeInfo.getVariableCorrelationScopeId())
+            .subScopeId(variableAggregationInfo.getBeforeAggregationScopeId())
             .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
             .list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;
         }
 
-        VariableAggregationUtil.aggregateVariablesForOneInstance(execution.getProcessInstanceId(), variableAggregationScopeInfo.getGatheredVariableScopeId(),
-            ((VariableScopeImpl) execution).getVariableAggregations(), variableInstances);
+        // After aggregation, the objectNode is stored on the multi instance root execution
+        VariableAggregationUtil.aggregateVariablesForOneInstance(execution.getProcessInstanceId(),
+            variableAggregationInfo.getAggregationScopeId(), variableAggregationInfo.getVariableAggregations(), variableInstances);
     }
 
     /**
@@ -498,17 +499,12 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
     }
 
-    protected DelegateExecution getMultiInstanceRootExecution(DelegateExecution executionEntity) {
-        DelegateExecution multiInstanceRootExecution = null;
-        DelegateExecution currentExecution = executionEntity;
-        while (currentExecution != null && multiInstanceRootExecution == null && currentExecution.getParent() != null) {
-            if (currentExecution.isMultiInstanceRoot()) {
-                multiInstanceRootExecution = currentExecution;
-            } else {
-                currentExecution = currentExecution.getParent();
-            }
-        }
-        return multiInstanceRootExecution;
+    protected DelegateExecution getMultiInstanceRootExecution(DelegateExecution execution) {
+        return ExecutionGraphUtil.getMultiInstanceRootExecution((ExecutionEntity) execution);
+    }
+
+    protected DelegateExecution getInstanceExecution(DelegateExecution execution) {
+        return ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance((ExecutionEntity) execution);
     }
     
     protected String getActiveValue(String originalValue, String propertyName, ObjectNode taskElementProperties) {

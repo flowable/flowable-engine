@@ -36,7 +36,7 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.util.VariableAggregationUtil;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
@@ -940,23 +940,16 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected void handleVariableAggregations(VariableInstance variableInstance) {
 
-        List<VariableAggregation> variableAggregations = getVariableAggregations();
-        if (variableAggregations == null) {
+        VariableAggregationInfo variableAggregationInfo = getVariableAggregationInfo();
+        if (variableAggregationInfo == null) {
             return;
         }
 
         String scopeId = variableInstance.getProcessInstanceId() != null ? variableInstance.getProcessInstanceId() : variableInstance.getScopeId();
-
-        VariableAggregationScopeInfo variableAggregationScopeInfo = getVariableAggregationScopeInfo();
-        if (variableAggregationScopeInfo != null) {
-            String subScopeId = variableAggregationScopeInfo.getVariableCorrelationScopeId();
-            VariableAggregationUtil.copyCreatedVariableForAggregation(variableAggregations, variableInstance, scopeId, subScopeId);
-        }
+        VariableAggregationUtil.copyCreatedVariableForAggregation(variableAggregationInfo.getVariableAggregations(), variableInstance, scopeId, variableAggregationInfo.getBeforeAggregationScopeId());
     }
 
-    public abstract List<VariableAggregation> getVariableAggregations();
-
-    public abstract VariableAggregationScopeInfo getVariableAggregationScopeInfo();
+    public abstract VariableAggregationInfo getVariableAggregationInfo();
 
     /*
      * Transient variables
