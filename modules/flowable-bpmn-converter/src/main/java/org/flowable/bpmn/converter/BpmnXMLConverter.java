@@ -93,6 +93,7 @@ import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.Transaction;
+import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -429,7 +430,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 } else {
 
                     if (!activeSubProcessList.isEmpty() && ELEMENT_MULTIINSTANCE.equalsIgnoreCase(xtr.getLocalName())) {
-
                         multiInstanceParser.parseChildElement(xtr, activeSubProcessList.get(activeSubProcessList.size() - 1), model);
 
                     } else if (convertersToBpmnMap.containsKey(xtr.getLocalName())) {
@@ -487,7 +487,19 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             } else if (flowElement instanceof SubProcess) {
                 SubProcess subProcess = (SubProcess) flowElement;
-                processFlowElements(subProcess.getFlowElements(), subProcess);
+                Collection<FlowElement> childFlowElements = subProcess.getFlowElements();
+
+                List<VariableAggregationDefinition> variableAggregationDefinitions = subProcess.getVariableAggregationDefinitions();
+                if (variableAggregationDefinitions != null && !variableAggregationDefinitions.isEmpty()) {
+                    for (FlowElement childFlowElement : childFlowElements) {
+                        if (childFlowElement instanceof FlowNode) {
+                            ((FlowNode) childFlowElement).setVariableAggregationDefinitions(variableAggregationDefinitions);
+                        }
+                    }
+
+                }
+
+                processFlowElements(childFlowElements, subProcess);
             }
         }
     }

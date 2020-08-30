@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -29,6 +28,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -287,7 +287,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
-    public Pair<String, String> getVariableAggregationScopeInfo() {
+    public VariableAggregationScopeInfo getVariableAggregationScopeInfo() {
         return null;
     }
 

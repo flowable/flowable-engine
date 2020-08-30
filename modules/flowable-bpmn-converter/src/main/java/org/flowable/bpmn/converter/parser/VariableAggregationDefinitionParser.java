@@ -47,6 +47,7 @@ public class VariableAggregationDefinitionParser extends BaseChildElementParser 
         }
         flowNode.getVariableAggregationDefinitions().add(variableAggregationDefinition);
 
+        variableAggregationDefinition.setElementId(flowNode.getId());
         variableAggregationDefinition.setTargetArrayVariable(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE));
         variableAggregationDefinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_TARGET_ARRAY_VARIABLE_EXPRESSION));
         variableAggregationDefinition.setSource(xtr.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE));

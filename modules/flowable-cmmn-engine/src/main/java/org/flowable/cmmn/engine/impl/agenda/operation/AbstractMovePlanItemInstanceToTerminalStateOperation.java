@@ -53,6 +53,11 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         // Not overriding the internalExecute, as that's meant for subclasses of this operation.
         super.run();
 
+        boolean hasVariableAggregationDefinitions = hasVariableAggregationDefinitions();
+        if (hasVariableAggregationDefinitions) {
+            aggregateVariablesForOneInstance(planItemInstanceEntity);
+        }
+
         if (!isNoop) {  // The super.run() could have marked this as a no-op. No point in continuing.
 
             String plannedNewState = getNewState();
@@ -82,15 +87,19 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                     }
                 }
 
-            } else if (planItemInstanceEntity.getPlanItemDefinition() != null
-                    && planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions() != null
-                    && !planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty()) {
-                aggregateVariables(planItemInstanceEntity);
+            } else if (hasVariableAggregationDefinitions()) {
+                aggregateVariablesForAllInstances(planItemInstanceEntity);
 
             }
 
             removeSentryRelatedData();
         }
+    }
+
+    protected boolean hasVariableAggregationDefinitions() {
+        return planItemInstanceEntity.getPlanItemDefinition() != null
+            && planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions() != null
+            && !planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty();
     }
 
     /**
@@ -202,7 +211,23 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
     }
 
-    protected void aggregateVariables(PlanItemInstanceEntity planItemInstanceEntity) {
+    protected void aggregateVariablesForOneInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
+        // Gathered variables are stored on finished the plan item instances
+        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
+            .subScopeId(planItemInstanceEntity.getId())
+            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .list();
+        if (variableInstances == null || variableInstances.isEmpty()) {
+            return;
+        }
+
+        ((VariableScopeImpl) planItemInstanceEntity).aggregateVariablesForOneInstance(variableInstances);
+    }
+
+    protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
@@ -228,7 +253,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
-        ((VariableScopeImpl) planItemInstanceEntity).aggregateGatheredVariables(variableInstances);
+        ((VariableScopeImpl) planItemInstanceEntity).aggregateVariablesOfAllInstances(variableInstances);
     }
 
     public abstract boolean isEvaluateRepetitionRule();

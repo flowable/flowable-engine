@@ -81,6 +81,11 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         callActivityEndListeners(execution);
 
+        if (hasVariableAggregationDefinitions(execution)) {
+            // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+            aggregateVariablesOfOneInstance(execution);
+        }
+
         boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
             if (completeConditionSatisfied) {
@@ -90,6 +95,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 sendCompletedEvent(multiInstanceRootExecution);
             }
 
+            // Call logic to leave activity instead of continuing multi-instance
             super.leave(execution);
         } else {
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);

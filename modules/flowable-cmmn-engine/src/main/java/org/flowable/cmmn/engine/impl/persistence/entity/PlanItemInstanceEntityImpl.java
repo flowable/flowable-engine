@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -39,6 +38,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -548,8 +548,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    public Pair<String, String> getVariableAggregationScopeInfo() {
-        return Pair.of(getCaseInstanceId(), getId());
+    public VariableAggregationScopeInfo getVariableAggregationScopeInfo() {
+        return new VariableAggregationScopeInfo(this.getId(), this.getId());
     }
 
     @Override

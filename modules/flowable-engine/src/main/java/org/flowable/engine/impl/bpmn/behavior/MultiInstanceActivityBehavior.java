@@ -54,6 +54,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.slf4j.Logger;
@@ -99,7 +100,6 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionElementIndexVariable = "loopCounter";
 
     /**
-     * @param activity
      * @param innerActivityBehavior
      *            The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
      */
@@ -139,28 +139,54 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
-        if (execution.getCurrentFlowElement() instanceof FlowNode
-                && ((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions() != null
-                && !((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions().isEmpty()) {
-            aggregateVariables(execution);
+        if (hasVariableAggregationDefinitions(execution)) {
+            aggregateVariablesOfAllInstances(execution);
         }
         cleanupMiRoot(execution);
     }
 
-    protected void aggregateVariables(DelegateExecution execution) {
+    protected boolean hasVariableAggregationDefinitions(DelegateExecution execution) {
+        return execution.getCurrentFlowElement() instanceof FlowNode
+            && ((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions() != null
+            && !((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions().isEmpty();
+    }
+
+    protected void aggregateVariablesOfOneInstance(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
+        VariableScopeImpl variableScope = (VariableScopeImpl) execution;
+        VariableAggregationScopeInfo variableAggregationScopeInfo = variableScope.getVariableAggregationScopeInfo();
 
         // Gathered variables are stored on the multi instance root execution
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(getMultiInstanceRootExecution(execution).getId())
+            .subScopeId(variableAggregationScopeInfo.getVariableCorrelationScopeId())
             .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
             .list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;
         }
 
-        ((VariableScopeImpl) execution).aggregateGatheredVariables(variableInstances);
+        variableScope.aggregateVariablesForOneInstance(variableInstances);
+    }
+
+    /**
+     * Aggregates all variables that were stored before for each instance
+     */
+    protected void aggregateVariablesOfAllInstances(DelegateExecution execution) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
+        // Gathered variables are stored on the multi instance root execution
+        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
+            .subScopeId(getMultiInstanceRootExecution(execution).getId()) // All objectNodes are stored against the MI root execution after instance completion
+            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .list();
+        if (variableInstances == null || variableInstances.isEmpty()) {
+            return;
+        }
+
+        ((VariableScopeImpl) execution).aggregateVariablesOfAllInstances(variableInstances);
     }
 
     protected void cleanupMiRoot(DelegateExecution execution) {

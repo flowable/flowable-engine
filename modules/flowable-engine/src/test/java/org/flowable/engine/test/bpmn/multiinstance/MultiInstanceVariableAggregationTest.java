@@ -41,7 +41,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
     @Test
     @Deployment
-    public void testParallelMultiInstanceUserTaskWithVariableAggregation() {
+    public void testParallelMultiInstanceUserTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("myProcess")
             .variable("nrOfLoops", 3)
@@ -85,7 +85,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
     @Test
     @Deployment
-    public void testSequentialMultiInstanceUserTaskWithVariableAggregation() {
+    public void testSequentialMultiInstanceUserTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("myProcess")
             .variable("nrOfLoops", 4)
@@ -162,6 +162,77 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         });
         assertThat(variableInstanceEntities).isEmpty();
 
+    }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 4)
+            .start();
+
+        // User task 'task one':  sets approved variable
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task one");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            taskService.complete(task.getId(), variables, true);
+        }
+
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
+        // User task 'task two': sets description variable
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task two");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("description", "description task " + i);
+            taskService.complete(task.getId(), variables, true);
+        }
+
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
+
+        // User task 'task three': updates description and adds score
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task three");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+//            variables.put("description", "updated description task " + i);
+            taskService.complete(task.getId(), variables, true);
+        }
+
+        assertVariablesNotVisibleForAnyExecution(processInstance);
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
+
+        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(
+                "["
+                    + "{ score: 10, approved : true, description : 'description task 0' },"
+                    + "{ score: 11, approved : false, description : 'description task 1' },"
+                    + "{ score: 12, approved : true, description : 'description task 2' },"
+                    + "{ score: 13, approved : false, description : 'description task 3' }"
+                    + "]]");
     }
 
     protected void assertVariablesNotVisibleForAnyExecution(ProcessInstance processInstance) {

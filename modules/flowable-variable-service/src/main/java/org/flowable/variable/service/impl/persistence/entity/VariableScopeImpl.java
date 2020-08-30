@@ -20,12 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -982,11 +980,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 .createVariableInstance(variableInstance.getName(), jsonVariableType);
             variableInstanceCopy.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
 
-            Pair<String, String> variableAggregationScopeInfo = getVariableAggregationScopeInfo();
-            if (variableAggregationScopeInfo != null) {
-                variableInstanceCopy.setScopeId(variableAggregationScopeInfo.getLeft());
-                variableInstanceCopy.setSubScopeId(variableAggregationScopeInfo.getRight());
-            }
+            VariableAggregationScopeInfo variableAggregationScopeInfo = getVariableAggregationScopeInfo();
+            variableInstanceCopy.setScopeId(variableInstance.getProcessInstanceId() != null ? variableInstance.getProcessInstanceId() : variableInstance.getScopeId());
+            variableInstanceCopy.setSubScopeId(variableAggregationScopeInfo.getVariableCorrelationScopeId());
 
             // The variable value is stored as an ObjectNode instead of the actual value.
             // The reason for this is:
@@ -996,8 +992,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             ObjectNode objectNode = objectMapper.createObjectNode();
 
             objectNode.put("type", variableInstance.getTypeName());
-            objectNode.put("variableScopeId", getId());
-            objectNode.put("timestamp", variableServiceConfiguration.getClock().getCurrentTime().getTime());
 
             if (StringType.TYPE_NAME.equals(variableInstance.getTypeName()) || LongStringType.TYPE_NAME.equals(variableInstance.getTypeName())) {
                 objectNode.put("value", (String) variableInstance.getValue());
@@ -1053,67 +1047,79 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     public abstract List<VariableAggregation> getVariableAggregations();
 
-    public abstract Pair<String, String> getVariableAggregationScopeInfo();
+    public abstract VariableAggregationScopeInfo getVariableAggregationScopeInfo();
 
-    public void aggregateGatheredVariables(List<VariableInstanceEntity> variableInstances) {
+    public void aggregateVariablesForOneInstance(List<VariableInstanceEntity> variableInstances) {
 
-        ObjectMapper objectMapper = CommandContextUtil.getVariableServiceConfiguration().getObjectMapper();
-        Map<String, ArrayNode> arrayVariables = new HashMap<>();
-        List<VariableAggregation> variableAggregations = getVariableAggregations();
+        VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
+        ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+
+        Map<String, ObjectNode> aggregatedVariables = new HashMap<>();
+
         for (VariableInstanceEntity variableInstance : variableInstances) {
 
             ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
 
-            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
+            List<VariableAggregation> matchingVariableAggregations = getVariableAggregations().stream()
                 .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
                 .collect(Collectors.toList());
 
-            // For all matching aggregations defined in the model, a target arrayNode variable is created.
-            // All stored single-value variables are merged into this arrayNode, using the 'variableScopeId'
-            // as correlation identifier to know which values belong together.
+            // The value is set to what is defined in the target of the aggregation definition
             for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
 
-                // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
-                // This might be ok when the moment of aggregation is set/documented to the moment of completion?
                 String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
-                ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
-                if (arrayNodeVariable == null) {
-                    arrayNodeVariable =  objectMapper.createArrayNode();
-                    arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
-                }
-
-                ObjectNode variableObjectNode= null;
-                long variableTimestamp = variableValue.get("timestamp").asLong();
-
-                // Check if another variable with same variableScopeId was already added before
-                for (JsonNode existingVariableNode : arrayNodeVariable) {
-                    String existingVariableScopeId = existingVariableNode.get("variableScopeId").asText();
-                    if (Objects.equals(variableValue.get("variableScopeId").asText(), existingVariableScopeId)) {
-                        variableObjectNode = (ObjectNode) existingVariableNode;
-                        break;
-                    }
-                }
-
-                // If such variable isn't created yet, create it.
+                ObjectNode variableObjectNode = aggregatedVariables.get(targetArrayVariableName);
                 if (variableObjectNode == null) {
                     variableObjectNode = objectMapper.createObjectNode();
-                    variableObjectNode.put("variableScopeId", variableValue.get("variableScopeId").asText());
-                    variableObjectNode.put("timestamp", variableTimestamp);
-                    arrayNodeVariable.add(variableObjectNode);
+                    variableObjectNode.put("timestamp", variableServiceConfiguration.getClock().getCurrentTime().getTime());
 
-                } else {
-                    long existingTimestamp = variableObjectNode.get("timestamp").asLong();
-                    if (variableTimestamp > existingTimestamp) {
-                        variableObjectNode.put("timestamp", variableTimestamp);
-                    }
-
+                    // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
+                    // This might be ok when the moment of aggregation is set/documented to the moment of completion?
+                    aggregatedVariables.put(targetArrayVariableName, variableObjectNode);
                 }
 
-                // The value is set to what is defined in the target of the aggregation definition
                 variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
-
             }
 
+            // After aggregation, the original variable isn't needed anymore
+            variableService.deleteVariableInstance(variableInstance);
+        }
+
+        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
+        VariableType jsonVariableType = variableTypes.getVariableType(JsonType.TYPE_NAME);
+        VariableAggregationScopeInfo variableAggregationScopeInfo = getVariableAggregationScopeInfo();
+
+        for (String aggregatedVariableName : aggregatedVariables.keySet()) {
+            VariableInstanceEntity aggregatedObjectNodeVariable = variableService
+                .createVariableInstance(aggregatedVariableName, jsonVariableType);
+            aggregatedObjectNodeVariable.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
+//            aggregatedObjectNodeVariable.setScopeId(variableInstance.getProcessInstanceId() != null ? variableInstance.getProcessInstanceId() : variableInstance.getScopeId());
+            aggregatedObjectNodeVariable.setSubScopeId(variableAggregationScopeInfo.getGatheredVariableScopeId());
+            aggregatedObjectNodeVariable.setValue(aggregatedVariables.get(aggregatedVariableName));
+            variableService.insertVariableInstance(aggregatedObjectNodeVariable);
+        }
+
+    }
+
+    public void aggregateVariablesOfAllInstances(List<VariableInstanceEntity> variableInstances) {
+
+        VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
+        ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
+        Map<String, ArrayNode> arrayVariables = new HashMap<>();
+        for (VariableInstanceEntity variableInstance : variableInstances) {
+
+            String targetArrayVariableName = variableInstance.getName(); // name was set before to the target array variable name
+            ArrayNode arrayNodeVariable = arrayVariables.get(targetArrayVariableName);
+            if (arrayNodeVariable == null) {
+                arrayNodeVariable = objectMapper.createArrayNode();
+                arrayVariables.put(targetArrayVariableName, arrayNodeVariable);
+            }
+
+            // TODO: validate if it's actually an objectnode
+            arrayNodeVariable.add((ObjectNode) variableInstance.getValue());
+
+            variableServiceConfiguration.getVariableService().deleteVariableInstance(variableInstance);
         }
 
         // Sort objectNodes and remove metadata
@@ -1123,7 +1129,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
             List<ObjectNode> list = new ArrayList<>(arrayVariable.size());
             for (JsonNode jsonNode : arrayVariable) {
-                list.add((ObjectNode) jsonNode);
+                // The copied objectNode is a deepCopy. This is needed because below the metadata (e.g. timestamp) is removed.
+                // As the objectNode is a variable too, this would trigger a variable update if the same instance is used.
+                list.add((ObjectNode) jsonNode.deepCopy());
             }
 
             // Sort
@@ -1136,13 +1144,12 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             // Add back to original list and remove metadata
             arrayVariable.removeAll();
             for (ObjectNode objectNode : list) {
-                objectNode.remove("variableScopeId");
                 objectNode.remove("timestamp");
 
                 arrayVariable.add(objectNode);
             }
 
-            setVariable(arrayVariableName, arrayVariable);
+            setVariable(arrayVariableName, arrayVariable); // calling setVariable (instead of variableService#insert will make sure history is created correctly)
         }
 
     }

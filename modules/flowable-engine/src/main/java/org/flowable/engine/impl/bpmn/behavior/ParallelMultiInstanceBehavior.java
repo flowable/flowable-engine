@@ -124,6 +124,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
+
+        if (hasVariableAggregationDefinitions(execution)) {
+            // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+            aggregateVariablesOfOneInstance(execution);
+        }
         
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
 

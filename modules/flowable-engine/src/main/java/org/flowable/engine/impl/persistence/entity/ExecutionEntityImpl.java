@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.FlowableListener;
@@ -51,6 +50,7 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.aggregation.VariableAggregation;
+import org.flowable.variable.service.impl.persistence.entity.VariableAggregationScopeInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -695,15 +695,32 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
-    public Pair<String, String> getVariableAggregationScopeInfo() {
+    public VariableAggregationScopeInfo getVariableAggregationScopeInfo() {
+
         //  Variable gathering is currently only supported when using multi-instance.
         // Hence why the multi-instance root execution is searched and returned.
-        ExecutionEntity multiInstanceRootExecution = this;
-        while (multiInstanceRootExecution != null) {
-            if (multiInstanceRootExecution.isMultiInstanceRoot()) {
-                return Pair.of(multiInstanceRootExecution.getProcessInstanceId(), multiInstanceRootExecution.getId());
+        // The variables will be stored related to this execution (and also be deleted)
+
+        ExecutionEntity multiInstanceRootExecution = null;
+
+        ExecutionEntity currentExecution = getParent();
+        ExecutionEntity instanceExecution = this;
+
+        while (multiInstanceRootExecution == null && currentExecution != null) {
+
+            if (currentExecution.isMultiInstanceRoot()) {
+                multiInstanceRootExecution = currentExecution;
+
+            } else {
+                instanceExecution = currentExecution;
+                currentExecution = currentExecution.getParent();
+
             }
-            multiInstanceRootExecution = multiInstanceRootExecution.getParent();
+
+        }
+
+        if (multiInstanceRootExecution != null) {
+            return new VariableAggregationScopeInfo(multiInstanceRootExecution.getId(), instanceExecution.getId());
         }
 
         return null;
