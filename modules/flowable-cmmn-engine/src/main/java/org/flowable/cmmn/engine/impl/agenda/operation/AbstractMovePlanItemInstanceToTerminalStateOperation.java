@@ -30,6 +30,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.flowable.variable.service.impl.util.VariableAggregationUtil;
@@ -225,8 +226,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
-        VariableAggregationUtil.aggregateVariablesForOneInstance(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
-            ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregationInfo().getVariableAggregations(), variableInstances);
+        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregationInfo();
+        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo, variableInstances);
     }
 
     protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {

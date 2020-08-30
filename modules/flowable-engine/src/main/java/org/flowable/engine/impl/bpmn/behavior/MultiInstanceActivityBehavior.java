@@ -169,8 +169,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
 
         // After aggregation, the objectNode is stored on the multi instance root execution
-        VariableAggregationUtil.aggregateVariablesForOneInstance(execution.getProcessInstanceId(),
-            variableAggregationInfo.getAggregationScopeId(), variableAggregationInfo.getVariableAggregations(), variableInstances);
+        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo, variableInstances);
     }
 
     /**

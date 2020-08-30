@@ -939,14 +939,12 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     }
 
     protected void handleVariableAggregations(VariableInstance variableInstance) {
-
         VariableAggregationInfo variableAggregationInfo = getVariableAggregationInfo();
         if (variableAggregationInfo == null) {
             return;
         }
 
-        String scopeId = variableInstance.getProcessInstanceId() != null ? variableInstance.getProcessInstanceId() : variableInstance.getScopeId();
-        VariableAggregationUtil.copyCreatedVariableForAggregation(variableAggregationInfo.getVariableAggregations(), variableInstance, scopeId, variableAggregationInfo.getBeforeAggregationScopeId());
+        VariableAggregationUtil.copyCreatedVariableForAggregation(variableAggregationInfo, variableInstance);
     }
 
     public abstract VariableAggregationInfo getVariableAggregationInfo();

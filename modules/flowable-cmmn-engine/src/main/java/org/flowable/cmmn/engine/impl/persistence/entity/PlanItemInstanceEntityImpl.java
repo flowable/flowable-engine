@@ -545,7 +545,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
                 })
                 .collect(Collectors.toList());
 
-            return new VariableAggregationInfo(variableAggregations, getId(), getId());
+            return new VariableAggregationInfo(getCaseInstanceId(), variableAggregations, getId(), getId());
         }
         return  null;
     }

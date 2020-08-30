@@ -695,7 +695,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 DelegateExecution instanceExecution = ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance(this);
                 DelegateExecution multiInstanceRootExecution = ExecutionGraphUtil.getMultiInstanceRootExecution(this);
                 if (instanceExecution != null && multiInstanceRootExecution != null) {
-                    return new VariableAggregationInfo(variableAggregations, instanceExecution.getId(), multiInstanceRootExecution.getId());
+                    return new VariableAggregationInfo(getProcessInstanceId(), variableAggregations, instanceExecution.getId(), multiInstanceRootExecution.getId());
                 }
 
             }

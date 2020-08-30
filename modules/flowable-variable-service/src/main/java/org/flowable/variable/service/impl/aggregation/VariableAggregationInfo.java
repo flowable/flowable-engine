@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class VariableAggregationInfo {
 
+    protected String instanceId; // process instance or case instance
     protected List<VariableAggregation> variableAggregations;
 
     /**
@@ -31,10 +32,20 @@ public class VariableAggregationInfo {
      */
     protected String aggregationScopeId;
 
-    public VariableAggregationInfo(List<VariableAggregation> variableAggregations, String beforeAggregationScopeId, String aggregationScopeId) {
+    public VariableAggregationInfo(String instanceId, List<VariableAggregation> variableAggregations, String beforeAggregationScopeId,
+        String aggregationScopeId) {
+        this.instanceId = instanceId;
         this.variableAggregations = variableAggregations;
         this.beforeAggregationScopeId = beforeAggregationScopeId;
         this.aggregationScopeId = aggregationScopeId;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public List<VariableAggregation> getVariableAggregations() {
