@@ -32,7 +32,7 @@ services:
             - FLOWABLE.COMMON.APP.SECURITY.OAUTH2.GROUPS-ATTRIBUTE=userGroups
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-keycloak", "8088", "Keycloak", "java", "-Dserver.port=8080", "-cp", "/app:/app/WEB-INF/classes:/app/WEB-INF/lib/*", "org.flowable.ui.application.FlowableUiApplication"]
+        entrypoint: ["./wait-for-something.sh", "flowable-keycloak", "8088", "Keycloak", "/flowable-entrypoint.sh"]
     flowable-db:
         image: postgres:9.6-alpine
         networks:

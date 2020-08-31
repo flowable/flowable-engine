@@ -14,7 +14,7 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD=test
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-ui-db", "5432", "PostgreSQL", "java", "-Dserver.port=8080", "-cp", "/app:/app/WEB-INF/classes:/app/WEB-INF/lib/*", "org.flowable.rest.app.FlowableRestApplication"]
+        entrypoint: ["./wait-for-something.sh", "flowable-ui-db", "5432", "PostgreSQL", "/flowable-entrypoint.sh"]
     flowable-ui-db:
         image: postgres:9.6-alpine
         container_name: flowable-ui-postgres
