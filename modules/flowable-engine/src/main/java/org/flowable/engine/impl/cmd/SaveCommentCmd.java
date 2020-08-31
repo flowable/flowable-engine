@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
-import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -42,16 +41,14 @@ public class SaveCommentCmd implements Command<Void>, Serializable {
         if (comment.getId() == null) {
             throw new FlowableIllegalArgumentException("comment id is null");
         } 
-        
-        CommentEntityManager commentEntityManager = CommandContextUtil.getCommentEntityManager(commandContext);
-        
+
         String eventMessage = comment.getFullMessage().replaceAll("\\s+", " ");
         if (eventMessage.length() > 163) {
             eventMessage = eventMessage.substring(0, 160) + "...";
         }
         comment.setMessage(eventMessage);
 
-        commentEntityManager.update(comment);
+        CommandContextUtil.getHistoryManager().updateComment(comment);
 
         return null;
     }

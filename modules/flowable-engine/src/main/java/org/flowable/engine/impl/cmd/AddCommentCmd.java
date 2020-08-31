@@ -111,7 +111,7 @@ public class AddCommentCmd implements Command<Comment> {
 
         comment.setFullMessage(message);
 
-        CommandContextUtil.getCommentEntityManager(commandContext).insert(comment);
+        CommandContextUtil.getHistoryManager().createComment(comment);
 
         return comment;
     }

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -347,6 +348,27 @@ public class CompositeHistoryManager implements HistoryManager {
     public void deleteHistoryUserTaskLog(long logNumber) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.deleteHistoryUserTaskLog(logNumber);
+        }
+    }
+
+    @Override
+    public void createComment(CommentEntity commentEntity) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.createComment(commentEntity);
+        }
+    }
+
+    @Override
+    public void updateComment(CommentEntity commentEntity) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.updateComment(commentEntity);
+        }
+    }
+
+    @Override
+    public void deleteComment(String commentId) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.deleteComment(commentId);
         }
     }
 

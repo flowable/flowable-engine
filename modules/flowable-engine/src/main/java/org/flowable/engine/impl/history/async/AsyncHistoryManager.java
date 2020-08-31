@@ -25,10 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.engine.task.Comment;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -514,6 +516,33 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.LOG_ENTRY_LOGNUMBER, logNumber);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_DELETE, data);
+        }
+    }
+
+    @Override
+    public void createComment(CommentEntity comment) {
+        ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+        addCommonCommentFields(comment, data);
+
+        getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_COMMENT_CREATED, data);
+    }
+
+    @Override
+    public void updateComment(CommentEntity comment) {
+        ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+        addCommonCommentFields(comment, data);
+
+        getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_COMMENT_UPDATED, data);
+    }
+
+    @Override
+    public void deleteComment(String commentId) {
+        ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+        Comment comment = CommandContextUtil.getCommentEntityManager().findComment(commentId);
+        if(comment != null) {
+            addCommonCommentFields((CommentEntity) comment, data);
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_COMMENT_DELETED, data);
         }
     }
 

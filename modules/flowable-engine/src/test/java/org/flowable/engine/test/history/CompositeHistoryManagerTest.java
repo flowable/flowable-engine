@@ -38,6 +38,8 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
+import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
@@ -489,5 +491,31 @@ class CompositeHistoryManagerTest {
 
         verify(historyManager1).deleteHistoryUserTaskLog(10L);
         verify(historyManager2).deleteHistoryUserTaskLog(10L);
+    }
+
+    @Test
+    void createComment() {
+        CommentEntity commentEntity = new CommentEntityImpl();
+        compositeHistoryManager.createComment(commentEntity);
+
+        verify(historyManager1).createComment(commentEntity);
+        verify(historyManager2).createComment(commentEntity);
+    }
+
+    @Test
+    void updateComment() {
+        CommentEntity commentEntity = new CommentEntityImpl();
+        compositeHistoryManager.updateComment(commentEntity);
+
+        verify(historyManager1).updateComment(commentEntity);
+        verify(historyManager2).updateComment(commentEntity);
+    }
+
+    @Test
+    void deleteComment() {
+        compositeHistoryManager.deleteComment("comment-id");
+
+        verify(historyManager1).deleteComment("comment-id");
+        verify(historyManager2).deleteComment("comment-id");
     }
 }
