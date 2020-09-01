@@ -3627,6 +3627,199 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    public void testQueryVariableValueEqualsAndNotEquals() {
+        Task taskWithStringValue = taskService.createTaskBuilder()
+                .name("With string value")
+                .create();
+        taskIds.add(taskWithStringValue.getId());
+        taskService.setVariable(taskWithStringValue.getId(), "var", "TEST");
+
+        Task taskWithNullValue = taskService.createTaskBuilder()
+                .name("With null value")
+                .create();
+        taskIds.add(taskWithNullValue.getId());
+        taskService.setVariable(taskWithNullValue.getId(), "var", null);
+
+        Task taskWithLongValue = taskService.createTaskBuilder()
+                .name("With long value")
+                .create();
+        taskIds.add(taskWithLongValue.getId());
+        taskService.setVariable(taskWithLongValue.getId(), "var", 100L);
+
+        Task taskWithDoubleValue = taskService.createTaskBuilder()
+                .name("With double value")
+                .create();
+        taskIds.add(taskWithDoubleValue.getId());
+        taskService.setVariable(taskWithDoubleValue.getId(), "var", 45.55);
+
+        assertThat(taskService.createTaskQuery().taskVariableValueNotEquals("var", "TEST").list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", taskWithNullValue.getId()),
+                        tuple("With long value", taskWithLongValue.getId()),
+                        tuple("With double value", taskWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueEquals("var", "TEST").list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", taskWithStringValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueNotEquals("var", 100L).list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", taskWithStringValue.getId()),
+                        tuple("With null value", taskWithNullValue.getId()),
+                        tuple("With double value", taskWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueEquals("var", 100L).list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With long value", taskWithLongValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueNotEquals("var", 45.55).list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", taskWithStringValue.getId()),
+                        tuple("With null value", taskWithNullValue.getId()),
+                        tuple("With long value", taskWithLongValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueEquals("var", 45.55).list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With double value", taskWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueNotEquals("var", "test").list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", taskWithStringValue.getId()),
+                        tuple("With null value", taskWithNullValue.getId()),
+                        tuple("With long value", taskWithLongValue.getId()),
+                        tuple("With double value", taskWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", taskWithNullValue.getId()),
+                        tuple("With long value", taskWithLongValue.getId()),
+                        tuple("With double value", taskWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().taskVariableValueEquals("var", "test").list())
+                .extracting(Task::getName, Task::getId)
+                .isEmpty();
+
+        assertThat(taskService.createTaskQuery().taskVariableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(Task::getName, Task::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", taskWithStringValue.getId())
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryProcessVariableValueEqualsAndNotEquals() {
+        ProcessInstance processWithStringValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With string value")
+                .variable("var", "TEST")
+                .start();
+
+        ProcessInstance processWithNullValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With null value")
+                .variable("var", null)
+                .start();
+
+        ProcessInstance processWithLongValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With long value")
+                .variable("var", 100L)
+                .start();
+
+        ProcessInstance processWithDoubleValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With double value")
+                .variable("var", 45.55)
+                .start();
+
+        assertThat(taskService.createTaskQuery().processVariableValueNotEquals("var", "TEST").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithNullValue.getId()),
+                        tuple("my task", processWithLongValue.getId()),
+                        tuple("my task", processWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueEquals("var", "TEST").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithStringValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueNotEquals("var", 100L).list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithStringValue.getId()),
+                        tuple("my task", processWithNullValue.getId()),
+                        tuple("my task", processWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueEquals("var", 100L).list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithLongValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueNotEquals("var", 45.55).list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithStringValue.getId()),
+                        tuple("my task", processWithNullValue.getId()),
+                        tuple("my task", processWithLongValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueEquals("var", 45.55).list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueNotEquals("var", "test").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithStringValue.getId()),
+                        tuple("my task", processWithNullValue.getId()),
+                        tuple("my task", processWithLongValue.getId()),
+                        tuple("my task", processWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithNullValue.getId()),
+                        tuple("my task", processWithLongValue.getId()),
+                        tuple("my task", processWithDoubleValue.getId())
+                );
+
+        assertThat(taskService.createTaskQuery().processVariableValueEquals("var", "test").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .isEmpty();
+
+        assertThat(taskService.createTaskQuery().processVariableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(Task::getName, Task::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                        tuple("my task", processWithStringValue.getId())
+                );
+    }
+
     /**
      * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks where gonzo is assignee - 2 tasks assigned to management group - 2 tasks assigned to accountancy group - 1 task
      * assigned to both the management and accountancy group

@@ -22,6 +22,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
+import org.flowable.variable.service.impl.types.NullType;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
@@ -105,6 +106,19 @@ public class QueryVariableValue implements Serializable {
             return variableInstanceEntity.getType().getTypeName();
         }
         return null;
+    }
+
+    public boolean needsTypeCheck() {
+        // When operator is not-equals or type of value is null, type doesn't matter!
+        if (operator == QueryOperator.NOT_EQUALS || operator == QueryOperator.NOT_EQUALS_IGNORE_CASE) {
+            return false;
+        }
+
+        if (variableInstanceEntity != null) {
+            return !NullType.TYPE_NAME.equals(variableInstanceEntity.getType().getTypeName());
+        }
+
+        return false;
     }
 
     public boolean isLocal() {

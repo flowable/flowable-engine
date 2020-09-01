@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -1255,5 +1256,102 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar","test")
         );
+    }
+
+
+    @Test
+    public void testQueryVariableValueEqualsAndNotEquals() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("With string value")
+                .variable("var", "TEST")
+                .start();
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("With null value")
+                .variable("var", null)
+                .start();
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("With long value")
+                .variable("var", 100L)
+                .start();
+
+        CaseInstance caseInstance4 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("With double value")
+                .variable("var", 45.55)
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "TEST").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", caseInstance2.getId()),
+                        tuple("With long value", caseInstance3.getId()),
+                        tuple("With double value", caseInstance4.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "TEST").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", caseInstance1.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", 100L).list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", caseInstance1.getId()),
+                        tuple("With null value", caseInstance2.getId()),
+                        tuple("With double value", caseInstance4.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", 100L).list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With long value", caseInstance3.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", 45.55).list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", caseInstance1.getId()),
+                        tuple("With null value", caseInstance2.getId()),
+                        tuple("With long value", caseInstance3.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", 45.55).list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With double value", caseInstance4.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("var", "test").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", caseInstance1.getId()),
+                        tuple("With null value", caseInstance2.getId()),
+                        tuple("With long value", caseInstance3.getId()),
+                        tuple("With double value", caseInstance4.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", caseInstance2.getId()),
+                        tuple("With long value", caseInstance3.getId()),
+                        tuple("With double value", caseInstance4.getId())
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("var", "test").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .isEmpty();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(CaseInstance::getName, CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", caseInstance1.getId())
+                );
     }
 }
