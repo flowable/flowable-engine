@@ -235,6 +235,61 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "]]");
     }
 
+    @Test
+    @Deployment
+    public void testSequentialMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        for (int i = 0; i < 3; i++) {
+
+            // User task 'task one':  sets approved variable
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getName()).isEqualTo("task one");
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            taskService.complete(task.getId(), variables, true);
+            assertVariablesNotVisibleForAnyExecution(processInstance);
+
+            // User task 'task two': sets description variable
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getName()).isEqualTo("task two");
+
+            variables = new HashMap<>();
+            variables.put("description", "description task " + i);
+            taskService.complete(task.getId(), variables, true);
+            assertVariablesNotVisibleForAnyExecution(processInstance);
+
+            // User task 'task three': updates description and adds score
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getName()).isEqualTo("task three");
+
+            variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            //            variables.put("description", "updated description task " + i);
+            taskService.complete(task.getId(), variables, true);
+            assertVariablesNotVisibleForAnyExecution(processInstance);
+        }
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
+
+        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(
+                "["
+                    + "{ score: 10, approved : true, description : 'description task 0' },"
+                    + "{ score: 11, approved : false, description : 'description task 1' },"
+                    + "{ score: 12, approved : true, description : 'description task 2' }"
+                    + "]]");
+
+    }
+
     protected void assertVariablesNotVisibleForAnyExecution(ProcessInstance processInstance) {
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "nrOfLoops")).isNotNull();
