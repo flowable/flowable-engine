@@ -389,6 +389,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             }
             planItemDefinition.getVariableAggregationDefinitions().add(variableAggregationDefinition);
 
+            variableAggregationDefinition.setElementId(currentCmmnElement.getId());
             variableAggregationDefinition.setTargetArrayVariable(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE));
             variableAggregationDefinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE_EXPRESSION));
             variableAggregationDefinition.setSource(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE));

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -51,53 +50,57 @@ public class VariableAggregationUtil {
 
     public static void copyCreatedVariableForAggregation(VariableAggregationInfo variableAggregationInfo, VariableInstance variableInstance, VariableServiceConfiguration variableServiceConfiguration) {
 
-        Optional<VariableAggregation> matchingVariableAggregation = variableAggregationInfo.getVariableAggregations()
-            .stream()
-            .filter(variableAggregation -> variableInstance.getName().equals(variableAggregation.getSource()))
-            .findFirst();
-        if (matchingVariableAggregation.isPresent()) {
+        Map<String, List<VariableAggregation>> matchingVariableAggregations =
+            variableAggregationInfo.findMatchingVariableAggregations(variableInstance.getName());
+        if (matchingVariableAggregations != null) {
+
+            // No need to look into the actual variable aggregations now, that will be done once the aggregation happens.
+            // However, we need the correct subScopeId (execution/planItemInstance) for storing it already on the correct scope
+            // such that retrieving the variables on completion is easy.
+            for (String elementId : matchingVariableAggregations.keySet()) {
+
 
                 VariableService variableService = variableServiceConfiguration.getVariableService();
                 VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
                 VariableType jsonVariableType = variableTypes.getVariableType(JsonType.TYPE_NAME);
 
-            // Copy of variable should not be associated with original instance nor with the current executionId/scopeId,
-            // as these variables should not be returned in the regular variable queries.
-            //
-            // The subScopeId needs to be set to the actual scope that does the variable aggregation,
-            // because the variables need to be deleted when the instance would be deleted without doing the aggregation.
-            VariableInstanceEntity variableInstanceCopy = variableService
-                .createVariableInstance(variableInstance.getName(), jsonVariableType);
-            variableInstanceCopy.setScopeId(variableAggregationInfo.getInstanceId());
-            variableInstanceCopy.setSubScopeId(variableAggregationInfo.getBeforeAggregationScopeId());
-            variableInstanceCopy.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
+                // Copy of variable should not be associated with original instance nor with the current executionId/scopeId,
+                // as these variables should not be returned in the regular variable queries.
+                //
+                // The subScopeId needs to be set to the actual scope that does the variable aggregation,
+                // because the variables need to be deleted when the instance would be deleted without doing the aggregation.
+                VariableInstanceEntity variableInstanceCopy = variableService
+                    .createVariableInstance(variableInstance.getName(), jsonVariableType);
+                variableInstanceCopy.setScopeId(variableAggregationInfo.getInstanceId());
+                variableInstanceCopy.setSubScopeId(variableAggregationInfo.getBeforeAggregationScopeIdForElementId(elementId));
+                variableInstanceCopy.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
 
-            // The variable value is stored as an ObjectNode instead of the actual value.
-            // The reason for this is:
-            // - it gets stored as json on the actual gathering anyway
-            // - this way extra metadata can be stored
-            ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
-            ObjectNode objectNode = objectMapper.createObjectNode();
+                // The variable value is stored as an ObjectNode instead of the actual value.
+                // The reason for this is:
+                // - it gets stored as json on the actual gathering anyway
+                // - this way extra metadata can be stored
+                ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
+                ObjectNode objectNode = objectMapper.createObjectNode();
 
-            objectNode.put("type", variableInstance.getTypeName());
+                objectNode.put("type", variableInstance.getTypeName());
 
-            if (StringType.TYPE_NAME.equals(variableInstance.getTypeName()) || LongStringType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (String) variableInstance.getValue());
-            } else if (BooleanType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (Boolean) variableInstance.getValue());
-            } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (Short) variableInstance.getValue());
-            } else if (IntegerType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (Integer) variableInstance.getValue());
-            } else if (LongType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (Long) variableInstance.getValue());
-            } else if (DoubleType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (Double) variableInstance.getValue());
-            } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.put("value", (String) variableInstance.getValue());
-            } else if (NullType.TYPE_NAME.equals(variableInstance.getTypeName())) {
-                objectNode.putNull("value");
-            }
+                if (StringType.TYPE_NAME.equals(variableInstance.getTypeName()) || LongStringType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (String) variableInstance.getValue());
+                } else if (BooleanType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (Boolean) variableInstance.getValue());
+                } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (Short) variableInstance.getValue());
+                } else if (IntegerType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (Integer) variableInstance.getValue());
+                } else if (LongType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (Long) variableInstance.getValue());
+                } else if (DoubleType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (Double) variableInstance.getValue());
+                } else if (ShortType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.put("value", (String) variableInstance.getValue());
+                } else if (NullType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    objectNode.putNull("value");
+                }
 
             /*
 
@@ -125,14 +128,17 @@ public class VariableAggregationUtil {
             }
              */
 
-            variableInstanceCopy.setValue(objectNode);
+                variableInstanceCopy.setValue(objectNode);
+                variableService.insertVariableInstance(variableInstanceCopy);
 
-            variableService.insertVariableInstance(variableInstanceCopy);
+            }
+
         }
 
     }
 
-    public static void aggregateVariablesForOneInstance(VariableAggregationInfo variableAggregationInfo, List<VariableInstanceEntity> variableInstances, VariableServiceConfiguration variableServiceConfiguration) {
+    public static void aggregateVariablesForOneInstance(String scopeId, String subScopeId,
+            List<VariableAggregation> variableAggregations, List<VariableInstanceEntity> variableInstances, VariableServiceConfiguration variableServiceConfiguration) {
 
         ObjectMapper objectMapper = variableServiceConfiguration.getObjectMapper();
         VariableService variableService = variableServiceConfiguration.getVariableService();
@@ -143,25 +149,23 @@ public class VariableAggregationUtil {
 
             ObjectNode variableValue = (ObjectNode) variableInstance.getValue();
 
-            List<VariableAggregation> matchingVariableAggregations = variableAggregationInfo.getVariableAggregations().stream()
+            List<VariableAggregation> matchingVariableAggregations = variableAggregations.stream()
                 .filter(variableAggregation -> variableAggregation.getSource().equals(variableInstance.getName()))
                 .collect(Collectors.toList());
 
             // The value is set to what is defined in the target of the aggregation definition
-            for (VariableAggregation matchingVariableAggregation : matchingVariableAggregations) {
+            for (VariableAggregation variableAggregation : matchingVariableAggregations) {
 
-                String targetArrayVariableName = matchingVariableAggregation.getTargetArrayVariable();
+                String targetArrayVariableName = variableAggregation.getTargetArrayVariable();
                 ObjectNode variableObjectNode = aggregatedVariables.get(targetArrayVariableName);
                 if (variableObjectNode == null) {
                     variableObjectNode = objectMapper.createObjectNode();
                     variableObjectNode.put("timestamp", variableServiceConfiguration.getClock().getCurrentTime().getTime());
 
-                    // TODO: expressions for target array gets re-evaluated now ... this is potentially wrong vs the moment of gathering the variable ...
-                    // This might be ok when the moment of aggregation is set/documented to the moment of completion?
                     aggregatedVariables.put(targetArrayVariableName, variableObjectNode);
                 }
 
-                variableObjectNode.set(matchingVariableAggregation.getTarget(), variableValue.get("value"));
+                variableObjectNode.set(variableAggregation.getTarget(), variableValue.get("value"));
             }
 
             // After aggregation, the original variable isn't needed anymore
@@ -175,8 +179,8 @@ public class VariableAggregationUtil {
             VariableInstanceEntity aggregatedObjectNodeVariable = variableService
                 .createVariableInstance(aggregatedVariableName, jsonVariableType);
             aggregatedObjectNodeVariable.setScopeType(ScopeTypes.VARIABLE_AGGREGATION);
-            aggregatedObjectNodeVariable.setScopeId(variableAggregationInfo.getInstanceId());
-            aggregatedObjectNodeVariable.setSubScopeId(variableAggregationInfo.getAggregationScopeId());
+            aggregatedObjectNodeVariable.setScopeId(scopeId);
+            aggregatedObjectNodeVariable.setSubScopeId(subScopeId);
             aggregatedObjectNodeVariable.setValue(aggregatedVariables.get(aggregatedVariableName));
             variableService.insertVariableInstance(aggregatedObjectNodeVariable);
         }

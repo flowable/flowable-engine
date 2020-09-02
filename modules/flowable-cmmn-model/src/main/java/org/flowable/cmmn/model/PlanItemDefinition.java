@@ -23,7 +23,7 @@ public class PlanItemDefinition extends CaseElement implements HasLifecycleListe
     protected String planItemRef;
     protected PlanItemControl defaultControl;
     protected List<FlowableListener> lifecycleListeners = new ArrayList<>();
-    protected List<VariableAggregationDefinition> variableAggregationDefinitions = new ArrayList<>();
+    protected List<VariableAggregationDefinition> variableAggregationDefinitions;
 
     public String getPlanItemRef() {
         return planItemRef;

@@ -226,8 +226,12 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             return;
         }
 
+        String elementId = planItemInstanceEntity.getPlanItemDefinitionId();
         VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregationInfo();
-        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo, variableInstances);
+        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo.getInstanceId(),
+            variableAggregationInfo.getAggregationScopeIdForElementId(elementId),
+            variableAggregationInfo.getVariableAggregationsForElementId(elementId),
+            variableInstances);
     }
 
     protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {

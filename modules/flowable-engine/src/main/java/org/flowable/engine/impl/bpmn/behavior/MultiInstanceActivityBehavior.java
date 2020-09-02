@@ -156,20 +156,24 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected void aggregateVariablesOfOneInstance(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
-        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) execution).getVariableAggregationInfo();
-
         // Gathered variables for one instance are stored on the instance execution (child of multi instance root execution)
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(variableAggregationInfo.getBeforeAggregationScopeId())
+            .subScopeId(ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance((ExecutionEntity) execution).getId()) // See VariableAggregationUtil#copyCreatedVariableForAggregation : the variables have been stored on the (multi-instance) instance execution
             .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
             .list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;
         }
 
+        String elementId = execution.getCurrentActivityId();
+        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) execution).getVariableAggregationInfo();
+
         // After aggregation, the objectNode is stored on the multi instance root execution
-        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo, variableInstances);
+        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo.getInstanceId(),
+            variableAggregationInfo.getAggregationScopeIdForElementId(elementId),
+            variableAggregationInfo.getVariableAggregationsForElementId(elementId),
+            variableInstances);
     }
 
     /**

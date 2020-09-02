@@ -38,7 +38,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testSequentialRepeatingUserTaskWithVariableAggregation() {
+    public void testSequentialRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingTask")
             .variable("otherVariable", "Hello World")
@@ -85,7 +85,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testParallelRepeatingUserTaskWithVariableAggregation() {
+    public void testParallelRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingTask")
             .variable("otherVariable", "Hello World")
@@ -137,6 +137,122 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ userId: 'userOne', approved : true, description : 'description task 1' },"
                     + "{ userId: 'userTwo', approved : false, description : 'description task 2' },"
                     + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
+                    + "]]");
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testSequentialRepeatingStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("repeatingStage")
+            .variable("otherVariable", "Hello World")
+            .start();
+
+        for (int i = 0; i < 3; i++) {
+
+            // User task 'task one':  sets approved variable
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task A").singleResult();
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId());
+
+            // User task 'task two': sets description variable
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task B").singleResult();
+
+            variables = new HashMap<>();
+            variables.put("description", "description task " + i);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId());
+
+            // User task 'task three': updates description and adds score
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task C").singleResult();
+
+            variables = new HashMap<>();
+            variables.put("myScore", i + 100);
+            //            variables.put("description", "updated description task " + i);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId());
+        }
+
+        Task remainingTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(remainingTask.getName()).isEqualTo("A");
+
+        ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+        assertThatJson(reviews)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(
+                "["
+                    + "{ score: 100, approved : true, description : 'description task 0' },"
+                    + "{ score: 101, approved : false, description : 'description task 1' },"
+                    + "{ score: 102, approved : true, description : 'description task 2' }"
+                    + "]]");
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testParallelRepeatingStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("repeatingStage")
+            .variable("myCollection", Arrays.asList("one", "two", "three", "four"))
+            .variable("otherVariable", "Hello World")
+            .start();
+
+        // User task 'Stage task A':  sets approved variable
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task A").list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        // User task 'Stage task B': sets description variable
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task B").list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("description", "description task " + i);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        // User task 'task three': updates description and adds score
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task C").list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            cmmnTaskService.setVariablesLocal(task.getId(), variables);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        Task taskAfterMi = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getName()).isEqualTo("A");
+
+        ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(
+                "["
+                    + "{ score: 10, approved : true, description : 'description task 0' },"
+                    + "{ score: 11, approved : false, description : 'description task 1' },"
+                    + "{ score: 12, approved : true, description : 'description task 2' },"
+                    + "{ score: 13, approved : false, description : 'description task 3' }"
                     + "]]");
 
     }

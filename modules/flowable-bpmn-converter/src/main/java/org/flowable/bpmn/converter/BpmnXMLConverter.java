@@ -493,7 +493,11 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 if (variableAggregationDefinitions != null && !variableAggregationDefinitions.isEmpty()) {
                     for (FlowElement childFlowElement : childFlowElements) {
                         if (childFlowElement instanceof FlowNode) {
-                            ((FlowNode) childFlowElement).setVariableAggregationDefinitions(variableAggregationDefinitions);
+                            FlowNode childFlowNode = (FlowNode) childFlowElement;
+                            if (childFlowNode.getVariableAggregationDefinitions() == null) {
+                                childFlowNode.setVariableAggregationDefinitions(new ArrayList<>());
+                            }
+                            childFlowNode.getVariableAggregationDefinitions().addAll(variableAggregationDefinitions);
                         }
                     }
 

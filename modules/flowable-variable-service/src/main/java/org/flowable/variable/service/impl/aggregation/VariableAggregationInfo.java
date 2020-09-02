@@ -12,7 +12,12 @@
  */
 package org.flowable.variable.service.impl.aggregation;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Joram Barrez
@@ -20,24 +25,22 @@ import java.util.List;
 public class VariableAggregationInfo {
 
     protected String instanceId; // process instance or case instance
-    protected List<VariableAggregation> variableAggregations;
+
+    // Key for the following maps is the elementId
+    protected Map<String, List<VariableAggregation>> variableAggregationsMap = new HashMap<>();
 
     /**
      * The scope id (e.g. execution id) where instance variables will be stored before aggregation is applied.
      */
-    protected String beforeAggregationScopeId;
+    protected Map<String, String> beforeAggregationScopeIdMap = new HashMap<>();
 
     /**
      * The scope id (e.g. execution id) where aggregation results will be stored.
      */
-    protected String aggregationScopeId;
+    protected Map<String, String> aggregationScopeIdMap = new HashMap<>();
 
-    public VariableAggregationInfo(String instanceId, List<VariableAggregation> variableAggregations, String beforeAggregationScopeId,
-        String aggregationScopeId) {
+    public VariableAggregationInfo(String instanceId) {
         this.instanceId = instanceId;
-        this.variableAggregations = variableAggregations;
-        this.beforeAggregationScopeId = beforeAggregationScopeId;
-        this.aggregationScopeId = aggregationScopeId;
     }
 
     public String getInstanceId() {
@@ -48,22 +51,54 @@ public class VariableAggregationInfo {
         this.instanceId = instanceId;
     }
 
-    public List<VariableAggregation> getVariableAggregations() {
-        return variableAggregations;
+    public void addRuntimeInfo(String elementId, List<VariableAggregation> variableAggregations, String beforeAggregationScopeId, String aggregationScopeId) {
+        variableAggregationsMap.put(elementId, variableAggregations);
+        beforeAggregationScopeIdMap.put(elementId, beforeAggregationScopeId);
+        aggregationScopeIdMap.put(elementId, aggregationScopeId);
     }
-    public void setVariableAggregations(List<VariableAggregation> variableAggregations) {
-        this.variableAggregations = variableAggregations;
+
+    /**
+     * @return Returns any {@link VariableAggregation} matching the provided variable name.
+     *         The key of the map is the elementId of the element in the model defining the variable aggregation.
+     */
+    public Map<String, List<VariableAggregation>> findMatchingVariableAggregations(String variableName) {
+
+        Map<String, List<VariableAggregation>> result = null;
+
+        for (String elementId : variableAggregationsMap.keySet()) {
+
+            List<VariableAggregation> matchingVariableAggregations = variableAggregationsMap.get(elementId)
+                .stream()
+                .filter(variableAggregation -> Objects.equals(variableName, variableAggregation.getSource()))
+                .collect(Collectors.toList());
+
+            if (!matchingVariableAggregations.isEmpty()) {
+
+                if (result == null) {
+                    result = new HashMap<>();
+                }
+                if (!result.containsKey(elementId)) {
+                    result.put(elementId, new ArrayList<>());
+                }
+                result.get(elementId).addAll(matchingVariableAggregations);
+
+            }
+
+        }
+
+        return result;
     }
-    public String getBeforeAggregationScopeId() {
-        return beforeAggregationScopeId;
+
+    public List<VariableAggregation> getVariableAggregationsForElementId(String elementId) {
+        return variableAggregationsMap.get(elementId);
     }
-    public void setBeforeAggregationScopeId(String beforeAggregationScopeId) {
-        this.beforeAggregationScopeId = beforeAggregationScopeId;
+
+    public String getBeforeAggregationScopeIdForElementId(String elementId) {
+        return beforeAggregationScopeIdMap.get(elementId);
     }
-    public String getAggregationScopeId() {
-        return aggregationScopeId;
+
+    public String getAggregationScopeIdForElementId(String elementId) {
+        return aggregationScopeIdMap.get(elementId);
     }
-    public void setAggregationScopeId(String aggregationScopeId) {
-        this.aggregationScopeId = aggregationScopeId;
-    }
+
 }

@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -493,7 +494,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public VariableAggregationInfo getVariableAggregationInfo() {
         PlanItemDefinition planItemDefinition = getPlanItemDefinition();
-        if (planItemDefinition.getVariableAggregationDefinitions() != null)  {
+        if (planItemDefinition.getVariableAggregationDefinitions() != null && !planItemDefinition.getVariableAggregationDefinitions().isEmpty())  {
 
             List<VariableAggregation> variableAggregations = planItemDefinition.getVariableAggregationDefinitions().stream()
                 .map(variableAggregationDefinition -> {
@@ -540,12 +541,36 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
                     }
 
-                    return new VariableAggregation(targetArrayVariable, source, target);
+                    return new VariableAggregation(variableAggregationDefinition.getElementId(), targetArrayVariable, source, target);
 
                 })
                 .collect(Collectors.toList());
 
-            return new VariableAggregationInfo(getCaseInstanceId(), variableAggregations, getId(), getId());
+            // Each distinct elementId has different plan item instance for each individual repetition
+            Map<String, List<VariableAggregation>> aggregationsByElementId = new HashMap<>();
+            for (VariableAggregation variableAggregation : variableAggregations) {
+                aggregationsByElementId.computeIfAbsent(variableAggregation.getElementId(), key -> new ArrayList<>()).add(variableAggregation);
+            }
+
+            VariableAggregationInfo variableAggregationInfo = new VariableAggregationInfo(getCaseInstanceId());
+            for (String elementId : aggregationsByElementId.keySet()) {
+
+                // The variable aggregation can only be defined on itself or a parent stage
+                // (otherwise we would never have gotten here as the parser wouldn't have set the aggregation definition)
+                PlanItemInstanceEntity planItemInstanceForElementId = this;
+                while (planItemInstanceForElementId != null && !Objects.equals(elementId, planItemInstanceForElementId.getPlanItemDefinitionId())) {
+                    planItemInstanceForElementId = planItemInstanceForElementId.getStagePlanItemInstanceEntity();
+                }
+
+                if (planItemInstanceForElementId != null) {
+                    // For CMMN, the variables are always stored against the plan item instance before and after aggregation,
+                    // because (contrary to executions) they will not be removed when they're completed.
+                    variableAggregationInfo.addRuntimeInfo(elementId, variableAggregations, planItemInstanceForElementId.getId(), planItemInstanceForElementId.getId());
+                }
+            }
+
+            return variableAggregationInfo;
+
         }
         return  null;
     }

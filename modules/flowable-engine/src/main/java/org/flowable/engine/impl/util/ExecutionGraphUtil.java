@@ -178,6 +178,18 @@ public class ExecutionGraphUtil {
         return multiInstanceRootExecution;
     }
 
+    public static DelegateExecution getMultiInstanceRootExecution(ExecutionEntity execution, String elementId) {
+        DelegateExecution parentExecution = getMultiInstanceRootExecution(execution);
+        if (parentExecution != null) {
+            if (elementId.equals(parentExecution.getCurrentActivityId())) {
+                return parentExecution;
+            } else {
+                return getMultiInstanceRootExecution((ExecutionEntity) parentExecution, elementId);
+            }
+        }
+        return null;
+    }
+
     public static DelegateExecution getParentInstanceExecutionInMultiInstance(ExecutionEntity execution) {
         ExecutionEntity instanceExecution = null;
         ExecutionEntity currentExecution = execution;
@@ -189,6 +201,18 @@ public class ExecutionGraphUtil {
             }
         }
         return instanceExecution;
+    }
+
+    public static DelegateExecution getParentInstanceExecutionInMultiInstance(ExecutionEntity execution, String elementId) {
+        DelegateExecution parentExecution = getParentInstanceExecutionInMultiInstance(execution);
+        if (parentExecution != null) {
+            if (elementId.equals(parentExecution.getCurrentActivityId())) {
+                return parentExecution;
+            } else {
+                return getParentInstanceExecutionInMultiInstance((ExecutionEntity) parentExecution, elementId);
+            }
+        }
+        return null;
     }
 
 }

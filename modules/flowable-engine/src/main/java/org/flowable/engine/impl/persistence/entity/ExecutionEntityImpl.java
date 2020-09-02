@@ -641,7 +641,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         FlowElement currentFlowElement = getCurrentFlowElement();
         if (currentFlowElement instanceof FlowNode) {
             FlowNode flowNode = (FlowNode) currentFlowElement;
-            if (flowNode.getVariableAggregationDefinitions() != null)  {
+            if (flowNode.getVariableAggregationDefinitions() != null && !flowNode.getVariableAggregationDefinitions().isEmpty())  {
                 List<VariableAggregation> variableAggregations = flowNode.getVariableAggregationDefinitions().stream()
                     .map(variableAggregationDefinition -> {
 
@@ -687,16 +687,27 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
                         }
 
-                        return new VariableAggregation(targetArrayVariable, source, target);
+                        return new VariableAggregation(variableAggregationDefinition.getElementId(), targetArrayVariable, source, target);
 
                     })
                     .collect(Collectors.toList());
 
-                DelegateExecution instanceExecution = ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance(this);
-                DelegateExecution multiInstanceRootExecution = ExecutionGraphUtil.getMultiInstanceRootExecution(this);
-                if (instanceExecution != null && multiInstanceRootExecution != null) {
-                    return new VariableAggregationInfo(getProcessInstanceId(), variableAggregations, instanceExecution.getId(), multiInstanceRootExecution.getId());
+                // Each distinct elementId has different executionId matching the corresponding multi-instance
+                Map<String, List<VariableAggregation>> aggregationsByElementId = new HashMap<>();
+                for (VariableAggregation variableAggregation : variableAggregations) {
+                    aggregationsByElementId.computeIfAbsent(variableAggregation.getElementId(), key -> new ArrayList<>()).add(variableAggregation);
                 }
+
+                VariableAggregationInfo variableAggregationInfo = new VariableAggregationInfo(getProcessInstanceId());
+                for (String elementId : aggregationsByElementId.keySet()) {
+                    DelegateExecution instanceExecution = ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance(this, elementId);
+                    DelegateExecution multiInstanceRootExecution = ExecutionGraphUtil.getMultiInstanceRootExecution(this, elementId);
+                    if (instanceExecution != null && multiInstanceRootExecution != null) {
+                        variableAggregationInfo.addRuntimeInfo(elementId, variableAggregations, instanceExecution.getId(), multiInstanceRootExecution.getId());
+                    }
+                }
+
+                return variableAggregationInfo;
 
             }
         }

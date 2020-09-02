@@ -17,14 +17,24 @@ package org.flowable.variable.service.impl.aggregation;
  */
 public class VariableAggregation {
 
+    protected String elementId;
     protected String targetArrayVariable;
     protected String source;
     protected String target;
 
-    public VariableAggregation(String targetArrayVariable, String source, String target) {
+    public VariableAggregation(String elementId, String targetArrayVariable, String source, String target) {
+        this.elementId = elementId;
         this.targetArrayVariable = targetArrayVariable;
         this.source = source;
         this.target = target;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 
     public String getTargetArrayVariable() {

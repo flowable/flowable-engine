@@ -17,7 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class VariableAggregationDefinition {
 
-    protected String elementId; // The id of the element where the aggregation will happen. This can be a parent element (e.g. multi-instance subprocess with a number of user tasks)
+    protected FlowNode element; // The element where the aggregation will happen. This can be a parent element (e.g. multi-instance subprocess with a number of user tasks)
     protected String targetArrayVariable;
     protected String targetArrayVariableExpression;
     protected String source;
@@ -25,12 +25,16 @@ public class VariableAggregationDefinition {
     protected String target;
     protected String targetExpression;
 
-    public String getElementId() {
-        return elementId;
+    public FlowNode getElement() {
+        return element;
     }
 
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
+    public void setElement(FlowNode element) {
+        this.element = element;
+    }
+
+    public String getElementId() {
+        return element.getId();
     }
 
     public String getTargetArrayVariable() {
