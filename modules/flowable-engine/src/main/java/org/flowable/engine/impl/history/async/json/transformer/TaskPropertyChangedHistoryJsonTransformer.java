@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.slf4j.Logger;
@@ -35,6 +35,10 @@ public class TaskPropertyChangedHistoryJsonTransformer extends AbstractNeedsTask
     
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskPropertyChangedHistoryJsonTransformer.class);
 
+    public TaskPropertyChangedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED);
@@ -44,7 +48,7 @@ public class TaskPropertyChangedHistoryJsonTransformer extends AbstractNeedsTask
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         if (StringUtils.isNotEmpty(taskId)) {
-            HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+            HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
 
             Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP);
             if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {

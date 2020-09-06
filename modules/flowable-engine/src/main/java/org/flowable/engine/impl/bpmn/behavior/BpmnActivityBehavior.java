@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -54,15 +55,18 @@ public class BpmnActivityBehavior implements Serializable {
     protected void dispatchJobCanceledEvents(ExecutionEntity activityExecution) {
         if (activityExecution != null) {
             List<JobEntity> jobs = activityExecution.getJobs();
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 for (JobEntity job : jobs) {
-                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
+                            processEngineConfiguration.getEngineCfgKey());
                 }
 
                 List<TimerJobEntity> timerJobs = activityExecution.getTimerJobs();
                 for (TimerJobEntity job : timerJobs) {
-                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
+                            processEngineConfiguration.getEngineCfgKey());
                 }
             }
         }

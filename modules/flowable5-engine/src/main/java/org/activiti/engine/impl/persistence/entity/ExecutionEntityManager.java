@@ -32,6 +32,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -90,7 +91,8 @@ public class ExecutionEntityManager extends AbstractManager {
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createCancelledEvent(execution.getProcessInstanceId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), deleteReason));
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), deleteReason),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances

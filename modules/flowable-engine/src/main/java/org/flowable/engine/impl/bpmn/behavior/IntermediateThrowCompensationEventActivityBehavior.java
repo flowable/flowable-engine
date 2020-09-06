@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -64,7 +65,8 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
         final String activityRef = compensateEventDefinition.getActivityRef();
 
         CommandContext commandContext = Context.getCommandContext();
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
 
         List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<>();
         if (StringUtils.isNotEmpty(activityRef)) {

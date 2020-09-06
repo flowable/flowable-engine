@@ -102,9 +102,10 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             if (contentItemEntity.getCreated() == null) {
                 contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
             }
-            CommandContextUtil.getContentItemEntityManager().insert(contentItemEntity);
+            contentEngineConfiguration.getContentItemEntityManager().insert(contentItemEntity);
+            
         } else {
-            CommandContextUtil.getContentItemEntityManager().update(contentItemEntity);
+            contentEngineConfiguration.getContentItemEntityManager().update(contentItemEntity);
         }
 
         return null;

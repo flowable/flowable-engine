@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -27,18 +27,21 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
  */
 public class GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd implements Command<List<HistoricEntityLink>> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseInstanceId;
 
-    public GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId) {
+    public GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is required");
         }
         this.caseInstanceId = caseInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<HistoricEntityLink> execute(CommandContext commandContext) {
-        return CommandContextUtil.getHistoricEntityLinkService()
+        return cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
                 .findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD);
     }
 

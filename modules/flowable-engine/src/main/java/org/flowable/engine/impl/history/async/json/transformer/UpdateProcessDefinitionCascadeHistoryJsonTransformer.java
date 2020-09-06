@@ -20,12 +20,12 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
@@ -36,6 +36,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UpdateProcessDefinitionCascadeHistoryJsonTransformer extends AbstractNeedsProcessInstanceHistoryJsonTransformer {
 
+    public UpdateProcessDefinitionCascadeHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_UPDATE_PROCESS_DEFINITION_CASCADE);
@@ -46,12 +50,12 @@ public class UpdateProcessDefinitionCascadeHistoryJsonTransformer extends Abstra
         String processDefinitionId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID);
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
         
-        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext);
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = processEngineConfiguration.getHistoricProcessInstanceEntityManager();
         HistoricProcessInstanceEntity historicProcessInstance = (HistoricProcessInstanceEntity) historicProcessInstanceEntityManager.findById(processInstanceId);
         historicProcessInstance.setProcessDefinitionId(processDefinitionId);
         historicProcessInstanceEntityManager.update(historicProcessInstance);
 
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+        HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
         HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
         taskQuery.processInstanceId(processInstanceId);
         List<HistoricTaskInstance> historicTasks = historicTaskService.findHistoricTaskInstancesByQueryCriteria(taskQuery);
@@ -63,7 +67,7 @@ public class UpdateProcessDefinitionCascadeHistoryJsonTransformer extends Abstra
             }
         }
         
-        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = processEngineConfiguration.getHistoricActivityInstanceEntityManager();
         HistoricActivityInstanceQueryImpl activityQuery = new HistoricActivityInstanceQueryImpl();
         activityQuery.processInstanceId(processInstanceId);
         List<HistoricActivityInstance> historicActivities = historicActivityInstanceEntityManager.findHistoricActivityInstancesByQueryCriteria(activityQuery);

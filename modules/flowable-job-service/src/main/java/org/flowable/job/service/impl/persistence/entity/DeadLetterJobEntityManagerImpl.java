@@ -26,11 +26,11 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntityManagerImpl
-    extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
-    implements DeadLetterJobEntityManager {
+        extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
+        implements DeadLetterJobEntityManager {
 
     public DeadLetterJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DeadLetterJobDataManager jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
@@ -86,7 +86,8 @@ public class DeadLetterJobEntityManagerImpl
 
         // Send event
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.ENTITY_DELETED, jobEntity), engineType);
         }
     }
     

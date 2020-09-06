@@ -35,6 +35,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.cmd.CancelJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -105,10 +106,11 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public String execute(CommandContext commandContext) {
-                JobEntity message = CommandContextUtil.getJobService(commandContext).createJob();
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobEntity message = jobService.createJob();
                 message.setJobType(Job.JOB_TYPE_MESSAGE);
                 message.setRetries(3);
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                jobService.scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -117,7 +119,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     @AfterEach
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deploymentId, true);
-        commandExecutor.execute(new CancelJobsCmd(messageId));
+        commandExecutor.execute(new CancelJobsCmd(messageId, processEngineConfiguration.getJobServiceConfiguration()));
     }
 
     @Test
@@ -198,7 +200,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getJobService(commandContext).updateJob(job);
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                jobService.updateJob(job);
                 return null;
             }
 
@@ -543,7 +546,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                jobEntity = jobService.createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
                 jobEntity.setRetries(0);
@@ -553,7 +557,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 exception.printStackTrace(new PrintWriter(stringWriter));
                 jobEntity.setExceptionStacktrace(stringWriter.toString());
 
-                CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
+                jobService.insertJob(jobEntity);
 
                 assertThat(jobEntity.getId()).isNotNull();
 
@@ -570,14 +574,15 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                jobEntity = jobService.createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
                 jobEntity.setRetries(0);
 
                 jobEntity.setExceptionMessage("I'm supposed to fail");
 
-                CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
+                jobService.insertJob(jobEntity);
 
                 assertThat(jobEntity.getId()).isNotNull();
 
@@ -594,8 +599,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-
-                CommandContextUtil.getJobService(commandContext).deleteJob(jobEntity.getId());
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                jobService.deleteJob(jobEntity.getId());
                 return null;
             }
         });

@@ -66,7 +66,7 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     @Override
     public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
-        return new CmmnHistoricVariableInstanceQueryImpl(commandExecutor);
+        return new CmmnHistoricVariableInstanceQueryImpl(commandExecutor, configuration);
     }
 
     @Override
@@ -76,77 +76,78 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public List<StageResponse> getStageOverview(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricStageOverviewCmd(caseInstanceId));
+        return commandExecutor.execute(new GetHistoricStageOverviewCmd(caseInstanceId, configuration));
     }
 
     @Override
     public void deleteHistoricCaseInstance(String caseInstanceId) {
-        commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));
+        commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId, configuration));
     }
 
     @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
-        return new HistoricTaskInstanceQueryImpl(commandExecutor);
+        return new HistoricTaskInstanceQueryImpl(commandExecutor, configuration.getDatabaseType(),
+                configuration.getTaskServiceConfiguration(), configuration.getVariableServiceConfiguration());
     }
     
     @Override
     public void deleteHistoricTaskInstance(String taskId) {
-        commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
+        commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId, configuration));
     }
     
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId, configuration));
     }
     
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForPlanItemInstance(String planItemInstanceId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForPlanItemInstanceCmd(planItemInstanceId));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForPlanItemInstanceCmd(planItemInstanceId, configuration));
     }
 
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForTask(String taskId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForTaskCmd(taskId));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForTaskCmd(taskId, configuration));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForCaseInstanceCmd(caseInstanceId));
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForCaseInstanceCmd(caseInstanceId, configuration));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(caseInstanceId));
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(caseInstanceId, configuration));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId, configuration));
     }
 
     @Override
     public void deleteHistoricTaskLogEntry(long logNumber) {
-        commandExecutor.execute(new CmmnDeleteHistoricTaskLogEntryCmd(logNumber));
+        commandExecutor.execute(new CmmnDeleteHistoricTaskLogEntryCmd(logNumber, configuration));
     }
 
     @Override
     public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task) {
-        return new HistoricTaskLogEntryBuilderImpl(commandExecutor, task);
+        return new HistoricTaskLogEntryBuilderImpl(commandExecutor, task, configuration.getTaskServiceConfiguration());
     }
 
     @Override
     public HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder() {
-        return new HistoricTaskLogEntryBuilderImpl(commandExecutor);
+        return new HistoricTaskLogEntryBuilderImpl(commandExecutor, configuration.getTaskServiceConfiguration());
     }
 
     @Override
     public HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery() {
-        return new HistoricTaskLogEntryQueryImpl(commandExecutor);
+        return new HistoricTaskLogEntryQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration());
     }
 
     @Override
     public NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery() {
-        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
+        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration());
     }
 
 }

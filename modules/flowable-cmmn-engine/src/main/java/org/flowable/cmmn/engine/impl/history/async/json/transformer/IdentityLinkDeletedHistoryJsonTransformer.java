@@ -12,8 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
@@ -21,16 +26,15 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
 public class IdentityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public IdentityLinkDeletedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_DELETED);
@@ -42,13 +46,13 @@ public class IdentityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJs
     }
     
     protected HistoricIdentityLinkEntity getHistoricIdentityLinkEntity(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricIdentityLinkService(commandContext)
+        return cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService()
                 .getHistoricIdentityLink(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
     }
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
         HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntity(historicalData, commandContext);
         if (historicIdentityLinkEntity != null) {
             historicIdentityLinkService.deleteHistoricIdentityLink(historicIdentityLinkEntity);

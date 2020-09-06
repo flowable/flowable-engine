@@ -119,6 +119,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -145,7 +146,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initDataManagers();
         initEntityManagers();
         initContentStorage();
-        initClock();
     }
 
     // services
@@ -272,6 +272,11 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return "content";
     }
 
     @Override

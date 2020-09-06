@@ -50,8 +50,10 @@ public interface FlowableEventDispatcher {
      * 
      * @param event
      *            event to dispatch.
+     * @param engineType
+     *            type of engine to dispatch           
      */
-    void dispatchEvent(FlowableEvent event);
+    void dispatchEvent(FlowableEvent event, String engineType);
 
     /**
      * @param enabled

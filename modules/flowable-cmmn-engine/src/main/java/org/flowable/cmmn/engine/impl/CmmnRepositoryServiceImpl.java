@@ -76,7 +76,7 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     public CmmnDeployment deploy(CmmnDeploymentBuilderImpl deploymentBuilder) {
-        return commandExecutor.execute(new DeployCmd(deploymentBuilder));
+        return commandExecutor.execute(new DeployCmd(deploymentBuilder, configuration));
     }
     
     @Override
@@ -96,7 +96,7 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
-        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
+        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, configuration));
     }
     
     @Override
@@ -111,27 +111,27 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public void addCandidateStarterUser(String caseDefinitionId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null));
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null, configuration));
     }
 
     @Override
     public void addCandidateStarterGroup(String caseDefinitionId, String groupId) {
-        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId));
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId, configuration));
     }
 
     @Override
     public void deleteCandidateStarterGroup(String caseDefinitionId, String groupId) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId, configuration));
     }
 
     @Override
     public void deleteCandidateStarterUser(String caseDefinitionId, String userId) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null, configuration));
     }
 
     @Override
     public List<IdentityLink> getIdentityLinksForCaseDefinition(String caseDefinitionId) {
-        return commandExecutor.execute(new GetIdentityLinksForCaseDefinitionCmd(caseDefinitionId));
+        return commandExecutor.execute(new GetIdentityLinksForCaseDefinitionCmd(caseDefinitionId, configuration));
     }
 
     @Override

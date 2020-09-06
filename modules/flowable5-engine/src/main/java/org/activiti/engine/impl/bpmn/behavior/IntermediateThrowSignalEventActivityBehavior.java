@@ -68,7 +68,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
                 signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
                 
             } else {
-                EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+                EventSubscriptionService eventSubscriptionService = CommandContextUtil.getProcessEngineConfiguration().getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
                 EventSubscriptionEntity flowable6EventSubscription = eventSubscriptionService.findById(signalEventSubscriptionEntity.getId());
                 EventSubscriptionUtil.eventReceived(flowable6EventSubscription, null, signalDefinition.isAsync());
             }

@@ -16,18 +16,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.data.AbstractTaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEntryDataManager;
 
 /**
  * @author martin.grofcik
  */
-public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<HistoricTaskLogEntryEntity> implements HistoricTaskLogEntryDataManager {
+public class MyBatisHistoricTaskLogEntryDataManager extends AbstractTaskDataManager<HistoricTaskLogEntryEntity> implements HistoricTaskLogEntryDataManager {
 
+    public MyBatisHistoricTaskLogEntryDataManager(TaskServiceConfiguration taskServiceConfiguration) {
+        super(taskServiceConfiguration);
+    }
+    
     @Override
     public Class<? extends HistoricTaskLogEntryEntity> getManagedEntityClass() {
         return HistoricTaskLogEntryEntityImpl.class;

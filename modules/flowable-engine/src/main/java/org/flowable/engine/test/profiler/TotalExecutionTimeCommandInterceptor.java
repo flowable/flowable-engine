@@ -15,6 +15,7 @@ package org.flowable.engine.test.profiler;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
 /**
  * @author Joram Barrez
@@ -28,7 +29,7 @@ public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterce
     }
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         ProfileSession currentProfileSession = profiler.getCurrentProfileSession();
 
         if (currentProfileSession != null) {
@@ -40,7 +41,7 @@ public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterce
             commandExecutionResult.setCommandFqn(className);
 
             long start = System.currentTimeMillis();
-            T result = next.execute(config, command);
+            T result = next.execute(config, command, commandExecutor);
             long end = System.currentTimeMillis();
             long totalTime = end - start;
             commandExecutionResult.setTotalTimeInMs(totalTime);
@@ -51,7 +52,7 @@ public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterce
             return result;
 
         } else {
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
         }
 
     }

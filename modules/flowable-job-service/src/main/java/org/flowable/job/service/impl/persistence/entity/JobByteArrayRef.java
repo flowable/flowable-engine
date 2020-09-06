@@ -15,6 +15,12 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
@@ -49,8 +55,8 @@ public class JobByteArrayRef implements Serializable {
         return name;
     }
 
-    public byte[] getBytes() {
-        ensureInitialized();
+    public byte[] getBytes(String engineType) {
+        ensureInitialized(engineType);
         return (entity != null ? entity.getBytes() : null);
     }
 
@@ -59,8 +65,8 @@ public class JobByteArrayRef implements Serializable {
      *
      * @return the byte array as {@link StandardCharsets#UTF_8} {@link String}
      */
-    public String asString() {
-        byte[] bytes = getBytes();
+    public String asString(String engineType) {
+        byte[] bytes = getBytes(engineType);
         if (bytes == null) {
             return null;
         }
@@ -68,9 +74,9 @@ public class JobByteArrayRef implements Serializable {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    public void setValue(String name, byte[] bytes) {
+    public void setValue(String name, byte[] bytes, String engineType) {
         this.name = name;
-        setBytes(bytes);
+        setBytes(bytes, engineType);
     }
 
     /**
@@ -80,17 +86,18 @@ public class JobByteArrayRef implements Serializable {
      * @param name the name of the byte array reference
      * @param value the value of the byte array reference
      */
-    public void setValue(String name, String value) {
+    public void setValue(String name, String value, String engineType) {
         this.name = name;
         if (value != null) {
-            setBytes(value.getBytes(StandardCharsets.UTF_8));
+            setBytes(value.getBytes(StandardCharsets.UTF_8), engineType);
         }
     }
 
-    private void setBytes(byte[] bytes) {
+    protected void setBytes(byte[] bytes, String engineType) {
         if (id == null) {
             if (bytes != null) {
-                JobByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getJobByteArrayEntityManager();
+                JobByteArrayEntityManager byteArrayEntityManager = getJobByteArrayEntityManager(
+                        engineType, CommandContextUtil.getCommandContext());
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -98,24 +105,26 @@ public class JobByteArrayRef implements Serializable {
                 id = entity.getId();
             }
         } else {
-            ensureInitialized();
+            ensureInitialized(engineType);
             entity.setBytes(bytes);
         }
     }
 
-    public JobByteArrayEntity getEntity() {
-        ensureInitialized();
+    public JobByteArrayEntity getEntity(String engineType) {
+        ensureInitialized(engineType);
         return entity;
     }
 
-    public void delete() {
+    public void delete(String engineType) {
         if (!deleted && id != null) {
+            JobByteArrayEntityManager byteArrayEntityManager = getJobByteArrayEntityManager(
+                    engineType, CommandContextUtil.getCommandContext());
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                CommandContextUtil.getJobByteArrayEntityManager().delete(entity);
+                byteArrayEntityManager.delete(entity);
             } else {
-                CommandContextUtil.getJobByteArrayEntityManager().deleteByteArrayById(id);
+                byteArrayEntityManager.deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -123,10 +132,11 @@ public class JobByteArrayRef implements Serializable {
         }
     }
 
-    private void ensureInitialized() {
+    protected void ensureInitialized(String engineType) {
         if (id != null && entity == null) {
-            entity = CommandContextUtil.getJobByteArrayEntityManager().findById(id);
-
+            CommandContext commandContext = Context.getCommandContext();
+            entity = getJobByteArrayEntityManager(engineType, commandContext).findById(id);
+            
             if (entity != null) {
                 name = entity.getName();
             }
@@ -149,6 +159,55 @@ public class JobByteArrayRef implements Serializable {
         copy.entity = entity;
         copy.deleted = deleted;
         return copy;
+    }
+    
+    protected JobByteArrayEntityManager getJobByteArrayEntityManager(String engineType, CommandContext commandContext) {
+        // Although 'engineType' is passed here, due to backwards compatibility, it also can be a scopeType value.
+        // For example, the scopeType of JobEntity determines which engine is used to retrieve the byteArrayEntityManager.
+        // The 'all' on the next line is exactly that, see JobServiceConfiguration#JOB_EXECUTION_SCOPE_ALL
+        if ("all".equalsIgnoreCase(engineType)) {
+            return getJobByteArrayEntityManagerForAllType(commandContext);
+            
+        } else {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+            if (engineConfiguration == null) {
+                return getJobByteArrayEntityManager(commandContext);
+            } else {
+                return getJobByteArrayEntityManager(engineConfiguration);
+            }
+        }
+    }
+
+    protected JobByteArrayEntityManager getJobByteArrayEntityManagerForAllType(CommandContext commandContext) {
+        AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.BPMN);
+        if (engineConfiguration == null) {
+            engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.CMMN);
+            
+            if (engineConfiguration == null) {
+                return getJobByteArrayEntityManager(commandContext);
+                
+            } else {
+                return getJobByteArrayEntityManager(engineConfiguration);
+            }
+        }
+        
+        return getJobByteArrayEntityManager(engineConfiguration);
+    }
+    
+    protected JobByteArrayEntityManager getJobByteArrayEntityManager(CommandContext commandContext) {
+        for (AbstractEngineConfiguration engineConfiguration : commandContext.getEngineConfigurations().values()) {
+            if (engineConfiguration.getServiceConfigurations().containsKey(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG)) {
+                return getJobByteArrayEntityManager(engineConfiguration);
+            }
+        }
+        
+        throw new IllegalStateException("Cannot initialize byte array. No engine configuration found");
+    }
+    
+    protected JobByteArrayEntityManager getJobByteArrayEntityManager(AbstractEngineConfiguration engineConfiguration) {
+        JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration)
+                engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+        return jobServiceConfiguration.getJobByteArrayEntityManager();
     }
 
     @Override

@@ -45,7 +45,7 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskEntity task = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);

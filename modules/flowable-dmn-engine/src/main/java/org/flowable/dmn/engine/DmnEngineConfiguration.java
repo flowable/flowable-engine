@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -222,6 +223,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initFunctionDelegates();
         initExpressionManager();
         initCommandContextFactory();
@@ -252,7 +254,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
-        initClock();
         initHitPolicyBehaviors();
         initRuleEngineExecutor();
     }
@@ -368,6 +369,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.DMN;
     }
 
     @Override

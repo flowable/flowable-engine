@@ -59,7 +59,7 @@ public class TriggerExecutionOperation extends AbstractOperation {
                     ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
                     
                 } else {
-                    JobService jobService = CommandContextUtil.getJobService();
+                    JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
                     JobEntity job = jobService.createJob();
                     job.setExecutionId(execution.getId());
                     job.setProcessInstanceId(execution.getProcessInstanceId());

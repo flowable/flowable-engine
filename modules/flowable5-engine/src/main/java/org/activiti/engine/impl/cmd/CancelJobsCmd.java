@@ -23,6 +23,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Send job cancelled event and delete job
@@ -54,7 +55,8 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
             if (jobToDelete != null) {
                 if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
                 jobToDelete.delete();
@@ -65,7 +67,8 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
                 if (timerJobToDelete != null) {
                     if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                         commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                                ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
+                                ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete),
+                                EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                     }
 
                     timerJobToDelete.delete();

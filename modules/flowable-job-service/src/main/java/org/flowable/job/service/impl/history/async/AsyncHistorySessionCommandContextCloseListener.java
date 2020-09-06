@@ -18,12 +18,10 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -88,14 +86,8 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                     }
                 }
                 
-                // History job needs to be created in the context of which it orginated
-                JobServiceConfiguration originalJobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-                try {
-                    commandContext.getCurrentEngineConfiguration().getServiceConfigurations().put(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, jobServiceConfiguration);
-                    asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);    
-                } finally {
-                    commandContext.getCurrentEngineConfiguration().getServiceConfigurations().put(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, originalJobServiceConfiguration);
-                }
+                // History job needs to be created in the context of which it originated
+                asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);
                 
             }
         }

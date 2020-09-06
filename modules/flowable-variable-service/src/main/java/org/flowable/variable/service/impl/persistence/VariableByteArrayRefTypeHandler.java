@@ -73,10 +73,10 @@ public class VariableByteArrayRefTypeHandler extends TypeReference<VariableByteA
 
     protected CommandExecutor getCommandExecutor() {
         CommandContext commandContext = Context.getCommandContext();
-        if (commandContext != null && commandContext.getCurrentEngineConfiguration() != null) {
+        if (commandContext != null) {
             // There is always a command context and engine here
             // However, just to be extra safe do a null check
-            return commandContext.getCurrentEngineConfiguration().getCommandExecutor();
+            return commandContext.getCommandExecutor();
         }
         return null;
     }

@@ -57,8 +57,9 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         EventModel eventModel = getEventModel(execution);
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                        .eventType(eventModel.getKey())
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                .getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
+                .eventType(eventModel.getKey())
                         .executionId(executionEntity.getId())
                         .processInstanceId(executionEntity.getProcessInstanceId())
                         .activityId(executionEntity.getCurrentActivityId())
@@ -93,7 +94,8 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         }
 
         if (boundaryEvent.isCancelActivity()) {
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             
             CommandContext commandContext = Context.getCommandContext();

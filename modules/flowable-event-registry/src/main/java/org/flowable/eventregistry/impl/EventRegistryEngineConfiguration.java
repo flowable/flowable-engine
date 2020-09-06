@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -207,6 +208,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -239,7 +241,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initOutboundEventProcessor();
         initChannelDefinitionProcessors();
         initDeployers();
-        initClock();
         initChangeDetectionManager();
         initChangeDetectionExecutor();
     }
@@ -386,6 +387,11 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.EVENT_REGISTRY;
     }
 
     @Override

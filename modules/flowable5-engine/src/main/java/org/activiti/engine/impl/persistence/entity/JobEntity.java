@@ -20,6 +20,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobHandler;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Job entity for persisting executable jobs.
@@ -96,9 +97,11 @@ public class JobEntity extends AbstractJobEntity {
 
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 
@@ -121,7 +124,8 @@ public class JobEntity extends AbstractJobEntity {
 
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 

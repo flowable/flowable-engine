@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
@@ -93,14 +94,14 @@ public class ResetExpiredJobsRunnable implements Runnable {
         while (hasExpiredJobs) {
 
             try {
-
+                JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
                 List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
                     .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
                 List<String> expiredJobIds = expiredJobs.stream().map(JobInfoEntity::getId).collect(Collectors.toList());
                 if (!expiredJobIds.isEmpty()) {
                     asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
-                        new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
+                        new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager, jobServiceConfiguration));
 
                 } else {
                     hasExpiredJobs = false;

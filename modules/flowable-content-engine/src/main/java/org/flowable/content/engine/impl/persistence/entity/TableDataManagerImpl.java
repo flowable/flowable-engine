@@ -111,6 +111,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                     LOGGER.debug("retrieved flowable table name {}", tableName);
                 }
             }
+            
         } catch (Exception e) {
             throw new FlowableException("couldn't get flowable table names using metadata: " + e.getMessage(), e);
         }

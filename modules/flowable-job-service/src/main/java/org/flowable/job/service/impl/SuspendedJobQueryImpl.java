@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.SuspendedJobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -33,6 +33,9 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job> implements SuspendedJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String processInstanceId;
     protected String executionId;
@@ -63,12 +66,14 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     public SuspendedJobQueryImpl() {
     }
 
-    public SuspendedJobQueryImpl(CommandContext commandContext) {
+    public SuspendedJobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public SuspendedJobQueryImpl(CommandExecutor commandExecutor) {
+    public SuspendedJobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -353,12 +358,12 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getSuspendedJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getSuspendedJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -384,7 +389,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

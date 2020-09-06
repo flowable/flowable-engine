@@ -33,24 +33,27 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class CmmnLoggingSessionUtil {
     
-    public static void addLoggingData(String type, String message, CaseInstanceEntity caseInstanceEntity) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, caseInstanceEntity.getId(), null, ScopeTypes.CMMN);
+    public static void addLoggingData(String type, String message, CaseInstanceEntity caseInstanceEntity, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, caseInstanceEntity.getId(), null, ScopeTypes.CMMN, objectMapper);
         loggingNode.put("scopeDefinitionId", caseInstanceEntity.getCaseDefinitionId());
         fillScopeDefinitionInfo(caseInstanceEntity.getCaseDefinitionId(), loggingNode);
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addLoggingData(String type, String message, PlanItemInstanceEntity planItemInstanceEntity) {
-        addLoggingData(type, message, null, null, planItemInstanceEntity);
+    public static void addLoggingData(String type, String message, PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        addLoggingData(type, message, null, null, planItemInstanceEntity, objectMapper);
     }
     
-    public static void addLoggingData(String type, String message, String oldState, String newState, PlanItemInstanceEntity planItemInstanceEntity) {
-        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity);
+    public static void addLoggingData(String type, String message, String oldState, String newState, 
+            PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity, objectMapper);
         loggingNode.put("state", planItemInstanceEntity.getState());
         if (oldState != null) {
             loggingNode.put("oldState", oldState);
@@ -59,11 +62,13 @@ public class CmmnLoggingSessionUtil {
             loggingNode.put("newState", newState);
         }
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addLoggingData(String type, String message, TaskEntity task, PlanItemInstanceEntity planItemInstanceEntity) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getScopeId(), task.getSubScopeId(), ScopeTypes.CMMN);
+    public static void addLoggingData(String type, String message, TaskEntity task, 
+            PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getScopeId(), task.getSubScopeId(), ScopeTypes.CMMN, objectMapper);
         loggingNode.put("scopeDefinitionId", planItemInstanceEntity.getCaseDefinitionId());
         loggingNode.put("taskId", task.getId());
         putIfNotNull("taskName", task.getName(), loggingNode);
@@ -76,15 +81,16 @@ public class CmmnLoggingSessionUtil {
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
         fillPlanItemDefinitionInfo(loggingNode, planItemInstanceEntity);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
     public static void addExecuteActivityBehaviorLoggingData(String type, PlanItemActivityBehavior activityBehavior, 
-                    PlanItemDefinition planItemDefinition, PlanItemInstanceEntity planItemInstanceEntity) {
+                    PlanItemDefinition planItemDefinition, PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
         
         String message = "In " + planItemDefinition.getClass().getSimpleName() + ", executing " + activityBehavior.getClass().getSimpleName();
         
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), ScopeTypes.CMMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), 
+                planItemInstanceEntity.getId(), ScopeTypes.CMMN, objectMapper);
         loggingNode.put("scopeDefinitionId", planItemInstanceEntity.getCaseDefinitionId());
         loggingNode.put("elementId", planItemDefinition.getId());
         putIfNotNull("elementName", planItemDefinition.getName(), loggingNode);
@@ -94,11 +100,14 @@ public class CmmnLoggingSessionUtil {
         
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addAsyncActivityLoggingData(String message, String type, JobEntity jobEntity, PlanItemDefinition planItemDefinition, PlanItemInstanceEntity planItemInstanceEntity) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), ScopeTypes.CMMN);
+    public static void addAsyncActivityLoggingData(String message, String type, JobEntity jobEntity, PlanItemDefinition planItemDefinition, 
+            PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), 
+                planItemInstanceEntity.getId(), ScopeTypes.CMMN, objectMapper);
         loggingNode.put("scopeDefinitionId", planItemInstanceEntity.getCaseDefinitionId());
         loggingNode.put("elementId", planItemDefinition.getId());
         putIfNotNull("elementName", planItemDefinition.getName(), loggingNode);
@@ -108,11 +117,14 @@ public class CmmnLoggingSessionUtil {
         
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static ObjectNode fillBasicTaskLoggingData(String message, TaskEntity task, PlanItemInstanceEntity planItemInstanceEntity) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getScopeId(), task.getSubScopeId(), ScopeTypes.CMMN);
+    public static ObjectNode fillBasicTaskLoggingData(String message, TaskEntity task, 
+            PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getScopeId(), task.getSubScopeId(), 
+                ScopeTypes.CMMN, objectMapper);
         loggingNode.put("scopeDefinitionId", planItemInstanceEntity.getCaseDefinitionId());
         loggingNode.put("taskId", task.getId());
         putIfNotNull("taskName", task.getName(), loggingNode);
@@ -123,8 +135,10 @@ public class CmmnLoggingSessionUtil {
         return loggingNode;
     }
     
-    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, SentryIfPart sentryIfPart, EntityWithSentryPartInstances instance) {
-        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, SentryIfPart sentryIfPart, 
+            EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         ArrayNode onPartArrayNode = loggingNode.putArray("onParts");
         for (SentryOnPart onPart : sentryOnParts) {
             ObjectNode onPartNode = onPartArrayNode.addObject();
@@ -137,11 +151,11 @@ public class CmmnLoggingSessionUtil {
         ObjectNode ifPartNode = loggingNode.putObject("ifPart");
         ifPartNode.put("condition", sentryIfPart.getCondition());
         
-        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, EntityWithSentryPartInstances instance) {
-        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         ArrayNode onPartArrayNode = loggingNode.putArray("onParts");
         for (SentryOnPart onPart : sentryOnParts) {
             ObjectNode onPartNode = onPartArrayNode.addObject();
@@ -151,19 +165,21 @@ public class CmmnLoggingSessionUtil {
             onPartNode.put("standardEvent", onPart.getStandardEvent());
         }
         
-        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addEvaluateSentryLoggingData(SentryIfPart sentryIfPart, EntityWithSentryPartInstances instance) {
-        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+    public static void addEvaluateSentryLoggingData(SentryIfPart sentryIfPart, EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         ObjectNode ifPartNode = loggingNode.putObject("ifPart");
         ifPartNode.put("condition", sentryIfPart.getCondition());
         
-        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode, ScopeTypes.CMMN);
     }
     
-    public static void addEvaluateSentryFailedLoggingData(SentryIfPart sentryIfPart, RuntimeException e, EntityWithSentryPartInstances instance) {
-        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+    public static void addEvaluateSentryFailedLoggingData(SentryIfPart sentryIfPart, RuntimeException e, 
+            EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         
         String label = null;
         if (instance instanceof PlanItemInstanceEntity) {
@@ -179,13 +195,15 @@ public class CmmnLoggingSessionUtil {
         loggingNode.put("message", "IfPart evaluation failed for " + label);
         ObjectNode ifPartNode = loggingNode.putObject("ifPart");
         ifPartNode.put("condition", sentryIfPart.getCondition());
-        LoggingSessionUtil.addErrorLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY_FAILED, loggingNode, e);
+        LoggingSessionUtil.addErrorLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY_FAILED, loggingNode, e, ScopeTypes.CMMN);
     }
     
-    public static void addErrorLoggingData(String type, String message, Throwable t, PlanItemInstanceEntity planItemInstanceEntity) {
-        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity);
+    public static void addErrorLoggingData(String type, String message, Throwable t, 
+            PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
+        
+        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity, objectMapper);
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
-        LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t);
+        LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t, ScopeTypes.CMMN);
     }
     
     public static void fillLoggingData(ObjectNode loggingNode, PlanItemInstanceEntity planItemInstanceEntity) {
@@ -208,9 +226,9 @@ public class CmmnLoggingSessionUtil {
     }
     
     public static void addTaskIdentityLinkData(String type, String message, boolean isUser, List<IdentityLinkEntity> identityLinkEntities, 
-                    TaskEntity task, PlanItemInstanceEntity planItemInstanceEntity) {
+                    TaskEntity task, PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
         
-        ObjectNode loggingNode = fillBasicTaskLoggingData(message, task, planItemInstanceEntity);
+        ObjectNode loggingNode = fillBasicTaskLoggingData(message, task, planItemInstanceEntity, objectMapper);
         ArrayNode identityLinkArray = null;
         if (isUser) {
             identityLinkArray = loggingNode.putArray("taskUserIdentityLinks");
@@ -229,7 +247,7 @@ public class CmmnLoggingSessionUtil {
             }
         }
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.CMMN);
     }
     
     protected static String getActivitySubType(PlanItemDefinition planItemDefinition) {
@@ -248,7 +266,7 @@ public class CmmnLoggingSessionUtil {
         loggingNode.put("scopeDefinitionName", caseDefinition.getName());
     }
     
-    protected static ObjectNode fillPlanItemInstanceInfo(String message, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected static ObjectNode fillPlanItemInstanceInfo(String message, PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         String activityId = null;
         String activityName = null;
@@ -262,10 +280,11 @@ public class CmmnLoggingSessionUtil {
         }
         
         return LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), 
-                        ScopeTypes.CMMN, planItemInstanceEntity.getCaseDefinitionId(), activityId, activityName, activityType, activitySubType);
+                        ScopeTypes.CMMN, planItemInstanceEntity.getCaseDefinitionId(), activityId, 
+                        activityName, activityType, activitySubType, objectMapper);
     }
     
-    protected static ObjectNode fillEvaluateSentryInstanceEntity(EntityWithSentryPartInstances instance) {
+    protected static ObjectNode fillEvaluateSentryInstanceEntity(EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
         ObjectNode loggingNode = null;
         String caseDefinitionId = null;
         if (instance instanceof PlanItemInstanceEntity) {
@@ -274,13 +293,13 @@ public class CmmnLoggingSessionUtil {
             if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
                 label = planItemInstanceEntity.getPlanItemDefinition().getName();
             }
-            loggingNode = fillPlanItemInstanceInfo("Evaluate sentry parts for " + label, planItemInstanceEntity);
+            loggingNode = fillPlanItemInstanceInfo("Evaluate sentry parts for " + label, planItemInstanceEntity, objectMapper);
             caseDefinitionId = planItemInstanceEntity.getCaseDefinitionId();
         
         } else {
             CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) instance;
             loggingNode = LoggingSessionUtil.fillLoggingData("Evaluate sentry parts for case instance " + instance.getId(), 
-                            caseInstanceEntity.getId(), null, ScopeTypes.CMMN);
+                            caseInstanceEntity.getId(), null, ScopeTypes.CMMN, objectMapper);
             caseDefinitionId = caseInstanceEntity.getCaseDefinitionId();
         }
         

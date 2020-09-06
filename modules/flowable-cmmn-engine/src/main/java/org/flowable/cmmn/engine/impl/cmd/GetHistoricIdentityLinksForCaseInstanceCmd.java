@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -28,19 +28,24 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 public class GetHistoricIdentityLinksForCaseInstanceCmd implements Command<List<HistoricIdentityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseInstanceId;
 
-    public GetHistoricIdentityLinksForCaseInstanceCmd(String caseInstanceId) {
+    public GetHistoricIdentityLinksForCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is required");
         }
         this.caseInstanceId = caseInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<HistoricIdentityLink> execute(CommandContext commandContext) {
-        return (List) CommandContextUtil.getHistoricIdentityLinkService().findHistoricIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        return (List) cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService()
+                .findHistoricIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
     }
 
 }

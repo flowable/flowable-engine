@@ -64,6 +64,12 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCmmnDynamicStateManager {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public AbstractCmmnDynamicStateManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     //-- Move container preparation section start
     public List<MovePlanItemInstanceEntityContainer> resolveMovePlanItemInstanceEntityContainers(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, String migrateToCaseDefinitionId, Map<String, Object> variables, CommandContext commandContext) {
@@ -193,7 +199,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         caseInstanceChangeState.setCurrentStageInstances(currentStages);
         
         // Set the case variables first so they are available during the change state logic
-        CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(caseInstanceChangeState.getCaseInstanceId());
         caseInstance.setVariables(caseInstanceChangeState.getCaseVariables());
 
@@ -328,7 +334,7 @@ public abstract class AbstractCmmnDynamicStateManager {
             PlanItemInstanceEntity existingPlanItemInstanceEntity = (PlanItemInstanceEntity) existingPlanItemInstance;
             
             if (existingPlanItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof HumanTask) {
-                TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+                TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
                 List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(existingPlanItemInstanceEntity.getId(), ScopeTypes.CMMN);
                 if (taskEntities == null || taskEntities.isEmpty()) {
                     throw new FlowableException("No task entity found for plan item instance " + existingPlanItemInstanceEntity.getId());
@@ -337,7 +343,7 @@ public abstract class AbstractCmmnDynamicStateManager {
                 // Should be only one
                 for (TaskEntity taskEntity : taskEntities) {
                     if (!taskEntity.isDeleted()) {
-                        TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false);
+                        TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false, cmmnEngineConfiguration);
                     }
                 }
             }
@@ -498,7 +504,7 @@ public abstract class AbstractCmmnDynamicStateManager {
     protected PlanItemInstanceEntity createStagesAndPlanItemInstances(PlanItem planItem, CaseInstanceEntity caseInstance, 
                     Collection<PlanItemInstanceEntity> movingPlanItemInstances, CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
         
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
         
         // Resolve the stage elements that need to be created for each move to plan item definition
         Map<String, Stage> stagesToCreate = new HashMap<>();
@@ -663,7 +669,7 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
         }
         
-        CommandContextUtil.getAgenda().planStartPlanItemInstanceOperation(newPlanItemInstance, null);
+        CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(newPlanItemInstance, null);
 
         return newPlanItemInstance;
     }
@@ -676,7 +682,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         
         PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof HumanTask) {
-            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
             if (taskEntities == null || taskEntities.isEmpty()) {
                 throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
@@ -685,12 +691,12 @@ public abstract class AbstractCmmnDynamicStateManager {
             // Should be only one
             for (TaskEntity taskEntity : taskEntities) {
                 if (!taskEntity.isDeleted()) {
-                    TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false);
+                    TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false, cmmnEngineConfiguration);
                 }
             }
             
         } else if (planItemDefinition instanceof Stage) {
-            deleteChildPlanItemInstances(planItemInstance, commandContext, cmmnEngineConfiguration);
+            deleteChildPlanItemInstances(planItemInstance, commandContext);
         
         } else if (planItemDefinition instanceof ProcessTask) {
             if (planItemInstance.getReferenceId() != null) {
@@ -699,20 +705,21 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
     }
     
-    protected void deleteChildPlanItemInstances(PlanItemInstanceEntity planItemInstance, CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    protected void deleteChildPlanItemInstances(PlanItemInstanceEntity planItemInstance, CommandContext commandContext) {
         List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                deleteChildPlanItemInstances(childPlanItemInstance, commandContext, cmmnEngineConfiguration);
+                deleteChildPlanItemInstances(childPlanItemInstance, commandContext);
                 terminatePlanItemInstance(childPlanItemInstance, commandContext, cmmnEngineConfiguration);
             }
         }
     }
 
     protected void handleHumanTaskNewAssignee(PlanItemInstanceEntity taskPlanItemInstance, String newAssigneeId, CommandContext commandContext) {
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery().subScopeId(taskPlanItemInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
-        TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration)
+                .subScopeId(taskPlanItemInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
+        TaskHelper.changeTaskAssignee(task, newAssigneeId, cmmnEngineConfiguration);
     }
 
     protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
@@ -745,8 +752,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
         childPlanItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
@@ -756,7 +762,7 @@ public abstract class AbstractCmmnDynamicStateManager {
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
         PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
         if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
-            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
+            stagePlanItem = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceEntityToCopy.getStageInstanceId());
         }
 
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createPlanItemInstanceEntityBuilder()

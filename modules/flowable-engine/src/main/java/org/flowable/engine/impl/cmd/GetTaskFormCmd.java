@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.TaskFormData;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -43,7 +44,8 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
 
     @Override
     public TaskFormData execute(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
         }
@@ -53,7 +55,7 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
             return compatibilityHandler.getTaskFormData(taskId);
         }
 
-        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
+        FormHandlerHelper formHandlerHelper = processEngineConfiguration.getFormHandlerHelper();
         TaskFormHandler taskFormHandler = formHandlerHelper.getTaskFormHandlder(task);
         if (taskFormHandler == null) {
             throw new FlowableException("No taskFormHandler specified for task '" + taskId + "'");

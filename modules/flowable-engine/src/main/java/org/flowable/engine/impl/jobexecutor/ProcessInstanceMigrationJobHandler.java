@@ -39,14 +39,14 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        BatchService batchService = CommandContextUtil.getBatchService(commandContext);
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         ProcessInstanceMigrationManager processInstanceMigrationManager = processEngineConfiguration.getProcessInstanceMigrationManager();
 
         String batchPartId = getBatchPartIdFromHandlerCfg(configuration);
         BatchPart batchPart = batchService.getBatchPart(batchPartId);
         Batch batch = batchService.getBatch(batchPart.getBatchId());
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(batch.getBatchDocumentJson());
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(batch.getBatchDocumentJson(processEngineConfiguration.getEngineCfgKey()));
 
         String exceptionMessage = null;
         try {

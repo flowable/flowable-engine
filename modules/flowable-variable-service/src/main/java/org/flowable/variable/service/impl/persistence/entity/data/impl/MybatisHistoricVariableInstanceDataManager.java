@@ -16,12 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.data.AbstractVariableDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByScopeIdAndScopeTypeMatcher;
@@ -31,7 +32,7 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
 /**
  * @author Joram Barrez
  */
-public class MybatisHistoricVariableInstanceDataManager extends AbstractDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
+public class MybatisHistoricVariableInstanceDataManager extends AbstractVariableDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
 
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByTaskIdMatcher 
         = new HistoricVariableInstanceByTaskIdMatcher();
@@ -44,6 +45,10 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceBySubScopeIdAndScopeTypeMatcher 
         = new HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher();
+    
+    public MybatisHistoricVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        super(variableServiceConfiguration);
+    }
     
     @Override
     public Class<? extends HistoricVariableInstanceEntity> getManagedEntityClass() {

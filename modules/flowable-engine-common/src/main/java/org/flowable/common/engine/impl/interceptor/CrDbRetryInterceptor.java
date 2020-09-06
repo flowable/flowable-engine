@@ -33,7 +33,7 @@ public class CrDbRetryInterceptor extends AbstractCommandInterceptor {
     protected int waitTimeIncrease = 5;
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         long waitTime = this.waitTime;
         int failedAttempts = 0;
 
@@ -47,7 +47,7 @@ public class CrDbRetryInterceptor extends AbstractCommandInterceptor {
             try {
 
                 // try to execute the command
-                return next.execute(config, command);
+                return next.execute(config, command, commandExecutor);
 
             } catch (Exception e) {
                 if (isTransactionRetryException(e)) {

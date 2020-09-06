@@ -14,13 +14,21 @@ package org.flowable.batch.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
+import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntity;
 import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchByteArrayDataManager;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 
 public class MybatisBatchByteArrayDataManager extends AbstractDataManager<BatchByteArrayEntity> implements BatchByteArrayDataManager {
 
+    protected BatchServiceConfiguration batchServiceConfiguration;
+    
+    public MybatisBatchByteArrayDataManager(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
+    }
+    
     @Override
     public BatchByteArrayEntity create() {
         return new BatchByteArrayEntityImpl();
@@ -42,4 +50,8 @@ public class MybatisBatchByteArrayDataManager extends AbstractDataManager<BatchB
         getDbSqlSession().delete("deleteBatchByteArrayNoRevisionCheck", byteArrayEntityId, BatchByteArrayEntityImpl.class);
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return batchServiceConfiguration.getIdGenerator();
+    }
 }

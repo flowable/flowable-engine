@@ -524,7 +524,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         }
 
                         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances);
+                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                         }
 
                         return criterion;
@@ -535,7 +535,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (LOGGER.isDebugEnabled()) {
@@ -592,7 +592,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                     && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), 
+                                entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
@@ -716,8 +717,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
-        try {
-            Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        try { 
+            Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
             Object result = conditionExpression.getValue(variableContainer);
 
             if (LOGGER.isDebugEnabled()) {
@@ -728,8 +730,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 return (Boolean) result;
             }
         } catch (RuntimeException e) {
-            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, entityWithSentryPartInstances);
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, 
+                        entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
             }
 
             throw e;

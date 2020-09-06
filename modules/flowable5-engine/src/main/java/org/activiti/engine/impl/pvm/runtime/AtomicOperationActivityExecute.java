@@ -20,6 +20,7 @@ import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.logging.LogMDC;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,8 @@ public class AtomicOperationActivityExecute implements AtomicOperation {
                                 execution.getProcessInstanceId(),
                                 execution.getProcessDefinitionId(),
                                 (String) activity.getProperties().get("type"),
-                                activity.getActivityBehavior().getClass().getCanonicalName()));
+                                activity.getActivityBehavior().getClass().getCanonicalName()),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
             activityBehavior.execute(execution);

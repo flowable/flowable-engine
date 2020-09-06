@@ -213,8 +213,8 @@ import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsAnyExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsExpressionFunction;
@@ -821,6 +821,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initCaseDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -840,6 +841,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             initSchemaManagementCommand();
         }
 
+        configureVariableServiceConfiguration();
+        configureJobServiceConfiguration();
         initVariableTypes();
         initBeans();
         initTransactionFactory();
@@ -866,7 +869,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initIdentityLinkInterceptor();
-        initClock();
         initEventDispatcher();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
@@ -1200,7 +1202,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (cmmnDeployer == null) {
-            cmmnDeployer = new CmmnDeployer();
+            cmmnDeployer = new CmmnDeployer(this);
         }
 
         initCmmnParser();
@@ -1318,7 +1320,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initCaseInstanceHelper() {
         if (caseInstanceHelper == null) {
-            caseInstanceHelper = new CaseInstanceHelperImpl();
+            caseInstanceHelper = new CaseInstanceHelperImpl(this);
         }
     }
     
@@ -1340,7 +1342,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initDynamicStateManager() {
         if (dynamicStateManager == null) {
-            dynamicStateManager = new DefaultCmmnDynamicStateManager();
+            dynamicStateManager = new DefaultCmmnDynamicStateManager(this);
         }
     }
 
@@ -1359,7 +1361,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initIdentityLinkInterceptor() {
         if (identityLinkInterceptor == null) {
-            identityLinkInterceptor = new DefaultCmmnIdentityLinkInterceptor();
+            identityLinkInterceptor = new DefaultCmmnIdentityLinkInterceptor(this);
         }
     }
 
@@ -1402,6 +1404,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.CMMN;
     }
 
     @Override
@@ -1454,16 +1461,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
 
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
 
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
@@ -1474,6 +1480,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 
@@ -1488,6 +1499,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
@@ -1537,6 +1549,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
@@ -1555,6 +1568,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
             this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
+            this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
     
@@ -1571,6 +1585,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initEventSubscriptionServiceConfiguration() {
         this.eventSubscriptionServiceConfiguration = instantiateEventSubscriptionServiceConfiguration();
         this.eventSubscriptionServiceConfiguration.setClock(this.clock);
+        this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         
@@ -1639,42 +1654,42 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
         
-        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer());
-        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer());
+        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
+        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
-        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer(this));
 
         return historyJsonTransformers;
     }
@@ -1689,19 +1704,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             };
         }
     }
-
-    public void initJobServiceConfiguration() {
+    
+    public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
+            this.jobServiceConfiguration.setIdGenerator(idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
-            this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
             this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
-            this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
-    
-            this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
     
             List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
             if (customAsyncRunnableExecutionExceptionHandlers != null) {
@@ -1741,9 +1753,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
-    
-            this.jobServiceConfiguration.init();
         }
+    }
+
+    public void initJobServiceConfiguration() {
+        this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
+        this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
+        
+        this.jobServiceConfiguration.init();
         
         if (this.jobHandlers != null) {
             for (String type : this.jobHandlers.keySet()) {
@@ -2011,7 +2029,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+        IdmIdentityService idmIdentityService = null;
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+
+        return idmIdentityService;
     }
 
     public CmmnEngineAgendaFactory getCmmnEngineAgendaFactory() {

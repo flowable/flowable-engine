@@ -15,18 +15,22 @@ package org.flowable.engine.impl.history.async.json.transformer;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractNeedsProcessInstanceHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public AbstractNeedsProcessInstanceHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext);
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = processEngineConfiguration.getHistoricProcessInstanceEntityManager();
         return historicProcessInstanceEntityManager.findById(processInstanceId) != null;
     }
 

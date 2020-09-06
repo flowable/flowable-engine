@@ -29,7 +29,7 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     implements JobInfoEntityManager<T> {
 
     public JobInfoEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DM jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
@@ -60,6 +60,12 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
         dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    }
+
+    @Override
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

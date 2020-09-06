@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl.persistence.entity.data;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -28,4 +29,8 @@ public abstract class AbstractEventDataManager<EntityImpl extends Entity> extend
         this.eventRegistryConfiguration = eventRegistryConfiguration;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return eventRegistryConfiguration.getIdGenerator();
+    }
 }

@@ -40,7 +40,7 @@ public class TimerJobEntityManagerImpl
     private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
 
     public TimerJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, TimerJobDataManager jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
@@ -135,6 +135,7 @@ public class TimerJobEntityManagerImpl
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
+        
         return true;
     }
 
@@ -152,7 +153,8 @@ public class TimerJobEntityManagerImpl
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
     

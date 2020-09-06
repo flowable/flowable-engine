@@ -35,7 +35,7 @@ public class HistoricCaseInstanceEntityManagerImpl
     
     @Override
     public HistoricCaseInstanceQuery createHistoricCaseInstanceQuery() {
-        return new HistoricCaseInstanceQueryImpl(engineConfiguration.getCommandExecutor());
+        return new HistoricCaseInstanceQueryImpl(engineConfiguration.getCommandExecutor(), engineConfiguration);
     }
     
     @Override

@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.event.logger;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -33,7 +34,8 @@ public class DatabaseEventFlusher extends AbstractEventFlusher {
             return; // Not interested in events about exceptions
         }
 
-        EventLogEntryEntityManager eventLogEntryEntityManager = CommandContextUtil.getEventLogEntryEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventLogEntryEntityManager eventLogEntryEntityManager = processEngineConfiguration.getEventLogEntryEntityManager();
         for (EventLoggerEventHandler eventHandler : eventHandlers) {
             try {
                 eventLogEntryEntityManager.insert(eventHandler.generateEventLogEntry(commandContext), false);

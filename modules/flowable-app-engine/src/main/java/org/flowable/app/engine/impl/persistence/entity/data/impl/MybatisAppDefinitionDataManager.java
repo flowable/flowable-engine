@@ -30,8 +30,8 @@ import org.flowable.common.engine.api.FlowableException;
  */
 public class MybatisAppDefinitionDataManager extends AbstractAppDataManager<AppDefinitionEntity> implements AppDefinitionDataManager {
 
-    public MybatisAppDefinitionDataManager(AppEngineConfiguration cmmnEngineConfiguration) {
-        super(cmmnEngineConfiguration);
+    public MybatisAppDefinitionDataManager(AppEngineConfiguration appEngineConfiguration) {
+        super(appEngineConfiguration);
     }
 
     @Override

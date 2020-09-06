@@ -72,12 +72,12 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public Task newTask(String taskId) {
-        return commandExecutor.execute(new NewTaskCmd(taskId));
+        return commandExecutor.execute(new NewTaskCmd(taskId, configuration));
     }
 
     @Override
     public void saveTask(Task task) {
-        commandExecutor.execute(new SaveTaskCmd(task));
+        commandExecutor.execute(new SaveTaskCmd(task, configuration));
     }
     
     @Override
@@ -146,42 +146,42 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public void deleteTask(String taskId) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, null, false));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, null, false, configuration));
     }
 
     @Override
     public void deleteTasks(Collection<String> taskIds) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, false));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, false, configuration));
     }
 
     @Override
     public void deleteTask(String taskId, boolean cascade) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, null, cascade));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, null, cascade, configuration));
     }
 
     @Override
     public void deleteTasks(Collection<String> taskIds, boolean cascade) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, cascade));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, cascade, configuration));
     }
 
     @Override
     public void deleteTask(String taskId, String deleteReason) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, deleteReason, false));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, deleteReason, false, configuration));
     }
     
     @Override
     public void deleteTasks(Collection<String> taskIds, String deleteReason) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, deleteReason, false));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, deleteReason, false, configuration));
     }
 
     @Override
     public FormInfo getTaskFormModel(String taskId) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false));
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false, configuration));
     }
     
     @Override
     public FormInfo getTaskFormModel(String taskId, boolean ignoreVariables) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables));
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables, configuration));
     }
     
     @Override
@@ -196,37 +196,38 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor);
+        return new TaskQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration(), configuration.getVariableServiceConfiguration(),
+                configuration.getIdmIdentityService());
     }
     
     @Override
     public List<Task> getSubTasks(String parentTaskId) {
-        return commandExecutor.execute(new GetSubTasksCmd(parentTaskId));
+        return commandExecutor.execute(new GetSubTasksCmd(parentTaskId, configuration));
     }
     
     @Override
     public Map<String, Object> getVariables(String taskId) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false, configuration));
     }
 
     @Override
     public Map<String, Object> getVariablesLocal(String taskId) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true, configuration));
     }
 
     @Override
     public Map<String, Object> getVariables(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, false));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, false, configuration));
     }
 
     @Override
     public Map<String, Object> getVariablesLocal(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, true));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, true, configuration));
     }
 
     @Override
     public Object getVariable(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, false));
+        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, false, configuration));
     }
 
     @Override
@@ -236,12 +237,12 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public boolean hasVariable(String taskId, String variableName) {
-        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, false));
+        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, false, configuration));
     }
 
     @Override
     public Object getVariableLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, true));
+        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, true, configuration));
     }
 
     @Override
@@ -256,7 +257,7 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public boolean hasVariableLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, true));
+        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, true, configuration));
     }
 
     @Override
@@ -315,52 +316,56 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public VariableInstance getVariableInstance(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, false));
+        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, false, configuration));
     }
 
     @Override
     public VariableInstance getVariableInstanceLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, true));
+        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, true, configuration));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances(String taskId) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, false));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, false, configuration));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, false));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, false, configuration));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(String taskId) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, true));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, true, configuration));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, true));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, true, configuration));
     }
     
     @Override
     public void setAssignee(String taskId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, IdentityLinkType.ASSIGNEE));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                IdentityLinkType.ASSIGNEE));
     }
 
     @Override
     public void setOwner(String taskId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, IdentityLinkType.OWNER));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                IdentityLinkType.OWNER));
     }
     
     @Override
     public void addUserIdentityLink(String taskId, String userId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, identityLinkType));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                identityLinkType));
     }
 
     @Override
     public void addGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, groupId, AddIdentityLinkCmd.IDENTITY_GROUP, identityLinkType));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, groupId, AddIdentityLinkCmd.IDENTITY_GROUP, 
+                identityLinkType));
     }
     
     @Override
@@ -375,12 +380,12 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public List<IdentityLink> getIdentityLinksForTask(String taskId) {
-        return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId));
+        return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId, configuration));
     }
 
     @Override
     public TaskBuilder createTaskBuilder() {
-        return new CmmnTaskBuilderImpl(commandExecutor);
+        return new CmmnTaskBuilderImpl(commandExecutor, configuration);
     }
 
 }

@@ -30,6 +30,7 @@ import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 
@@ -104,7 +105,8 @@ public class DeploymentEntityManager extends AbstractManager {
                     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                         Context.getProcessEngineConfiguration()
                                 .getEventDispatcher()
-                                .dispatchEvent(ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+                                .dispatchEvent(ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()),
+                                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                     }
 
                     ((TimerJobEntity) timerStartJob).delete();

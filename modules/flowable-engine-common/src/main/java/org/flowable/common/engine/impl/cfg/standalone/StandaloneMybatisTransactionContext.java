@@ -94,7 +94,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
         }
 
         if (executeInNewContext) {
-            CommandExecutor commandExecutor = Context.getCommandContext().getCurrentEngineConfiguration().getCommandExecutor();
+            CommandExecutor commandExecutor = Context.getCommandContext().getCommandExecutor();
             CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
             commandExecutor.execute(commandConfig, new Command<Void>() {
                 @Override

@@ -542,7 +542,8 @@ public abstract class AbstractDynamicStateManager {
 
     protected List<ExecutionEntity> createEmbeddedSubProcessAndExecutions(Collection<FlowElementMoveEntry> moveToFlowElements, List<ExecutionEntity> movingExecutions, MoveExecutionEntityContainer moveExecutionEntityContainer, ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
 
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         // Resolve the sub process elements that need to be created for each move to flow element
         HashMap<String, SubProcess> subProcessesToCreate = new HashMap<>();
@@ -602,13 +603,14 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (newFlowElement instanceof CallActivity) {
-                        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newChildExecution);
+                        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
 
-                        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+                        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
                         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                             eventDispatcher.dispatchEvent(
                                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
-                                    newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
+                                    newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement),
+                                processEngineConfiguration.getEngineCfgKey());
                         }
                     }
 
@@ -670,6 +672,7 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected ExecutionEntity createEmbeddedSubProcessHierarchy(SubProcess subProcess, ExecutionEntity defaultParentExecution, Map<String, SubProcess> subProcessesToCreate, Set<String> movingExecutionIds, ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processInstanceChangeState.getProcessInstanceActiveEmbeddedExecutions().containsKey(subProcess.getId())) {
             return processInstanceChangeState.getProcessInstanceActiveEmbeddedExecutions().get(subProcess.getId()).get(0);
         }
@@ -684,22 +687,23 @@ public abstract class AbstractDynamicStateManager {
             parentSubProcess = createEmbeddedSubProcessHierarchy(subProcess.getSubProcess(), defaultParentExecution, subProcessesToCreate, movingExecutionIds, processInstanceChangeState, commandContext);
             processInstanceChangeState.getCreatedEmbeddedSubProcesses().put(subProcess.getSubProcess().getId(), parentSubProcess);
         }
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(parentSubProcess);
         subProcessExecution.setCurrentFlowElement(subProcess);
         subProcessExecution.setScope(true);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
-                    subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
+                    subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess),
+                processEngineConfiguration.getEngineCfgKey());
         }
 
         subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(subProcessExecution);
+        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(subProcessExecution);
 
         List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
@@ -710,7 +714,7 @@ public abstract class AbstractDynamicStateManager {
             processCreatedEventSubProcess((EventSubProcess) subProcess, subProcessExecution, movingExecutionIds, commandContext);
         }
 
-        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
 
         //Process containing child Event SubProcesses not contained in this creation hierarchy
         List<EventSubProcess> childEventSubProcesses = subProcess.findAllSubFlowElementInFlowMapOfType(EventSubProcess.class);
@@ -759,7 +763,7 @@ public abstract class AbstractDynamicStateManager {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         Process subProcess = ProcessDefinitionUtil.getProcess(subProcessDefinition.getId());
         if (subProcess == null) {
@@ -782,7 +786,8 @@ public abstract class AbstractDynamicStateManager {
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.PROCESS_CREATED, subProcessInstance), processEngineConfiguration.getEngineCfgKey());
         }
 
         // process template-defined data objects
@@ -815,15 +820,16 @@ public abstract class AbstractDynamicStateManager {
         }
 
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return subProcessInstance;
     }
 
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
-
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
 
         // manage the bidirectional parent-child relation
         childExecution.setProcessInstanceId(parentExecutionEntity.getProcessInstanceId());
@@ -844,14 +850,15 @@ public abstract class AbstractDynamicStateManager {
 
         // If we are moving a UserTask we need to update its processDefinition references
         if (newFlowElement instanceof UserTask) {
-            TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery().executionId(childExecution.getId()).singleResult();
+            TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration)
+                    .executionId(childExecution.getId()).singleResult();
             task.setProcessDefinitionId(childExecution.getProcessDefinitionId());
             task.setTaskDefinitionKey(newFlowElement.getId());
             task.setName(newFlowElement.getName());
             task.setProcessInstanceId(childExecution.getProcessInstanceId());
 
             //Sync history
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext).syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
+            processEngineConfiguration.getActivityInstanceEntityManager().syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
         }
 
         // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities
@@ -868,9 +875,13 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected void handleUserTaskNewAssignee(ExecutionEntity taskExecution, String newAssigneeId, CommandContext commandContext) {
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
-        TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration)
+                .executionId(taskExecution.getId()).singleResult();
+        if (task != null) {
+            TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        }
     }
 
     protected boolean isEventSubProcessStart(FlowElement flowElement) {
@@ -939,10 +950,10 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected void processCreatedEventSubProcess(EventSubProcess eventSubProcess, ExecutionEntity eventSubProcessExecution, Set<String> movingExecutionIds, CommandContext commandContext) {
-
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
+        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<StartEvent> allStartEvents = eventSubProcess.findAllSubFlowElementInFlowMapOfType(StartEvent.class);
 
         for (StartEvent startEvent : allStartEvents) {
@@ -992,7 +1003,7 @@ public abstract class AbstractDynamicStateManager {
                             messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
                         }
 
-                        ExecutionEntity messageExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
+                        ExecutionEntity messageExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(eventSubProcessExecution.getParent());
                         messageExecution.setCurrentFlowElement(startEvent);
                         messageExecution.setEventScope(true);
                         messageExecution.setActive(false);
@@ -1011,10 +1022,11 @@ public abstract class AbstractDynamicStateManager {
                         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(messageSubscription);
                         messageExecution.getEventSubscriptions().add(messageSubscription);
                         
-                        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                        processEngineConfiguration.getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageSubscription.getActivityId(),
-                                messageSubscription.getEventName(), null, messageSubscription.getExecutionId(),
-                                messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()));
+                                    messageSubscription.getEventName(), null, messageSubscription.getExecutionId(),
+                                    messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()),
+                                    processEngineConfiguration.getEngineCfgKey());
 
                     }
                     if (eventDefinition instanceof SignalEventDefinition && (eventSubscriptions == null || eventSubscriptions.isEmpty())) {
@@ -1026,7 +1038,7 @@ public abstract class AbstractDynamicStateManager {
                             signalEventDefinition.setSignalRef(signal.getName());
                         }
 
-                        ExecutionEntity signalExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
+                        ExecutionEntity signalExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(eventSubProcessExecution.getParent());
                         signalExecution.setCurrentFlowElement(startEvent);
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
@@ -1047,10 +1059,11 @@ public abstract class AbstractDynamicStateManager {
                         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(signalSubscription);
                         signalExecution.getEventSubscriptions().add(signalSubscription);
                         
-                        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                        processEngineConfiguration.getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalSubscription.getActivityId(),
-                                signalSubscription.getEventName(), null, signalSubscription.getExecutionId(),
-                                signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()));
+                                    signalSubscription.getEventName(), null, signalSubscription.getExecutionId(),
+                                    signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()),
+                                    processEngineConfiguration.getEngineCfgKey());
 
                     }
 
@@ -1058,7 +1071,7 @@ public abstract class AbstractDynamicStateManager {
                         if (!startEventExecution.isPresent()) {
 
                             TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-                            ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
+                            ExecutionEntity timerExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(eventSubProcessExecution.getParent());
                             timerExecution.setCurrentFlowElement(startEvent);
                             timerExecution.setEventScope(true);
                             timerExecution.setActive(false);

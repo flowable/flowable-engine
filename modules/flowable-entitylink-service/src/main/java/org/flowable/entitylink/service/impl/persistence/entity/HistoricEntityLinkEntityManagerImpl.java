@@ -27,8 +27,8 @@ public class HistoricEntityLinkEntityManagerImpl
     extends AbstractServiceEngineEntityManager<EntityLinkServiceConfiguration, HistoricEntityLinkEntity, HistoricEntityLinkDataManager>
     implements HistoricEntityLinkEntityManager {
 
-    public HistoricEntityLinkEntityManagerImpl(EntityLinkServiceConfiguration identityLinkServiceConfiguration, HistoricEntityLinkDataManager historicEntityLinkDataManager) {
-        super(identityLinkServiceConfiguration, historicEntityLinkDataManager);
+    public HistoricEntityLinkEntityManagerImpl(EntityLinkServiceConfiguration entityLinkServiceConfiguration, HistoricEntityLinkDataManager historicEntityLinkDataManager) {
+        super(entityLinkServiceConfiguration, entityLinkServiceConfiguration.getEngineName(), historicEntityLinkDataManager);
     }
 
     @Override

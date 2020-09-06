@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -52,7 +53,9 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
         String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
                         .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
                         .eventName(signalName)
                         .signal(signal)
@@ -66,11 +69,11 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                    .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
-                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
+                    null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -90,13 +93,14 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
     protected ExecutionEntity deleteSignalEventSubscription(DelegateExecution execution) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(Context.getCommandContext(), signalEventDefinition,
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
         for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
             if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
-
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
                 CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
             }

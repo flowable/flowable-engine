@@ -13,11 +13,16 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         return historicActivityInstanceExistsForData(historicalData, commandContext);

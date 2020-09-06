@@ -38,7 +38,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -793,7 +792,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
 
         List<HistoricEntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService(commandContext);
+            HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
 
             return historicEntityLinkService.findHistoricEntityLinksByReferenceScopeIdAndType(task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD);
         });

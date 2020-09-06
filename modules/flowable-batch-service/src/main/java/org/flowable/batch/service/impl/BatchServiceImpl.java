@@ -62,7 +62,7 @@ public class BatchServiceImpl extends CommonServiceImpl<BatchServiceConfiguratio
     
     @Override
     public BatchBuilder createBatchBuilder() {
-        return new BatchBuilderImpl(this);
+        return new BatchBuilderImpl(configuration);
     }
     
     @Override

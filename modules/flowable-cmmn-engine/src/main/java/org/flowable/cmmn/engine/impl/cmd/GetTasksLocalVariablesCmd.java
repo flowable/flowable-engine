@@ -31,6 +31,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected Set<String> taskIds;
 
     public GetTasksLocalVariablesCmd(Set<String> taskIds) {
@@ -47,7 +48,8 @@ public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>
         }
 
         List<VariableInstance> instances = new ArrayList<>();
-        List<VariableInstanceEntity> entities = CommandContextUtil.getVariableService().findVariableInstancesByTaskIds(taskIds);
+        List<VariableInstanceEntity> entities = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                .getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskIds(taskIds);
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();
             instances.add(entity);

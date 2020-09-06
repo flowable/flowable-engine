@@ -15,23 +15,28 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.data.AbstractJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.SuspendedJobsByExecutionIdMatcher;
 
 /**
  * @author Tijs Rademakers
  */
-public class MybatisSuspendedJobDataManager extends AbstractDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
+public class MybatisSuspendedJobDataManager extends AbstractJobDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
 
     protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
 
+    public MybatisSuspendedJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        super(jobServiceConfiguration);
+    }
+    
     @Override
     public Class<? extends SuspendedJobEntity> getManagedEntityClass() {
         return SuspendedJobEntityImpl.class;

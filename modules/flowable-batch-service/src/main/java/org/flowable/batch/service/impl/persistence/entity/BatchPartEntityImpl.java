@@ -174,9 +174,9 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
     }
 
     @Override
-    public String getResultDocumentJson() {
-        if (resultDocRefId != null && resultDocRefId.getEntity() != null) {
-            byte[] bytes = resultDocRefId.getEntity().getBytes();
+    public String getResultDocumentJson(String engineType) {
+        if (resultDocRefId != null && resultDocRefId.getEntity(engineType) != null) {
+            byte[] bytes = resultDocRefId.getEntity(engineType).getBytes();
             if (bytes != null) {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
@@ -185,8 +185,8 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
     }
 
     @Override
-    public void setResultDocumentJson(String resultDocumentJson) {
-        this.resultDocRefId = setByteArrayRef(this.resultDocRefId, BATCH_RESULT_LABEL, resultDocumentJson);
+    public void setResultDocumentJson(String resultDocumentJson, String engineType) {
+        this.resultDocRefId = setByteArrayRef(this.resultDocRefId, BATCH_RESULT_LABEL, resultDocumentJson, engineType);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         this.tenantId = tenantId;
     }
 
-    private static BatchByteArrayRef setByteArrayRef(BatchByteArrayRef byteArrayRef, String name, String value) {
+    private static BatchByteArrayRef setByteArrayRef(BatchByteArrayRef byteArrayRef, String name, String value, String engineType) {
         if (byteArrayRef == null) {
             byteArrayRef = new BatchByteArrayRef();
         }
@@ -207,7 +207,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         if (value != null) {
             bytes = value.getBytes(StandardCharsets.UTF_8);
         }
-        byteArrayRef.setValue(name, bytes);
+        byteArrayRef.setValue(name, bytes, engineType);
         return byteArrayRef;
     }
 

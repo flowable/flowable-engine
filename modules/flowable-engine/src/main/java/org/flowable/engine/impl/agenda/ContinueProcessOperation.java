@@ -170,7 +170,8 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
         
         JobEntity job = jobService.createJob();
         job.setExecutionId(execution.getId());
@@ -190,7 +191,6 @@ public class ContinueProcessOperation extends AbstractOperation {
         jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.isLoggingSessionEnabled()) {
             BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Created async job for " + flowNode.getId() + ", with job id " + job.getId(),
                             LoggingSessionConstants.TYPE_SERVICE_TASK_ASYNC_JOB, job, flowNode, execution);
@@ -272,12 +272,12 @@ public class ContinueProcessOperation extends AbstractOperation {
             if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createMultiInstanceActivityEvent(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED, flowNode.getId(),
-                                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode), processEngineConfiguration.getEngineCfgKey());
             }
             else {
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                                execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                                execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode), processEngineConfiguration.getEngineCfgKey());
             }
         }
         
@@ -325,7 +325,7 @@ public class ContinueProcessOperation extends AbstractOperation {
                             targetFlowElement != null ? targetFlowElement.getId() : null,
                             targetFlowElement != null ? targetFlowElement.getName() : null,
                             targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
-                            targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
+                            targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null), processEngineConfiguration.getEngineCfgKey());
         }
 
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSequenceFlowTaken(execution);

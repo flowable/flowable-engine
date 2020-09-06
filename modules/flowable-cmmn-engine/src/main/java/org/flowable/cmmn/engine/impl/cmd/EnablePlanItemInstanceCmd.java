@@ -31,6 +31,7 @@ public class EnablePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd 
 
     public EnablePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables, Map<String, Object> localVariables,
             Map<String, Object> transientVariables) {
+        
         super(planItemInstanceId, variables, localVariables, transientVariables);
     }
 

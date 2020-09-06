@@ -43,11 +43,11 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
     }
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 
         if (config.getTransactionPropagation() == TransactionPropagation.NOT_SUPPORTED) {
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
         }
 
         boolean requiresNew = config.getTransactionPropagation() == TransactionPropagation.REQUIRES_NEW;
@@ -63,7 +63,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
             }
             T result;
             try {
-                result = next.execute(config, command);
+                result = next.execute(config, command, commandExecutor);
             } catch (RuntimeException ex) {
                 doRollback(isNew, ex);
                 throw ex;

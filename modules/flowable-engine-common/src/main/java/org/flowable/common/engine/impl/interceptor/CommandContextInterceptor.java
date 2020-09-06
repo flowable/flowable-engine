@@ -18,10 +18,12 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -32,44 +34,53 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
     protected CommandContextFactory commandContextFactory;
-    protected String currentEngineConfigurationKey;
+    protected ClassLoader classLoader;
+    protected boolean useClassForNameClassLoading;
+    protected Clock clock;
+    protected ObjectMapper objectMapper;
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
-    protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
 
     public CommandContextInterceptor() {
     }
 
-    public CommandContextInterceptor(CommandContextFactory commandContextFactory) {
+    public CommandContextInterceptor(CommandContextFactory commandContextFactory, ClassLoader classLoader, 
+            boolean useClassForNameClassLoading, Clock clock, ObjectMapper objectMapper) {
+        
         this.commandContextFactory = commandContextFactory;
+        this.classLoader = classLoader;
+        this.useClassForNameClassLoading = useClassForNameClassLoading;
+        this.clock = clock;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         CommandContext commandContext = Context.getCommandContext();
 
         boolean contextReused = false;
-        AbstractEngineConfiguration previousEngineConfiguration = null;
         
         // We need to check the exception, because the transaction can be in a
         // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
         if (!config.isContextReusePossible() || commandContext == null || commandContext.getException() != null) {
             commandContext = commandContextFactory.createCommandContext(command);
             commandContext.setEngineConfigurations(engineConfigurations);
+            commandContext.setCommandExecutor(commandExecutor);
+            commandContext.setClassLoader(classLoader);
+            commandContext.setUseClassForNameClassLoading(useClassForNameClassLoading);
+            commandContext.setClock(clock);
+            commandContext.setObjectMapper(objectMapper);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
             contextReused = true;
             commandContext.setReused(true);
-            previousEngineConfiguration = commandContext.getCurrentEngineConfiguration();
         }
 
         try {
-
-            commandContext.setCurrentEngineConfiguration(engineConfigurations.get(currentEngineConfigurationKey));
             // Push on stack
             Context.setCommandContext(commandContext);
 
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
 
         } catch (Exception e) {
 
@@ -82,10 +93,8 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
                 }
 
             } finally {
-
                 // Pop from stack
                 Context.removeCommandContext();
-                commandContext.setCurrentEngineConfiguration(previousEngineConfiguration);
             }
         }
 
@@ -117,28 +126,12 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         this.commandContextFactory = commandContextFactory;
     }
     
-    public String getCurrentEngineConfigurationKey() {
-        return currentEngineConfigurationKey;
-    }
-
-    public void setCurrentEngineConfigurationKey(String currentEngineConfigurationKey) {
-        this.currentEngineConfigurationKey = currentEngineConfigurationKey;
-    }
-
     public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {
         return engineConfigurations;
     }
 
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
-    }
-    
-    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
-        return serviceConfigurations;
-    }
-
-    public void setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
-        this.serviceConfigurations = serviceConfigurations;
     }
     
 }

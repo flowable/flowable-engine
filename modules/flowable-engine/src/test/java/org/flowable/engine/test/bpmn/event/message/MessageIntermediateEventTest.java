@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +140,6 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 }

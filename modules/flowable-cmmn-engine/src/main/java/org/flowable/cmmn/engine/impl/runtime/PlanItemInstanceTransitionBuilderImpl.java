@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
@@ -31,6 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTransitionBuilder {
 
     protected CommandExecutor commandExecutor;
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String planItemInstanceId;
     protected Map<String, Object> variables;
@@ -38,8 +40,9 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
     protected Map<String, Object> transientVariables;
     protected Map<String, Object> childTaskVariables;
 
-    public PlanItemInstanceTransitionBuilderImpl(CommandExecutor commandExecutor, String planItemInstanceId) {
+    public PlanItemInstanceTransitionBuilderImpl(CommandExecutor commandExecutor, String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.planItemInstanceId = planItemInstanceId;
     }
 

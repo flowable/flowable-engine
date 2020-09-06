@@ -15,23 +15,28 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.data.AbstractJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.DeadLetterJobsByExecutionIdMatcher;
 
 /**
  * @author Tijs Rademakers
  */
-public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
+public class MybatisDeadLetterJobDataManager extends AbstractJobDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
 
     protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
 
+    public MybatisDeadLetterJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        super(jobServiceConfiguration);
+    }
+    
     @Override
     public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {
         return DeadLetterJobEntityImpl.class;

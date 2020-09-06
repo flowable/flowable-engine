@@ -33,7 +33,8 @@ public class DefaultCmmnHistoryCleaningManager implements CmmnHistoryCleaningMan
         int days = cmmnEngineConfiguration.getCleanInstancesEndedAfterNumberOfDays();
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.DAY_OF_YEAR, -days);
-        HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(
+                cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration);
         historicCaseInstanceQuery.finishedBefore(cal.getTime());
         return historicCaseInstanceQuery;
     }

@@ -17,27 +17,29 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 public class UnacquireOwnedHistoryJobsCmd implements Command<Void> {
 
     private final String lockOwner;
     private final String tenantId;
+    private final JobServiceConfiguration jobServiceConfiguration;
 
-    public UnacquireOwnedHistoryJobsCmd(String lockOwner, String tenantId) {
+    public UnacquireOwnedHistoryJobsCmd(String lockOwner, String tenantId, JobServiceConfiguration jobServiceConfiguration) {
         this.lockOwner = lockOwner;
         this.tenantId = tenantId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        HistoryJobQueryImpl jobQuery = new HistoryJobQueryImpl(commandContext);
+        HistoryJobQueryImpl jobQuery = new HistoryJobQueryImpl(commandContext, jobServiceConfiguration);
         jobQuery.lockOwner(lockOwner);
         jobQuery.jobTenantId(tenantId);
-        List<HistoryJob> jobs = CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(jobQuery);
+        List<HistoryJob> jobs = jobServiceConfiguration.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(jobQuery);
         for (HistoryJob job : jobs) {
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
+            jobServiceConfiguration.getJobManager().unacquire(job);
         }
         return null;
     }

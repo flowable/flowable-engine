@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.EntityLink;
@@ -39,14 +40,15 @@ public class GetEntityLinkParentsForProcessInstanceCmd implements Command<List<E
 
     @Override
     public List<EntityLink> execute(CommandContext commandContext) {
-        ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntity processInstance = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
 
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find process instance with id " + processInstanceId, ExecutionEntity.class);
         }
 
-        return CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
-            processInstanceId, ScopeTypes.BPMN, EntityLinkType.CHILD);
+        return processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
+                .findEntityLinksByReferenceScopeIdAndType(processInstanceId, ScopeTypes.BPMN, EntityLinkType.CHILD);
     }
 
 }

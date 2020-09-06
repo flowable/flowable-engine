@@ -74,7 +74,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
         }
 
         try {
-            commandExecutor.execute(new ExecuteJobCmd(jobId));
+            commandExecutor.execute(new ExecuteJobCmd(jobId, configuration.getJobServiceConfiguration()));
         } catch (RuntimeException e) {
             if (e instanceof FlowableException) {
                 throw e;
@@ -86,102 +86,101 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public void executeHistoryJob(String historyJobId) {
-        commandExecutor.execute(new ExecuteHistoryJobCmd(historyJobId));
+        commandExecutor.execute(new ExecuteHistoryJobCmd(historyJobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveTimerToExecutableJob(String jobId) {
-        return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId));
+        return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveJobToDeadLetterJob(String jobId) {
-        return commandExecutor.execute(new MoveJobToDeadLetterJobCmd(jobId));
+        return commandExecutor.execute(new MoveJobToDeadLetterJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
-        return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries));
+        return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteJob(String jobId) {
-        commandExecutor.execute(new DeleteJobCmd(jobId));
+        commandExecutor.execute(new DeleteJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteTimerJob(String jobId) {
-        commandExecutor.execute(new DeleteTimerJobCmd(jobId));
+        commandExecutor.execute(new DeleteTimerJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public void deleteSuspendedJob(String jobId) {
-        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId));
+        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteDeadLetterJob(String jobId) {
-        commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
+        commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public void setJobRetries(String jobId, int retries) {
-        commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+        commandExecutor.execute(new SetJobRetriesCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void setTimerJobRetries(String jobId, int retries) {
-        commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries));
+        commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public JobQuery createJobQuery() {
-        return new JobQueryImpl(commandExecutor);
+        return new JobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public TimerJobQuery createTimerJobQuery() {
-        return new TimerJobQueryImpl(commandExecutor);
+        return new TimerJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public SuspendedJobQuery createSuspendedJobQuery() {
-        return new SuspendedJobQueryImpl(commandExecutor);
+        return new SuspendedJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public DeadLetterJobQuery createDeadLetterJobQuery() {
-        return new DeadLetterJobQueryImpl(commandExecutor);
+        return new DeadLetterJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
     
     @Override
     public String getJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.ASYNC));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.ASYNC, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getTimerJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.TIMER));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.TIMER, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getSuspendedJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.SUSPENDED));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.SUSPENDED, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getDeadLetterJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public void handleHistoryCleanupTimerJob() {
-        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
+        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd(configuration));
     }
     
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
-        return new HistoryJobQueryImpl(commandExecutor);
+        return new HistoryJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
-
 }

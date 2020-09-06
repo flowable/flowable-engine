@@ -18,8 +18,8 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +32,13 @@ public class ExecuteHistoryJobCmd implements Command<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteHistoryJobCmd.class);
 
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String historyJobId;
 
-    public ExecuteHistoryJobCmd(String historyJobId) {
+    public ExecuteHistoryJobCmd(String historyJobId, JobServiceConfiguration jobServiceConfiguration) {
         this.historyJobId = historyJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ExecuteHistoryJobCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("historyJobId is null");
         }
 
-        HistoryJobEntity historyJobEntity = CommandContextUtil.getHistoryJobEntityManager(commandContext).findById(historyJobId);
+        HistoryJobEntity historyJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().findById(historyJobId);
         if (historyJobEntity == null) {
             throw new JobNotFoundException(historyJobId);
         }
@@ -54,7 +57,7 @@ public class ExecuteHistoryJobCmd implements Command<Void> {
         }
 
         try {
-            CommandContextUtil.getJobManager(commandContext).execute(historyJobEntity);
+            jobServiceConfiguration.getJobManager().execute(historyJobEntity);
         } catch (Throwable exception) {
             // Finally, Throw the exception to indicate the failure
             throw new FlowableException("HistoryJob " + historyJobId + " failed", exception);

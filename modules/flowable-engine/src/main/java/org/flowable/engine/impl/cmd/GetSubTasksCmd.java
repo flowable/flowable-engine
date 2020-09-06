@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.Task;
 
@@ -35,7 +36,8 @@ public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
 
     @Override
     public List<Task> execute(CommandContext commandContext) {
-        return CommandContextUtil.getTaskService().findTasksByParentTaskId(parentTaskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return processEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByParentTaskId(parentTaskId);
     }
 
 }

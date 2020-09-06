@@ -38,6 +38,7 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
 
     public AbstractNeedsPlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> localVariables, Map<String, Object> transientVariables) {
+        
         this.planItemInstanceId = planItemInstanceId;
         this.variables = variables;
         this.localVariables = localVariables;
@@ -49,7 +50,9 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
         if (planItemInstanceId == null) {
             throw new FlowableIllegalArgumentException("Plan item instance id is null");
         }
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                .getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {
             throw new FlowableObjectNotFoundException("Cannot find plan item instance for id " + planItemInstanceId, PlanItemInstanceEntity.class);
         }

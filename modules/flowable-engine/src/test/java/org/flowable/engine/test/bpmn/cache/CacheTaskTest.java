@@ -147,7 +147,7 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
         managementService.executeCommand(commandContext -> {
             // Make sure that it is loaded in the cache
             String taskId = TestCacheTaskListener.TASK_ID;
-            Task queriedTask = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
+            Task queriedTask = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
             assertThat(queriedTask.getProcessVariables()).isEmpty();
             assertThat(queriedTask.getTaskLocalVariables()).isEmpty();
 
@@ -162,7 +162,7 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
             assertThat(queriedTask.getTaskLocalVariables()).containsOnly(entry("localVar", "localValue"));
 
             // Make sure that it is loaded in the cache
-            HistoricTaskInstance queriedHistoricTask = CommandContextUtil.getHistoricTaskService(commandContext).getHistoricTask(taskId);
+            HistoricTaskInstance queriedHistoricTask = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
             assertThat(queriedHistoricTask.getProcessVariables()).isEmpty();
             assertThat(queriedHistoricTask.getTaskLocalVariables()).isEmpty();
 

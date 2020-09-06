@@ -24,11 +24,11 @@ import org.flowable.variable.service.impl.persistence.entity.data.VariableByteAr
  * @author Marcus Klimstra (CGI)
  */
 public class VariableByteArrayEntityManagerImpl
-    extends AbstractServiceEngineEntityManager<VariableServiceConfiguration, VariableByteArrayEntity, VariableByteArrayDataManager>
-    implements VariableByteArrayEntityManager {
+        extends AbstractServiceEngineEntityManager<VariableServiceConfiguration, VariableByteArrayEntity, VariableByteArrayDataManager>
+        implements VariableByteArrayEntityManager {
 
     public VariableByteArrayEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, VariableByteArrayDataManager byteArrayDataManager) {
-        super(variableServiceConfiguration, byteArrayDataManager);
+        super(variableServiceConfiguration, variableServiceConfiguration.getEngineName(), byteArrayDataManager);
     }
 
     @Override

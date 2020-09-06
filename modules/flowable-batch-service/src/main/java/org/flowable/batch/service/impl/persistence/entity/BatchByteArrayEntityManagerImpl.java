@@ -24,11 +24,11 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineE
  * @author Marcus Klimstra (CGI)
  */
 public class BatchByteArrayEntityManagerImpl
-    extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchByteArrayEntity, BatchByteArrayDataManager>
-    implements BatchByteArrayEntityManager {
+        extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchByteArrayEntity, BatchByteArrayDataManager>
+        implements BatchByteArrayEntityManager {
 
     public BatchByteArrayEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchByteArrayDataManager byteArrayDataManager) {
-        super(batchServiceConfiguration, byteArrayDataManager);
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), byteArrayDataManager);
     }
 
     @Override

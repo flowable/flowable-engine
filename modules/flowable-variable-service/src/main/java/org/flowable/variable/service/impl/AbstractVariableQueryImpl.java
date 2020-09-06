@@ -18,11 +18,10 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * Abstract query class that adds methods to query for variable values.
@@ -32,18 +31,22 @@ import org.flowable.variable.service.impl.util.CommandContextUtil;
 public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extends AbstractQuery<T, U> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
     public AbstractVariableQueryImpl() {
     }
 
-    public AbstractVariableQueryImpl(CommandContext commandContext) {
+    public AbstractVariableQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public AbstractVariableQueryImpl(CommandExecutor commandExecutor) {
+    public AbstractVariableQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     @Override
@@ -229,9 +232,8 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     protected void ensureVariablesInitialized() {
         if (!queryVariableValues.isEmpty()) {
-            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
             for (QueryVariableValue queryVariableValue : queryVariableValues) {
-                queryVariableValue.initialize(variableTypes);
+                queryVariableValue.initialize(variableServiceConfiguration);
             }
         }
     }

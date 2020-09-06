@@ -24,6 +24,7 @@ import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
@@ -33,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -42,8 +44,9 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public abstract class AbstractDynamicInjectionCmd {
 
     protected void createDerivedProcessDefinitionForTask(CommandContext commandContext, String taskId) {
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
-        ProcessInstance processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getProcessInstanceId());
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
+        ProcessInstance processInstance = processEngineConfiguration.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
         createDerivedProcessDefinition(commandContext, processInstance);
     }
 
@@ -61,9 +64,10 @@ public abstract class AbstractDynamicInjectionCmd {
         updateExecutions(commandContext, derivedProcessDefinitionEntity, (ExecutionEntity) processInstance, bpmnModel);
     }
 
-    protected DeploymentEntity createDerivedDeployment(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntitty) {
-        DeploymentEntityManager deploymentEntityManager = CommandContextUtil.getDeploymentEntityManager(commandContext);
-        DeploymentEntity deploymentEntity = deploymentEntityManager.findById(processDefinitionEntitty.getDeploymentId());
+    protected DeploymentEntity createDerivedDeployment(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        DeploymentEntityManager deploymentEntityManager = processEngineConfiguration.getDeploymentEntityManager();
+        DeploymentEntity deploymentEntity = deploymentEntityManager.findById(processDefinitionEntity.getDeploymentId());
 
         DeploymentEntity newDeploymentEntity = deploymentEntityManager.create();
         newDeploymentEntity.setName(deploymentEntity.getName());
@@ -128,42 +132,46 @@ public abstract class AbstractDynamicInjectionCmd {
         processInstance.setProcessDefinitionId(processDefinitionEntity.getId());
         processInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
         
-        List<TaskEntity> currentTasks = CommandContextUtil.getTaskService(commandContext).findTasksByProcessInstanceId(processInstance.getId());
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        List<TaskEntity> currentTasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService()
+                .findTasksByProcessInstanceId(processInstance.getId());
         for (TaskEntity currentTask : currentTasks) {
             currentTask.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        List<JobEntity> currentJobs = CommandContextUtil.getJobService(commandContext).findJobsByProcessInstanceId(processInstance.getId());
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
+        List<JobEntity> currentJobs = jobService.findJobsByProcessInstanceId(processInstance.getId());
         for (JobEntity currentJob : currentJobs) {
             currentJob.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        List<TimerJobEntity> currentTimerJobs = CommandContextUtil.getTimerJobService(commandContext).findTimerJobsByProcessInstanceId(processInstance.getId());
+        List<TimerJobEntity> currentTimerJobs = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().findTimerJobsByProcessInstanceId(processInstance.getId());
         for (TimerJobEntity currentTimerJob : currentTimerJobs) {
             currentTimerJob.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        List<SuspendedJobEntity> currentSuspendedJobs = CommandContextUtil.getJobService(commandContext).findSuspendedJobsByProcessInstanceId(processInstance.getId());
+        List<SuspendedJobEntity> currentSuspendedJobs = jobService.findSuspendedJobsByProcessInstanceId(processInstance.getId());
         for (SuspendedJobEntity currentSuspendedJob : currentSuspendedJobs) {
             currentSuspendedJob.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        List<DeadLetterJobEntity> currentDeadLetterJobs = CommandContextUtil.getJobService(commandContext).findDeadLetterJobsByProcessInstanceId(processInstance.getId());
+        List<DeadLetterJobEntity> currentDeadLetterJobs = jobService.findDeadLetterJobsByProcessInstanceId(processInstance.getId());
         for (DeadLetterJobEntity currentDeadLetterJob : currentDeadLetterJobs) {
             currentDeadLetterJob.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessDefinitionId(previousProcessDefinitionId);
+        List<IdentityLinkEntity> identityLinks = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                .getIdentityLinkService().findIdentityLinksByProcessDefinitionId(previousProcessDefinitionId);
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             if (identityLinkEntity.getTaskId() != null || identityLinkEntity.getProcessInstanceId() != null || identityLinkEntity.getScopeId() != null) {
                 identityLinkEntity.setProcessDefId(processDefinitionEntity.getId());
             }
         }
 
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).updateActivityInstancesProcessDefinitionId(processDefinitionEntity.getId(), processInstance.getId());
-        CommandContextUtil.getHistoryManager(commandContext).updateProcessDefinitionIdInHistory(processDefinitionEntity, processInstance);
+        processEngineConfiguration.getActivityInstanceEntityManager().updateActivityInstancesProcessDefinitionId(processDefinitionEntity.getId(), processInstance.getId());
+        processEngineConfiguration.getHistoryManager().updateProcessDefinitionIdInHistory(processDefinitionEntity, processInstance);
         
-        List<ExecutionEntity> childExecutions = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByProcessInstanceId(processInstance.getId());
+        List<ExecutionEntity> childExecutions = processEngineConfiguration.getExecutionEntityManager().findChildExecutionsByProcessInstanceId(processInstance.getId());
         for (ExecutionEntity childExecution : childExecutions) {
             childExecution.setProcessDefinitionId(processDefinitionEntity.getId());
             childExecution.setProcessDefinitionVersion(processDefinitionEntity.getVersion());

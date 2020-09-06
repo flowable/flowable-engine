@@ -663,7 +663,7 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

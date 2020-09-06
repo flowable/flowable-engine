@@ -110,7 +110,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+        processEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent
@@ -121,8 +121,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         // Deployment settings
@@ -138,8 +138,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         }
 
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return deployment;

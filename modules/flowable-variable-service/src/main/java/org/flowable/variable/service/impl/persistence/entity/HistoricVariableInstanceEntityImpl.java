@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.api.types.VariableType;
 
 /**
@@ -93,7 +94,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public byte[] getBytes() {
         if (byteArrayRef != null) {
-            return byteArrayRef.getBytes();
+            return byteArrayRef.getBytes(getEngineType());
         }
         return null;
     }
@@ -103,7 +104,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
         if (byteArrayRef == null) {
             byteArrayRef = new VariableByteArrayRef();
         }
-        byteArrayRef.setValue("hist.var-" + name, bytes);
+        byteArrayRef.setValue("hist.var-" + name, bytes, getEngineType());
     }
 
     // getters and setters //////////////////////////////////////////////////////
@@ -280,6 +281,14 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
 
     // common methods //////////////////////////////////////////////////////////
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

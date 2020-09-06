@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -29,6 +30,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Tijs Rademakers
  */
 public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateManager implements CmmnDynamicStateManager {
+    
+    public DefaultCmmnDynamicStateManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
 
     @Override
     public void movePlanItemInstanceState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, CommandContext commandContext) {
@@ -65,7 +70,7 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
     @Override
     protected Map<String, List<PlanItemInstance>> resolveActiveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext) {
         PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-        PlanItemInstanceQueryImpl planItemInstanceQuery = new PlanItemInstanceQueryImpl(commandContext);
+        PlanItemInstanceQueryImpl planItemInstanceQuery = new PlanItemInstanceQueryImpl(commandContext, cmmnEngineConfiguration);
         planItemInstanceQuery.caseInstanceId(caseInstanceId)
             .onlyStages()
             .planItemInstanceStateActive();

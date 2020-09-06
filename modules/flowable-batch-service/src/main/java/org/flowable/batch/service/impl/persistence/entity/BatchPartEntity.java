@@ -45,7 +45,7 @@ public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
 
     BatchByteArrayRef getResultDocRefId();
 
-    void setResultDocumentJson(String resultDocumentJson);
+    void setResultDocumentJson(String resultDocumentJson, String engineType);
     
     void setTenantId(String tenantId);
 }

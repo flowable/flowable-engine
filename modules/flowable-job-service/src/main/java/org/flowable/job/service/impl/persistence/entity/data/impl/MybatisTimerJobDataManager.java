@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
@@ -26,6 +25,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.data.AbstractJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByExecutionIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByScopeIdAndSubScopeIdMatcher;
@@ -35,16 +35,14 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.T
  * @author Vasile Dirla
  * @author Joram Barrez
  */
-public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEntity> implements TimerJobDataManager {
-
-    protected JobServiceConfiguration jobServiceConfiguration;
+public class MybatisTimerJobDataManager extends AbstractJobDataManager<TimerJobEntity> implements TimerJobDataManager {
     
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByExecutionIdMatcher = new TimerJobsByExecutionIdMatcher();
 
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByScopeIdAndSubScopeIdMatcher = new TimerJobsByScopeIdAndSubScopeIdMatcher();
 
     public MybatisTimerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        this.jobServiceConfiguration = jobServiceConfiguration;
+        super(jobServiceConfiguration);
     }
     
     @Override

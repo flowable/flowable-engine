@@ -179,10 +179,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             jobDataManager = new MybatisJobDataManager(this);
         }
         if (deadLetterJobDataManager == null) {
-            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager();
+            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager(this);
         }
         if (suspendedJobDataManager == null) {
-            suspendedJobDataManager = new MybatisSuspendedJobDataManager();
+            suspendedJobDataManager = new MybatisSuspendedJobDataManager(this);
         }
         if (timerJobDataManager == null) {
             timerJobDataManager = new MybatisTimerJobDataManager(this);
@@ -191,7 +191,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             historyJobDataManager = new MybatisHistoryJobDataManager(this);
         }
         if (jobByteArrayDataManager == null) {
-            jobByteArrayDataManager = new MybatisJobByteArrayDataManager();
+            jobByteArrayDataManager = new MybatisJobByteArrayDataManager(this);
         }
     }
 

@@ -27,7 +27,7 @@ public class JobByteArrayEntityManagerImpl
     implements JobByteArrayEntityManager {
 
     public JobByteArrayEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, JobByteArrayDataManager byteArrayDataManager) {
-        super(jobServiceConfiguration, byteArrayDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), byteArrayDataManager);
     }
 
     @Override

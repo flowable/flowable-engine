@@ -18,10 +18,10 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -31,6 +31,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class MilestoneReachedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+    
+    public MilestoneReachedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
     
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
@@ -44,7 +48,7 @@ public class MilestoneReachedHistoryJsonTransformer extends AbstractHistoryJsonT
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext);
+        HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
         HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
         historicMilestoneInstanceEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
         historicMilestoneInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));

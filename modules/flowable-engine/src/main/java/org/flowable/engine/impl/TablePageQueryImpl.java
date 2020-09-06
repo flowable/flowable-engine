@@ -20,7 +20,7 @@ import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * 
@@ -31,6 +31,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
     private static final long serialVersionUID = 1L;
 
     transient CommandExecutor commandExecutor;
+    transient ProcessEngineConfigurationImpl engineConfiguration;
 
     protected String tableName;
     protected String order;
@@ -40,8 +41,9 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
     public TablePageQueryImpl() {
     }
 
-    public TablePageQueryImpl(CommandExecutor commandExecutor) {
+    public TablePageQueryImpl(CommandExecutor commandExecutor, ProcessEngineConfigurationImpl engineConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.engineConfiguration = engineConfiguration;
     }
 
     @Override
@@ -84,7 +86,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
 
     @Override
     public TablePage execute(CommandContext commandContext) {
-        return CommandContextUtil.getTableDataManager(commandContext).getTablePage(this, firstResult, maxResults);
+        return engineConfiguration.getTableDataManager().getTablePage(this, firstResult, maxResults);
     }
 
     public String getOrder() {

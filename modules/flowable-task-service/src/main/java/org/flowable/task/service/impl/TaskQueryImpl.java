@@ -22,21 +22,18 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.idm.api.Group;
-import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.util.CommandContextUtil;
-import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -50,6 +47,9 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, CacheAwareQuery<TaskEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    protected IdmIdentityService idmIdentityService;
 
     protected String taskId;
     protected String name;
@@ -141,17 +141,29 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQueryImpl() {
     }
 
-    public TaskQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public TaskQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration, 
+            VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
+        
+        super(commandContext, variableServiceConfiguration);
+        this.taskServiceConfiguration = taskServiceConfiguration;
+        this.idmIdentityService = idmIdentityService;
     }
 
-    public TaskQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public TaskQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration, 
+            VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
+        
+        super(commandExecutor, variableServiceConfiguration);
+        this.taskServiceConfiguration = taskServiceConfiguration;
+        this.idmIdentityService = idmIdentityService;
     }
 
-    public TaskQueryImpl(CommandExecutor commandExecutor, String databaseType) {
-        super(commandExecutor);
+    public TaskQueryImpl(CommandExecutor commandExecutor, String databaseType, TaskServiceConfiguration taskServiceConfiguration,
+            VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
+        
+        super(commandExecutor, variableServiceConfiguration);
         this.databaseType = databaseType;
+        this.taskServiceConfiguration = taskServiceConfiguration;
+        this.idmIdentityService = idmIdentityService;
     }
 
     @Override
@@ -1500,14 +1512,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     protected Collection<String> getGroupsForCandidateUser(String candidateUser) {
         Collection<String> groupIds = new ArrayList<>();
-        IdmEngineConfigurationApi idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
-        if (idmEngineConfiguration != null) {
-            IdmIdentityService idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
-            if (idmIdentityService != null) {
-                List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
-                for (Group group : groups) {
-                    groupIds.add(group.getId());
-                }
+        if (idmIdentityService != null) {
+            List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
+            for (Group group : groups) {
+                groupIds.add(group.getId());
             }
         }
         return groupIds;
@@ -1515,9 +1523,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     @Override
     protected void ensureVariablesInitialized() {
-        VariableTypes types = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(types);
+            var.initialize(variableServiceConfiguration);
         }
 
         for (TaskQueryImpl orQueryObject : orQueryObjects) {
@@ -1535,7 +1542,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
         // Create instance of the orQuery
         orActive = true;
-        currentOrQueryObject = new TaskQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new TaskQueryImpl(commandContext, taskServiceConfiguration, variableServiceConfiguration, idmIdentityService);
+        } else {
+            currentOrQueryObject = new TaskQueryImpl(commandExecutor, taskServiceConfiguration, variableServiceConfiguration, idmIdentityService);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -1651,13 +1662,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public List<Task> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         List<Task> tasks = null;
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
         }
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
-            tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
+            tasks = taskServiceConfiguration.getTaskEntityManager().findTasksWithRelatedEntitiesByQueryCriteria(this);
 
             if (taskId != null) {
                 if (includeProcessVariables) {
@@ -1668,7 +1678,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             }
 
         } else {
-            tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
+            tasks = taskServiceConfiguration.getTaskEntityManager().findTasksByQueryCriteria(this);
         }
 
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
@@ -1710,11 +1720,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public void enhanceCachedValue(TaskEntity task) {
         if (includeProcessVariables) {
-            task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService()
+            task.getQueryVariables().addAll(variableServiceConfiguration.getVariableService()
                     .findVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
         } else if (includeTaskLocalVariables) {
             task.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskId(task.getId()));
+                    .addAll(variableServiceConfiguration.getVariableService().findVariableInstancesByTaskId(task.getId()));
         }
     }
 
@@ -1722,12 +1732,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
 
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
         }
 
-        return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByQueryCriteria(this);
+        return taskServiceConfiguration.getTaskEntityManager().findTaskCountByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////////////

@@ -22,7 +22,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -86,7 +85,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
             jobIds.add(jobEntity.getId());
         }
 
-        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager()));
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertJobDetails(false);
 
         // And it can be re-acquired
@@ -134,13 +133,14 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
         assertEquals(1, expiredJobs.size());
         assertEquals(job.getId(), expiredJobs.get(0).getId());
+
         assertJobDetails(false);
 
         List<String> jobIds = new ArrayList<>();
         for (JobInfoEntity j : expiredJobs) {
             jobIds.add(j.getId());
         }
-        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager()));
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertEquals(0, managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager())).size());
         
         assertNull(managementService.createJobQuery().jobId(job.getId()).singleResult());
@@ -156,7 +156,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
                 @Override
                 public Void execute(CommandContext commandContext) {
-                    JobEntityManager jobEntityManager = CommandContextUtil.getJobServiceConfiguration(commandContext).getJobEntityManager();
+                    JobEntityManager jobEntityManager = processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
                     JobEntity jobEntity = jobEntityManager.create();
 
                     jobEntity.setJobType("type");

@@ -18,6 +18,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -39,9 +40,10 @@ public class DispatchEventCommand implements Command<Void> {
             throw new FlowableIllegalArgumentException("event is null");
         }
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(event);
+            eventDispatcher.dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
         } else {
             throw new FlowableException("Message dispatcher is disabled, cannot dispatch event");
         }

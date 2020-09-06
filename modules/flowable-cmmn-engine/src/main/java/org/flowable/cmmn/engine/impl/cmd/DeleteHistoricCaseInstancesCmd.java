@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -27,10 +27,14 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected HistoricCaseInstanceQueryImpl historicCaseInstanceQuery;
 
-    public DeleteHistoricCaseInstancesCmd(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+    public DeleteHistoricCaseInstancesCmd(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.historicCaseInstanceQuery = historicCaseInstanceQuery;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class DeleteHistoricCaseInstancesCmd implements Command<Object>, Serializ
             throw new FlowableIllegalArgumentException("query is null");
         }
         
-        CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).deleteHistoricCaseInstances(historicCaseInstanceQuery);
+        cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().deleteHistoricCaseInstances(historicCaseInstanceQuery);
 
         return null;
     }

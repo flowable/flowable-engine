@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -65,15 +66,16 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
 
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;
         if (processInstanceScope) {
             subscriptionEntities = eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(
                             execution.getProcessInstanceId(), eventSubscriptionName);
             
-            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isEnableEntityLinks()) {
-                List<EntityLink> entityLinks = CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByReferenceScopeIdAndType(
-                                execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                List<EntityLink> entityLinks = processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
+                        .findEntityLinksByReferenceScopeIdAndType(execution.getProcessInstanceId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
                 if (entityLinks != null) {
                     for (EntityLink entityLink : entityLinks) {
                         if (ScopeTypes.BPMN.equals(entityLink.getScopeType())) {
@@ -94,10 +96,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
-                            null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                            signalEventSubscriptionEntity.getProcessDefinitionId()));
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
+                    null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                    signalEventSubscriptionEntity.getProcessDefinitionId()), processEngineConfiguration.getEngineCfgKey());
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, signalEventSubscriptionEntity.getProcessDefinitionId())) {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

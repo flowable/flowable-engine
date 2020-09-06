@@ -17,6 +17,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Command that dispatches a JOB_CANCELLED event and deletes the job entity.
@@ -42,7 +43,8 @@ public class CancelJobCmd extends DeleteJobCmd {
     private void sendCancelEvent(JobEntity jobToDelete) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 

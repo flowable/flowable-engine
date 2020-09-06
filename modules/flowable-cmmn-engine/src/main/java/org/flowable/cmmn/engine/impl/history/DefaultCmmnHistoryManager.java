@@ -26,7 +26,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -138,7 +137,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
-            HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+            HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
             historicIdentityLinkEntity.setId(identityLink.getId());
             historicIdentityLinkEntity.setGroupId(identityLink.getGroupId());
@@ -156,14 +155,14 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
+            cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
         }
     }
     
     @Override
     public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && entityLink.getScopeId() != null) {
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
             HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
             historicEntityLinkEntity.setId(entityLink.getId());
             historicEntityLinkEntity.setLinkType(entityLink.getLinkType());
@@ -184,49 +183,49 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     @Override
     public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
+            cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
 
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricVariableService().createAndInsert(variable, createTime);
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().createAndInsert(variable, createTime);
         }
     }
 
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
         }
     }
 
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricVariableService().recordVariableRemoved(variableInstanceEntity);
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableRemoved(variableInstanceEntity);
         }
     }
 
     @Override
     public void recordTaskCreated(TaskEntity task) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricTaskService().recordTaskCreated(task);
+            cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskCreated(task);
         }
     }
 
     @Override
     public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
+            cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
         }
     }
 
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity, changeTime);
+            cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskInfoChange(taskEntity, changeTime, cmmnEngineConfiguration);
         }
     }
 
@@ -349,12 +348,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
-        CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+        cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }
 
     @Override
     public void deleteHistoricUserTaskLogEntry(long logNumber) {
-        CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
+        cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
     }
 
     protected void recordHistoricPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, Date lastUpdatedTime, Consumer<HistoricPlanItemInstanceEntity> changes) {

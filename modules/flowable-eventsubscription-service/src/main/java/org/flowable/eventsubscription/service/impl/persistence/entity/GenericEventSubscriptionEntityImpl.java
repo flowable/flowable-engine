@@ -13,9 +13,16 @@
 
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+
 /**
  * @author Joram Barrez
  */
 public class GenericEventSubscriptionEntityImpl extends EventSubscriptionEntityImpl implements GenericEventSubscriptionEntity {
 
+    public GenericEventSubscriptionEntityImpl() {}
+    
+    public GenericEventSubscriptionEntityImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        super(eventSubscriptionServiceConfiguration);
+    }
 }

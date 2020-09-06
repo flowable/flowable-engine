@@ -132,7 +132,7 @@ public class TimerUtil {
 
         TimerJobEntity timer = null;
         if (duedate != null) {
-            timer = CommandContextUtil.getTimerJobService().createTimerJob();
+            timer = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setRevision(1);
             timer.setJobHandlerType(jobHandlerType);
@@ -190,7 +190,8 @@ public class TimerUtil {
     }
     
     public static TimerJobEntity rescheduleTimerJob(String timerJobId, TimerEventDefinition timerEventDefinition) {
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         TimerJobEntity timerJob = timerJobService.findTimerJobById(timerJobId);
         if (timerJob != null) {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(timerJob.getProcessDefinitionId());
@@ -207,14 +208,14 @@ public class TimerUtil {
             timerJobService.deleteTimerJob(timerJob);
             timerJobService.insertTimerJob(rescheduledTimerJob);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(
-                        FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, 
+                        rescheduledTimerJob, timerJob.getId()), processEngineConfiguration.getEngineCfgKey());
                 
              // job rescheduled event should occur before new timer scheduled event
-                eventDispatcher.dispatchEvent(
-                                FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, rescheduledTimerJob));
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, rescheduledTimerJob),
+                                processEngineConfiguration.getEngineCfgKey());
             }
 
             return rescheduledTimerJob;

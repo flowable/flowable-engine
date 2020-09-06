@@ -48,7 +48,7 @@ public class BoundaryTimerEventActivityBehavior extends BoundaryEventActivityBeh
         TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
                 TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
         if (timerJob != null) {
-            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
+            CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 

@@ -27,7 +27,7 @@ public abstract class AbstractTaskServiceEntityManager<EntityImpl extends Entity
     extends AbstractServiceEngineEntityManager<TaskServiceConfiguration, EntityImpl, DM> {
 
     public AbstractTaskServiceEntityManager(TaskServiceConfiguration taskServiceConfiguration, DM dataManager) {
-        super(taskServiceConfiguration, dataManager);
+        super(taskServiceConfiguration, taskServiceConfiguration.getEngineName(), dataManager);
     }
 
     @Override

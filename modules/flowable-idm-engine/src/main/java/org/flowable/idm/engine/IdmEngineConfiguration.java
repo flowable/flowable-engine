@@ -97,8 +97,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected IdmIdentityService idmIdentityService = new IdmIdentityServiceImpl();
-    protected IdmManagementService idmManagementService = new IdmManagementServiceImpl();
+    protected IdmIdentityService idmIdentityService = new IdmIdentityServiceImpl(this);
+    protected IdmManagementService idmManagementService = new IdmManagementServiceImpl(this);
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -171,6 +171,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -197,7 +198,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         initServices();
         initDataManagers();
         initEntityManagers();
-        initClock();
         initEventDispatcher();
     }
 
@@ -362,6 +362,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return "idm";
     }
 
     @Override

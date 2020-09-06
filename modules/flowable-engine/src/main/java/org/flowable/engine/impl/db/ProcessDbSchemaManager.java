@@ -260,7 +260,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
                     dbHistoryProperty = CommandContextUtil.getPropertyEntityManager().create();
                     dbHistoryProperty.setName("schema.history");
                     dbHistoryProperty.setValue("create(5.0)");
-                    dbSqlSession.insert(dbHistoryProperty);
+                    dbSqlSession.insert(dbHistoryProperty, processEngineConfiguration.getIdGenerator());
                 } else {
                     dbHistoryProperty = dbSqlSession.selectById(PropertyEntity.class, "schema.history");
                 }

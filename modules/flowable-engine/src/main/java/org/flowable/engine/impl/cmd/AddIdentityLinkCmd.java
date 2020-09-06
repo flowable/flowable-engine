@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
@@ -70,7 +71,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
-
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
             compatibilityHandler.addIdentityLink(taskId, identityId, identityIdType, identityType);
@@ -108,11 +109,13 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
+            IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                    .getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
             
         } else if (IDENTITY_GROUP == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
+            IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                    .getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
 
         }

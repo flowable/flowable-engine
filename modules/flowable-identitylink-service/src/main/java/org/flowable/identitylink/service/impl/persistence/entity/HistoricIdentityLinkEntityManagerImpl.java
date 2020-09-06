@@ -29,7 +29,7 @@ public class HistoricIdentityLinkEntityManagerImpl
 
 
     public HistoricIdentityLinkEntityManagerImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration, HistoricIdentityLinkDataManager historicIdentityLinkDataManager) {
-        super(identityLinkServiceConfiguration, historicIdentityLinkDataManager);
+        super(identityLinkServiceConfiguration, identityLinkServiceConfiguration.getEngineName(), historicIdentityLinkDataManager);
     }
 
     @Override

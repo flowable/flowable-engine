@@ -14,16 +14,21 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.data.AbstractVariableDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisVariableByteArrayDataManager extends AbstractDataManager<VariableByteArrayEntity> implements VariableByteArrayDataManager {
+public class MybatisVariableByteArrayDataManager extends AbstractVariableDataManager<VariableByteArrayEntity> implements VariableByteArrayDataManager {
 
+    public MybatisVariableByteArrayDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        super(variableServiceConfiguration);
+    }
+    
     @Override
     public VariableByteArrayEntity create() {
         return new VariableByteArrayEntityImpl();

@@ -27,8 +27,8 @@ import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
  */
 public class MybatisAppDeploymentDataManager extends AbstractAppDataManager<AppDeploymentEntity> implements AppDeploymentDataManager {
 
-    public MybatisAppDeploymentDataManager(AppEngineConfiguration cmmnEngineConfiguration) {
-        super(cmmnEngineConfiguration);
+    public MybatisAppDeploymentDataManager(AppEngineConfiguration appEngineConfiguration) {
+        super(appEngineConfiguration);
     }
 
     @Override

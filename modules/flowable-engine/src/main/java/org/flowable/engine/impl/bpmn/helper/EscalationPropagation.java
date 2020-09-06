@@ -170,8 +170,9 @@ public class EscalationPropagation {
                     eventDispatcher = processEngineConfiguration.getEventDispatcher();
                 }
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                    processEngineConfiguration.getEventDispatcher()
-                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ESCALATION_END_EVENT, processInstanceEntity));
+                    processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                            FlowableEngineEventType.PROCESS_COMPLETED_WITH_ESCALATION_END_EVENT, processInstanceEntity),
+                            processEngineConfiguration.getEngineCfgKey());
                 }
             }
             
@@ -189,7 +190,8 @@ public class EscalationPropagation {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createEscalationEvent(FlowableEngineEventType.ACTIVITY_ESCALATION_RECEIVED, event.getId(), escalationCode, 
-                                    escalationName, parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
+                            escalationName, parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         if (event instanceof StartEvent) {

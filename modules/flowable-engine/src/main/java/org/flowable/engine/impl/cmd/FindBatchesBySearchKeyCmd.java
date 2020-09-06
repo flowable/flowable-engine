@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class FindBatchesBySearchKeyCmd implements Command<List<Batch>> {
@@ -29,6 +30,7 @@ public class FindBatchesBySearchKeyCmd implements Command<List<Batch>> {
     
     @Override
     public List<Batch> execute(CommandContext commandContext) {
-        return CommandContextUtil.getBatchService(commandContext).findBatchesBySearchKey(searchKey);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return processEngineConfiguration.getBatchServiceConfiguration().getBatchService().findBatchesBySearchKey(searchKey);
     }
 }

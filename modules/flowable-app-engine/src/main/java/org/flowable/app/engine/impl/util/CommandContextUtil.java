@@ -138,8 +138,7 @@ public class CommandContextUtil {
     }
 
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
-        return (IdentityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
-                        .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+        return getAppEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration();
     }
 
     public static IdentityLinkService getIdentityLinkService() {
@@ -155,8 +154,7 @@ public class CommandContextUtil {
     }
 
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
-                        .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+        return getAppEngineConfiguration(commandContext).getVariableServiceConfiguration();
     }
 
     public static DbSqlSession getDbSqlSession() {

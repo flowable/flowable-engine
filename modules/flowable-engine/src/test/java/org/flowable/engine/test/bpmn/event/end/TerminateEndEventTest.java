@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -312,19 +313,19 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testTerminateParallelGateway() throws Exception {
-        final List<FlowableEvent> events = new ArrayList<>();
+        final List<FlowableEventType> events = new ArrayList<>();
         processEngine.getRuntimeService().addEventListener(new AbstractFlowableEngineEventListener() {
             
             @Override
             public void onEvent(FlowableEvent event) {
                 if (FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT == event.getType() || FlowableEngineEventType.TASK_CREATED == event.getType()) {
-                    events.add(event);
+                    events.add(event.getType());
                 }
                 
                 if (FlowableEngineEventType.ACTIVITY_CANCELLED == event.getType()) {
                     List<org.flowable.task.api.Task> list = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().list();
                     if (!list.isEmpty()) {
-                        events.add(event);
+                        events.add(event.getType());
                     }
                 }
             }

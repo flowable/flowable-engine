@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -283,7 +284,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         if(customValuesByteArrayRef == null) {
             customValuesByteArrayRef = new JobByteArrayRef();
         }
-        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());
     }
 
     @Override
@@ -317,7 +318,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
             exceptionByteArrayRef = new JobByteArrayRef();
         }
 
-        exceptionByteArrayRef.setValue("stacktrace", exception);
+        exceptionByteArrayRef.setValue("stacktrace", exception, getEngineType());
     }
 
     @Override
@@ -335,13 +336,21 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         return exceptionByteArrayRef;
     }
 
-    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+    protected String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }
-        return jobByteArrayRef.asString();
+        return jobByteArrayRef.asString(getEngineType());
     }
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         return getClass().getName() + " [id=" + id + "]";

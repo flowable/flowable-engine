@@ -25,7 +25,7 @@ public class BatchPartEntityManagerImpl
     implements BatchPartEntityManager {
 
     public BatchPartEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchPartDataManager batchPartDataManager) {
-        super(batchServiceConfiguration, batchPartDataManager);
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), batchPartDataManager);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class BatchPartEntityManagerImpl
         BatchPartEntity batchPartEntity = getBatchPartEntityManager().findById(batchPartId);
         batchPartEntity.setCompleteTime(getClock().getCurrentTime());
         batchPartEntity.setStatus(status);
-        batchPartEntity.setResultDocumentJson(resultJson);
+        batchPartEntity.setResultDocumentJson(resultJson, serviceConfiguration.getEngineName());
         
         return batchPartEntity;
     }
@@ -75,7 +75,7 @@ public class BatchPartEntityManagerImpl
         BatchByteArrayRef resultDocRefId = batchPartEntity.getResultDocRefId();
 
         if (resultDocRefId != null && resultDocRefId.getId() != null) {
-            resultDocRefId.delete();
+            resultDocRefId.delete(serviceConfiguration.getEngineName());
         }
 
         delete(batchPartEntity);

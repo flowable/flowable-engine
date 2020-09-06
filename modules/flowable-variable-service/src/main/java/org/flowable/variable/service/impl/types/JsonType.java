@@ -14,11 +14,16 @@ package org.flowable.variable.service.impl.types;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -132,7 +137,7 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             if (textValue.length() <= maxLength) {
                 variableInstanceEntity.setTextValue(textValue);
                 if (variableInstanceEntity.getByteArrayRef() != null) {
-                    variableInstanceEntity.getByteArrayRef().delete();
+                    variableInstanceEntity.getByteArrayRef().delete(getEngineType(variableInstanceEntity.getScopeType()));
                 }
             } else {
                 variableInstanceEntity.setTextValue(null);
@@ -147,16 +152,41 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         if (trackObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
-                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
-                                    commandContext.getCurrentEngineConfiguration();
-                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
+                VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(valueFields);
+                if (variableServiceConfiguration != null) {
                     commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
                         new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields, variableServiceConfiguration)
                     ));
                     variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
             }
+        }
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration(ValueFields valueFields) {
+        String engineType = getEngineType(valueFields.getScopeType());
+        Map<String, AbstractEngineConfiguration> engineConfigurationMap = Context.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = engineConfigurationMap.get(engineType);
+        if (engineConfiguration == null) {
+            for (AbstractEngineConfiguration possibleEngineConfiguration : engineConfigurationMap.values()) {
+                if (possibleEngineConfiguration instanceof HasVariableServiceConfiguration) {
+                    engineConfiguration = possibleEngineConfiguration;
+                }
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            return null;
+        }
+        
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    protected String getEngineType(String scopeType) {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
         }
     }
 

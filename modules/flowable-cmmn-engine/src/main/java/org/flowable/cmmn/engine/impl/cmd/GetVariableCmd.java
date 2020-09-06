@@ -38,8 +38,9 @@ public class GetVariableCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         
-        VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceByScopeIdAndScopeTypeAndName(caseInstanceId, ScopeTypes.CMMN, variableName);
+        VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                .getVariableServiceConfiguration().getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(caseInstanceId, ScopeTypes.CMMN, variableName);
+
         if (variableInstanceEntity != null) {
             return variableInstanceEntity.getValue();
         } 

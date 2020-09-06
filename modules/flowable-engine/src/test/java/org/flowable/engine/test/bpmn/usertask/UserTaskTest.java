@@ -22,7 +22,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
 import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
@@ -84,7 +83,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
 
         List<EntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkService entityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
 
             return entityLinkService.findEntityLinksByScopeIdAndType(processInstance.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
         });

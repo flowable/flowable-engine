@@ -15,35 +15,39 @@ package org.flowable.variable.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance> implements NativeHistoricVariableInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
-    public NativeHistoricVariableInstanceQueryImpl(CommandContext commandContext) {
+    public NativeHistoricVariableInstanceQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public NativeHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
+    public NativeHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     // results ////////////////////////////////////////////////////////////////
 
     @Override
     public List<HistoricVariableInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstancesByNativeQuery(parameterMap);
+        return variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByNativeQuery(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstanceCountByNativeQuery(parameterMap);
+        return variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceCountByNativeQuery(parameterMap);
     }
 
 }

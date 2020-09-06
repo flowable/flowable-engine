@@ -27,7 +27,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -270,19 +269,19 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
     protected CaseDefinition getCaseDefinition(IdentityLinkEntity identityLink) {
         String caseDefinitionId = null;
         if (ScopeTypes.CMMN.equals(identityLink.getScopeType()) && identityLink.getScopeId() != null) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(identityLink.getScopeId());
+            CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(identityLink.getScopeId());
             if (caseInstance != null) {
                 caseDefinitionId = caseInstance.getCaseDefinitionId();
             }
 
         } else if (identityLink.getTaskId() != null) {
-            TaskEntity task = CommandContextUtil.getTaskService().getTask(identityLink.getTaskId());
+            TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
             if (task != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
                 caseDefinitionId = task.getScopeDefinitionId();
             }
         
         } else if (ScopeTypes.PLAN_ITEM.equals(identityLink.getScopeType()) && identityLink.getSubScopeId() != null) {
-            PlanItemInstanceEntity planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(identityLink.getSubScopeId());
+            PlanItemInstanceEntity planItemInstance = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(identityLink.getSubScopeId());
             if (planItemInstance != null) {
                 caseDefinitionId = planItemInstance.getCaseDefinitionId();
             }

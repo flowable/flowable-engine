@@ -17,9 +17,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -168,7 +168,7 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     }
 
     @Override
-    public DmnDeploymentQuery orderByDeploymenTime() {
+    public DmnDeploymentQuery orderByDeploymentTime() {
         return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
     }
 

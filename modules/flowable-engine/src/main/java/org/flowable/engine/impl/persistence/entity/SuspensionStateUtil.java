@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -63,7 +64,8 @@ public class SuspensionStateUtil {
     }
 
     protected static void addTaskSuspensionStateEntryLog(TaskEntity taskEntity, SuspensionState state) {
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        TaskServiceConfiguration taskServiceConfiguration = processEngineConfiguration.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
             BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
             ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
@@ -79,9 +81,10 @@ public class SuspensionStateUtil {
 
     protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {
         CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         FlowableEventDispatcher eventDispatcher = null;
         if (commandContext != null) {
-            eventDispatcher = CommandContextUtil.getEventDispatcher();
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
         }
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             FlowableEngineEventType eventType = null;
@@ -90,7 +93,7 @@ public class SuspensionStateUtil {
             } else {
                 eventType = FlowableEngineEventType.ENTITY_SUSPENDED;
             }
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity), processEngineConfiguration.getEngineCfgKey());
         }
     }
 

@@ -13,6 +13,8 @@
 package org.flowable.engine.impl.util;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -33,12 +35,13 @@ public class EventSubscriptionUtil {
     protected static void processEventSync(EventSubscriptionEntity eventSubscriptionEntity, Object payload) {
 
         // A compensate event needs to be deleted before the handlers are called
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
-            CommandContextUtil.getEventSubscriptionService().deleteEventSubscription(eventSubscriptionEntity);
+            processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().deleteEventSubscription(eventSubscriptionEntity);
             CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscriptionEntity);
         }
 
-        EventHandler eventHandler = CommandContextUtil.getProcessEngineConfiguration().getEventHandler(eventSubscriptionEntity.getEventType());
+        EventHandler eventHandler = processEngineConfiguration.getEventHandler(eventSubscriptionEntity.getEventType());
         if (eventHandler == null) {
             throw new FlowableException("Could not find eventhandler for event of type '" + eventSubscriptionEntity.getEventType() + "'.");
         }
@@ -46,7 +49,8 @@ public class EventSubscriptionUtil {
     }
 
     protected static void scheduleEventAsync(EventSubscriptionEntity eventSubscriptionEntity, Object payload) {
-        JobService jobService = CommandContextUtil.getJobService();
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
         JobEntity message = jobService.createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType(ProcessEventJobHandler.TYPE);

@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.agenda.AbstractOperation;
@@ -33,7 +34,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         
         FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);

@@ -18,9 +18,9 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +34,11 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveJobToDeadLetterJobCmd.class);
 
     protected String jobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public MoveJobToDeadLetterJobCmd(String jobId) {
+    public MoveJobToDeadLetterJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -46,9 +48,9 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        AbstractRuntimeJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
+        AbstractRuntimeJobEntity job = jobServiceConfiguration.getTimerJobEntityManager().findById(jobId);
         if (job == null) {
-            job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getJobEntityManager().findById(jobId);
         }
 
         if (job == null) {
@@ -59,7 +61,7 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             LOGGER.debug("Moving job to deadletter job table {}", job.getId());
         }
 
-        DeadLetterJobEntity deadLetterJob = CommandContextUtil.getJobManager(commandContext).moveJobToDeadLetterJob(job);
+        DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getJobManager().moveJobToDeadLetterJob(job);
 
         return deadLetterJob;
     }

@@ -539,7 +539,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     private void cleanDB() {
         String jobId = managementService.createTimerJobQuery().singleResult().getId();
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        commandExecutor.execute(new CancelJobsCmd(jobId));
+        commandExecutor.execute(new CancelJobsCmd(jobId, processEngineConfiguration.getJobServiceConfiguration()));
     }
 
 }

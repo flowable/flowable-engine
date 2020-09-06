@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,6 +31,10 @@ public class ProcessInstancePropertyChangedHistoryJsonTransformer extends Abstra
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_BUSINESS_KEY = "businessKey";
 
+    public ProcessInstancePropertyChangedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED);
@@ -41,7 +45,7 @@ public class ProcessInstancePropertyChangedHistoryJsonTransformer extends Abstra
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
         String property = getStringFromJson(historicalData, HistoryJsonConstants.PROPERTY);
         if (StringUtils.isNotEmpty(processInstanceId) && StringUtils.isNotEmpty(property)) {
-            HistoricProcessInstanceEntity historicProcessInstance = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findById(processInstanceId);
+            HistoricProcessInstanceEntity historicProcessInstance = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
             if (PROPERTY_NAME.equals(property)) {
                 historicProcessInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));

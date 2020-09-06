@@ -83,8 +83,8 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         EventModel eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
 
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
@@ -112,10 +112,11 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition)
-            || PlanItemTransition.EXIT.equals(transition)
-            || PlanItemTransition.DISMISS.equals(transition)) {
+                || PlanItemTransition.EXIT.equals(transition)
+                || PlanItemTransition.DISMISS.equals(transition)) {
 
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
@@ -132,7 +133,8 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
 
         String correlationKey = getCorrelationKey(commandContext, planItemInstanceEntity);
 
-        CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
             .eventType(eventDefinition.getKey())
             .subScopeId(planItemInstanceEntity.getId())
             .scopeId(planItemInstanceEntity.getCaseInstanceId())

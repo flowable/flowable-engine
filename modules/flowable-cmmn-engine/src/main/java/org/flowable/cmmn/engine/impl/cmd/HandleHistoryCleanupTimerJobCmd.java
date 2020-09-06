@@ -19,7 +19,6 @@ import java.util.List;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -36,12 +35,17 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public HandleHistoryCleanupTimerJobCmd(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     @Override
     public Object execute(CommandContext commandContext) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnManagementService managementService = cmmnEngineConfiguration.getCmmnManagementService();
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        TimerJobService timerJobService = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<Job> cleanupJobs = managementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).list();
         
         if (cleanupJobs.isEmpty()) {

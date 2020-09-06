@@ -14,6 +14,7 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -37,8 +38,8 @@ public class ProcessEventJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
 
         // lookup subscription:
         EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptionService.findById(configuration);

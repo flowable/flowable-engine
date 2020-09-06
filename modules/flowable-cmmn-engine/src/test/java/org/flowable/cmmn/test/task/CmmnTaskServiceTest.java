@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
@@ -256,7 +255,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
 
         List<EntityLink> entityLinks = commandExecutor.execute(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkService entityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
 
             return entityLinkService.findEntityLinksByScopeIdAndType(caseInstance.getId(), ScopeTypes.CMMN, EntityLinkType.CHILD);
         });
@@ -268,7 +267,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
 
         List<HistoricEntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService(commandContext);
+            HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
 
             return historicEntityLinkService.findHistoricEntityLinksByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN, EntityLinkType.CHILD);
         });

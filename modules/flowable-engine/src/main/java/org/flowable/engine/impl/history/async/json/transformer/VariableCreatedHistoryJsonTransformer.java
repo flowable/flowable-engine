@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -37,6 +37,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public VariableCreatedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_VARIABLE_CREATED);
@@ -49,7 +53,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableService historicVariableService = CommandContextUtil.getHistoricVariableService();
+        HistoricVariableService historicVariableService = processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService();
         HistoricVariableInstanceEntity historicVariableInstanceEntity = historicVariableService.createHistoricVariableInstance();
         historicVariableInstanceEntity.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         historicVariableInstanceEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
@@ -61,7 +65,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setSubScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
         historicVariableInstanceEntity.setScopeType(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_TYPE));
         
-        VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
+        VariableTypes variableTypes = processEngineConfiguration.getVariableTypes();
         VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TYPE));
         
         historicVariableInstanceEntity.setVariableType(variableType);

@@ -34,12 +34,12 @@ public class EntityLinkUtil {
         // scopeId is the process instance in which this is being created
         // referenceScopeId is CaseTask, HumanTask, etc.
 
-        EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService();
+        EntityLinkService entityLinkService = CommandContextUtil.getCmmnEngineConfiguration().getEntityLinkServiceConfiguration().getEntityLinkService();
         List<EntityLink> scopeParentEntityLinks = entityLinkService.findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD);
 
         Set<String> parentIds = new HashSet<>();
 
-        CmmnHistoryManager historyManager = CommandContextUtil.getCmmnHistoryManager();
+        CmmnHistoryManager historyManager = CommandContextUtil.getCmmnEngineConfiguration().getCmmnHistoryManager();
         EntityLink scopeRootEntityLink = null;
         // First copy existing links
         for (EntityLink parentEntityLink : scopeParentEntityLinks) {

@@ -29,6 +29,7 @@ public class TriggerPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd
 
     public TriggerPlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables, Map<String, Object> localVariables,
             Map<String, Object> transientVariables) {
+        
         super(planItemInstanceId, variables, localVariables, transientVariables);
     }
 

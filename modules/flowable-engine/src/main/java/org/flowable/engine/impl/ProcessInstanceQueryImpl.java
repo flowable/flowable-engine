@@ -27,7 +27,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
@@ -45,6 +44,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         ProcessInstanceQuery, CacheAwareQuery<ExecutionEntity>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    
     protected String executionId;
     protected String businessKey;
     protected String businessKeyLike;
@@ -104,12 +106,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public ProcessInstanceQueryImpl() {
     }
 
-    public ProcessInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public ProcessInstanceQueryImpl(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandContext, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
-    public ProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public ProcessInstanceQueryImpl(CommandExecutor commandExecutor, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandExecutor, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
     @Override
@@ -561,7 +565,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new ProcessInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration);
+        } else {
+            currentOrQueryObject = new ProcessInstanceQueryImpl(commandExecutor, processEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -794,12 +802,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
         }
         
-        return CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceCountByQueryCriteria(this);
+        return processEngineConfiguration.getExecutionEntityManager().findProcessInstanceCountByQueryCriteria(this);
     }
 
     @Override
@@ -807,15 +814,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
         }
         
         if (includeProcessVariables) {
-            processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceAndVariablesByQueryCriteria(this);
+            processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceAndVariablesByQueryCriteria(this);
         } else {
-            processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceByQueryCriteria(this);
+            processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceByQueryCriteria(this);
         }
 
         if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
@@ -834,8 +840,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     @Override
     public void enhanceCachedValue(ExecutionEntity processInstance) {
         if (includeProcessVariables) {
-            processInstance.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableService().findVariableInstancesByProcessInstanceId(processInstance.getId()));
+            processInstance.getQueryVariables().addAll(processEngineConfiguration.getVariableServiceConfiguration()
+                    .getVariableService().findVariableInstancesByExecutionId(processInstance.getId()));
         }
     }
 

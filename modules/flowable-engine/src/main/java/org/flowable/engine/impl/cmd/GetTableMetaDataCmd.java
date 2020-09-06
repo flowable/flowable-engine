@@ -26,6 +26,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String tableName;
 
     public GetTableMetaDataCmd(String tableName) {

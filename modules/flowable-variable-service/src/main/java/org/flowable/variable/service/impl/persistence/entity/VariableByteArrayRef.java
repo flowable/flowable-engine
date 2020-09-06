@@ -14,9 +14,13 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * <p>
@@ -53,20 +57,20 @@ public class VariableByteArrayRef implements Serializable {
         return name;
     }
 
-    public byte[] getBytes() {
-        ensureInitialized();
+    public byte[] getBytes(String engineType) {
+        ensureInitialized(engineType);
         return (entity != null ? entity.getBytes() : null);
     }
 
-    public void setValue(String name, byte[] bytes) {
+    public void setValue(String name, byte[] bytes, String engineType) {
         this.name = name;
-        setBytes(bytes);
+        setBytes(bytes, engineType);
     }
 
-    private void setBytes(byte[] bytes) {
+    private void setBytes(byte[] bytes, String engineType) {
         if (id == null) {
             if (bytes != null) {
-                VariableByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getByteArrayEntityManager();
+                VariableByteArrayEntityManager byteArrayEntityManager = getVariableByteArrayEntityManager(engineType);
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -75,29 +79,30 @@ public class VariableByteArrayRef implements Serializable {
                 deleted = false;
             }
         } else {
-            ensureInitialized();
+            ensureInitialized(engineType);
             if (bytes != null) {
                 entity.setBytes(bytes);
             } else {
                 // If the bytes are null delete this
-                delete();
+                delete(engineType);
             }
         }
     }
 
-    public VariableByteArrayEntity getEntity() {
-        ensureInitialized();
+    public VariableByteArrayEntity getEntity(String engineType) {
+        ensureInitialized(engineType);
         return entity;
     }
 
-    public void delete() {
+    public void delete(String engineType) {
         if (!deleted && id != null) {
+            VariableByteArrayEntityManager byteArrayEntityManager = getVariableByteArrayEntityManager(engineType);
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                CommandContextUtil.getByteArrayEntityManager().delete(entity);
+                byteArrayEntityManager.delete(entity);
             } else {
-                CommandContextUtil.getByteArrayEntityManager().deleteByteArrayById(id);
+                byteArrayEntityManager.deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -105,13 +110,13 @@ public class VariableByteArrayRef implements Serializable {
         }
     }
 
-    private void ensureInitialized() {
+    private void ensureInitialized(String engineType) {
         if (id != null && entity == null) {
-            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                entity = CommandContextUtil.getByteArrayEntityManager(commandContext).findById(id);
+                entity = getVariableByteArrayEntityManager(engineType).findById(id);
             } else if (commandExecutor != null) {
-                entity = commandExecutor.execute(context -> CommandContextUtil.getByteArrayEntityManager(context).findById(id));
+                entity = commandExecutor.execute(context -> getVariableByteArrayEntityManager(engineType).findById(id));
             } else {
                 throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
             }
@@ -138,6 +143,70 @@ public class VariableByteArrayRef implements Serializable {
         copy.entity = entity;
         copy.deleted = deleted;
         return copy;
+    }
+    
+    protected VariableByteArrayEntityManager getVariableByteArrayEntityManager(String engineType) {
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            return getVariableByteArrayEntityManager(engineType, commandContext);
+
+        } else if (commandExecutor != null) {
+            return commandExecutor.execute(context -> {
+                return getVariableByteArrayEntityManager(engineType, context);
+            });
+            
+        } else {
+            throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
+        }
+    }
+    
+    protected VariableByteArrayEntityManager getVariableByteArrayEntityManager(String engineType, CommandContext commandContext) {
+        // Although 'engineType' is passed here, due to backwards compatibility, it also can be a scopeType value.
+        // For example, the scopeType of JobEntity determines which engine is used to retrieve the byteArrayEntityManager.
+        // The 'all' on the next line is exactly that, see JobServiceConfiguration#JOB_EXECUTION_SCOPE_ALL
+        if ("all".equalsIgnoreCase(engineType)) {
+            return getVariableByteArrayEntityManagerForAllType(commandContext);
+            
+        } else {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+            if (engineConfiguration == null) {
+                return getVariableByteArrayEntityManager(commandContext);
+            } else {
+                return getVariableByteArrayEntityManager(engineConfiguration);
+            }
+        }
+    }
+
+    protected VariableByteArrayEntityManager getVariableByteArrayEntityManagerForAllType(CommandContext commandContext) {
+        AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.BPMN);
+        if (engineConfiguration == null) {
+            engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.CMMN);
+            
+            if (engineConfiguration == null) {
+                return getVariableByteArrayEntityManager(commandContext);
+                
+            } else {
+                return getVariableByteArrayEntityManager(engineConfiguration);
+            }
+        }
+        
+        return getVariableByteArrayEntityManager(engineConfiguration);
+    }
+    
+    protected VariableByteArrayEntityManager getVariableByteArrayEntityManager(CommandContext commandContext) {
+        for (AbstractEngineConfiguration engineConfiguration : commandContext.getEngineConfigurations().values()) {
+            if (engineConfiguration.getServiceConfigurations().containsKey(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG)) {
+                return getVariableByteArrayEntityManager(engineConfiguration);
+            }
+        }
+        
+        throw new IllegalStateException("Cannot initialize byte array. No engine configuration found");
+    }
+    
+    protected VariableByteArrayEntityManager getVariableByteArrayEntityManager(AbstractEngineConfiguration engineConfiguration) {
+        VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration)
+                engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+        return variableServiceConfiguration.getByteArrayEntityManager();
     }
 
     @Override

@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 
@@ -31,6 +31,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public HistoricUserTaskLogRecordJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_RECORD);
@@ -59,6 +63,6 @@ public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJso
         taskLogEntryBuilder.subScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
         taskLogEntryBuilder.scopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_DEFINITION_ID));
 
-        CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+        processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }
 }

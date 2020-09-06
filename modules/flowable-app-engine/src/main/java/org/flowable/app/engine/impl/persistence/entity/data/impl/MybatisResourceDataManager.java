@@ -27,8 +27,8 @@ import org.flowable.app.engine.impl.persistence.entity.data.AppResourceDataManag
  */
 public class MybatisResourceDataManager extends AbstractAppDataManager<AppResourceEntity> implements AppResourceDataManager {
 
-    public MybatisResourceDataManager(AppEngineConfiguration cmmnEngineConfiguration) {
-        super(cmmnEngineConfiguration);
+    public MybatisResourceDataManager(AppEngineConfiguration appEngineConfiguration) {
+        super(appEngineConfiguration);
     }
 
     @Override

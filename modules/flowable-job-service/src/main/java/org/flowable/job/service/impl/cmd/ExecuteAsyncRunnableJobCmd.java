@@ -23,7 +23,6 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +78,10 @@ public class ExecuteAsyncRunnableJobCmd implements Command<Object>, Serializable
         
         jobServiceConfiguration.getJobManager().execute(job);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job),
+                    jobServiceConfiguration.getEngineName());
         }
 
         return null;

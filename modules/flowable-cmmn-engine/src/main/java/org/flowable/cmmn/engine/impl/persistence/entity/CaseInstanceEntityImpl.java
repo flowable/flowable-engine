@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -36,7 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
-
+    
     protected String businessKey;
     protected String name;
     protected String parentId;
@@ -240,7 +241,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, ScopeTypes.CMMN);
+        return getVariableServiceConfiguration().getVariableService()
+                .findVariableInstanceByScopeIdAndScopeType(id, ScopeTypes.CMMN);
     }
 
     @Override
@@ -263,17 +265,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
+        return getVariableServiceConfiguration().getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
+        return getVariableServiceConfiguration().getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
     }
 
     @Override
     protected boolean isPropagateToHistoricVariable() {
         return true;
+    }
+
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getVariableServiceConfiguration();
     }
 
     @Override

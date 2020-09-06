@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -29,10 +29,14 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseInstanceId;
 
-    public DeleteHistoricCaseInstanceCmd(String caseInstanceId) {
+    public DeleteHistoricCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.caseInstanceId = caseInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -41,7 +45,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         // Check if case instance is still running
-        HistoricCaseInstance instance = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        HistoricCaseInstance instance = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (instance == null) {
             throw new FlowableObjectNotFoundException("No historic case instance found with id: " + caseInstanceId, HistoricCaseInstance.class);
@@ -50,7 +54,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
             throw new FlowableException("Case instance is still running, cannot delete historic case instance: " + caseInstanceId);
         }
 
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordHistoricCaseInstanceDeleted(caseInstanceId, instance.getTenantId());
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceDeleted(caseInstanceId, instance.getTenantId());
 
         return null;
     }

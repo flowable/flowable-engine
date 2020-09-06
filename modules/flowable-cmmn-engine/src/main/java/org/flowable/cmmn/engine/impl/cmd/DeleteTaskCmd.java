@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -26,21 +27,26 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteTaskCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String taskId;
     protected Collection<String> taskIds;
     protected boolean cascade;
     protected String deleteReason;
 
-    public DeleteTaskCmd(String taskId, String deleteReason, boolean cascade) {
+    public DeleteTaskCmd(String taskId, String deleteReason, boolean cascade, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.taskId = taskId;
         this.cascade = cascade;
         this.deleteReason = deleteReason;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public DeleteTaskCmd(Collection<String> taskIds, String deleteReason, boolean cascade) {
+    public DeleteTaskCmd(Collection<String> taskIds, String deleteReason, boolean cascade, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.taskIds = taskIds;
         this.cascade = cascade;
         this.deleteReason = deleteReason;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -59,6 +65,6 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     }
 
     protected void deleteTask(CommandContext commandContext, String taskId) {
-        TaskHelper.deleteTask(taskId, deleteReason, cascade);
+        TaskHelper.deleteTask(taskId, deleteReason, cascade, cmmnEngineConfiguration);
     }
 }

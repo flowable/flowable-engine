@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
@@ -26,6 +25,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.data.AbstractJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobsByExecutionIdMatcher;
 
@@ -33,18 +33,12 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.J
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
+public class MybatisJobDataManager extends AbstractJobDataManager<JobEntity> implements JobDataManager {
     
-    protected JobServiceConfiguration jobServiceConfiguration;
-
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
     
-    public MybatisJobDataManager() {
-        
-    }
-    
     public MybatisJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        this.jobServiceConfiguration = jobServiceConfiguration;
+        super(jobServiceConfiguration);
     }
 
     @Override

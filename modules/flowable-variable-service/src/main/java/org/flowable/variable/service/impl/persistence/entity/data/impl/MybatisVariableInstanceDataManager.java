@@ -18,12 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.data.AbstractVariableDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByExecutionIdMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByProcessInstanceIdMatcher;
@@ -38,7 +39,7 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
 /**
  * @author Joram Barrez
  */
-public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
+public class MybatisVariableInstanceDataManager extends AbstractVariableDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher 
         = new VariableInstanceByExecutionIdMatcher();
@@ -63,6 +64,10 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher 
         = new VariableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher();
 
+    public MybatisVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        super(variableServiceConfiguration);
+    }
+    
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
         return VariableInstanceEntityImpl.class;

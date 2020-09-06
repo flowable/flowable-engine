@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
@@ -26,16 +26,19 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class NewTaskCmd implements Command<Task>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String taskId;
 
-    public NewTaskCmd(String taskId) {
+    public NewTaskCmd(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.taskId = taskId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Task execute(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskService().createTask();
+        TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().createTask();
         task.setId(taskId);
         task.setRevision(0);
         return task;

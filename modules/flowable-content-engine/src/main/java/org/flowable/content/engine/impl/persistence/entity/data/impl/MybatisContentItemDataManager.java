@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
@@ -70,5 +71,10 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
         getDbSqlSession().delete("deleteContentItemsByScopeIdAndScopeType", params, getManagedEntityClass());
+    }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return contentEngineConfiguration.getIdGenerator();
     }
 }

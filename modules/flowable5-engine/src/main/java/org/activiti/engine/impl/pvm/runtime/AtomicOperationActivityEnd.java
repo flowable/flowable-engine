@@ -23,6 +23,7 @@ import org.activiti.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
@@ -56,7 +57,8 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
                                 execution.getId(),
                                 execution.getProcessInstanceId(), execution.getProcessDefinitionId(),
                                 (String) executionEntity.getActivity().getProperties().get("type"),
-                                executionEntity.getActivity().getActivityBehavior().getClass().getCanonicalName()));
+                                executionEntity.getActivity().getActivityBehavior().getClass().getCanonicalName()),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
 
@@ -70,7 +72,8 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
             // dispatch process completed event
             if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, execution));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, execution),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
             execution.performOperation(PROCESS_END);
@@ -108,7 +111,8 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
                         // dispatch process completed event
                         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, execution));
+                                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, execution),
+                                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                         }
 
                         parentScopeExecution.performOperation(PROCESS_END);

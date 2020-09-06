@@ -19,10 +19,10 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,21 +38,26 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
     protected String jobId;
     protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public ExecuteAsyncJobCmd(String jobId) {
+    public ExecuteAsyncJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
     
-    public ExecuteAsyncJobCmd(String jobId, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+    public ExecuteAsyncJobCmd(String jobId, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
+            JobServiceConfiguration jobServiceConfiguration) {
+        
         this.jobId = jobId;
         this.jobEntityManager = jobEntityManager;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
         
         if (jobEntityManager == null) {
-            jobEntityManager = CommandContextUtil.getJobEntityManager(commandContext); // Backwards compatibility
+            jobEntityManager = jobServiceConfiguration.getJobEntityManager(); // Backwards compatibility
         }
 
         if (jobId == null) {
@@ -76,12 +81,12 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Executing async job {}", job.getId());
         }
 
-        CommandContextUtil.getJobManager(commandContext).execute(job);
+        jobServiceConfiguration.getJobManager().execute(job);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job),
+                    jobServiceConfiguration.getEngineName());
         }
 
         return null;

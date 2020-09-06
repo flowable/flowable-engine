@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.common.engine.impl.interceptor.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LoggingSession implements Session {
     
     protected CommandContext commandContext;
-    protected CommandContextCloseListener commandContextCloseListener;
+    protected LoggingSessionCommandContextCloseListener commandContextCloseListener;
     
     protected LoggingListener loggingListener;
     protected ObjectMapper objectMapper;
@@ -41,12 +40,13 @@ public class LoggingSession implements Session {
     }
 
     protected void initCommandContextCloseListener() {
-        this.commandContextCloseListener = new LoggingSessionCommandContextCloseListener(this, loggingListener); 
+        this.commandContextCloseListener = new LoggingSessionCommandContextCloseListener(this, loggingListener, objectMapper); 
     }
     
-    public void addLoggingData(String type, ObjectNode data) {
+    public void addLoggingData(String type, ObjectNode data, String engineType) {
         if (loggingData == null) {
             loggingData = new ArrayList<>();
+            commandContextCloseListener.setEngineType(engineType);
             commandContext.addCloseListener(commandContextCloseListener);
         }
         
