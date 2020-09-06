@@ -527,17 +527,16 @@
                           <!-- Match-all variable-names when name is null -->
                           and A${index}.NAME_= #{queryVariableValue.name}
                         </if>
-                        <if test="!queryVariableValue.type.equals('null')">
-                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                        <if test="queryVariableValue.needsTypeCheck()">
                           and A${index}.TYPE_ = #{queryVariableValue.type}
                         </if>
                         <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                           <choose>
                             <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                              and lower(A${index}.TEXT_)
+                              and (lower(A${index}.TEXT_)
                             </when>
                             <otherwise>
-                              and A${index}.TEXT_
+                              and (A${index}.TEXT_
                             </otherwise>
                           </choose>
                           <choose>
@@ -548,6 +547,10 @@
                           <choose>
                             <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                           </choose>
+                          <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                              or A${index}.TEXT_ is null
+                          </if>
+                          )
                         </if>
                         <if test="queryVariableValue.textValue2 != null">
                         and A${index}.TEXT2_
@@ -561,14 +564,22 @@
                           </choose>
                         </if>
                         <if test="queryVariableValue.longValue != null">
-                            and A${index}.LONG_
+                            and (A${index}.LONG_
                             <include refid="variableOperator" />
                             #{queryVariableValue.longValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or A${index}.LONG_ is null
+                            </if>
+                            )
                         </if>
                         <if test="queryVariableValue.doubleValue != null">
-                            and A${index}.DOUBLE_
+                            and (A${index}.DOUBLE_
                             <include refid="variableOperator" />
                             #{queryVariableValue.doubleValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or A${index}.DOUBLE_ is null
+                            </if>
+                            )
                         </if>
                         <!-- Null variable type -->
                         <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
@@ -704,17 +715,16 @@
                                         <!-- Match-all variable-names when name is null -->
                                         and A_OR${orIndex}.NAME_= #{queryVariableValue.name}
                                     </if>
-                                    <if test="!queryVariableValue.type.equals('null')">
-                                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                                    <if test="queryVariableValue.needsTypeCheck()">
                                         and A_OR${orIndex}.TYPE_ = #{queryVariableValue.type}
                                     </if>
                                     <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                                         <choose>
                                             <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                                                and lower(A_OR${orIndex}.TEXT_)
+                                                and (lower(A_OR${orIndex}.TEXT_)
                                             </when>
                                             <otherwise>
-                                                and A_OR${orIndex}.TEXT_
+                                                and (A_OR${orIndex}.TEXT_
                                             </otherwise>
                                         </choose>
                                         <choose>
@@ -731,6 +741,10 @@
                                                 ${wildcardEscapeClause}
                                             </when>
                                         </choose>
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.TEXT_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <if test="queryVariableValue.textValue2 != null">
                                         and A_OR${orIndex}.TEXT2_
@@ -746,14 +760,22 @@
                                         </choose>
                                     </if>
                                     <if test="queryVariableValue.longValue != null">
-                                        and A_OR${orIndex}.LONG_
+                                        and (A_OR${orIndex}.LONG_
                                         <include refid="variableOperator"/>
                                         #{queryVariableValue.longValue}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.LONG_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <if test="queryVariableValue.doubleValue != null">
-                                        and A_OR${orIndex}.DOUBLE_
+                                        and (A_OR${orIndex}.DOUBLE_
                                         <include refid="variableOperator"/>
                                         #{queryVariableValue.doubleValue}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.DOUBLE_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <!-- Null variable type -->
                                     <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">

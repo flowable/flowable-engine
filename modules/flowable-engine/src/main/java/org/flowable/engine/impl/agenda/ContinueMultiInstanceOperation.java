@@ -138,11 +138,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         }
         MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
-        if (!flowNode.isAsynchronous()) {
-            execution.setVariableLocal(elementIndexVariable, loopCounter);
-        } else {
-            multiInstanceRootExecution.setVariableLocal(elementIndexVariable, loopCounter);
-        }
+        execution.setVariableLocal(elementIndexVariable, loopCounter);
         return activityBehavior;
     }
     

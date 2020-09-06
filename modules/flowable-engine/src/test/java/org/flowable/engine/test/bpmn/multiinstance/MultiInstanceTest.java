@@ -1793,6 +1793,105 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
+    @Deployment
+    public void testLoopCounterVariableForSequentialMultiInstance() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        for (int i = 0; i < myCollection.size(); i++) {
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+            Integer loopCounter = (Integer) runtimeService.getVariableLocal(task.getExecutionId(), "loopCounter");
+            assertThat(loopCounter).isEqualTo(i);
+
+            String myElement = (String) runtimeService.getVariableLocal(task.getExecutionId(), "myElement");
+            assertThat(myElement).isEqualTo(myCollection.get(i));
+
+            taskService.complete(task.getId());
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testLoopCounterVariableForParallelMultiInstance() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(4);
+
+        List<Integer> loopCounters = new ArrayList<>();
+        for (Task task : tasks) {
+            loopCounters.add((Integer) runtimeService.getVariableLocal(task.getExecutionId(), "loopCounter"));
+
+            String myElement = (String) runtimeService.getVariableLocal(task.getExecutionId(), "myElement");
+            assertThat(myElement).isNotNull();
+        }
+
+        assertThat(loopCounters).containsOnly(0, 1 , 2, 3);
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testMapLoopCounterIntoAsyncParallelMultiInstanceCallActivity.bpmn20.xml"
+    })
+    public void testMapLoopCounterIntoAsyncParallelMultiInstanceCallActivity() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(myCollection.size());
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+        assertThat(processInstances).hasSize(myCollection.size());
+
+        List<Integer> loopCounters = new ArrayList<>();
+        for (ProcessInstance instance : processInstances) {
+            loopCounters.add(((Integer) runtimeService.getVariable(instance.getId(), "copiedLoopCounter")));
+        }
+        assertThat(loopCounters).containsOnly(0, 1 , 2, 3);
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testMapLoopCounterIntoAsyncSequentialMultiInstanceCallActivity.bpmn20.xml"
+    })
+    public void testMapLoopCounterIntoAsyncSequentialMultiInstanceCallActivity() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        for (int i = 0; i < myCollection.size(); i++) {
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            managementService.executeJob(job.getId());
+
+            ProcessInstance calledProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+
+            Integer copiedLoopCounter = (Integer) runtimeService.getVariable(calledProcessInstance.getId(), "copiedLoopCounter");
+            assertThat(i).isEqualTo(copiedLoopCounter);
+
+            Task task = taskService.createTaskQuery().processInstanceId(calledProcessInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+        }
+    }
+
     protected void resetTestCounts() {
         TestStartExecutionListener.countWithLoopCounter.set(0);
         TestStartExecutionListener.countWithoutLoopCounter.set(0);

@@ -86,18 +86,24 @@
                             <ports>
                                 <port>8080</port>
                             </ports>
+                            <environment>
+                                <JAVA_OPTS>-Xmx512M</JAVA_OPTS>
+                                <SERVER_PORT>8080</SERVER_PORT>
+                            </environment>
                             <entrypoint>
-                                <entrypoint>java</entrypoint>
-                                <!-- Start of JVM flags -->
-                                <entrypoint>-Dserver.port=8080</entrypoint>
-                                <!-- End of JVM flags -->
-                                <entrypoint>-cp</entrypoint>
-                                <entrypoint>/app:/app/WEB-INF/classes:/app/WEB-INF/lib/*</entrypoint>
-                                <!-- use your actual main class, not the spring.boot.WarLauncher -->
-                                <entrypoint>org.flowable.rest.app.FlowableRestApplication</entrypoint>
+                                <entrypoint>/flowable-entrypoint.sh</entrypoint>
                             </entrypoint>
                             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         </container>
+                        <extraDirectories>
+                            <paths>src/main/jib</paths>
+                            <permissions>
+                                <permission>
+                                    <file>/flowable-entrypoint.sh</file>
+                                    <mode>544</mode> <!-- Read/execute for owner, read for group/other -->
+                                </permission>
+                            </permissions>
+                        </extraDirectories>
                     </configuration>
                 </plugin>
             </plugins>
@@ -695,7 +701,9 @@
                             </from>
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
-                                <image>flowable/flowable-rest:latest</image>
+                                <tags>
+                                    <tag>flowable/flowable-rest:latest</tag>
+                                </tags>
                             </to>
                         </configuration>
                         <executions>

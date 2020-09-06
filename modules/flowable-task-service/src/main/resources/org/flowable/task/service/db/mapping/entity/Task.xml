@@ -927,7 +927,7 @@
                 <if test="var.name == null">
                   and A${index}.NAME_ is not null
                 </if>
-                <if test="!var.type.equals('null')">
+                <if test="var.needsTypeCheck()">
                   and A${index}.TYPE_ = #{var.type}
                 </if>
 
@@ -935,10 +935,10 @@
                 <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                   <choose>
                     <when test="var.operator.equals('EQUALS_IGNORE_CASE') || var.operator.equals('NOT_EQUALS_IGNORE_CASE') || var.operator.equals('LIKE_IGNORE_CASE')">
-                      and lower(A${index}.TEXT_)
+                      and (lower(A${index}.TEXT_)
                     </when>
                     <otherwise>
-                      and A${index}.TEXT_
+                      and (A${index}.TEXT_
                     </otherwise>
                   </choose>
                   <choose>
@@ -949,6 +949,10 @@
                   <choose>
         			<when test="var.operator.equals('LIKE') || var.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
         		  </choose>
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.TEXT_ is null
+                  </if>
+                  )
                 </if>
                 <if test="var.textValue2 != null">
                   and A${index}.TEXT2_
@@ -962,14 +966,22 @@
         		  </choose>
                 </if>
                 <if test="var.longValue != null">
-                  and A${index}.LONG_
+                  and (A${index}.LONG_
                   <include refid="executionVariableOperator" />
                   #{var.longValue}
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.LONG_ is null
+                  </if>
+                  )
                 </if>
                 <if test="var.doubleValue != null">
-                  and A${index}.DOUBLE_
+                  and (A${index}.DOUBLE_
                   <include refid="executionVariableOperator" />
                   #{var.doubleValue}
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.DOUBLE_ is null
+                  </if>
+                  )
                 </if>
                 <!-- Null variable type -->
                 <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
@@ -1371,17 +1383,17 @@
                       <if test="var.name == null">
                         and A_${orLocal}OR${orIndex}.NAME_ is not null
                       </if>
-                      <if test="!var.type.equals('null')">
+                      <if test="var.needsTypeCheck()">
                         and A_${orLocal}OR${orIndex}.TYPE_ = #{var.type}
                       </if>
                       <!-- Variable value -->
                       <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                         <choose>
                           <when test="var.operator.equals('EQUALS_IGNORE_CASE') || var.operator.equals('NOT_EQUALS_IGNORE_CASE') || var.operator.equals('LIKE_IGNORE_CASE')">
-                            and lower(A_${orLocal}OR${orIndex}.TEXT_)
+                            and (lower(A_${orLocal}OR${orIndex}.TEXT_)
                           </when>
                           <otherwise>
-                            and A_${orLocal}OR${orIndex}.TEXT_
+                            and (A_${orLocal}OR${orIndex}.TEXT_
                           </otherwise>
                         </choose>
                         <choose>
@@ -1392,6 +1404,10 @@
                         <choose>
                             <when test="var.operator.equals('LIKE') || var.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                         </choose>
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.TEXT_ is null
+                        </if>
+                        )
                       </if>
                       <if test="var.textValue2 != null">
                         and A_${orLocal}OR${orIndex}.TEXT2_
@@ -1405,14 +1421,22 @@
                         </choose>
                       </if>
                       <if test="var.longValue != null">
-                        and A_${orLocal}OR${orIndex}.LONG_
+                        and (A_${orLocal}OR${orIndex}.LONG_
                         <include refid="executionVariableOperator" />
                         #{var.longValue}
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.LONG_ is null
+                        </if>
+                        )
                       </if>
                       <if test="var.doubleValue != null">
-                        and A_${orLocal}OR${orIndex}.DOUBLE_
+                        and (A_${orLocal}OR${orIndex}.DOUBLE_
                         <include refid="executionVariableOperator" />
                         #{var.doubleValue}
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.DOUBLE_ is null
+                        </if>
+                        )
                       </if>
                       <!-- Null variable type -->
                       <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">

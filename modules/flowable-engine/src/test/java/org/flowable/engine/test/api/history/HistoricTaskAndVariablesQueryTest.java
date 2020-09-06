@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.junit.jupiter.api.AfterEach;
@@ -790,6 +792,205 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertThat(tasks)
                     .extracting(HistoricTaskInstance::getCategory)
                     .containsOnly("testCategory");
+        }
+    }
+
+    @Test
+    public void testQueryVariableValueEqualsAndNotEquals() {
+        Task taskWithStringValue = taskService.createTaskBuilder()
+                .name("With string value")
+                .create();
+        taskIds.add(taskWithStringValue.getId());
+        taskService.setVariable(taskWithStringValue.getId(), "var", "TEST");
+
+        Task taskWithNullValue = taskService.createTaskBuilder()
+                .name("With null value")
+                .create();
+        taskIds.add(taskWithNullValue.getId());
+        taskService.setVariable(taskWithNullValue.getId(), "var", null);
+
+        Task taskWithLongValue = taskService.createTaskBuilder()
+                .name("With long value")
+                .create();
+        taskIds.add(taskWithLongValue.getId());
+        taskService.setVariable(taskWithLongValue.getId(), "var", 100L);
+
+        Task taskWithDoubleValue = taskService.createTaskBuilder()
+                .name("With double value")
+                .create();
+        taskIds.add(taskWithDoubleValue.getId());
+        taskService.setVariable(taskWithDoubleValue.getId(), "var", 45.55);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueNotEquals("var", "TEST").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With null value", taskWithNullValue.getId()),
+                            tuple("With long value", taskWithLongValue.getId()),
+                            tuple("With double value", taskWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", "TEST").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With string value", taskWithStringValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueNotEquals("var", 100L).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With string value", taskWithStringValue.getId()),
+                            tuple("With null value", taskWithNullValue.getId()),
+                            tuple("With double value", taskWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 100L).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With long value", taskWithLongValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueNotEquals("var", 45.55).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With string value", taskWithStringValue.getId()),
+                            tuple("With null value", taskWithNullValue.getId()),
+                            tuple("With long value", taskWithLongValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", 45.55).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With double value", taskWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueNotEquals("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With string value", taskWithStringValue.getId()),
+                            tuple("With null value", taskWithNullValue.getId()),
+                            tuple("With long value", taskWithLongValue.getId()),
+                            tuple("With double value", taskWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueNotEqualsIgnoreCase("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With null value", taskWithNullValue.getId()),
+                            tuple("With long value", taskWithLongValue.getId()),
+                            tuple("With double value", taskWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .isEmpty();
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskVariableValueEqualsIgnoreCase("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(
+                            tuple("With string value", taskWithStringValue.getId())
+                    );
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryProcessVariableValueEqualsAndNotEquals() {
+        ProcessInstance processWithStringValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With string value")
+                .variable("var", "TEST")
+                .start();
+
+        ProcessInstance processWithNullValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With null value")
+                .variable("var", null)
+                .start();
+
+        ProcessInstance processWithLongValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With long value")
+                .variable("var", 100L)
+                .start();
+
+        ProcessInstance processWithDoubleValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With double value")
+                .variable("var", 45.55)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", "TEST").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithNullValue.getId()),
+                            tuple("my task", processWithLongValue.getId()),
+                            tuple("my task", processWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", "TEST").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithStringValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 100L).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithStringValue.getId()),
+                            tuple("my task", processWithNullValue.getId()),
+                            tuple("my task", processWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 100L).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithLongValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 45.55).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithStringValue.getId()),
+                            tuple("my task", processWithNullValue.getId()),
+                            tuple("my task", processWithLongValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", 45.55).list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithStringValue.getId()),
+                            tuple("my task", processWithNullValue.getId()),
+                            tuple("my task", processWithLongValue.getId()),
+                            tuple("my task", processWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueNotEqualsIgnoreCase("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithNullValue.getId()),
+                            tuple("my task", processWithLongValue.getId()),
+                            tuple("my task", processWithDoubleValue.getId())
+                    );
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .isEmpty();
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processVariableValueEqualsIgnoreCase("var", "test").list())
+                    .extracting(HistoricTaskInstance::getName, HistoricTaskInstance::getProcessInstanceId)
+                    .containsExactlyInAnyOrder(
+                            tuple("my task", processWithStringValue.getId())
+                    );
         }
     }
 
