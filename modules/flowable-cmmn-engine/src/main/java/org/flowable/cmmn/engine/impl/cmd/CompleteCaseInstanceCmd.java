@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -22,8 +23,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class CompleteCaseInstanceCmd extends AbstractNeedsCaseInstanceCmd {
 
-    public CompleteCaseInstanceCmd(String caseInstanceId) {
-        super(caseInstanceId);
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public CompleteCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(caseInstanceId, cmmnEngineConfiguration);
     }
     
     @Override

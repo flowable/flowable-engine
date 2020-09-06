@@ -20,10 +20,11 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
+import org.flowable.job.service.impl.asyncexecutor.message.AsyncJobMessageReceiver;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,14 +40,14 @@ public class AsyncHistoryJobMessageReceiver {
 
     protected CommandExecutor commandExecutor;
     protected AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler;
+    protected JobServiceConfiguration jobServiceConfiguration;
     
-    public AsyncHistoryJobMessageReceiver() {
+    public AsyncHistoryJobMessageReceiver(CommandExecutor commandExecutor, 
+            AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler, JobServiceConfiguration jobServiceConfiguration) {
         
-    }
-    
-    public AsyncHistoryJobMessageReceiver(CommandExecutor commandExecutor, AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler) {
         this.commandExecutor = commandExecutor;
         this.asyncHistoryJobMessageHandler = asyncHistoryJobMessageHandler;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
     
     public void messageForJobReceived(final String jobId) {
@@ -64,9 +65,9 @@ public class AsyncHistoryJobMessageReceiver {
             @Override
             public Void execute(CommandContext commandContext) {
                 
-                HistoryJobEntityManager historyJobEntityManager = CommandContextUtil.getHistoryJobEntityManager(commandContext);
+                HistoryJobEntityManager historyJobEntityManager = jobServiceConfiguration.getHistoryJobEntityManager();
                 
-                HistoryJobQueryImpl query = new HistoryJobQueryImpl();
+                HistoryJobQueryImpl query = new HistoryJobQueryImpl(commandContext, jobServiceConfiguration);
                 query.jobId(jobId);
                 
                 List<HistoryJob> jobs = historyJobEntityManager.findHistoryJobsByQueryCriteria(query);
@@ -92,10 +93,10 @@ public class AsyncHistoryJobMessageReceiver {
     }
     
     protected JsonNode getHistoryJobData(CommandContext commandContext, HistoryJobEntity job) {
-        ObjectMapper objectMapper = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper();
+        ObjectMapper objectMapper = jobServiceConfiguration.getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
-                return objectMapper.readTree(job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes());
+                return objectMapper.readTree(job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes(jobServiceConfiguration.getEngineName()));
             } catch (IOException e) {
                 throw new FlowableException("Could not deserialize json for history job data", e);
             }

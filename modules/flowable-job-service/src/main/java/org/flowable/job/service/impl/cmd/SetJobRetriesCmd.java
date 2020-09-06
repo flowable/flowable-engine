@@ -22,9 +22,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Falko Menge
@@ -32,11 +32,13 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    private final String jobId;
-    private final int retries;
+    protected final String jobId;
+    protected final int retries;
 
-    public SetJobRetriesCmd(String jobId, int retries) {
+    public SetJobRetriesCmd(String jobId, int retries, JobServiceConfiguration jobServiceConfiguration) {
         if (jobId == null || jobId.length() < 1) {
             throw new FlowableIllegalArgumentException("The job id is mandatory, but '" + jobId + "' has been provided.");
         }
@@ -45,18 +47,20 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
         }
         this.jobId = jobId;
         this.retries = retries;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        JobEntity job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+        JobEntity job = jobServiceConfiguration.getJobEntityManager().findById(jobId);
         if (job != null) {
 
             job.setRetries(retries);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+            FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job),
+                        jobServiceConfiguration.getEngineName());
             }
         } else {
             throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'.", Job.class);

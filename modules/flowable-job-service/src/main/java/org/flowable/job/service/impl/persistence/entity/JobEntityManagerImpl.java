@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -38,15 +39,15 @@ public class JobEntityManagerImpl
 
     @Override
     public boolean insertJobEntity(JobEntity timerJobEntity) {
-        return doInsert(timerJobEntity, true);
+        return doInsert(timerJobEntity, true, serviceConfiguration.getIdGenerator());
     }
 
     @Override
-    public void insert(JobEntity jobEntity, boolean fireCreateEvent) {
-        doInsert(jobEntity, fireCreateEvent);
+    public void insert(JobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
+        doInsert(jobEntity, fireCreateEvent, idGenerator);
     }
 
-    protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
+    protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
         if (serviceConfiguration.getInternalJobManager() != null) {
             boolean handledJob = serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
             if (!handledJob) {
@@ -58,7 +59,7 @@ public class JobEntityManagerImpl
         if (jobEntity.getCorrelationId() == null) {
             jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
         }
-        super.insert(jobEntity, fireCreateEvent);
+        super.insert(jobEntity, fireCreateEvent, idGenerator);
         return true;
     }
 
@@ -87,7 +88,8 @@ public class JobEntityManagerImpl
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
 

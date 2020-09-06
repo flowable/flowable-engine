@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -29,16 +29,20 @@ import org.flowable.identitylink.api.IdentityLink;
 public class GetIdentityLinksForCaseDefinitionCmd implements Command<List<IdentityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseDefinitionId;
 
-    public GetIdentityLinksForCaseDefinitionCmd(String caseDefinitionId) {
+    public GetIdentityLinksForCaseDefinitionCmd(String caseDefinitionId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.caseDefinitionId = caseDefinitionId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
-        CaseDefinitionEntity caseDefinition = CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findById(caseDefinitionId);
+        CaseDefinitionEntity caseDefinition = cmmnEngineConfiguration.getCaseDefinitionEntityManager().findById(caseDefinitionId);
 
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find case definition with id " + caseDefinitionId, CaseDefinition.class);

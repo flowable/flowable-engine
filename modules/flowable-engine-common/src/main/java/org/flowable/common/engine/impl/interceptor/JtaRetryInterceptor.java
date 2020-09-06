@@ -36,12 +36,12 @@ public class JtaRetryInterceptor extends RetryInterceptor {
     }
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         if (calledInsideTransaction()) {
             LOGGER.trace("Called inside transaction, skipping the retry interceptor.");
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
         } else {
-            return super.execute(config, command);
+            return super.execute(config, command, commandExecutor);
         }
     }
 

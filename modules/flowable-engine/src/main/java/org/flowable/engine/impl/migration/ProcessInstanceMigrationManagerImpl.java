@@ -110,8 +110,10 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             } else {
                 BpmnModel newModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
         
-                ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId));
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
+                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(
+                        new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinitionId));
         
                 for (ProcessInstance processInstance : processInstances) {
                     doValidateProcessInstanceMigration(processInstance.getId(), processDefinition.getTenantId(), newModel, document, validationResult, commandContext);
@@ -313,10 +315,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         // Check of the target definition exists before submitting the batch
         ProcessDefinition targetProcessDefinition = resolveProcessDefinition(document, commandContext);
 
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria( new ProcessInstanceQueryImpl().processDefinitionId(sourceProcDefId));
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
+        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(
+                new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(sourceProcDefId));
 
-        BatchService batchService = CommandContextUtil.getBatchService(commandContext);
+        BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         Batch batch = batchService.createBatchBuilder().batchType(Batch.PROCESS_MIGRATION_TYPE)
             .searchKey(sourceProcDefId)
             .searchKey2(targetProcessDefinition.getId())
@@ -324,7 +328,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             .batchDocumentJson(document.asJsonString())
             .create();
         
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
         for (ProcessInstance processInstance : processInstances) {
             BatchPart batchPart = batchService.createBatchPart(batch, ProcessInstanceBatchMigrationResult.STATUS_WAITING, 
                             processInstance.getId(), null, ScopeTypes.BPMN);
@@ -338,14 +342,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         }
         
         if (!processInstances.isEmpty()) {
-            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
             timerJob.setRevision(1);
             timerJob.setJobHandlerType(ProcessInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(processEngineConfiguration.getBatchStatusTimeCycleConfig()));
             timerJob.setRepeat(processEngineConfiguration.getBatchStatusTimeCycleConfig());
@@ -369,8 +372,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             throw new FlowableException("Cannot find the process definition to migrate to, identified by " + printProcessDefinitionIdentifierMessage(document));
         }
 
-        ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinitionId);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
 
         for (ProcessInstance processInstance : processInstances) {

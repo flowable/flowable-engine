@@ -59,7 +59,7 @@ public class HistoricDetailEntityManagerImpl
         }
         historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 
-        insert(historicFormPropertyEntity);
+        insert(historicFormPropertyEntity, engineConfiguration.getIdGenerator());
         return historicFormPropertyEntity;
     }
 
@@ -83,7 +83,7 @@ public class HistoricDetailEntityManagerImpl
             historicVariableUpdate.setBytes(variableInstance.getBytes());
         }
 
-        insert(historicVariableUpdate);
+        insert(historicVariableUpdate, engineConfiguration.getIdGenerator());
         return historicVariableUpdate;
     }
 
@@ -94,7 +94,7 @@ public class HistoricDetailEntityManagerImpl
         if (entity instanceof HistoricDetailVariableInstanceUpdateEntity) {
             HistoricDetailVariableInstanceUpdateEntity historicDetailVariableInstanceUpdateEntity = ((HistoricDetailVariableInstanceUpdateEntity) entity);
             if (historicDetailVariableInstanceUpdateEntity.getByteArrayRef() != null) {
-                historicDetailVariableInstanceUpdateEntity.getByteArrayRef().delete();
+                historicDetailVariableInstanceUpdateEntity.getByteArrayRef().delete(engineConfiguration.getEngineCfgKey());
             }
         }
     }

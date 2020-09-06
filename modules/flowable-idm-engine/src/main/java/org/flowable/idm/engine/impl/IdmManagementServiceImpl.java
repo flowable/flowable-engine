@@ -37,9 +37,13 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
  */
 public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineConfiguration> implements IdmManagementService {
 
+    public IdmManagementServiceImpl(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
+    
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override
@@ -49,12 +53,12 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
     }
 
     @Override
     public TablePageQuery createTablePageQuery() {
-        return new TablePageQueryImpl(commandExecutor);
+        return new TablePageQueryImpl(commandExecutor, configuration);
     }
 
     @Override

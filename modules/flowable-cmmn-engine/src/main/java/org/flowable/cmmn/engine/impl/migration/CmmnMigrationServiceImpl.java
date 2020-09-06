@@ -47,42 +47,45 @@ public class CmmnMigrationServiceImpl extends CommonEngineServiceImpl<CmmnEngine
 
     @Override
     public CaseInstanceMigrationValidationResult validateMigrationForCaseInstance(String caseInstanceId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseInstanceId, caseInstanceMigrationDocument));
+        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseInstanceId, caseInstanceMigrationDocument, configuration));
     }
 
     @Override
     public CaseInstanceMigrationValidationResult validateMigrationForCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseInstanceMigrationDocument, caseDefinitionId));
+        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseInstanceMigrationDocument, caseDefinitionId, configuration));
     }
 
     @Override
     public CaseInstanceMigrationValidationResult validateMigrationForCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, caseInstanceMigrationDocument));
+        return commandExecutor.execute(new CaseInstanceMigrationValidationCmd(caseDefinitionKey, caseDefinitionVersion, 
+                caseDefinitionTenantId, caseInstanceMigrationDocument, configuration));
     }
 
     @Override
     public void migrateCaseInstance(String caseInstanceId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceId, caseInstanceMigrationDocument));
+        commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceId, caseInstanceMigrationDocument, configuration));
     }
 
     @Override
     public void migrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceMigrationDocument, caseDefinitionId));
+        commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceMigrationDocument, caseDefinitionId, configuration));
     }
 
     @Override
     public void migrateCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        commandExecutor.execute(new CaseInstanceMigrationCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, caseInstanceMigrationDocument));
+        commandExecutor.execute(new CaseInstanceMigrationCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, 
+                caseInstanceMigrationDocument, configuration));
     }
 
     @Override
     public Batch batchMigrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseInstanceMigrationDocument, caseDefinitionId));
+        return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseInstanceMigrationDocument, caseDefinitionId, configuration));
     }
 
     @Override
     public Batch batchMigrateCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-        return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, caseInstanceMigrationDocument));
+        return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseDefinitionKey, caseDefinitionVersion, 
+                caseDefinitionTenantId, caseInstanceMigrationDocument, configuration));
     }
 
     @Override

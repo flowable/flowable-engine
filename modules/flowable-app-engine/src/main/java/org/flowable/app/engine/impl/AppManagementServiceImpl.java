@@ -32,7 +32,7 @@ public class AppManagementServiceImpl extends CommonEngineServiceImpl<AppEngineC
 
     @Override
     public Map<String, Long> getTableCounts() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override

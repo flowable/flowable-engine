@@ -36,14 +36,19 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class CompleteTaskCmd implements Command<Void> {
     
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String taskId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     
-    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables, 
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         this.taskId = taskId;
         this.variables = variables;
         this.transientVariables = transientVariables;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
     @Override
@@ -53,7 +58,7 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
+        TaskEntity taskEntity = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
@@ -61,7 +66,7 @@ public class CompleteTaskCmd implements Command<Void> {
         String planItemInstanceId = taskEntity.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = null;
         if (planItemInstanceId != null) {
-            planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+            planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
             if (planItemInstanceEntity == null) {
                 throw new FlowableException("Could not find plan item instance for task " + taskId);
             }
@@ -74,9 +79,8 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
 
-        logUserTaskCompleted(taskEntity);
+        logUserTaskCompleted(taskEntity, cmmnEngineConfiguration);
         
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
         }
@@ -93,13 +97,13 @@ public class CompleteTaskCmd implements Command<Void> {
                 }
             
                 CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_COMPLETE, 
-                                "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity);
+                        "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
             
             CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
             
         } else {
-            TaskHelper.deleteTask(taskEntity, null, false, true);
+            TaskHelper.deleteTask(taskEntity, null, false, true, cmmnEngineConfiguration);
         }
         
         return null;

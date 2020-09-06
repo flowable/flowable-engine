@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.entitylink.api.EntityLink;
@@ -31,17 +32,17 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 public class EntityLinkUtil {
 
     public static void createEntityLinks(String scopeId, String subScopeId, String parentElementId,
-            String referenceScopeId, String referenceScopeType) {
+            String referenceScopeId, String referenceScopeType, CmmnEngineConfiguration cmmnEngineConfiguration) {
         
         // scopeId is the process instance in which this is being created
         // referenceScopeId is CaseTask, HumanTask, etc.
 
-        EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService();
+        EntityLinkService entityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
         List<EntityLink> scopeParentEntityLinks = entityLinkService.findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD);
 
         Set<String> parentIds = new HashSet<>();
 
-        CmmnHistoryManager historyManager = CommandContextUtil.getCmmnHistoryManager();
+        CmmnHistoryManager historyManager = cmmnEngineConfiguration.getCmmnHistoryManager();
         EntityLink scopeRootEntityLink = null;
         // First copy existing links
         for (EntityLink parentEntityLink : scopeParentEntityLinks) {

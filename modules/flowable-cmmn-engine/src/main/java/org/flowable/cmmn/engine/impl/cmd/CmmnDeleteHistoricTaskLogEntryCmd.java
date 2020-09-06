@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -21,15 +21,18 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class CmmnDeleteHistoricTaskLogEntryCmd implements Command<Void> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected long logNumber;
 
-    public CmmnDeleteHistoricTaskLogEntryCmd(long logNumber) {
+    public CmmnDeleteHistoricTaskLogEntryCmd(long logNumber, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.logNumber = logNumber;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getTaskServiceConfiguration(commandContext).getInternalHistoryTaskManager().deleteHistoryUserTaskLog(logNumber);
+        cmmnEngineConfiguration.getTaskServiceConfiguration().getInternalHistoryTaskManager().deleteHistoryUserTaskLog(logNumber);
         return null;
     }
 }

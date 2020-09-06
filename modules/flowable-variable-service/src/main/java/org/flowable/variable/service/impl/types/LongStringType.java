@@ -12,6 +12,8 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.variable.service.VariableServiceConfiguration;
+
 /**
  * @author Martin Grofcik
  */
@@ -20,7 +22,8 @@ public class LongStringType extends SerializableType {
     public static final String TYPE_NAME = "longString";
     private final int minLength;
 
-    public LongStringType(int minLength) {
+    public LongStringType(int minLength, VariableServiceConfiguration variableServiceConfiguration) {
+        super(variableServiceConfiguration);
         this.minLength = minLength;
     }
 

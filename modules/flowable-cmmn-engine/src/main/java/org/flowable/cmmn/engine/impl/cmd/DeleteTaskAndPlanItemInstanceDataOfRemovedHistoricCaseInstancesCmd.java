@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -25,11 +25,17 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     @Override
     public Object execute(CommandContext commandContext) {
-        CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskInstancesForNonExistingCaseInstances();
-        CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
+        cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskInstancesForNonExistingCaseInstances();
+        cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager().deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
 
         return null;
     }

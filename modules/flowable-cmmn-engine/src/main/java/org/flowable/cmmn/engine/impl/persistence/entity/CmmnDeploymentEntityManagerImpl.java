@@ -21,10 +21,9 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -39,12 +38,12 @@ public class CmmnDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(CmmnDeploymentEntity deployment) {
-        super.insert(deployment, true);
+    public void insert(CmmnDeploymentEntity deployment, IdGenerator idGenerator) {
+        super.insert(deployment, true, idGenerator);
 
         for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getCmmnResourceEntityManager().insert((CmmnResourceEntity) resource);
+            getCmmnResourceEntityManager().insert((CmmnResourceEntity) resource, idGenerator);
         }
     }
 
@@ -53,11 +52,9 @@ public class CmmnDeploymentEntityManagerImpl
         CaseDefinitionEntityManager caseDefinitionEntityManager = getCaseDefinitionEntityManager();
         List<CaseDefinition> caseDefinitions = caseDefinitionEntityManager.createCaseDefinitionQuery().deploymentId(deploymentId).list();
         for (CaseDefinition caseDefinition : caseDefinitions) {
-
-            CommandContext commandContext = CommandContextUtil.getCommandContext();
-            CommandContextUtil.getIdentityLinkService(commandContext)
+            engineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                 .deleteIdentityLinksByScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
-            CommandContextUtil.getEventSubscriptionService(commandContext)
+            engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                 .deleteEventSubscriptionsForScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
             
             if (cascade) {

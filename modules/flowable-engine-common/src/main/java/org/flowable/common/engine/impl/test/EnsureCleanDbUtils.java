@@ -44,7 +44,7 @@ public class EnsureCleanDbUtils {
             Collection<String> tableNamesExcludedFromDbCleanCheck, boolean hasNoException, Command<Void> dropAndRecreateDbCommand) {
         logger.debug("verifying that db is clean after test");
         Map<String, Long> tableCounts = engineConfiguration.getCommandExecutor()
-                .execute(commandContext -> commandContext.getCurrentEngineConfiguration().getTableDataManager().getTableCount());
+                .execute(commandContext -> engineConfiguration.getTableDataManager().getTableCount());
         StringBuilder outputMessage = new StringBuilder();
         for (String tableName : tableCounts.keySet()) {
             String tableNameWithoutPrefix = tableName.replace(engineConfiguration.getDatabaseTablePrefix(), "");

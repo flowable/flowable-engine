@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -44,23 +45,24 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Deployment id is null");
         }
 
-        DeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        DeploymentEntity deployment = processEngineConfiguration.getDeploymentEntityManager().findById(deploymentId);
 
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
         }
 
         if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
+            processEngineConfiguration.getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
         }
 
         // Update category
         deployment.setCategory(category);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return null;

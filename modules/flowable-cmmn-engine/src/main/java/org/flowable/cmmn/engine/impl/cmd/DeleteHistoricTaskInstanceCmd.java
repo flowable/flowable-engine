@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -26,10 +27,14 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String taskId;
 
-    public DeleteHistoricTaskInstanceCmd(String taskId) {
+    public DeleteHistoricTaskInstanceCmd(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.taskId = taskId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -39,7 +44,7 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
             throw new FlowableIllegalArgumentException("taskId is null");
         }
         
-        TaskHelper.deleteHistoricTask(taskId);
+        TaskHelper.deleteHistoricTask(taskId, cmmnEngineConfiguration);
         
         return null;
     }

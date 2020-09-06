@@ -12,33 +12,12 @@
  */
 package org.flowable.variable.service.impl.util;
 
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
-import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 public class CommandContextUtil {
 
-    public static VariableServiceConfiguration getVariableServiceConfiguration() {
-        return getVariableServiceConfiguration(getCommandContext());
-    }
-    
-    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        if (commandContext != null) {
-            return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
-                            .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
-        }
-        return null;
-    }
-    
     public static DbSqlSession getDbSqlSession() {
         return getDbSqlSession(getCommandContext());
     }
@@ -47,42 +26,7 @@ public class CommandContextUtil {
         return commandContext.getSession(DbSqlSession.class);
     }
     
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return getVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-    }
-    
-    public static ByteArrayEntityManager getByteArrayEntityManager() {
-        return getByteArrayEntityManager(getCommandContext());
-    }
-    
-    public static ByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
-        if (commandContext != null) {
-            return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
-        }
-        return null;
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return getHistoricVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
-    }
-    
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
-    }
-
-    public static ExpressionManager getExpressionManager() {
-        AbstractEngineConfiguration currentEngineConfiguration = getCommandContext().getCurrentEngineConfiguration();
-        if (currentEngineConfiguration instanceof HasExpressionManagerEngineConfiguration) {
-            return ((HasExpressionManagerEngineConfiguration) currentEngineConfiguration).getExpressionManager();
-        }
-        throw new FlowableException("Unable to obtain expression manager from the current engine configuration: " + currentEngineConfiguration);
     }
 }

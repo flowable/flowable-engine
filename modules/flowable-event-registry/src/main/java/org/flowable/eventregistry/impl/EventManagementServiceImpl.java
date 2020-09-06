@@ -31,7 +31,7 @@ public class EventManagementServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public Map<String, Long> getTableCounts() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstance;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
@@ -31,8 +32,9 @@ public class SignalEventListenerInstanceQueryImpl implements SignalEventListener
 
     protected PlanItemInstanceQuery innerQuery;
 
-    SignalEventListenerInstanceQueryImpl(CommandExecutor commandExecutor) {
-        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor).planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER);
+    public SignalEventListenerInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration)
+                .planItemDefinitionType(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER);
     }
 
     @Override

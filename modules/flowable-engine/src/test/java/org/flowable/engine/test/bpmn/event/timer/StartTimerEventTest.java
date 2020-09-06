@@ -28,7 +28,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -674,9 +673,9 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
             @Override
             public Integer execute(CommandContext commandContext) {
-                List<String> enabledCategories = CommandContextUtil.getJobServiceConfiguration().getEnabledJobCategories();
-                AsyncExecutor asyncExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncExecutor();
-                List<TimerJobEntity> timerJobs = CommandContextUtil.getJobServiceConfiguration().getTimerJobEntityManager()
+                List<String> enabledCategories = processEngineConfiguration.getJobServiceConfiguration().getEnabledJobCategories();
+                AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+                List<TimerJobEntity> timerJobs = processEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager()
                         .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
                 return timerJobs.size();
             }
@@ -688,7 +687,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     protected void cleanDB() {
         String jobId = managementService.createTimerJobQuery().singleResult().getId();
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        commandExecutor.execute(new CancelJobsCmd(jobId));
+        commandExecutor.execute(new CancelJobsCmd(jobId, processEngineConfiguration.getJobServiceConfiguration()));
     }
 
 }

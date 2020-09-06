@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -32,8 +33,9 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     
     protected HistoricVariableInstanceQueryImpl wrappedHistoricVariableInstanceQuery;
     
-    public CmmnHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
-        this.wrappedHistoricVariableInstanceQuery = new HistoricVariableInstanceQueryImpl(commandExecutor);
+    public CmmnHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.wrappedHistoricVariableInstanceQuery = new HistoricVariableInstanceQueryImpl(commandExecutor, 
+                cmmnEngineConfiguration.getVariableServiceConfiguration());
     }
 
     @Override

@@ -18,8 +18,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
@@ -32,6 +32,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public EntityLinkCreatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_CREATED);
@@ -44,7 +48,7 @@ public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJson
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
         HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
         historicEntityLinkEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
         historicEntityLinkEntity.setLinkType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ENTITY_LINK_TYPE));

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Collection;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -27,8 +28,8 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
     private final Collection<String> variableNames;
     private final boolean isLocal;
 
-    public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
-        super(taskId);
+    public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(taskId, cmmnEngineConfiguration);
         this.variableNames = variableNames;
         this.isLocal = isLocal;
     }

@@ -16,6 +16,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -40,11 +41,11 @@ public class ModelEntityManagerImpl
     }
 
     @Override
-    public void insert(ModelEntity model) {
+    public void insert(ModelEntity model, IdGenerator idGenerator) {
         model.setCreateTime(getClock().getCurrentTime());
         model.setLastUpdateTime(getClock().getCurrentTime());
 
-        super.insert(model);
+        super.insert(model, idGenerator);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ModelEntityManagerImpl
         ModelEntity model = findById(modelId);
         if (model != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-            ref.setValue("source", modelSource);
+            ref.setValue("source", modelSource, engineConfiguration.getEngineCfgKey());
 
             if (model.getEditorSourceValueId() == null) {
                 model.setEditorSourceValueId(ref.getId());
@@ -79,7 +80,7 @@ public class ModelEntityManagerImpl
     public void deleteEditorSource(ModelEntity model) {
         if (model.getEditorSourceValueId() != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-            ref.delete();
+            ref.delete(engineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -87,7 +88,7 @@ public class ModelEntityManagerImpl
     public void deleteEditorSourceExtra(ModelEntity model) {
         if (model.getEditorSourceExtraValueId() != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-            ref.delete();
+            ref.delete(engineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -96,7 +97,7 @@ public class ModelEntityManagerImpl
         ModelEntity model = findById(modelId);
         if (model != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-            ref.setValue("source-extra", modelSource);
+            ref.setValue("source-extra", modelSource, engineConfiguration.getEngineCfgKey());
 
             if (model.getEditorSourceExtraValueId() == null) {
                 model.setEditorSourceExtraValueId(ref.getId());
@@ -123,7 +124,7 @@ public class ModelEntityManagerImpl
         }
 
         ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-        return ref.getBytes();
+        return ref.getBytes(engineConfiguration.getEngineCfgKey());
     }
 
     @Override
@@ -134,7 +135,7 @@ public class ModelEntityManagerImpl
         }
 
         ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-        return ref.getBytes();
+        return ref.getBytes(engineConfiguration.getEngineCfgKey());
     }
 
     @Override

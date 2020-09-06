@@ -17,8 +17,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
@@ -31,6 +31,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EntityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public EntityLinkDeletedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_ENTITY_LINK_DELETED);
@@ -42,13 +46,13 @@ public class EntityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJson
     }
     
     protected HistoricEntityLink getHistoricEntityLink(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricEntityLinkService(commandContext)
+        return cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
                 .getHistoricEntityLink(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
     }
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
         HistoricEntityLink historicEntityLink = getHistoricEntityLink(historicalData, commandContext);
         if (historicEntityLink != null) {
             historicEntityLinkService.deleteHistoricEntityLink(historicEntityLink);

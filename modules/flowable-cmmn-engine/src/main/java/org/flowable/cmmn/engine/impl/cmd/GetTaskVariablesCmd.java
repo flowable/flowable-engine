@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -32,14 +32,18 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class GetTaskVariablesCmd implements Command<Map<String, Object>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String taskId;
     protected Collection<String> variableNames;
     protected boolean isLocal;
 
-    public GetTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
+    public GetTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.taskId = taskId;
         this.variableNames = variableNames;
         this.isLocal = isLocal;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class GetTaskVariablesCmd implements Command<Map<String, Object>>, Serial
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("task " + taskId + " doesn't exist", Task.class);

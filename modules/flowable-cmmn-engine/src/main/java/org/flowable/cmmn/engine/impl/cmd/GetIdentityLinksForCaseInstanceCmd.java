@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,24 +30,27 @@ import org.flowable.identitylink.api.IdentityLink;
 public class GetIdentityLinksForCaseInstanceCmd implements Command<List<IdentityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseInstanceId;
 
-    public GetIdentityLinksForCaseInstanceCmd(String caseInstanceId) {
+    public GetIdentityLinksForCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.caseInstanceId = caseInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
-        CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find case instance with id " + caseInstanceId, CaseInstanceEntity.class);
         }
 
-        return (List) CommandContextUtil.getIdentityLinkService(commandContext).findIdentityLinksByScopeIdAndType(
-                        caseInstanceId, ScopeTypes.CMMN);
+        return (List) cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                .findIdentityLinksByScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
     }
 
 }

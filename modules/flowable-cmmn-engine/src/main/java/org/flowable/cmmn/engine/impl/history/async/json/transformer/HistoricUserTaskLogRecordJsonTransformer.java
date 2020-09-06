@@ -18,8 +18,8 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
@@ -31,6 +31,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public HistoricUserTaskLogRecordJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_HISTORIC_USER_TASK_LOG_RECORD);
@@ -56,6 +60,6 @@ public class HistoricUserTaskLogRecordJsonTransformer extends AbstractHistoryJso
         taskLogEntryBuilder.type(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LOG_ENTRY_TYPE));
         taskLogEntryBuilder.userId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_USER_ID));
 
-        CommandContextUtil.getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+        cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
     }
 }

@@ -16,6 +16,7 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 import java.text.MessageFormat;
 
 import org.flowable.bpmn.model.Signal;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -27,8 +28,11 @@ public class SignalEventSubscriptionEntityImpl extends EventSubscriptionEntityIm
 
     // Using json here, but not worth of adding json dependency lib for this
     private static final String CONFIGURATION_TEMPLATE = "'{'\"scope\":\"{0}\"'}'";
+    
+    public SignalEventSubscriptionEntityImpl() {}
 
-    public SignalEventSubscriptionEntityImpl() {
+    public SignalEventSubscriptionEntityImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        super(eventSubscriptionServiceConfiguration);
         eventType = EVENT_TYPE;
     }
 

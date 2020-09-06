@@ -43,7 +43,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetMessage("i'm coding a test");
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -76,7 +76,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
             @Override
             public String execute(CommandContext commandContext) {
                 TimerJobEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
-                CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timer);
                 return timer.getId();
             }
         });
@@ -96,7 +96,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
         assertThat(tweetHandler.getMessages()).isEmpty();
 
         Job executableJob = managementService.moveTimerToExecutableJob(jobId);
-        commandExecutor.execute(new ExecuteAsyncJobCmd(executableJob.getId()));
+        commandExecutor.execute(new ExecuteAsyncJobCmd(executableJob.getId(), processEngineConfiguration.getJobServiceConfiguration()));
 
         assertThat(tweetHandler.getMessages().get(0)).isEqualTo("i'm coding a test");
         assertThat(tweetHandler.getMessages()).hasSize(1);

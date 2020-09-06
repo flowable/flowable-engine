@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
@@ -34,15 +35,15 @@ public class ExternalWorkerJobEntityManagerImpl
 
     @Override
     public boolean insertExternalWorkerJobEntity(ExternalWorkerJobEntity jobEntity) {
-        return doInsert(jobEntity, true);
+        return doInsert(jobEntity, true, serviceConfiguration.getIdGenerator());
     }
 
     @Override
-    public void insert(ExternalWorkerJobEntity jobEntity, boolean fireCreateEvent) {
-        doInsert(jobEntity, fireCreateEvent);
+    public void insert(ExternalWorkerJobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
+        doInsert(jobEntity, fireCreateEvent, idGenerator);
     }
 
-    protected boolean doInsert(ExternalWorkerJobEntity jobEntity, boolean fireCreateEvent) {
+    protected boolean doInsert(ExternalWorkerJobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
         if (serviceConfiguration.getInternalJobManager() != null) {
             boolean handledJob = serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
             if (!handledJob) {
@@ -54,7 +55,7 @@ public class ExternalWorkerJobEntityManagerImpl
         if (jobEntity.getCorrelationId() == null) {
             jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
         }
-        super.insert(jobEntity, fireCreateEvent);
+        super.insert(jobEntity, fireCreateEvent, idGenerator);
         return true;
     }
 

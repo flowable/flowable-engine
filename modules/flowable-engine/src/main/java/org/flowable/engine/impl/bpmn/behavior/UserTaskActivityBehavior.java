@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -82,7 +83,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
     @Override
     public void execute(DelegateExecution execution, MigrationContext migrationContext) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
 
         TaskEntity task = taskService.createTask();
         task.setExecutionId(execution.getId());
@@ -102,7 +104,6 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         List<String> activeTaskCandidateUsers = null;
         List<String> activeTaskCandidateGroups = null;
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
         if (processEngineConfiguration.isEnableProcessDefinitionInfoCache()) {
@@ -183,7 +184,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                         businessCalendarName = DueDateBusinessCalendar.NAME;
                     }
 
-                    BusinessCalendar businessCalendar = CommandContextUtil.getProcessEngineConfiguration(commandContext).getBusinessCalendarManager()
+                    BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager()
                             .getBusinessCalendar(businessCalendarName);
                     task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
 
@@ -261,10 +262,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher();
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getTaskServiceConfiguration().getEventDispatcher();
             if (eventDispatcher != null  && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(
-                        FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+                eventDispatcher.dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task),
+                        processEngineConfiguration.getEngineCfgKey());
             }
             
             if (StringUtils.isNotEmpty(activeTaskIdVariableName)) {
@@ -283,7 +284,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        List<TaskEntity> taskEntities = CommandContextUtil.getTaskService().findTasksByExecutionId(execution.getId()); // Should be only one
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        List<TaskEntity> taskEntities = processEngineConfiguration.getTaskServiceConfiguration().getTaskService()
+                .findTasksByExecutionId(execution.getId()); // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
                 throw new FlowableException("UserTask should not be signalled before complete");
@@ -310,7 +313,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 if (processEngineConfiguration.isLoggingSessionEnabled()) {
                     ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + assigneeValue, task, execution);
                     loggingNode.put("taskAssignee", assigneeValue);
-                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_ASSIGNEE, loggingNode);
+                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_ASSIGNEE, loggingNode, ScopeTypes.BPMN);
                 }
             }
         }
@@ -327,7 +330,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 if (processEngineConfiguration.isLoggingSessionEnabled()) {
                     ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + ownerValue, task, execution);
                     loggingNode.put("taskOwner", ownerValue);
-                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_OWNER, loggingNode);
+                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_OWNER, loggingNode, ScopeTypes.BPMN);
                 }
             }
         }
@@ -339,7 +342,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Object value = groupIdExpr.getValue(execution);
                 if (value != null) {
                     Collection<String> candidates = extractCandidates(value);
-                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
+                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                            .getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
 
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
@@ -351,8 +355,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             if (!allIdentityLinkEntities.isEmpty()) {
                 if (processEngineConfiguration.isLoggingSessionEnabled()) {
                     BpmnLoggingSessionUtil.addTaskIdentityLinkData(LoggingSessionConstants.TYPE_USER_TASK_SET_GROUP_IDENTITY_LINKS, 
-                                    "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", false,
-                                    allIdentityLinkEntities, task, execution);
+                            "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", false,
+                            allIdentityLinkEntities, task, execution);
                 }
             }
         }
@@ -364,7 +368,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Object value = userIdExpr.getValue(execution);
                 if (value != null) {
                     Collection<String> candidates = extractCandidates(value);
-                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
+                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                            .getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
 
                     if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
@@ -392,7 +397,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
                     Collection<String> userIds = extractCandidates(value);
                     for (String userId : userIds) {
-                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
+                        IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                                .getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
                         IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         customIdentityLinkEntities.add(identityLinkEntity);
                     }
@@ -418,7 +424,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                     Object value = idExpression.getValue(execution);
                     Collection<String> groupIds = extractCandidates(value);
                     for (String groupId : groupIds) {
-                        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                        IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                                .getIdentityLinkService().createTaskIdentityLink(
                                 task.getId(), null, groupId, customGroupIdentityLinkType);
                         IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         customIdentityLinkEntities.add(identityLinkEntity);

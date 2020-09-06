@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -28,19 +29,20 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
 
     protected boolean force;
 
-    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId) {
-        super(planItemInstanceId);
+    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(planItemInstanceId, cmmnEngineConfiguration);
     }
 
-    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, boolean force) {
-        super(planItemInstanceId);
+    public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, boolean force, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(planItemInstanceId, cmmnEngineConfiguration);
         this.force = force;
     }
 
     public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
-            Map<String, Object> localVariables, Map<String, Object> transientVariables, boolean force) {
-        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
+            Map<String, Object> localVariables, Map<String, Object> transientVariables, boolean force, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, cmmnEngineConfiguration);
         this.force = force;
     }
 

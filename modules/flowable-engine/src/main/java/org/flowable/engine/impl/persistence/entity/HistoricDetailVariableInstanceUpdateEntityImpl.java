@@ -14,7 +14,10 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableType;
 
 /**
@@ -72,7 +75,7 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
     @Override
     public byte[] getBytes() {
         if (byteArrayRef != null) {
-            return byteArrayRef.getBytes();
+            return byteArrayRef.getBytes(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return null;
     }
@@ -88,7 +91,8 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         if (byteArrayRef == null) {
             byteArrayRef = new ByteArrayRef();
         }
-        byteArrayRef.setValue(byteArrayName, bytes);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        byteArrayRef.setValue(byteArrayName, bytes, processEngineConfiguration.getEngineCfgKey());
     }
 
     // getters and setters ////////////////////////////////////////////////////////

@@ -37,6 +37,7 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -242,12 +243,13 @@ public class BaseDynamicSubProcessInjectUtil {
     
     public static void addResource(CommandContext commandContext, DeploymentEntity deploymentEntity, String resourceName, byte[] bytes) {
         if (!deploymentEntity.getResources().containsKey(resourceName)) { 
-            ResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager(commandContext);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            ResourceEntityManager resourceEntityManager = processEngineConfiguration.getResourceEntityManager();
             ResourceEntity resourceEntity = resourceEntityManager.create();
             resourceEntity.setDeploymentId(deploymentEntity.getId());
             resourceEntity.setName(resourceName);
             resourceEntity.setBytes(bytes);
-            resourceEntityManager.insert(resourceEntity);
+            resourceEntityManager.insert(resourceEntity, processEngineConfiguration.getIdGenerator());
             deploymentEntity.addResource(resourceEntity);
         }
     }

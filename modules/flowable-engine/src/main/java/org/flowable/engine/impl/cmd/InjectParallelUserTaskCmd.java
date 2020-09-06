@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
@@ -61,7 +62,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
     protected void updateBpmnProcess(CommandContext commandContext, Process process,
             BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
         if (!(flowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
@@ -196,9 +198,10 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity, 
             ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         ExecutionEntity executionAtTask = executionEntityManager.findById(taskEntity.getExecutionId());
 
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionEntity.getId());

@@ -16,6 +16,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -26,11 +27,11 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntityManagerImpl
-    extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
-    implements DeadLetterJobEntityManager {
+        extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
+        implements DeadLetterJobEntityManager {
 
     public DeadLetterJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DeadLetterJobDataManager jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class DeadLetterJobEntityManagerImpl
     }
 
     @Override
-    public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
+    public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
         if (getServiceConfiguration().getInternalJobManager() != null) {
             getServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
         }
@@ -73,12 +74,12 @@ public class DeadLetterJobEntityManagerImpl
         if (jobEntity.getCorrelationId() == null) {
             jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
         }
-        super.insert(jobEntity, fireCreateEvent);
+        super.insert(jobEntity, fireCreateEvent, idGenerator);
     }
 
     @Override
-    public void insert(DeadLetterJobEntity jobEntity) {
-        insert(jobEntity, true);
+    public void insert(DeadLetterJobEntity jobEntity, IdGenerator idGenerator) {
+        insert(jobEntity, true, idGenerator);
     }
 
     @Override
@@ -94,7 +95,8 @@ public class DeadLetterJobEntityManagerImpl
 
         // Send event
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.ENTITY_DELETED, jobEntity), engineType);
         }
     }
     

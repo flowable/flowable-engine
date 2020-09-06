@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.job;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -31,6 +32,12 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
 
     public static final String TYPE = "cmmn-external-worker-complete";
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public ExternalWorkerTaskCompleteJobHandler(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     @Override
     public String getType() {
@@ -41,7 +48,7 @@ public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
 
-        VariableService variableService = CommandContextUtil.getVariableService(commandContext);
+        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> jobVariables = variableService.findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN_EXTERNAL_WORKER);
 
         if (!jobVariables.isEmpty()) {

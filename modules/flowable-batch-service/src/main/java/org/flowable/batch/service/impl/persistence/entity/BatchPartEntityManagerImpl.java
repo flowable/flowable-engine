@@ -26,7 +26,7 @@ public class BatchPartEntityManagerImpl
     implements BatchPartEntityManager {
 
     public BatchPartEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchPartDataManager batchPartDataManager) {
-        super(batchServiceConfiguration, batchPartDataManager);
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), batchPartDataManager);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class BatchPartEntityManagerImpl
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);
         batchPartEntity.setCreateTime(getClock().getCurrentTime());
-        insert(batchPartEntity);
+        insert(batchPartEntity, serviceConfiguration.getIdGenerator());
         
         return batchPartEntity;
     }
@@ -66,7 +66,7 @@ public class BatchPartEntityManagerImpl
         BatchPartEntity batchPartEntity = getBatchPartEntityManager().findById(batchPartId);
         batchPartEntity.setCompleteTime(getClock().getCurrentTime());
         batchPartEntity.setStatus(status);
-        batchPartEntity.setResultDocumentJson(resultJson);
+        batchPartEntity.setResultDocumentJson(resultJson, serviceConfiguration.getEngineName());
         
         return batchPartEntity;
     }
@@ -76,7 +76,7 @@ public class BatchPartEntityManagerImpl
         ByteArrayRef resultDocRefId = batchPartEntity.getResultDocRefId();
 
         if (resultDocRefId != null && resultDocRefId.getId() != null) {
-            resultDocRefId.delete();
+            resultDocRefId.delete(serviceConfiguration.getEngineName());
         }
 
         delete(batchPartEntity);

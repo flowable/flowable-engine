@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.runtime;
 
 import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CreateInjectedPlanItemInstanceCmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -26,14 +27,17 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInstanceBuilder {
 
     protected final CommandExecutor commandExecutor;
+    protected final CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String stagePlanItemInstanceId;
     protected String caseInstanceId;
     protected String caseDefinitionId;
     protected String elementId;
     protected String name;
 
-    public InjectedPlanItemInstanceBuilderImpl(CommandExecutor commandExecutor) {
+    public InjectedPlanItemInstanceBuilderImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -58,14 +62,14 @@ public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInst
     public PlanItemInstance createInStage(String stagePlanItemInstanceId) {
         validateData();
         this.stagePlanItemInstanceId = stagePlanItemInstanceId;
-        return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this));
+        return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this, cmmnEngineConfiguration));
     }
 
     @Override
     public PlanItemInstance createInCase(String caseInstanceId) {
         validateData();
         this.caseInstanceId = caseInstanceId;
-        return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this));
+        return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this, cmmnEngineConfiguration));
     }
 
     protected void validateData() {

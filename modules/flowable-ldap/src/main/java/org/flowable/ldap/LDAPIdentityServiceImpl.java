@@ -29,6 +29,7 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
@@ -44,7 +45,8 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
     protected LDAPConfiguration ldapConfigurator;
     protected LDAPGroupCache ldapGroupCache;
 
-    public LDAPIdentityServiceImpl(LDAPConfiguration ldapConfigurator, LDAPGroupCache ldapGroupCache) {
+    public LDAPIdentityServiceImpl(LDAPConfiguration ldapConfigurator, LDAPGroupCache ldapGroupCache, IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
         this.ldapConfigurator = ldapConfigurator;
         this.ldapGroupCache = ldapGroupCache;
     }

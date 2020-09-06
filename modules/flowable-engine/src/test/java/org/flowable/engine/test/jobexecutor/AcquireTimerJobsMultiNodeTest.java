@@ -30,6 +30,7 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -61,7 +62,8 @@ class AcquireTimerJobsMultiNodeTest extends JobExecutorTestCase {
 
         String correlationId = commandExecutor.execute(commandContext -> {
             TimerJobEntity timer = createTweetTimer("i'm coding a test", Date.from(now.plusSeconds(10)));
-            CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+            timerJobService.scheduleTimerJob(timer);
             return timer.getCorrelationId();
         });
 
@@ -119,13 +121,13 @@ class AcquireTimerJobsMultiNodeTest extends JobExecutorTestCase {
         }
 
         @Override
-        public <T> T execute(CommandConfig config, Command<T> command) {
+        public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
 
             if (workLatch != null) {
                 workLatch.countDown();
             }
 
-            T result = super.execute(config, command);
+            T result = super.execute(config, command, commandExecutor);
 
             if (waitLatch != null) {
                 try {

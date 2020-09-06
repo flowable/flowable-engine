@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -70,7 +71,9 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableIllegalArgumentException("Cannot start process instance by message: message name is null");
         }
 
-        MessageEventSubscriptionEntity messageEventSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).findMessageStartEventSubscriptionByName(messageName, tenantId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        MessageEventSubscriptionEntity messageEventSubscription = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                .findMessageStartEventSubscriptionByName(messageName, tenantId);
 
         if (messageEventSubscription == null) {
             throw new FlowableObjectNotFoundException("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found.", MessageEventSubscriptionEntity.class);
@@ -81,14 +84,14 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableException("Cannot start process instance by message: subscription to message with name '" + messageName + "' is not a message start event.");
         }
 
-        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
+        DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
 
         ProcessDefinition processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
         }
 
-        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition, 
             messageName, businessKey, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
 

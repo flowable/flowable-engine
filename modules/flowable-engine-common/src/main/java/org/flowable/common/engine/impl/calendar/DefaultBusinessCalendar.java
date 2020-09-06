@@ -52,7 +52,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
 
     @Override
     public Date resolveDuedate(String duedate) {
-        Date resolvedDuedate = Context.getCommandContext().getCurrentEngineConfiguration().getClock().getCurrentTime(); 
+        Date resolvedDuedate = Context.getCommandContext().getClock().getCurrentTime(); 
 
         String[] tokens = duedate.split(" and ");
         for (String token : tokens) {

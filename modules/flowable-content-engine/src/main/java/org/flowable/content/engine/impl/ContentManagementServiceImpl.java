@@ -33,7 +33,7 @@ public class ContentManagementServiceImpl extends CommonEngineServiceImpl<Conten
 
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override
@@ -43,12 +43,12 @@ public class ContentManagementServiceImpl extends CommonEngineServiceImpl<Conten
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
     }
 
     @Override
     public TablePageQuery createTablePageQuery() {
-        return new TablePageQueryImpl(commandExecutor);
+        return new TablePageQueryImpl(commandExecutor, configuration);
     }
 
     public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {

@@ -28,7 +28,7 @@ public abstract class AbstractEngineEntityManager<T extends AbstractEngineConfig
     protected T engineConfiguration;
 
     public AbstractEngineEntityManager(T engineConfiguration, DM dataManager) {
-        super(dataManager);
+        super(dataManager, engineConfiguration.getEngineCfgKey());
         this.engineConfiguration = engineConfiguration;
     }
 

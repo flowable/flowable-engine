@@ -852,6 +852,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initCaseDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -871,6 +872,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             initSchemaManagementCommand();
         }
 
+        configureVariableServiceConfiguration();
+        configureJobServiceConfiguration();
         initVariableTypes();
         initBeans();
         initTransactionFactory();
@@ -898,7 +901,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceCallbacks();
         initFormFieldHandler();
         initIdentityLinkInterceptor();
-        initClock();
         initEventDispatcher();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
@@ -1093,6 +1095,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 initDefaultAsyncHistoryListener();
             }
             asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+            asyncHistorySessionFactory.setJobServiceConfiguration(jobServiceConfiguration);
             sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
         }
         
@@ -1230,7 +1233,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (cmmnDeployer == null) {
-            cmmnDeployer = new CmmnDeployer();
+            cmmnDeployer = new CmmnDeployer(this);
         }
 
         initCmmnParser();
@@ -1349,7 +1352,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initCaseInstanceHelper() {
         if (caseInstanceHelper == null) {
-            caseInstanceHelper = new CaseInstanceHelperImpl();
+            caseInstanceHelper = new CaseInstanceHelperImpl(this);
         }
     }
     
@@ -1371,13 +1374,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initDynamicStateManager() {
         if (dynamicStateManager == null) {
-            dynamicStateManager = new DefaultCmmnDynamicStateManager();
+            dynamicStateManager = new DefaultCmmnDynamicStateManager(this);
         }
     }
 
     public void initCaseInstanceMigrationManager() {
         if (caseInstanceMigrationManager == null) {
-            caseInstanceMigrationManager = new CaseInstanceMigrationManagerImpl();
+            caseInstanceMigrationManager = new CaseInstanceMigrationManagerImpl(this);
         }
     }
 
@@ -1396,7 +1399,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initIdentityLinkInterceptor() {
         if (identityLinkInterceptor == null) {
-            identityLinkInterceptor = new DefaultCmmnIdentityLinkInterceptor();
+            identityLinkInterceptor = new DefaultCmmnIdentityLinkInterceptor(this);
         }
     }
 
@@ -1440,6 +1443,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
     }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.CMMN;
+    }
 
     @Override
     public CommandInterceptor createTransactionInterceptor() {
@@ -1466,7 +1474,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
             variableTypes.addType(new NullType());
             variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableServiceConfiguration));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -1479,11 +1487,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             variableTypes.addType(new ByteArrayType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableServiceConfiguration));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -1491,17 +1499,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
 
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
 
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
@@ -1512,6 +1518,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 
@@ -1552,7 +1563,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.internalTaskAssignmentManager != null) {
             this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
         } else {
-            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager());
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
         }
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
@@ -1642,7 +1653,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
-        jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler());
+        jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {
@@ -1661,12 +1672,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
             }
 
-            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, jobServiceConfiguration);
             allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
 
-            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED, jobServiceConfiguration);
             allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
@@ -1682,44 +1693,44 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
         
-        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer());
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer());
-        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer());
+        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
+        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
-        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer(this));
         
-        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer());
+        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
-        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer(this));
 
         return historyJsonTransformers;
     }
@@ -1734,20 +1745,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             };
         }
     }
-
-    public void initJobServiceConfiguration() {
+    
+    public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
             this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
-            this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
             this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
-            this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
-    
-            this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
     
             List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
             if (customAsyncRunnableExecutionExceptionHandlers != null) {
@@ -1791,9 +1798,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             if (enabledJobCategories != null) {
                 this.jobServiceConfiguration.setEnabledJobCategories(enabledJobCategories);
             }
-    
-            this.jobServiceConfiguration.init();
         }
+    }
+
+    public void initJobServiceConfiguration() {
+        this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
+        this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
+        
+        this.jobServiceConfiguration.init();
         
         if (this.jobHandlers != null) {
             for (String type : this.jobHandlers.keySet()) {

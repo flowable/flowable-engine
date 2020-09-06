@@ -42,7 +42,8 @@ public class PlanItemFutureJavaDelegateActivityBehavior extends CoreCmmnActivity
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
             CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER,
-                    "Executing service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstanceEntity);
+                    "Executing service task with java class " + planItemJavaDelegate.getClass().getName(), 
+                    planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
 
         CompletableFuture<Object> future = planItemJavaDelegate.execute(planItemInstanceEntity, cmmnEngineConfiguration.getAsyncTaskInvoker());
@@ -66,8 +67,10 @@ public class PlanItemFutureJavaDelegateActivityBehavior extends CoreCmmnActivity
             if (throwable == null) {
                 planItemJavaDelegate.afterExecution(planItemInstance, value);
                 if (loggingSessionEnabled) {
-                    CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT,
-                            "Executed service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstance);
+                    CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+                    CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, 
+                            "Executed service task with java class " + planItemJavaDelegate.getClass().getName(), 
+                            planItemInstance, cmmnEngineConfiguration.getObjectMapper());
                 }
 
                 CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstance);

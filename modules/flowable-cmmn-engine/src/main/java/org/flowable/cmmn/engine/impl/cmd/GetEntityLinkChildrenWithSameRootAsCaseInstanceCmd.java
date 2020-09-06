@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -29,21 +29,24 @@ import org.flowable.entitylink.api.EntityLinkType;
  */
 public class GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd implements Command<List<EntityLink>> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseInstanceId;
 
-    public GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId) {
+    public GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.caseInstanceId = caseInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<EntityLink> execute(CommandContext commandContext) {
-        CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find case instance with id " + caseInstanceId, CaseInstanceEntity.class);
         }
 
-        return CommandContextUtil.getEntityLinkService(commandContext)
+        return cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
                 .findEntityLinksWithSameRootScopeForScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD);
     }
 

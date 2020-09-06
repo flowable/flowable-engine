@@ -57,7 +57,7 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     
     @Override
     public void insertEntityLink(EntityLink entityLink) {
-        getEntityLinkEntityManager().insert((EntityLinkEntity) entityLink);
+        getEntityLinkEntityManager().insert((EntityLinkEntity) entityLink, configuration.getIdGenerator());
     }
     
     @Override

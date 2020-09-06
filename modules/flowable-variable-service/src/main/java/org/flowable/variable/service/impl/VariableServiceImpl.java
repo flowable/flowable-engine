@@ -47,7 +47,7 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
 
     @Override
     public void insertVariableInstance(VariableInstanceEntity variable) {
-        getVariableInstanceEntityManager().insert(variable);
+        getVariableInstanceEntityManager().insert(variable, configuration.getIdGenerator());
     }
 
     @Override

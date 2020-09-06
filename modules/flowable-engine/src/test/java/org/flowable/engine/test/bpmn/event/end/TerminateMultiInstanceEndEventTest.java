@@ -269,7 +269,6 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         assertThat(aTasks).hasSize(12);
         List<org.flowable.task.api.Task> afterInnerMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("AfterInnerMi").list();
         assertThat(afterInnerMiTasks).hasSize(12);
-
     }
 
     @Test

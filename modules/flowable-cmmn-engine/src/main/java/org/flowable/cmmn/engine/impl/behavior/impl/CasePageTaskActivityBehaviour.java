@@ -54,25 +54,29 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
         
         if (StringUtils.isNotEmpty(beforeContext.getAssignee())) {
             IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, 
-                            getExpressionValue(beforeContext.getAssignee(), planItemInstanceEntity, expressionManager), null, IdentityLinkType.ASSIGNEE);
+                            getExpressionValue(beforeContext.getAssignee(), planItemInstanceEntity, expressionManager), 
+                            null, IdentityLinkType.ASSIGNEE, cmmnEngineConfiguration);
         }
         
         if (StringUtils.isNotEmpty(beforeContext.getOwner())) {
             IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, 
-                            getExpressionValue(beforeContext.getOwner(), planItemInstanceEntity, expressionManager), null, IdentityLinkType.OWNER);
+                            getExpressionValue(beforeContext.getOwner(), planItemInstanceEntity, expressionManager), 
+                            null, IdentityLinkType.OWNER, cmmnEngineConfiguration);
         }
         
         if (beforeContext.getCandidateUsers() != null && !beforeContext.getCandidateUsers().isEmpty()) {
             for (String candidateUser : beforeContext.getCandidateUsers()) {
                 IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, 
-                                getExpressionValue(candidateUser, planItemInstanceEntity, expressionManager), null, IdentityLinkType.CANDIDATE);
+                                getExpressionValue(candidateUser, planItemInstanceEntity, expressionManager), 
+                                null, IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
             }
         }
         
         if (beforeContext.getCandidateGroups() != null && !beforeContext.getCandidateGroups().isEmpty()) {
             for (String candidateGroup : beforeContext.getCandidateGroups()) {
                 IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, null,
-                                getExpressionValue(candidateGroup, planItemInstanceEntity, expressionManager), IdentityLinkType.CANDIDATE);
+                                getExpressionValue(candidateGroup, planItemInstanceEntity, expressionManager), 
+                                IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
             }
         }
 

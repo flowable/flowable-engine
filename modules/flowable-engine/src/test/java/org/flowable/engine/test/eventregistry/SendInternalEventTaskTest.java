@@ -82,7 +82,7 @@ public class SendInternalEventTaskTest extends FlowableEventRegistryBpmnTestCase
         assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
         assertThat(job.getElementId()).isEqualTo("sendEventTask");
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 500000000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
 
         assertThat(runtimeService.createProcessInstanceQuery().list())
                 .extracting(ProcessInstance::getProcessDefinitionKey)

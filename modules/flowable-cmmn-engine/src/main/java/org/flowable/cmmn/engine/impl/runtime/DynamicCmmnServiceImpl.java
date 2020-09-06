@@ -30,6 +30,6 @@ public class DynamicCmmnServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder() {
-        return new InjectedPlanItemInstanceBuilderImpl(commandExecutor);
+        return new InjectedPlanItemInstanceBuilderImpl(commandExecutor, configuration);
     }
 }

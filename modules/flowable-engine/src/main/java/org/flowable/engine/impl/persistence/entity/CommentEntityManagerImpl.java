@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
@@ -37,10 +38,10 @@ public class CommentEntityManagerImpl
     }
 
     @Override
-    public void insert(CommentEntity commentEntity) {
+    public void insert(CommentEntity commentEntity, IdGenerator idGenerator) {
         checkHistoryEnabled();
 
-        insert(commentEntity, false);
+        insert(commentEntity, false, idGenerator);
 
         Comment comment = (Comment) commentEntity;
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
@@ -54,10 +55,12 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
     }
     
@@ -78,8 +81,9 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
         
         return updatedCommentEntity;
@@ -167,8 +171,9 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
     }
 

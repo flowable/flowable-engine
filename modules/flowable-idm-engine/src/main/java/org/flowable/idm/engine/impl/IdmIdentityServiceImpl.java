@@ -68,6 +68,10 @@ import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
  */
 public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineConfiguration> implements IdmIdentityService {
 
+    public IdmIdentityServiceImpl(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
+    
     @Override
     public Group newGroup(String groupId) {
         return commandExecutor.execute(new CreateGroupCmd(groupId));
@@ -80,12 +84,12 @@ public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineCon
 
     @Override
     public void saveGroup(Group group) {
-        commandExecutor.execute(new SaveGroupCmd(group));
+        commandExecutor.execute(new SaveGroupCmd(group, configuration));
     }
 
     @Override
     public void saveUser(User user) {
-        commandExecutor.execute(new SaveUserCmd(user));
+        commandExecutor.execute(new SaveUserCmd(user, configuration));
     }
 
     @Override
@@ -150,7 +154,7 @@ public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineCon
 
     @Override
     public void saveToken(Token token) {
-        commandExecutor.execute(new SaveTokenCmd(token));
+        commandExecutor.execute(new SaveTokenCmd(token, configuration));
     }
 
     @Override
@@ -200,12 +204,12 @@ public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineCon
 
     @Override
     public Privilege createPrivilege(String name) {
-        return commandExecutor.execute(new CreatePrivilegeCmd(name));
+        return commandExecutor.execute(new CreatePrivilegeCmd(name, configuration));
     }
 
     @Override
     public void addUserPrivilegeMapping(String privilegeId, String userId) {
-        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, userId, null));
+        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, userId, null, configuration));
     }
 
     @Override
@@ -215,7 +219,7 @@ public class IdmIdentityServiceImpl extends CommonEngineServiceImpl<IdmEngineCon
 
     @Override
     public void addGroupPrivilegeMapping(String privilegeId, String groupId) {
-        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, null, groupId));
+        commandExecutor.execute(new AddPrivilegeMappingCmd(privilegeId, null, groupId, configuration));
     }
 
     @Override

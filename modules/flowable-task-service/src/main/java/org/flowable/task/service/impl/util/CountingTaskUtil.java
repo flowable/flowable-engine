@@ -14,6 +14,7 @@ package org.flowable.task.service.impl.util;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
@@ -24,27 +25,30 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CountingTaskUtil {
 
-    public static void handleDeleteVariableInstanceEntityCount(VariableInstanceEntity variableInstance, boolean fireDeleteEvent) {
-        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager().findById(variableInstance.getTaskId());
-            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+    public static void handleDeleteVariableInstanceEntityCount(VariableInstanceEntity variableInstance, boolean fireDeleteEvent,
+            TaskServiceConfiguration taskServiceConfiguration) {
+        
+        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally(taskServiceConfiguration)) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskServiceConfiguration.getTaskEntityManager().findById(variableInstance.getTaskId());
+            if (isTaskRelatedEntityCountEnabled(countingTaskEntity, taskServiceConfiguration)) {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
             }
         }
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = taskServiceConfiguration.getEventDispatcher();
         if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
+            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance),
+                    taskServiceConfiguration.getEngineName());
 
             eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED,
-                            variableInstance, null, variableInstance.getType()));
+                    variableInstance, null, variableInstance.getType()), taskServiceConfiguration.getEngineName());
         }
     }
 
-    public static void handleInsertVariableInstanceEntityCount(VariableInstanceEntity variableInstance) {
-        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager().findById(variableInstance.getTaskId());
-            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+    public static void handleInsertVariableInstanceEntityCount(VariableInstanceEntity variableInstance, TaskServiceConfiguration taskServiceConfiguration) {
+        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally(taskServiceConfiguration)) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskServiceConfiguration.getTaskEntityManager().findById(variableInstance.getTaskId());
+            if (isTaskRelatedEntityCountEnabled(countingTaskEntity, taskServiceConfiguration)) {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
             }
         }
@@ -53,17 +57,17 @@ public class CountingTaskUtil {
     /**
      * Check if the Task Relationship Count performance improvement is enabled.
      */
-    public static boolean isTaskRelatedEntityCountEnabledGlobally() {
-        if (CommandContextUtil.getTaskServiceConfiguration() == null) {
+    public static boolean isTaskRelatedEntityCountEnabledGlobally(TaskServiceConfiguration taskServiceConfiguration) {
+        if (taskServiceConfiguration == null) {
             return false;
         }
         
-        return CommandContextUtil.getTaskServiceConfiguration().isEnableTaskRelationshipCounts();
+        return taskServiceConfiguration.isEnableTaskRelationshipCounts();
     }
 
-    public static boolean isTaskRelatedEntityCountEnabled(TaskEntity taskEntity) {
+    public static boolean isTaskRelatedEntityCountEnabled(TaskEntity taskEntity, TaskServiceConfiguration taskServiceConfiguration) {
         if (taskEntity instanceof CountingTaskEntity) {
-            return isTaskRelatedEntityCountEnabled((CountingTaskEntity) taskEntity);
+            return isTaskRelatedEntityCountEnabled((CountingTaskEntity) taskEntity, taskServiceConfiguration);
         }
         return false;
     }
@@ -71,7 +75,7 @@ public class CountingTaskUtil {
     /**
      * Similar functionality with <b>ExecutionRelatedEntityCount</b>, but on the TaskEntity level.
      */
-    public static boolean isTaskRelatedEntityCountEnabled(CountingTaskEntity taskEntity) {
-        return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
+    public static boolean isTaskRelatedEntityCountEnabled(CountingTaskEntity taskEntity, TaskServiceConfiguration taskServiceConfiguration) {
+        return isTaskRelatedEntityCountEnabledGlobally(taskServiceConfiguration) && taskEntity.isCountEnabled();
     }
 }

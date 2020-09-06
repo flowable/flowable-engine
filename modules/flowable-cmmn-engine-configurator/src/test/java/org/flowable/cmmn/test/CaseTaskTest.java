@@ -1089,7 +1089,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         @Override
         public Void execute(CommandContext commandContext) {
-            List<Execution> query = new ExecutionQueryImpl(commandContext.getCurrentEngineConfiguration().getCommandExecutor())
+            List<Execution> query = new ExecutionQueryImpl(cmmnEngineConfiguration.getCommandExecutor())
                     .list();
             ExecutionEntityManager entityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
             for (Execution execution : query) {

@@ -24,9 +24,15 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class GetTableCountCmd implements Command<Map<String, Long>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected String engineType;
+    
+    public GetTableCountCmd(String engineType) {
+        this.engineType = engineType;
+    }
 
     @Override
     public Map<String, Long> execute(CommandContext commandContext) {
-        return commandContext.getCurrentEngineConfiguration().getTableDataManager().getTableCount();
+        return commandContext.getEngineConfigurations().get(engineType).getTableDataManager().getTableCount();
     }
 }

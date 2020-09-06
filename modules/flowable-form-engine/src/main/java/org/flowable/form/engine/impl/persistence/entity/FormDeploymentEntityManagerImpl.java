@@ -16,6 +16,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
@@ -37,17 +38,17 @@ public class FormDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(FormDeploymentEntity deployment) {
-        insert(deployment, true);
+    public void insert(FormDeploymentEntity deployment, IdGenerator idGenerator) {
+        insert(deployment, true, idGenerator);
     }
 
     @Override
-    public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
-        super.insert(deployment, fireEvent);
+    public void insert(FormDeploymentEntity deployment, boolean fireEvent, IdGenerator idGenerator) {
+        super.insert(deployment, fireEvent, idGenerator);
 
         for (FormResourceEntity resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getResourceEntityManager().insert(resource);
+            getResourceEntityManager().insert(resource, idGenerator);
         }
     }
 

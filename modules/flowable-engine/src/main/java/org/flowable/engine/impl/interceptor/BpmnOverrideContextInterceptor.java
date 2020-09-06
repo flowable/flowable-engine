@@ -15,14 +15,15 @@ package org.flowable.engine.impl.interceptor;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 
 public class BpmnOverrideContextInterceptor extends AbstractCommandInterceptor {
     
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         try {
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
         } finally {
             BpmnOverrideContext.removeBpmnOverrideContext();
         }

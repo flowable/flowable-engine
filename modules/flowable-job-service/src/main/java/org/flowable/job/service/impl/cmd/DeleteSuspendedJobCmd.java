@@ -21,9 +21,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +35,14 @@ public class DeleteSuspendedJobCmd implements Command<Object>, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteSuspendedJobCmd.class);
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String suspendedJobId;
 
-    public DeleteSuspendedJobCmd(String suspendedJobId) {
+    public DeleteSuspendedJobCmd(String suspendedJobId, JobServiceConfiguration jobServiceConfiguration) {
         this.suspendedJobId = suspendedJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -48,15 +51,15 @@ public class DeleteSuspendedJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getSuspendedJobEntityManager(commandContext).delete(jobToDelete);
+        jobServiceConfiguration.getSuspendedJobEntityManager().delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(SuspendedJobEntity jobToDelete) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getJobServiceConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -68,7 +71,7 @@ public class DeleteSuspendedJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", suspendedJobId);
         }
 
-        SuspendedJobEntity job = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findById(suspendedJobId);
+        SuspendedJobEntity job = jobServiceConfiguration.getSuspendedJobEntityManager().findById(suspendedJobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No suspended job found with id '" + suspendedJobId + "'", Job.class);
         }

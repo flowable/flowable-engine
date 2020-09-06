@@ -17,17 +17,19 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Filip Hrisafov
  */
 public class GetJobByCorrelationIdCmd implements Command<Job> {
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String correlationId;
 
-    public GetJobByCorrelationIdCmd(String correlationId) {
+    public GetJobByCorrelationIdCmd(String correlationId, JobServiceConfiguration jobServiceConfiguration) {
         this.correlationId = correlationId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -36,27 +38,26 @@ public class GetJobByCorrelationIdCmd implements Command<Job> {
             throw new FlowableIllegalArgumentException("correlationId is null");
         }
 
-        JobServiceConfiguration configuration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        Job job = configuration.getDeadLetterJobEntityManager().findJobByCorrelationId(correlationId);
+        Job job = jobServiceConfiguration.getDeadLetterJobEntityManager().findJobByCorrelationId(correlationId);
         if (job != null) {
             return job;
         }
 
-        job = configuration.getExternalWorkerJobEntityManager().findJobByCorrelationId(correlationId);
+        job = jobServiceConfiguration.getExternalWorkerJobEntityManager().findJobByCorrelationId(correlationId);
         if (job != null) {
             return job;
         }
 
-        job = configuration.getTimerJobEntityManager().findJobByCorrelationId(correlationId);
+        job = jobServiceConfiguration.getTimerJobEntityManager().findJobByCorrelationId(correlationId);
         if (job != null) {
             return job;
         }
 
-        job = configuration.getSuspendedJobEntityManager().findJobByCorrelationId(correlationId);
+        job = jobServiceConfiguration.getSuspendedJobEntityManager().findJobByCorrelationId(correlationId);
         if (job != null) {
             return job;
         }
 
-        return configuration.getJobEntityManager().findJobByCorrelationId(correlationId);
+        return jobServiceConfiguration.getJobEntityManager().findJobByCorrelationId(correlationId);
     }
 }

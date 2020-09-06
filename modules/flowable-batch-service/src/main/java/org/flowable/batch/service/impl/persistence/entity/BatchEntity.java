@@ -29,7 +29,7 @@ public interface BatchEntity extends Batch, Entity, HasRevision {
     
     void setStatus(String status);
 
-    void setBatchDocumentJson(String batchDocumentJson);
+    void setBatchDocumentJson(String batchDocumentJson, String engineType);
 
     void setTenantId(String tenantId);
 }

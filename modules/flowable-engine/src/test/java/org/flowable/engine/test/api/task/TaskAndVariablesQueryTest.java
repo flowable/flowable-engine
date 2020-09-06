@@ -25,7 +25,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -420,7 +419,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
     public Task createTaskWithDefinitionId(String taskId) {
         return this.processEngineConfiguration.getCommandExecutor().execute((Command<Task>) commandContext -> {
-                TaskEntity task = CommandContextUtil.getTaskService().createTask();
+                TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().createTask();
                 task.setId(taskId);
                 task.setRevision(0);
                 task.setTaskDefinitionId("testTaskDefinitionId");

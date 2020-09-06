@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -32,6 +32,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public TaskCreatedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_CREATED);
@@ -44,7 +48,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+        HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
 
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);

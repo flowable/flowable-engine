@@ -70,7 +70,7 @@ public class KeycloakIdmAutoConfiguration {
     @Bean
     public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> keycloakIdmEngineConfigurer(KeycloakConfiguration keycloakConfiguration) {
         return engineConfiguration -> {
-            engineConfiguration.setIdmIdentityService(new KeycloakIdentityServiceImpl(keycloakConfiguration));
+            engineConfiguration.setIdmIdentityService(new KeycloakIdentityServiceImpl(keycloakConfiguration, engineConfiguration));
         };
     }
 
