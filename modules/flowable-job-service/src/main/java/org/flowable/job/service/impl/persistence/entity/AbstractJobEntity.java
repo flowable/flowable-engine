@@ -24,9 +24,28 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
  */
 public interface AbstractJobEntity extends Entity, HasRevision {
 
+    /**
+     * Set the scope type for the job.
+     * The scope type is the type which is used by the job executor to pick
+     * the jobs for executing.
+     * <p>
+     * For example if the job should be picked up by the CMMN Job executor then it
+     * should have the same type as the CMMN job executor.
+     * @param scopeType the scope type for the job
+     */
+    void setScopeType(String scopeType);
+
+    String getScopeType();
+
+    int getRetries();
+
     void setRetries(int retries);
 
     void setJobHandlerType(String jobHandlerType);
+
+    String getJobHandlerType();
+
+    String getJobHandlerConfiguration();
 
     void setJobHandlerConfiguration(String jobHandlerConfiguration);
 
@@ -36,16 +55,26 @@ public interface AbstractJobEntity extends Entity, HasRevision {
 
     ByteArrayRef getCustomValuesByteArrayRef();
 
+    void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef);
+
     String getExceptionStacktrace();
 
     void setExceptionStacktrace(String exception);
+
+    String getExceptionMessage();
 
     void setExceptionMessage(String exceptionMessage);
 
     ByteArrayRef getExceptionByteArrayRef();
 
+    void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef);
+
+    String getTenantId();
+
     void setTenantId(String tenantId);
 
     Date getCreateTime();
+
+    void setCreateTime(Date createTime);
 
 }

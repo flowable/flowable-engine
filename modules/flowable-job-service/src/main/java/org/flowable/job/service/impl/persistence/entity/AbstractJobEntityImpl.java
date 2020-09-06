@@ -312,6 +312,11 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
+    public void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef) {
+        this.customValuesByteArrayRef = customValuesByteArrayRef;
+    }
+
+    @Override
     public String getCustomValues() {
         return getJobByteArrayRefAsString(customValuesByteArrayRef);
     }
@@ -363,7 +368,12 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         return exceptionByteArrayRef;
     }
 
-    protected String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
+    @Override
+    public void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef) {
+        this.exceptionByteArrayRef = exceptionByteArrayRef;
+    }
+
+    private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }

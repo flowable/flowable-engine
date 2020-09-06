@@ -63,6 +63,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
@@ -87,6 +88,7 @@ import org.flowable.rest.service.api.identity.UserInfoResponse;
 import org.flowable.rest.service.api.identity.UserResponse;
 import org.flowable.rest.service.api.management.BatchPartResponse;
 import org.flowable.rest.service.api.management.BatchResponse;
+import org.flowable.rest.service.api.management.HistoryJobResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
 import org.flowable.rest.service.api.repository.DecisionResponse;
@@ -1046,6 +1048,36 @@ public class RestResponseFactory {
         if (job.getExecutionId() != null) {
             response.setExecutionUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION, job.getExecutionId()));
         }
+
+        return response;
+    }
+
+    public List<HistoryJobResponse> createHistoryJobResponseList(List<HistoryJob> jobs) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoryJobResponse> responseList = new ArrayList<>(jobs.size());
+        for (HistoryJob job : jobs) {
+            responseList.add(createHistoryJobResponse(job, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job) {
+        return createHistoryJobResponse(job, createUrlBuilder());
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job, RestUrlBuilder urlBuilder) {
+        HistoryJobResponse response = new HistoryJobResponse();
+        response.setId(job.getId());
+        response.setExceptionMessage(job.getExceptionMessage());
+        response.setRetries(job.getRetries());
+        response.setCreateTime(job.getCreateTime());
+        response.setScopeType(job.getScopeType());
+        response.setJobHandlerType(job.getJobHandlerType());
+        response.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        response.setCustomValues(job.getCustomValues());
+        response.setTenantId(job.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_JOB, job.getId()));
 
         return response;
     }

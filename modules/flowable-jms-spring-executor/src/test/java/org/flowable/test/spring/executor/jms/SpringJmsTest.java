@@ -62,4 +62,31 @@ public class SpringJmsTest {
         assertThat(((DefaultAsyncJobExecutor) processEngine.getProcessEngineConfiguration().getAsyncExecutor()).getAsyncJobAcquisitionThread()).isNull();
     }
 
+    @Test
+    public void testMessageQueueAsyncExecutorException() {
+        processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/test/spring/executor/jms/SpringJmsTest.testMessageQueueAsyncExecutorException.bpmn20.xml")
+            .deploy();
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("input1", 123);
+        vars.put("input2", 456);
+        processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);
+
+        assertThat(processEngine.getManagementService().createDeadLetterJobQuery().count()).isEqualTo(0);
+
+        for (int i = 0; i < 2; i++) {
+            // Wait until the job has used up all retries
+            Awaitility.await().atMost(Duration.ofMinutes(1)).pollInterval(Duration.ofMillis(500)).untilAsserted(
+                () -> assertThat(processEngine.getManagementService().createTimerJobQuery().count()).isEqualTo(1));
+
+            // Async service task expression fails -> is moved to timer
+            assertThat(processEngine.getManagementService().createTimerJobQuery().singleResult().getRetries()).isEqualTo(3 - (i+1));
+            processEngine.getManagementService().moveTimerToExecutableJob(processEngine.getManagementService().createTimerJobQuery().singleResult().getId());
+        }
+
+        assertThat(processEngine.getManagementService().createDeadLetterJobQuery().count()).isEqualTo(0);
+
+    }
+
 }

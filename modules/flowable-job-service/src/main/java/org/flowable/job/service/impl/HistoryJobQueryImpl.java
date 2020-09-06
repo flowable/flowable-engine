@@ -148,23 +148,8 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     // sorting //////////////////////////////////////////
 
     @Override
-    public HistoryJobQuery orderByJobDuedate() {
-        return orderBy(JobQueryProperty.DUEDATE);
-    }
-
-    @Override
-    public HistoryJobQuery orderByExecutionId() {
-        return orderBy(JobQueryProperty.EXECUTION_ID);
-    }
-
-    @Override
     public HistoryJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
-    }
-
-    @Override
-    public HistoryJobQuery orderByProcessInstanceId() {
-        return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
     @Override

@@ -27,5 +27,18 @@ public interface JobInfoEntity extends JobInfo, AbstractJobEntity, Entity, HasRe
     Date getLockExpirationTime();
 
     void setLockExpirationTime(Date claimedUntil);
+
+    /**
+     * Set the scope type for the job.
+     * The scope type is the type which is used by the job executor to pick
+     * the jobs for executing.
+     * <p>
+     * For example if the job should be picked up by the CMMN Job executor then it
+     * should have the same type as the CMMN job executor.
+     * @param scopeType the scope type for the job
+     */
+    void setScopeType(String scopeType);
+
+    String getScopeType();
     
 }

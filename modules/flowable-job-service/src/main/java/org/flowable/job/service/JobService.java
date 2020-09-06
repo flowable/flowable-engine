@@ -69,8 +69,6 @@ public interface JobService {
     
     void updateAllJobTypesTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    void unacquireWithDecrementRetries(JobInfo job);
-    
     void createAsyncJob(JobEntity job, boolean isExclusive);
     
     JobEntity createJob();
