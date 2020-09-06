@@ -68,6 +68,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
             contextReused = true;
+            commandContext.setReused(true);
         }
 
         try {
