@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -42,6 +43,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -469,4 +471,25 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         managementService.deleteSuspendedJob(suspendedJob.getId());
         managementService.deleteExternalWorkerJob(externalWorkerJob.getId());
     }
+
+    @Test
+    void testMoveDeadLetterJobToInvalidHistoryJob() {
+        for (String jobType : Arrays.asList(JobEntity.JOB_TYPE_MESSAGE, JobEntity.JOB_TYPE_TIMER, JobEntity.JOB_TYPE_EXTERNAL_WORKER)) {
+            Job deadLetterJob = managementService.executeCommand(context -> {
+                DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+                job.setJobType(jobType);
+                CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+                return job;
+            });
+
+            try {
+                managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
+                Assert.fail();
+            } catch (FlowableIllegalArgumentException e) { }
+
+            managementService.deleteDeadLetterJob(deadLetterJob.getId());
+        }
+
+    }
+
 }

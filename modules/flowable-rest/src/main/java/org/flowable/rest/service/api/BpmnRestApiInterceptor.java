@@ -40,6 +40,8 @@ import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
@@ -138,6 +140,8 @@ public interface BpmnRestApiInterceptor {
     void createModel(Model model, ModelRequest request);
     
     void accessJobInfoById(Job job);
+
+    void accessHistoryJobInfoById(HistoryJob job);
     
     void accessJobInfoWithQuery(JobQuery jobQuery);
     
@@ -146,8 +150,12 @@ public interface BpmnRestApiInterceptor {
     void accessSuspendedJobInfoWithQuery(SuspendedJobQuery jobQuery);
     
     void accessDeadLetterJobInfoWithQuery(DeadLetterJobQuery jobQuery);
+
+    void accessHistoryJobInfoWithQuery(HistoryJobQuery jobQuery);
     
     void deleteJob(Job job);
+
+    void deleteHistoryJob(HistoryJob historyJob);
     
     void accessBatchInfoById(Batch batch);
     

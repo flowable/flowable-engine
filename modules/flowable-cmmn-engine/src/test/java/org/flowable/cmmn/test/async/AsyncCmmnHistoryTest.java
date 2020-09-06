@@ -42,6 +42,8 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
@@ -49,13 +51,23 @@ import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -72,6 +84,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
+        cmmnEngineConfiguration.setAsyncHistoryExecutorActivate(false);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
         cmmnEngineConfiguration.setAsyncFailedJobWaitTime(1);
@@ -1065,6 +1078,110 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey())
                 .isEqualTo("newBusinessKey");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testHistoryJobFailure() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .start();
+
+        // Fetch the first history job, and programmatically change the handler type, such that it will guaranteed fail.
+        HistoryJob historyJob = cmmnManagementService.createHistoryJobQuery().singleResult();
+        changeHistoryJsonToBeInvalid((HistoryJobEntity) historyJob);
+
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(0);
+
+        Job deadLetterJob = cmmnManagementService.createDeadLetterJobQuery().singleResult();
+        assertThat(deadLetterJob.getJobType()).isEqualTo(HistoryJobEntity.HISTORY_JOB_TYPE);
+        assertThat(deadLetterJob.getExceptionMessage()).isNotEmpty();
+
+        String deadLetterJobExceptionStacktrace = cmmnManagementService.getDeadLetterJobExceptionStacktrace(deadLetterJob.getId());
+        assertThat(deadLetterJobExceptionStacktrace).isNotEmpty();
+
+        // The history jobs in the deadletter table have no link to the case instance, hence why a manual cleanup is needed.
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        cmmnManagementService.createHistoryJobQuery().list().forEach(j -> cmmnManagementService.deleteHistoryJob(j.getId()));
+        cmmnManagementService.createDeadLetterJobQuery().list().forEach(j -> cmmnManagementService.deleteDeadLetterJob(j.getId()));
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncCmmnHistoryTest.testHistoryJobFailure.cmmn")
+    public void testMoveDeadLetterJobBackToHistoryJob() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .start();
+
+        // Fetch the first history job, and programmatically change the handler type, such that it will guaranteed fail.
+        HistoryJob historyJob = cmmnManagementService.createHistoryJobQuery().singleResult();
+        changeHistoryJsonToBeInvalid((HistoryJobEntity) historyJob);
+
+        String originalAdvancedConfiguration = getAdvancedJobHandlerConfiguration(historyJob.getId());
+        assertThat(originalAdvancedConfiguration).isNotEmpty();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(0);
+        Job deadLetterJob = cmmnManagementService.createDeadLetterJobQuery().singleResult();
+
+        cmmnManagementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(1);
+        historyJob = cmmnManagementService.createHistoryJobQuery().singleResult();
+
+        assertThat(historyJob.getCreateTime()).isNotNull();
+        assertThat(historyJob.getRetries()).isEqualTo(3);
+        assertThat(historyJob.getExceptionMessage()).isNotNull(); // this is consistent with regular jobs
+        assertThat(historyJob.getJobHandlerConfiguration()).isNull(); // needs to have been reset
+
+        String newAdvancedConfiguration = getAdvancedJobHandlerConfiguration(historyJob.getId());
+        assertThat(originalAdvancedConfiguration).isEqualTo(newAdvancedConfiguration);
+
+        // The history jobs in the deadletter table have no link to the case instance, hence why a manual cleanup is needed.
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        cmmnManagementService.createHistoryJobQuery().list().forEach(j -> cmmnManagementService.deleteHistoryJob(j.getId()));
+        cmmnManagementService.createDeadLetterJobQuery().list().forEach(j -> cmmnManagementService.deleteDeadLetterJob(j.getId()));
+    }
+
+    protected String getAdvancedJobHandlerConfiguration(String historyJobId) {
+        return cmmnEngineConfiguration.getCommandExecutor().execute(new Command<String>() {
+
+            @Override
+            public String execute(CommandContext commandContext) {
+                JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+                HistoryJobEntity job = jobServiceConfiguration.getHistoryJobEntityManager().findById(historyJobId);
+                return job.getAdvancedJobHandlerConfiguration();
+            }
+        });
+    }
+
+    protected void changeHistoryJsonToBeInvalid(HistoryJobEntity historyJob) {
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                try {
+                    HistoryJobEntity historyJobEntity = historyJob;
+
+                    ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+                    JsonNode historyJsonNode = objectMapper.readTree(historyJobEntity.getAdvancedJobHandlerConfiguration());
+
+                    for (JsonNode jsonNode : historyJsonNode) {
+                        if (jsonNode.has("type") && jsonNode.get("type").asText().equals("cmmn-case-instance-start")) {
+                            ((ObjectNode) jsonNode).put("type", "invalidType");
+                        }
+                    }
+
+                    historyJobEntity.setAdvancedJobHandlerConfiguration(objectMapper.writeValueAsString(historyJsonNode));
+                } catch (JsonProcessingException e) {
+                    Assert.fail();
+                }
+                return null;
+            }
+        });
     }
 
 }

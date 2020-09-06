@@ -31,6 +31,7 @@ import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -45,14 +46,17 @@ import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
+import org.flowable.job.service.impl.cmd.GetHistoryJobAdvancedConfigurationCmd;
 import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
+import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
 import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
@@ -101,6 +105,16 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
 
     @Override
+    public String getHistoryJobHistoryJson(String historyJobId) {
+        return commandExecutor.execute(new GetHistoryJobAdvancedConfigurationCmd(historyJobId));
+    }
+
+    @Override
+    public void deleteHistoryJob(String jobId) {
+        commandExecutor.execute(new DeleteHistoryJobCmd(jobId));
+    }
+
+    @Override
     public Job moveTimerToExecutableJob(String jobId) {
         return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
@@ -113,6 +127,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
         return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries) {
+        return commandExecutor.execute(new MoveDeadLetterJobToHistoryJobCmd(jobId, retries));
     }
 
     @Override

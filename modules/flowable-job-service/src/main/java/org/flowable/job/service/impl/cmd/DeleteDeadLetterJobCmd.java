@@ -38,10 +38,10 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
     
     protected JobServiceConfiguration jobServiceConfiguration;
 
-    protected String timerJobId;
+    protected String deadLetterJobId;
 
-    public DeleteDeadLetterJobCmd(String timerJobId, JobServiceConfiguration jobServiceConfiguration) {
-        this.timerJobId = timerJobId;
+    public DeleteDeadLetterJobCmd(String deadLetterJobId, JobServiceConfiguration jobServiceConfiguration) {
+        this.deadLetterJobId = deadLetterJobId;
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
@@ -64,16 +64,16 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
     }
 
     protected DeadLetterJobEntity getJobToDelete(CommandContext commandContext) {
-        if (timerJobId == null) {
+        if (deadLetterJobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Deleting job {}", timerJobId);
+            LOGGER.debug("Deleting job {}", deadLetterJobId);
         }
 
-        DeadLetterJobEntity job = jobServiceConfiguration.getDeadLetterJobEntityManager().findById(timerJobId);
+        DeadLetterJobEntity job = jobServiceConfiguration.getDeadLetterJobEntityManager().findById(deadLetterJobId);
         if (job == null) {
-            throw new FlowableObjectNotFoundException("No dead letter job found with id '" + timerJobId + "'", Job.class);
+            throw new FlowableObjectNotFoundException("No dead letter job found with id '" + deadLetterJobId + "'", Job.class);
         }
 
         return job;
