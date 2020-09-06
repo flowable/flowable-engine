@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -34,6 +34,9 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String processInstanceId;
     protected String executionId;
@@ -67,12 +70,14 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     public JobQueryImpl() {
     }
 
-    public JobQueryImpl(CommandContext commandContext) {
+    public JobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public JobQueryImpl(CommandExecutor commandExecutor) {
+    public JobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -360,12 +365,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -383,7 +388,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

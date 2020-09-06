@@ -17,7 +17,7 @@ import org.flowable.common.engine.impl.context.Context;
 public class DefaultCommandInvoker extends AbstractCommandInterceptor {
 
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         T result = command.execute(commandContext);
         return result;

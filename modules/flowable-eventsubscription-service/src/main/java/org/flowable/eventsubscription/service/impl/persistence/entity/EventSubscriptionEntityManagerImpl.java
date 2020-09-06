@@ -36,7 +36,7 @@ public class EventSubscriptionEntityManagerImpl
     public EventSubscriptionEntityManagerImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration, 
                     EventSubscriptionDataManager eventSubscriptionDataManager) {
         
-        super(eventSubscriptionServiceConfiguration, eventSubscriptionDataManager);
+        super(eventSubscriptionServiceConfiguration, eventSubscriptionServiceConfiguration.getEngineName(), eventSubscriptionDataManager);
     }
 
     @Override
@@ -239,7 +239,7 @@ public class EventSubscriptionEntityManagerImpl
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
         
-        insert(subscriptionEntity);
+        insert(subscriptionEntity, serviceConfiguration.getIdGenerator());
         
         return subscriptionEntity;
     }
@@ -259,7 +259,7 @@ public class EventSubscriptionEntityManagerImpl
 
         subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(subscriptionEntity);
+        insert(subscriptionEntity, serviceConfiguration.getIdGenerator());
         
         return subscriptionEntity;
     }
@@ -276,7 +276,7 @@ public class EventSubscriptionEntityManagerImpl
 
         eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(eventSubscription);
+        insert(eventSubscription, serviceConfiguration.getIdGenerator());
         return eventSubscription;
     }
 
@@ -298,7 +298,7 @@ public class EventSubscriptionEntityManagerImpl
 
         eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(eventSubscription);
+        insert(eventSubscription, serviceConfiguration.getIdGenerator());
 
         return eventSubscription;
     }

@@ -24,12 +24,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.junit.jupiter.api.Test;
 
@@ -160,7 +160,8 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             @Override
             public Void execute(CommandContext commandContext) {
                 Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
-                CommandContextUtil.getTimerJobService(commandContext).findTimerJobById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
+                TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
+                timerJobService.findTimerJobById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
                 return null;
             }
 

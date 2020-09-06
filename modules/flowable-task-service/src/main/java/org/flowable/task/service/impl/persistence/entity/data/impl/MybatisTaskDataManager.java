@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.task.api.Task;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
@@ -29,7 +30,6 @@ import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByProcessInstanceIdMatcher;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByScopeIdAndScopeTypeMatcher;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksBySubScopeIdAndScopeTypeMatcher;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -43,6 +43,12 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     protected CachedEntityMatcher<TaskEntity> tasksBySubScopeIdAndScopeTypeMatcher = new TasksBySubScopeIdAndScopeTypeMatcher();
     
     protected CachedEntityMatcher<TaskEntity> tasksByScopeIdAndScopeTypeMatcher = new TasksByScopeIdAndScopeTypeMatcher();
+    
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    
+    public MybatisTaskDataManager(TaskServiceConfiguration taskServiceConfiguration) {
+        this.taskServiceConfiguration = taskServiceConfiguration;
+    }
 
     @Override
     public Class<? extends TaskEntity> getManagedEntityClass() {
@@ -116,7 +122,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         if (taskQuery.getTaskVariablesLimit() != null) {
             taskQuery.setMaxResults(taskQuery.getTaskVariablesLimit());
         } else {
-            taskQuery.setMaxResults(CommandContextUtil.getTaskServiceConfiguration().getTaskQueryLimit());
+            taskQuery.setMaxResults(taskServiceConfiguration.getTaskQueryLimit());
         }
         taskQuery.setFirstResult(0);
 

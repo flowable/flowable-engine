@@ -197,6 +197,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -228,7 +229,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initAppDefinitionCache();
         initAppResourceConverter();
         initDeploymentManager();
-        initClock();
         initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
         configuratorsAfterInit();
@@ -380,6 +380,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.APP;
+    }
+
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -404,7 +409,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             }
             variableTypes.addType(new NullType());
             variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableServiceConfiguration));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -417,11 +422,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             variableTypes.addType(new ByteArrayType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableServiceConfiguration));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -437,7 +442,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());

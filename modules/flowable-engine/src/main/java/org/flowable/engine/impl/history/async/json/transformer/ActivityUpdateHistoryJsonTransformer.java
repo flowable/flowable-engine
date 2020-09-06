@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,6 +32,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ActivityUpdateHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public ActivityUpdateHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_UPDATE_HISTORIC_ACTIVITY_INSTANCE);
@@ -41,7 +45,7 @@ public class ActivityUpdateHistoryJsonTransformer extends AbstractHistoryJsonTra
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String activityInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
         if (StringUtils.isNotEmpty(activityInstanceId)) {
-            HistoricActivityInstanceEntity historicActivityInstance = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findById(activityInstanceId);
+            HistoricActivityInstanceEntity historicActivityInstance = processEngineConfiguration.getHistoricActivityInstanceEntityManager().findById(activityInstanceId);
             if (historicActivityInstance == null) {
                 return false;
             }
@@ -54,8 +58,7 @@ public class ActivityUpdateHistoryJsonTransformer extends AbstractHistoryJsonTra
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String activityInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID);
         if (StringUtils.isNotEmpty(activityInstanceId)) {
-            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext)
-                .getHistoricActivityInstanceEntityManager();
+            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = processEngineConfiguration.getHistoricActivityInstanceEntityManager();
             HistoricActivityInstanceEntity historicActivityInstance = historicActivityInstanceEntityManager.findById(activityInstanceId);
             if (historicActivityInstance != null) {
                 String taskId = getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID);

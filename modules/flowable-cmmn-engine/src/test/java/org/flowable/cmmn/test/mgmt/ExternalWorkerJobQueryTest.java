@@ -22,7 +22,6 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -403,7 +402,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
     protected void addUserIdentityLinkToJob(Job job, String userId) {
         cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
-                    CommandContextUtil.getIdentityLinkService(commandContext)
+                    cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                             .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, userId, null, IdentityLinkType.PARTICIPANT);
 
                     return null;
@@ -413,7 +412,7 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
     protected void addGroupIdentityLinkToJob(Job job, String groupId) {
         cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
-                    CommandContextUtil.getIdentityLinkService(commandContext)
+                    cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                             .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, null, groupId, IdentityLinkType.PARTICIPANT);
                     return null;
                 });

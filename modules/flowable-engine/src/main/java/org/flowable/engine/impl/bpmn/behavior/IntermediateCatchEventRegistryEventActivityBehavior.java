@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -53,16 +54,18 @@ public class IntermediateCatchEventRegistryEventActivityBehavior extends Interme
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-            .eventType(eventDefinitionKey)
-            .executionId(executionEntity.getId())
-            .processInstanceId(executionEntity.getProcessInstanceId())
-            .activityId(executionEntity.getCurrentActivityId())
-            .processDefinitionId(executionEntity.getProcessDefinitionId())
-            .scopeType(ScopeTypes.BPMN)
-            .tenantId(executionEntity.getTenantId())
-            .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
-            .create();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                    .eventType(eventDefinitionKey)
+                    .executionId(executionEntity.getId())
+                    .processInstanceId(executionEntity.getProcessInstanceId())
+                    .activityId(executionEntity.getCurrentActivityId())
+                    .processDefinitionId(executionEntity.getProcessDefinitionId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .tenantId(executionEntity.getTenantId())
+                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
+                    .create();
 
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
@@ -106,10 +109,11 @@ public class IntermediateCatchEventRegistryEventActivityBehavior extends Interme
             EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
         }
 
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
-        CommandContext commandContext = Context.getCommandContext();
         String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
         for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
             if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {

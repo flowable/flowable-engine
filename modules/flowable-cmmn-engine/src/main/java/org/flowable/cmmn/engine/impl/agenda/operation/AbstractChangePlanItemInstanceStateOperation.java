@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.Objects;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -52,8 +53,9 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         }
 
         planItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
+        CmmnEngineConfiguration cmmnEngineConfiguration =CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
+                commandContext, planItemInstanceEntity, oldState, getNewState());
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
@@ -72,7 +74,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
                                 ", old state " + oldState + ", new state " + newState;
             }
             
-            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity);
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
     }
 

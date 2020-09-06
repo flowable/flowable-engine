@@ -46,13 +46,13 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
                 TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), null, timerEventDefinition.getCalendarName()));
 
         if (timerJob != null) {
-            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
+            CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 
     @Override
     public void eventCancelledByEventGateway(DelegateExecution execution) {
-        JobService jobService = CommandContextUtil.getJobService();
+        JobService jobService = CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getJobService();
         List<JobEntity> jobEntities = jobService.findJobsByExecutionId(execution.getId());
 
         for (JobEntity jobEntity : jobEntities) { // Should be only one

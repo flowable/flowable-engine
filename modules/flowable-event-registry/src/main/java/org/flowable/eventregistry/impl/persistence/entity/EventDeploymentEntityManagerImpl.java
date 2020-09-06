@@ -16,6 +16,7 @@ package org.flowable.eventregistry.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.impl.EventDeploymentQueryImpl;
@@ -35,17 +36,17 @@ public class EventDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(EventDeploymentEntity deployment) {
-        insert(deployment, true);
+    public void insert(EventDeploymentEntity deployment, IdGenerator idGenerator) {
+        insert(deployment, true, idGenerator);
     }
 
     @Override
-    public void insert(EventDeploymentEntity deployment, boolean fireEvent) {
-        super.insert(deployment, fireEvent);
+    public void insert(EventDeploymentEntity deployment, boolean fireEvent, IdGenerator idGenerator) {
+        super.insert(deployment, fireEvent, idGenerator);
 
         for (EventResourceEntity resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getResourceEntityManager().insert(resource);
+            getResourceEntityManager().insert(resource, idGenerator);
         }
     }
 

@@ -44,24 +44,26 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected Map<String, Object> transientVariables;
     protected boolean localScope;
 
-    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
-        super(taskId);
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables, 
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        super(taskId, cmmnEngineConfiguration);
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.variables = variables;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, boolean localScope) {
+            Map<String, Object> variables, boolean localScope, CmmnEngineConfiguration cmmnEngineConfiguration) {
 
-        this(taskId, formDefinitionId, outcome, variables);
+        this(taskId, formDefinitionId, outcome, variables, cmmnEngineConfiguration);
         this.localScope = localScope;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+            Map<String, Object> variables, Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
 
-        this(taskId, formDefinitionId, outcome, variables);
+        this(taskId, formDefinitionId, outcome, variables, cmmnEngineConfiguration);
         this.transientVariables = transientVariables;
     }
 
@@ -77,9 +79,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
         if (formInfo != null) {
             // validate input at first
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
+            if (isFormFieldValidationEnabled(task)) {
                 formService.validateFormFields(formInfo, variables);
             }
             // Extract raw variables and complete the task
@@ -108,7 +109,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         return null;
     }
 
-    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, TaskEntity task) {
+    protected boolean isFormFieldValidationEnabled(TaskEntity task) {
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
             HumanTask humanTask = (HumanTask) CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).
                 findPlanItemDefinition(task.getTaskDefinitionKey());
@@ -121,7 +122,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     protected void completeTask(CommandContext commandContext, TaskEntity task, Map<String, Object> taskVariables) {
         String planItemInstanceId = task.getSubScopeId();
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {
             throw new FlowableException("Could not find plan item instance for task " + taskId);
         }
@@ -142,9 +143,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        logUserTaskCompleted(task);
+        logUserTaskCompleted(task, cmmnEngineConfiguration);
 
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(task);
         }

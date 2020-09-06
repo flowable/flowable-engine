@@ -62,7 +62,7 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
     
     @Override
     public void insertHistoricEntityLink(HistoricEntityLink entityLink, boolean fireCreateEvent) {
-        getHistoricEntityLinkEntityManager().insert((HistoricEntityLinkEntity) entityLink, fireCreateEvent);
+        getHistoricEntityLinkEntityManager().insert((HistoricEntityLinkEntity) entityLink, fireCreateEvent, configuration.getIdGenerator());
     }
     
     @Override

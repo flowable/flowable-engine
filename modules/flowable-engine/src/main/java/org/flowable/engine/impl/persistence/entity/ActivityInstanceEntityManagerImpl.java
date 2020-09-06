@@ -350,7 +350,7 @@ public class ActivityInstanceEntityManagerImpl
             activityInstanceEntity.setTenantId(execution.getTenantId());
         }
 
-        insert(activityInstanceEntity);
+        insert(activityInstanceEntity, engineConfiguration.getIdGenerator());
         return activityInstanceEntity;
     }
 
@@ -423,7 +423,7 @@ public class ActivityInstanceEntityManagerImpl
         activityInstanceEntity.setDurationInMillis(historicActivityInstance.getDurationInMillis());
         activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());
 
-        insert(activityInstanceEntity);
+        insert(activityInstanceEntity, engineConfiguration.getIdGenerator());
         return activityInstanceEntity;
     }
 

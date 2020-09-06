@@ -75,8 +75,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, MigrationContext migrationContext) {
         if (evaluateIsBlocking(planItemInstanceEntity)) {
-
-            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
 
             TaskEntity taskEntity = taskService.createTask();
@@ -102,7 +102,6 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                     humanTask.getFormKey(), humanTask.getAssignee(), humanTask.getOwner(), 
                     humanTask.getCandidateUsers(), humanTask.getCandidateGroups());
             
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (cmmnEngineConfiguration.getCreateHumanTaskInterceptor() != null) {
                 cmmnEngineConfiguration.getCreateHumanTaskInterceptor().beforeCreateHumanTask(beforeContext);
             }
@@ -116,24 +115,24 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
 
-            TaskHelper.insertTask(taskEntity, true);
+            TaskHelper.insertTask(taskEntity, true, cmmnEngineConfiguration);
             
             if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                 CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_CREATE, "Human task '" + 
-                                taskEntity.getName() + "' created", taskEntity, planItemInstanceEntity);
+                                taskEntity.getName() + "' created", taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                 
                 if (StringUtils.isNotEmpty(taskEntity.getAssignee())) {
                     ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + 
-                                    taskEntity.getAssignee(), taskEntity, planItemInstanceEntity);
+                            taskEntity.getAssignee(), taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                     loggingNode.put("taskAssignee", taskEntity.getAssignee());
-                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_ASSIGNEE, loggingNode);
+                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_ASSIGNEE, loggingNode, ScopeTypes.CMMN);
                 }
                 
                 if (StringUtils.isNotEmpty(taskEntity.getOwner())) {
                     ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + 
-                                    taskEntity.getOwner(), taskEntity, planItemInstanceEntity);
+                taskEntity.getOwner(), taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                     loggingNode.put("taskOwner", taskEntity.getOwner());
-                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_OWNER, loggingNode);
+                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_OWNER, loggingNode, ScopeTypes.CMMN);
                 }
             }
 
@@ -142,7 +141,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
-                        planItemInstanceEntity.getPlanItemDefinitionId(), taskEntity.getId(), ScopeTypes.TASK);
+                        planItemInstanceEntity.getPlanItemDefinitionId(), taskEntity.getId(), ScopeTypes.TASK, cmmnEngineConfiguration);
             }
 
             if (cmmnEngineConfiguration.getCreateHumanTaskInterceptor() != null) {
@@ -310,6 +309,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     protected void handleCandidateUsers(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         List<String> candidateUsers = beforeContext.getCandidateUsers();
         if (candidateUsers != null && !candidateUsers.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
@@ -317,19 +317,20 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(planItemInstanceEntity);
                 Collection<String> candidates = extractCandidates(value);
-                List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
+                List<IdentityLinkEntity> identityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                        .getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
 
                 if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
-                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities, cmmnEngineConfiguration);
                     allIdentityLinkEntities.addAll(identityLinkEntities);
                 }
             }
             
             if (!allIdentityLinkEntities.isEmpty()) {
-                if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                     CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
-                                    "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
-                                    allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
+                            "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
+                            allIdentityLinkEntities, taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                 }
             }
         }
@@ -339,6 +340,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     protected void handleCandidateGroups(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         List<String> candidateGroups = beforeContext.getCandidateGroups();
         if (candidateGroups != null && !candidateGroups.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
@@ -346,19 +348,20 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(planItemInstanceEntity);
                 Collection<String> candidates = extractCandidates(value);
-                List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
+                List<IdentityLinkEntity> identityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                        .getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
 
                 if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
-                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities, cmmnEngineConfiguration);
                     allIdentityLinkEntities.addAll(identityLinkEntities);
                 }
             }
             
             if (!allIdentityLinkEntities.isEmpty()) {
-                if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                     CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
-                                    "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", true,
-                                    allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
+                            "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", true,
+                            allIdentityLinkEntities, taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                 }
             }
         }
@@ -390,7 +393,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             throw new FlowableIllegalStateException("Can only trigger a human task plan item that is in the ACTIVE state");
         }
 
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
         List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
         if (taskEntities == null || taskEntities.isEmpty()) {
             throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
@@ -399,7 +403,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                TaskHelper.deleteTask(taskEntity, null, false, true);
+                TaskHelper.deleteTask(taskEntity, null, false, true, cmmnEngineConfiguration);
             }
         }
 
@@ -409,10 +413,11 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
-            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
             for (TaskEntity taskEntity : taskEntities) {
-                TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true);
+                TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true, cmmnEngineConfiguration);
             }
         }
     }

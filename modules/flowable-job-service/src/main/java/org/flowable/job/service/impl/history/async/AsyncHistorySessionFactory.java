@@ -18,11 +18,13 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.job.service.JobServiceConfiguration;
 
 public class AsyncHistorySessionFactory implements SessionFactory {
 
     protected AsyncHistoryListener asyncHistoryListener;
     protected List<String> registeredJobDataTypes = new ArrayList<>();
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     @Override
     public Class<?> getSessionType() {
@@ -31,7 +33,7 @@ public class AsyncHistorySessionFactory implements SessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        return new AsyncHistorySession(commandContext, asyncHistoryListener, registeredJobDataTypes);
+        return new AsyncHistorySession(commandContext, asyncHistoryListener, registeredJobDataTypes, jobServiceConfiguration);
     }
     
     public void registerJobDataTypes(List<String> registeredJobDataTypes) {
@@ -53,5 +55,12 @@ public class AsyncHistorySessionFactory implements SessionFactory {
     public void setRegisteredJobDataTypes(List<String> registeredJobDataTypes) {
         this.registeredJobDataTypes = registeredJobDataTypes;
     }
-    
+
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        return jobServiceConfiguration;
+    }
+
+    public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
 }

@@ -32,7 +32,6 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -614,11 +613,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(instance.getProcessInstanceId());
 
-                List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionService()
+                List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
                 assertThat(subs)
                         .extracting(EventSubscription::getEventName)

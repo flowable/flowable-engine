@@ -1000,7 +1000,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initProcessDiagramGenerator();
+        initCommandContextFactory();
+        initTransactionContextFactory();
+        initCommandExecutors();
+        initIdGenerator();
         initHistoryLevel();
         initFunctionDelegates();
         initAstFunctionCreators();
@@ -1018,6 +1023,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             initSchemaManager();
             initSchemaManagementCommand();
         }
+        
+        configureVariableServiceConfiguration();
+        configureJobServiceConfiguration();
 
         initHelpers();
         initVariableTypes();
@@ -1025,13 +1033,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFormEngines();
         initFormTypes();
         initScriptingEngines();
-        initClock();
         initBusinessCalendarManager();
-        initCommandContextFactory();
-        initTransactionContextFactory();
-        initCommandExecutors();
         initServices();
-        initIdGenerator();
         initWsdlImporterFactory();
         initBehaviorFactory();
         initListenerFactory();
@@ -1120,6 +1123,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.BPMN;
     }
 
     @Override
@@ -1449,6 +1457,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 initDefaultAsyncHistoryListener();
             }
             asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+            asyncHistorySessionFactory.setJobServiceConfiguration(jobServiceConfiguration);
             sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
         }
 
@@ -1458,16 +1467,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initDefaultAsyncHistoryListener() {
         asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
 
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
@@ -1478,6 +1485,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 
@@ -1599,20 +1611,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected TaskServiceConfiguration instantiateTaskServiceConfiguration() {
         return new TaskServiceConfiguration(ScopeTypes.BPMN);
     }
-
-    public void initJobServiceConfiguration() {
+    
+    public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
             this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
-            this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
             this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
             this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
-            this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
-
-            this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
 
             List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
             if (customAsyncRunnableExecutionExceptionHandlers != null) {
@@ -1666,9 +1674,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (enabledJobCategories != null) {
                 this.jobServiceConfiguration.setEnabledJobCategories(enabledJobCategories);
             }
-
-            this.jobServiceConfiguration.init();
         }
+    }
+
+    public void initJobServiceConfiguration() {
+        this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
+        this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
+        
+        this.jobServiceConfiguration.init();
 
         if (this.jobHandlers != null) {
             for (String type : this.jobHandlers.keySet()) {
@@ -2089,12 +2103,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
             }
 
-            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, jobServiceConfiguration);
             allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
 
-            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED, jobServiceConfiguration);
             allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
@@ -2109,41 +2123,41 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
-        historyJsonTransformers.add(new ProcessInstanceStartHistoryJsonTransformer());
-        historyJsonTransformers.add(new ProcessInstanceEndHistoryJsonTransformer());
-        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryJsonTransformer());
-        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
-        historyJsonTransformers.add(new ProcessInstancePropertyChangedHistoryJsonTransformer());
-        historyJsonTransformers.add(new SubProcessInstanceStartHistoryJsonTransformer());
-        historyJsonTransformers.add(new SetProcessDefinitionHistoryJsonTransformer());
-        historyJsonTransformers.add(new UpdateProcessDefinitionCascadeHistoryJsonTransformer());
+        historyJsonTransformers.add(new ProcessInstanceStartHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ProcessInstanceEndHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer(this));
+        historyJsonTransformers.add(new ProcessInstancePropertyChangedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new SubProcessInstanceStartHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new SetProcessDefinitionHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new UpdateProcessDefinitionCascadeHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new ActivityStartHistoryJsonTransformer());
-        historyJsonTransformers.add(new ActivityEndHistoryJsonTransformer());
-        historyJsonTransformers.add(new ActivityFullHistoryJsonTransformer());
-        historyJsonTransformers.add(new ActivityUpdateHistoryJsonTransformer());
+        historyJsonTransformers.add(new ActivityStartHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ActivityEndHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ActivityFullHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new ActivityUpdateHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new TaskPropertyChangedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskAssigneeChangedHistoryJsonTransformer());
-        historyJsonTransformers.add(new TaskOwnerChangedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskPropertyChangedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskAssigneeChangedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskOwnerChangedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
-        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
-        historyJsonTransformers.add(new HistoricDetailVariableUpdateHistoryJsonTransformer());
-        historyJsonTransformers.add(new FormPropertiesSubmittedHistoryJsonTransformer());
+        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricDetailVariableUpdateHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new FormPropertiesSubmittedHistoryJsonTransformer(this));
 
-        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer());
-        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer());
+        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer(this));
+        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer(this));
         return historyJsonTransformers;
     }
 
@@ -2354,7 +2368,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
             variableTypes.addType(new NullType());
             variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableServiceConfiguration));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -2367,11 +2381,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects, variableServiceConfiguration));
             variableTypes.addType(new ByteArrayType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableServiceConfiguration));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -3039,6 +3053,38 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public ProcessEngineConfigurationImpl setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
+        return this;
+    }
+
+    public IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return identityLinkServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkServiceConfiguration(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
+        this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
+        return this;
+    }
+
+    public EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
+        return entityLinkServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setEntityLinkServiceConfiguration(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
+        this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
+        return this;
+    }
+
+    public TaskServiceConfiguration getTaskServiceConfiguration() {
+        return taskServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskServiceConfiguration(TaskServiceConfiguration taskServiceConfiguration) {
+        this.taskServiceConfiguration = taskServiceConfiguration;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableServiceConfiguration(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
         return this;
     }
 
@@ -4923,6 +4969,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
     
+    public BatchServiceConfiguration getBatchServiceConfiguration() {
+        return batchServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setBatchServiceConfiguration(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
+        return this;
+    }
+
+    public EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return eventSubscriptionServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setEventSubscriptionServiceConfiguration(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
+        return this;
+    }
+
     @Override
     public VariableServiceConfiguration getVariableServiceConfiguration() {
         return variableServiceConfiguration;

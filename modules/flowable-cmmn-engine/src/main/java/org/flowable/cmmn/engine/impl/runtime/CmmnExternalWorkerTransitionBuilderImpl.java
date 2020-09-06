@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.ExternalWorkerJobCompleteCmd;
 import org.flowable.cmmn.engine.impl.cmd.ExternalWorkerJobTerminateCmd;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -28,13 +29,15 @@ public class CmmnExternalWorkerTransitionBuilderImpl implements CmmnExternalWork
     protected final CommandExecutor commandExecutor;
     protected final String externalJobId;
     protected final String workerId;
+    protected final CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected Map<String, Object> variables;
 
-    public CmmnExternalWorkerTransitionBuilderImpl(CommandExecutor commandExecutor, String externalJobId, String workerId) {
+    public CmmnExternalWorkerTransitionBuilderImpl(CommandExecutor commandExecutor, String externalJobId, String workerId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.commandExecutor = commandExecutor;
         this.externalJobId = externalJobId;
         this.workerId = workerId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -57,11 +60,11 @@ public class CmmnExternalWorkerTransitionBuilderImpl implements CmmnExternalWork
 
     @Override
     public void complete() {
-        commandExecutor.execute(new ExternalWorkerJobCompleteCmd(externalJobId, workerId, variables));
+        commandExecutor.execute(new ExternalWorkerJobCompleteCmd(externalJobId, workerId, variables, cmmnEngineConfiguration));
     }
 
     @Override
     public void terminate() {
-        commandExecutor.execute(new ExternalWorkerJobTerminateCmd(externalJobId, workerId, variables));
+        commandExecutor.execute(new ExternalWorkerJobTerminateCmd(externalJobId, workerId, variables, cmmnEngineConfiguration));
     }
 }

@@ -114,7 +114,7 @@ public class CmmnEngineImpl implements CmmnEngine {
             asyncExecutor.shutdown();
 
             // Async executor will have cleared the jobs lock owner/times, but not yet the case instance lock time/owner
-            cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+            cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(asyncExecutor.getLockOwner(), cmmnEngineConfiguration));
         }
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
             asyncHistoryExecutor.shutdown();

@@ -78,7 +78,7 @@ public class PersistHistoricDecisionExecutionCmd implements Command<Void> {
                 throw new FlowableException("Error writing execution json", e);
             }
 
-            historicDecisionExecutionEntityManager.insert(decisionExecutionEntity);
+            historicDecisionExecutionEntityManager.insert(decisionExecutionEntity, engineConfiguration.getIdGenerator());
         }
 
         return null;

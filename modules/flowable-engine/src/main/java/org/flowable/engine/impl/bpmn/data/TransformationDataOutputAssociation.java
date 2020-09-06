@@ -15,8 +15,9 @@ package org.flowable.engine.impl.bpmn.data;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -45,7 +46,8 @@ public class TransformationDataOutputAssociation extends AbstractDataAssociation
     public void evaluate(DelegateExecution execution) {
         Object value = this.transformation.getValue(execution);
 
-        VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
         try {
             variableTypes.findVariableType(value);
         } catch (final FlowableException e) {

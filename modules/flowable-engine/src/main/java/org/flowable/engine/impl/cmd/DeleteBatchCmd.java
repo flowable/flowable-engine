@@ -17,6 +17,7 @@ import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class DeleteBatchCmd implements Command<Void> {
@@ -29,7 +30,8 @@ public class DeleteBatchCmd implements Command<Void> {
     
     @Override
     public Void execute(CommandContext commandContext) {
-        BatchService batchService = CommandContextUtil.getBatchService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         Batch batch = batchService.getBatch(batchId);
         if (batch == null) {
             throw new FlowableException("batch entity not found for id " + batchId);

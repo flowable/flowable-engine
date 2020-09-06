@@ -407,7 +407,7 @@ public abstract class AbstractEngineConfiguration {
     protected int maxLengthStringVariableType = -1;
     
     protected void initEngineConfigurations() {
-        engineConfigurations.put(getEngineCfgKey(), this);
+        addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
 
     // DataSource
@@ -599,11 +599,10 @@ public abstract class AbstractEngineConfiguration {
 
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
+                        classLoader, useClassForNameClassLoading, clock);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);
                 interceptors.add(commandContextInterceptor);
             }
 
@@ -622,6 +621,8 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract String getEngineCfgKey();
+    
+    public abstract String getEngineScopeType();
 
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
         return null;
@@ -688,11 +689,11 @@ public abstract class AbstractEngineConfiguration {
         }
 
         if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, this::getEventDispatcher);
+            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, getEngineCfgKey(), this::getEventDispatcher);
         }
 
         if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
+            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -1037,7 +1038,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public LockManager getLockManager(String lockName) {
-        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate(), getEngineCfgKey());
     }
 
     // getters and setters
@@ -1376,11 +1377,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public void addEngineConfiguration(String key, AbstractEngineConfiguration engineConfiguration) {
+    public void addEngineConfiguration(String key, String scopeType, AbstractEngineConfiguration engineConfiguration) {
         if (engineConfigurations == null) {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(key, engineConfiguration);
+        engineConfigurations.put(scopeType, engineConfiguration);
     }
 
     public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {

@@ -120,10 +120,13 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             }
 
             if (!(execution.getCurrentFlowElement() instanceof SubProcess) &&
-                !(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics())) {
-                    CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
-                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
-                                    execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                    !(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics())) {
+                
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
+                                execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
     }
@@ -186,8 +189,8 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         } else {
 
             // Leave, and reuse the incoming sequence flow, make executions for all the others (if applicable)
-
-            ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
             List<ExecutionEntity> outgoingExecutions = new ArrayList<>(flowNode.getOutgoingFlows().size());
 
             SequenceFlow sequenceFlow = outgoingSequenceFlows.get(0);
@@ -202,19 +205,18 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 for (int i = 1; i < outgoingSequenceFlows.size(); i++) {
 
                     ExecutionEntity parent = execution.getParentId() != null ? execution.getParent() : execution;
-                    ExecutionEntity outgoingExecutionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(parent);
+                    ExecutionEntity outgoingExecutionEntity = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parent);
 
                     SequenceFlow outgoingSequenceFlow = outgoingSequenceFlows.get(i);
                     outgoingExecutionEntity.setActive(false);
                     outgoingExecutionEntity.setCurrentFlowElement(outgoingSequenceFlow);
 
-                    executionEntityManager.insert(outgoingExecutionEntity);
+                    executionEntityManager.insert(outgoingExecutionEntity, processEngineConfiguration.getIdGenerator());
                     outgoingExecutions.add(outgoingExecutionEntity);
                 }
             }
 
             // Leave (only done when all executions have been made, since some queries depend on this)
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             for (ExecutionEntity outgoingExecution : outgoingExecutions) {
                 agenda.planContinueProcessOperation(outgoingExecution);
                 if (processEngineConfiguration.isLoggingSessionEnabled()) {

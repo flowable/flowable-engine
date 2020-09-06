@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
@@ -70,7 +71,8 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
         List<SignalEventSubscriptionEntity> signalEvents = null;
 
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         if (executionId == null) {
             signalEvents = eventSubscriptionService.findSignalEventSubscriptionsByEventName(eventName, tenantId);
         } else {
@@ -108,10 +110,10 @@ public class SignalEventReceivedCmd implements Command<Void> {
                     compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
 
                 } else {
-                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    processEngineConfiguration.getEventDispatcher().dispatchEvent(
                             FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
                                     payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                                    signalEventSubscriptionEntity.getProcessDefinitionId()));
+                                    signalEventSubscriptionEntity.getProcessDefinitionId()), processEngineConfiguration.getEngineCfgKey());
 
                     EventSubscriptionUtil.eventReceived(signalEventSubscriptionEntity, payload, async);
                 }

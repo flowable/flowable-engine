@@ -16,9 +16,9 @@ import java.util.Collection;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Filip Hrisafov
@@ -26,14 +26,16 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class UnlockTimerJobsCmd implements Command<Void> {
 
     protected final Collection<TimerJobEntity> timerJobs;
+    protected final JobServiceConfiguration jobServiceConfiguration;
 
-    public UnlockTimerJobsCmd(Collection<TimerJobEntity> timerJobs) {
+    public UnlockTimerJobsCmd(Collection<TimerJobEntity> timerJobs, JobServiceConfiguration jobServiceConfiguration) {
         this.timerJobs = timerJobs;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getTimerJobEntityManager(commandContext);
+        TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
         for (TimerJobEntity timerJob : timerJobs) {
             TimerJobEntity dbTimerJob = timerJobEntityManager.findById(timerJob.getId());
             if (dbTimerJob != null) {

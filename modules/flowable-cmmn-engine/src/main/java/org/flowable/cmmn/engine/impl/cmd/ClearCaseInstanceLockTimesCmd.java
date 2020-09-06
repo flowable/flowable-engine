@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -21,15 +21,18 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ClearCaseInstanceLockTimesCmd implements Command<Void> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String lockOwner;
 
-    public ClearCaseInstanceLockTimesCmd(String lockOwner) {
+    public ClearCaseInstanceLockTimesCmd(String lockOwner, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.lockOwner = lockOwner;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).clearAllLockTimes(lockOwner);
+        cmmnEngineConfiguration.getCaseInstanceEntityManager().clearAllLockTimes(lockOwner);
         return null;
     }
 

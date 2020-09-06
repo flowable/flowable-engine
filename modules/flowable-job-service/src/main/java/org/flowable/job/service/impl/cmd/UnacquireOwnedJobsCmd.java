@@ -17,8 +17,8 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,27 +26,30 @@ public class UnacquireOwnedJobsCmd implements Command<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnacquireOwnedJobsCmd.class);
     
-    private final String lockOwner;
-    private final String tenantId;
+    protected final JobServiceConfiguration jobServiceConfiguration;
+    
+    protected final String lockOwner;
+    protected final String tenantId;
 
-    public UnacquireOwnedJobsCmd(String lockOwner, String tenantId) {
+    public UnacquireOwnedJobsCmd(String lockOwner, String tenantId, JobServiceConfiguration jobServiceConfiguration) {
         this.lockOwner = lockOwner;
         this.tenantId = tenantId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        JobQueryImpl jobQuery = new JobQueryImpl(commandContext);
+        JobQueryImpl jobQuery = new JobQueryImpl(commandContext, jobServiceConfiguration);
         jobQuery.lockOwner(lockOwner);
 
         if (tenantId != null) {
             jobQuery.jobTenantId(tenantId);
         }
 
-        List<Job> jobs = CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(jobQuery);
+        List<Job> jobs = jobServiceConfiguration.getJobEntityManager().findJobsByQueryCriteria(jobQuery);
         for (Job job : jobs) {
             logJobUnlocking(job);
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
+            jobServiceConfiguration.getJobManager().unacquire(job);
         }
         return null;
     }

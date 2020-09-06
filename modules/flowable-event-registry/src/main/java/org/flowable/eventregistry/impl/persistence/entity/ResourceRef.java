@@ -14,6 +14,8 @@ package org.flowable.eventregistry.impl.persistence.entity;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
 /**
@@ -60,13 +62,14 @@ public class ResourceRef implements Serializable {
     }
 
     private void setBytes(byte[] bytes) {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
         EventResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager();
         if (id == null) {
             if (bytes != null) {
                 entity = resourceEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
-                resourceEntityManager.insert(entity);
+                resourceEntityManager.insert(entity, eventRegistryEngineConfiguration.getIdGenerator());
                 id = entity.getId();
             }
         } else {

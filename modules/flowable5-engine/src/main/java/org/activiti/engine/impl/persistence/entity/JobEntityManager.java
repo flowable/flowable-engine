@@ -67,7 +67,7 @@ public class JobEntityManager extends AbstractManager {
         TransactionContext transactionContext = org.flowable.common.engine.impl.context.Context.getTransactionContext();
         if (transactionContext != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
-                CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor());
             transactionContext.addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
 
         } else {

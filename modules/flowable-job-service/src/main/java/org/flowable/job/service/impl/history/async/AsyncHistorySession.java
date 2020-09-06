@@ -25,7 +25,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -36,6 +35,7 @@ public class AsyncHistorySession implements Session {
     protected CommandContext commandContext;
     protected AsyncHistoryListener asyncHistoryListener;
     protected CommandContextCloseListener commandContextCloseListener;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     // A list of the different types of history for which jobs will be created
     // Note that the ordering of the types is important, as it will define the order of job creation.
@@ -45,9 +45,10 @@ public class AsyncHistorySession implements Session {
     protected String tenantId;
     protected Map<JobServiceConfiguration, AsyncHistorySessionData> sessionData;
 
-    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener) {
+    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener, JobServiceConfiguration jobServiceConfiguration) {
         this.commandContext = commandContext;
         this.asyncHistoryListener = asyncHistoryJobListener;
+        this.jobServiceConfiguration = jobServiceConfiguration;
         
         // A command context close listener is registered to avoid creating the async history data if it wouldn't be needed 
         initCommandContextCloseListener();
@@ -59,33 +60,20 @@ public class AsyncHistorySession implements Session {
         }
     }
     
-    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener, List<String> jobDataTypes) {
-        this(commandContext, asyncHistoryJobListener);
+    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener, 
+            List<String> jobDataTypes, JobServiceConfiguration jobServiceConfiguration) {
+        
+        this(commandContext, asyncHistoryJobListener, jobServiceConfiguration);
         this.jobDataTypes = jobDataTypes;
     }
     
     protected boolean isAsyncHistoryExecutorEnabled() {
-        AsyncExecutor asyncHistoryExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getAsyncHistoryExecutor();
+        AsyncExecutor asyncHistoryExecutor = jobServiceConfiguration.getAsyncHistoryExecutor();
         return asyncHistoryExecutor != null && asyncHistoryExecutor.isActive();
     }
 
     protected void initCommandContextCloseListener() {
         this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
-    }
-    
-    public void addHistoricData(String type, ObjectNode data) {
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
-        addHistoricData(jobServiceConfiguration, type, data, null);
-    }
-
-    public void addHistoricData(String type, ObjectNode data, String tenantId) {
-        
-        // Different engines can call each other and all generate historical data.
-        // To make sure the context of where the data is coming from (and thus being able to process it in the right context),
-        // the JobService configuration is stored.
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
-      
-        addHistoricData(jobServiceConfiguration, type, data, tenantId);
     }
     
     public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, ObjectNode data) {

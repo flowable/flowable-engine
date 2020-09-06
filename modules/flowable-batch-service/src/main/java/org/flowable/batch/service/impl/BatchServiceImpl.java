@@ -62,12 +62,12 @@ public class BatchServiceImpl extends CommonServiceImpl<BatchServiceConfiguratio
     
     @Override
     public BatchBuilder createBatchBuilder() {
-        return new BatchBuilderImpl(this);
+        return new BatchBuilderImpl(configuration);
     }
     
     @Override
     public void insertBatch(Batch batch) {
-        getBatchEntityManager().insert((BatchEntity) batch);
+        getBatchEntityManager().insert((BatchEntity) batch, configuration.getIdGenerator());
     }
     
     @Override

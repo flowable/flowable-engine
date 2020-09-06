@@ -28,8 +28,8 @@ public class ByteArrayEntityManagerImpl
 
     protected Supplier<FlowableEventDispatcher> eventDispatcherSupplier;
 
-    public ByteArrayEntityManagerImpl(ByteArrayDataManager byteArrayDataManager, Supplier<FlowableEventDispatcher> eventDispatcherSupplier) {
-        super(byteArrayDataManager);
+    public ByteArrayEntityManagerImpl(ByteArrayDataManager byteArrayDataManager, String engineType, Supplier<FlowableEventDispatcher> eventDispatcherSupplier) {
+        super(byteArrayDataManager, engineType);
         this.eventDispatcherSupplier = eventDispatcherSupplier;
     }
 

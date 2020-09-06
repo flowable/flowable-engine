@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.types.ValueFields;
@@ -40,26 +39,29 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
     protected static final String LONG_JSON_TYPE_NAME = "longJson";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonType.class);
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected final int maxLength;
     protected final boolean trackObjects;
     protected final String typeName;
     protected ObjectMapper objectMapper;
 
-    public JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        this(maxLength, objectMapper, trackObjects, TYPE_NAME);
+    public JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, VariableServiceConfiguration variableServiceConfiguration) {
+        this(maxLength, objectMapper, trackObjects, TYPE_NAME, variableServiceConfiguration);
     }
 
-    protected JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, String typeName) {
+    protected JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, String typeName, VariableServiceConfiguration variableServiceConfiguration) {
         this.maxLength = maxLength;
         this.trackObjects = trackObjects;
         this.objectMapper = objectMapper;
         this.typeName = typeName;
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     // Needed for backwards compatibility of longJsonType
-    public static JsonType longJsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        return new JsonType(maxLength, objectMapper, trackObjects, LONG_JSON_TYPE_NAME);
+    public static JsonType longJsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, VariableServiceConfiguration variableServiceConfiguration) {
+        return new JsonType(maxLength, objectMapper, trackObjects, LONG_JSON_TYPE_NAME, variableServiceConfiguration);
     }
 
     @Override
@@ -132,7 +134,7 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             if (textValue.length() <= maxLength) {
                 variableInstanceEntity.setTextValue(textValue);
                 if (variableInstanceEntity.getByteArrayRef() != null) {
-                    variableInstanceEntity.getByteArrayRef().delete();
+                    variableInstanceEntity.getByteArrayRef().delete(variableServiceConfiguration.getEngineName());
                 }
             } else {
                 variableInstanceEntity.setTextValue(null);
@@ -147,15 +149,10 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         if (trackObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
-                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
-                                    commandContext.getCurrentEngineConfiguration();
-                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
-                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                        new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields, variableServiceConfiguration)
-                    ));
-                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
-                }
+                commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                    new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                ));
+                variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
             }
         }
     }

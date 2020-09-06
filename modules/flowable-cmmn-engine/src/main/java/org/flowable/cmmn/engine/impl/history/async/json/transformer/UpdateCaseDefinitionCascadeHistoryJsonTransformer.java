@@ -18,13 +18,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -36,6 +36,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UpdateCaseDefinitionCascadeHistoryJsonTransformer extends AbstractNeedsHistoricCaseInstanceJsonTransformer {
 
+    public UpdateCaseDefinitionCascadeHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_UPDATE_CASE_DEFINITION_CASCADE);
@@ -46,12 +50,12 @@ public class UpdateCaseDefinitionCascadeHistoryJsonTransformer extends AbstractN
         String caseDefinitionId = getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID);
         String caseInstanceId = getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID);
         
-        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext);
+        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
         HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
         historicCaseInstance.setCaseDefinitionId(caseDefinitionId);
         historicCaseInstanceEntityManager.update(historicCaseInstance);
 
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService(commandContext);
+        HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
         HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
         taskQuery.caseInstanceId(caseInstanceId);
         List<HistoricTaskInstance> historicTasks = historicTaskService.findHistoricTaskInstancesByQueryCriteria(taskQuery);
@@ -66,7 +70,7 @@ public class UpdateCaseDefinitionCascadeHistoryJsonTransformer extends AbstractN
         // because of upgrade runtimeActivity instances can be only subset of historicActivity instances
         HistoricPlanItemInstanceQueryImpl historicPlanItemQuery = new HistoricPlanItemInstanceQueryImpl();
         historicPlanItemQuery.planItemInstanceCaseInstanceId(caseInstanceId);
-        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext);
+        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
         List<HistoricPlanItemInstance> historicPlanItems = historicPlanItemInstanceEntityManager.findByCriteria(historicPlanItemQuery);
         if (historicPlanItems != null) {
             for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItems) {

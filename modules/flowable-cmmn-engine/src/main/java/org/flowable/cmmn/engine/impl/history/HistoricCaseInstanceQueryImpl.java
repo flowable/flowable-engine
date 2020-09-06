@@ -20,12 +20,12 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.IdentityLinkQueryObject;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
@@ -46,6 +46,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         implements HistoricCaseInstanceQuery, CacheAwareQuery<HistoricCaseInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
@@ -87,12 +89,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricCaseInstanceQueryImpl() {
     }
 
-    public HistoricCaseInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public HistoricCaseInstanceQueryImpl(CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandContext, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public HistoricCaseInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public HistoricCaseInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandExecutor, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -471,7 +475,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).countByCriteria(this);
+        return cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().countByCriteria(this);
     }
 
     @Override
@@ -479,14 +483,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ensureVariablesInitialized();
         List<HistoricCaseInstance> results;
         if (includeCaseVariables) {
-            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findWithVariablesByQueryCriteria(this);
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
 
             if (caseInstanceId != null) {
                 addCachedVariableForQueryById(commandContext, results);
             }
 
         } else {
-            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findByCriteria(this);
         }
 
         return results;
@@ -524,7 +528,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public void enhanceCachedValue(HistoricCaseInstanceEntity caseInstance) {
         if (isIncludeCaseVariables()) {
             caseInstance.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                    .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
                             .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
         }
     }
@@ -532,9 +536,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public void delete() {
         if (commandExecutor != null) {
-            commandExecutor.execute(new DeleteHistoricCaseInstancesCmd(this));
+            commandExecutor.execute(new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration));
         } else {
-            new DeleteHistoricCaseInstancesCmd(this).execute(Context.getCommandContext());
+            new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration).execute(Context.getCommandContext());
         }
     }
 
@@ -542,9 +546,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public void deleteWithRelatedData() {
         if (commandExecutor != null) {
             CommandConfig config = new CommandConfig().transactionRequiresNew();
-            commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd(this));
-            commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd());
-            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd());
+            commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration));
+            commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd(cmmnEngineConfiguration));
+            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd(cmmnEngineConfiguration));
         } else {
             throw new FlowableException("deleting historic case instances with related data requires CommandExecutor");
         }
@@ -630,7 +634,11 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new HistoricCaseInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoricCaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration);
+        } else {
+            currentOrQueryObject = new HistoricCaseInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }

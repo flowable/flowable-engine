@@ -163,7 +163,8 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
     @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            definitionIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().findIdentityLinksByScopeDefinitionIdAndType(id, ScopeTypes.CMMN);
+            definitionIdentityLinkEntities = CommandContextUtil.getCmmnEngineConfiguration().getIdentityLinkServiceConfiguration()
+                    .getIdentityLinkService().findIdentityLinksByScopeDefinitionIdAndType(id, ScopeTypes.CMMN);
             isIdentityLinksInitialized = true;
         }
 

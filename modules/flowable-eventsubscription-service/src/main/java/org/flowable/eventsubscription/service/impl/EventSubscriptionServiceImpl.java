@@ -136,7 +136,7 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
 
     @Override
     public void insertEventSubscription(EventSubscriptionEntity eventSubscription) {
-        getEventSubscriptionEntityManager().insert(eventSubscription);
+        getEventSubscriptionEntityManager().insert(eventSubscription, configuration.getIdGenerator());
     }
 
     @Override

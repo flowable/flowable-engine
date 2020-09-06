@@ -83,7 +83,7 @@ public class IdentityInfoEntityManagerImpl
             identityInfoEntity.setKey(key);
             identityInfoEntity.setValue(value);
             identityInfoEntity.setPasswordBytes(storedPassword);
-            insert(identityInfoEntity, false);
+            insert(identityInfoEntity, false, engineConfiguration.getIdGenerator());
             if (accountDetails != null) {
                 insertAccountDetails(identityInfoEntity, accountDetails, accountDetails.keySet());
             }
@@ -97,7 +97,7 @@ public class IdentityInfoEntityManagerImpl
             identityInfoDetail.setParentId(identityInfoEntity.getId());
             identityInfoDetail.setKey(newKey);
             identityInfoDetail.setValue(accountDetails.get(newKey));
-            insert(identityInfoDetail, false);
+            insert(identityInfoDetail, false, engineConfiguration.getIdGenerator());
         }
     }
 

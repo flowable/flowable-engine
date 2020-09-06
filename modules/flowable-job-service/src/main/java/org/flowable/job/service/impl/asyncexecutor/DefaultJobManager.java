@@ -69,9 +69,6 @@ public class DefaultJobManager implements JobManager {
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
-    public DefaultJobManager() {
-    }
-
     public DefaultJobManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
@@ -90,7 +87,7 @@ public class DefaultJobManager implements JobManager {
     @Override
     public void scheduleAsyncJob(JobEntity jobEntity) {
         callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, jobEntity);
-        jobServiceConfiguration.getJobEntityManager().insert(jobEntity);
+        jobServiceConfiguration.getJobEntityManager().insert(jobEntity, jobServiceConfiguration.getIdGenerator());
         triggerExecutorIfNeeded(jobEntity);
     }
 
@@ -120,14 +117,14 @@ public class DefaultJobManager implements JobManager {
             throw new FlowableException("Empty timer job can not be scheduled");
         }
         callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, timerJob);
-        jobServiceConfiguration.getTimerJobEntityManager().insert(timerJob);
+        jobServiceConfiguration.getTimerJobEntityManager().insert(timerJob, jobServiceConfiguration.getIdGenerator());
     }
 
     private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.TIMER_SCHEDULED, timerJob), jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -184,7 +181,7 @@ public class DefaultJobManager implements JobManager {
     @Override
     public SuspendedJobEntity moveJobToSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity suspendedJob = createSuspendedJobFromOtherJob(job);
-        jobServiceConfiguration.getSuspendedJobEntityManager().insert(suspendedJob);
+        jobServiceConfiguration.getSuspendedJobEntityManager().insert(suspendedJob, jobServiceConfiguration.getIdGenerator());
         if (job instanceof TimerJobEntity) {
             jobServiceConfiguration.getTimerJobEntityManager().delete((TimerJobEntity) job);
 
@@ -202,16 +199,16 @@ public class DefaultJobManager implements JobManager {
         AbstractRuntimeJobEntity activatedJob = null;
         if (Job.JOB_TYPE_TIMER.equals(job.getJobType())) {
             activatedJob = createTimerJobFromOtherJob(job);
-            jobServiceConfiguration.getTimerJobEntityManager().insert((TimerJobEntity) activatedJob);
+            jobServiceConfiguration.getTimerJobEntityManager().insert((TimerJobEntity) activatedJob, jobServiceConfiguration.getIdGenerator());
 
         } else if (Job.JOB_TYPE_EXTERNAL_WORKER.equals(job.getJobType())) {
             activatedJob = createExternalWorkerJobFromOtherJob(job);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert((ExternalWorkerJobEntity) activatedJob);
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert((ExternalWorkerJobEntity) activatedJob, jobServiceConfiguration.getIdGenerator());
 
         } else {
             activatedJob = createExecutableJobFromOtherJob(job);
             JobEntity jobEntity = (JobEntity) activatedJob;
-            jobServiceConfiguration.getJobEntityManager().insert(jobEntity);
+            jobServiceConfiguration.getJobEntityManager().insert(jobEntity, jobServiceConfiguration.getIdGenerator());
             triggerExecutorIfNeeded(jobEntity);
         }
 
@@ -222,7 +219,7 @@ public class DefaultJobManager implements JobManager {
     @Override
     public DeadLetterJobEntity moveJobToDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(job);
-        jobServiceConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
+        jobServiceConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob, jobServiceConfiguration.getIdGenerator());
         if (job instanceof TimerJobEntity) {
             jobServiceConfiguration.getTimerJobEntityManager().delete((TimerJobEntity) job);
 
@@ -293,7 +290,7 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setId(null); // We want a new id to be assigned to this job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
+            jobServiceConfiguration.getHistoryJobEntityManager().insert(newJobEntity, jobServiceConfiguration.getIdGenerator());
             jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(jobEntity);
 
         } else if (job instanceof JobEntity) {
@@ -309,7 +306,7 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setId(null); // We want a new id to be assigned to this job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getJobEntityManager().insert(newJobEntity);
+            jobServiceConfiguration.getJobEntityManager().insert(newJobEntity, jobServiceConfiguration.getIdGenerator());
             jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
 
             // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
@@ -324,7 +321,7 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setId(null); // We want a new id to be assigned to this job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
+            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity, jobServiceConfiguration.getIdGenerator());
             jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
         } else if (job instanceof TimerJobEntity) {
             jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
@@ -353,7 +350,7 @@ public class DefaultJobManager implements JobManager {
                 newHistoryJobEntity.setCreateTime(jobServiceConfiguration.getClock().getCurrentTime());
 
                 newHistoryJobEntity.setRetries(newHistoryJobEntity.getRetries() - 1);
-                jobServiceConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity);
+                jobServiceConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity, jobServiceConfiguration.getIdGenerator());
                 jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
             
             } else {
@@ -371,11 +368,11 @@ public class DefaultJobManager implements JobManager {
 
             if (newJobEntity.getRetries() > 0) {
                 newJobEntity.setRetries(newJobEntity.getRetries() - 1);
-                jobServiceConfiguration.getJobEntityManager().insert(newJobEntity);
+                jobServiceConfiguration.getJobEntityManager().insert(newJobEntity, jobServiceConfiguration.getIdGenerator());
 
             } else {
                 DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(newJobEntity);
-                jobServiceConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
+                jobServiceConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob, jobServiceConfiguration.getIdGenerator());
             }
 
             jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
@@ -390,14 +387,14 @@ public class DefaultJobManager implements JobManager {
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);
         if (jobEntity.getId() != null) {
-            CommandContextUtil.getJobEntityManager().delete(jobEntity);
+            jobServiceConfiguration.getJobEntityManager().delete(jobEntity);
         }
     }
 
     protected void executeHistoryJob(HistoryJobEntity historyJobEntity) {
         executeHistoryJobHandler(historyJobEntity);
         if (historyJobEntity.getId() != null) {
-            CommandContextUtil.getHistoryJobEntityManager().delete(historyJobEntity);
+            jobServiceConfiguration.getHistoryJobEntityManager().delete(historyJobEntity);
         }
     }
 
@@ -516,7 +513,7 @@ public class DefaultJobManager implements JobManager {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (Context.getTransactionContext() != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
-                            CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
+                    jobServiceConfiguration.getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
             
         } else {
@@ -548,7 +545,7 @@ public class DefaultJobManager implements JobManager {
     protected String getBusinessCalendarName(String calendarName, VariableScope variableScope) {
         String businessCalendarName = CYCLE_TYPE;
         if (StringUtils.isNotEmpty(calendarName)) {
-            businessCalendarName = (String) CommandContextUtil.getJobServiceConfiguration().getExpressionManager()
+            businessCalendarName = (String) jobServiceConfiguration.getExpressionManager()
                     .createExpression(calendarName).getValue(variableScope);
         }
         return businessCalendarName;
@@ -557,7 +554,7 @@ public class DefaultJobManager implements JobManager {
     @Override
     public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
         callHistoryJobProcessors(HistoryJobProcessorContext.Phase.BEFORE_CREATE, historyJobEntity);
-        jobServiceConfiguration.getHistoryJobEntityManager().insert(historyJobEntity);
+        jobServiceConfiguration.getHistoryJobEntityManager().insert(historyJobEntity, jobServiceConfiguration.getIdGenerator());
         triggerAsyncHistoryExecutorIfNeeded(historyJobEntity);
         return historyJobEntity;
     }
@@ -581,7 +578,8 @@ public class DefaultJobManager implements JobManager {
         if (asyncHistorySession != null) {
             TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
             if (transactionContext != null) {
-                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(commandContext, historyJobEntity)); 
+                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(
+                        jobServiceConfiguration, historyJobEntity)); 
             }
         }
     }
@@ -670,14 +668,6 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setExclusive(copyFromJob.isExclusive());
         copyToJob.setExecutionId(copyFromJob.getExecutionId());
         copyToJob.setId(copyFromJob.getId());
-        copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
-        copyToJob.setCustomValues(copyFromJob.getCustomValues());
-        copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
-        copyToJob.setCategory(copyFromJob.getCategory());
-        copyToJob.setJobType(copyFromJob.getJobType());
-        copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
-        copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
-        copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
         copyToJob.setElementId(copyFromJob.getElementId());
         copyToJob.setElementName(copyFromJob.getElementName());
@@ -686,6 +676,14 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setSubScopeId(copyFromJob.getSubScopeId());
         copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setScopeDefinitionId(copyFromJob.getScopeDefinitionId());
+        copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
+        copyToJob.setCustomValues(copyFromJob.getCustomValues());
+        copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
+        copyToJob.setCategory(copyFromJob.getCategory());
+        copyToJob.setJobType(copyFromJob.getJobType());
+        copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
+        copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
+        copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setRepeat(copyFromJob.getRepeat());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
@@ -702,6 +700,7 @@ public class DefaultJobManager implements JobManager {
 
     protected HistoryJobEntity copyHistoryJobInfo(HistoryJobEntity copyToJob, HistoryJobEntity copyFromJob) {
         copyToJob.setId(copyFromJob.getId());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
@@ -721,7 +720,6 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setCustomValues(copyFromJob.getCustomValues());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
-        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
         return copyToJob;

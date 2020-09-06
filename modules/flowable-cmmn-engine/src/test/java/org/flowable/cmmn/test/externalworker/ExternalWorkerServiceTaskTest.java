@@ -31,7 +31,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
@@ -975,7 +974,8 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
         assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
 
-        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(cmmnEngineConfiguration.getAsyncExecutor().getLockOwner()));
+        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(
+                cmmnEngineConfiguration.getAsyncExecutor().getLockOwner(), cmmnEngineConfiguration));
 
         // Clearing the async executor jobs times should not clear the ones which are locked by the external worker
         caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
@@ -985,7 +985,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
         assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
 
-        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd("worker1"));
+        cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd("worker1", cmmnEngineConfiguration));
 
         // Clearing the worker1 jobs times should not clear the ones which are locked by the external worker
         caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
@@ -1184,7 +1184,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
     protected void addUserIdentityLinkToJob(Job job, String userId) {
         cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
-                    CommandContextUtil.getIdentityLinkService(commandContext)
+                    cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                             .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, userId, null, IdentityLinkType.PARTICIPANT);
 
                     return null;
@@ -1194,7 +1194,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
     protected void addGroupIdentityLinkToJob(Job job, String groupId) {
         cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
-                    CommandContextUtil.getIdentityLinkService(commandContext)
+                    cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                             .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, null, groupId, IdentityLinkType.PARTICIPANT);
                     return null;
                 });
@@ -1202,14 +1202,14 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
     protected Collection<IdentityLinkEntity> getJobIdentityLinks(Job job) {
         return cmmnEngineConfiguration.getCommandExecutor()
-                .execute(commandContext -> CommandContextUtil.getIdentityLinkService(commandContext)
+                .execute(commandContext -> cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                         .findIdentityLinksByScopeIdAndType(job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER));
     }
 
     protected Map<String, Object> getExternalWorkerVariablesForPlanItemInstance(String planItemInstanceId) {
         return cmmnEngineConfiguration.getCommandExecutor()
                 .execute(commandContext -> {
-                    List<VariableInstanceEntity> variables = CommandContextUtil.getVariableService(commandContext)
+                    List<VariableInstanceEntity> variables = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                             .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceId, ScopeTypes.CMMN_EXTERNAL_WORKER);
 
                     Map<String, Object> variableMap = new HashMap<>();

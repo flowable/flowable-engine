@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -30,6 +30,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 public class AddIdentityLinkForCaseDefinitionCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseDefinitionId;
 
@@ -37,11 +39,14 @@ public class AddIdentityLinkForCaseDefinitionCmd implements Command<Void>, Seria
 
     protected String groupId;
 
-    public AddIdentityLinkForCaseDefinitionCmd(String caseDefinitionId, String userId, String groupId) {
+    public AddIdentityLinkForCaseDefinitionCmd(String caseDefinitionId, String userId, String groupId,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         validateParams(userId, groupId, caseDefinitionId);
         this.caseDefinitionId = caseDefinitionId;
         this.userId = userId;
         this.groupId = groupId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     protected void validateParams(String userId, String groupId, String caseDefinitionId) {
@@ -56,14 +61,14 @@ public class AddIdentityLinkForCaseDefinitionCmd implements Command<Void>, Seria
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CaseDefinitionEntity caseDefinition = CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findById(caseDefinitionId);
+        CaseDefinitionEntity caseDefinition = cmmnEngineConfiguration.getCaseDefinitionEntityManager().findById(caseDefinitionId);
 
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find case definition with id " + caseDefinitionId, CaseDefinition.class);
         }
 
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeDefinitionIdentityLink(
-                        caseDefinition.getId(), ScopeTypes.CMMN, userId, groupId);
+        IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                .createScopeDefinitionIdentityLink(caseDefinition.getId(), ScopeTypes.CMMN, userId, groupId);
         caseDefinition.getIdentityLinks().add(identityLinkEntity);
 
         return null;

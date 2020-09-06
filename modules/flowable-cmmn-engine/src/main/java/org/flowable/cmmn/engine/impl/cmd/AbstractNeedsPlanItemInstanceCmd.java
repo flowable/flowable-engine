@@ -33,6 +33,8 @@ import org.flowable.form.api.FormService;
  */
 public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>, Serializable {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String planItemInstanceId;
     protected Map<String, Object> variables;
     protected Map<String, Object> formVariables;
@@ -41,13 +43,15 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
     protected Map<String, Object> localVariables;
     protected Map<String, Object> transientVariables;
 
-    public AbstractNeedsPlanItemInstanceCmd(String planItemInstanceId) {
+    public AbstractNeedsPlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.planItemInstanceId = planItemInstanceId;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     public AbstractNeedsPlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
-            Map<String, Object> localVariables, Map<String, Object> transientVariables) {
+            Map<String, Object> localVariables, Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         this.planItemInstanceId = planItemInstanceId;
         this.variables = variables;
         this.formVariables = formVariables;
@@ -55,6 +59,7 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
         this.formInfo = formInfo;
         this.localVariables = localVariables;
         this.transientVariables = transientVariables;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -62,7 +67,8 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
         if (planItemInstanceId == null) {
             throw new FlowableIllegalArgumentException("Plan item instance id is null");
         }
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        
+        PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {
             throw new FlowableObjectNotFoundException("Cannot find plan item instance for id " + planItemInstanceId, PlanItemInstanceEntity.class);
         }
@@ -76,7 +82,6 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
 
             Map<String, Object> variablesFromFormSubmission = formService.getVariablesFromFormSubmission(formInfo, formVariables, formOutcome);
 
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, planItemInstanceEntity.getCaseInstanceId(), ScopeTypes.CMMN, variablesFromFormSubmission,
                     planItemInstanceEntity.getTenantId());

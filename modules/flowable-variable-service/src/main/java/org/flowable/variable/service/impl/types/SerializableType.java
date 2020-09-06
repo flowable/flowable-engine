@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.IoUtil;
@@ -40,6 +39,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class SerializableType extends ByteArrayType implements MutableVariableType<Object, byte[]> {
 
     public static final String TYPE_NAME = "serializable";
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected boolean trackDeserializedObjects;
 
@@ -48,12 +49,13 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
         return TYPE_NAME;
     }
 
-    public SerializableType() {
-
+    public SerializableType(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public SerializableType(boolean trackDeserializedObjects) {
+    public SerializableType(boolean trackDeserializedObjects, VariableServiceConfiguration variableServiceConfiguration) {
         this.trackDeserializedObjects = trackDeserializedObjects;
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     @Override
@@ -90,15 +92,10 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
         if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
-                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
-                                    commandContext.getCurrentEngineConfiguration();
-                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
-                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                        new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
-                    ));
-                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
-                }
+                commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                    new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                ));
+                variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
             }
         }
     }

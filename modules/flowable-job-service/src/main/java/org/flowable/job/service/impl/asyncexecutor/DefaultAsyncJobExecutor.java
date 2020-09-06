@@ -25,7 +25,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +138,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<Void>() {
             @Override
             public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getJobManager(commandContext).unacquire(job);
+                jobServiceConfiguration.getJobManager().unacquire(job);
                 return null;
             }
         });

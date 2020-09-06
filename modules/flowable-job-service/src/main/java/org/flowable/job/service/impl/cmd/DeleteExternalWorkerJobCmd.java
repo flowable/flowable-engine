@@ -19,10 +19,10 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Filip Hrisafov
@@ -30,9 +30,11 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class DeleteExternalWorkerJobCmd implements Command<Object> {
 
     protected String jobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public DeleteExternalWorkerJobCmd(String jobId) {
+    public DeleteExternalWorkerJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -41,17 +43,17 @@ public class DeleteExternalWorkerJobCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
 
-        ExternalWorkerJobEntityManager jobEntityManager = CommandContextUtil.getExternalWorkerJobEntityManager(commandContext);
+        ExternalWorkerJobEntityManager jobEntityManager = jobServiceConfiguration.getExternalWorkerJobEntityManager();
 
         ExternalWorkerJobEntity job = jobEntityManager.findById(jobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No external worker job found with id '" + jobId + "'", Job.class);
         }
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getJobServiceConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                    .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
+                    jobServiceConfiguration.getEngineName());
         }
 
         jobEntityManager.delete(job);

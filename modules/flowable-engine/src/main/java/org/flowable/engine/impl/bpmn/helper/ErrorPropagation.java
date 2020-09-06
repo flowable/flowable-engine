@@ -186,7 +186,8 @@ public class ErrorPropagation {
                 }
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                     processEngineConfiguration.getEventDispatcher()
-                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
+                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity),
+                                    processEngineConfiguration.getEngineCfgKey());
                 }
             }
             
@@ -214,7 +215,8 @@ public class ErrorPropagation {
 
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
-                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
+                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
 

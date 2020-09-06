@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -56,8 +57,8 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     }
 
     @Override
-    public void insert(HistoricVariableInstanceEntity entity) {
-        super.insert(entity);
+    public void insert(HistoricVariableInstanceEntity entity, IdGenerator idGenerator) {
+        super.insert(entity, idGenerator);
     }
 
     @Override

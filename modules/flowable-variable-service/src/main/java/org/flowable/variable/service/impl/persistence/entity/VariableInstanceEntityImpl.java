@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
@@ -105,13 +106,13 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
     @Override
     public byte[] getBytes() {
         ensureByteArrayRefInitialized();
-        return byteArrayRef.getBytes();
+        return byteArrayRef.getBytes(getEngineType());
     }
 
     @Override
     public void setBytes(byte[] bytes) {
         ensureByteArrayRefInitialized();
-        byteArrayRef.setValue("var-" + name, bytes);
+        byteArrayRef.setValue("var-" + name, bytes, getEngineType());
     }
 
     @Override
@@ -287,6 +288,14 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
 
     // misc methods ///////////////////////////////////////////////////////////////
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

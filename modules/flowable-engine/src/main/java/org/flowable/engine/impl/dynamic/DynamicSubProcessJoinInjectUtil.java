@@ -32,6 +32,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -48,7 +49,8 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
     public static void injectSubProcessWithJoin(String taskId, Process process, BpmnModel bpmnModel, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder,
                     ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         FlowElement taskFlowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
         if (!(taskFlowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
@@ -101,7 +103,7 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         dynamicEmbeddedSubProcessBuilder.setDynamicSubProcessId(subProcess.getId());
 
         ProcessDefinition subProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(dynamicEmbeddedSubProcessBuilder.getProcessDefinitionId());
-        ResourceEntity subProcessBpmnResource = CommandContextUtil.getResourceEntityManager(commandContext)
+        ResourceEntity subProcessBpmnResource = processEngineConfiguration.getResourceEntityManager()
                 .findResourceByDeploymentIdAndResourceName(subProcessDefinition.getDeploymentId(), subProcessDefinition.getResourceName());
         BpmnModel bpmnModelSubProcess = new BpmnXMLConverter().convertToBpmnModel(new BytesStreamSource(subProcessBpmnResource.getBytes()), false, false);
         for (FlowElement flowElement : bpmnModelSubProcess.getMainProcess().getFlowElements()) {

@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -47,9 +48,8 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-
-        CreateCmmnExternalWorkerJobInterceptor interceptor = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                .getCreateCmmnExternalWorkerJobInterceptor();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CreateCmmnExternalWorkerJobInterceptor interceptor = cmmnEngineConfiguration.getCreateCmmnExternalWorkerJobInterceptor();
 
         CreateCmmnExternalWorkerJobBeforeContext beforeContext = new CreateCmmnExternalWorkerJobBeforeContext(
                 serviceTask,
@@ -67,7 +67,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             throw new FlowableException("no topic expression configured");
         }
 
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+        JobServiceConfiguration jobServiceConfiguration = cmmnEngineConfiguration.getJobServiceConfiguration();
         JobService jobService = jobServiceConfiguration.getJobService();
 
         ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();

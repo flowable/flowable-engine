@@ -15,6 +15,7 @@ package org.flowable.task.service;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -55,7 +56,7 @@ public interface HistoricTaskService {
     
     HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason, Date endTime);
     
-    HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
+    HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime, AbstractEngineConfiguration engineConfiguration);
 
     void deleteHistoricTaskLogEntry(long taskLogNumber);
 

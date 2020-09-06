@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -57,24 +58,27 @@ public class BoundarySignalEventActivityBehavior extends BoundaryEventActivityBe
         String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
                 ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                .eventName(signalName)
-                .signal(signal)
-                .executionId(executionEntity.getId())
-                .processInstanceId(executionEntity.getProcessInstanceId())
-                .activityId(executionEntity.getCurrentActivityId())
-                .processDefinitionId(executionEntity.getProcessDefinitionId())
-                .tenantId(executionEntity.getTenantId())
-                .create();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                    .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                    .eventName(signalName)
+                    .signal(signal)
+                    .executionId(executionEntity.getId())
+                    .processInstanceId(executionEntity.getProcessInstanceId())
+                    .activityId(executionEntity.getCurrentActivityId())
+                    .processDefinitionId(executionEntity.getProcessDefinitionId())
+                    .tenantId(executionEntity.getTenantId())
+                    .create();
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
-                    null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+                    null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -84,9 +88,12 @@ public class BoundarySignalEventActivityBehavior extends BoundaryEventActivityBe
         BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
         
         if (boundaryEvent.isCancelActivity()) {
-            String eventName = EventDefinitionExpressionUtil.determineSignalName(Context.getCommandContext(), signalEventDefinition,
+            CommandContext commandContext = Context.getCommandContext();
+            String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
                     ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+            
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {

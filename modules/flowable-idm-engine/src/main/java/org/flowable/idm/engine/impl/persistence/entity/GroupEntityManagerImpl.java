@@ -52,7 +52,8 @@ public class GroupEntityManagerImpl
 
             getMembershipEntityManager().deleteMembershipByGroupId(groupId);
             if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
+                getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null),
+                        engineConfiguration.getEngineCfgKey());
             }
 
             delete(group);

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -45,8 +46,9 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
 
         // Remove event subscription when moving to a terminal state
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition) || PlanItemTransition.DISMISS.equals(transition)) {
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
@@ -60,7 +62,7 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
                 signalName = signalExpression.getValue(planItemInstance).toString();
             }
 
-            CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+            cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
                 .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
                 .eventName(signalName)
                 .subScopeId(planItemInstance.getId())
@@ -80,7 +82,8 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         
         String signalName = null;
         if (StringUtils.isNotEmpty(signalRef)) {

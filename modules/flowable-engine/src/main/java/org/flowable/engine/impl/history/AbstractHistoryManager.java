@@ -172,7 +172,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 comment.setMessage(new String[] { groupId, type });
             }
 
-            getCommentEntityManager().insert(comment);
+            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
         }
     }
 
@@ -205,7 +205,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 }
                 comment.setMessage(new String[] { groupId, type });
             }
-            getCommentEntityManager().insert(comment);
+            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 comment.setAction(Event.ACTION_DELETE_ATTACHMENT);
             }
             comment.setMessage(attachmentName);
-            getCommentEntityManager().insert(comment);
+            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
         }
     }
 
@@ -257,8 +257,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         }
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task, updateTime);
+            HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
+            historicTaskService.recordTaskInfoChange(task, updateTime, processEngineConfiguration);
         }
 
     }
@@ -382,12 +382,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         if (sourceActivityExecution != null) {
             processDefinitionId = sourceActivityExecution.getProcessDefinitionId();
         } else if (variable.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
+            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             if (processInstanceExecution != null) {
                 processDefinitionId = processInstanceExecution.getProcessDefinitionId();
             }
         } else if (variable.getTaskId() != null) {
-            TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(variable.getTaskId());
+            TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(variable.getTaskId());
             if (taskEntity != null) {
                 processDefinitionId = taskEntity.getProcessDefinitionId();
             }
@@ -398,12 +398,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
         String processDefinitionId = null;
         if (identityLink.getProcessInstanceId() != null) {
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
             if (execution != null) {
                 processDefinitionId = execution.getProcessDefinitionId();
             }
         } else if (identityLink.getTaskId() != null) {
-            TaskEntity task = CommandContextUtil.getTaskService().getTask(identityLink.getTaskId());
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
             if (task != null) {
                 processDefinitionId = task.getProcessDefinitionId();
             }
@@ -414,13 +414,13 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     protected String getProcessDefinitionId(EntityLinkEntity entityLink) {
         String processDefinitionId = null;
         if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(entityLink.getScopeId());
             if (execution != null) {
                 processDefinitionId = execution.getProcessDefinitionId();
             }
 
         } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(entityLink.getScopeId());
             if (task != null) {
                 processDefinitionId = task.getProcessDefinitionId();
             }

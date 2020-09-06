@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -37,8 +37,10 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     protected String identityType;
 
-    public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType) {
-        super(taskId);
+    public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        super(taskId, cmmnEngineConfiguration);
         validateParams(taskId, identityId, identityIdType, identityType);
         this.taskId = taskId;
         this.identityId = identityId;
@@ -83,7 +85,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-            TaskHelper.changeTaskAssignee(task, identityId);
+            TaskHelper.changeTaskAssignee(task, identityId, cmmnEngineConfiguration);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -96,17 +98,18 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
 
-            TaskHelper.changeTaskOwner(task, identityId);
+            TaskHelper.changeTaskOwner(task, identityId, cmmnEngineConfiguration);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+            IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .createTaskIdentityLink(task.getId(), identityId, null, identityType);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity, cmmnEngineConfiguration);
 
         } else if (IDENTITY_GROUP == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
-            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-
+            IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .createTaskIdentityLink(task.getId(), null, identityId, identityType);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity, cmmnEngineConfiguration);
         }
 
         if (assignedToNoOne) {

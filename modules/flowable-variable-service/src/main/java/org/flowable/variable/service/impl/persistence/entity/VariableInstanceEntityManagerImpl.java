@@ -33,7 +33,7 @@ public class VariableInstanceEntityManagerImpl
     implements VariableInstanceEntityManager {
 
     public VariableInstanceEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, VariableInstanceDataManager variableInstanceDataManager) {
-        super(variableServiceConfiguration, variableInstanceDataManager);
+        super(variableServiceConfiguration, variableServiceConfiguration.getEngineName(), variableInstanceDataManager);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class VariableInstanceEntityManagerImpl
         super.delete(entity, false);
         ByteArrayRef byteArrayRef = entity.getByteArrayRef();
         if (byteArrayRef != null) {
-            byteArrayRef.delete();
+            byteArrayRef.delete(serviceConfiguration.getEngineName());
         }
         entity.setDeleted(true);
     }

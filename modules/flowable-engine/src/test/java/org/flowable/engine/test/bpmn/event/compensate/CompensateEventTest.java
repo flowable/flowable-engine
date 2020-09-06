@@ -24,7 +24,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -87,7 +86,8 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getEventSubscriptionService(commandContext).updateEventSubscription(eventSubscription);
+                processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                    .updateEventSubscription(eventSubscription);
                 return null;
             }
         });
