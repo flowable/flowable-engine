@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
-import org.flowable.job.api.JobInfo;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
@@ -140,11 +139,6 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         return getJobManager().moveJobToDeadLetterJob(job);
     }
 
-    @Override
-    public void unacquireWithDecrementRetries(JobInfo job) {
-        getJobManager().unacquireWithDecrementRetries(job);
-    }
-    
     @Override
     public JobEntity createJob() {
         return getJobEntityManager().create();

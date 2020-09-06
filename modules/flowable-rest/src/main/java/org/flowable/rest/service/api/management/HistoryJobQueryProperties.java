@@ -10,28 +10,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.rest.service.api.management;
 
-package org.flowable.job.api;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.Date;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.job.service.impl.JobQueryProperty;
 
 /**
- * Represents one history job
- * 
- * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public interface HistoryJob extends JobInfo {
+public class HistoryJobQueryProperties {
 
-    String HISTORY_JOB_TYPE = "historyJob";
-    
-    /**
-     * Get the job create time.
-     */
-    Date getCreateTime();
-    
-    /**
-     * Get the scope type. 
-     */
-    String getScopeType();
+    public static Map<String, QueryProperty> PROPERTIES;
+
+    static {
+        PROPERTIES = new HashMap<>();
+        PROPERTIES.put("id", JobQueryProperty.JOB_ID);
+        PROPERTIES.put("retries", JobQueryProperty.RETRIES);
+        PROPERTIES.put("tenantId", JobQueryProperty.TENANT_ID);
+    }
 
 }

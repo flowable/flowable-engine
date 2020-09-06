@@ -135,10 +135,12 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
         Task task = startOneTaskprocess();
 
         downgradeHistoryJobConfigurations();
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 100L);
 
         taskService.setAssignee(task.getId(), null);
-
+        downgradeHistoryJobConfigurations();
         waitForHistoryJobExecutorToProcessAllJobs(20000L, 100L);
+
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertThat(historicTaskInstance.getClaimTime()).isNull();
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(task.getProcessInstanceId())

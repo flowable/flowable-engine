@@ -78,24 +78,9 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
     HistoryJobQuery orderByJobId();
 
     /**
-     * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByJobDuedate();
-
-    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     HistoryJobQuery orderByJobRetries();
-
-    /**
-     * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByProcessInstanceId();
-
-    /**
-     * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByExecutionId();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
