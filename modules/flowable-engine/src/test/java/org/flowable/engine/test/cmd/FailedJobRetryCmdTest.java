@@ -15,6 +15,7 @@ package org.flowable.engine.test.cmd;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -91,6 +92,22 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
         execution = refreshExecutionEntity(execution.getId());
         assertThat(execution.getActivityId()).isEqualTo("failingServiceTask");
 
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testTimeCycleVariable.bpmn20.xml" })
+    public void testTimeCycleVariable() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("timeCycleVariable")
+            .variable("fail", true)
+            .variable("myVariable", "R11/PT5M")
+            .start();
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 50);
+
+        Job failedJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(failedJob).isNotNull();
+        assertThat(failedJob.getRetries()).isEqualTo(10); // 11 - 1 -> the variable is used
     }
 
     protected void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
