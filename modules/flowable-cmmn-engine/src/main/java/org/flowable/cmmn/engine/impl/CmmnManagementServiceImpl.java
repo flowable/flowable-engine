@@ -203,7 +203,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public void handleHistoryCleanupTimerJob() {
-        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd(configuration));
+        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
     
     @Override
@@ -223,7 +223,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
-        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId, configuration);
+        return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
     
     public <T> T executeCommand(Command<T> command) {

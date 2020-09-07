@@ -78,7 +78,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicCaseInstanceEntity.setCallbackType(caseInstanceEntity.getCallbackType());
             historicCaseInstanceEntity.setReferenceId(caseInstanceEntity.getReferenceId());
             historicCaseInstanceEntity.setReferenceType(caseInstanceEntity.getReferenceType());
-            historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+            historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
         }
     }
 
@@ -130,7 +130,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicMilestoneInstanceEntity.setElementId(milestoneInstance.getElementId());
             historicMilestoneInstanceEntity.setTimeStamp(cmmnEngineConfiguration.getClock().getCurrentTime());
             historicMilestoneInstanceEntity.setTenantId(milestoneInstance.getTenantId());
-            historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+            historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
         }
     }
 
@@ -264,7 +264,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setExtraValue(planItemInstanceEntity.getExtraValue());
             historicPlanItemInstanceEntity.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
             
-            historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+            historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
         }
     }
     

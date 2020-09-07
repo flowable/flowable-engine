@@ -36,19 +36,14 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class CompleteTaskCmd implements Command<Void> {
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String taskId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     
-    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables, 
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
-        
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {  
         this.taskId = taskId;
         this.variables = variables;
         this.transientVariables = transientVariables;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
     @Override
@@ -58,6 +53,7 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskEntity taskEntity = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);

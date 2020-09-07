@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
@@ -33,7 +32,6 @@ import org.flowable.form.api.FormInfo;
 public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTransitionBuilder {
 
     protected CommandExecutor commandExecutor;
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String planItemInstanceId;
     protected Map<String, Object> variables;
@@ -47,9 +45,8 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
     protected String childTaskFormOutcome;
     protected FormInfo childTaskFormInfo;
 
-    public PlanItemInstanceTransitionBuilderImpl(CommandExecutor commandExecutor, String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public PlanItemInstanceTransitionBuilderImpl(CommandExecutor commandExecutor, String planItemInstanceId) {
         this.commandExecutor = commandExecutor;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.planItemInstanceId = planItemInstanceId;
     }
 
@@ -175,49 +172,49 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
     public void trigger() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void enable() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void disable() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void start() {
         commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
                 formInfo, localVariables, transientVariables, childTaskVariables, childTaskFormVariables, 
-                childTaskFormOutcome, childTaskFormInfo, cmmnEngineConfiguration));
+                childTaskFormOutcome, childTaskFormInfo));
     }
 
     @Override
     public void terminate() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void completeStage() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, false, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables, false));
     }
 
     @Override
     public void forceCompleteStage() {
         validateChildTaskVariablesNotSet();
         commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
-                formInfo, localVariables, transientVariables, true, cmmnEngineConfiguration));
+                formInfo, localVariables, transientVariables, true));
     }
 
     protected void validateChildTaskVariablesNotSet() {

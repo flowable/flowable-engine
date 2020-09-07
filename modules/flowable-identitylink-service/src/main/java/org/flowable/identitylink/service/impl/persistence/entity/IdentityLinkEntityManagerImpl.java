@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
@@ -39,8 +38,8 @@ public class IdentityLinkEntityManagerImpl
     }
 
     @Override
-    public void insert(IdentityLinkEntity entity, boolean fireCreateEvent, IdGenerator idGenerator) {
-        super.insert(entity, fireCreateEvent, idGenerator);
+    public void insert(IdentityLinkEntity entity, boolean fireCreateEvent) {
+        super.insert(entity, fireCreateEvent);
 
         IdentityLinkEventHandler identityLinkEventHandler = getIdentityLinkEventHandler();
         if (identityLinkEventHandler != null) {
@@ -120,7 +119,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(type);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         return identityLinkEntity;
     }
     
@@ -133,7 +132,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(type);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         return identityLinkEntity;
     }
     
@@ -149,7 +148,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(type);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         return identityLinkEntity;
     }
 
@@ -160,7 +159,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(type);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         
         return identityLinkEntity;
     }
@@ -172,7 +171,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         return identityLinkEntity;
     }
     
@@ -184,7 +183,7 @@ public class IdentityLinkEntityManagerImpl
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);
         identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
-        insert(identityLinkEntity, serviceConfiguration.getIdGenerator());
+        insert(identityLinkEntity);
         return identityLinkEntity;
     }
 

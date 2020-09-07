@@ -93,7 +93,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId) {
-        return new PlanItemInstanceTransitionBuilderImpl(commandExecutor, planItemInstanceId, configuration);
+        return new PlanItemInstanceTransitionBuilderImpl(commandExecutor, planItemInstanceId);
     }
 
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
@@ -111,47 +111,47 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override 
     public void triggerPlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override
     public void enablePlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override
     public void disablePlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override
     public void completeStagePlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId));
     }
 
     @Override
     public void completeStagePlanItemInstance(String planItemInstanceId, boolean force) {
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, true, configuration));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, true));
     }
 
     @Override
     public void startPlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override
     public void completeCaseInstance(String caseInstanceId) {
-        commandExecutor.execute(new CompleteCaseInstanceCmd(caseInstanceId, configuration));
+        commandExecutor.execute(new CompleteCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
     public void terminateCaseInstance(String caseInstanceId) {
-        commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId, configuration));
+        commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
     public void terminatePlanItemInstance(String planItemInstanceId) {
-        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, configuration));
+        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
 
     @Override
@@ -161,17 +161,17 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     @Override
     public void completeGenericEventListenerInstance(String genericEventListenerInstanceId) {
-        commandExecutor.execute(new TriggerPlanItemInstanceCmd(genericEventListenerInstanceId, configuration));
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(genericEventListenerInstanceId));
     }
 
     @Override
     public void completeUserEventListenerInstance(String userEventListenerInstanceId) {
-        commandExecutor.execute(new TriggerPlanItemInstanceCmd(userEventListenerInstanceId, configuration));
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(userEventListenerInstanceId));
     }
 
     @Override
     public Map<String, Object> getVariables(String caseInstanceId) {
-        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
     }
     
     @Override
@@ -181,7 +181,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public Map<String, Object> getLocalVariables(String planItemInstanceId) {
-        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId, configuration));
+        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId));
     }
     
     @Override
@@ -191,17 +191,17 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public Object getVariable(String caseInstanceId, String variableName) {
-        return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName, configuration));
+        return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName));
     }
     
     @Override
     public VariableInstance getVariableInstance(String caseInstanceId, String variableName) {
-        return commandExecutor.execute(new GetCaseVariableInstanceCmd(caseInstanceId, variableName, configuration));
+        return commandExecutor.execute(new GetCaseVariableInstanceCmd(caseInstanceId, variableName));
     }
     
     @Override
     public Object getLocalVariable(String planItemInstanceId, String variableName) {
-        return commandExecutor.execute(new GetLocalVariableCmd(planItemInstanceId, variableName, configuration));
+        return commandExecutor.execute(new GetLocalVariableCmd(planItemInstanceId, variableName));
     }
     
     @Override
@@ -296,52 +296,52 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public List<StageResponse> getStageOverview(String caseInstanceId) {
-        return commandExecutor.execute(new GetStageOverviewCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetStageOverviewCmd(caseInstanceId));
     }
 
     @Override
     public void addUserIdentityLink(String caseInstanceId, String userId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkForCaseInstanceCmd(caseInstanceId, userId, null, identityLinkType, configuration));
+        commandExecutor.execute(new AddIdentityLinkForCaseInstanceCmd(caseInstanceId, userId, null, identityLinkType));
     }
 
     @Override
     public void addGroupIdentityLink(String caseInstanceId, String groupId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkForCaseInstanceCmd(caseInstanceId, null, groupId, identityLinkType, configuration));
+        commandExecutor.execute(new AddIdentityLinkForCaseInstanceCmd(caseInstanceId, null, groupId, identityLinkType));
     }
 
     @Override
     public void deleteUserIdentityLink(String caseInstanceId, String userId, String identityLinkType) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseInstanceCmd(caseInstanceId, userId, null, identityLinkType, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseInstanceCmd(caseInstanceId, userId, null, identityLinkType));
     }
 
     @Override
     public void deleteGroupIdentityLink(String caseInstanceId, String groupId, String identityLinkType) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseInstanceCmd(caseInstanceId, null, groupId, identityLinkType, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseInstanceCmd(caseInstanceId, null, groupId, identityLinkType));
     }
 
     @Override
     public List<IdentityLink> getIdentityLinksForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetIdentityLinksForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetIdentityLinksForCaseInstanceCmd(caseInstanceId));
     }
     
     @Override
     public List<IdentityLink> getIdentityLinksForPlanItemInstance(String planItemInstanceId) {
-        return commandExecutor.execute(new GetIdentityLinksForPlanItemInstanceCmd(planItemInstanceId, configuration));
+        return commandExecutor.execute(new GetIdentityLinksForPlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override
     public List<EntityLink> getEntityLinkChildrenForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetEntityLinkChildrenForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetEntityLinkChildrenForCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
     public List<EntityLink> getEntityLinkChildrenWithSameRootAsCaseInstance(String instanceId) {
-        return commandExecutor.execute(new GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(instanceId, configuration));
+        return commandExecutor.execute(new GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(instanceId));
     }
 
     @Override
     public List<EntityLink> getEntityLinkParentsForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetEntityLinkParentsForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
     }
 
     @Override

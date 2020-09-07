@@ -12,8 +12,6 @@
  */
 package org.flowable.common.engine.impl.persistence.entity;
 
-import org.flowable.common.engine.impl.cfg.IdGenerator;
-
 /**
  * @author Joram Barrez
  */
@@ -23,9 +21,9 @@ public interface EntityManager<EntityImpl extends Entity> {
 
     EntityImpl findById(String entityId);
 
-    void insert(EntityImpl entity, IdGenerator idGenerator);
+    void insert(EntityImpl entity);
 
-    void insert(EntityImpl entity, boolean fireCreateEvent, IdGenerator idGenerator);
+    void insert(EntityImpl entity, boolean fireCreateEvent);
 
     EntityImpl update(EntityImpl entity);
 

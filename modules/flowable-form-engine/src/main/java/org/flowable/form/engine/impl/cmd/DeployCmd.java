@@ -94,7 +94,7 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        formEngineConfiguration.getDeploymentEntityManager().insert(deployment, formEngineConfiguration.getIdGenerator());
+        formEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

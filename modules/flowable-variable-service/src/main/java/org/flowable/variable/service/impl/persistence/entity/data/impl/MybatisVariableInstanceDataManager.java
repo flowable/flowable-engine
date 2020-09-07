@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
@@ -49,6 +51,12 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypesMatcher
         = new VariableInstanceBySubScopeIdAndScopeTypesMatcher();
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    
+    public MybatisVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
+    }
 
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
@@ -120,5 +128,10 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("subScopeId", subScopeId);
         params.put("scopeTypes", scopeTypes);
         bulkDelete("deleteVariablesBySubScopeIdAndScopeTypes", variableInstanceBySubScopeIdAndScopeTypesMatcher, params);
+    }
+    
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return variableServiceConfiguration.getIdGenerator();
     }
 }

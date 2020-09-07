@@ -17,6 +17,7 @@ import java.util.Map;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -34,8 +35,8 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
 
     protected Map<String, Object> variables;
 
-    public ExternalWorkerJobTerminateCmd(String externalJobId, String workerId, Map<String, Object> variables, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(externalJobId, workerId, cmmnEngineConfiguration);
+    public ExternalWorkerJobTerminateCmd(String externalJobId, String workerId, Map<String, Object> variables) {
+        super(externalJobId, workerId);
         this.variables = variables;
     }
 
@@ -44,6 +45,7 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
         externalWorkerJob.setJobHandlerConfiguration("terminate:");
 
         if (variables != null && !variables.isEmpty()) {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
             VariableService variableService = variableServiceConfiguration.getVariableService();
             VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();

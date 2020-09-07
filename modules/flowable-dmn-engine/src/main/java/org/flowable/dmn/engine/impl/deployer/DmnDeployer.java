@@ -112,7 +112,7 @@ public class DmnDeployer implements Deployer {
         DecisionEntityManager decisionEntityManager = dmnEngineConfiguration.getDecisionEntityManager();
 
         for (DecisionEntity decision : parsedDeployment.getAllDecisions()) {
-            decisionEntityManager.insert(decision, dmnEngineConfiguration.getIdGenerator());
+            decisionEntityManager.insert(decision);
         }
     }
 

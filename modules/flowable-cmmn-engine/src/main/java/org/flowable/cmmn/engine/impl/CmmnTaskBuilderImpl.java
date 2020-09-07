@@ -33,7 +33,7 @@ public class CmmnTaskBuilderImpl extends BaseTaskBuilderImpl {
 
     @Override
     public Task create() {
-        return commandExecutor.execute(new CreateCmmnTaskCmd(this, cmmnEngineConfiguration));
+        return commandExecutor.execute(new CreateCmmnTaskCmd(this));
     }
 
 }

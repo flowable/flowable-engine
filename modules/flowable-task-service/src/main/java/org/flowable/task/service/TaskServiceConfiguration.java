@@ -102,7 +102,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
             historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager(this);
         }
         if (historicTaskLogDataManager == null) {
-            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager();
+            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager(this);
         }
     }
 

@@ -57,7 +57,7 @@ public class MilestoneReachedHistoryJsonTransformer extends AbstractHistoryJsonT
         historicMilestoneInstanceEntity.setElementId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ELEMENT_ID));
         historicMilestoneInstanceEntity.setTimeStamp(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
         historicMilestoneInstanceEntity.setTenantId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TENANT_ID));
-        historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+        historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
     }
 
 }

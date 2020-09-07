@@ -56,7 +56,7 @@ public class BatchPartEntityManagerImpl
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);
         batchPartEntity.setCreateTime(getClock().getCurrentTime());
-        insert(batchPartEntity, serviceConfiguration.getIdGenerator());
+        insert(batchPartEntity);
         
         return batchPartEntity;
     }

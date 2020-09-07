@@ -55,7 +55,7 @@ public class SaveUserCmd implements Command<Void>, Serializable {
             }
             
             if (user instanceof UserEntity) {
-                idmEngineConfiguration.getUserEntityManager().insert((UserEntity) user, true, idmEngineConfiguration.getIdGenerator());
+                idmEngineConfiguration.getUserEntityManager().insert((UserEntity) user, true);
             } else {
                 CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) user, idmEngineConfiguration.getIdGenerator());
             }

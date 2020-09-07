@@ -72,126 +72,126 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public Task newTask(String taskId) {
-        return commandExecutor.execute(new NewTaskCmd(taskId, configuration));
+        return commandExecutor.execute(new NewTaskCmd(taskId));
     }
 
     @Override
     public void saveTask(Task task) {
-        commandExecutor.execute(new SaveTaskCmd(task, configuration));
+        commandExecutor.execute(new SaveTaskCmd(task));
     }
     
     @Override
     public void claim(String taskId, String userId) {
-        commandExecutor.execute(new ClaimTaskCmd(taskId, userId, configuration));
+        commandExecutor.execute(new ClaimTaskCmd(taskId, userId));
     }
 
     @Override
     public void unclaim(String taskId) {
-        commandExecutor.execute(new ClaimTaskCmd(taskId, null, configuration));
+        commandExecutor.execute(new ClaimTaskCmd(taskId, null));
     }
 
     @Override
     public void complete(String taskId) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, null, null, configuration));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, null, null));
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, variables, null, configuration));        
+        commandExecutor.execute(new CompleteTaskCmd(taskId, variables, null));        
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, variables, transientVariables, configuration));        
+        commandExecutor.execute(new CompleteTaskCmd(taskId, variables, transientVariables));        
     }
     
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
-        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, configuration));
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
     }
 
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, Map<String, Object> transientVariables) {
 
-        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables, configuration));
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
 
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
 
-        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope, configuration));
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
     }
     
     @Override
     public void delegateTask(String taskId, String userId) {
-        commandExecutor.execute(new DelegateTaskCmd(taskId, userId, configuration));
+        commandExecutor.execute(new DelegateTaskCmd(taskId, userId));
     }
 
     @Override
     public void resolveTask(String taskId) {
-        commandExecutor.execute(new ResolveTaskCmd(taskId, null, configuration));
+        commandExecutor.execute(new ResolveTaskCmd(taskId, null));
     }
 
     @Override
     public void resolveTask(String taskId, Map<String, Object> variables) {
-        commandExecutor.execute(new ResolveTaskCmd(taskId, variables, configuration));
+        commandExecutor.execute(new ResolveTaskCmd(taskId, variables));
     }
 
     @Override
     public void resolveTask(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
-        commandExecutor.execute(new ResolveTaskCmd(taskId, variables, transientVariables, configuration));
+        commandExecutor.execute(new ResolveTaskCmd(taskId, variables, transientVariables));
     }
     
     @Override
     public void deleteTask(String taskId) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, null, false, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, null, false));
     }
 
     @Override
     public void deleteTasks(Collection<String> taskIds) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, false, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, false));
     }
 
     @Override
     public void deleteTask(String taskId, boolean cascade) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, null, cascade, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, null, cascade));
     }
 
     @Override
     public void deleteTasks(Collection<String> taskIds, boolean cascade) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, cascade, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, null, cascade));
     }
 
     @Override
     public void deleteTask(String taskId, String deleteReason) {
-        commandExecutor.execute(new DeleteTaskCmd(taskId, deleteReason, false, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskId, deleteReason, false));
     }
     
     @Override
     public void deleteTasks(Collection<String> taskIds, String deleteReason) {
-        commandExecutor.execute(new DeleteTaskCmd(taskIds, deleteReason, false, configuration));
+        commandExecutor.execute(new DeleteTaskCmd(taskIds, deleteReason, false));
     }
 
     @Override
     public FormInfo getTaskFormModel(String taskId) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false, configuration));
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false));
     }
     
     @Override
     public FormInfo getTaskFormModel(String taskId, boolean ignoreVariables) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables, configuration));
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables));
     }
     
     @Override
     public void setPriority(String taskId, int priority) {
-        commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority, configuration));
+        commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority));
     }
 
     @Override
     public void setDueDate(String taskId, Date dueDate) {
-        commandExecutor.execute(new SetTaskDueDateCmd(taskId, dueDate, configuration));
+        commandExecutor.execute(new SetTaskDueDateCmd(taskId, dueDate));
     }
     
     @Override
@@ -202,32 +202,32 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public List<Task> getSubTasks(String parentTaskId) {
-        return commandExecutor.execute(new GetSubTasksCmd(parentTaskId, configuration));
+        return commandExecutor.execute(new GetSubTasksCmd(parentTaskId));
     }
     
     @Override
     public Map<String, Object> getVariables(String taskId) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false, configuration));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, false));
     }
 
     @Override
     public Map<String, Object> getVariablesLocal(String taskId) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true, configuration));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, null, true));
     }
 
     @Override
     public Map<String, Object> getVariables(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, false, configuration));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, false));
     }
 
     @Override
     public Map<String, Object> getVariablesLocal(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, true, configuration));
+        return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, true));
     }
 
     @Override
     public Object getVariable(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, false, configuration));
+        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, false));
     }
 
     @Override
@@ -237,12 +237,12 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public boolean hasVariable(String taskId, String variableName) {
-        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, false, configuration));
+        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, false));
     }
 
     @Override
     public Object getVariableLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, true, configuration));
+        return commandExecutor.execute(new GetTaskVariableCmd(taskId, variableName, true));
     }
 
     @Override
@@ -252,12 +252,12 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public List<VariableInstance> getVariableInstancesLocalByTaskIds(Set<String> taskIds) {
-        return commandExecutor.execute(new GetTasksLocalVariablesCmd(taskIds, configuration));
+        return commandExecutor.execute(new GetTasksLocalVariablesCmd(taskIds));
     }
 
     @Override
     public boolean hasVariableLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, true, configuration));
+        return commandExecutor.execute(new HasTaskVariableCmd(taskId, variableName, true));
     }
 
     @Override
@@ -267,7 +267,7 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
         }
         Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
-        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, false, configuration));
+        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, false));
     }
 
     @Override
@@ -277,110 +277,110 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
         }
         Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
-        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, true, configuration));
+        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, true));
     }
 
     @Override
     public void setVariables(String taskId, Map<String, ? extends Object> variables) {
-        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, false, configuration));
+        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, false));
     }
 
     @Override
     public void setVariablesLocal(String taskId, Map<String, ? extends Object> variables) {
-        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, true, configuration));
+        commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, true));
     }
 
     @Override
     public void removeVariable(String taskId, String variableName) {
         Collection<String> variableNames = new ArrayList<>();
         variableNames.add(variableName);
-        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false, configuration));
+        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false));
     }
 
     @Override
     public void removeVariableLocal(String taskId, String variableName) {
         Collection<String> variableNames = new ArrayList<>(1);
         variableNames.add(variableName);
-        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true, configuration));
+        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
     }
 
     @Override
     public void removeVariables(String taskId, Collection<String> variableNames) {
-        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false, configuration));
+        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false));
     }
 
     @Override
     public void removeVariablesLocal(String taskId, Collection<String> variableNames) {
-        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true, configuration));
+        commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
     }
     
     @Override
     public VariableInstance getVariableInstance(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, false, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, false));
     }
 
     @Override
     public VariableInstance getVariableInstanceLocal(String taskId, String variableName) {
-        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, true, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstanceCmd(taskId, variableName, true));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances(String taskId) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, false, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, false));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, false, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, false));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(String taskId) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, true, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, null, true));
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(String taskId, Collection<String> variableNames) {
-        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, true, configuration));
+        return commandExecutor.execute(new GetTaskVariableInstancesCmd(taskId, variableNames, true));
     }
     
     @Override
     public void setAssignee(String taskId, String userId) {
         commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
-                IdentityLinkType.ASSIGNEE, configuration));
+                IdentityLinkType.ASSIGNEE));
     }
 
     @Override
     public void setOwner(String taskId, String userId) {
         commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
-                IdentityLinkType.OWNER, configuration));
+                IdentityLinkType.OWNER));
     }
     
     @Override
     public void addUserIdentityLink(String taskId, String userId, String identityLinkType) {
         commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
-                identityLinkType, configuration));
+                identityLinkType));
     }
 
     @Override
     public void addGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
         commandExecutor.execute(new AddIdentityLinkCmd(taskId, groupId, AddIdentityLinkCmd.IDENTITY_GROUP, 
-                identityLinkType, configuration));
+                identityLinkType));
     }
     
     @Override
     public void deleteGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
-        commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, null, groupId, identityLinkType, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, null, groupId, identityLinkType));
     }
 
     @Override
     public void deleteUserIdentityLink(String taskId, String userId, String identityLinkType) {
-        commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, userId, null, identityLinkType, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkCmd(taskId, userId, null, identityLinkType));
     }
 
     @Override
     public List<IdentityLink> getIdentityLinksForTask(String taskId) {
-        return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId, configuration));
+        return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId));
     }
 
     @Override

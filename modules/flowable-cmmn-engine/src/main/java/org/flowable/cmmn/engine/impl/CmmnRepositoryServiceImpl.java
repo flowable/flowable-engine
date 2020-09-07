@@ -76,7 +76,7 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     public CmmnDeployment deploy(CmmnDeploymentBuilderImpl deploymentBuilder) {
-        return commandExecutor.execute(new DeployCmd(deploymentBuilder, configuration));
+        return commandExecutor.execute(new DeployCmd(deploymentBuilder));
     }
     
     @Override
@@ -96,7 +96,7 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
-        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, configuration));
+        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
     }
     
     @Override
@@ -121,17 +121,17 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public void deleteCandidateStarterGroup(String caseDefinitionId, String groupId) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId));
     }
 
     @Override
     public void deleteCandidateStarterUser(String caseDefinitionId, String userId) {
-        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null, configuration));
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null));
     }
 
     @Override
     public List<IdentityLink> getIdentityLinksForCaseDefinition(String caseDefinitionId) {
-        return commandExecutor.execute(new GetIdentityLinksForCaseDefinitionCmd(caseDefinitionId, configuration));
+        return commandExecutor.execute(new GetIdentityLinksForCaseDefinitionCmd(caseDefinitionId));
     }
 
     @Override

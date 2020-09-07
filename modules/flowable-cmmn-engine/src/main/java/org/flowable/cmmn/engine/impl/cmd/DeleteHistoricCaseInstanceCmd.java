@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -30,13 +31,10 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
 
-    public DeleteHistoricCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public DeleteHistoricCaseInstanceCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -45,6 +43,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         // Check if case instance is still running
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         HistoricCaseInstance instance = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (instance == null) {

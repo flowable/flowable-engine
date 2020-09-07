@@ -48,7 +48,7 @@ public class AddPrivilegeMappingCmd implements Command<Void>, Serializable {
         } else if (groupId != null) {
             entity.setGroupId(groupId);
         }
-        privilegeMappingEntityManager.insert(entity, idmEngineConfiguration.getIdGenerator());
+        privilegeMappingEntityManager.insert(entity);
 
         return null;
     }

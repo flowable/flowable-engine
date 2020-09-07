@@ -14,7 +14,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -25,17 +24,16 @@ import org.flowable.form.api.FormInfo;
  */
 public class TerminatePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
-    public TerminatePlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(planItemInstanceId, cmmnEngineConfiguration);
+    public TerminatePlanItemInstanceCmd(String planItemInstanceId) {
+        super(planItemInstanceId);
     }
 
     public TerminatePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables,
-            Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Map<String, Object> transientVariables) {
         
-        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, 
-                transientVariables, cmmnEngineConfiguration);
+        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
     }
 
     @Override

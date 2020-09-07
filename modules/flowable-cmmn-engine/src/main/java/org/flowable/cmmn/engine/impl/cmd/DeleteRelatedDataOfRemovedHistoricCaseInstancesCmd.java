@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
@@ -28,14 +29,9 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
-    public DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
-    }
-
     @Override
     public Object execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().deleteHistoricMilestoneInstancesForNonExistingCaseInstances();
         IdentityLinkServiceConfiguration identityLinkServiceConfiguration = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricCaseIdentityLinksForNonExistingInstances();

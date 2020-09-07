@@ -36,11 +36,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstance> {
 
     protected final InjectedPlanItemInstanceBuilderImpl planItemInstanceBuilder;
-    protected final CmmnEngineConfiguration cmmnEngineConfiguration;
 
-    public CreateInjectedPlanItemInstanceCmd(InjectedPlanItemInstanceBuilderImpl planItemInstanceBuilder, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public CreateInjectedPlanItemInstanceCmd(InjectedPlanItemInstanceBuilderImpl planItemInstanceBuilder) {
         this.planItemInstanceBuilder = planItemInstanceBuilder;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -78,6 +76,7 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage instance or case instance.");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
             .createPlanItemInstanceEntityBuilder()
             .caseDefinitionId(runningCaseDefinitionId)
@@ -99,6 +98,7 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
     }
 
     protected PlanItemInstanceEntity getStageInstanceEntity(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
             .findById(planItemInstanceBuilder.getStagePlanItemInstanceId());
 
@@ -113,6 +113,7 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
     }
 
     protected CaseInstanceEntity getCaseInstanceEntity(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceBuilder.getCaseInstanceId());
         if (caseInstanceEntity == null) {
             throw new FlowableIllegalArgumentException(

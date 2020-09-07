@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -28,18 +29,16 @@ import org.flowable.entitylink.api.EntityLinkType;
  * @author Filip Hrisafov
  */
 public class GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd implements Command<List<EntityLink>> {
-
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected String caseInstanceId;
 
-    public GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<EntityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {

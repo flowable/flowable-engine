@@ -22,7 +22,6 @@ import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDeploymentDataManager;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -37,12 +36,12 @@ public class AppDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(AppDeploymentEntity deployment, IdGenerator idGenerator) {
-        super.insert(deployment, true, idGenerator);
+    public void insert(AppDeploymentEntity deployment) {
+        super.insert(deployment, true);
 
         for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getAppResourceEntityManager().insert((AppResourceEntity) resource, idGenerator);
+            getAppResourceEntityManager().insert((AppResourceEntity) resource);
         }
     }
 

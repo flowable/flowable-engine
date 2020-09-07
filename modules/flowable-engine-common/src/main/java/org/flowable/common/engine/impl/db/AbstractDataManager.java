@@ -72,8 +72,8 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
     }
 
     @Override
-    public void insert(EntityImpl entity, IdGenerator idGenerator) {
-        getDbSqlSession().insert(entity, idGenerator);
+    public void insert(EntityImpl entity) {
+        getDbSqlSession().insert(entity, getIdGenerator());
     }
 
     @Override
@@ -300,4 +300,5 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, entityId);
     }
 
+    protected abstract IdGenerator getIdGenerator();
 }

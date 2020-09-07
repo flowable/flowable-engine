@@ -32,6 +32,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -47,17 +48,15 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
 
-    public GetHistoricStageOverviewCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetHistoricStageOverviewCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<StageResponse> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         HistoricCaseInstanceEntity caseInstance = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findById(caseInstanceId);
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId, HistoricCaseInstanceEntity.class);

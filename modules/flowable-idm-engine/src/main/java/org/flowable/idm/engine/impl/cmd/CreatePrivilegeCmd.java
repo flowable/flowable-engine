@@ -51,7 +51,7 @@ public class CreatePrivilegeCmd implements Command<Privilege>, Serializable {
 
         PrivilegeEntity entity = CommandContextUtil.getPrivilegeEntityManager(commandContext).create();
         entity.setName(name);
-        CommandContextUtil.getPrivilegeEntityManager(commandContext).insert(entity, idmEngineConfiguration.getIdGenerator());
+        CommandContextUtil.getPrivilegeEntityManager(commandContext).insert(entity);
         return entity;
     }
 }

@@ -77,7 +77,7 @@ public class DeployCmd implements Command<AppDeployment> {
         
         deployment.setDeploymentTime(appEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
-        appEngineConfiguration.getAppDeploymentEntityManager().insert(deployment, appEngineConfiguration.getIdGenerator());
+        appEngineConfiguration.getAppDeploymentEntityManager().insert(deployment);
         appEngineConfiguration.getDeploymentManager().deploy(deployment, null);
         return deployment;
     }

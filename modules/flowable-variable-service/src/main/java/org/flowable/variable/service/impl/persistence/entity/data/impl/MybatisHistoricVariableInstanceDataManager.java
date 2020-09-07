@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
@@ -46,6 +47,12 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceBySubScopeIdAndScopeTypeMatcher 
         = new HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher();
     
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    
+    public MybatisHistoricVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricVariableInstanceEntity> getManagedEntityClass() {
         return HistoricVariableInstanceEntityImpl.class;
@@ -57,8 +64,8 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     }
 
     @Override
-    public void insert(HistoricVariableInstanceEntity entity, IdGenerator idGenerator) {
-        super.insert(entity, idGenerator);
+    public void insert(HistoricVariableInstanceEntity entity) {
+        super.insert(entity);
     }
 
     @Override
@@ -123,4 +130,10 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
     }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return variableServiceConfiguration.getIdGenerator();
+    }
+    
 }

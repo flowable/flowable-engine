@@ -114,7 +114,7 @@ public class HistoricDetailVariableUpdateHistoryJsonTransformer extends Abstract
         historicDetailEntity.setTime(time);
         
         HistoricDetailEntityManager historicDetailEntityManager = processEngineConfiguration.getHistoricDetailEntityManager();
-        historicDetailEntityManager.insert(historicDetailEntity, processEngineConfiguration.getIdGenerator());
+        historicDetailEntityManager.insert(historicDetailEntity);
     }
 
 }

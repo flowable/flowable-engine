@@ -34,7 +34,7 @@ public class MembershipEntityManagerImpl
         MembershipEntity membershipEntity = create();
         membershipEntity.setUserId(userId);
         membershipEntity.setGroupId(groupId);
-        insert(membershipEntity, false, engineConfiguration.getIdGenerator());
+        insert(membershipEntity, false);
 
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(

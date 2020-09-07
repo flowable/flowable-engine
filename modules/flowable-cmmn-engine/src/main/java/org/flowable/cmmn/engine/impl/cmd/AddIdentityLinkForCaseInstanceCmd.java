@@ -17,6 +17,7 @@ import java.io.Serializable;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -29,8 +30,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class AddIdentityLinkForCaseInstanceCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseInstanceId;
 
@@ -40,15 +39,12 @@ public class AddIdentityLinkForCaseInstanceCmd implements Command<Void>, Seriali
 
     protected String type;
 
-    public AddIdentityLinkForCaseInstanceCmd(String caseInstanceId, String userId, String groupId, String type,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
-        
+    public AddIdentityLinkForCaseInstanceCmd(String caseInstanceId, String userId, String groupId, String type) {
         validateParams(caseInstanceId, userId, groupId, type);
         this.caseInstanceId = caseInstanceId;
         this.userId = userId;
         this.groupId = groupId;
         this.type = type;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     protected void validateParams(String caseInstanceId, String userId, String groupId, String type) {
@@ -69,6 +65,7 @@ public class AddIdentityLinkForCaseInstanceCmd implements Command<Void>, Seriali
 
     @Override
     public Void execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(caseInstanceId);
 

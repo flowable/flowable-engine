@@ -211,7 +211,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                     outgoingExecutionEntity.setActive(false);
                     outgoingExecutionEntity.setCurrentFlowElement(outgoingSequenceFlow);
 
-                    executionEntityManager.insert(outgoingExecutionEntity, processEngineConfiguration.getIdGenerator());
+                    executionEntityManager.insert(outgoingExecutionEntity);
                     outgoingExecutions.add(outgoingExecutionEntity);
                 }
             }

@@ -67,7 +67,7 @@ public class BatchServiceImpl extends CommonServiceImpl<BatchServiceConfiguratio
     
     @Override
     public void insertBatch(Batch batch) {
-        getBatchEntityManager().insert((BatchEntity) batch, configuration.getIdGenerator());
+        getBatchEntityManager().insert((BatchEntity) batch);
     }
     
     @Override

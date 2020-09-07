@@ -41,7 +41,7 @@ public class SaveModelCmd implements Command<Void>, Serializable {
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (model.getId() == null) {
-            processEngineConfiguration.getModelEntityManager().insert(model, processEngineConfiguration.getIdGenerator());
+            processEngineConfiguration.getModelEntityManager().insert(model);
         } else {
             processEngineConfiguration.getModelEntityManager().updateModel(model);
         }

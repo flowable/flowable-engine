@@ -98,7 +98,7 @@ public class HistoricTaskLogEntryEntityManagerImpl
 
         historicTaskLogEntryEntity.setType(historicTaskLogEntryBuilder.getType());
         historicTaskLogEntryEntity.setData(historicTaskLogEntryBuilder.getData());
-        getDataManager().insert(historicTaskLogEntryEntity, serviceConfiguration.getIdGenerator());
+        getDataManager().insert(historicTaskLogEntryEntity);
     }
 
 }

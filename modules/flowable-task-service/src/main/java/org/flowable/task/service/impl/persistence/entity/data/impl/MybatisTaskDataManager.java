@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
@@ -189,4 +190,9 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         }
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return taskServiceConfiguration.getIdGenerator();
+    }
+    
 }

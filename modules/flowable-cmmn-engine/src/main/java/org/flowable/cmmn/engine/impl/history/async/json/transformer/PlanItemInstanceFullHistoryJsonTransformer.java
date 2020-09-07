@@ -55,7 +55,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create();
             copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
-            historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+            historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
             
         } else {
             // If there is already a historic plan item instance it means that the last update time must not be null

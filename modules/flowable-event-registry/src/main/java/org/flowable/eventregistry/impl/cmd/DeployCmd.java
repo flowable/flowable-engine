@@ -94,7 +94,7 @@ public class DeployCmd<T> implements Command<EventDeployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        eventRegistryConfiguration.getDeploymentEntityManager().insert(deployment, eventRegistryConfiguration.getIdGenerator());
+        eventRegistryConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

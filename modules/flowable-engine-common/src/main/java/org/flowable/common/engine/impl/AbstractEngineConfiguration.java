@@ -673,11 +673,11 @@ public abstract class AbstractEngineConfiguration {
 
     public void initDataManagers() {
         if (propertyDataManager == null) {
-            propertyDataManager = new MybatisPropertyDataManager();
+            propertyDataManager = new MybatisPropertyDataManager(idGenerator);
         }
 
         if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager();
+            byteArrayDataManager = new MybatisByteArrayDataManager(idGenerator);
         }
     }
 

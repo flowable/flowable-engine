@@ -157,7 +157,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
 
     @Override
     public void insertJob(JobEntity job) {
-        getJobEntityManager().insert(job, configuration.getIdGenerator());
+        getJobEntityManager().insert(job);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
 
     @Override
     public void insertExternalWorkerJob(ExternalWorkerJobEntity job) {
-        getExternalWorkerJobEntityManager().insert(job, configuration.getIdGenerator());
+        getExternalWorkerJobEntityManager().insert(job);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
 
     @Override
     public void insertDeadLetterJob(DeadLetterJobEntity deadLetterJob) {
-        getDeadLetterJobEntityManager().insert(deadLetterJob, configuration.getIdGenerator());
+        getDeadLetterJobEntityManager().insert(deadLetterJob);
     }
 
     @Override

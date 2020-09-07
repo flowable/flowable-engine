@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
@@ -28,13 +29,14 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     protected String userId;
 
-    public ClaimTaskCmd(String taskId, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public ClaimTaskCmd(String taskId, String userId) {
+        super(taskId);
         this.userId = userId;
     }
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (userId != null) {
             Clock clock = cmmnEngineConfiguration.getClock();
             task.setClaimTime(clock.getCurrentTime());

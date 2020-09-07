@@ -101,7 +101,7 @@ public class PlanItemInstanceEntityManagerImpl
         }
         planItemInstanceEntity.setTenantId(builder.getTenantId());
 
-        insert(planItemInstanceEntity, engineConfiguration.getIdGenerator());
+        insert(planItemInstanceEntity);
 
 
         // adding variables must be done after the entity was inserted, before it does not yet have an id for the variables to be referenced

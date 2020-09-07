@@ -37,14 +37,11 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class SaveTaskCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected TaskEntity task;
 
-    public SaveTaskCmd(Task task, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public SaveTaskCmd(Task task) {
         this.task = (TaskEntity) task;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -53,6 +50,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("task is null");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (task.getRevision() == 0) {
             TaskHelper.insertTask(task, true, cmmnEngineConfiguration);
             cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskCreated(task);

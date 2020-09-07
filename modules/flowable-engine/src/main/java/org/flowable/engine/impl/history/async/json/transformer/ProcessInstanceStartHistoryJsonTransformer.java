@@ -73,7 +73,7 @@ public class ProcessInstanceStartHistoryJsonTransformer extends AbstractHistoryJ
             historicProcessInstance.setReferenceType(getStringFromJson(historicalData, HistoryJsonConstants.REFERENCE_TYPE));
             historicProcessInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
     
-            historicProcessInstanceEntityManager.insert(historicProcessInstance, false, processEngineConfiguration.getIdGenerator());
+            historicProcessInstanceEntityManager.insert(historicProcessInstance, false);
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
             

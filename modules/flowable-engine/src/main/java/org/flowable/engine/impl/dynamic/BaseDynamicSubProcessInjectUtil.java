@@ -249,7 +249,7 @@ public class BaseDynamicSubProcessInjectUtil {
             resourceEntity.setDeploymentId(deploymentEntity.getId());
             resourceEntity.setName(resourceName);
             resourceEntity.setBytes(bytes);
-            resourceEntityManager.insert(resourceEntity, processEngineConfiguration.getIdGenerator());
+            resourceEntityManager.insert(resourceEntity);
             deploymentEntity.addResource(resourceEntity);
         }
     }

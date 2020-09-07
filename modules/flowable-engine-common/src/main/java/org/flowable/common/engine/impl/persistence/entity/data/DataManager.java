@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.persistence.entity.data;
 
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
@@ -24,7 +23,7 @@ public interface DataManager<EntityImpl extends Entity> {
 
     EntityImpl findById(String entityId);
 
-    void insert(EntityImpl entity, IdGenerator idGenerator);
+    void insert(EntityImpl entity);
 
     EntityImpl update(EntityImpl entity);
 

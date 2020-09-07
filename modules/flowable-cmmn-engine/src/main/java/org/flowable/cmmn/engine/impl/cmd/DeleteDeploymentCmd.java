@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -21,16 +22,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class DeleteDeploymentCmd implements Command<Void> {
-
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected String deploymentId;
     protected boolean cascade;
 
-    public DeleteDeploymentCmd(String deploymentId, boolean cascade, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public DeleteDeploymentCmd(String deploymentId, boolean cascade) {
         this.deploymentId = deploymentId;
         this.cascade = cascade;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -38,6 +36,8 @@ public class DeleteDeploymentCmd implements Command<Void> {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         cmmnEngineConfiguration.getDeploymentManager().removeDeployment(deploymentId, cascade);
         return null;
     }

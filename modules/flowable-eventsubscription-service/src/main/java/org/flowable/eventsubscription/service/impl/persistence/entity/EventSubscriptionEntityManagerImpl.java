@@ -239,7 +239,7 @@ public class EventSubscriptionEntityManagerImpl
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
         
-        insert(subscriptionEntity, serviceConfiguration.getIdGenerator());
+        insert(subscriptionEntity);
         
         return subscriptionEntity;
     }
@@ -259,7 +259,7 @@ public class EventSubscriptionEntityManagerImpl
 
         subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(subscriptionEntity, serviceConfiguration.getIdGenerator());
+        insert(subscriptionEntity);
         
         return subscriptionEntity;
     }
@@ -276,7 +276,7 @@ public class EventSubscriptionEntityManagerImpl
 
         eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(eventSubscription, serviceConfiguration.getIdGenerator());
+        insert(eventSubscription);
         return eventSubscription;
     }
 
@@ -298,7 +298,7 @@ public class EventSubscriptionEntityManagerImpl
 
         eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
-        insert(eventSubscription, serviceConfiguration.getIdGenerator());
+        insert(eventSubscription);
 
         return eventSubscription;
     }

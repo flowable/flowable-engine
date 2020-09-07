@@ -124,7 +124,7 @@ public class CmmnDeployer implements EngineDeployer {
                 CmmnResourceEntity resource = caseDefinitionDiagramHelper.createDiagramForCaseDefinition(
                                 caseDefinition, parseResult.getCmmnModelForCaseDefinition(caseDefinition));
                 if (resource != null) {
-                    CommandContextUtil.getCmmnResourceEntityManager().insert(resource, false, cmmnEngineConfiguration.getIdGenerator());
+                    CommandContextUtil.getCmmnResourceEntityManager().insert(resource, false);
                     ((CmmnDeploymentEntity) parseResult.getDeployment()).addResource(resource); // now we'll find it if we look for the diagram name later.
                 }
             }
@@ -179,7 +179,7 @@ public class CmmnDeployer implements EngineDeployer {
     protected void persistCaseDefinitions(CmmnParseResult parseResult) {
         CaseDefinitionEntityManager caseDefinitionManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
-            caseDefinitionManager.insert(caseDefinition, false, cmmnEngineConfiguration.getIdGenerator());
+            caseDefinitionManager.insert(caseDefinition, false);
             addAuthorizationsForNewCaseDefinition(parseResult.getCmmnCaseForCaseDefinition(caseDefinition), caseDefinition);
         }
     }

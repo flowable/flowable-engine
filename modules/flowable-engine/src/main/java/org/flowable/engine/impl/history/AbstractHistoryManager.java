@@ -172,7 +172,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 comment.setMessage(new String[] { groupId, type });
             }
 
-            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
+            getCommentEntityManager().insert(comment);
         }
     }
 
@@ -205,7 +205,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 }
                 comment.setMessage(new String[] { groupId, type });
             }
-            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
+            getCommentEntityManager().insert(comment);
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 comment.setAction(Event.ACTION_DELETE_ATTACHMENT);
             }
             comment.setMessage(attachmentName);
-            getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
+            getCommentEntityManager().insert(comment);
         }
     }
 

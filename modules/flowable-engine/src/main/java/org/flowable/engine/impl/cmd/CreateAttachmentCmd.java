@@ -91,13 +91,13 @@ public class CreateAttachmentCmd implements Command<Attachment> {
         attachment.setUserId(Authentication.getAuthenticatedUserId());
         attachment.setTime(processEngineConfiguration.getClock().getCurrentTime());
 
-        processEngineConfiguration.getAttachmentEntityManager().insert(attachment, false, processEngineConfiguration.getIdGenerator());
+        processEngineConfiguration.getAttachmentEntityManager().insert(attachment, false);
 
         if (content != null) {
             byte[] bytes = IoUtil.readInputStream(content, attachmentName);
             ByteArrayEntity byteArray = processEngineConfiguration.getByteArrayEntityManager().create();
             byteArray.setBytes(bytes);
-            processEngineConfiguration.getByteArrayEntityManager().insert(byteArray, processEngineConfiguration.getIdGenerator());
+            processEngineConfiguration.getByteArrayEntityManager().insert(byteArray);
             attachment.setContentId(byteArray.getId());
             attachment.setContent(byteArray);
         }

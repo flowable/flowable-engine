@@ -15,7 +15,6 @@ package org.flowable.common.engine.impl.persistence.entity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
@@ -49,13 +48,13 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     }
 
     @Override
-    public void insert(EntityImpl entity, IdGenerator idGenerator) {
-        insert(entity, true, idGenerator);
+    public void insert(EntityImpl entity) {
+        insert(entity, true);
     }
 
     @Override
-    public void insert(EntityImpl entity, boolean fireCreateEvent, IdGenerator idGenerator) {
-        getDataManager().insert(entity, idGenerator);
+    public void insert(EntityImpl entity, boolean fireCreateEvent) {
+        getDataManager().insert(entity);
         if (fireCreateEvent) {
             fireEntityInsertedEvent(entity);
         }

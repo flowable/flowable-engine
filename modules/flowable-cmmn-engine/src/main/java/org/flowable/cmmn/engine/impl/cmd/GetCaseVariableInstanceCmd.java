@@ -17,6 +17,7 @@ import java.io.Serializable;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -27,15 +28,12 @@ public class GetCaseVariableInstanceCmd implements Command<VariableInstance>, Se
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
     protected String variableName;
 
-    public GetCaseVariableInstanceCmd(String caseInstanceId, String variableName, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetCaseVariableInstanceCmd(String caseInstanceId, String variableName) {
         this.caseInstanceId = caseInstanceId;
         this.variableName = variableName;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -47,6 +45,7 @@ public class GetCaseVariableInstanceCmd implements Command<VariableInstance>, Se
             throw new FlowableIllegalArgumentException("variableName is null");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {

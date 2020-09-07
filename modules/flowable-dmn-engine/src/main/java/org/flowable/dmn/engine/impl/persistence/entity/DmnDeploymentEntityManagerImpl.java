@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
@@ -38,12 +37,12 @@ public class DmnDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(DmnDeploymentEntity deployment, IdGenerator idGenerator) {
-        super.insert(deployment, true, idGenerator);
+    public void insert(DmnDeploymentEntity deployment) {
+        super.insert(deployment, true);
 
         for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getResourceEntityManager().insert((DmnResourceEntity) resource, idGenerator);
+            getResourceEntityManager().insert((DmnResourceEntity) resource);
         }
     }
 

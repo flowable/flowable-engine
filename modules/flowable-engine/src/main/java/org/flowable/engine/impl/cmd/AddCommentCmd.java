@@ -112,7 +112,7 @@ public class AddCommentCmd implements Command<Comment> {
 
         comment.setFullMessage(message);
 
-        processEngineConfiguration.getCommentEntityManager().insert(comment, processEngineConfiguration.getIdGenerator());
+        processEngineConfiguration.getCommentEntityManager().insert(comment);
 
         return comment;
     }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
@@ -30,18 +31,16 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String taskId;
 
-    public GetIdentityLinksForTaskCmd(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetIdentityLinksForTaskCmd(String taskId) {
         this.taskId = taskId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         List<IdentityLink> identityLinks = (List) task.getIdentityLinks();

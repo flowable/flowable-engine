@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -24,15 +25,12 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class GetVariableCmd implements Command<Object> {
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
     protected String variableName;
     
-    public GetVariableCmd(String caseInstanceId, String variableName, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetVariableCmd(String caseInstanceId, String variableName) {
         this.caseInstanceId = caseInstanceId;
         this.variableName = variableName;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
     @Override
@@ -41,6 +39,7 @@ public class GetVariableCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         VariableInstanceEntity variableInstanceEntity = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .scopeId(caseInstanceId)

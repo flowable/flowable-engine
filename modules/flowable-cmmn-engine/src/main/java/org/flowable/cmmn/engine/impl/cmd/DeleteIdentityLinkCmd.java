@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -37,8 +38,8 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     protected String type;
 
-    public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
+        super(taskId);
         validateParams(userId, groupId, type, taskId);
         this.taskId = taskId;
         this.userId = userId;
@@ -69,6 +70,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (IdentityLinkType.ASSIGNEE.equals(type)) {
             TaskHelper.changeTaskAssignee(task, null, cmmnEngineConfiguration);
         } else if (IdentityLinkType.OWNER.equals(type)) {
