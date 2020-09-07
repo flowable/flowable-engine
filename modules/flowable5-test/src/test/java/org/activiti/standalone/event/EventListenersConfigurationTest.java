@@ -17,6 +17,7 @@ import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.test.api.event.TestFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -39,7 +40,7 @@ public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
 
         // Dispatch custom event
         FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertEquals(1, listener.getEventsReceived().size());
         assertEquals(event, listener.getEventsReceived().get(0));

@@ -23,6 +23,7 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
 
 /**
@@ -54,8 +55,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_CREATED);
 
         // Dispatch events
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event2, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertEquals(2, newListener.getEventsReceived().size());
         assertEquals(event1, newListener.getEventsReceived().get(0));
@@ -64,8 +65,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         // Remove listener and dispatch events again, listener should not be invoked
         dispatcher.removeEventListener(newListener);
         newListener.clearEventsReceived();
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event2, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertTrue(newListener.getEventsReceived().isEmpty());
     }
@@ -85,9 +86,9 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         ActivitiEntityEventImpl event3 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_UPDATED);
 
         // Dispatch events, only 2 out of 3 should have entered the listener
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
-        dispatcher.dispatchEvent(event3);
+        dispatcher.dispatchEvent(event1, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event2, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event3, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertEquals(2, newListener.getEventsReceived().size());
         assertEquals(event1, newListener.getEventsReceived().get(0));
@@ -96,8 +97,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         // Remove listener and dispatch events again, listener should not be invoked
         dispatcher.removeEventListener(newListener);
         newListener.clearEventsReceived();
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event2, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertTrue(newListener.getEventsReceived().isEmpty());
     }
@@ -117,8 +118,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         ActivitiEntityEventImpl event2 = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.ENTITY_DELETED);
 
         // Dispatch events, all should have entered the listener
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        dispatcher.dispatchEvent(event2, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertTrue(newListener.getEventsReceived().isEmpty());
     }
@@ -140,7 +141,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         ActivitiEntityEventImpl otherEvent = new ActivitiEntityEventImpl(new TaskEntity(), FlowableEngineEventType.CUSTOM);
 
         // Dispatch create event
-        dispatcher.dispatchEvent(createEvent);
+        dispatcher.dispatchEvent(createEvent, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertTrue(listener.isCreateReceived());
         assertFalse(listener.isUpdateReceived());
         assertFalse(listener.isCustomReceived());
@@ -149,7 +150,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Dispatch update event
-        dispatcher.dispatchEvent(updateEvent);
+        dispatcher.dispatchEvent(updateEvent, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertTrue(listener.isUpdateReceived());
         assertFalse(listener.isCreateReceived());
         assertFalse(listener.isCustomReceived());
@@ -157,7 +158,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Dispatch delete event
-        dispatcher.dispatchEvent(deleteEvent);
+        dispatcher.dispatchEvent(deleteEvent, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertTrue(listener.isDeleteReceived());
         assertFalse(listener.isCreateReceived());
         assertFalse(listener.isCustomReceived());
@@ -165,7 +166,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Dispatch other event
-        dispatcher.dispatchEvent(otherEvent);
+        dispatcher.dispatchEvent(otherEvent, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertTrue(listener.isCustomReceived());
         assertFalse(listener.isCreateReceived());
         assertFalse(listener.isUpdateReceived());
@@ -177,7 +178,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
 
         // Dispatch event for a task, should be received
         dispatcher.addEventListener(listener);
-        dispatcher.dispatchEvent(createEvent);
+        dispatcher.dispatchEvent(createEvent, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertTrue(listener.isCreateReceived());
         listener.reset();
@@ -186,7 +187,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         ActivitiEntityEventImpl createEventForExecution = new ActivitiEntityEventImpl(new ExecutionEntity(),
                 FlowableEngineEventType.ENTITY_CREATED);
 
-        dispatcher.dispatchEvent(createEventForExecution);
+        dispatcher.dispatchEvent(createEventForExecution, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertFalse(listener.isCreateReceived());
     }
 
@@ -203,7 +204,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
 
         ActivitiEventImpl event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_CREATED);
         try {
-            dispatcher.dispatchEvent(event);
+            dispatcher.dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             assertEquals(1, secondListener.getEventsReceived().size());
         } catch (Throwable t) {
             fail("No exception expected");
@@ -220,7 +221,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         dispatcher.addEventListener(secondListener);
 
         try {
-            dispatcher.dispatchEvent(event);
+            dispatcher.dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             fail("Exception expected");
         } catch (Throwable t) {
             assertTrue(t instanceof ActivitiException);
