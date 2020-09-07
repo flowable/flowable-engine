@@ -19,7 +19,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -711,6 +713,30 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     }
 
     @Test
+    public void testHistoryJobMissingActivityStart() {
+        Task task = startOneTaskprocess();
+
+        // Removing the 'activity start' will fail both the processing of the starting of the process instance and the setting of the assignee
+        HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
+        removeActivityStart((HistoryJobEntity) historyJob, "theTask");
+
+        taskService.complete(task.getId());
+
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(2);
+
+        List<String> exceptionMessages = managementService.createDeadLetterJobQuery().list().stream().map(job -> job.getExceptionMessage()).collect(Collectors.toList());
+        assertThat(exceptionMessages).containsOnly(
+            "Job is not applicable for transformer types: [activity-end]",
+            "Job is not applicable for transformer types: [activity-update]"
+        );
+
+        // The history jobs in the deadletter table have no link to the process instance, hence why a manual cleanup is needed.
+        managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
+    }
+
+    @Test
     public void testMoveDeadLetterJobBackToHistoryJob() {
         Task task = startOneTaskprocess();
 
@@ -757,6 +783,34 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                     for (JsonNode jsonNode : historyJsonNode) {
                         if (jsonNode.has("type")) {
                             ((ObjectNode) jsonNode).put("type", "invalidType");
+                        }
+                    }
+
+                    historyJobEntity.setAdvancedJobHandlerConfiguration(objectMapper.writeValueAsString(historyJsonNode));
+                } catch (JsonProcessingException e) {
+                    Assert.fail();
+                }
+                return null;
+            }
+        });
+    }
+
+    protected void removeActivityStart(HistoryJobEntity historyJob, String activityId) {
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                try {
+                    HistoryJobEntity historyJobEntity = historyJob;
+
+                    ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+                    JsonNode historyJsonNode = objectMapper.readTree(historyJobEntity.getAdvancedJobHandlerConfiguration());
+
+                    Iterator<JsonNode> iterator = historyJsonNode.iterator();
+                    while (iterator.hasNext()) {
+                        JsonNode jsonNode = iterator.next();
+                        if (jsonNode.path("data").path("activityId").asText().equals(activityId)) {
+                            iterator.remove();
                         }
                     }
 

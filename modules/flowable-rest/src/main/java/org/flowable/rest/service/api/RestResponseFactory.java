@@ -1077,7 +1077,7 @@ public class RestResponseFactory {
         response.setCustomValues(job.getCustomValues());
         response.setTenantId(job.getTenantId());
 
-        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_JOB, job.getId()));
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORY_JOB, job.getId()));
 
         return response;
     }
