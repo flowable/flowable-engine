@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -30,6 +31,10 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.Compensate
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,5 +139,16 @@ public class EventSubscriptionUtil {
         }
 
         jobService.scheduleAsyncJob(message);
+
+        if (StringUtils.isEmpty(executionId) && payload != null) {
+            VariableService variableService = CommandContextUtil.getVariableService();
+            VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
+
+            VariableType type = variableTypes.findVariableType(payload);
+            VariableInstanceEntity payloadVariable = variableService.createVariableInstance(ProcessEventJobHandler.PAYLOAD_VARIABLE_NAME, type, payload);
+            payloadVariable.setScopeType(ScopeTypes.JOB);
+            payloadVariable.setScopeId(message.getId());
+            variableService.insertVariableInstance(payloadVariable);
+        }
     }
 }

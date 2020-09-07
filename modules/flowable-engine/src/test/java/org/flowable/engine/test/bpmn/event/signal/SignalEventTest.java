@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.MapEntry.entry;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,12 @@ import java.util.Map;
 
 import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -38,6 +41,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.validation.validator.Problems;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -703,6 +707,112 @@ public class SignalEventTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
+    }
+
+    @Test
+    public void testSignalStartEventFromAPIAsyncWithVariables() {
+
+        // Deploy test processes
+        repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEventAsync.bpmn20.xml").deploy();
+
+        runtimeService.signalEventReceivedAsync("The Signal", Collections.singletonMap("variable", "value"));
+
+        assertEquals(3, managementService.createJobQuery().count());
+        for (Job job : managementService.createJobQuery().list()) {
+            managementService.executeJob(job.getId());
+        }
+        assertThatJobsWereExecutedWithVariables(managementService.createJobQuery().list());
+    }
+
+    @Test
+    public void testSignalStartEventFromAPIAsyncWithVariablesMovingToDeadLetterAndBack() {
+        // Deploy test processes
+        repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEventAsync.bpmn20.xml").deploy();
+
+        runtimeService.signalEventReceivedAsync("The Signal", Collections.singletonMap("variable", "value"));
+
+        assertEquals(3, managementService.createJobQuery().count());
+        List<Job> jobs = managementService.createJobQuery().list();
+        for (Job job : jobs) {
+            managementService.moveJobToDeadLetterJob(job.getId());
+        }
+
+        for (Job job : jobs) {
+            managementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
+        }
+
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        assertThatJobsWereExecutedWithVariables(jobs);
+    }
+
+    @Test
+    public void testDeleteAsyncSignalJobWithVariables() {
+        // Deploy test processes
+        repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEventAsync.bpmn20.xml").deploy();
+
+        runtimeService.signalEventReceivedAsync("The Signal", Collections.singletonMap("variable", "value"));
+
+        assertEquals(3, managementService.createJobQuery().count());
+        List<Job> jobs = managementService.createJobQuery().list();
+        managementService.deleteJob(jobs.get(0).getId());
+        assertThatVaraiblesAreEmptyForJob(jobs.get(0));
+
+        managementService.moveJobToDeadLetterJob(jobs.get(1).getId());
+        managementService.deleteDeadLetterJob(jobs.get(1).getId());
+        assertThatVaraiblesAreEmptyForJob(jobs.get(1));
+    }
+
+    public void assertThatVaraiblesAreEmptyForJob(Job job) {
+        List<VariableInstanceEntity> variables = managementService.executeCommand(commandContext -> CommandContextUtil.getVariableService(commandContext)
+                .findVariableInstanceByScopeIdAndScopeType(job.getId(), ScopeTypes.JOB)
+        );
+        assertThat(variables).isEmpty();
+    }
+
+    protected void assertThatJobsWereExecutedWithVariables(List<Job> jobs) {
+        assertEquals(3, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(3, taskService.createTaskQuery().count());
+
+        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<String> names = Arrays.asList("A", "B", "C");
+        for (int i = 0; i < tasks.size(); i++) {
+            assertEquals("Task in process " + names.get(i), tasks.get(i).getName());
+        }
+
+        runtimeService.createProcessInstanceQuery().list().forEach(
+                processInstance -> assertThat(runtimeService.getVariable(processInstance.getId(), "variable"))
+                        .isEqualTo("value")
+        );
+
+        // Start a process with a signal boundary event
+        runtimeService.startProcessInstanceByKey("processWithSignalCatch");
+        assertEquals(4, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(4, taskService.createTaskQuery().count());
+        assertEquals(1, taskService.createTaskQuery().taskName("Task in process D").count());
+
+        // Firing again
+        runtimeService.signalEventReceivedAsync("The Signal",
+                Collections.singletonMap("intermediateVariable", "intermediateValue"));
+
+        assertEquals(4, managementService.createJobQuery().count());
+        for (Job job : managementService.createJobQuery().list()) {
+            managementService.executeJob(job.getId());
+        }
+        assertEquals(7, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(7, taskService.createTaskQuery().count());
+        assertEquals(1, taskService.createTaskQuery().taskName("Task after signal").count());
+
+        Task taskAfterSignal = taskService.createTaskQuery().taskName("Task after signal").singleResult();
+        assertThat(taskService.getVariable(taskAfterSignal.getId(), "intermediateVariable"))
+                .isEqualTo("intermediateValue");
+
+        // Cleanup
+        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
 
     @Test

@@ -48,7 +48,7 @@ public class DeleteSuspendedJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getSuspendedJobEntityManager(commandContext).delete(jobToDelete);
+        CommandContextUtil.getSuspendedJobEntityManager(commandContext).deleteJobEntityAndRelatedData(jobToDelete);
         return null;
     }
 

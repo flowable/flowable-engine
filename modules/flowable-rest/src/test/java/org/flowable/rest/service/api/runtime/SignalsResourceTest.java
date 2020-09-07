@@ -141,8 +141,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
             var.put("value", "test");
 
             httpPost.setEntity(new StringEntity(requestNode.toString()));
-            closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
-
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_ACCEPTED));
         } finally {
             // Clean up tenant-specific deployment
             if (tenantDeployment != null) {

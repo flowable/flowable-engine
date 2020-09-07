@@ -58,7 +58,7 @@ public class SignalResource {
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicated signal has been processed and no errors occurred."),
             @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
-            @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
+            @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing, which is not allowed. Response body contains additional information about the error.")
     })
     @PostMapping(value = "/runtime/signals")
     public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
@@ -82,14 +82,11 @@ public class SignalResource {
         }
 
         if (signalRequest.isAsync()) {
-            if (signalVariables != null) {
-                throw new FlowableIllegalArgumentException("Async signals cannot take variables as payload");
-            }
 
             if (signalRequest.isCustomTenantSet()) {
-                runtimeService.signalEventReceivedAsyncWithTenantId(signalRequest.getSignalName(), signalRequest.getTenantId());
+                runtimeService.signalEventReceivedAsyncWithTenantId(signalRequest.getSignalName(), signalVariables, signalRequest.getTenantId());
             } else {
-                runtimeService.signalEventReceivedAsync(signalRequest.getSignalName());
+                runtimeService.signalEventReceivedAsync(signalRequest.getSignalName(), signalVariables);
             }
             response.setStatus(HttpStatus.ACCEPTED.value());
         } else {

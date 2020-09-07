@@ -17,11 +17,16 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -78,6 +83,21 @@ public class JobEntityManagerImpl
     }
 
     @Override
+    public void deleteJobEntityAndRelatedData(JobEntity jobEntity) {
+        super.delete(jobEntity, false);
+
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
+        deleteVariables(jobEntity.getId());
+
+        // Send event
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+        }
+    }
+
+    @Override
     public void delete(JobEntity jobEntity) {
         super.delete(jobEntity, false);
 
@@ -99,5 +119,4 @@ public class JobEntityManagerImpl
         
         super.delete(entity, fireDeleteEvent);
     }
-
 }

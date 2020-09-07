@@ -613,6 +613,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public void signalEventReceivedAsync(String signalName, Map<String, Object> processVariables) {
+        commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, processVariables, true, null));
+    }
+
+    @Override
+    public void signalEventReceivedAsyncWithTenantId(String signalName, Map<String, Object> processVariables, String tenantId) {
+        commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, processVariables, true, tenantId));
+    }
+
+    @Override
     public void signalEventReceivedAsyncWithTenantId(String signalName, String tenantId) {
         commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, true, tenantId));
     }
