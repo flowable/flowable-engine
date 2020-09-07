@@ -191,7 +191,7 @@ public class ByteArrayRef implements Serializable {
         } else if (commandExecutor != null) {
             return commandExecutor.execute(context -> {
                 if ("all".equalsIgnoreCase(engineType)) {
-                    return getEngineConfigurationForAllType(commandContext);
+                    return getEngineConfigurationForAllType(context);
                     
                 } else {
                     AbstractEngineConfiguration engineConfiguration = context.getEngineConfigurations().get(engineType);
