@@ -240,6 +240,7 @@ public abstract class BaseHttpActivityDelegate {
             case "GET":
             case "POST":
             case "PUT":
+            case "PATCH":
             case "DELETE":
                 break;
             default:

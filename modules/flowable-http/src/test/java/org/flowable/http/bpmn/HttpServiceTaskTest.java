@@ -452,6 +452,33 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertKeysEquals(process.getId(), response);
         continueProcess(process);
     }
+    
+    @Test
+    @Deployment
+    public void testHttpPatch2XX() throws Exception {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPatch2XX");
+        assertThat(process.isEnded()).isFalse();
+
+        String body = "{\"test\":\"sample\",\"result\":true}";
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("httpPatchRequestMethod", "PATCH");
+        request.put("httpPatchRequestUrl", "https://localhost:9799/api?code=201");
+        request.put("httpPatchRequestHeaders", "Content-Type: application/json");
+        request.put("httpPatchRequestBody", body);
+        assertKeysEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("httpPatchResponseStatusCode", 201);
+        assertKeysEquals(process.getId(), response);
+        // Response body assertions
+        String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPatchResponseBody");
+        assertThat(responseBody).isNotNull();
+        JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
+        HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
+        assertThat(testData.getBody()).isEqualTo(body);
+        continueProcess(process);
+    }
 
     @Test
     @Deployment

@@ -35,6 +35,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -149,6 +150,12 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                     HttpPut put = new HttpPut(uri);
                     setRequestEntity(requestInfo, put);
                     request = put;
+                    break;
+                }
+                case "PATCH": {
+                    HttpPatch patch = new HttpPatch(uri);
+                    setRequestEntity(requestInfo, patch);
+                    request = patch;
                     break;
                 }
                 case "DELETE": {

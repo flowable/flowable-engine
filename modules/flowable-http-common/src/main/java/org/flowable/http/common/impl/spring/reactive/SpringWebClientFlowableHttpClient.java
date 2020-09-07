@@ -109,6 +109,12 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                     headersSpec = put;
                     break;
                 }
+                case "PATCH": {
+                    WebClient.RequestBodySpec patch = webClient.patch().uri(uri);
+                    setRequestEntity(requestInfo, patch);
+                    headersSpec = patch;
+                    break;
+                }
                 case "DELETE": {
                     headersSpec = webClient.delete().uri(uri);
                     break;
