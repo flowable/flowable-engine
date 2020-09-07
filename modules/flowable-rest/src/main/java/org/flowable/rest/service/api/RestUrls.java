@@ -67,6 +67,7 @@ public final class RestUrls {
     public static final String SEGMENT_TIMER_JOBS = "timer-jobs";
     public static final String SEGMENT_SUSPENDED_JOBS = "suspended-jobs";
     public static final String SEGMENT_DEADLETTER_JOBS = "deadletter-jobs";
+    public static final String SEGMENT_HISTORY_JOBS = "history-jobs";
     public static final String SEGMENT_JOB_EXCEPTION_STACKTRACE = "exception-stacktrace";
     public static final String SEGMENT_BATCHES = "batches";
     public static final String SEGMENT_BATCH_DOCUMENT = "batch-document";
@@ -508,6 +509,11 @@ public final class RestUrls {
      * URL template for a single job: <i>management/deadletter-jobs/{0:jobId}</i>
      */
     public static final String[] URL_DEADLETTER_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS, "{0}" };
+
+    /**
+     * URL template for a single job: <i>management/history-jobs/{0:jobId}</i>
+     */
+    public static final String[] URL_HISTORY_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_HISTORY_JOBS, "{0}" };
 
     /**
      * URL template for the stacktrace of a single job: <i>management/jobs/{0:jobId}/exception-stacktrace</i>

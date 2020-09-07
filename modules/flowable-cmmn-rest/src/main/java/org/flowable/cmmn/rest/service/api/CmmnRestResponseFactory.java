@@ -40,6 +40,7 @@ import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInsta
 import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
 import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceResponse;
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceResponse;
+import org.flowable.cmmn.rest.service.api.management.HistoryJobResponse;
 import org.flowable.cmmn.rest.service.api.management.JobResponse;
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.repository.CmmnDeploymentResponse;
@@ -70,6 +71,7 @@ import org.flowable.dmn.api.DmnDecision;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -886,6 +888,36 @@ public class CmmnRestResponseFactory {
                 response.setPlanItemInstanceId(job.getSubScopeId());
             }
         }
+
+        return response;
+    }
+
+    public List<HistoryJobResponse> createHistoryJobResponseList(List<HistoryJob> jobs) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoryJobResponse> responseList = new ArrayList<>(jobs.size());
+        for (HistoryJob job : jobs) {
+            responseList.add(createHistoryJobResponse(job, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job) {
+        return createHistoryJobResponse(job, createUrlBuilder());
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job, RestUrlBuilder urlBuilder) {
+        HistoryJobResponse response = new HistoryJobResponse();
+        response.setId(job.getId());
+        response.setExceptionMessage(job.getExceptionMessage());
+        response.setRetries(job.getRetries());
+        response.setCreateTime(job.getCreateTime());
+        response.setScopeType(job.getScopeType());
+        response.setJobHandlerType(job.getJobHandlerType());
+        response.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        response.setCustomValues(job.getCustomValues());
+        response.setTenantId(job.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORY_JOB, job.getId()));
 
         return response;
     }
