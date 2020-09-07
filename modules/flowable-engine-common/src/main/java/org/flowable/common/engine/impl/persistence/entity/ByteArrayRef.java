@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * <p>
@@ -179,7 +180,12 @@ public class ByteArrayRef implements Serializable {
                 return getEngineConfigurationForAllType(commandContext);
                 
             } else {
-                return commandContext.getEngineConfigurations().get(engineType);
+                AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+                if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
+                    engineConfiguration = commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+                }
+                
+                return engineConfiguration;
             }
             
         } else if (commandExecutor != null) {
@@ -188,7 +194,12 @@ public class ByteArrayRef implements Serializable {
                     return getEngineConfigurationForAllType(commandContext);
                     
                 } else {
-                    return context.getEngineConfigurations().get(engineType);
+                    AbstractEngineConfiguration engineConfiguration = context.getEngineConfigurations().get(engineType);
+                    if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
+                        engineConfiguration = context.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+                    }
+                    
+                    return engineConfiguration;
                 }
             });
             

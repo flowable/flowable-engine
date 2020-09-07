@@ -22,6 +22,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.job.api.Job;
 
 /**
@@ -55,7 +56,8 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
             if (commandContext.getEventDispatcher().isEnabled()) {
                 commandContext.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         } else {
             throw new ActivitiObjectNotFoundException("No job found with id '" + jobId + "'.", Job.class);

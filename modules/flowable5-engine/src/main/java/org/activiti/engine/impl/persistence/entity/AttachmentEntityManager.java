@@ -21,6 +21,7 @@ import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -67,7 +68,9 @@ public class AttachmentEntityManager extends AbstractManager {
             getDbSqlSession().delete(attachment);
             if (dispatchEvents) {
                 getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, 
+                                attachment, executionId, processInstanceId, processDefinitionId),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
     }

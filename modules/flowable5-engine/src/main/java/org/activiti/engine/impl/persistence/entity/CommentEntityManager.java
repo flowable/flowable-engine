@@ -24,6 +24,7 @@ import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Event;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -47,7 +48,9 @@ public class CommentEntityManager extends AbstractManager {
                 }
             }
             getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, persistentObject, 
+                            processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 
@@ -68,9 +71,13 @@ public class CommentEntityManager extends AbstractManager {
                 }
             }
             getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, 
+                            persistentObject, processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, persistentObject, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, 
+                            persistentObject, processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 

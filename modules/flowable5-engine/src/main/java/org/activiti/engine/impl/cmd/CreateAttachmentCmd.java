@@ -31,6 +31,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -96,9 +97,13 @@ public class CreateAttachmentCmd implements Command<Attachment> {
             }
 
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, 
+                            attachment, processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, 
+                            attachment, processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return attachment;

@@ -21,6 +21,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.AttachmentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -67,7 +68,9 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
                 }
             }
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, 
+                            attachment, processInstanceId, processInstanceId, processDefinitionId),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return null;
     }

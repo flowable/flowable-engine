@@ -29,6 +29,7 @@ import org.activiti.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.engine.impl.repository.DeploymentBuilderImpl;
 import org.activiti.engine.repository.Deployment;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -92,7 +93,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         // Deployment settings
@@ -112,7 +114,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return deployment;

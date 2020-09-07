@@ -20,6 +20,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.repository.Deployment;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tijs Rademakers
@@ -54,7 +55,8 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
 
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return null;
