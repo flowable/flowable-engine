@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="Examples">
+
+	<process id="timeCycleVariable">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingServiceTask" />
+
+ 		<serviceTask id="failingServiceTask" flowable:async="true" flowable:class="org.flowable.engine.test.cmd.FailingDelegate">
+			<extensionElements>
+	       		<flowable:failedJobRetryTimeCycle>${myVariable}</flowable:failedJobRetryTimeCycle>
+	       	</extensionElements>
+		</serviceTask>
+        
+		<sequenceFlow id="flow2" sourceRef="failingServiceTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+	
+</definitions>

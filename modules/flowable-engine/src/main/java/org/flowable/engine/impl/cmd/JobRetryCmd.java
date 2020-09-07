@@ -18,16 +18,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobService;
@@ -64,17 +67,29 @@ public class JobRetryCmd implements Command<Object> {
             return null;
         }
 
-        ProcessEngineConfiguration processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
         FlowElement currentFlowElement = executionEntity != null ? executionEntity.getCurrentFlowElement() : null;
-        if (executionEntity != null) {
-            executionEntity.setActive(false);
-        }
 
         String failedJobRetryTimeCycleValue = null;
         if (currentFlowElement instanceof ServiceTask) {
             failedJobRetryTimeCycleValue = ((ServiceTask) currentFlowElement).getFailedJobRetryTimeCycleValue();
+        }
+
+        if (executionEntity != null) {
+            executionEntity.setActive(false);
+
+            if (StringUtils.isNotEmpty(failedJobRetryTimeCycleValue)) {
+                ExpressionManager expressionManager = processEngineConfig.getExpressionManager();
+                if (expressionManager != null) {
+                    Expression expression = expressionManager.createExpression(failedJobRetryTimeCycleValue);
+                    Object value = expression.getValue(executionEntity);
+                    if (value != null) {
+                        failedJobRetryTimeCycleValue = value.toString();
+                    }
+                }
+            }
         }
 
         AbstractRuntimeJobEntity newJobEntity = null;
