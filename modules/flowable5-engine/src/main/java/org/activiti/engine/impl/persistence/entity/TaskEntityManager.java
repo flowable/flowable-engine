@@ -29,6 +29,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Task;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.TaskListener;
 
 /**
@@ -56,7 +57,8 @@ public class TaskEntityManager extends AbstractManager {
                                 task.getExecutionId(),
                                 task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(),
-                                "userTask", UserTaskActivityBehavior.class.getName(), deleteReason));
+                                "userTask", UserTaskActivityBehavior.class.getName(), deleteReason),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
             deleteTask(task, reason, cascade);
@@ -98,7 +100,8 @@ public class TaskEntityManager extends AbstractManager {
 
             if (commandContext.getEventDispatcher().isEnabled()) {
                 commandContext.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
     }

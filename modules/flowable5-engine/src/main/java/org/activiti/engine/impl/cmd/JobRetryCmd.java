@@ -39,6 +39,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 import org.slf4j.Logger;
@@ -139,9 +140,9 @@ public class JobRetryCmd implements Command<Object> {
         FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-                    FlowableEngineEventType.ENTITY_UPDATED, newJobEntity));
+                    FlowableEngineEventType.ENTITY_UPDATED, newJobEntity), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-                    FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+                    FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return null;

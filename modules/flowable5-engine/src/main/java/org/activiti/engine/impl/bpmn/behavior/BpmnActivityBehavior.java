@@ -33,6 +33,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,14 +85,17 @@ public class BpmnActivityBehavior implements Serializable {
             for (JobEntity job : jobs) {
                 if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
             }
 
             List<TimerJobEntity> timerJobs = ((ExecutionEntity) activityExecution).getTimerJobs();
             for (TimerJobEntity job : timerJobs) {
                 if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                    Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                    Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
             }
         }

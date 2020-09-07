@@ -53,6 +53,7 @@ import org.activiti.engine.impl.variable.DeserializedObject;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -864,7 +865,7 @@ public class DbSqlSession implements Session {
                 if (persistentObject instanceof VariableInstanceEntity) {
                     VariableInstanceEntity variableInstance = (VariableInstanceEntity) persistentObject;
                     Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            createVariableDeleteEvent(variableInstance));
+                            createVariableDeleteEvent(variableInstance), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
             }
         }
@@ -890,7 +891,7 @@ public class DbSqlSession implements Session {
                     if (persistentObject instanceof VariableInstanceEntity) {
                         VariableInstanceEntity variableInstance = (VariableInstanceEntity) persistentObject;
                         Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                                createVariableDeleteEvent(variableInstance));
+                                createVariableDeleteEvent(variableInstance), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                     }
                 } else if (delete instanceof BulkCheckedDeleteOperation) {
                     BulkCheckedDeleteOperation bulkCheckedDeleteOperation = (BulkCheckedDeleteOperation) delete;
@@ -898,7 +899,7 @@ public class DbSqlSession implements Session {
                         for (PersistentObject persistentObject : bulkCheckedDeleteOperation.getPersistentObjects()) {
                             VariableInstanceEntity variableInstance = (VariableInstanceEntity) persistentObject;
                             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                                    createVariableDeleteEvent(variableInstance));
+                                    createVariableDeleteEvent(variableInstance), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                         }
                     }
                 }

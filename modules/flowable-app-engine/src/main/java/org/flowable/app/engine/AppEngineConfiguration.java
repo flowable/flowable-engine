@@ -213,6 +213,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             initSchemaManagementCommand();
         }
 
+        configureVariableServiceConfiguration();
         initVariableTypes();
         initBeans();
         initTransactionFactory();
@@ -434,19 +435,22 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             }
         }
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = new VariableServiceConfiguration(ScopeTypes.APP);
 
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.variableServiceConfiguration.setExpressionManager(expressionManager);
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 

@@ -31,6 +31,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -86,7 +87,8 @@ public class JobEntityManager extends AbstractManager {
         for (TimerJobEntity timer : timers) {
             if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timer));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timer),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
             timer.delete();
         }
