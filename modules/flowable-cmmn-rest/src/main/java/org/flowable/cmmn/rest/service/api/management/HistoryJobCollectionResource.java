@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.management;
+package org.flowable.cmmn.rest.service.api.management;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
@@ -19,11 +19,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.ManagementService;
 import org.flowable.job.api.HistoryJobQuery;
-import org.flowable.rest.service.api.BpmnRestApiInterceptor;
-import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,13 +46,13 @@ import io.swagger.annotations.Authorization;
 public class HistoryJobCollectionResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
-    protected ManagementService managementService;
+    protected CmmnManagementService managementService;
     
     @Autowired(required=false)
-    protected BpmnRestApiInterceptor restApiInterceptor;
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List history jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
     @ApiImplicitParams({
@@ -72,7 +72,7 @@ public class HistoryJobCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
-    @GetMapping(value = "/management/history-jobs", produces = "application/json")
+    @GetMapping(value = "/cmmn-management/history-jobs", produces = "application/json")
     public DataResponse<HistoryJobResponse> getHistoryJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         HistoryJobQuery query = managementService.createHistoryJobQuery();
 

@@ -42,6 +42,8 @@ import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
@@ -103,12 +105,18 @@ public interface CmmnRestApiInterceptor {
     void accessJobInfoWithQuery(JobQuery jobQuery);
     
     void accessTimerJobInfoWithQuery(TimerJobQuery jobQuery);
+
+    void accessHistoryJobInfoWithQuery(HistoryJobQuery jobQuery);
     
     void accessSuspendedJobInfoWithQuery(SuspendedJobQuery jobQuery);
     
     void accessDeadLetterJobInfoWithQuery(DeadLetterJobQuery jobQuery);
+
+    void accessHistoryJobInfoById(HistoryJob historyJob);
     
     void deleteJob(Job job);
+
+    void deleteHistoryJob(HistoryJob historyJob);
     
     void accessManagementInfo();
     
