@@ -31,6 +31,7 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
@@ -104,8 +105,11 @@ public class AppEngineAutoConfigurationTest {
                 assertThat(engineConfiguration.getEngineConfigurations())
                         .containsOnlyKeys(
                                 EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                                ScopeTypes.APP,
                                 EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
-                                EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG
+                                ScopeTypes.EVENT_REGISTRY,
+                                EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
+                                "idm"
                         );
 
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -149,7 +153,8 @@ public class AppEngineAutoConfigurationTest {
 
                 assertThat(engineConfiguration.getEngineConfigurations())
                         .containsOnlyKeys(
-                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG
+                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                                ScopeTypes.APP
                         );
 
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -269,17 +274,25 @@ public class AppEngineAutoConfigurationTest {
             assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            ScopeTypes.APP,
                             EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            ScopeTypes.EVENT_REGISTRY,
                             EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            "idm",
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             assertThat(processConfiguration.getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            ScopeTypes.APP,
                             EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            ScopeTypes.EVENT_REGISTRY,
                             EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            "idm",
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             deleteDeployments(appEngine);
@@ -329,13 +342,17 @@ public class AppEngineAutoConfigurationTest {
             assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            ScopeTypes.APP,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             assertThat(processConfiguration.getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            ScopeTypes.APP,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             deleteDeployments(appEngine);
