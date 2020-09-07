@@ -76,12 +76,12 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public List<StageResponse> getStageOverview(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricStageOverviewCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricStageOverviewCmd(caseInstanceId));
     }
 
     @Override
     public void deleteHistoricCaseInstance(String caseInstanceId) {
-        commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId, configuration));
+        commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
@@ -92,37 +92,37 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     @Override
     public void deleteHistoricTaskInstance(String taskId) {
-        commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId, configuration));
+        commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
     }
     
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId));
     }
     
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForPlanItemInstance(String planItemInstanceId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForPlanItemInstanceCmd(planItemInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForPlanItemInstanceCmd(planItemInstanceId));
     }
 
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForTask(String taskId) {
-        return commandExecutor.execute(new GetHistoricIdentityLinksForTaskCmd(taskId, configuration));
+        return commandExecutor.execute(new GetHistoricIdentityLinksForTaskCmd(taskId));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
-        return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId, configuration));
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
     }
 
     @Override

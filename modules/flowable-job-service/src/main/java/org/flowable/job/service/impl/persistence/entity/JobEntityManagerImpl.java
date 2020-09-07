@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -39,15 +38,15 @@ public class JobEntityManagerImpl
 
     @Override
     public boolean insertJobEntity(JobEntity timerJobEntity) {
-        return doInsert(timerJobEntity, true, serviceConfiguration.getIdGenerator());
+        return doInsert(timerJobEntity, true);
     }
 
     @Override
-    public void insert(JobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
-        doInsert(jobEntity, fireCreateEvent, idGenerator);
+    public void insert(JobEntity jobEntity, boolean fireCreateEvent) {
+        doInsert(jobEntity, fireCreateEvent);
     }
 
-    protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
+    protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
         if (serviceConfiguration.getInternalJobManager() != null) {
             boolean handledJob = serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
             if (!handledJob) {
@@ -59,7 +58,7 @@ public class JobEntityManagerImpl
         if (jobEntity.getCorrelationId() == null) {
             jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
         }
-        super.insert(jobEntity, fireCreateEvent, idGenerator);
+        super.insert(jobEntity, fireCreateEvent);
         return true;
     }
 

@@ -44,26 +44,24 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected Map<String, Object> transientVariables;
     protected boolean localScope;
 
-    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables, 
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
-        
-        super(taskId, cmmnEngineConfiguration);
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
+        super(taskId);
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.variables = variables;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, boolean localScope, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Map<String, Object> variables, boolean localScope) {
 
-        this(taskId, formDefinitionId, outcome, variables, cmmnEngineConfiguration);
+        this(taskId, formDefinitionId, outcome, variables);
         this.localScope = localScope;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Map<String, Object> variables, Map<String, Object> transientVariables) {
 
-        this(taskId, formDefinitionId, outcome, variables, cmmnEngineConfiguration);
+        this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
     }
 
@@ -74,6 +72,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
@@ -110,6 +109,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     protected boolean isFormFieldValidationEnabled(TaskEntity task) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
             HumanTask humanTask = (HumanTask) CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).
                 findPlanItemDefinition(task.getTaskDefinitionKey());
@@ -121,6 +121,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     protected void completeTask(CommandContext commandContext, TaskEntity task, Map<String, Object> taskVariables) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         String planItemInstanceId = task.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {

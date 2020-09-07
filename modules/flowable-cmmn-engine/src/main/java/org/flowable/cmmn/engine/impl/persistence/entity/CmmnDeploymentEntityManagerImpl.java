@@ -23,7 +23,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataM
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -38,12 +37,12 @@ public class CmmnDeploymentEntityManagerImpl
     }
 
     @Override
-    public void insert(CmmnDeploymentEntity deployment, IdGenerator idGenerator) {
-        super.insert(deployment, true, idGenerator);
+    public void insert(CmmnDeploymentEntity deployment) {
+        super.insert(deployment, true);
 
         for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getCmmnResourceEntityManager().insert((CmmnResourceEntity) resource, idGenerator);
+            getCmmnResourceEntityManager().insert((CmmnResourceEntity) resource);
         }
     }
 

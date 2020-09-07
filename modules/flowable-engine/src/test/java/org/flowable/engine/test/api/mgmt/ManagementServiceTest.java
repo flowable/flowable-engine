@@ -422,7 +422,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                     .getSuspendedJobEntityManager()
                     .create();
             job.setJobType("testSuspended");
-            processEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().insert(job, processEngineConfiguration.getIdGenerator());
+            processEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().insert(job);
             return job;
         });
 

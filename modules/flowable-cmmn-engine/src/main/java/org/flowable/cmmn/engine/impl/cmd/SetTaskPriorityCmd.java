@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -25,14 +26,16 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
 
     protected int priority;
 
-    public SetTaskPriorityCmd(String taskId, int priority, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public SetTaskPriorityCmd(String taskId, int priority) {
+        super(taskId);
         this.priority = priority;
     }
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         task.setPriority(priority);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
         cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().updateTask(task, true);
         return null;

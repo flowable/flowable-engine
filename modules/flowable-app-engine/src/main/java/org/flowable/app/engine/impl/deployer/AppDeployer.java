@@ -75,7 +75,7 @@ public class AppDeployer implements EngineDeployer {
                     newAppDefinition.setTenantId(deployment.getTenantId());
                     newAppDefinition.setDeploymentId(deployment.getId());
                     newAppDefinition.setResourceName(resourceName);
-                    appDefinitionEntityManager.insert(newAppDefinition, false, appEngineConfiguration.getIdGenerator());
+                    appDefinitionEntityManager.insert(newAppDefinition, false);
                     updateCachingAndArtifacts(newAppDefinition, appResourceModel, deploymentEntity);
                     
                 } else {

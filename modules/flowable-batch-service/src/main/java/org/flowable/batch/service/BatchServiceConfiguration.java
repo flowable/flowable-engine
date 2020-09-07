@@ -65,10 +65,10 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (batchDataManager == null) {
-            batchDataManager = new MybatisBatchDataManager();
+            batchDataManager = new MybatisBatchDataManager(this);
         }
         if (batchPartDataManager == null) {
-            batchPartDataManager = new MybatisBatchPartDataManager();
+            batchPartDataManager = new MybatisBatchPartDataManager(this);
         }
     }
 

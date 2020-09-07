@@ -287,7 +287,7 @@ public class ExecutionEntityManagerImpl
         processInstanceExecution.setStartUserId(authenticatedUserId);
 
         // Store in database
-        insert(processInstanceExecution, false, engineConfiguration.getIdGenerator());
+        insert(processInstanceExecution, false);
 
         if (initiatorVariableName != null) {
             processInstanceExecution.setVariable(initiatorVariableName, authenticatedUserId);
@@ -328,7 +328,7 @@ public class ExecutionEntityManagerImpl
         parentExecutionEntity.addChildExecution(childExecution);
 
         // Insert the child execution
-        insert(childExecution, false, engineConfiguration.getIdGenerator());
+        insert(childExecution, false);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Child execution {} created with parent {}", childExecution, parentExecutionEntity.getId());
@@ -364,7 +364,7 @@ public class ExecutionEntityManagerImpl
         subProcessInstance.setBusinessKey(businessKey);
 
         // Store in database
-        insert(subProcessInstance, false, engineConfiguration.getIdGenerator());
+        insert(subProcessInstance, false);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Child execution {} created with super execution {}", subProcessInstance, superExecutionEntity.getId());

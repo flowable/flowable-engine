@@ -67,7 +67,7 @@ public class LockCmd implements Command<Boolean> {
             property.setName(lockName);
             // The format of the value is the current time in ISO8601 - hostName(hostAddress)
             property.setValue(Instant.now().toString() + hostLockDescription);
-            propertyEntityManager.insert(property, engineConfiguration.getIdGenerator());
+            propertyEntityManager.insert(property);
             return true;
         } else {
             return false;

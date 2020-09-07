@@ -709,7 +709,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         // In the onEvent triggerMode, they are stored for the duration of the transaction (which is the same as one evaluation cycle) but not inserted.
         if (sentry.isDefaultTriggerMode()) {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-            sentryPartInstanceEntityManager.insert(sentryPartInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+            sentryPartInstanceEntityManager.insert(sentryPartInstanceEntity);
         }
 
         entityWithSentryPartInstances.getSatisfiedSentryPartInstances().add(sentryPartInstanceEntity);

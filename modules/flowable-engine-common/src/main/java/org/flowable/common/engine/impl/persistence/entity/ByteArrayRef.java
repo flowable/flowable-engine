@@ -103,7 +103,7 @@ public class ByteArrayRef implements Serializable {
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
-                byteArrayEntityManager.insert(entity, engineConfiguration.getIdGenerator());
+                byteArrayEntityManager.insert(entity);
                 id = entity.getId();
                 deleted = false;
             }

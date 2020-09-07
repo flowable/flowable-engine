@@ -904,7 +904,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         // Set the value after initializing the back pointer
         variableInstance.setValue(value);
-        variableInstanceEntityManager.insert(variableInstance, variableServiceConfiguration.getIdGenerator());
+        variableInstanceEntityManager.insert(variableInstance);
 
         if (variableInstances != null) {
             variableInstances.put(variableName, variableInstance);

@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
@@ -33,6 +35,12 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     protected CachedEntityMatcher<HistoricEntityLinkEntity> historicEntityLinksByScopeIdAndTypeMatcher = new HistoricEntityLinksByScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<HistoricEntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
 
+    protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    
+    public MybatisHistoricEntityLinkDataManager(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
+        this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricEntityLinkEntity> getManagedEntityClass() {
         return HistoricEntityLinkEntityImpl.class;
@@ -108,4 +116,10 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     public void deleteHistoricEntityLinksForNonExistingCaseInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricCaseEntityLinks", null, HistoricEntityLinkEntityImpl.class);
     }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return entityLinkServiceConfiguration.getIdGenerator();
+    }
+    
 }

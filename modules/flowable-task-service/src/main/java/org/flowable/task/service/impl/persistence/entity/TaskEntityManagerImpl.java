@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
@@ -74,7 +73,7 @@ public class TaskEntityManagerImpl extends AbstractTaskServiceEntityManager<Task
         taskEntity.setTaskDefinitionKey(taskBuilder.getTaskDefinitionKey());
         taskEntity.setScopeId(taskBuilder.getScopeId());
         taskEntity.setScopeType(taskBuilder.getScopeType());
-        insert(taskEntity, serviceConfiguration.getIdGenerator());
+        insert(taskEntity);
 
         TaskEntity enrichedTaskEntity = serviceConfiguration.getTaskPostProcessor().enrich(taskEntity);
         update(enrichedTaskEntity, false);
@@ -99,8 +98,8 @@ public class TaskEntityManagerImpl extends AbstractTaskServiceEntityManager<Task
     }
 
     @Override
-    public void insert(TaskEntity taskEntity, boolean fireCreatedEvent, IdGenerator idGenerator) {
-        super.insert(taskEntity, fireCreatedEvent, idGenerator);
+    public void insert(TaskEntity taskEntity, boolean fireCreatedEvent) {
+        super.insert(taskEntity, fireCreatedEvent);
         if (fireCreatedEvent) {
             logTaskCreatedEvent(taskEntity);
         }

@@ -13,6 +13,7 @@
 package org.flowable.app.engine.impl.persistence.entity.data;
 
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
@@ -21,14 +22,18 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
  */
 public abstract class AbstractAppDataManager<EntityImpl extends Entity> extends AbstractDataManager<EntityImpl> {
     
-    protected AppEngineConfiguration cmmnEngineConfiguration;
+    protected AppEngineConfiguration appEngineConfiguration;
 
-    public AbstractAppDataManager(AppEngineConfiguration cmmnEngineConfiguration) {
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    public AbstractAppDataManager(AppEngineConfiguration appEngineConfiguration) {
+        this.appEngineConfiguration = appEngineConfiguration;
     }
 
-    protected AppEngineConfiguration getCmmnEngineConfiguration() {
-        return cmmnEngineConfiguration;
+    protected AppEngineConfiguration getAppEngineConfiguration() {
+        return appEngineConfiguration;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return appEngineConfiguration.getIdGenerator();
+    }
 }

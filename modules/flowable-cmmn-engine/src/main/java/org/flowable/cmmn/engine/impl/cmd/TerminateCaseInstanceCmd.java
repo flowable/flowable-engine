@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -22,8 +21,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class TerminateCaseInstanceCmd extends AbstractNeedsCaseInstanceCmd {
 
-    public TerminateCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(caseInstanceId, cmmnEngineConfiguration);
+    public TerminateCaseInstanceCmd(String caseInstanceId) {
+        super(caseInstanceId);
     }
     
     @Override

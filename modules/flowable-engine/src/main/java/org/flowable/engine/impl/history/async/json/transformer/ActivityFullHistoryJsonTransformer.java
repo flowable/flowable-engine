@@ -72,7 +72,7 @@ public class ActivityFullHistoryJsonTransformer extends AbstractHistoryJsonTrans
             historicActivityInstanceEntity.setDurationInMillis(endTime.getTime() - startTime.getTime());
         }
 
-        historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity, processEngineConfiguration.getIdGenerator());
+        historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
         dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                 FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
         

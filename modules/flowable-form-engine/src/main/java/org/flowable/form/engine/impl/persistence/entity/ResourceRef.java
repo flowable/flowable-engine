@@ -15,7 +15,6 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
-import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
@@ -62,14 +61,13 @@ public class ResourceRef implements Serializable {
     }
 
     private void setBytes(byte[] bytes) {
-        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
-        FormResourceEntityManager resourceEntityManager = formEngineConfiguration.getResourceEntityManager();
+        FormResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager();
         if (id == null) {
             if (bytes != null) {
                 entity = resourceEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
-                resourceEntityManager.insert(entity, formEngineConfiguration.getIdGenerator());
+                resourceEntityManager.insert(entity);
                 id = entity.getId();
             }
         } else {

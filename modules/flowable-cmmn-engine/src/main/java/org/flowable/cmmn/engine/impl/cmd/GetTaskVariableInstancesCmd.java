@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,17 +31,14 @@ public class GetTaskVariableInstancesCmd implements Command<Map<String, Variable
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String taskId;
     protected Collection<String> variableNames;
     protected boolean isLocal;
 
-    public GetTaskVariableInstancesCmd(String taskId, Collection<String> variableNames, boolean isLocal, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetTaskVariableInstancesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
         this.taskId = taskId;
         this.variableNames = variableNames;
         this.isLocal = isLocal;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -49,6 +47,7 @@ public class GetTaskVariableInstancesCmd implements Command<Map<String, Variable
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         if (task == null) {

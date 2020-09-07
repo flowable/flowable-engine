@@ -83,7 +83,7 @@ public abstract class AbstractDynamicInjectionCmd {
             newDeploymentEntity.setDerivedFromRoot(deploymentEntity.getId());
         }
 
-        deploymentEntityManager.insert(newDeploymentEntity, processEngineConfiguration.getIdGenerator());
+        deploymentEntityManager.insert(newDeploymentEntity);
         return newDeploymentEntity;
     }
 

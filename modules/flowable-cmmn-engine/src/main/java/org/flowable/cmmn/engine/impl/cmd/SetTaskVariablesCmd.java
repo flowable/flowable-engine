@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -30,8 +29,8 @@ public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
     protected Map<String, ? extends Object> variables;
     protected boolean isLocal;
 
-    public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
+        super(taskId);
         this.taskId = taskId;
         this.variables = variables;
         this.isLocal = isLocal;

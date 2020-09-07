@@ -167,7 +167,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
                     jobEntity.setLockExpirationTime(Date.from(Instant.now().minus(100, ChronoUnit.DAYS)));
                     jobEntity.setLockOwner("claimed");
 
-                    jobEntityManager.insert(jobEntity, processEngineConfiguration.getJobServiceConfiguration().getIdGenerator());
+                    jobEntityManager.insert(jobEntity);
                     return null;
                 }
             });

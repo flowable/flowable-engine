@@ -536,9 +536,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public void delete() {
         if (commandExecutor != null) {
-            commandExecutor.execute(new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration));
+            commandExecutor.execute(new DeleteHistoricCaseInstancesCmd(this));
         } else {
-            new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration).execute(Context.getCommandContext());
+            new DeleteHistoricCaseInstancesCmd(this).execute(Context.getCommandContext());
         }
     }
 
@@ -546,9 +546,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public void deleteWithRelatedData() {
         if (commandExecutor != null) {
             CommandConfig config = new CommandConfig().transactionRequiresNew();
-            commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd(this, cmmnEngineConfiguration));
-            commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd(cmmnEngineConfiguration));
-            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd(cmmnEngineConfiguration));
+            commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd(this));
+            commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd());
+            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd());
         } else {
             throw new FlowableException("deleting historic case instances with related data requires CommandExecutor");
         }

@@ -14,7 +14,6 @@ package org.flowable.idm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
@@ -62,12 +61,11 @@ public class ByteArrayRef implements Serializable {
     private void setBytes(byte[] bytes) {
         if (id == null) {
             if (bytes != null) {
-                IdmEngineConfiguration idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
-                ByteArrayEntityManager byteArrayEntityManager = idmEngineConfiguration.getIdmByteArrayEntityManager();
+                ByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getIdmByteArrayEntityManager();
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
-                byteArrayEntityManager.insert(entity, idmEngineConfiguration.getIdGenerator());
+                byteArrayEntityManager.insert(entity);
                 id = entity.getId();
             }
         } else {

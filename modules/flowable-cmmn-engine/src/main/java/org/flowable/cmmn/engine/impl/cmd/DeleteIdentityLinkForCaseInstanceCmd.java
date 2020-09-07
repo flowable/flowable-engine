@@ -18,6 +18,7 @@ import java.io.Serializable;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -31,23 +32,19 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteIdentityLinkForCaseInstanceCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseInstanceId;
     protected String userId;
     protected String groupId;
     protected String type;
 
-    public DeleteIdentityLinkForCaseInstanceCmd(String caseInstanceId, String userId, String groupId, String type,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public DeleteIdentityLinkForCaseInstanceCmd(String caseInstanceId, String userId, String groupId, String type) {
         
         validateParams(userId, groupId, caseInstanceId, type);
         this.caseInstanceId = caseInstanceId;
         this.userId = userId;
         this.groupId = groupId;
         this.type = type;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     protected void validateParams(String userId, String groupId, String caseInstanceId, String type) {
@@ -66,6 +63,7 @@ public class DeleteIdentityLinkForCaseInstanceCmd implements Command<Object>, Se
 
     @Override
     public Void execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -31,13 +32,13 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
 
-    public ResolveTaskCmd(String taskId, Map<String, Object> variables, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
+        super(taskId);
         this.variables = variables;
     }
 
-    public ResolveTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        this(taskId, variables, cmmnEngineConfiguration);
+    public ResolveTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        this(taskId, variables);
         this.transientVariables = transientVariables;
     }
 
@@ -50,6 +51,7 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
             task.setTransientVariables(transientVariables);
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         task.setDelegationState(DelegationState.RESOLVED);
         TaskHelper.changeTaskAssignee(task, task.getOwner(), cmmnEngineConfiguration);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());

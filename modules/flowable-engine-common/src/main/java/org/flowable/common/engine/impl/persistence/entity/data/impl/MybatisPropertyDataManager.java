@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
@@ -24,6 +25,12 @@ import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManag
  */
 public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEntity> implements PropertyDataManager {
 
+    protected IdGenerator idGenerator;
+    
+    public MybatisPropertyDataManager(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
+    
     @Override
     public Class<? extends PropertyEntity> getManagedEntityClass() {
         return PropertyEntityImpl.class;
@@ -40,4 +47,8 @@ public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEnti
         return getDbSqlSession().selectList("selectProperties");
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 }

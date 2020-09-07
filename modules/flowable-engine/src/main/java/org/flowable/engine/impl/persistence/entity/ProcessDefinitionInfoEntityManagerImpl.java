@@ -32,7 +32,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
 
     @Override
     public void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo) {
-        insert(processDefinitionInfo, engineConfiguration.getIdGenerator());
+        insert(processDefinitionInfo);
     }
 
     @Override

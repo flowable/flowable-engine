@@ -55,7 +55,7 @@ public class HistoricVariableInstanceEntityManagerImpl
         historicVariableInstance.setCreateTime(createTime);
         historicVariableInstance.setLastUpdatedTime(createTime);
 
-        insert(historicVariableInstance, serviceConfiguration.getIdGenerator());
+        insert(historicVariableInstance);
 
         return historicVariableInstance;
     }

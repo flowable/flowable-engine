@@ -16,8 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
@@ -28,6 +30,12 @@ import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEnt
  */
 public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<HistoricTaskLogEntryEntity> implements HistoricTaskLogEntryDataManager {
 
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    
+    public MyBatisHistoricTaskLogEntryDataManager(TaskServiceConfiguration taskServiceConfiguration) {
+        this.taskServiceConfiguration = taskServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricTaskLogEntryEntity> getManagedEntityClass() {
         return HistoricTaskLogEntryEntityImpl.class;
@@ -85,8 +93,14 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     public long findHistoricTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery) {
         return (Long) getDbSqlSession().selectOne("selectHistoricTaskLogEntriesCountByNativeQueryCriteria", nativeHistoricTaskLogEntryQuery);
     }
+    
     @Override
     public List<HistoricTaskLogEntry> findHistoricTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery) {
         return getDbSqlSession().selectListWithRawParameter("selectHistoricTaskLogEntriesByNativeQueryCriteria", nativeHistoricTaskLogEntryQuery);
+    }
+    
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return taskServiceConfiguration.getIdGenerator();
     }
 }

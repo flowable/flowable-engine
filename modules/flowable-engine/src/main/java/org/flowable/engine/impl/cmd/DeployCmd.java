@@ -111,7 +111,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        processEngineConfiguration.getDeploymentEntityManager().insert(deployment, processEngineConfiguration.getIdGenerator());
+        processEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

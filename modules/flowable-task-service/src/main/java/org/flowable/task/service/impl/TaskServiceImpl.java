@@ -99,7 +99,7 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
 
     @Override
     public void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
-        getTaskEntityManager().insert(taskEntity, fireCreateEvent, configuration.getIdGenerator());
+        getTaskEntityManager().insert(taskEntity, fireCreateEvent);
     }
 
     @Override

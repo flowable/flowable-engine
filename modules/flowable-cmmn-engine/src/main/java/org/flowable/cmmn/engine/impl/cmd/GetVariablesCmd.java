@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -28,13 +29,10 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class GetVariablesCmd implements Command<Map<String, Object>> {
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
     
-    public GetVariablesCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetVariablesCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
     @Override
@@ -42,6 +40,8 @@ public class GetVariablesCmd implements Command<Map<String, Object>> {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         List<VariableInstanceEntity> variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         Map<String, Object> variables = new HashMap<>(variableInstanceEntities.size());

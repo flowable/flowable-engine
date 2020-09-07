@@ -189,7 +189,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         }
 
         if (formInstanceEntity.getId() == null) {
-            formInstanceEntityManager.insert(formInstanceEntity, formEngineConfiguration.getIdGenerator());
+            formInstanceEntityManager.insert(formInstanceEntity);
         } else {
             formInstanceEntityManager.update(formInstanceEntity);
         }

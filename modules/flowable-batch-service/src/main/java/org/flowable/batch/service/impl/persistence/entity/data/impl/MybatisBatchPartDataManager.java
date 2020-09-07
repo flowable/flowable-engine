@@ -16,13 +16,21 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntity;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 
 public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEntity> implements BatchPartDataManager {
 
+    protected BatchServiceConfiguration batchServiceConfiguration;
+    
+    public MybatisBatchPartDataManager(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends BatchPartEntity> getManagedEntityClass() {
         return BatchPartEntityImpl.class;
@@ -60,5 +68,10 @@ public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEn
         params.put("scopeType", scopeType);
         
         return getDbSqlSession().selectList("selectBatchPartsByScopeIdAndType", params);
+    }
+    
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return batchServiceConfiguration.getIdGenerator();
     }
 }

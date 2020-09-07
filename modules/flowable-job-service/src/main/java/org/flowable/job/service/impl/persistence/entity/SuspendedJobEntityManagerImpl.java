@@ -16,7 +16,6 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -65,7 +64,7 @@ public class SuspendedJobEntityManagerImpl
     }
 
     @Override
-    public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent, IdGenerator idGenerator) {
+    public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
         if (serviceConfiguration.getInternalJobManager() != null) {
             serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
         }
@@ -74,12 +73,12 @@ public class SuspendedJobEntityManagerImpl
         if (jobEntity.getCorrelationId() == null) {
             jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
         }
-        super.insert(jobEntity, fireCreateEvent, idGenerator);
+        super.insert(jobEntity, fireCreateEvent);
     }
 
     @Override
-    public void insert(SuspendedJobEntity jobEntity, IdGenerator idGenerator) {
-        insert(jobEntity, true, idGenerator);
+    public void insert(SuspendedJobEntity jobEntity) {
+        insert(jobEntity, true);
     }
 
     @Override

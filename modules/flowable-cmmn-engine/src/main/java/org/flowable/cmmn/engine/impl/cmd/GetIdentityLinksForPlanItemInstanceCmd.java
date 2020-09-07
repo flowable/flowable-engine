@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,19 +31,17 @@ import org.flowable.identitylink.api.IdentityLink;
 public class GetIdentityLinksForPlanItemInstanceCmd implements Command<List<IdentityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String planItemInstanceId;
 
-    public GetIdentityLinksForPlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetIdentityLinksForPlanItemInstanceCmd(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         PlanItemInstance planItemInstance = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
 
         if (planItemInstance == null) {

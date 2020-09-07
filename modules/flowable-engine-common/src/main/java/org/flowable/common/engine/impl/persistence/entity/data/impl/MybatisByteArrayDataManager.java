@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
@@ -24,6 +25,12 @@ import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataMana
  */
 public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEntity> implements ByteArrayDataManager {
 
+    protected IdGenerator idGenerator;
+    
+    public MybatisByteArrayDataManager(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
+    
     @Override
     public ByteArrayEntity create() {
         return new ByteArrayEntityImpl();
@@ -45,4 +52,8 @@ public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEn
         getDbSqlSession().delete("deleteByteArrayNoRevisionCheck", byteArrayEntityId, ByteArrayEntityImpl.class);
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 }

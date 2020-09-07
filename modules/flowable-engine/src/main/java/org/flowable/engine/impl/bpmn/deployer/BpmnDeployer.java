@@ -132,7 +132,7 @@ public class BpmnDeployer implements EngineDeployer {
                 ResourceEntity resource = processDefinitionDiagramHelper.createDiagramForProcessDefinition(
                         processDefinition, parsedDeployment.getBpmnParseForProcessDefinition(processDefinition));
                 if (resource != null) {
-                    resourceEntityManager.insert(resource, false, processEngineConfiguration.getIdGenerator());
+                    resourceEntityManager.insert(resource, false);
                     deploymentEntity.addResource(resource); // now we'll find it if we look for the diagram name later.
                 }
             }
@@ -282,7 +282,7 @@ public class BpmnDeployer implements EngineDeployer {
         ProcessDefinitionEntityManager processDefinitionManager = processEngineConfiguration.getProcessDefinitionEntityManager();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
-            processDefinitionManager.insert(processDefinition, false, processEngineConfiguration.getIdGenerator());
+            processDefinitionManager.insert(processDefinition, false);
             bpmnDeploymentHelper.addAuthorizationsForNewProcessDefinition(parsedDeployment.getProcessModelForProcessDefinition(processDefinition), processDefinition);
         }
     }

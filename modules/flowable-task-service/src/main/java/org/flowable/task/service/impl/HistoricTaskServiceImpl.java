@@ -85,7 +85,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
     @Override
     public void insertHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireCreateEvent) {
-        getHistoricTaskInstanceEntityManager().insert(historicTaskInstanceEntity, fireCreateEvent, configuration.getIdGenerator());
+        getHistoricTaskInstanceEntityManager().insert(historicTaskInstanceEntity, fireCreateEvent);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     public HistoricTaskInstanceEntity recordTaskCreated(TaskEntity task) {
         HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = getHistoricTaskInstanceEntityManager();
         HistoricTaskInstanceEntity historicTaskInstanceEntity = historicTaskInstanceEntityManager.create(task);
-        historicTaskInstanceEntityManager.insert(historicTaskInstanceEntity, true, configuration.getIdGenerator());
+        historicTaskInstanceEntityManager.insert(historicTaskInstanceEntity, true);
         return historicTaskInstanceEntity;
     }
 
@@ -162,7 +162,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
             taskLogEntry.setType(logEntryType);
             taskLogEntry.setData(data);
             taskLogEntry.setUserId(Authentication.getAuthenticatedUserId());
-            getHistoricTaskLogEntryEntityManager().insert(taskLogEntry, configuration.getIdGenerator());
+            getHistoricTaskLogEntryEntityManager().insert(taskLogEntry);
         }
     }
 

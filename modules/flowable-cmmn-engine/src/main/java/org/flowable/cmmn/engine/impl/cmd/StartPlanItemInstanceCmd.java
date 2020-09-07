@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -33,19 +32,17 @@ public class StartPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
     protected String childTaskFormOutcome;
     protected FormInfo childTaskFormInfo;
 
-    public StartPlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(planItemInstanceId, cmmnEngineConfiguration);
+    public StartPlanItemInstanceCmd(String planItemInstanceId) {
+        super(planItemInstanceId);
     }
 
     public StartPlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables,
             Map<String, Object> transientVariables, Map<String, Object> childTaskVariables,
-            Map<String, Object> childTaskFormVariables, String childTaskFormOutcome, FormInfo childTaskFormInfo,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Map<String, Object> childTaskFormVariables, String childTaskFormOutcome, FormInfo childTaskFormInfo) {
         
-        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, 
-                transientVariables, cmmnEngineConfiguration);
+        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
         this.childTaskVariables = childTaskVariables;
         this.childTaskFormVariables = childTaskFormVariables;
         this.childTaskFormOutcome = childTaskFormOutcome;

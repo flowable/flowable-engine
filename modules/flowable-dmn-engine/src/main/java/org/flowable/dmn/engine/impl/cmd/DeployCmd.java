@@ -95,7 +95,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        dmnEngineConfiguration.getDeploymentEntityManager().insert(deployment, dmnEngineConfiguration.getIdGenerator());
+        dmnEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

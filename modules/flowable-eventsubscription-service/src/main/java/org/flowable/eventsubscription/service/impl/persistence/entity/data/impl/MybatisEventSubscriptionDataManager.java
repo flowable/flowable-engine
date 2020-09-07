@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -333,4 +334,9 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         return messageEventSubscriptionEntities;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return eventSubscriptionServiceConfiguration.getIdGenerator();
+    }
+    
 }

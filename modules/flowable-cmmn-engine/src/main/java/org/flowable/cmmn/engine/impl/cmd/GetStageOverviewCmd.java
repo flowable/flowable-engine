@@ -33,6 +33,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -51,17 +52,15 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
 
-    public GetStageOverviewCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetStageOverviewCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<StageResponse> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId, CaseInstanceEntity.class);

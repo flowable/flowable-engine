@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,20 +31,18 @@ public class GetHistoricEntityLinkChildrenForCaseInstanceCmd implements Command<
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String caseInstanceId;
 
-    public GetHistoricEntityLinkChildrenForCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetHistoricEntityLinkChildrenForCaseInstanceCmd(String caseInstanceId) {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is required");
         }
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<HistoricEntityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         return cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
                 .findHistoricEntityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD);
     }

@@ -47,7 +47,7 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
 
         if (idmEngineConfiguration.getTokenEntityManager().isNewToken(token)) {
             if (token instanceof TokenEntity) {
-                idmEngineConfiguration.getTokenEntityManager().insert((TokenEntity) token, true, idmEngineConfiguration.getIdGenerator());
+                idmEngineConfiguration.getTokenEntityManager().insert((TokenEntity) token, true);
             } else {
                 CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) token, idmEngineConfiguration.getIdGenerator());
             }

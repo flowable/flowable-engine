@@ -62,7 +62,7 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     
     @Override
     public void insertHistoricIdentityLink(HistoricIdentityLinkEntity identityLink, boolean fireCreateEvent) {
-        getHistoricIdentityLinkEntityManager().insert(identityLink, fireCreateEvent, configuration.getIdGenerator());
+        getHistoricIdentityLinkEntityManager().insert(identityLink, fireCreateEvent);
     }
     
     @Override

@@ -124,7 +124,7 @@ public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServi
     
     @Override
     public void insertIdentityLink(IdentityLinkEntity identityLink) {
-        getIdentityLinkEntityManager().insert(identityLink, configuration.getIdGenerator());
+        getIdentityLinkEntityManager().insert(identityLink);
     }
     
     @Override

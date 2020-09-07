@@ -59,7 +59,7 @@ public class HistoricDetailEntityManagerImpl
         }
         historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 
-        insert(historicFormPropertyEntity, engineConfiguration.getIdGenerator());
+        insert(historicFormPropertyEntity);
         return historicFormPropertyEntity;
     }
 
@@ -83,7 +83,7 @@ public class HistoricDetailEntityManagerImpl
             historicVariableUpdate.setBytes(variableInstance.getBytes());
         }
 
-        insert(historicVariableUpdate, engineConfiguration.getIdGenerator());
+        insert(historicVariableUpdate);
         return historicVariableUpdate;
     }
 

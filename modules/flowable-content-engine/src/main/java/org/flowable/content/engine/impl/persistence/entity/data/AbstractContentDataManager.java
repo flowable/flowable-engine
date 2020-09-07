@@ -12,6 +12,7 @@
  */
 package org.flowable.content.engine.impl.persistence.entity.data;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.content.engine.ContentEngineConfiguration;
@@ -28,4 +29,8 @@ public abstract class AbstractContentDataManager<EntityImpl extends Entity> exte
         this.contentEngineConfiguration = contentEngineConfiguration;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return contentEngineConfiguration.getIdGenerator();
+    }
 }

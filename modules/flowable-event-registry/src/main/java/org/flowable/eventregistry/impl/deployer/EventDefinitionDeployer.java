@@ -169,7 +169,7 @@ public class EventDefinitionDeployer implements Deployer {
         EventDefinitionEntityManager eventDefinitionEntityManager = eventRegistryEngineConfiguration.getEventDefinitionEntityManager();
 
         for (EventDefinitionEntity eventDefinition : parsedDeployment.getAllEventDefinitions()) {
-            eventDefinitionEntityManager.insert(eventDefinition, eventRegistryEngineConfiguration.getIdGenerator());
+            eventDefinitionEntityManager.insert(eventDefinition);
         }
     }
     
@@ -181,7 +181,7 @@ public class EventDefinitionDeployer implements Deployer {
         ChannelDefinitionEntityManager channelDefinitionEntityManager = eventRegistryEngineConfiguration.getChannelDefinitionEntityManager();
 
         for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
-            channelDefinitionEntityManager.insert(channelDefinition, eventRegistryEngineConfiguration.getIdGenerator());
+            channelDefinitionEntityManager.insert(channelDefinition);
         }
     }
 

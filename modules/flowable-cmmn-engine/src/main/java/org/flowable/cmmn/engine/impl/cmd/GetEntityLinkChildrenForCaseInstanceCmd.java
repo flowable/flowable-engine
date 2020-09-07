@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -31,18 +32,16 @@ import org.flowable.entitylink.api.EntityLinkType;
 public class GetEntityLinkChildrenForCaseInstanceCmd implements Command<List<EntityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseInstanceId;
 
-    public GetEntityLinkChildrenForCaseInstanceCmd(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetEntityLinkChildrenForCaseInstanceCmd(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public List<EntityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {

@@ -84,7 +84,7 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
             }
     
             HistoricDetailEntityManager historicDetailEntityManager = processEngineConfiguration.getHistoricDetailEntityManager();
-            historicDetailEntityManager.insert(historicFormPropertyEntity, processEngineConfiguration.getIdGenerator());
+            historicDetailEntityManager.insert(historicFormPropertyEntity);
             
             counter++;
         }

@@ -49,9 +49,9 @@ public class JobExecutorTest extends JobExecutorTestCase {
                 jobManager.execute(createTweetMessage("message-four"));
 
                 TimerJobEntityManager timerJobManager = jobServiceConfiguration.getTimerJobEntityManager();
-                timerJobManager.insert(createTweetTimer("timer-one", new Date()), jobServiceConfiguration.getIdGenerator());
-                timerJobManager.insert(createTweetTimer("timer-one", new Date()), jobServiceConfiguration.getIdGenerator());
-                timerJobManager.insert(createTweetTimer("timer-two", new Date()), jobServiceConfiguration.getIdGenerator());
+                timerJobManager.insert(createTweetTimer("timer-one", new Date()));
+                timerJobManager.insert(createTweetTimer("timer-one", new Date()));
+                timerJobManager.insert(createTweetTimer("timer-two", new Date()));
                 return null;
             }
         });

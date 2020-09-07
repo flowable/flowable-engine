@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -27,8 +28,8 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
     private static final long serialVersionUID = 1L;
     protected String userId;
 
-    public DelegateTaskCmd(String taskId, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(taskId, cmmnEngineConfiguration);
+    public DelegateTaskCmd(String taskId, String userId) {
+        super(taskId);
         this.userId = userId;
     }
 
@@ -38,6 +39,8 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
         if (task.getOwner() == null) {
             task.setOwner(task.getAssignee());
         }
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskHelper.changeTaskAssignee(task, userId, cmmnEngineConfiguration);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
         return null;

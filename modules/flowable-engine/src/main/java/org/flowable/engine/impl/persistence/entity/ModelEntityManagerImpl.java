@@ -16,7 +16,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -41,11 +40,11 @@ public class ModelEntityManagerImpl
     }
 
     @Override
-    public void insert(ModelEntity model, IdGenerator idGenerator) {
+    public void insert(ModelEntity model) {
         model.setCreateTime(getClock().getCurrentTime());
         model.setLastUpdateTime(getClock().getCurrentTime());
 
-        super.insert(model, idGenerator);
+        super.insert(model);
     }
 
     @Override

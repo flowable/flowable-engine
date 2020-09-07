@@ -52,7 +52,7 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
     
     @Override
     public void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
-        getHistoricVariableInstanceEntityManager().insert(variable, configuration.getIdGenerator());
+        getHistoricVariableInstanceEntityManager().insert(variable);
     }
     
     @Override

@@ -43,7 +43,7 @@ public class CmmnManagementServiceTest extends FlowableCmmnTestCase {
             suspendedJobEntity.setJobType(SuspendedJobEntity.JOB_TYPE_MESSAGE);
             suspendedJobEntity.setJobHandlerType("testJobHandlerType");
 
-            suspendedJobEntityManager.insert(suspendedJobEntity, cmmnEngineConfiguration.getIdGenerator());
+            suspendedJobEntityManager.insert(suspendedJobEntity);
             return suspendedJobEntity;
         });
 

@@ -64,7 +64,7 @@ public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTran
         historicActivityInstanceEntity.setTransactionOrder(getIntegerFromJson(historicalData, HistoryJsonConstants.TRANSACTION_ORDER));
         historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
 
-        historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity, processEngineConfiguration.getIdGenerator());
+        historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
         dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                 FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
     }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -34,21 +35,19 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
     private static final long serialVersionUID = 1L;
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected String taskId;
 
-    public GetHistoricIdentityLinksForTaskCmd(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetHistoricIdentityLinksForTaskCmd(String taskId) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is required");
         }
         this.taskId = taskId;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public List<HistoricIdentityLink> execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         HistoricTaskInstanceEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
 
         if (task == null) {

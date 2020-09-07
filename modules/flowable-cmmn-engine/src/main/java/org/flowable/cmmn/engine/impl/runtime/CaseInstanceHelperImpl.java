@@ -432,7 +432,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         String authenticatedUserId = Authentication.getAuthenticatedUserId();
         caseInstanceEntity.setStartUserId(authenticatedUserId);
         
-        caseInstanceEntityManager.insert(caseInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+        caseInstanceEntityManager.insert(caseInstanceEntity);
         caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
 
         return caseInstanceEntity;

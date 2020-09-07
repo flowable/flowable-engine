@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -37,10 +38,8 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     protected String identityType;
 
-    public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
-        
-        super(taskId, cmmnEngineConfiguration);
+    public AddIdentityLinkCmd(String taskId, String identityId, int identityIdType, String identityType) {
+        super(taskId);
         validateParams(taskId, identityId, identityIdType, identityType);
         this.taskId = taskId;
         this.identityId = identityId;
@@ -70,7 +69,8 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
-
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        
         String oldAssigneeId = task.getAssignee();
         String oldOwnerId = task.getOwner();
         

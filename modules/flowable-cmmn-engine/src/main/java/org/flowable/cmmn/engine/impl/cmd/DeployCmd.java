@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -31,20 +32,18 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class DeployCmd implements Command<CmmnDeployment> {
-
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected CmmnDeploymentBuilderImpl deploymentBuilder;
 
-    public DeployCmd(CmmnDeploymentBuilderImpl deploymentBuilder, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public DeployCmd(CmmnDeploymentBuilderImpl deploymentBuilder) {
         this.deploymentBuilder = deploymentBuilder;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public CmmnDeployment execute(CommandContext commandContext) {
         CmmnDeploymentEntity deployment = deploymentBuilder.getDeployment();
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
             List<CmmnDeployment> existingDeployments = new ArrayList<>();
@@ -79,7 +78,7 @@ public class DeployCmd implements Command<CmmnDeployment> {
         
         deployment.setDeploymentTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
-        cmmnEngineConfiguration.getCmmnDeploymentEntityManager().insert(deployment, cmmnEngineConfiguration.getIdGenerator());
+        cmmnEngineConfiguration.getCmmnDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

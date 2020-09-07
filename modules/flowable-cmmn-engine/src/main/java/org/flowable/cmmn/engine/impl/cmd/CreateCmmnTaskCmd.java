@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
@@ -30,17 +31,15 @@ import org.flowable.task.service.impl.util.CountingTaskUtil;
  */
 public class CreateCmmnTaskCmd implements Command<Task> {
     
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
     protected TaskBuilder taskBuilder;
 
-    public CreateCmmnTaskCmd(TaskBuilder taskBuilder, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public CreateCmmnTaskCmd(TaskBuilder taskBuilder) {
         this.taskBuilder = taskBuilder;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Task execute(CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskServiceConfiguration taskServiceConfiguration = cmmnEngineConfiguration.getTaskServiceConfiguration();
         Task task = taskServiceConfiguration.getTaskService().createTask(this.taskBuilder);
         if (CountingTaskUtil.isTaskRelatedEntityCountEnabledGlobally(taskServiceConfiguration) && StringUtils.isNotEmpty(task.getParentTaskId())) {

@@ -80,7 +80,7 @@ public class TimerJobServiceImpl extends ServiceImpl implements TimerJobService 
 
     @Override
     public void insertTimerJob(TimerJobEntity timerJob) {
-        getTimerJobEntityManager().insert(timerJob, configuration.getIdGenerator());
+        getTimerJobEntityManager().insert(timerJob);
     }
 
     @Override

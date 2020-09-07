@@ -84,7 +84,7 @@ public class SubProcessInstanceStartHistoryJsonTransformer extends AbstractHisto
             subProcessInstance.setReferenceType(getStringFromJson(historicalData, HistoryJsonConstants.REFERENCE_TYPE));
             subProcessInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
         
-            historicProcessInstanceEntityManager.insert(subProcessInstance, false, processEngineConfiguration.getIdGenerator());
+            historicProcessInstanceEntityManager.insert(subProcessInstance, false);
     
             // Fire event
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(

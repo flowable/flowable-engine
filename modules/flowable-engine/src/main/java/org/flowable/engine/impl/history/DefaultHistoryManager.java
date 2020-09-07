@@ -106,7 +106,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().create(processInstance);
 
             // Insert historic process-instance
-            getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false, processEngineConfiguration.getIdGenerator());
+            getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
 
             // Fire event
             FlowableEventDispatcher eventDispatcher = getEventDispatcher();
@@ -544,7 +544,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         historicActivityInstanceEntity.setTenantId(activityInstance.getTenantId());
 
 
-        getHistoricActivityInstanceEntityManager().insert(historicActivityInstanceEntity, processEngineConfiguration.getIdGenerator());
+        getHistoricActivityInstanceEntityManager().insert(historicActivityInstanceEntity);
         return historicActivityInstanceEntity;
     }
 

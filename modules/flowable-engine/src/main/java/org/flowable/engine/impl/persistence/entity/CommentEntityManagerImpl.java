@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
@@ -38,10 +37,10 @@ public class CommentEntityManagerImpl
     }
 
     @Override
-    public void insert(CommentEntity commentEntity, IdGenerator idGenerator) {
+    public void insert(CommentEntity commentEntity) {
         checkHistoryEnabled();
 
-        insert(commentEntity, false, idGenerator);
+        insert(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {

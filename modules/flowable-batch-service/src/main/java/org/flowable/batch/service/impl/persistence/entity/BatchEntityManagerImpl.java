@@ -63,7 +63,7 @@ public class BatchEntityManagerImpl
         batchEntity.setBatchDocumentJson(batchBuilder.getBatchDocumentJson(), serviceConfiguration.getEngineName());
         batchEntity.setTenantId(batchBuilder.getTenantId());
         
-        dataManager.insert(batchEntity, serviceConfiguration.getIdGenerator());
+        dataManager.insert(batchEntity);
         
         return batchEntity;
     }

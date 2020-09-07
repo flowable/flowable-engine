@@ -16,8 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
@@ -34,6 +36,12 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByScopeIdAndTypeMatcher = new HistoricIdentityLinksByScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksBySubScopeIdAndTypeMatcher = new HistoricIdentityLinksBySubScopeIdAndTypeMatcher();
 
+    protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    
+    public MybatisHistoricIdentityLinkDataManager(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
+        this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {
         return HistoricIdentityLinkEntityImpl.class;
@@ -101,4 +109,10 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
     public void deleteHistoricTaskIdentityLinksForNonExistingInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricTaskIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);
     }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return identityLinkServiceConfiguration.getIdGenerator();
+    }
+    
 }

@@ -42,16 +42,13 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String taskId;
     protected boolean ignoreVariables;
 
-    public GetTaskFormModelCmd(String taskId, boolean ignoreVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public GetTaskFormModelCmd(String taskId, boolean ignoreVariables) {
         this.taskId = taskId;
         this.ignoreVariables = ignoreVariables;
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -61,6 +58,7 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         TaskInfo task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         Date endTime = null;
         if (task == null) {

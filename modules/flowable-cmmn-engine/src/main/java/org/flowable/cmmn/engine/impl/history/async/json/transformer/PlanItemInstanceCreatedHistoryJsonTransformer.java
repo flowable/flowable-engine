@@ -49,7 +49,7 @@ public class PlanItemInstanceCreatedHistoryJsonTransformer extends AbstractPlanI
         HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
         HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create();
         copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
-        historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+        historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
     }
 
 }

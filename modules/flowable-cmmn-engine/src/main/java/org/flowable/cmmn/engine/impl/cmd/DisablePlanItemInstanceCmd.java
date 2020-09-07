@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -27,17 +26,17 @@ import org.flowable.form.api.FormInfo;
  */
 public class DisablePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
-    public DisablePlanItemInstanceCmd(String planItemInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(planItemInstanceId, cmmnEngineConfiguration);
+    public DisablePlanItemInstanceCmd(String planItemInstanceId) {
+        super(planItemInstanceId);
     }
 
     public DisablePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables,
-            Map<String, Object> transientVariables, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Map<String, Object> transientVariables) {
         
         super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, 
-                localVariables, transientVariables, cmmnEngineConfiguration);
+                localVariables, transientVariables);
     }
 
     @Override

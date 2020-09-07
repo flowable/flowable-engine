@@ -44,7 +44,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
             PropertyEntity newPropertyEntity = propertyEntityManager.create();
             newPropertyEntity.setName(PROPERTY_TASK_RELATED_ENTITY_COUNT);
             newPropertyEntity.setValue(Boolean.toString(configProperty));
-            propertyEntityManager.insert(newPropertyEntity, processEngineConfiguration.getIdGenerator());
+            propertyEntityManager.insert(newPropertyEntity);
 
         } else {
 

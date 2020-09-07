@@ -112,7 +112,7 @@ public class FormDefinitionDeployer implements Deployer {
         FormDefinitionEntityManager formDefinitionEntityManager = formEngineConfiguration.getFormDefinitionEntityManager();
 
         for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
-            formDefinitionEntityManager.insert(formDefinition, formEngineConfiguration.getIdGenerator());
+            formDefinitionEntityManager.insert(formDefinition);
         }
     }
 

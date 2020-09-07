@@ -47,7 +47,7 @@ public class SaveGroupCmd implements Command<Void>, Serializable {
 
         if (idmEngineConfiguration.getGroupEntityManager().isNewGroup(group)) {
             if (group instanceof GroupEntity) {
-                idmEngineConfiguration.getGroupEntityManager().insert((GroupEntity) group, idmEngineConfiguration.getIdGenerator());
+                idmEngineConfiguration.getGroupEntityManager().insert((GroupEntity) group);
             } else {
                 CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) group, idmEngineConfiguration.getIdGenerator());
             }

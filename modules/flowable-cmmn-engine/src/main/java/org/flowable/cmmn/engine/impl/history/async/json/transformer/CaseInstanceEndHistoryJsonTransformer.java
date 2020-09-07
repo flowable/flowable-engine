@@ -62,7 +62,7 @@ public class CaseInstanceEndHistoryJsonTransformer extends AbstractNeedsHistoric
                historicCaseInstanceEntity.setReferenceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID));
                historicCaseInstanceEntity.setReferenceType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE));
                historicCaseInstanceEntity.setTenantId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TENANT_ID));
-               historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity, cmmnEngineConfiguration.getIdGenerator());
+               historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
                
            } else {
                Date endTime = getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_END_TIME);
