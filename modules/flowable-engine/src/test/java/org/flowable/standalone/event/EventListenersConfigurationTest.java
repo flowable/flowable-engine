@@ -43,7 +43,7 @@ public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
 
         // Dispatch a custom event
         FlowableEvent event = new FlowableProcessEventImpl(FlowableEngineEventType.CUSTOM);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(listener.getEventsReceived()).hasSize(1);
         assertThat(listener.getEventsReceived().get(0)).isEqualTo(event);

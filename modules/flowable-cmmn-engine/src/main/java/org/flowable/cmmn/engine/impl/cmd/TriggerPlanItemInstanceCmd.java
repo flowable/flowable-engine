@@ -32,6 +32,7 @@ public class TriggerPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables,
             Map<String, Object> transientVariables) {
+        
         super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
     }
 

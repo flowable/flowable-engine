@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -66,7 +67,8 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
     @Override
     public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
@@ -80,7 +82,7 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
                 }
             }
 
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
@@ -96,12 +98,12 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
 
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newSubProcessExecution);
+        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newSubProcessExecution);
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(outgoingFlowExecution);
+        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(outgoingFlowExecution);
 
         leave(outgoingFlowExecution);
     }

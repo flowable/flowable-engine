@@ -12,59 +12,18 @@
  */
 package org.flowable.batch.service.impl.util;
 
-import org.flowable.batch.service.BatchServiceConfiguration;
-import org.flowable.batch.service.impl.persistence.entity.BatchEntityManager;
-import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityManager;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 
 public class CommandContextUtil {
 
-    public static BatchServiceConfiguration getBatchServiceConfiguration() {
-        return getBatchServiceConfiguration(getCommandContext());
-    }
-    
-    public static BatchServiceConfiguration getBatchServiceConfiguration(CommandContext commandContext) {
-        if (commandContext != null) {
-            return (BatchServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
-                            .get(EngineConfigurationConstants.KEY_BATCH_SERVICE_CONFIG);
-        }
-        return null;
-    }
-    
     public static DbSqlSession getDbSqlSession() {
         return getDbSqlSession(getCommandContext());
     }
     
     public static DbSqlSession getDbSqlSession(CommandContext commandContext) {
         return commandContext.getSession(DbSqlSession.class);
-    }
-    
-    public static BatchEntityManager getBatchEntityManager() {
-        return getBatchEntityManager(getCommandContext());
-    }
-    
-    public static BatchEntityManager getBatchEntityManager(CommandContext commandContext) {
-        return getBatchServiceConfiguration(commandContext).getBatchEntityManager();
-    }
-    
-    public static BatchPartEntityManager getBatchPartEntityManager() {
-        return getBatchPartEntityManager(getCommandContext());
-    }
-    
-    public static BatchPartEntityManager getBatchPartEntityManager(CommandContext commandContext) {
-        return getBatchServiceConfiguration(commandContext).getBatchPartEntityManager();
-    }
-    
-    public static ByteArrayEntityManager getBatchByteArrayEntityManager() {
-        return getBatchByteArrayEntityManager(getCommandContext());
-    }
-    
-    public static ByteArrayEntityManager getBatchByteArrayEntityManager(CommandContext commandContext) {
-        return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
     }
     
     public static CommandContext getCommandContext() {

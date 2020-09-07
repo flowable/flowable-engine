@@ -40,6 +40,7 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
     public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
             Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables, Map<String, Object> transientVariables, boolean force) {
+        
         super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
         this.force = force;
     }

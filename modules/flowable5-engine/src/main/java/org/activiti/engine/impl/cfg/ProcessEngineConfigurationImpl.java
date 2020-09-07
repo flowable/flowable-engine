@@ -213,6 +213,7 @@ import org.flowable.engine.impl.bpmn.parser.factory.DefaultXMLImporterFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.XMLImporterFactory;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.validation.ProcessValidator;
@@ -570,6 +571,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void init() {
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initProcessDiagramGenerator();
         initHistoryLevel();
         initExpressionManager();
@@ -578,7 +580,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFormEngines();
         initFormTypes();
         initScriptingEngines();
-        initClock();
         initBusinessCalendarManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -1351,6 +1352,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected void initVariableTypes() {
         if (variableTypes == null) {
+            org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             variableTypes = new DefaultVariableTypes();
             if (customPreVariableTypes != null) {
                 for (VariableType customVariableType : customPreVariableTypes) {
@@ -1359,7 +1361,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
             variableTypes.addType(new NullType());
             variableTypes.addType(new StringType(maxLengthStringVariableType));
-            variableTypes.addType(new LongStringType(maxLengthStringVariableType + 1));
+            variableTypes.addType(new LongStringType(maxLengthStringVariableType + 1, processEngineConfiguration.getVariableServiceConfiguration()));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -1367,9 +1369,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new DateType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper, false));
+            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper, false, processEngineConfiguration.getVariableServiceConfiguration()));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, objectMapper, false));
+            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, objectMapper, false, processEngineConfiguration.getVariableServiceConfiguration()));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType());
             if (customPostVariableTypes != null) {

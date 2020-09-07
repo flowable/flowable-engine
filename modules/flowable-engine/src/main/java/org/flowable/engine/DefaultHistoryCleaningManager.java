@@ -31,7 +31,8 @@ public class DefaultHistoryCleaningManager implements HistoryCleaningManager {
         int days = processEngineConfiguration.getCleanInstancesEndedAfterNumberOfDays();
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.DAY_OF_YEAR, -days);
-        HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = new HistoricProcessInstanceQueryImpl(processEngineConfiguration.getCommandExecutor());
+        HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = new HistoricProcessInstanceQueryImpl(
+                processEngineConfiguration.getCommandExecutor(), processEngineConfiguration);
         historicProcessInstanceQuery.finishedBefore(cal.getTime());
         return historicProcessInstanceQuery;
     }

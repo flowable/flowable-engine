@@ -31,7 +31,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
     protected int waitIncreaseFactor = 5;
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         long waitTime = waitTimeInMs;
         int failedAttempts = 0;
 
@@ -45,7 +45,7 @@ public class RetryInterceptor extends AbstractCommandInterceptor {
             try {
 
                 // try to execute the command
-                return next.execute(config, command);
+                return next.execute(config, command, commandExecutor);
 
             } catch (FlowableOptimisticLockingException e) {
                 LOGGER.info("Caught optimistic locking exception: {}", e.getMessage(), e);

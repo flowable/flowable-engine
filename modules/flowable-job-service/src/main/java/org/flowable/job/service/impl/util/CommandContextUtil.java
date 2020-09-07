@@ -12,109 +12,18 @@
  */
 package org.flowable.job.service.impl.util;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
-import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 
 public class CommandContextUtil {
 
-    public static JobServiceConfiguration getJobServiceConfiguration() {
-        return getJobServiceConfiguration(getCommandContext());
-    }
-    
-    public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
-        if (commandContext != null) {
-            return (JobServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
-                            .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
-        }
-        return null;
-    }
-    
     public static DbSqlSession getDbSqlSession() {
         return getDbSqlSession(getCommandContext());
     }
     
     public static DbSqlSession getDbSqlSession(CommandContext commandContext) {
         return commandContext.getSession(DbSqlSession.class);
-    }
-    
-    public static FlowableEventDispatcher getEventDispatcher() {
-        return getEventDispatcher(getCommandContext());
-    }
-    
-    public static FlowableEventDispatcher getEventDispatcher(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getEventDispatcher();
-    }
-    
-    public static JobManager getJobManager() {
-        return getJobManager(getCommandContext());
-    }
-    
-    public static JobManager getJobManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getJobManager();
-    }
-    
-    public static JobEntityManager getJobEntityManager() {
-        return getJobEntityManager(getCommandContext());
-    }
-    
-    public static JobEntityManager getJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getJobEntityManager();
-    }
-
-    public static ExternalWorkerJobEntityManager getExternalWorkerJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getExternalWorkerJobEntityManager();
-    }
-    
-    public static DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return getDeadLetterJobEntityManager(getCommandContext());
-    }
-    
-    public static DeadLetterJobEntityManager getDeadLetterJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getDeadLetterJobEntityManager();
-    }
-    
-    public static SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return getSuspendedJobEntityManager(getCommandContext());
-    }
-    
-    public static SuspendedJobEntityManager getSuspendedJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getSuspendedJobEntityManager();
-    }
-    
-    public static TimerJobEntityManager getTimerJobEntityManager() {
-        return getTimerJobEntityManager(getCommandContext());
-    }
-    
-    public static TimerJobEntityManager getTimerJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getTimerJobEntityManager();
-    }
-    
-    public static HistoryJobEntityManager getHistoryJobEntityManager() {
-        return getHistoryJobEntityManager(getCommandContext());
-    }
-    
-    public static HistoryJobEntityManager getHistoryJobEntityManager(CommandContext commandContext) {
-        return getJobServiceConfiguration(commandContext).getHistoryJobEntityManager();
-    }
-    
-    public static ByteArrayEntityManager getJobByteArrayEntityManager() {
-        return getJobByteArrayEntityManager(getCommandContext());
-    }
-    
-    public static ByteArrayEntityManager getJobByteArrayEntityManager(CommandContext commandContext) {
-        return commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager();
     }
     
     public static CommandContext getCommandContext() {

@@ -33,6 +33,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -392,42 +394,44 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     void testFindJobByCorrelationId() {
         Job asyncJob = managementService.executeCommand(context -> {
-            JobEntity job = CommandContextUtil.getJobService(context).createJob();
+            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            JobEntity job = jobService.createJob();
             job.setJobType("testAsync");
-            CommandContextUtil.getJobService(context).insertJob(job);
+            jobService.insertJob(job);
             return job;
         });
 
         Job timerJob = managementService.executeCommand(context -> {
-            TimerJobEntity job = CommandContextUtil.getTimerJobService(context).createTimerJob();
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getTimerJobService();
+            TimerJobEntity job = timerJobService.createTimerJob();
             job.setJobType("testTimer");
-            CommandContextUtil.getTimerJobService(context).insertTimerJob(job);
+            timerJobService.insertTimerJob(job);
             return job;
         });
 
         Job deadLetterJob = managementService.executeCommand(context -> {
-            DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            DeadLetterJobEntity job = jobService.createDeadLetterJob();
             job.setJobType("testDeadLetter");
-            CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+            jobService.insertDeadLetterJob(job);
             return job;
         });
 
         Job suspendedJob = managementService.executeCommand(context -> {
-            SuspendedJobEntity job = CommandContextUtil.getJobServiceConfiguration(context)
+            SuspendedJobEntity job = processEngineConfiguration.getJobServiceConfiguration()
                     .getSuspendedJobEntityManager()
                     .create();
             job.setJobType("testSuspended");
-            CommandContextUtil.getJobServiceConfiguration(context)
-                    .getSuspendedJobEntityManager()
-                    .insert(job);
+            processEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().insert(job);
             return job;
         });
 
 
         Job externalWorkerJob = managementService.executeCommand(context -> {
-            ExternalWorkerJobEntity job = CommandContextUtil.getJobService(context).createExternalWorkerJob();
+            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
             job.setJobType("testExternal");
-            CommandContextUtil.getJobService(context).insertExternalWorkerJob(job);
+            jobService.insertExternalWorkerJob(job);
             return job;
         });
 

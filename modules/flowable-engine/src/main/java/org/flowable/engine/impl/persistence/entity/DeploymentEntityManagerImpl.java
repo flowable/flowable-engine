@@ -38,7 +38,6 @@ import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
@@ -114,11 +113,13 @@ public class DeploymentEntityManagerImpl
     }
 
     protected void deleteProcessDefinitionIdentityLinks(ProcessDefinition processDefinition) {
-        CommandContextUtil.getIdentityLinkService().deleteIdentityLinksByProcessDefinitionId(processDefinition.getId());
+        engineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+            .deleteIdentityLinksByProcessDefinitionId(processDefinition.getId());
     }
 
     protected void deleteEventSubscriptions(ProcessDefinition processDefinition) {
-        CommandContextUtil.getEventSubscriptionService().deleteEventSubscriptionsForProcessDefinition(processDefinition.getId());
+        engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+            .deleteEventSubscriptionsForProcessDefinition(processDefinition.getId());
     }
 
     protected void deleteProcessDefinitionInfo(String processDefinitionId) {
@@ -137,17 +138,18 @@ public class DeploymentEntityManagerImpl
 
     protected void deleteHistoricTaskEventLogEntriesForProcessDefinitions(List<ProcessDefinition> processDefinitions) {
         for (ProcessDefinition processDefinition : processDefinitions) {
-            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinition.getId());
+            engineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processDefinition.getId());
         }
     }
 
     protected void removeTimerStartJobs(ProcessDefinition processDefinition) {
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
+        TimerJobService timerJobService = engineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<TimerJobEntity> timerStartJobs = timerJobService.findJobsByTypeAndProcessDefinitionId(TimerStartEventJobHandler.TYPE, processDefinition.getId());
         if (timerStartJobs != null && timerStartJobs.size() > 0) {
             for (TimerJobEntity timerStartJob : timerStartJobs) {
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, 
+                            timerStartJob, null, null, processDefinition.getId()), engineConfiguration.getEngineCfgKey());
                 }
 
                 timerJobService.deleteTimerJob(timerStartJob);
@@ -210,14 +212,14 @@ public class DeploymentEntityManagerImpl
                 timerJob.setTenantId(previousProcessDefinition.getTenantId());
             }
 
-            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
+            engineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 
     protected void restoreSignalStartEvent(ProcessDefinition previousProcessDefinition, BpmnModel bpmnModel, StartEvent startEvent, EventDefinition eventDefinition) {
         CommandContext commandContext = Context.getCommandContext();
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-        SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
+        SignalEventSubscriptionEntity subscriptionEntity = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createSignalEventSubscription();
 
         String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
         subscriptionEntity.setEventName(eventName);
@@ -227,7 +229,7 @@ public class DeploymentEntityManagerImpl
             subscriptionEntity.setTenantId(previousProcessDefinition.getTenantId());
         }
 
-        CommandContextUtil.getEventSubscriptionService(commandContext).insertEventSubscription(subscriptionEntity);
+        engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().insertEventSubscription(subscriptionEntity);
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(subscriptionEntity);
     }
 
@@ -239,7 +241,7 @@ public class DeploymentEntityManagerImpl
         }
 
         CommandContext commandContext = Context.getCommandContext();
-        MessageEventSubscriptionEntity newSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).createMessageEventSubscription();
+        MessageEventSubscriptionEntity newSubscription = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createMessageEventSubscription();
         String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
         newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
@@ -250,7 +252,7 @@ public class DeploymentEntityManagerImpl
             newSubscription.setTenantId(previousProcessDefinition.getTenantId());
         }
 
-        CommandContextUtil.getEventSubscriptionService().insertEventSubscription(newSubscription);
+        engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().insertEventSubscription(newSubscription);
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(newSubscription);
     }
 

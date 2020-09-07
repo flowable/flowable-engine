@@ -19,8 +19,8 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -32,6 +32,8 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
  */
 public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery,
         CacheAwareQuery<PlanItemInstanceEntity> {
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected String caseDefinitionId;
     protected String derivedCaseDefinitionId;
@@ -88,12 +90,14 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         
     }
     
-    public PlanItemInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public PlanItemInstanceQueryImpl(CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandContext, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public PlanItemInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public PlanItemInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandExecutor, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -640,13 +644,13 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
+        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().countByCriteria(this);
     }
 
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
     }
     
     @Override

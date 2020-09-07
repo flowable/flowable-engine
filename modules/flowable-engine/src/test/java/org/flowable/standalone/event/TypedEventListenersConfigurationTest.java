@@ -43,7 +43,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch a custom event
         FlowableEvent event = new FlowableProcessEventImpl(FlowableEngineEventType.CUSTOM);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(listener.getEventsReceived()).hasSize(1);
         assertThat(listener.getEventsReceived().get(0)).isEqualTo(event);
@@ -51,9 +51,9 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch another event the listener is registered for
         event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_DELETED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
         event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_UPDATED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(listener.getEventsReceived())
                 .extracting(FlowableEvent::getType)
@@ -62,7 +62,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch an event that is NOT part of the types configured
         event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.getEventsReceived()).isEmpty();
     }
 }

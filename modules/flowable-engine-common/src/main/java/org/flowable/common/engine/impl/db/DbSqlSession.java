@@ -29,7 +29,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -75,9 +75,9 @@ public class DbSqlSession implements Session {
 
     // insert ///////////////////////////////////////////////////////////////////
 
-    public void insert(Entity entity) {
+    public void insert(Entity entity, IdGenerator idGenerator) {
         if (entity.getId() == null) {
-            String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
+            String id = idGenerator.getNextId();
             if (dbSqlSessionFactory.isUsePrefixId()) {
                 id = entity.getIdPrefix() + id;
             }

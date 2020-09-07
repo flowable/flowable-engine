@@ -25,22 +25,26 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -109,11 +113,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected List<VariableInstanceEntity> queryVariables;
     protected List<IdentityLinkEntity> queryIdentityLinks;
     protected boolean forcedUpdate;
-
-
-    public TaskEntityImpl() {
-
-    }
 
     @Override
     public Object getPersistentState() {
@@ -198,7 +197,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
-        return CommandContextUtil.getTaskServiceConfiguration().getInternalTaskVariableScopeResolver().resolveParentVariableScope(this);
+        return getTaskServiceConfiguration().getInternalTaskVariableScopeResolver().resolveParentVariableScope(this);
     }
 
     @Override
@@ -222,14 +221,14 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     protected List<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().createInternalVariableInstanceQuery().taskId(id).list();
+        return getVariableServiceConfiguration().getVariableService().createInternalVariableInstanceQuery().taskId(id).list();
     }
     
     @Override
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
         VariableInstanceEntity variableInstance = super.createVariableInstance(variableName, value);
         
-        CountingTaskUtil.handleInsertVariableInstanceEntityCount(variableInstance);
+        CountingTaskUtil.handleInsertVariableInstanceEntityCount(variableInstance, getTaskServiceConfiguration());
 
         return variableInstance;
         
@@ -239,7 +238,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         super.deleteVariableInstanceForExplicitUserCall(variableInstance);
         
-        CountingTaskUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
+        CountingTaskUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true, getTaskServiceConfiguration());
     }
 
     // task assignment ////////////////////////////////////////////////////////////
@@ -259,7 +258,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
             if (queryIdentityLinks == null) {
-                taskIdentityLinkEntities = CommandContextUtil.getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
+                taskIdentityLinkEntities = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
             } else {
                 taskIdentityLinkEntities = queryIdentityLinks;
             }
@@ -330,7 +329,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     public void addUserIdentityLink(String userId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         IdentityLinkEntity identityLink = identityLinkEntityManager.addTaskIdentityLink(this.id, userId, null, identityLinkType);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -340,7 +339,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     public void addGroupIdentityLink(String groupId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         IdentityLinkEntity identityLink = identityLinkEntityManager.addTaskIdentityLink(this.id, null, groupId, identityLinkType);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -360,13 +359,13 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     
     @Override
     public void deleteUserIdentityLink(String userId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), userId, null, identityLinkType);
     }
     
     @Override
     public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), null, groupId,identityLinkType);
     }
 
@@ -400,7 +399,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             throw new FlowableException("lazy loading outside command context");
         }
 
-        return CommandContextUtil.getVariableService()
+        return getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .taskId(id)
                 .name(variableName)
@@ -413,7 +412,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableService()
+        return getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .taskId(id)
                 .names(variableNames)
@@ -624,7 +623,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     
     @Override
     public void addCandidateUser(String userId) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         IdentityLinkEntity identityLink = identityLinkEntityManager.addCandidateUser(this.id, userId);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -634,7 +633,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     
     @Override
     public void addCandidateUsers(Collection<String> candidateUsers) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         List<IdentityLinkEntity> identityLinks = identityLinkEntityManager.addCandidateUsers(this.id, candidateUsers);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -644,7 +643,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     
     @Override
     public void addCandidateGroup(String groupId) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         IdentityLinkEntity identityLink = identityLinkEntityManager.addCandidateGroup(this.id, groupId);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -654,7 +653,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     
     @Override
     public void addCandidateGroups(Collection<String> candidateGroups) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         List<IdentityLinkEntity> identityLinks = identityLinkEntityManager.addCandidateGroups(this.id, candidateGroups);
         InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
         if (taskAssignmentManager != null) {
@@ -668,12 +667,40 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
     
     protected InternalTaskAssignmentManager getTaskAssignmentManager() {
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
         if (taskServiceConfiguration != null) {
             return taskServiceConfiguration.getInternalTaskAssignmentManager();
         }
         
         return null;
+    }
+    
+    protected TaskServiceConfiguration getTaskServiceConfiguration() {
+        return (TaskServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+    
+    protected IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return (IdentityLinkServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return (VariableServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    protected AbstractEngineConfiguration getTaskEngineConfiguration() {
+        Map<String, AbstractEngineConfiguration> engineConfigurations = CommandContextUtil.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = null;
+        if (ScopeTypes.CMMN.equals(scopeType)) {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        } else {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            if (engineConfiguration == null) {
+                engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
+        }
+        
+        return engineConfiguration;
     }
 
     @Override

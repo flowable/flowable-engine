@@ -69,9 +69,6 @@ public class DefaultJobManager implements JobManager {
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
-    public DefaultJobManager() {
-    }
-
     public DefaultJobManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
@@ -124,10 +121,10 @@ public class DefaultJobManager implements JobManager {
     }
 
     private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.TIMER_SCHEDULED, timerJob), jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -390,14 +387,14 @@ public class DefaultJobManager implements JobManager {
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);
         if (jobEntity.getId() != null) {
-            CommandContextUtil.getJobEntityManager().delete(jobEntity);
+            jobServiceConfiguration.getJobEntityManager().delete(jobEntity);
         }
     }
 
     protected void executeHistoryJob(HistoryJobEntity historyJobEntity) {
         executeHistoryJobHandler(historyJobEntity);
         if (historyJobEntity.getId() != null) {
-            CommandContextUtil.getHistoryJobEntityManager().delete(historyJobEntity);
+            jobServiceConfiguration.getHistoryJobEntityManager().delete(historyJobEntity);
         }
     }
 
@@ -516,7 +513,7 @@ public class DefaultJobManager implements JobManager {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (Context.getTransactionContext() != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
-                            CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
+                    jobServiceConfiguration.getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
             
         } else {
@@ -548,7 +545,7 @@ public class DefaultJobManager implements JobManager {
     protected String getBusinessCalendarName(String calendarName, VariableScope variableScope) {
         String businessCalendarName = CYCLE_TYPE;
         if (StringUtils.isNotEmpty(calendarName)) {
-            businessCalendarName = (String) CommandContextUtil.getJobServiceConfiguration().getExpressionManager()
+            businessCalendarName = (String) jobServiceConfiguration.getExpressionManager()
                     .createExpression(calendarName).getValue(variableScope);
         }
         return businessCalendarName;
@@ -581,7 +578,8 @@ public class DefaultJobManager implements JobManager {
         if (asyncHistorySession != null) {
             TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
             if (transactionContext != null) {
-                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(commandContext, historyJobEntity)); 
+                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(
+                        jobServiceConfiguration, historyJobEntity)); 
             }
         }
     }
@@ -670,14 +668,6 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setExclusive(copyFromJob.isExclusive());
         copyToJob.setExecutionId(copyFromJob.getExecutionId());
         copyToJob.setId(copyFromJob.getId());
-        copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
-        copyToJob.setCustomValues(copyFromJob.getCustomValues());
-        copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
-        copyToJob.setCategory(copyFromJob.getCategory());
-        copyToJob.setJobType(copyFromJob.getJobType());
-        copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
-        copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
-        copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
         copyToJob.setElementId(copyFromJob.getElementId());
         copyToJob.setElementName(copyFromJob.getElementName());
@@ -686,6 +676,14 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setSubScopeId(copyFromJob.getSubScopeId());
         copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setScopeDefinitionId(copyFromJob.getScopeDefinitionId());
+        copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
+        copyToJob.setCustomValues(copyFromJob.getCustomValues());
+        copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
+        copyToJob.setCategory(copyFromJob.getCategory());
+        copyToJob.setJobType(copyFromJob.getJobType());
+        copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
+        copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
+        copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setRepeat(copyFromJob.getRepeat());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
@@ -702,6 +700,7 @@ public class DefaultJobManager implements JobManager {
 
     protected HistoryJobEntity copyHistoryJobInfo(HistoryJobEntity copyToJob, HistoryJobEntity copyFromJob) {
         copyToJob.setId(copyFromJob.getId());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
@@ -721,7 +720,6 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setCustomValues(copyFromJob.getCustomValues());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
-        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
         return copyToJob;

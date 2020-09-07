@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
@@ -107,7 +108,8 @@ public class DmnDeployer implements Deployer {
      * Saves each decision. It is assumed that the deployment is new, the decisions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistDecisions(ParsedDeployment parsedDeployment) {
-        DecisionEntityManager decisionEntityManager = CommandContextUtil.getDecisionEntityManager();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
+        DecisionEntityManager decisionEntityManager = dmnEngineConfiguration.getDecisionEntityManager();
 
         for (DecisionEntity decision : parsedDeployment.getAllDecisions()) {
             decisionEntityManager.insert(decision);

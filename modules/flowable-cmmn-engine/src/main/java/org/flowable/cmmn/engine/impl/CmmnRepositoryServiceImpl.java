@@ -111,12 +111,12 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public void addCandidateStarterUser(String caseDefinitionId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null));
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null, configuration));
     }
 
     @Override
     public void addCandidateStarterGroup(String caseDefinitionId, String groupId) {
-        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId));
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId, configuration));
     }
 
     @Override

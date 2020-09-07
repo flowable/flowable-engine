@@ -18,7 +18,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.Test;
 
 public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
@@ -58,7 +57,7 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
             // clean
             historyService.deleteHistoricProcessInstance(processInstanceId);
             managementService.executeCommand(commandContext -> {
-                CommandContextUtil.getHistoricTaskService(commandContext)
+                processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
                         .deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
                 return null;
             });

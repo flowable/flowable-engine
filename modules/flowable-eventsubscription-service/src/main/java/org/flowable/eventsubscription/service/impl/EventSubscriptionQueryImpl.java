@@ -26,8 +26,8 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 
 /**
  * @author Daniel Meyer
@@ -36,6 +36,8 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         implements EventSubscriptionQuery, CacheAwareQuery<EventSubscriptionEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
 
     protected String id;
     protected String eventType;
@@ -65,12 +67,14 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     }
 
-    public EventSubscriptionQueryImpl(CommandContext commandContext) {
+    public EventSubscriptionQueryImpl(CommandContext commandContext, EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         super(commandContext);
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
     }
 
-    public EventSubscriptionQueryImpl(CommandExecutor commandExecutor) {
+    public EventSubscriptionQueryImpl(CommandExecutor commandExecutor, EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         super(commandExecutor);
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
     }
 
     @Override
@@ -410,12 +414,12 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionCountByQueryCriteria(this);
+        return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionCountByQueryCriteria(this);
     }
 
     @Override
     public List<EventSubscription> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(this);
+        return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////

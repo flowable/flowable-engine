@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -56,13 +57,15 @@ public class DeleteIdentityLinkForCaseDefinitionCmd implements Command<Object>, 
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CaseDefinitionEntity caseDefinition = CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findById(caseDefinitionId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseDefinitionEntity caseDefinition = cmmnEngineConfiguration.getCaseDefinitionEntityManager().findById(caseDefinitionId);
 
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find case definition with id " + caseDefinitionId, CaseDefinition.class);
         }
 
-        CommandContextUtil.getIdentityLinkService().deleteScopeDefinitionIdentityLink(caseDefinition.getId(), ScopeTypes.CMMN, userId, groupId);
+        cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+            .deleteScopeDefinitionIdentityLink(caseDefinition.getId(), ScopeTypes.CMMN, userId, groupId);
 
         return null;
     }

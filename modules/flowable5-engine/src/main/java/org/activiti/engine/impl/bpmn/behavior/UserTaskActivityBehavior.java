@@ -34,6 +34,7 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
@@ -217,7 +218,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             // All properties set, now firing 'create' events
             if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
 

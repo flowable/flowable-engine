@@ -50,6 +50,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     private static final long serialVersionUID = 1L;
     
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String businessKey;
@@ -100,12 +102,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public HistoricProcessInstanceQueryImpl() {
     }
 
-    public HistoricProcessInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public HistoricProcessInstanceQueryImpl(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandContext, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
-    public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandExecutor, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
     @Override
@@ -692,7 +696,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new HistoricProcessInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoricProcessInstanceQueryImpl(commandContext, processEngineConfiguration);
+        } else {
+            currentOrQueryObject = new HistoricProcessInstanceQueryImpl(commandExecutor, processEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -756,7 +764,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
@@ -769,20 +776,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
         
         if (includeProcessVariables) {
-            results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
 
             if (processInstanceId != null) {
                 addCachedVariableForQueryById(commandContext, results);
             }
 
         } else {
-            results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesByQueryCriteria(this);
         }
 
         if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
@@ -829,7 +835,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public void enhanceCachedValue(HistoricProcessInstanceEntity processInstance) {
         if (includeProcessVariables) {
             processInstance.getQueryVariables()
-                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                    .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
                             .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
         }
     }

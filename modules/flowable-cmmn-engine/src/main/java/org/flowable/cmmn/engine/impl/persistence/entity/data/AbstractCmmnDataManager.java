@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
@@ -31,4 +32,8 @@ public abstract class AbstractCmmnDataManager<EntityImpl extends Entity> extends
         return cmmnEngineConfiguration;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return cmmnEngineConfiguration.getIdGenerator();
+    }
 }

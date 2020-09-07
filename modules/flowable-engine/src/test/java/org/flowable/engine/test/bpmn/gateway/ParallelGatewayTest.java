@@ -23,7 +23,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -225,11 +224,10 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
-                List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionService()
+                List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
                 assertThat(subs)
                         .extracting(EventSubscription::getEventName)
@@ -254,11 +252,10 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
-                List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionService()
+                List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
                 assertThat(subs)
                         .extracting(EventSubscription::getEventName)

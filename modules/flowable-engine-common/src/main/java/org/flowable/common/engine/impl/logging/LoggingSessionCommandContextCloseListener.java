@@ -17,20 +17,25 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LoggingSessionCommandContextCloseListener implements CommandContextCloseListener {
     
     protected LoggingSession loggingSession;
     protected LoggingListener loggingListener;
+    protected ObjectMapper objectMapper;
+    
+    protected String engineType;
     
     public LoggingSessionCommandContextCloseListener() {
         
     }
     
-    public LoggingSessionCommandContextCloseListener(LoggingSession loggingSession, LoggingListener loggingListener) {
+    public LoggingSessionCommandContextCloseListener(LoggingSession loggingSession, LoggingListener loggingListener, ObjectMapper objectMapper) {
         this.loggingSession = loggingSession;
         this.loggingListener = loggingListener;
+        this.objectMapper = objectMapper;
     }
     
     @Override
@@ -40,18 +45,16 @@ public class LoggingSessionCommandContextCloseListener implements CommandContext
     
     @Override
     public void closed(CommandContext commandContext) {
-        String engineType = LoggingSessionUtil.getEngineType(commandContext);
         LoggingSessionUtil.addEngineLoggingData(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, 
-                        "Closed command context for " + engineType + " engine", engineType);
+                "Closed command context for " + engineType + " engine", engineType, objectMapper);
         List<ObjectNode> loggingData = loggingSession.getLoggingData();
         loggingListener.loggingGenerated(loggingData);
     }
 
     @Override
     public void closeFailure(CommandContext commandContext) {
-        String engineType = LoggingSessionUtil.getEngineType(commandContext);
         LoggingSessionUtil.addEngineLoggingData(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE_FAILURE, 
-                        "Exception at closing command context for " + engineType + " engine", engineType);
+                "Exception at closing command context for " + engineType + " engine", engineType, objectMapper);
         List<ObjectNode> loggingData = loggingSession.getLoggingData();
         loggingListener.loggingGenerated(loggingData);
     }
@@ -85,5 +88,13 @@ public class LoggingSessionCommandContextCloseListener implements CommandContext
 
     public void setLoggingListener(LoggingListener loggingListener) {
         this.loggingListener = loggingListener;
+    }
+
+    public String getEngineType() {
+        return engineType;
+    }
+
+    public void setEngineType(String engineType) {
+        this.engineType = engineType;
     }
 }

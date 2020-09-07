@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -68,9 +69,11 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
                 execution.setTransientVariables(transientVariables);
             }
 
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
-                            null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
+                            null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
 
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
             

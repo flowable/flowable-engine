@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
@@ -40,8 +41,9 @@ public class GetHistoricEntityLinkChildrenForProcessInstanceCmd implements Comma
 
     @Override
     public List<HistoricEntityLink> execute(CommandContext commandContext) {
-        return CommandContextUtil.getHistoricEntityLinkService().findHistoricEntityLinksByScopeIdAndScopeType(
-                        processInstanceId, ScopeTypes.BPMN, EntityLinkType.CHILD);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                .findHistoricEntityLinksByScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN, EntityLinkType.CHILD);
     }
 
 }

@@ -40,13 +40,11 @@ import org.slf4j.LoggerFactory;
 public class TableDataManagerImpl implements TableDataManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableDataManagerImpl.class);
-
-    protected DbSqlSession getDbSqlSession() {
-        return Context.getCommandContext().getSession(DbSqlSession.class);
-    }
-
-    protected AbstractEngineConfiguration getProcessEngineConfiguration() {
-        return Context.getCommandContext().getCurrentEngineConfiguration();
+    
+    protected AbstractEngineConfiguration engineConfiguration;
+    
+    public TableDataManagerImpl(AbstractEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
     }
 
     @Override
@@ -115,8 +113,8 @@ public class TableDataManagerImpl implements TableDataManager {
 
     protected String getDatabaseCatalog() {
         String catalog = null;
-        if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
-            catalog = getProcessEngineConfiguration().getDatabaseCatalog();
+        if (engineConfiguration.getDatabaseCatalog() != null && engineConfiguration.getDatabaseCatalog().length() > 0) {
+            catalog = engineConfiguration.getDatabaseCatalog();
         }
 
         return catalog;
@@ -124,11 +122,11 @@ public class TableDataManagerImpl implements TableDataManager {
 
     protected String getDatabaseSchema() {
         String schema = null;
-        if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
+        if (engineConfiguration.getDatabaseSchema() != null && engineConfiguration.getDatabaseSchema().length() > 0) {
             if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                schema = getProcessEngineConfiguration().getDatabaseSchema().toUpperCase(Locale.ROOT);
+                schema = engineConfiguration.getDatabaseSchema().toUpperCase(Locale.ROOT);
             } else {
-                schema = getProcessEngineConfiguration().getDatabaseSchema();
+                schema = engineConfiguration.getDatabaseSchema();
             }
         }
 
@@ -205,6 +203,10 @@ public class TableDataManagerImpl implements TableDataManager {
             result = null;
         }
         return result;
+    }
+    
+    protected DbSqlSession getDbSqlSession() {
+        return Context.getCommandContext().getSession(DbSqlSession.class);
     }
 
 }

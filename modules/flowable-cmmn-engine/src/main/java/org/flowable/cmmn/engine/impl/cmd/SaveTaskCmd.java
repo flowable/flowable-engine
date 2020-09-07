@@ -23,8 +23,10 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -48,36 +50,37 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("task is null");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (task.getRevision() == 0) {
-            TaskHelper.insertTask(task, true);
-            CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(task);
+            TaskHelper.insertTask(task, true, cmmnEngineConfiguration);
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskCreated(task);
 
             if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.TASK_CREATED, task), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
             }
 
         } else {
             
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-
-            TaskInfo originalTaskEntity = CommandContextUtil.getTaskService().getTask(task.getId());
+            TaskServiceConfiguration taskServiceConfiguration = cmmnEngineConfiguration.getTaskServiceConfiguration();
+            TaskInfo originalTaskEntity = taskServiceConfiguration.getTaskService().getTask(task.getId());
             
             if (originalTaskEntity == null && cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
+                originalTaskEntity = taskServiceConfiguration.getHistoricTaskService().getHistoricTask(task.getId());
             }
             
             String originalAssignee = originalTaskEntity.getAssignee();
             
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
-            CommandContextUtil.getTaskService().updateTask(task, true);
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
+            taskServiceConfiguration.getTaskService().updateTask(task, true);
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
 
-                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-                    .executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
+                cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
                 if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
-                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
+                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(
+                            FlowableEngineEventType.TASK_ASSIGNED, task), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
                 }
 
             }

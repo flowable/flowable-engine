@@ -62,7 +62,6 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
     @Override
     public void schemaCreate() {
         try {
-            
             getCommonSchemaManager().schemaCreate();
             getIdentityLinkSchemaManager().schemaCreate();
             getEntityLinkSchemaManager().schemaCreate();

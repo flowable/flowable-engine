@@ -362,7 +362,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
                 ((HistoryJobEntity) historyJob).setAdvancedJobHandlerConfiguration(
                         processEngineConfiguration.getObjectMapper().writeValueAsString(downgradedConfigurations)
                 );
-                org.flowable.job.service.impl.util.CommandContextUtil.getHistoryJobEntityManager(commandContext).update((HistoryJobEntity) historyJob);
+                processEngineConfiguration.getJobServiceConfiguration().getHistoryJobEntityManager().update((HistoryJobEntity) historyJob);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -25,10 +25,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String tableName;
+    protected String engineType;
 
-    public GetTableMetaDataCmd(String tableName) {
+    public GetTableMetaDataCmd(String tableName, String engineType) {
         this.tableName = tableName;
+        this.engineType = engineType;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
         if (tableName == null) {
             throw new FlowableIllegalArgumentException("tableName is null");
         }
-        return commandContext.getCurrentEngineConfiguration().getTableDataManager().getTableMetaData(tableName);
+        return commandContext.getEngineConfigurations().get(engineType).getTableDataManager().getTableMetaData(tableName);
     }
 
 }

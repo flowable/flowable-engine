@@ -18,10 +18,10 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -32,6 +32,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class CaseInstanceStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public CaseInstanceStartHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START);
@@ -44,7 +48,7 @@ public class CaseInstanceStartHistoryJsonTransformer extends AbstractHistoryJson
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-           HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext);
+           HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
            
            String id = getStringFromJson(historicalData, "id");
            HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(id);

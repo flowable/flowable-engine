@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,6 +26,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceMigrationValidationResult> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseInstanceId;
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
@@ -33,7 +35,9 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
     protected String caseDefinitionTenantId;
     protected CaseInstanceMigrationDocument caseInstanceMigrationDocument;
 
-    public CaseInstanceMigrationValidationCmd(String caseInstanceId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
+    public CaseInstanceMigrationValidationCmd(String caseInstanceId, CaseInstanceMigrationDocument caseInstanceMigrationDocument,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (caseInstanceId == null) {
             throw new FlowableException("Must specify a case instance id to migrate");
         }
@@ -42,9 +46,12 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
         }
         this.caseInstanceId = caseInstanceId;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public CaseInstanceMigrationValidationCmd(CaseInstanceMigrationDocument caseInstanceMigrationDocument, String caseDefinitionId) {
+    public CaseInstanceMigrationValidationCmd(CaseInstanceMigrationDocument caseInstanceMigrationDocument, String caseDefinitionId,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (caseDefinitionId == null) {
             throw new FlowableException("Must specify a case definition id to migrate");
         }
@@ -53,9 +60,12 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
         }
         this.caseDefinitionId = null;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public CaseInstanceMigrationValidationCmd(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
+    public CaseInstanceMigrationValidationCmd(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, 
+            CaseInstanceMigrationDocument caseInstanceMigrationDocument, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (caseDefinitionKey == null) {
             throw new FlowableException("Must specify a case definition id to migrate");
         }
@@ -69,11 +79,12 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
         this.caseDefinitionVersion = caseDefinitionVersion;
         this.caseDefinitionTenantId = caseDefinitionTenantId;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public CaseInstanceMigrationValidationResult execute(CommandContext commandContext) {
-        CaseInstanceMigrationManager migrationManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationManager();
+        CaseInstanceMigrationManager migrationManager = cmmnEngineConfiguration.getCaseInstanceMigrationManager();
 
         if (caseInstanceId != null) {
             return migrationManager.validateMigrateCaseInstance(caseInstanceId, caseInstanceMigrationDocument, commandContext);

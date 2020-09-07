@@ -23,9 +23,9 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
-import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.ExternalWorkerJob;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Filip Hrisafov
@@ -33,6 +33,9 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQuery, ExternalWorkerJob> implements ExternalWorkerJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String processInstanceId;
     protected String executionId;
@@ -66,12 +69,14 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     public ExternalWorkerJobQueryImpl() {
     }
 
-    public ExternalWorkerJobQueryImpl(CommandContext commandContext) {
+    public ExternalWorkerJobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public ExternalWorkerJobQueryImpl(CommandExecutor commandExecutor) {
+    public ExternalWorkerJobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -353,12 +358,12 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getExternalWorkerJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getExternalWorkerJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<ExternalWorkerJob> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getExternalWorkerJobEntityManager(commandContext).findJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getExternalWorkerJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -376,7 +381,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -38,9 +39,10 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
         if (task.getOwner() == null) {
             task.setOwner(task.getAssignee());
         }
-        TaskHelper.changeTaskAssignee(task, userId);
-        CommandContextUtil.getCmmnHistoryManager(commandContext)
-            .recordTaskInfoChange(task, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        TaskHelper.changeTaskAssignee(task, userId, cmmnEngineConfiguration);
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
         return null;
     }
 

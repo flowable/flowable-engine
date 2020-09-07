@@ -12,24 +12,28 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
 public class VariableRemovedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public VariableRemovedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED);
@@ -41,7 +45,7 @@ public class VariableRemovedHistoryJsonTransformer extends AbstractHistoryJsonTr
     }
     
     protected HistoricVariableInstanceEntity getHistoricVariableInstanceEntity(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricVariableService(commandContext)
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
             .getHistoricVariableInstance(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
     }
 
@@ -49,7 +53,7 @@ public class VariableRemovedHistoryJsonTransformer extends AbstractHistoryJsonTr
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricVariableInstanceEntity historicVariable = getHistoricVariableInstanceEntity(historicalData, commandContext);
         if (historicVariable != null) {
-            CommandContextUtil.getHistoricVariableService(commandContext).deleteHistoricVariableInstance(historicVariable);
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstance(historicVariable);
         }
     }
 

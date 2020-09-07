@@ -93,7 +93,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode), processEngineConfiguration.getEngineCfgKey());
         }
 
         try {
@@ -110,7 +110,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
         
         JobEntity job = jobService.createJob();
         job.setExecutionId(execution.getId());

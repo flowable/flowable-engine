@@ -30,7 +30,6 @@ import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -41,11 +40,15 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
     protected final String workerId;
     protected final int numberOfJobs;
     protected final ExternalWorkerJobAcquireBuilderImpl builder;
+    protected final JobServiceConfiguration jobServiceConfiguration;
 
-    public AcquireExternalWorkerJobsCmd(String workerId, int numberOfJobs, ExternalWorkerJobAcquireBuilderImpl builder) {
+    public AcquireExternalWorkerJobsCmd(String workerId, int numberOfJobs, ExternalWorkerJobAcquireBuilderImpl builder,
+            JobServiceConfiguration jobServiceConfiguration) {
+        
         this.workerId = workerId;
         this.numberOfJobs = numberOfJobs;
         this.builder = builder;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -63,7 +66,6 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
             throw new FlowableIllegalArgumentException("workerId must not be empty");
         }
 
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
         ExternalWorkerJobEntityManager externalWorkerJobEntityManager = jobServiceConfiguration.getExternalWorkerJobEntityManager();
         InternalJobManager internalJobManager = jobServiceConfiguration.getInternalJobManager();
 
@@ -94,7 +96,7 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
 
     protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime());
+        gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
         job.setLockOwner(workerId);
         job.setLockExpirationTime(gregorianCalendar.getTime());

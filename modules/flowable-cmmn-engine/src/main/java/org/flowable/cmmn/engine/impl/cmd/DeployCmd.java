@@ -32,7 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class DeployCmd implements Command<CmmnDeployment> {
-
+    
     protected CmmnDeploymentBuilderImpl deploymentBuilder;
 
     public DeployCmd(CmmnDeploymentBuilderImpl deploymentBuilder) {
@@ -41,9 +41,9 @@ public class DeployCmd implements Command<CmmnDeployment> {
 
     @Override
     public CmmnDeployment execute(CommandContext commandContext) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnDeploymentEntity deployment = deploymentBuilder.getDeployment();
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
             List<CmmnDeployment> existingDeployments = new ArrayList<>();
@@ -78,7 +78,7 @@ public class DeployCmd implements Command<CmmnDeployment> {
         
         deployment.setDeploymentTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
-        CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).insert(deployment);
+        cmmnEngineConfiguration.getCmmnDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent

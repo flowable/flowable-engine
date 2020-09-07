@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd implements Command<Object>, Serializable {
@@ -25,8 +26,9 @@ public class DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd imple
 
     @Override
     public Object execute(CommandContext commandContext) {
-        CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskInstancesForNonExistingProcessInstances();
-        CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).deleteHistoricActivityInstancesForNonExistingProcessInstances();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskInstancesForNonExistingProcessInstances();
+        processEngineConfiguration.getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesForNonExistingProcessInstances();
 
         return null;
     }

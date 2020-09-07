@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -33,6 +33,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Filip Hrisafov
  */
 public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItemInstanceHistoryJsonTransformer {
+    
+    public PlanItemInstanceFullHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
     
     @Override
     public List<String> getTypes() {
@@ -48,8 +52,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = getHistoricPlanItemInstanceEntity(historicalData, commandContext);
         if (historicPlanItemInstanceEntity == null) {
-            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = CommandContextUtil
-                .getHistoricPlanItemInstanceEntityManager(commandContext);
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create();
             copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
@@ -61,7 +64,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
                             lastUpdateTime.after(historicPlanItemInstanceEntity.getLastUpdatedTime()))) {
                 
                 copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
-                CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).update(historicPlanItemInstanceEntity);
+                cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager().update(historicPlanItemInstanceEntity);
             }
         }
     }
@@ -89,7 +92,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
     }
 
     protected HistoricPlanItemInstanceEntity getHistoricPlanItemInstanceEntity(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext)
+        return cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager()
             .findById(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
     }
 }

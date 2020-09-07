@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -38,7 +39,8 @@ public class GetLocalVariableCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("planItemInstanceId is null");
         }
         
-        VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        VariableInstanceEntity variableInstanceEntity = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .subScopeId(planItemInstanceId)
                 .scopeType(ScopeTypes.CMMN)

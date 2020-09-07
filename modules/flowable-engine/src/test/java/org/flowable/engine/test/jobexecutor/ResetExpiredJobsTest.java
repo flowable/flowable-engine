@@ -24,7 +24,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -62,7 +61,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         // Running the 'reset expired' logic should have no effect now
         JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
         int expiredJobsPagesSize = processEngineConfiguration.getAsyncExecutorResetExpiredJobsPageSize();
-        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
+        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs).isEmpty();
         assertJobDetails(false);
 
@@ -71,7 +70,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         assertJobDetails(true);
 
         // Running the 'reset expired' logic should have no effect, the lock time is not yet passed
-        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs).isEmpty();
         assertJobDetails(true);
 
@@ -80,7 +79,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(newDate);
 
         // Running the reset logic should now reset the lock
-        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize,  jobServiceConfiguration.getJobEntityManager()));
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize,  jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs).hasSizeGreaterThan(0);
 
         List<String> jobIds = new ArrayList<>();
@@ -88,7 +87,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
             jobIds.add(jobEntity.getId());
         }
 
-        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager()));
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertJobDetails(false);
 
         // And it can be re-acquired
@@ -126,13 +125,13 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         
         int expiredJobsPagesSize = processEngineConfiguration.getAsyncExecutorResetExpiredJobsPageSize();
         JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
-        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
+        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs).isEmpty();
         
         // Move time to timeout + 1 second. This should trigger the max timeout and the job should be reset (unacquired: reinserted as a new job)
         processEngineConfiguration.getClock().setCurrentTime(new Date(startOfTestTime.getTime() + (processEngineConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout() + 1000)));
       
-        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()));
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs)
                 .extracting(JobInfoEntity::getId)
                 .containsExactly(job.getId());
@@ -143,8 +142,8 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         for (JobInfoEntity j : expiredJobs) {
             jobIds.add(j.getId());
         }
-        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager()));
-        assertThat(managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager()))).isEmpty();
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
+        assertThat(managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration))).isEmpty();
         
         assertThat(managementService.createJobQuery().jobId(job.getId()).singleResult()).isNull();
         assertThat(managementService.createJobQuery().singleResult()).isNotNull();
@@ -159,7 +158,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
                 @Override
                 public Void execute(CommandContext commandContext) {
-                    JobEntityManager jobEntityManager = CommandContextUtil.getJobServiceConfiguration(commandContext).getJobEntityManager();
+                    JobEntityManager jobEntityManager = processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
                     JobEntity jobEntity = jobEntityManager.create();
 
                     jobEntity.setJobType("type");

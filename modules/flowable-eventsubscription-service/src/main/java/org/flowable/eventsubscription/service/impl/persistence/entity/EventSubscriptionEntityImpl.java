@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -41,9 +41,11 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     protected String scopeDefinitionId;
     protected String scopeType;
     protected String tenantId;
+    
+    public EventSubscriptionEntityImpl() {}
 
-    public EventSubscriptionEntityImpl() {
-        this.created = CommandContextUtil.getEventSubscriptionServiceConfiguration().getClock().getCurrentTime();
+    public EventSubscriptionEntityImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        this.created = eventSubscriptionServiceConfiguration.getClock().getCurrentTime();
     }
 
     @Override

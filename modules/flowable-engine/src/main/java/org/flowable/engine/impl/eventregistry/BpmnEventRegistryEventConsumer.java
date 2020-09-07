@@ -154,7 +154,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     @Override
     protected EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(commandExecutor);
+        return new EventSubscriptionQueryImpl(commandExecutor, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

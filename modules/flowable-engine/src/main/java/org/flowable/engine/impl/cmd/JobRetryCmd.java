@@ -59,15 +59,14 @@ public class JobRetryCmd implements Command<Object> {
 
     @Override
     public Object execute(CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfig.getJobServiceConfiguration().getJobService();
+        TimerJobService timerJobService = processEngineConfig.getJobServiceConfiguration().getTimerJobService();
         
         JobEntity job = jobService.findJobById(jobId);
         if (job == null) {
             return null;
         }
-
-        ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
         FlowElement currentFlowElement = executionEntity != null ? executionEntity.getCurrentFlowElement() : null;
@@ -149,10 +148,13 @@ public class JobRetryCmd implements Command<Object> {
         }
 
         // Dispatch both an update and a retry-decrement event
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity));
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity),
+                    processEngineConfiguration.getEngineCfgKey());
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return null;

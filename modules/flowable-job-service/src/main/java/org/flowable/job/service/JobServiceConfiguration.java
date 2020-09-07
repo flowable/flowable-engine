@@ -182,10 +182,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             jobDataManager = new MybatisJobDataManager(this);
         }
         if (deadLetterJobDataManager == null) {
-            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager();
+            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager(this);
         }
         if (suspendedJobDataManager == null) {
-            suspendedJobDataManager = new MybatisSuspendedJobDataManager();
+            suspendedJobDataManager = new MybatisSuspendedJobDataManager(this);
         }
         if (timerJobDataManager == null) {
             timerJobDataManager = new MybatisTimerJobDataManager(this);

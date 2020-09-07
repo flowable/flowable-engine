@@ -41,6 +41,7 @@ public class StartPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
             Map<String, Object> localVariables,
             Map<String, Object> transientVariables, Map<String, Object> childTaskVariables,
             Map<String, Object> childTaskFormVariables, String childTaskFormOutcome, FormInfo childTaskFormInfo) {
+        
         super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
         this.childTaskVariables = childTaskVariables;
         this.childTaskFormVariables = childTaskFormVariables;

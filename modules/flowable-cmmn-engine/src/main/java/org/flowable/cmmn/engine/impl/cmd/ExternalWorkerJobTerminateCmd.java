@@ -14,17 +14,18 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -41,12 +42,13 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
 
     @Override
     protected void runJobLogic(ExternalWorkerJobEntity externalWorkerJob, CommandContext commandContext) {
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
         externalWorkerJob.setJobHandlerConfiguration("terminate:");
 
         if (variables != null && !variables.isEmpty()) {
-            VariableService variableService = CommandContextUtil.getVariableService(commandContext);
-            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableTypes();
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+            VariableService variableService = variableServiceConfiguration.getVariableService();
+            VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
@@ -60,7 +62,7 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
                 variableService.insertVariableInstance(variableInstance);
             }
 
-            PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
                     .findById(externalWorkerJob.getSubScopeId());
 
             if (planItemInstanceEntity instanceof CountingPlanItemInstanceEntity) {
@@ -69,6 +71,6 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
             }
         }
 
-        moveExternalWorkerJobToExecutableJob(jobServiceConfiguration, externalWorkerJob, commandContext);
+        moveExternalWorkerJobToExecutableJob(externalWorkerJob, commandContext);
     }
 }

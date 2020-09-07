@@ -13,9 +13,9 @@
 
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.ChangePlanItemStateBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -25,10 +25,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ChangePlanItemStateCmd implements Command<Void> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected ChangePlanItemStateBuilderImpl changePlanItemStateBuilder;
 
-    public ChangePlanItemStateCmd(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
+    public ChangePlanItemStateCmd(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.changePlanItemStateBuilder = changePlanItemStateBuilder;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class ChangePlanItemStateCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Case instance id is required");   
         }
 
-        CmmnDynamicStateManager dynamicStateManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDynamicStateManager();
+        CmmnDynamicStateManager dynamicStateManager = cmmnEngineConfiguration.getDynamicStateManager();
         dynamicStateManager.movePlanItemInstanceState(changePlanItemStateBuilder, commandContext);
 
         return null;

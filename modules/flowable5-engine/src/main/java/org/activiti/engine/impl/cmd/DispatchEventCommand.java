@@ -17,6 +17,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Command that dispatches an event.
@@ -38,7 +39,7 @@ public class DispatchEventCommand implements Command<Void> {
         }
 
         if (commandContext.getEventDispatcher().isEnabled()) {
-            commandContext.getEventDispatcher().dispatchEvent(event);
+            commandContext.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         } else {
             throw new ActivitiException("Message dispatcher is disabled, cannot dispatch event");
         }

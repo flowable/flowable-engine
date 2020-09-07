@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.variable.api.types.VariableType;
@@ -40,6 +40,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public VariableCreatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED);
@@ -52,7 +56,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableService historicVariableService = CommandContextUtil.getHistoricVariableService();
+        HistoricVariableService historicVariableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService();
         HistoricVariableInstanceEntity historicVariableInstanceEntity = historicVariableService.createHistoricVariableInstance();
         historicVariableInstanceEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
         historicVariableInstanceEntity.setScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID));
@@ -64,7 +68,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setRevision(getIntegerFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REVISION));
         historicVariableInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));
         
-        VariableTypes variableTypes = CommandContextUtil.getCmmnEngineConfiguration().getVariableTypes();
+        VariableTypes variableTypes = cmmnEngineConfiguration.getVariableTypes();
         VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TYPE));
         
         historicVariableInstanceEntity.setVariableType(variableType);

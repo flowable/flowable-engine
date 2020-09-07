@@ -60,11 +60,11 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        TaskInfo task = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
+        TaskInfo task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         Date endTime = null;
         if (task == null) {
             historic = true;
-            task = CommandContextUtil.getHistoricTaskService(commandContext).getHistoricTask(taskId);
+            task = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
             if (task != null) {
                 endTime = ((HistoricTaskInstance) task).getEndTime();
             }
@@ -137,7 +137,7 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
         }
 
-        FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
+        FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
         formFieldHandler.enrichFormFields(formInfo);
 
         return formInfo;

@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.ExternalWorkerJobBpmnErrorCmd;
 import org.flowable.engine.impl.cmd.ExternalWorkerJobCompleteCmd;
 import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Filip Hrisafov
@@ -28,13 +29,17 @@ public class ExternalWorkerCompletionBuilderImpl implements ExternalWorkerComple
     protected final CommandExecutor commandExecutor;
     protected final String externalJobId;
     protected final String workerId;
+    protected final JobServiceConfiguration jobServiceConfiguration;
 
     protected Map<String, Object> variables;
 
-    public ExternalWorkerCompletionBuilderImpl(CommandExecutor commandExecutor, String externalJobId, String workerId) {
+    public ExternalWorkerCompletionBuilderImpl(CommandExecutor commandExecutor, String externalJobId, 
+            String workerId, JobServiceConfiguration jobServiceConfiguration) {
+        
         this.commandExecutor = commandExecutor;
         this.externalJobId = externalJobId;
         this.workerId = workerId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -57,11 +62,11 @@ public class ExternalWorkerCompletionBuilderImpl implements ExternalWorkerComple
 
     @Override
     public void complete() {
-        commandExecutor.execute(new ExternalWorkerJobCompleteCmd(externalJobId, workerId, variables));
+        commandExecutor.execute(new ExternalWorkerJobCompleteCmd(externalJobId, workerId, variables, jobServiceConfiguration));
     }
 
     @Override
     public void bpmnError(String errorCode) {
-        commandExecutor.execute(new ExternalWorkerJobBpmnErrorCmd(externalJobId, workerId, variables, errorCode));
+        commandExecutor.execute(new ExternalWorkerJobBpmnErrorCmd(externalJobId, workerId, variables, errorCode, jobServiceConfiguration));
     }
 }

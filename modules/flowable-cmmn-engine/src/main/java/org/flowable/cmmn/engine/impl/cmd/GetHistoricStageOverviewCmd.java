@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -46,6 +47,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String caseInstanceId;
 
     public GetHistoricStageOverviewCmd(String caseInstanceId) {
@@ -54,12 +56,13 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
 
     @Override
     public List<StageResponse> execute(CommandContext commandContext) {
-        HistoricCaseInstanceEntity caseInstance = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        HistoricCaseInstanceEntity caseInstance = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findById(caseInstanceId);
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId, HistoricCaseInstanceEntity.class);
         }
 
-        HistoricPlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext);
+        HistoricPlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
         List<HistoricPlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl()
             .planItemInstanceCaseInstanceId(caseInstanceId)
             .planItemInstanceDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.MILESTONE))
@@ -71,7 +74,7 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
                 || Objects.equals(PlanItemInstanceState.ASYNC_ACTIVE, planItemInstance.getState());
         });
 
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstance.getCaseDefinitionId());
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);

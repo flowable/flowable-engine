@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.form.TaskFormData;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;
@@ -50,16 +51,17 @@ public class GetRenderedTaskFormCmd implements Command<Object>, Serializable {
             throw new FlowableIllegalArgumentException("Task id should not be null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' not found", Task.class);
         }
 
-        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
+        FormHandlerHelper formHandlerHelper = processEngineConfiguration.getFormHandlerHelper();
         TaskFormHandler taskFormHandler = formHandlerHelper.getTaskFormHandlder(task);
         if (taskFormHandler != null) {
 
-            FormEngine formEngine = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormEngines().get(formEngineName);
+            FormEngine formEngine = processEngineConfiguration.getFormEngines().get(formEngineName);
 
             if (formEngine == null) {
                 throw new FlowableException("No formEngine '" + formEngineName + "' defined process engine configuration");

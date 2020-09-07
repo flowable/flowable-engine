@@ -19,7 +19,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.task.service.TaskServiceConfiguration;
 
 /**
  * @author martin.grofcik
@@ -27,14 +27,17 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
 public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBuilderImpl implements Command<Void> {
 
     protected CommandExecutor commandExecutor;
+    protected TaskServiceConfiguration taskServiceConfiguration;
 
-    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task) {
+    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskInfo task, TaskServiceConfiguration taskServiceConfiguration) {
         super(task);
         this.commandExecutor = commandExecutor;
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
-    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor) {
+    public HistoricTaskLogEntryBuilderImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
     @Override
@@ -51,10 +54,10 @@ public class HistoricTaskLogEntryBuilderImpl extends BaseHistoricTaskLogEntryBui
             userId(Authentication.getAuthenticatedUserId());
         }
         if (timeStamp == null) {
-            timeStamp(CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime());
+            timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
         }
 
-        CommandContextUtil.getTaskServiceConfiguration(commandContext).getInternalHistoryTaskManager().recordHistoryUserTaskLog(this);
+        taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(this);
         return null;
     }
 

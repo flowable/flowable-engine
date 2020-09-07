@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,13 +26,17 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class CaseInstanceMigrationBatchCmd implements Command<Batch> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
     protected int caseDefinitionVersion;
     protected String caseDefinitionTenantId;
     protected CaseInstanceMigrationDocument caseInstanceMigrationDocument;
 
-    public CaseInstanceMigrationBatchCmd(CaseInstanceMigrationDocument caseInstanceMigrationDocument, String caseDefinitionId) {
+    public CaseInstanceMigrationBatchCmd(CaseInstanceMigrationDocument caseInstanceMigrationDocument, String caseDefinitionId,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (caseDefinitionId == null) {
             throw new FlowableException("Must specify a case definition id to migrate");
         }
@@ -41,9 +45,12 @@ public class CaseInstanceMigrationBatchCmd implements Command<Batch> {
         }
         this.caseDefinitionId = null;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public CaseInstanceMigrationBatchCmd(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
+    public CaseInstanceMigrationBatchCmd(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, 
+            CaseInstanceMigrationDocument caseInstanceMigrationDocument, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (caseDefinitionKey == null) {
             throw new FlowableException("Must specify a case definition id to migrate");
         }
@@ -57,11 +64,12 @@ public class CaseInstanceMigrationBatchCmd implements Command<Batch> {
         this.caseDefinitionVersion = caseDefinitionVersion;
         this.caseDefinitionTenantId = caseDefinitionTenantId;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Batch execute(CommandContext commandContext) {
-        CaseInstanceMigrationManager migrationManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationManager();
+        CaseInstanceMigrationManager migrationManager = cmmnEngineConfiguration.getCaseInstanceMigrationManager();
 
         if (caseDefinitionId != null) {
             return migrationManager.batchMigrateCaseInstancesOfCaseDefinition(caseDefinitionId, caseInstanceMigrationDocument, commandContext);

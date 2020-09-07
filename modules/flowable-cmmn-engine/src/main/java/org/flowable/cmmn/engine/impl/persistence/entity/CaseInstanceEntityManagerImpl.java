@@ -28,12 +28,14 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -62,7 +64,7 @@ public class CaseInstanceEntityManagerImpl
 
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
-        return new CaseInstanceQueryImpl(engineConfiguration.getCommandExecutor());
+        return new CaseInstanceQueryImpl(engineConfiguration.getCommandExecutor(), engineConfiguration);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class CaseInstanceEntityManagerImpl
 
         for (VariableInstanceEntity variableInstance : variableInstances) {
             if (variableInstance.getByteArrayRef() != null && variableInstance.getByteArrayRef().getId() != null) {
-                variableInstance.getByteArrayRef().delete();
+                variableInstance.getByteArrayRef().delete(engineConfiguration.getEngineCfgKey());
             }
         }
 
@@ -122,11 +124,11 @@ public class CaseInstanceEntityManagerImpl
         TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
-            TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
+            TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true, engineConfiguration);
         }
         
         // Event subscriptions
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        EventSubscriptionService eventSubscriptionService = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         eventSubscriptionService.deleteEventSubscriptionsForScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
 
         // Sentry part instances
@@ -150,38 +152,47 @@ public class CaseInstanceEntityManagerImpl
         }
         planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
 
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
         // Child task behaviors have potentially associated child entities (case/process instances)
         for (PlanItemInstanceEntity childTaskPlanItemInstance : childTaskPlanItemInstances) {
             if (PlanItemInstanceState.ACTIVE.equals(childTaskPlanItemInstance.getState())) {
                 ChildTaskActivityBehavior childTaskActivityBehavior = (ChildTaskActivityBehavior) childTaskPlanItemInstance.getPlanItem().getBehavior();
-                childTaskActivityBehavior.deleteChildEntity(CommandContextUtil.getCommandContext(), childTaskPlanItemInstance, cascade);
+                childTaskActivityBehavior.deleteChildEntity(commandContext, childTaskPlanItemInstance, cascade);
             }
         }
+        
+        JobServiceConfiguration jobServiceConfiguration = engineConfiguration.getJobServiceConfiguration();
 
         // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = engineConfiguration.getJobServiceConfiguration().getJobEntityManager();
-        List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl(commandContext, jobServiceConfiguration)
+                .scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job job : jobs) {
             jobEntityManager.delete(job.getId());
         }
         TimerJobEntityManager timerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
-        List<Job> timerJobs = timerJobEntityManager.findJobsByQueryCriteria(new TimerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        List<Job> timerJobs = timerJobEntityManager.findJobsByQueryCriteria(new TimerJobQueryImpl(commandContext, jobServiceConfiguration)
+                .scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job timerJob : timerJobs) {
             timerJobEntityManager.delete(timerJob.getId());
         }
         SuspendedJobEntityManager suspendedJobEntityManager = engineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager();
-        List<Job> suspendedJobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        List<Job> suspendedJobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl(commandContext, jobServiceConfiguration)
+                .scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job suspendedJob : suspendedJobs) {
             suspendedJobEntityManager.delete(suspendedJob.getId());
         }
         DeadLetterJobEntityManager deadLetterJobEntityManager = engineConfiguration.getJobServiceConfiguration().getDeadLetterJobEntityManager();
-        List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(new DeadLetterJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(
+                new DeadLetterJobQueryImpl(commandContext, jobServiceConfiguration).scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job deadLetterJob : deadLetterJobs) {
             deadLetterJobEntityManager.delete(deadLetterJob.getId());
         }
 
         ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
-        List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(new ExternalWorkerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
+        List<ExternalWorkerJob> externalWorkerJobs = externalWorkerJobEntityManager.findJobsByQueryCriteria(
+                new ExternalWorkerJobQueryImpl(commandContext, jobServiceConfiguration).scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (ExternalWorkerJob externalWorkerJob : externalWorkerJobs) {
             externalWorkerJobEntityManager.delete(externalWorkerJob.getId());
             getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(externalWorkerJob.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);

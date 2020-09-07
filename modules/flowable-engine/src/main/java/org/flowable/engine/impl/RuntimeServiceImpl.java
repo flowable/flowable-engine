@@ -188,7 +188,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ExecutionQuery createExecutionQuery() {
-        return new ExecutionQueryImpl(commandExecutor);
+        return new ExecutionQueryImpl(commandExecutor, configuration);
     }
 
     @Override
@@ -208,7 +208,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(commandExecutor);
+        return new EventSubscriptionQueryImpl(commandExecutor, configuration.getEventSubscriptionServiceConfiguration());
     }
 
     @Override
@@ -530,7 +530,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ProcessInstanceQuery createProcessInstanceQuery() {
-        return new ProcessInstanceQueryImpl(commandExecutor);
+        return new ProcessInstanceQueryImpl(commandExecutor, configuration);
     }
 
     @Override

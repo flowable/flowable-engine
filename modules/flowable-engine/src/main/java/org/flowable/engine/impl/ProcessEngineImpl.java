@@ -96,7 +96,8 @@ public class ProcessEngineImpl implements ProcessEngine {
             }
         }
 
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED), 
+                processEngineConfiguration.getEngineCfgKey());
     }
 
     @Override
@@ -137,7 +138,8 @@ public class ProcessEngineImpl implements ProcessEngine {
             }
         }
 
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED),
+                processEngineConfiguration.getEngineCfgKey());
     }
 
     // getters and setters

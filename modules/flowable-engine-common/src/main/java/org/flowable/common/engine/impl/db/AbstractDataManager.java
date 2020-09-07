@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
@@ -72,7 +73,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
     @Override
     public void insert(EntityImpl entity) {
-        getDbSqlSession().insert(entity);
+        getDbSqlSession().insert(entity, getIdGenerator());
     }
 
     @Override
@@ -299,4 +300,5 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, entityId);
     }
 
+    protected abstract IdGenerator getIdGenerator();
 }

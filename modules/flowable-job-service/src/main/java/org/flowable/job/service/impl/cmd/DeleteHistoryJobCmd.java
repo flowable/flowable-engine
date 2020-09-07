@@ -21,9 +21,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +35,14 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteHistoryJobCmd.class);
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String historyJobId;
 
-    public DeleteHistoryJobCmd(String historyJobId) {
+    public DeleteHistoryJobCmd(String historyJobId, JobServiceConfiguration jobServiceConfiguration) {
         this.historyJobId = historyJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -48,15 +51,15 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getHistoryJobEntityManager(commandContext).delete(jobToDelete);
+        jobServiceConfiguration.getHistoryJobEntityManager().delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(HistoryJobEntity jobToDelete) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getJobServiceConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -68,7 +71,7 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", historyJobId);
         }
 
-        HistoryJobEntity job = CommandContextUtil.getHistoryJobEntityManager(commandContext).findById(historyJobId);
+        HistoryJobEntity job = jobServiceConfiguration.getHistoryJobEntityManager().findById(historyJobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No history job found with id '" + historyJobId + "'", Job.class);
         }

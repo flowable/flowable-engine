@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**

@@ -28,7 +28,7 @@ public class EntityLinkEntityManagerImpl
     implements EntityLinkEntityManager {
 
     public EntityLinkEntityManagerImpl(EntityLinkServiceConfiguration entityLinkServiceConfiguration, EntityLinkDataManager entityLinkDataManager) {
-        super(entityLinkServiceConfiguration, entityLinkDataManager);
+        super(entityLinkServiceConfiguration, entityLinkServiceConfiguration.getEngineName(), entityLinkDataManager);
     }
     
     @Override

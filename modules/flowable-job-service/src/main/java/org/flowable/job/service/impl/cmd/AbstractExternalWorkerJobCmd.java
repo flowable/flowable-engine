@@ -46,7 +46,7 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
             // Part of the same transaction to avoid a race condition with the
             // potentially new jobs (wrt process instance locking) that are created
             // during the execution of the original job
-            new UnlockExclusiveJobCmd(externalWorkerJob).execute(commandContext);
+            new UnlockExclusiveJobCmd(externalWorkerJob, jobServiceConfiguration).execute(commandContext);
         }
         return null;
     }

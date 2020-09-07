@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkInfo;
 import org.flowable.entitylink.api.EntityLinkService;
@@ -27,6 +26,7 @@ import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.junit.jupiter.api.Test;
@@ -39,8 +39,9 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
     @Test
     void testFindEntityLinksWithSameRootWithNullRoot() {
         managementService.executeCommand(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            EntityLinkServiceConfiguration entityLinkServiceConfiguration = processEngineConfiguration.getEntityLinkServiceConfiguration();
+            EntityLinkService entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
+            HistoricEntityLinkService historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
             createEntityLinkWithoutRootScope("1", "execution1", "element1", "2.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
             createEntityLinkWithoutRootScope("1", "execution2", "element2", "2.2", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
             createEntityLinkWithoutRootScope("1", "execution3", "element1", "3.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
@@ -112,11 +113,12 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
                 .isEmpty();
 
         managementService.executeCommand(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkServiceConfiguration entityLinkServiceConfiguration = processEngineConfiguration.getEntityLinkServiceConfiguration();
+            EntityLinkService entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
             entityLinkService.deleteEntityLinksByScopeIdAndType("1", ScopeTypes.BPMN);
             entityLinkService.deleteEntityLinksByScopeIdAndType("2.1", ScopeTypes.BPMN);
 
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkService historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
             historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("1", ScopeTypes.BPMN);
             historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("2.1", ScopeTypes.BPMN);
             return null;
@@ -126,8 +128,9 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
     @Test
     void testFindEntityLinksWithSameRootWithNullRootInSameContext() {
         managementService.executeCommand(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            EntityLinkServiceConfiguration entityLinkServiceConfiguration = processEngineConfiguration.getEntityLinkServiceConfiguration();
+            EntityLinkService entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
+            HistoricEntityLinkService historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
             createEntityLinkWithoutRootScope("1", "execution1", "element1", "2.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
             createEntityLinkWithoutRootScope("1", "execution2", "element2", "2.2", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
             createEntityLinkWithoutRootScope("1", "execution3", "element1", "3.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
@@ -199,11 +202,12 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
 
 
         managementService.executeCommand(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkServiceConfiguration entityLinkServiceConfiguration = processEngineConfiguration.getEntityLinkServiceConfiguration();
+            EntityLinkService entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
             entityLinkService.deleteEntityLinksByScopeIdAndType("1", ScopeTypes.BPMN);
             entityLinkService.deleteEntityLinksByScopeIdAndType("2.1", ScopeTypes.BPMN);
 
-            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            HistoricEntityLinkService historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
             historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("1", ScopeTypes.BPMN);
             historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("2.1", ScopeTypes.BPMN);
             return null;
@@ -211,22 +215,22 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
     }
 
     protected List<EntityLink> findEntityLinksByScopeId(String scopeId) {
-        return managementService.executeCommand(commandContext -> CommandContextUtil.getEntityLinkService(commandContext)
+        return managementService.executeCommand(commandContext -> processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
                 .findEntityLinksByScopeIdAndType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD));
     }
 
     protected List<EntityLink> findEntityLinksWithSameRootByScopeId(String scopeId) {
-        return managementService.executeCommand(commandContext -> CommandContextUtil.getEntityLinkService(commandContext)
+        return managementService.executeCommand(commandContext -> processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
                 .findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD));
     }
 
     protected List<HistoricEntityLink> findHistoricEntityLinksByScopeId(String scopeId) {
-        return managementService.executeCommand(commandContext -> CommandContextUtil.getHistoricEntityLinkService()
+        return managementService.executeCommand(commandContext -> processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
                 .findHistoricEntityLinksByScopeIdAndScopeType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD));
     }
 
     protected List<HistoricEntityLink> findHistoricEntityLinksWithSameRootByScopeId(String scopeId) {
-        return managementService.executeCommand(commandContext -> CommandContextUtil.getHistoricEntityLinkService()
+        return managementService.executeCommand(commandContext -> processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
                 .findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD));
     }
 

@@ -13,6 +13,8 @@
 
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
@@ -20,8 +22,11 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 public class CompensateEventSubscriptionEntityImpl extends EventSubscriptionEntityImpl implements CompensateEventSubscriptionEntity {
 
     private static final long serialVersionUID = 1L;
+    
+    public CompensateEventSubscriptionEntityImpl() {}
 
-    public CompensateEventSubscriptionEntityImpl() {
+    public CompensateEventSubscriptionEntityImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        super(eventSubscriptionServiceConfiguration);
         eventType = EVENT_TYPE;
     }
 

@@ -14,7 +14,7 @@ package org.flowable.batch.service.impl;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchBuilder;
-import org.flowable.batch.service.impl.util.CommandContextUtil;
+import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
  */
 public class BatchBuilderImpl implements BatchBuilder {
     
-    protected BatchServiceImpl batchService;
+    protected BatchServiceConfiguration batchServiceConfiguration;
     protected CommandExecutor commandExecutor;
     
     protected String batchType;
@@ -36,12 +36,13 @@ public class BatchBuilderImpl implements BatchBuilder {
     
     public BatchBuilderImpl() {}
     
-    public BatchBuilderImpl(CommandExecutor commandExecutor) {
+    public BatchBuilderImpl(CommandExecutor commandExecutor, BatchServiceConfiguration batchServiceConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.batchServiceConfiguration = batchServiceConfiguration;
     }
     
-    public BatchBuilderImpl(BatchServiceImpl batchService) {
-        this.batchService = batchService;
+    public BatchBuilderImpl(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
     }
 
     @Override
@@ -88,12 +89,12 @@ public class BatchBuilderImpl implements BatchBuilder {
 
                 @Override
                 public Batch execute(CommandContext commandContext) {
-                    return CommandContextUtil.getBatchEntityManager(commandContext).createBatch(selfBatchBuilder);
+                    return batchServiceConfiguration.getBatchEntityManager().createBatch(selfBatchBuilder);
                 }
             });
             
         } else {
-            return batchService.createBatch(this);
+            return ((BatchServiceImpl) batchServiceConfiguration.getBatchService()).createBatch(this);
         }
     }
 

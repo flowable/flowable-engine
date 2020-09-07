@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -38,16 +39,16 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnDecisionService;
+import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
 import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
-import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
 import org.flowable.dmn.engine.impl.agenda.DefaultDmnEngineAgendaFactory;
 import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaFactory;
@@ -226,6 +227,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initFunctionDelegates();
         initExpressionManager();
         initCommandContextFactory();
@@ -257,7 +259,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
-        initClock();
         initHitPolicyBehaviors();
         initRuleEngineExecutor();
     }
@@ -370,6 +371,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.DMN;
     }
 
     @Override

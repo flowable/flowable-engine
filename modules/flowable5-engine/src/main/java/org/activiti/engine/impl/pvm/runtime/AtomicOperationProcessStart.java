@@ -22,6 +22,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Tom Baeyens
@@ -51,9 +52,10 @@ public class AtomicOperationProcessStart extends AbstractEventAtomicOperation {
             }
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED,
-                            execution, variablesMap, false));
+                            execution, variablesMap, false), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             Context.getProcessEngineConfiguration().getEventDispatcher()
-                    .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variablesMap, false));
+                    .dispatchEvent(ActivitiEventBuilder.createProcessStartedEvent(execution, variablesMap, false),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();

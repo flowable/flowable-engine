@@ -23,6 +23,7 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
@@ -34,7 +35,8 @@ public class KeycloakIdentityServiceImpl extends IdmIdentityServiceImpl {
 
     protected KeycloakConfiguration keycloakConfiguration;
 
-    public KeycloakIdentityServiceImpl(KeycloakConfiguration keycloakConfiguration) {
+    public KeycloakIdentityServiceImpl(KeycloakConfiguration keycloakConfiguration, IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
         this.keycloakConfiguration = keycloakConfiguration;
     }
 

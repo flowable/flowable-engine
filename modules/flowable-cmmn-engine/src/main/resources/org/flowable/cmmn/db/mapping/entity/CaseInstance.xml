@@ -187,12 +187,14 @@
                     ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
             <id property="id" column="VAR_ID_"/>
             <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR"/>
-            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType"
-                    jdbcType="VARCHAR"/>
+            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR"/>
             <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
             <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR"/>
             <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR"/>
             <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
             <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
             <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
             <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR"/>
@@ -303,7 +305,7 @@
             <if test="includeCaseVariables">,
                 VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
                 VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
-                VAR_TASK_ID_,
+                VAR_TASK_ID_, VAR.SCOPE_ID_ as VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_, VAR.SCOPE_TYPE_ as VAR_SCOPE_TYPE_, 
                 VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
                 VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
             </if>
@@ -338,6 +340,9 @@
                 TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_,
                 TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_,
                 TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+                TEMPVAR_SCOPE_ID_ as VAR_SCOPE_ID_,
+                TEMPVAR_SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_,
+                TEMPVAR_SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
                 TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
                 TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
                 TEMPVAR_TEXT_ as VAR_TEXT_,
@@ -372,6 +377,9 @@
                 VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_,
                 VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_,
                 VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+                VAR.SCOPE_ID_ as TEMPVAR_SCOPE_ID_,
+                VAR.SUB_SCOPE_ID_ as TEMPVAR_SUB_SCOPE_ID_,
+                VAR.SCOPE_TYPE_ as TEMPVAR_SCOPE_TYPE_,
                 VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_,
                 VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
                 VAR.TEXT_ as TEMPVAR_TEXT_,

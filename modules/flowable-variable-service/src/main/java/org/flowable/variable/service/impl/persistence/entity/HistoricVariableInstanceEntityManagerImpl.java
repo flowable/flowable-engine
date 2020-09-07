@@ -33,7 +33,7 @@ public class HistoricVariableInstanceEntityManagerImpl
     implements HistoricVariableInstanceEntityManager {
 
     public HistoricVariableInstanceEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, HistoricVariableInstanceDataManager historicVariableInstanceDataManager) {
-        super(variableServiceConfiguration, historicVariableInstanceDataManager);
+        super(variableServiceConfiguration, variableServiceConfiguration.getEngineName(), historicVariableInstanceDataManager);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class HistoricVariableInstanceEntityManagerImpl
         super.delete(entity, fireDeleteEvent);
 
         if (entity.getByteArrayRef() != null) {
-            entity.getByteArrayRef().delete();
+            entity.getByteArrayRef().delete(serviceConfiguration.getEngineName());
         }
     }
 

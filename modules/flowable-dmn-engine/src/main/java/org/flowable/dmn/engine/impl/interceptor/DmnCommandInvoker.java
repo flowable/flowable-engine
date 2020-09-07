@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.dmn.engine.impl.agenda.DmnEngineAgenda;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -32,7 +33,7 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         final DmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         if (commandContext.isReused() && !agenda.isEmpty()) {
