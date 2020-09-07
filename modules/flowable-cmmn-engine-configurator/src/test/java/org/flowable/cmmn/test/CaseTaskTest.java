@@ -33,6 +33,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ExecutionQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -1089,8 +1090,8 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         @Override
         public Void execute(CommandContext commandContext) {
-            List<Execution> query = new ExecutionQueryImpl(cmmnEngineConfiguration.getCommandExecutor())
-                    .list();
+            List<Execution> query = new ExecutionQueryImpl(cmmnEngineConfiguration.getCommandExecutor(), (ProcessEngineConfigurationImpl)
+                    processEngine.getProcessEngineConfiguration()).list();
             ExecutionEntityManager entityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
             for (Execution execution : query) {
                 ExecutionEntity executionEntity = (ExecutionEntity) execution;

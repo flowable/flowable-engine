@@ -43,7 +43,7 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
     
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
+        return commandExecutor.execute(new GetTableCountCmd());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
     @Override

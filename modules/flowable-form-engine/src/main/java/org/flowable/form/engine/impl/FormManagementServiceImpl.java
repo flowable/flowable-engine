@@ -37,7 +37,7 @@ public class FormManagementServiceImpl extends CommonEngineServiceImpl<FormEngin
 
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
+        return commandExecutor.execute(new GetTableCountCmd());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class FormManagementServiceImpl extends CommonEngineServiceImpl<FormEngin
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
     @Override
