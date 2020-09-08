@@ -46,30 +46,16 @@ import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
-import org.flowable.entitylink.api.EntityLinkService;
-import org.flowable.entitylink.api.history.HistoricEntityLinkService;
-import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventsubscription.service.EventSubscriptionService;
-import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.identitylink.service.HistoricIdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.InternalTaskAssignmentManager;
-import org.flowable.task.service.TaskService;
-import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.variable.service.HistoricVariableService;
-import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Joram Barrez
