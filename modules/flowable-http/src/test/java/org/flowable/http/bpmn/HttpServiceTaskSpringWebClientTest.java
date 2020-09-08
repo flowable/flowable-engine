@@ -14,11 +14,6 @@ package org.flowable.http.bpmn;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.IOException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Disabled;
