@@ -20,7 +20,6 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * <p>
@@ -176,35 +175,29 @@ public class ByteArrayRef implements Serializable {
     protected AbstractEngineConfiguration getEngineConfiguration(String engineType) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            if ("all".equalsIgnoreCase(engineType)) {
-                return getEngineConfigurationForAllType(commandContext);
-                
-            } else {
-                AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
-                if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
-                    engineConfiguration = commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-                }
-                
-                return engineConfiguration;
-            }
+            return getEngineConfiguration(engineType, commandContext);
             
         } else if (commandExecutor != null) {
             return commandExecutor.execute(context -> {
-                if ("all".equalsIgnoreCase(engineType)) {
-                    return getEngineConfigurationForAllType(context);
-                    
-                } else {
-                    AbstractEngineConfiguration engineConfiguration = context.getEngineConfigurations().get(engineType);
-                    if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
-                        engineConfiguration = context.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-                    }
-                    
-                    return engineConfiguration;
-                }
+                return getEngineConfiguration(engineType, context);
             });
             
         } else {
             throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
+        }
+    }
+    
+    protected AbstractEngineConfiguration getEngineConfiguration(String engineType, CommandContext commandContext) {
+        if ("all".equalsIgnoreCase(engineType)) {
+            return getEngineConfigurationForAllType(commandContext);
+            
+        } else {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+            if (engineConfiguration == null) {
+                engineConfiguration = getFirstEngineConfigurationWithByteArrayEntityManager(commandContext);
+            }
+            
+            return engineConfiguration;
         }
     }
     
@@ -214,7 +207,23 @@ public class ByteArrayRef implements Serializable {
             engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.CMMN);
             
             if (engineConfiguration == null) {
-                engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.APP);
+                engineConfiguration = getFirstEngineConfigurationWithByteArrayEntityManager(commandContext);
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            throw new IllegalStateException("Cannot initialize byte array. No engine configuration found");
+        }
+        
+        return engineConfiguration;
+    }
+    
+    protected AbstractEngineConfiguration getFirstEngineConfigurationWithByteArrayEntityManager(CommandContext commandContext) {
+        AbstractEngineConfiguration engineConfiguration = null;
+        for (AbstractEngineConfiguration possibleEngineConfiguration : commandContext.getEngineConfigurations().values()) {
+            if (possibleEngineConfiguration.getByteArrayEntityManager() != null) {
+                engineConfiguration = possibleEngineConfiguration;
+                break;
             }
         }
         
