@@ -176,38 +176,35 @@ public class ByteArrayRef implements Serializable {
     protected AbstractEngineConfiguration getEngineConfiguration(String engineType) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            if ("all".equalsIgnoreCase(engineType)) {
-                return getEngineConfigurationForAllType(commandContext);
-                
-            } else {
-                AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
-                if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
-                    engineConfiguration = commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-                }
-                
-                return engineConfiguration;
-            }
-            
+            return getEngineConfiguration(engineType, commandContext);
+
         } else if (commandExecutor != null) {
             return commandExecutor.execute(context -> {
-                if ("all".equalsIgnoreCase(engineType)) {
-                    return getEngineConfigurationForAllType(context);
-                    
-                } else {
-                    AbstractEngineConfiguration engineConfiguration = context.getEngineConfigurations().get(engineType);
-                    if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
-                        engineConfiguration = context.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-                    }
-                    
-                    return engineConfiguration;
-                }
+                return getEngineConfiguration(engineType, context);
             });
             
         } else {
             throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
         }
     }
-    
+
+    protected AbstractEngineConfiguration getEngineConfiguration(String engineType, CommandContext commandContext) {
+        // Although 'engineType' is passed here, due to backwards compatibility, it also can be a scopeType value.
+        // For example, the scopeType of JobEntity determines which engine is used to retrieve the byteArrayEntityManager.
+        // The 'all' on the next line is exactly that, see JobServiceConfiguration#JOB_EXECUTION_SCOPE_ALL
+        if ("all".equalsIgnoreCase(engineType)) {
+            return getEngineConfigurationForAllType(commandContext);
+
+        } else {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+            if (engineConfiguration == null && (ScopeTypes.BPMN.equals(engineType) || EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineType))) {
+                engineConfiguration = commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
+
+            return engineConfiguration;
+        }
+    }
+
     protected AbstractEngineConfiguration getEngineConfigurationForAllType(CommandContext commandContext) {
         AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.BPMN);
         if (engineConfiguration == null) {
