@@ -287,7 +287,8 @@ public class DefaultJobManager implements JobManager {
 
         // Need to copy the bytes, because the delete of the deadLetterJobEntity will delete the byte array too
         // (which is needed when the deadLetterJob gets removed through the API service, so the byte array deletion can't be removed from there)
-        ByteArrayEntity byteArrayEntity = CommandContextUtil.getJobByteArrayEntityManager().findById(deadLetterJobEntity.getJobHandlerConfiguration());
+        ByteArrayEntity byteArrayEntity = getCommandContext().getEngineConfigurations().get(jobServiceConfiguration.getEngineName())
+            .getByteArrayEntityManager().findById(deadLetterJobEntity.getJobHandlerConfiguration());
         historyJobEntity.setAdvancedJobHandlerConfigurationBytes(byteArrayEntity.getBytes());
 
         historyJobEntityManager.insert(historyJobEntity);
@@ -402,7 +403,7 @@ public class DefaultJobManager implements JobManager {
 
                     // Is copied from original HistoryJobEntity before and needs to be reset (as a new byteRef needs to be created)
                     if (deadLetterJob.getExceptionByteArrayRef() != null) {
-                        deadLetterJob.getExceptionByteArrayRef().delete();
+                        deadLetterJob.getExceptionByteArrayRef().delete(jobServiceConfiguration.getEngineName());
                         deadLetterJob.setExceptionByteArrayRef(null);
                     }
                     deadLetterJob.setExceptionStacktrace(getExceptionStacktrace(exception));
@@ -803,6 +804,7 @@ public class DefaultJobManager implements JobManager {
 
     protected AbstractJobEntity copyHistoryJobProperties(AbstractJobEntity copyToJob, AbstractJobEntity copyFromJob) {
         copyToJob.setId(copyFromJob.getId());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setCreateTime(copyFromJob.getCreateTime());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getExceptionByteArrayRef() != null) {

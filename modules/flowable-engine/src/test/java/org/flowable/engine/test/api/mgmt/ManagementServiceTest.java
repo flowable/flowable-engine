@@ -476,9 +476,10 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     void testMoveDeadLetterJobToInvalidHistoryJob() {
         for (String jobType : Arrays.asList(JobEntity.JOB_TYPE_MESSAGE, JobEntity.JOB_TYPE_TIMER, JobEntity.JOB_TYPE_EXTERNAL_WORKER)) {
             Job deadLetterJob = managementService.executeCommand(context -> {
-                DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+                DeadLetterJobEntity job = jobService.createDeadLetterJob();
                 job.setJobType(jobType);
-                CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+                jobService.insertDeadLetterJob(job);
                 return job;
             });
 

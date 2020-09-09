@@ -19,8 +19,10 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
@@ -73,7 +75,11 @@ public class ExecuteAsyncRunnableJobCmd implements Command<Object>, Serializable
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Executing async job {}", job.getId());
+            if (job instanceof JobEntity) {
+                LOGGER.debug("Executing async job {}", job.getId());
+            } else if (job instanceof HistoryJob) {
+                LOGGER.debug("Executing history job {}", job.getId());
+            }
         }
         
         jobServiceConfiguration.getJobManager().execute(job);
