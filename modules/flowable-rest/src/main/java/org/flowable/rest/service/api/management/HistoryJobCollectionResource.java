@@ -66,11 +66,11 @@ public class HistoryJobCollectionResource {
             @ApiImplicitParam(name = "lockOwner", dataType = "string", value = "If true, only return jobs which are owned by the given lockOwner.", paramType = "query"),
             @ApiImplicitParam(name = "locked", dataType = "boolean", value = "If true, only return jobs which are locked.  If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "unlocked", dataType = "boolean", value = "If true, only return jobs which are unlocked. If false, this parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,dueDate,executionId,processInstanceId,retries,tenantId", paramType = "query")
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,retries,tenantId", paramType = "query")
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
-            @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
+            @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/management/history-jobs", produces = "application/json")
     public DataResponse<HistoryJobResponse> getHistoryJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
