@@ -828,7 +828,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
             @Override
             public String execute(CommandContext commandContext) {
-                JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+                JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
                 HistoryJobEntity job = jobServiceConfiguration.getHistoryJobEntityManager().findById(historyJobId);
                 return job.getAdvancedJobHandlerConfiguration();
             }

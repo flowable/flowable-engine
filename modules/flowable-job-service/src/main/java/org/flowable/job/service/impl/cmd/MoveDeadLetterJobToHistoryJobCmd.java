@@ -19,8 +19,8 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +35,12 @@ public class MoveDeadLetterJobToHistoryJobCmd implements Command<HistoryJob>, Se
 
     protected String deadletterJobId;
     protected int retries;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public MoveDeadLetterJobToHistoryJobCmd(String deadletterJobId, int retries) {
+    public MoveDeadLetterJobToHistoryJobCmd(String deadletterJobId, int retries, JobServiceConfiguration jobServiceConfiguration) {
         this.deadletterJobId = deadletterJobId;
         this.retries = retries;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class MoveDeadLetterJobToHistoryJobCmd implements Command<HistoryJob>, Se
             throw new FlowableIllegalArgumentException("deadletterJobId is null");
         }
 
-        DeadLetterJobEntity deadLetterJobEntity = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(deadletterJobId);
+        DeadLetterJobEntity deadLetterJobEntity = jobServiceConfiguration.getDeadLetterJobEntityManager().findById(deadletterJobId);
         if (deadLetterJobEntity == null) {
             throw new JobNotFoundException(deadletterJobId);
         }
@@ -57,7 +59,7 @@ public class MoveDeadLetterJobToHistoryJobCmd implements Command<HistoryJob>, Se
             LOGGER.debug("Moving deadletter job to history job table {}", deadLetterJobEntity.getId());
         }
 
-        return CommandContextUtil.getJobManager(commandContext).moveDeadLetterJobToHistoryJob(deadLetterJobEntity, retries);
+        return jobServiceConfiguration.getJobManager().moveDeadLetterJobToHistoryJob(deadLetterJobEntity, retries);
     }
 
     public String getDeadletterJobId() {
