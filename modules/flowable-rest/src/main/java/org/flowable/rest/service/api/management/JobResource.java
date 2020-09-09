@@ -297,7 +297,7 @@ public class JobResource extends JobBaseResource {
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
-    @ApiOperation(value = "Move a single deadletter job", tags = { "Jobs" })
+    @ApiOperation(value = "Move a single deadletter job. Accepts 'move' and 'moveToHistoryJob' as action.", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the dead letter job was moved. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested job was not found."),
