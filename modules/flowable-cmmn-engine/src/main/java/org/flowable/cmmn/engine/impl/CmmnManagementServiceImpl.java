@@ -107,12 +107,12 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public String getHistoryJobHistoryJson(String historyJobId) {
-        return commandExecutor.execute(new GetHistoryJobAdvancedConfigurationCmd(historyJobId));
+        return commandExecutor.execute(new GetHistoryJobAdvancedConfigurationCmd(historyJobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteHistoryJob(String jobId) {
-        commandExecutor.execute(new DeleteHistoryJobCmd(jobId));
+        commandExecutor.execute(new DeleteHistoryJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
@@ -132,7 +132,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries) {
-        return commandExecutor.execute(new MoveDeadLetterJobToHistoryJobCmd(jobId, retries));
+        return commandExecutor.execute(new MoveDeadLetterJobToHistoryJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override

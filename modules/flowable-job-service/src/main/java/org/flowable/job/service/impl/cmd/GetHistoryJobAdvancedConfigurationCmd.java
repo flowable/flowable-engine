@@ -17,8 +17,8 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +31,12 @@ public class GetHistoryJobAdvancedConfigurationCmd implements Command<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetHistoryJobAdvancedConfigurationCmd.class);
 
+    protected JobServiceConfiguration jobServiceConfiguration;
     protected String historyJobId;
 
-    public GetHistoryJobAdvancedConfigurationCmd(String historyJobId) {
+    public GetHistoryJobAdvancedConfigurationCmd(String historyJobId, JobServiceConfiguration jobServiceConfiguration) {
         this.historyJobId = historyJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class GetHistoryJobAdvancedConfigurationCmd implements Command<String> {
             throw new FlowableIllegalArgumentException("historyJobId is null");
         }
 
-        HistoryJobEntity historyJobEntity = CommandContextUtil.getHistoryJobEntityManager(commandContext).findById(historyJobId);
+        HistoryJobEntity historyJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().findById(historyJobId);
         if (historyJobEntity == null) {
             throw new JobNotFoundException(historyJobId);
         }
