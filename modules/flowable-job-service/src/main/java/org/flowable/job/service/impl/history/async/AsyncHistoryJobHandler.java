@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -30,8 +29,8 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<>();
     protected HistoryJsonTransformer defaultHistoryJsonTransformer;
     
-    public AsyncHistoryJobHandler(String jobType, JobServiceConfiguration jobServiceConfiguration) {
-        super(jobType, jobServiceConfiguration);
+    public AsyncHistoryJobHandler(String jobType) {
+        super(jobType);
     }
 
     public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {

@@ -600,7 +600,7 @@ public abstract class AbstractEngineConfiguration {
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
-                        classLoader, useClassForNameClassLoading, clock);
+                        classLoader, useClassForNameClassLoading, clock, objectMapper);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
                 interceptors.add(commandContextInterceptor);

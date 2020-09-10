@@ -26,6 +26,8 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Tom Baeyens
  * @author Agim Emruli
@@ -48,6 +50,7 @@ public class CommandContext {
     protected ClassLoader classLoader;
     protected boolean useClassForNameClassLoading;
     protected Clock clock;
+    protected ObjectMapper objectMapper;
     
     public CommandContext(Command<?> command) {
         this.command = command;
@@ -320,6 +323,14 @@ public class CommandContext {
 
     public void setClock(Clock clock) {
         this.clock = clock;
+    }
+    
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
     
     // getters and setters
