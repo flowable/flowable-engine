@@ -23,6 +23,8 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -35,18 +37,20 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     protected ClassLoader classLoader;
     protected boolean useClassForNameClassLoading;
     protected Clock clock;
+    protected ObjectMapper objectMapper;
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
 
     public CommandContextInterceptor() {
     }
 
     public CommandContextInterceptor(CommandContextFactory commandContextFactory, ClassLoader classLoader, 
-            boolean useClassForNameClassLoading, Clock clock) {
+            boolean useClassForNameClassLoading, Clock clock, ObjectMapper objectMapper) {
         
         this.commandContextFactory = commandContextFactory;
         this.classLoader = classLoader;
         this.useClassForNameClassLoading = useClassForNameClassLoading;
         this.clock = clock;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -64,6 +68,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
             commandContext.setClassLoader(classLoader);
             commandContext.setUseClassForNameClassLoading(useClassForNameClassLoading);
             commandContext.setClock(clock);
+            commandContext.setObjectMapper(objectMapper);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());

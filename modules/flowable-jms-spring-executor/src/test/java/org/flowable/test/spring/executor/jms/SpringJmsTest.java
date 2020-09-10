@@ -12,6 +12,8 @@
  */
 package org.flowable.test.spring.executor.jms;
 
+import static org.junit.Assert.assertEquals;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,19 +74,19 @@ public class SpringJmsTest {
         vars.put("input2", 456);
         processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);
 
-        assertThat(processEngine.getManagementService().createDeadLetterJobQuery().count()).isEqualTo(0);
+        assertEquals(0, processEngine.getManagementService().createDeadLetterJobQuery().count());
 
         for (int i = 0; i < 2; i++) {
             // Wait until the job has used up all retries
             Awaitility.await().atMost(Duration.ofMinutes(1)).pollInterval(Duration.ofMillis(500)).untilAsserted(
-                () -> assertThat(processEngine.getManagementService().createTimerJobQuery().count()).isEqualTo(1));
+                () -> assertEquals(1, processEngine.getManagementService().createTimerJobQuery().count()));
 
             // Async service task expression fails -> is moved to timer
-            assertThat(processEngine.getManagementService().createTimerJobQuery().singleResult().getRetries()).isEqualTo(3 - (i+1));
+            assertEquals(3, - (i+1), processEngine.getManagementService().createTimerJobQuery().singleResult().getRetries());
             processEngine.getManagementService().moveTimerToExecutableJob(processEngine.getManagementService().createTimerJobQuery().singleResult().getId());
         }
 
-        assertThat(processEngine.getManagementService().createDeadLetterJobQuery().count()).isEqualTo(0);
+        assertEquals(0, processEngine.getManagementService().createDeadLetterJobQuery().count());
 
     }
 
