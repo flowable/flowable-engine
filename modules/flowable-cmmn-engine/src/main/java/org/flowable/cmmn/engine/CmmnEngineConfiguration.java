@@ -2071,7 +2071,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     	IdmIdentityService idmIdentityService = null;
     	IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     	if (idmEngineConfiguration != null) {
-    		idmEngineConfiguration.getIdmIdentityService();
+    		idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
     	}
     	
     	return idmIdentityService;
