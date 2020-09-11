@@ -545,7 +545,13 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+    	IdmIdentityService idmIdentityService = null;
+    	IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    	if (idmEngineConfiguration != null) {
+    		idmEngineConfiguration.getIdmIdentityService();
+    	}
+    	
+    	return idmIdentityService;
     }
 
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
