@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.After;
@@ -55,7 +56,7 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
             assertThat(historicCaseInstance.getBusinessKey()).isEqualTo("bzKey");
         }
@@ -69,7 +70,7 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
         assertThat(caseInstance.getBusinessKey()).isEqualTo("bzKey");
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
             assertThat(historicCaseInstance.getBusinessKey()).isEqualTo("bzKey");
         }
@@ -81,7 +82,7 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance2 = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
             assertThat(historicCaseInstance2.getBusinessKey()).isEqualTo("newKey");
         }

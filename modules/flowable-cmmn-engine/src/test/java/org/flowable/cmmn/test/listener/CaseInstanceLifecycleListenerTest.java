@@ -22,7 +22,9 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -86,8 +88,10 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
     }
 
     private void assertHistoricVariable(String caseInstanceId, String varName, String value) {
-        String variable = (String) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(varName).singleResult().getValue();
-        assertThat(variable).isEqualTo(value);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            String variable = (String) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(varName).singleResult().getValue();
+            assertThat(variable).isEqualTo(value);
+        }
     }
 
     static class TestDelegateTaskListener implements CaseInstanceLifecycleListener {

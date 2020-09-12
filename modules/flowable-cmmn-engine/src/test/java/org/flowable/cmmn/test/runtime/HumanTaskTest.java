@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -104,7 +105,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .variableName("var1")
@@ -234,13 +235,15 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertCaseInstanceEnded(caseInstance);
 
-        List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().list();
-        assertThat(historicTaskInstances).hasSize(3);
-        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-            assertThat(historicTaskInstance.getStartTime()).isNotNull();
-            assertThat(historicTaskInstance.getEndTime()).isNotNull();
-            if (!historicTaskInstance.getName().equals("A")) {
-                assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-terminate-case");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().list();
+            assertThat(historicTaskInstances).hasSize(3);
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertThat(historicTaskInstance.getStartTime()).isNotNull();
+                assertThat(historicTaskInstance.getEndTime()).isNotNull();
+                if (!historicTaskInstance.getName().equals("A")) {
+                    assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-terminate-case");
+                }
             }
         }
 
@@ -257,13 +260,15 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(taskA.getId());
         assertCaseInstanceEnded(caseInstance2);
 
-        historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).list();
-        assertThat(historicTaskInstances).hasSize(3);
-        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-            assertThat(historicTaskInstance.getStartTime()).isNotNull();
-            assertThat(historicTaskInstance.getEndTime()).isNotNull();
-            if (historicTaskInstance.getName().equals("B")) {
-                assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-exit");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).list();
+            assertThat(historicTaskInstances).hasSize(3);
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                assertThat(historicTaskInstance.getStartTime()).isNotNull();
+                assertThat(historicTaskInstance.getEndTime()).isNotNull();
+                if (historicTaskInstance.getName().equals("B")) {
+                    assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-exit");
+                }
             }
         }
     }

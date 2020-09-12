@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
@@ -39,13 +40,15 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
 
-        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+        }
 
-            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-            cmmnTaskService.complete(task.getId());
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
+        cmmnTaskService.complete(task.getId());
 
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
             HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
@@ -74,16 +77,19 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
         }
 
-        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
 
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(20);
 
-            for (int i = 0; i < 10; i++) {
-                Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
-                cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                cmmnTaskService.complete(task.getId());
-            }
+        }
 
+        for (int i = 0; i < 10; i++) {
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
+            cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+            cmmnTaskService.complete(task.getId());
+        }
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
             HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);

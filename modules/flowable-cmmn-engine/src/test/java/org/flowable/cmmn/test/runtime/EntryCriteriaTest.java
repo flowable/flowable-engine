@@ -27,6 +27,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -41,21 +43,28 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
 
-        List<HistoricMilestoneInstance> mileStones = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricMilestoneInstance> mileStones = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
                 .orderByMilestoneName().asc()
                 .list();
-        assertThat(mileStones)
+            assertThat(mileStones)
                 .extracting(HistoricMilestoneInstance::getName)
                 .containsExactly("PlanItem Milestone One");
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance).isNotNull();
+        }
+
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
 
     @Test
@@ -64,7 +73,10 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
+        }
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -76,16 +88,21 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         }
 
-        HistoricMilestoneInstance mileStone = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricMilestoneInstance mileStone = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertThat(mileStone.getName()).isEqualTo("PlanItem Milestone One");
+            assertThat(mileStone.getName()).isEqualTo("PlanItem Milestone One");
+        }
+
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isZero();
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance).isNotNull();
+        }
     }
 
     @Test
@@ -102,7 +119,10 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
             assertThat(planItemInstances).hasSize(3);
 
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(i).getId());
-            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            }
 
             // Triggering the other two should not have additional effects
             for (PlanItemInstance planItemInstance : cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -110,7 +130,10 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
                 cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
             }
 
-            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            }
+
             assertCaseInstanceEnded(caseInstance);
         }
     }
@@ -133,8 +156,11 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
 
     @Test
