@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
@@ -35,6 +36,7 @@ import org.flowable.cmmn.test.delegate.TestJavaDelegateThrowsException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.junit.Test;
 
@@ -66,10 +68,12 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("javaDelegate")
                 .singleResult().getValue()).isEqualTo("executed");
+        }
     }
 
     @Test
@@ -94,14 +98,16 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("testValue")
                 .singleResult().getValue()).isEqualTo("test");
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("testExpression")
                 .singleResult().getValue()).isEqualTo(true);
+        }
     }
 
     @Test
@@ -152,10 +158,12 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("beanResponse")
                 .singleResult().getValue()).isEqualTo("hello test");
+        }
     }
 
     @Test
@@ -180,10 +188,12 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("javaDelegate")
                 .singleResult().getValue()).isEqualTo("executed");
+        }
     }
 
     @Test
@@ -208,14 +218,16 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("testValue")
                 .singleResult().getValue()).isEqualTo("test");
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .variableName("testExpression")
                 .singleResult().getValue()).isEqualTo(true);
+        }
     }
 
     @Test
@@ -399,8 +411,11 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId()).trigger();
 
         assertCaseInstanceEnded(caseInstance);
-        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult().getState())
-            .isEqualTo(PlanItemInstanceState.COMPLETED);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult().getState())
+                .isEqualTo(PlanItemInstanceState.COMPLETED);
+        }
 
     }
 

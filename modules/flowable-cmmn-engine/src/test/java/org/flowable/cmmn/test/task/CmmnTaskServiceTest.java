@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -65,7 +66,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                         Task::getAssignee)
                 .containsExactly("The Task", "This is a test documentation", "johnDoe");
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId())
                     .singleResult();
             assertThat(historicTaskInstance).isNotNull();
@@ -75,7 +76,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId())
                     .singleResult();
             assertThat(historicTaskInstance)
@@ -103,7 +104,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId())
                     .singleResult();
             assertThat(historicTaskInstance)
@@ -154,9 +155,12 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                 "${variableToUpdate}", "updatedVariableValue"
                 )
         );
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).
                 includeCaseVariables().singleResult();
-        assertThat(historicCaseInstance.getCaseVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
+            assertThat(historicCaseInstance.getCaseVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
+        }
     }
 
     @Test
@@ -172,9 +176,12 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                 "${variableToUpdate}", "updatedVariableValue"
                 )
         );
-        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).
                 includeTaskLocalVariables().singleResult();
-        assertThat(historicTaskInstance.getTaskLocalVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
+            assertThat(historicTaskInstance.getTaskLocalVariables()).containsEntry("variableToUpdate", "updatedVariableValue");
+        }
     }
 
     @Test

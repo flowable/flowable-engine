@@ -38,9 +38,12 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.test.delegate.TestJavaDelegate;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
@@ -63,12 +66,14 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
 
         assertCaseInstanceEnded(caseInstance);
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId())
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId())
                 .singleResult();
 
-        // Every service task sleeps for 1s, but when we use futures it should take less then 2s.
-        long durationInMillis = historicCaseInstance.getEndTime().getTime() - historicCaseInstance.getEndTime().getTime();
-        assertThat(durationInMillis).isLessThan(1500);
+            // Every service task sleeps for 1s, but when we use futures it should take less then 2s.
+            long durationInMillis = historicCaseInstance.getEndTime().getTime() - historicCaseInstance.getEndTime().getTime();
+            assertThat(durationInMillis).isLessThan(1500);
+        }
     }
 
     @Test
@@ -245,36 +250,38 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
 
         assertCaseInstanceEnded(caseInstance);
 
-        List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
-        Map<String, Object> historicVariables = historicVariableInstances.stream()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
                 .filter(variable -> !variable.getVariableName().equals("initiator"))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
-        assertThat(historicVariables)
+            assertThat(historicVariables)
                 .containsOnlyKeys(
-                        "counter1", "beforeExecutionThreadName1", "executionThreadName1", "afterExecutionThreadName1",
-                        "counter2", "beforeExecutionThreadName2", "executionThreadName2", "afterExecutionThreadName2"
+                    "counter1", "beforeExecutionThreadName1", "executionThreadName1", "afterExecutionThreadName1",
+                    "counter2", "beforeExecutionThreadName2", "executionThreadName2", "afterExecutionThreadName2"
                 )
                 .contains(
-                        entry("counter1", 1),
-                        entry("beforeExecutionThreadName1", currentThreadName),
-                        entry("afterExecutionThreadName1", currentThreadName),
-                        entry("counter2", 2),
-                        entry("beforeExecutionThreadName2", currentThreadName),
-                        entry("afterExecutionThreadName2", currentThreadName)
+                    entry("counter1", 1),
+                    entry("beforeExecutionThreadName1", currentThreadName),
+                    entry("afterExecutionThreadName1", currentThreadName),
+                    entry("counter2", 2),
+                    entry("beforeExecutionThreadName2", currentThreadName),
+                    entry("afterExecutionThreadName2", currentThreadName)
                 );
 
-        assertThat(historicVariables.get("executionThreadName1"))
+            assertThat(historicVariables.get("executionThreadName1"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 .startsWith("flowable-async-job-executor-thread-");
 
-        assertThat(historicVariables.get("executionThreadName2"))
+            assertThat(historicVariables.get("executionThreadName2"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 // The executions should be done on different threads
                 .isNotEqualTo(historicVariables.get("executionThreadName1"))
                 .startsWith("flowable-async-job-executor-thread-");
+        }
     }
 
     @Test
@@ -461,17 +468,19 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
 
         assertCaseInstanceEnded(caseInstance);
 
-        List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
-        Map<String, Object> historicVariables = historicVariableInstances.stream()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
                 .filter(variable -> !variable.getVariableName().equals("initiator"))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
-        assertThat(historicVariables)
+            assertThat(historicVariables)
                 .containsOnly(
-                        entry("counterDelegate1_1", 1),
-                        entry("counterDelegate1_2", 2),
-                        entry("counterDelegate2_1", 3)
+                    entry("counterDelegate1_1", 1),
+                    entry("counterDelegate1_2", 2),
+                    entry("counterDelegate2_1", 3)
                 );
+        }
     }
 
     @Test
@@ -491,36 +500,38 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
 
         assertCaseInstanceEnded(caseInstance);
 
-        List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
-        Map<String, Object> historicVariables = historicVariableInstances.stream()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
                 .filter(variable -> !variable.getVariableName().equals("initiator"))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
-        assertThat(historicVariables)
+            assertThat(historicVariables)
                 .containsOnlyKeys(
-                        "counter1", "beforeExecutionThreadName1", "executionThreadName1", "afterExecutionThreadName1",
-                        "counter2", "beforeExecutionThreadName2", "executionThreadName2", "afterExecutionThreadName2"
+                    "counter1", "beforeExecutionThreadName1", "executionThreadName1", "afterExecutionThreadName1",
+                    "counter2", "beforeExecutionThreadName2", "executionThreadName2", "afterExecutionThreadName2"
                 )
                 .contains(
-                        entry("counter1", 1),
-                        entry("beforeExecutionThreadName1", currentThreadName),
-                        entry("afterExecutionThreadName1", currentThreadName),
-                        entry("counter2", 2),
-                        entry("beforeExecutionThreadName2", currentThreadName),
-                        entry("afterExecutionThreadName2", currentThreadName)
+                    entry("counter1", 1),
+                    entry("beforeExecutionThreadName1", currentThreadName),
+                    entry("afterExecutionThreadName1", currentThreadName),
+                    entry("counter2", 2),
+                    entry("beforeExecutionThreadName2", currentThreadName),
+                    entry("afterExecutionThreadName2", currentThreadName)
                 );
 
-        assertThat(historicVariables.get("executionThreadName1"))
+            assertThat(historicVariables.get("executionThreadName1"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 .startsWith("flowable-async-job-executor-thread-");
 
-        assertThat(historicVariables.get("executionThreadName2"))
+            assertThat(historicVariables.get("executionThreadName2"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 // The executions should be done on different threads
                 .isNotEqualTo(historicVariables.get("executionThreadName1"))
                 .startsWith("flowable-async-job-executor-thread-");
+        }
     }
 
     @Test

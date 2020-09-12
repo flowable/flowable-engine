@@ -22,7 +22,9 @@ import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.junit.After;
 import org.junit.Before;
@@ -56,9 +58,11 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
+        }
     }
 
     @Test
@@ -69,9 +73,11 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
+        }
     }
 
     @Test
@@ -82,9 +88,11 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").list()).isEmpty();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").singleResult()).isNull();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").list()).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("").singleResult()).isNull();
+        }
     }
 
     @Test
@@ -94,7 +102,9 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("gonzo").count()).isZero();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("gonzo").count()).isZero();
+        }
     }
 
     @Test
@@ -137,11 +147,13 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
                 .isEqualTo(caseInstance.getId());
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId())
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId())
                 .isEqualTo(caseInstance.getId());
+        }
     }
 
     @Test
@@ -151,9 +163,11 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).list()).isEmpty();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).singleResult()).isNull();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).list()).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("")).singleResult()).isNull();
+        }
     }
 
     @Test
@@ -163,9 +177,11 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 .start();
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).list()).isEmpty();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).singleResult()).isNull();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).list()).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.singleton("NonExisting")).singleResult()).isNull();
+        }
     }
 
     @Test
@@ -176,13 +192,15 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", IdentityLinkType.PARTICIPANT);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).count())
                 .isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).list().get(0).getId()).isEqualTo(caseInstance.getId());
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).singleResult().getId()).isEqualTo(caseInstance.getId());
+        }
     }
 
 }

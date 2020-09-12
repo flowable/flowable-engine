@@ -30,11 +30,13 @@ import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.FlowablePlanItemFutureJavaDelegate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.After;
 import org.junit.Before;
@@ -95,24 +97,26 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
                 .transientVariable("bean", testBean)
                 .start();
 
-        List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
-        Map<String, Object> historicVariables = historicVariableInstances.stream()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
+            Map<String, Object> historicVariables = historicVariableInstances.stream()
                 .filter(variable -> !variable.getVariableName().equals("initiator"))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
-        assertThat(historicVariables)
+            assertThat(historicVariables)
                 .containsOnlyKeys(
-                        "executionThread1", "executionThread2", "executionThread3",
-                        "executionThread4", "executionThread5", "executionThread6",
-                        "executionThread7", "executionThread8", "executionThread9"
+                    "executionThread1", "executionThread2", "executionThread3",
+                    "executionThread4", "executionThread5", "executionThread6",
+                    "executionThread7", "executionThread8", "executionThread9"
                 )
                 .containsValues(
-                        "flowable-async-job-executor-thread-1",
-                        "flowable-async-job-executor-thread-2",
-                        "flowable-async-job-executor-thread-3",
-                        "flowable-async-job-executor-thread-4",
-                        currentThreadName
+                    "flowable-async-job-executor-thread-1",
+                    "flowable-async-job-executor-thread-2",
+                    "flowable-async-job-executor-thread-3",
+                    "flowable-async-job-executor-thread-4",
+                    currentThreadName
                 );
+        }
     }
 
     @Test
