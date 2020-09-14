@@ -42,7 +42,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
         List<String> enabledCategories = jobServiceConfiguration.getEnabledJobCategories();
         List<TimerJobEntity> timerJobs = jobServiceConfiguration.getTimerJobEntityManager()
-                .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+                .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxTimerJobsPerAcquisition()));
         
         for (TimerJobEntity job : timerJobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
