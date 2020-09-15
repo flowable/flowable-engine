@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -175,7 +176,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         } finally {
-            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deployment.getId());
             Authentication.setAuthenticatedUserId(null);
         }
 
@@ -211,7 +212,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
         } finally {
-            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deployment.getId());
             Authentication.setAuthenticatedUserId(null);
         }
 

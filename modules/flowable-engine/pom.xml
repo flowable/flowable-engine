@@ -1283,6 +1283,7 @@
                                 <exclude>**/ProcessInstanceMigration*Test.java</exclude>
                                 <exclude>**/CacheTaskTest.java</exclude>
                                 <exclude>**/CompensateEventTest</exclude> <!-- Needs investigation -->
+                                <exclude>**/MultipleExternalWorkerAcquireServiceTaskTest</exclude> <!-- Fails occasionally when system has lots of concurrency. Excluded, as the external workers don't use async history -->
                             </excludes>
                             <argLine>${argLine} -Xmx4g</argLine>
                         </configuration>

@@ -295,15 +295,17 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     private void checkHistoricEntityLink(HistoricEntityLink historicEntityLink, CaseInstance caseInstance, String referenceScopeId) {
-        assertThat(historicEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
-        assertThat(historicEntityLink.getCreateTime()).isNotNull();
-        assertThat(historicEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
-        assertThat(historicEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
-        assertThat(historicEntityLink.getScopeDefinitionId()).isNull();
-        assertThat(historicEntityLink.getReferenceScopeId()).isEqualTo(referenceScopeId);
-        assertThat(historicEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.CMMN);
-        assertThat(historicEntityLink.getReferenceScopeDefinitionId()).isNull();
-        assertThat(historicEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(historicEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(historicEntityLink.getCreateTime()).isNotNull();
+            assertThat(historicEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(historicEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(historicEntityLink.getScopeDefinitionId()).isNull();
+            assertThat(historicEntityLink.getReferenceScopeId()).isEqualTo(referenceScopeId);
+            assertThat(historicEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(historicEntityLink.getReferenceScopeDefinitionId()).isNull();
+            assertThat(historicEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+        }
     }
 
     // Same as testBasicBlocking(), but now with a non-blocking case task

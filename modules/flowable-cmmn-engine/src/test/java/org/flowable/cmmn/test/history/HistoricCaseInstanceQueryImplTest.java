@@ -30,7 +30,6 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,11 +38,9 @@ import org.junit.Test;
  */
 public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
-    private String deplId;
-
     @Before
     public void createCase() {
-        deplId = cmmnRepositoryService.createDeployment()
+        deploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
                 .deploy()
@@ -52,11 +49,6 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .start();
-    }
-
-    @After
-    public void deleteCase() {
-        cmmnRepositoryService.deleteDeployment(deplId, true);
     }
 
     @Test
@@ -1080,7 +1072,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
             assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
             assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
-            assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+            assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deploymentId);
             assertThat(historicCaseInstance.getCaseVariables()).isEmpty();
         }
     }
@@ -1102,7 +1094,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
             assertThat(historicCaseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
             assertThat(historicCaseInstance.getCaseDefinitionVersion()).isEqualTo(1);
-            assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+            assertThat(historicCaseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deploymentId);
             assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar", "test")
             );

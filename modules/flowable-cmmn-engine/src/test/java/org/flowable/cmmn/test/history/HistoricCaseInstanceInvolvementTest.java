@@ -35,8 +35,6 @@ import org.junit.Test;
  */
 public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
-
     @Before
     public void createCaseInstance() {
         deploymentId = cmmnEngine.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
@@ -44,11 +42,6 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .start();
-    }
-
-    @After
-    public void deleteCaseInstance() {
-        cmmnEngine.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
 
     @Test

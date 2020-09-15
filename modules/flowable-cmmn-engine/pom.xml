@@ -623,6 +623,54 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>cfghistoryasync</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                                message="updating flowable configuration flowable.cmmn.cfg.xml to qa/cfg/historyasync.flowable.cmmn.cfg.xml" />
+                                        <copy
+                                                file="${basedir}/../../qa/cfg/historyasync.flowable.cmmn.cfg.xml"
+                                                tofile="target/test-classes/flowable.cmmn.cfg.xml"
+                                                overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/AsyncCmmnHistoryTest.java</exclude>
+                                <exclude>**/CacheTaskTest.java</exclude>
+                                <exclude>**/PlanItemInjectionTest.java</exclude>
+
+                                <!-- Needs investigation -->
+                                <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>
+                                <exclude>**/CmmnHistoryServiceTaskLogTest.java</exclude>
+
+                            </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 
 </project>

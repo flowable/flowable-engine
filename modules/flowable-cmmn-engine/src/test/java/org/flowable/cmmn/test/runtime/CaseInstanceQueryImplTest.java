@@ -36,7 +36,6 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,11 +44,9 @@ import org.junit.Test;
  */
 public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
-    private String deplId;
-
     @Before
     public void createCase() {
-        deplId = cmmnRepositoryService.createDeployment()
+        deploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
                 .deploy()
@@ -58,11 +55,6 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .start();
-    }
-
-    @After
-    public void deleteCase() {
-        cmmnRepositoryService.deleteDeployment(deplId, true);
     }
 
     @Test
@@ -1232,7 +1224,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
         assertThat(caseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
         assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
-        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deploymentId);
         assertThat(caseInstance.getCaseVariables()).isEmpty();
     }
 
@@ -1252,7 +1244,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneTaskCase");
         assertThat(caseInstance.getCaseDefinitionName()).isEqualTo("oneTaskCaseName");
         assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
-        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deplId);
+        assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(deploymentId);
         assertThat(caseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar","test")
         );

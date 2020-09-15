@@ -28,7 +28,6 @@ import org.junit.Test;
  */
 public class PlanItemInstanceCriterionTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
     protected CaseInstance caseInstance;
 
     @Before
@@ -38,11 +37,6 @@ public class PlanItemInstanceCriterionTest extends FlowableCmmnTestCase {
             .deploy()
             .getId();
         this.caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("criterions").start();
-    }
-
-    @After
-    public void removeDeployment() {
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

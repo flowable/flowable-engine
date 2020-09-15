@@ -24,7 +24,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,12 +32,11 @@ import org.junit.Test;
  */
 public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
     protected String caseDefinitionId;
 
     @Before
     public void deployCaseDefinition() {
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        deploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
                 .deploy()
                 .getId();
@@ -46,11 +44,6 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .deploymentId(deploymentId)
                 .singleResult()
                 .getId();
-    }
-
-    @After
-    public void deleteDeployment() {
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

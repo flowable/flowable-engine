@@ -60,8 +60,9 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
         } else {
             // If there is already a historic plan item instance it means that the last update time must not be null
             Date lastUpdateTime = getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME);
-            if (lastUpdateTime != null && (historicPlanItemInstanceEntity.getLastUpdatedTime() == null || 
-                            lastUpdateTime.after(historicPlanItemInstanceEntity.getLastUpdatedTime()))) {
+            if (lastUpdateTime != null && (historicPlanItemInstanceEntity.getLastUpdatedTime() == null
+                            || lastUpdateTime.after(historicPlanItemInstanceEntity.getLastUpdatedTime())
+                            || lastUpdateTime.equals(historicPlanItemInstanceEntity.getLastUpdatedTime()))) { // last in wins in case of ties
                 
                 copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
                 cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager().update(historicPlanItemInstanceEntity);

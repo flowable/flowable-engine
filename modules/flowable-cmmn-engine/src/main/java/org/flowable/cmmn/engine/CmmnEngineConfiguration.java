@@ -1997,6 +1997,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 // In case an async history executor was injected, only the job handlers are set. 
                 // In the normal case, these are set on the jobServiceConfiguration, but these are not shared between instances
                 if (historyJobHandlers != null) {
+                    if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
+                        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+                    }
                     historyJobHandlers.forEach((type, handler) -> { asyncHistoryExecutor.getJobServiceConfiguration().mergeHistoryJobHandler(handler); });
                 }
                 
