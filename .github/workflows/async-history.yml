@@ -3,9 +3,13 @@ name: Flowable Async History Build
 on: [push]
 
 jobs:
-  test_async_bpmn:
-    name: BPMN Async History
+  test_async:
+    name: Async History ${{ matrix.engineModule }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engineModule: ['flowable-engine', 'flowable-cmmn-engine']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
@@ -21,7 +25,7 @@ jobs:
           ./mvnw test
           -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcfghistoryasync
-          -pl org.flowable:flowable-engine
+          -pl org.flowable:${{ matrix.engineModule }}
       - uses: actions/upload-artifact@v2
         if: always()
         with:
