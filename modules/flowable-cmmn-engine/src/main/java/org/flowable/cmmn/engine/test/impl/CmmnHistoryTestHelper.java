@@ -32,7 +32,7 @@ public class CmmnHistoryTestHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnHistoryTestHelper.class);
 
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        return isHistoryLevelAtLeast(historyLevel, cmmnEngineConfiguration, 10000);
+        return isHistoryLevelAtLeast(historyLevel, cmmnEngineConfiguration, 20000);
     }
 
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, CmmnEngineConfiguration cmmnEngineConfiguration, long time) {
