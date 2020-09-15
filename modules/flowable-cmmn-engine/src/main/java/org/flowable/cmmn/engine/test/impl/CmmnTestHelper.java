@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
@@ -132,35 +133,37 @@ public abstract class CmmnTestHelper {
 
     public static void deleteDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, String deploymentId) {
         if (deploymentId != null) {
+            deleteWithoutGeneratingHistoryJobs(cmmnEngineConfiguration,
+                configuration -> configuration.getCmmnRepositoryService().deleteDeployment(deploymentId, true));
+        }
+    }
 
-            boolean isAsyncHistoryEnabled = cmmnEngineConfiguration.isAsyncHistoryEnabled();
+    public static void deleteWithoutGeneratingHistoryJobs(CmmnEngineConfiguration cmmnEngineConfiguration, Consumer<CmmnEngineConfiguration> consumer) {
+        boolean isAsyncHistoryEnabled = cmmnEngineConfiguration.isAsyncHistoryEnabled();
+        if (isAsyncHistoryEnabled) {
+            CmmnManagementService cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
+            List<HistoryJob> historyJobs = cmmnManagementService.createHistoryJobQuery().list();
+            for (HistoryJob historyJob : historyJobs) {
+                cmmnManagementService.deleteHistoryJob(historyJob.getId());
+            }
+        }
+
+        CmmnHistoryManager asyncHistoryManager = null;
+        try {
             if (isAsyncHistoryEnabled) {
-                CmmnManagementService cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
-                List<HistoryJob> historyJobs = cmmnManagementService.createHistoryJobQuery().list();
-                for (HistoryJob historyJob : historyJobs) {
-                    cmmnManagementService.deleteHistoryJob(historyJob.getId());
-                }
+                cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
+                asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+                cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
             }
 
-            CmmnHistoryManager asyncHistoryManager = null;
-            try {
-                if (isAsyncHistoryEnabled) {
-                    cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
-                    asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                    cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
-                }
+            consumer.accept(cmmnEngineConfiguration);
 
-                cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
+        } finally {
 
-            } finally {
-
-                if (isAsyncHistoryEnabled) {
-                    cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
-                    cmmnEngineConfiguration.setCmmnHistoryManager(asyncHistoryManager);
-                }
-
+            if (isAsyncHistoryEnabled) {
+                cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
+                cmmnEngineConfiguration.setCmmnHistoryManager(asyncHistoryManager);
             }
-
 
         }
     }

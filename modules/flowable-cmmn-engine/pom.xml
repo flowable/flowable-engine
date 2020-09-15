@@ -654,6 +654,7 @@
                                 <exclude>**/AsyncCmmnHistoryTest.java</exclude>
                                 <exclude>**/CacheTaskTest.java</exclude>
                                 <exclude>**/PlanItemInjectionTest.java</exclude>
+                                <exclude>**/CmmnStandaloneTaskBuilderTest.java</exclude>
 
                                 <!-- Needs investigation -->
                                 <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>

@@ -949,7 +949,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             }
 
         } finally {
-            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, caseInstance.getCaseDefinitionId());
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration,
+                cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getDeploymentId());
 
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
