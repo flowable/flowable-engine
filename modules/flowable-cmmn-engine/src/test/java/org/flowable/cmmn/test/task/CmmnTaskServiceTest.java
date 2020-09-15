@@ -224,61 +224,6 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCreateTaskWithBuilderAndScopes() {
-        Task task = cmmnTaskService.createTaskBuilder().name("builderTask").
-                scopeId("testScopeId").
-                scopeType("testScopeType").
-                create();
-
-        try {
-            Task taskFromQuery = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
-            assertThat(taskFromQuery.getScopeId()).isEqualTo("testScopeId");
-            assertThat(taskFromQuery.getScopeType()).isEqualTo("testScopeType");
-        } finally {
-            cmmnTaskService.deleteTask(task.getId(), true);
-
-            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-                HistoricTaskInstance taskFromQuery = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-                assertThat(taskFromQuery.getScopeId()).isNull();
-                assertThat(taskFromQuery.getScopeType()).isNull();
-
-                cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
-            }
-
-            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-                cmmnHistoryService.createHistoricTaskLogEntryQuery().list().forEach(historicTaskLogEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber()));
-                cmmnManagementService.createHistoryJobQuery().list().forEach(historyJob -> cmmnManagementService.deleteHistoryJob(historyJob.getId()));
-            }
-        }
-    }
-
-    @Test
-    public void testCreateTaskWithBuilderWithoutScopes() {
-        Task task = cmmnTaskService.createTaskBuilder().name("builderTask").
-                create();
-        try {
-            Task taskFromQuery = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
-            assertThat(taskFromQuery.getScopeId()).isNull();
-            assertThat(taskFromQuery.getScopeType()).isNull();
-        } finally {
-            cmmnTaskService.deleteTask(task.getId(), true);
-
-            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-                HistoricTaskInstance taskFromQuery = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-                assertThat(taskFromQuery.getScopeId()).isNull();
-                assertThat(taskFromQuery.getScopeType()).isNull();
-
-                cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
-            }
-
-            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-                cmmnHistoryService.createHistoricTaskLogEntryQuery().list().forEach(historicTaskLogEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber()));
-                cmmnManagementService.createHistoryJobQuery().list().forEach(historyJob -> cmmnManagementService.deleteHistoryJob(historyJob.getId()));
-            }
-        }
-    }
-
-    @Test
     @CmmnDeployment
     public void testEntityLinkCreation() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("entityLinkCreation").start();
