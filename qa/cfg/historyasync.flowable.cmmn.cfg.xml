@@ -35,6 +35,7 @@
 
     <property name="asyncHistoryEnabled" value="true" />
     <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
+    <property name="asyncHistoryExecutorNumberOfRetries" value="100" />
 
     <property name="asyncFailedJobWaitTime" value="1" />
 
