@@ -237,7 +237,7 @@
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <configuration>
                             <path>/flowable-idm</path>
-                            <port>8080</port>
+                            <port>9090</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
                                 <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
@@ -263,7 +263,7 @@
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <configuration>
                             <path>/flowable-idm</path>
-                            <port>8080</port>
+                            <port>9090</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
                                 <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
@@ -343,7 +343,7 @@
                         <configuration>
                             <imageName>flowable/${project.build.finalName}</imageName>
                             <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
+                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=9090", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
                             <forceTags>true</forceTags>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
