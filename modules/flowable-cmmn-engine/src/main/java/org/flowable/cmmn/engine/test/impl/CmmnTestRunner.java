@@ -119,7 +119,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
                 } finally {
 
                     if (deploymentId != null) {
-                        deleteDeployment(deploymentId);
+                        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
                         deploymentId = null;
                     }
 
@@ -133,6 +133,13 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
 
                     if (errors == null || errors.isEmpty()) {
                         assertDatabaseEmpty(method);
+
+                        // Delete any remaining data
+                        List<org.flowable.cmmn.api.repository.CmmnDeployment> cmmnDeployments = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery().list();
+                        for (org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment : cmmnDeployments) {
+                            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cmmnDeployment.getId());
+                        }
+
                     }
 
                 }
@@ -187,10 +194,6 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             }
         }
         return className + "." + method.getName() + ".cmmn";
-    }
-    
-    protected void deleteDeployment(String deploymentId) {
-        cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {

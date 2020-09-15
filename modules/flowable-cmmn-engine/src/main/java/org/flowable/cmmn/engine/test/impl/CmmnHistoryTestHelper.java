@@ -21,11 +21,15 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class CmmnHistoryTestHelper {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnHistoryTestHelper.class);
 
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, CmmnEngineConfiguration cmmnEngineConfiguration) {
         return isHistoryLevelAtLeast(historyLevel, cmmnEngineConfiguration, 10000);
@@ -36,6 +40,7 @@ public class CmmnHistoryTestHelper {
 
             // When using async history, we need to process all the historic jobs first before the history can be checked
             if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+                LOGGER.debug("CMMN engine is configured to use asynchronous history. Processing async history jobs now, before continuing.");
                 waitForJobExecutorToProcessAllHistoryJobs(cmmnEngineConfiguration, cmmnEngineConfiguration.getCmmnManagementService(), time, 200);
             }
 

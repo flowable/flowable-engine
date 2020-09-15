@@ -40,6 +40,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
@@ -68,7 +69,7 @@ public abstract class AbstractFlowableCmmnTestCase {
     @After
     public void cleanup() {
         if (deploymentId != null) {
-           cmmnRepositoryService.deleteDeployment(deploymentId, true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
         }
     }
 

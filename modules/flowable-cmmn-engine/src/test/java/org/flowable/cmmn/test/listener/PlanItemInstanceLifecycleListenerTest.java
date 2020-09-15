@@ -33,7 +33,6 @@ import org.junit.Test;
 public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase {
 
     private Map<String, List<PlanItemInstanceLifecycleListener>> originalLifeCycleListeners;
-    private String deploymentId;
 
     private AbstractTestLifecycleListener testLifeCycleListener;
 
@@ -50,7 +49,6 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
     @After
     public void removeListeners() {
         cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

@@ -236,6 +236,19 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertThat(taskFromQuery.getScopeType()).isEqualTo("testScopeType");
         } finally {
             cmmnTaskService.deleteTask(task.getId(), true);
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                HistoricTaskInstance taskFromQuery = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+                assertThat(taskFromQuery.getScopeId()).isNull();
+                assertThat(taskFromQuery.getScopeType()).isNull();
+
+                cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+            }
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().list().forEach(historicTaskLogEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber()));
+                cmmnManagementService.createHistoryJobQuery().list().forEach(historyJob -> cmmnManagementService.deleteHistoryJob(historyJob.getId()));
+            }
         }
     }
 
@@ -249,6 +262,19 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertThat(taskFromQuery.getScopeType()).isNull();
         } finally {
             cmmnTaskService.deleteTask(task.getId(), true);
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                HistoricTaskInstance taskFromQuery = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+                assertThat(taskFromQuery.getScopeId()).isNull();
+                assertThat(taskFromQuery.getScopeType()).isNull();
+
+                cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+            }
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().list().forEach(historicTaskLogEntry -> cmmnHistoryService.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber()));
+                cmmnManagementService.createHistoryJobQuery().list().forEach(historyJob -> cmmnManagementService.deleteHistoryJob(historyJob.getId()));
+            }
         }
     }
 

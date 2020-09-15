@@ -28,7 +28,6 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +36,6 @@ import org.junit.Test;
  */
 public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
     protected String caseDefinitionId;
 
     @Before
@@ -50,11 +48,6 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .deploymentId(deploymentId)
                 .singleResult()
                 .getId();
-    }
-
-    @After
-    public void deleteDeployment() {
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

@@ -133,7 +133,10 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
 
         assertThat(caseInstance.getCaseVariables()).containsOnly(entries);
         assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).containsOnly(entries);
-        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
+        }
     }
 
     @Test
@@ -156,7 +159,10 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
         );
 
         assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).isNull();
-        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).isNull();
+        }
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
@@ -207,7 +213,11 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
 
             return null;
         });
+
         assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).containsOnly(entries);
-        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(entries);
+        }
     }
 }

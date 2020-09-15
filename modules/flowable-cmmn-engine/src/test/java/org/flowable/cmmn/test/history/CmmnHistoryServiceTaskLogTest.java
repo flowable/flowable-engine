@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -659,10 +660,12 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
     @Test
     public void queryForTaskLogEntriesByUserId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().userId("testUser"),
-             cmmnHistoryService.createHistoricTaskLogEntryQuery().userId("testUser")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().userId("testUser"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().userId("testUser")
+            );
+        }
     }
 
     protected void assertThatTaskLogIsFetched(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder, HistoricTaskLogEntryQuery historicTaskLogEntryQuery) {
@@ -719,42 +722,52 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
     @Test
     public void queryForTaskLogEntriesByType() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().type("testType"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().type("testType")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().type("testType"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().type("testType")
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByProcessInstanceId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().processInstanceId("testProcess"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().processInstanceId("testProcess")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().processInstanceId("testProcess"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().processInstanceId("testProcess")
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByScopeId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeId("testScopeId"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeId("testScopeId")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeId("testScopeId"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeId("testScopeId")
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesBySubScopeId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().subScopeId("testSubScopeId"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().subScopeId("testSubScopeId")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().subScopeId("testSubScopeId"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().subScopeId("testSubScopeId")
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByScopeType() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeType("testScopeType"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeType("testScopeType")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeType("testScopeType"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeType("testScopeType")
+            );
+        }
     }
 
     @Test
@@ -813,34 +826,42 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
     @Test
     public void queryForTaskLogEntriesByFromToTimeStamp() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate())
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate())
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByTenantId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate())
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate())
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByProcessDefinitionId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().processDefinitionId("testProcessDefinitionId"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().processDefinitionId("testProcessDefinitionId")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().processDefinitionId("testProcessDefinitionId"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().processDefinitionId("testProcessDefinitionId")
+            );
+        }
     }
 
     @Test
     public void queryForTaskLogEntriesByScopeDefinitionId() {
-        assertThatTaskLogIsFetched(
-            cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeDefinitionId("testScopeDefinitionId"),
-            cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeDefinitionId("testScopeDefinitionId")
-        );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThatTaskLogIsFetched(
+                cmmnHistoryService.createHistoricTaskLogEntryBuilder().scopeDefinitionId("testScopeDefinitionId"),
+                cmmnHistoryService.createHistoricTaskLogEntryQuery().scopeDefinitionId("testScopeDefinitionId")
+            );
+        }
     }
 
     @Test
@@ -928,8 +949,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             }
 
         } finally {
-            cmmnRepositoryService.deleteDeployment(cmmnRepositoryService.createCaseDefinitionQuery()
-                    .caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getDeploymentId(), true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, caseInstance.getCaseDefinitionId());
 
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
